@@ -113,8 +113,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         </div>
       </div>
 
-      <div className="relative sticky top-0 bg-[var(--color-brand-dark)] z-10 border-b border-[#D4AF37]/15 w-full overflow-hidden">
-        <div className="px-4 overflow-x-auto no-scrollbar flex gap-0 min-w-max relative max-w-full touch-pan-x">
+      <div className="relative sticky top-0 bg-[var(--color-brand-dark)] z-10 border-b border-[#D4AF37]/15 w-full">
+        <div className="px-4 overflow-x-auto flex flex-nowrap gap-0 relative w-full">
           {tabs.map(tab => (
             <button
               key={tab.id}
