@@ -1,3 +1,4 @@
+// Manual Build Trigger - 2026-03-09
 import { useState, useEffect, useRef } from 'react';
 import { Home as HomeIcon } from 'lucide-react';
 import { Sidebar } from './components/Sidebar';
