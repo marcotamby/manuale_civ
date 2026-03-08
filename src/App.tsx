@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Topbar } from './components/Topbar';
 import { UnitDetailModal } from './components/UnitDetailModal';
@@ -26,8 +26,32 @@ function App() {
 
   useEffect(() => {
     sessionStorage.setItem('aoe4_selectedCiv', selectedCiv);
-  }, [selectedCiv]);
+    // Scroll to top on civ change
+    const mainContent = document.querySelector('main > div:last-child');
+    if (mainContent) mainContent.scrollTop = 0;
+  }, [selectedCiv, currentPage]);
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const touchStartX = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    // Only track if swipe starts near the left edge (e.g., first 40px)
+    if (e.touches[0].clientX < 40) {
+      touchStartX.current = e.touches[0].clientX;
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diffX = touchEndX - touchStartX.current;
+
+    // If swipe right and sidebar is closed, open it
+    if (diffX > 50 && !isSidebarOpen) {
+      setIsSidebarOpen(true);
+    }
+    touchStartX.current = null;
+  };
   const { favorites, isLoginModalOpen, closeLoginModal } = useAuth();
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
@@ -68,7 +92,11 @@ function App() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--color-brand-dark)] text-white font-sans">
+    <div 
+      className="flex h-screen overflow-hidden bg-[var(--color-brand-dark)] text-white font-sans"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       {(currentPage !== 'home' || favorites.length > 0 || isSidebarOpen) && (
         <Sidebar
           selectedCiv={selectedCiv}

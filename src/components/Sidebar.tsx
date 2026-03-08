@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { useCivData } from './CivContext';
 import { useAuth } from './AuthContext';
 import { Home as HomeIcon, Map as MapIcon, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -15,6 +16,23 @@ interface SidebarProps {
 export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClose, onOpen, currentPage }: SidebarProps) {
   const { favorites } = useAuth();
   const { civilizations: civilizationsData } = useCivData();
+  const touchStartX = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diffX = touchEndX - touchStartX.current;
+
+    // If swipe left and sidebar is open, close it
+    if (diffX < -50 && isOpen) {
+      onClose();
+    }
+    touchStartX.current = null;
+  };
   
   const favoriteCivs = civilizationsData.filter(c => favorites.includes(c.id));
 
@@ -39,7 +57,10 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
       )}
 
       {/* Sidebar Content */}
-      <aside className={`w-20 md:w-28 h-full flex flex-col items-center py-6 glass border-r border-[#D4AF37]/20 transition-transform duration-300 overflow-y-auto overflow-x-hidden no-scrollbar fixed md:static z-30
+      <aside 
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        className={`w-20 md:w-28 h-full flex flex-col items-center py-6 glass border-r border-[#D4AF37]/20 transition-transform duration-300 overflow-y-auto overflow-x-hidden no-scrollbar fixed md:static z-30
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
         {/* Mobile Toggle Button (only when open to close it, or we rely on App.tsx topbar to open it) */}
