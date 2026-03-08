@@ -43,10 +43,10 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
     <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full bg-[var(--color-brand-dark)]">
       <header className="mb-6 flex flex-col md:flex-row items-end justify-between gap-4">
         <div className="flex-1 w-full flex flex-wrap items-end justify-end gap-3">
-          <div className="flex items-center gap-2 glass p-1 rounded-xl">
+          <div className="flex items-center glass p-1 rounded-xl h-[42px]">
             <button
               onClick={() => setIsCompareMode(!isCompareMode)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+              className={`flex items-center gap-2 px-4 h-full rounded-lg text-sm font-bold transition-all ${
                 isCompareMode 
                   ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]' 
                   : 'text-gray-400 hover:text-gray-200'
@@ -58,17 +58,17 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
             {isCompareMode && selectedForCompare.length === 2 && (
               <button
                 onClick={handleStartCompare}
-                className="animate-in fade-in zoom-in duration-300 flex items-center gap-2 px-4 py-2 bg-yellow-600/80 text-white font-bold rounded-lg shadow-lg border border-yellow-500/50 hover:bg-yellow-500 transition-all text-sm"
+                className="animate-in fade-in zoom-in duration-300 flex items-center gap-2 px-4 h-full bg-yellow-600/80 text-white font-bold rounded-lg shadow-lg border border-yellow-500/50 hover:bg-yellow-500 transition-all text-sm ml-1"
               >
                 Vai ({selectedForCompare.length})
               </button>
             )}
           </div>
 
-          <div className="flex items-center gap-2 glass p-1 rounded-xl">
+          <div className="flex items-center glass p-1 rounded-xl h-[42px]">
             <button
               onClick={() => setDifficultyFilter(difficultyFilter === 'Preferiti' ? 'Tutte' : 'Preferiti')}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-bold transition-all ${
+              className={`flex items-center gap-2 px-3 h-full rounded-lg text-sm font-bold transition-all ${
                 difficultyFilter === 'Preferiti'
                   ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]' 
                   : 'text-gray-400 hover:text-gray-200'
