@@ -40,6 +40,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
 
+    // Persist login state
+    const storedUser = localStorage.getItem('auth_user');
+    if (storedUser) {
+      try {
+        const parsed = JSON.parse(storedUser);
+        setUser(parsed);
+        setIsAuthenticated(true);
+        const adminEmails = ['marcotamby@gmail.com', 'marco.tamborrino.94@gmail.com'];
+        if (parsed.name?.toLowerCase() === 'admin' || (parsed.email && adminEmails.includes(parsed.email))) {
+          setIsAdmin(true);
+        }
+      } catch (e) {
+        console.error('Failed to parse stored user', e);
+      }
+    }
+
     // Development bypass: if running on localhost, always enable admin features
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     if (isLocalhost) {
@@ -58,6 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = (userData: UserData) => {
     setIsAuthenticated(true);
     setUser(userData);
+    localStorage.setItem('auth_user', JSON.stringify(userData));
     const adminEmails = ['marcotamby@gmail.com', 'marco.tamborrino.94@gmail.com'];
     if (userData.name?.toLowerCase() === 'admin' || (userData.email && adminEmails.includes(userData.email))) {
       setIsAdmin(true);
@@ -68,6 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAuthenticated(false);
     setIsAdmin(false);
     setUser(null);
+    localStorage.removeItem('auth_user');
   };
 
   const toggleFavorite = (civId: string) => {

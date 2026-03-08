@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Download, Save, X, Loader2, Play, Map, Plus, Trash2 } from 'lucide-react';
+import { Save, X, Loader2, Play, Map, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import type { Civilization } from '../data/aoe4Data';
 
@@ -15,16 +15,6 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
   const [isSaving, setIsSaving] = useState(false);
 
   if (!isOpen) return null;
-
-  const handleDownload = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(editedCiv, null, 2));
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", `${civ.id}_updated.json`);
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
-  };
 
   const handleSave = async () => {
     try {
@@ -203,7 +193,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                   </button>
                 </div>
                 <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                  {(editedCiv.uniqueUnits || []).map((u, idx) => (
+                  {(editedCiv.uniqueUnits || []).map((u: any, idx: number) => (
                     <div key={idx} className="bg-black/50 border border-gray-700 rounded-lg p-3 relative group">
                       <button onClick={() => removeFromArray('uniqueUnits', idx)} className="absolute top-2 right-2 text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Trash2 size={16} />
@@ -237,7 +227,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                   </button>
                 </div>
                 <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                  {(editedCiv.technologies || []).map((t, idx) => (
+                  {(editedCiv.technologies || []).map((t: any, idx: number) => (
                     <div key={idx} className="bg-black/50 border border-gray-700 rounded-lg p-3 relative group">
                       <button onClick={() => removeFromArray('technologies', idx)} className="absolute top-2 right-2 text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Trash2 size={16} />
@@ -263,7 +253,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                   </button>
                 </div>
                 <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                  {(editedCiv.landmarks || []).map((l, idx) => (
+                  {(editedCiv.landmarks || []).map((l: any, idx: number) => (
                     <div key={idx} className="bg-black/50 border border-gray-700 rounded-lg p-3 relative group">
                       <button onClick={() => removeFromArray('landmarks', idx)} className="absolute top-2 right-2 text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Trash2 size={16} />
@@ -291,7 +281,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                   </button>
                 </div>
                 <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                  {(editedCiv.buildOrders || []).map((bo, idx) => (
+                  {(editedCiv.buildOrders || []).map((bo: any, idx: number) => (
                     <div key={idx} className="bg-black/50 border border-gray-700 rounded-lg p-3 relative group">
                       <button onClick={() => removeFromArray('buildOrders', idx)} className="absolute top-2 right-2 text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                         <Trash2 size={16} />
@@ -307,7 +297,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                       {/* Steps (Simplified handling via raw text to keep it usable without infinite nesting) */}
                       <label className="text-xs text-gray-400 font-bold block mb-1">Passaggi (Formato Testo: Minuto - Azione, uno per riga)</label>
                       <textarea 
-                        value={bo.steps.map(s => `${s.time || ''} - ${s.action}`).join('\n')}
+                        value={bo.steps.map((s: any) => `${s.time || ''} - ${s.action}`).join('\n')}
                         onChange={e => {
                           const rawLines = e.target.value.split('\n');
                           const mappedSteps = rawLines.map(line => {
@@ -330,14 +320,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
           </div>
         </div>
 
-        <div className="p-6 border-t border-purple-500/20 bg-black/40 flex justify-between items-center gap-4">
-          <button 
-            onClick={handleDownload}
-            className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold flex items-center gap-2 transition-all border border-white/5"
-          >
-            <Download size={18} />
-            Scarica JSON
-          </button>
+        <div className="p-6 border-t border-purple-500/20 bg-black/40 flex justify-end items-center gap-4">
 
           <button 
             onClick={handleSave}
