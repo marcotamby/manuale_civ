@@ -128,7 +128,7 @@ function App() {
             <div className="flex items-center gap-3 px-4 md:px-6 py-2 shrink-0">
               <button
                 onClick={() => setCurrentPage('home')}
-                title="Torna alla Home"
+                title="Dashboard"
                 className="p-2 glass rounded-lg hover:bg-white/10 transition-colors text-yellow-500"
               >
                 <HomeIcon size={20} />
