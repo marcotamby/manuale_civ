@@ -14,7 +14,7 @@ export function Topbar({}: TopbarProps) {
   const { isAuthenticated, isAdmin, user, logout, openLoginModal } = useAuth();
 
   return (
-    <div className="w-full glass border-b border-[#D4AF37]/20 flex flex-col md:flex-row items-start md:items-center justify-between p-4 md:px-10 md:py-4 z-10 shrink-0 gap-4">
+    <div className="w-full glass border-b border-white/5 flex flex-col md:flex-row items-start md:items-center justify-between p-2 md:px-10 md:py-3 z-10 shrink-0 gap-4">
       
       <div className="flex items-center gap-4">
         <div>

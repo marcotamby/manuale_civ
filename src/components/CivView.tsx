@@ -71,7 +71,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   return (
     <div className="flex-1 overflow-y-auto overflow-x-hidden w-full civ-view-container">
       {/* Civ Hero Header */}
-      <div className="relative px-6 pt-8 pb-6 glass border-b border-[#D4AF37]/20 overflow-hidden">
+      <div className="relative px-6 pt-8 pb-6 border-b border-white/5 overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <img src={civ.flag} alt="" className="w-full h-full object-cover blur-2xl scale-150" />
         </div>
@@ -95,15 +95,15 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 {civ.difficulty}
               </span>
               {isAdmin && (
-                <div className="flex gap-2 items-center bg-purple-500/10 px-3 py-1.5 rounded-xl border border-purple-500/30">
-                  <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider">
+                <div className="flex gap-2 items-center bg-white/5 px-2 py-1 rounded-lg border border-white/10">
+                  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">
                     Admin
                   </span>
                   <button 
                     onClick={() => setIsEditorOpen(true)}
-                    className="px-4 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 shadow-lg shadow-purple-600/20 active:scale-95"
+                    className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold rounded flex items-center gap-1 transition-all active:scale-95"
                   >
-                    <Edit size={14} /> Modifica Backend
+                    <Edit size={12} /> Modifica
                   </button>
                 </div>
               )}
