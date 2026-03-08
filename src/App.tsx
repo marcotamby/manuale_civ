@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Topbar } from './components/Topbar';
 import { UnitDetailModal } from './components/UnitDetailModal';
@@ -13,8 +13,20 @@ import { useAuth } from './components/AuthContext';
 import { LoginModal } from './components/LoginModal';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'civ' | 'maps' | 'compare'>('home');
-  const [selectedCiv, setSelectedCiv] = useState<string>('english');
+  const [currentPage, setCurrentPage] = useState<'home' | 'civ' | 'maps' | 'compare'>(() => {
+    return (sessionStorage.getItem('aoe4_currentPage') as any) || 'home';
+  });
+  const [selectedCiv, setSelectedCiv] = useState<string>(() => {
+    return sessionStorage.getItem('aoe4_selectedCiv') || 'english';
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem('aoe4_currentPage', currentPage);
+  }, [currentPage]);
+
+  useEffect(() => {
+    sessionStorage.setItem('aoe4_selectedCiv', selectedCiv);
+  }, [selectedCiv]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { favorites, isLoginModalOpen, closeLoginModal } = useAuth();
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
