@@ -80,7 +80,6 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
           </div>
 
           <CustomSelect
-            label="Filtra"
             options={[
               { value: 'Tutte', label: 'Tutte le civiltà' },
               { value: 'Preferiti', label: 'Civiltà Preferite' },
@@ -94,7 +93,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
         </div>
       </header>
 
-      <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 md:gap-5 pb-20">
+      <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 md:gap-5 pb-20">
         {filteredCivs.map(civ => {
           const isSelected = selectedForCompare.includes(civ.id);
           const isFavorite = favorites.includes(civ.id);

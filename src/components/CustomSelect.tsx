@@ -30,7 +30,7 @@ export function CustomSelect({ options, value, onChange, label }: CustomSelectPr
   }, []);
 
   return (
-    <div className="flex flex-col gap-1 min-w-[140px]" ref={dropdownRef}>
+    <div className="flex flex-col gap-1 min-w-[120px] flex-1 sm:flex-initial" ref={dropdownRef}>
       {label && <label className="text-xs text-gray-500 font-bold uppercase tracking-wider ml-1">{label}</label>}
       <div className="relative">
         <button
