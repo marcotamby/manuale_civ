@@ -13,6 +13,7 @@ interface AdminCivEditorModalProps {
 export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEditorModalProps) {
   const [editedCiv, setEditedCiv] = useState<Civilization>(civ);
   const [isSaving, setIsSaving] = useState(false);
+  const [stepsTexts, setStepsTexts] = useState<Record<number, string>>({});
 
   if (!isOpen) return null;
 
@@ -56,14 +57,16 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
 
   const updateArrayField = <T extends keyof Civilization>(field: T, index: number, key: string, value: any) => {
     const newArr = [...(editedCiv[field] as any[])];
-    newArr[index] = { ...newArr[index], [key]: value };
     
-    // Convert numbers for stats or age
-    if (['attack', 'armor', 'speed', 'health'].includes(key)) {
-        newArr[index].stats = { ...newArr[index].stats, [key]: Number(value) };
-        delete newArr[index][key];
-    } else if (key === 'age') {
-        newArr[index][key] = Number(value);
+    if (key === 'steps' && field === 'buildOrders') {
+      newArr[index] = { ...newArr[index], steps: value };
+    } else if (['attack', 'armor', 'speed', 'health'].includes(key)) {
+      newArr[index] = { 
+        ...newArr[index], 
+        stats: { ...(newArr[index].stats || {}), [key]: Number(value) } 
+      };
+    } else {
+      newArr[index] = { ...newArr[index], [key]: key === 'age' ? Number(value) : value };
     }
     
     setEditedCiv({ ...editedCiv, [field]: newArr });
@@ -308,19 +311,38 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                       <textarea value={bo.description} onChange={e => updateArrayField('buildOrders', idx, 'description', e.target.value)} placeholder="Descrizione Strategia" rows={2} className="bg-gray-800 text-white text-xs rounded px-2 py-1 border border-gray-600 w-full resize-none mb-2" />
                       
                       {/* Steps (Simplified handling via raw text to keep it usable without infinite nesting) */}
-                      <label className="text-xs text-gray-400 font-bold block mb-1">Passaggi (Formato Testo: Minuto - Azione, uno per riga)</label>
+                      <label className="text-xs text-gray-400 font-bold block mb-1">Passaggi (Formato: "Minuto - Azione" oppure solo "Azione")</label>
                       <textarea 
-                        value={bo.steps.map((s: any) => `${s.time || ''} - ${s.action}`).join('\n')}
+                        value={stepsTexts[idx] !== undefined ? stepsTexts[idx] : bo.steps.map((s: any) => s.time ? `${s.time} - ${s.action}` : s.action).join('\n')}
                         onChange={e => {
-                          const rawLines = e.target.value.split('\n');
+                          const val = e.target.value;
+                          setStepsTexts(prev => ({ ...prev, [idx]: val }));
+                          
+                          const rawLines = val.split('\n');
                           const mappedSteps = rawLines.map(line => {
-                            const [timePart, ...actionParts] = line.split('-');
-                            return { time: timePart.trim(), action: actionParts.join('-').trim() || timePart.trim() }; // basic parsing
-                          }).filter(s => s.action);
+                            if (!line.trim()) return null;
+                            const dashIndex = line.indexOf(' - ');
+                            if (dashIndex !== -1) {
+                              return { 
+                                time: line.substring(0, dashIndex).trim(), 
+                                action: line.substring(dashIndex + 3).trim() 
+                              };
+                            }
+                            const parts = line.split('-');
+                            if (parts.length > 1) {
+                              const time = parts[0].trim();
+                              const action = parts.slice(1).join('-').trim();
+                              if (time.length <= 5 && (time.includes(':') || !isNaN(Number(time)))) {
+                                return { time, action };
+                              }
+                            }
+                            return { time: '', action: line.trim() };
+                          }).filter(Boolean);
+                          
                           updateArrayField('buildOrders', idx, 'steps', mappedSteps);
                         }}
-                        placeholder="0:00 - Coda villici&#10;0:30 - Costruisci Casa" 
-                        rows={4} 
+                        placeholder="0:00 - Coda villici&#10;0:30 - Costruisci Casa&#10;Inizia l'attacco" 
+                        rows={6} 
                         className="bg-gray-900 text-yellow-300 font-mono text-xs rounded px-2 py-1 border border-gray-600 w-full resize-y" 
                       />
                     </div>
