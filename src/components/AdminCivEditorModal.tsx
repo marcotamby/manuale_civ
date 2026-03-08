@@ -134,15 +134,28 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
               <div>
                 <label className="block text-sm font-bold text-gray-300 mb-1 flex items-center gap-2">
                   <Play size={16} className="text-red-500" />
-                  Video IDs (YouTube)
+                  Video YouTube (Link o ID)
                 </label>
                 <textarea 
                   value={editedCiv.videos?.join(', ') || ''}
-                  onChange={e => setEditedCiv({...editedCiv, videos: e.target.value.split(',').map(v => v.trim()).filter(Boolean)})}
-                  placeholder="ID1, ID2, ID3..."
-                  rows={2}
+                  onChange={e => {
+                    const rawValues = e.target.value.split(',').map(v => v.trim()).filter(Boolean);
+                    const parsedIds = rawValues.map(val => {
+                      // Extract ID from various YouTube URL formats
+                      if (val.includes('youtube.com/watch?v=')) {
+                        return val.split('v=')[1]?.split('&')[0] || val;
+                      } else if (val.includes('youtu.be/')) {
+                        return val.split('youtu.be/')[1]?.split('?')[0] || val;
+                      }
+                      return val;
+                    });
+                    setEditedCiv({...editedCiv, videos: parsedIds});
+                  }}
+                  placeholder="Incolla i link dei video separati da virgola..."
+                  rows={3}
                   className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-sm text-white focus:border-purple-500 transition-colors"
                 />
+                <p className="text-[10px] text-gray-500 mt-1 italic">Puoi incollare i link completi (es. youtube.com/watch?v=...) e verranno convertiti in ID automaticamente.</p>
               </div>
             </div>
 

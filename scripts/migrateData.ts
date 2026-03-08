@@ -53,7 +53,10 @@ async function migrate() {
           short_description: civ.shortDescription,
           passive_bonuses: civ.passiveBonuses,
           unique_units: civ.uniqueUnits,
-          technologies: civ.technologies
+          technologies: civ.technologies,
+          landmarks: civ.landmarks,
+          videos: civ.videos || [],
+          build_orders: civ.buildOrders || []
         }, { onConflict: 'id' });
         
       if (error) {
