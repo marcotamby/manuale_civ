@@ -83,9 +83,9 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
             options={[
               { value: 'Tutte', label: 'Tutte le civiltà' },
               { value: 'Preferiti', label: 'Civiltà Preferite' },
-              { value: 'Facile', label: 'Difficoltà: Facile' },
-              { value: 'Medio', label: 'Difficoltà: Media' },
-              { value: 'Difficile', label: 'Difficoltà: Difficile' }
+              { value: 'Facile', label: 'Facile' },
+              { value: 'Medio', label: 'Medio' },
+              { value: 'Difficile', label: 'Difficile' }
             ]}
             value={difficultyFilter}
             onChange={setDifficultyFilter}
