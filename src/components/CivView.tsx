@@ -246,8 +246,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                     
                     <div className="space-y-3">
                       {bo.steps.slice(0, 3).map((step, sIdx) => (
-                        <div key={sIdx} className="flex gap-3 text-xs">
-                          <span className="text-yellow-500 font-mono w-8 shrink-0">{step.time || '--:--'}</span>
+                        <div key={sIdx} className="flex gap-3 text-xs leading-relaxed">
+                          {step.time && (
+                            <span className="text-yellow-500 font-mono w-10 shrink-0 font-bold">{step.time}</span>
+                          )}
                           <span className="text-gray-300">{step.action}</span>
                         </div>
                       ))}
