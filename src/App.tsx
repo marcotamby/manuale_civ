@@ -97,7 +97,7 @@ function App() {
 
   return (
     <div 
-      className="flex h-screen overflow-hidden bg-[var(--color-brand-dark)] text-white font-sans"
+      className="flex h-screen w-full overflow-hidden bg-[var(--color-brand-dark)] text-white font-sans"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -183,7 +183,7 @@ function App() {
             </div>
           )}
 
-          <div className="flex-1 overflow-y-auto main-content-area elegant-scrollbar md:md-content-padding">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden w-full main-content-area elegant-scrollbar md:md-content-padding">
             {currentPage === 'home' && (
               <Home 
                 onSelectCiv={handleSelectCiv} 
