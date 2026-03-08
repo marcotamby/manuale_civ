@@ -7,9 +7,8 @@ import { CivDataProvider } from './components/CivContext.tsx'
 
 import { GoogleOAuthProvider } from '@react-oauth/google'
 
-// Add your real Client ID in a .env file at the root of the project:
-// VITE_GOOGLE_CLIENT_ID="your-client-id.apps.googleusercontent.com"
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
+// Use the real Google Client ID directly to avoid Vercel environment variable issues
+const GOOGLE_CLIENT_ID = "403799038562-p202o225j2vf0k72fbjbmeqgrntmr6su.apps.googleusercontent.com";
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
