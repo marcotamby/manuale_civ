@@ -13,7 +13,7 @@ import { useAuth } from './components/AuthContext';
 import { LoginModal } from './components/LoginModal';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'civ' | 'maps' | 'compare'>(() => {
+  const [currentPage, setCurrentPage] = useState<'home' | 'civ' | 'compare'>(() => {
     return (sessionStorage.getItem('aoe4_currentPage') as any) || 'home';
   });
   const [selectedCiv, setSelectedCiv] = useState<string>(() => {
@@ -101,7 +101,7 @@ function App() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {(currentPage !== 'home' || favorites.length > 0 || isSidebarOpen) && (
+      {(currentPage !== 'home' || favorites.length > 0) && (
         <Sidebar
           selectedCiv={selectedCiv}
           onSelectCiv={handleSelectCiv}
@@ -122,7 +122,7 @@ function App() {
         />
 
         <div className="flex-1 overflow-hidden flex flex-col">
-          {currentPage !== 'home' && currentPage !== 'maps' && (
+          {currentPage !== 'home' && (
             <div className="flex items-center gap-3 px-4 md:px-6 py-2 shrink-0">
               <button
                 onClick={() => setCurrentPage('home')}
@@ -135,17 +135,19 @@ function App() {
                 </svg>
               </button>
 
-              <button
-                onClick={() => setIsSidebarOpen(true)}
-                className="md:hidden p-2 glass rounded-lg hover:bg-white/10 transition-colors"
-                title="Apri Menu"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="3" y1="12" x2="21" y2="12"></line>
-                  <line x1="3" y1="6" x2="21" y2="6"></line>
-                  <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-              </button>
+              {(currentPage !== 'home' || favorites.length > 0) && (
+                <button
+                  onClick={() => setIsSidebarOpen(true)}
+                  className="md:hidden p-2 glass rounded-lg hover:bg-white/10 transition-colors"
+                  title="Apri Menu"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                  </svg>
+                </button>
+              )}
 
               {currentPage === 'civ' && (
                 <div className="flex items-center gap-2 ml-auto">
@@ -192,9 +194,6 @@ function App() {
             )}
             {currentPage === 'civ' && (
               <CivView civId={selectedCiv} onSelectUnit={setSelectedUnit} />
-            )}
-            {currentPage === 'maps' && (
-              <MapsView />
             )}
             {currentPage === 'compare' && (
               <CompareView civIds={compareIds} onClose={() => setCurrentPage('home')} />

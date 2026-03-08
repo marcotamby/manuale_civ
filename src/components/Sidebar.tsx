@@ -80,14 +80,6 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
             >
               <HomeIcon size={24} />
             </button>
-
-            <button
-              onClick={() => onSelectPage('maps')}
-              title="Mappe"
-              className="w-full aspect-square rounded-2xl glass flex items-center justify-center text-blue-400 border border-blue-500/20 hover:border-blue-400 hover:shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all group"
-            >
-              <MapIcon size={24} />
-            </button>
           </div>
         )}
 
