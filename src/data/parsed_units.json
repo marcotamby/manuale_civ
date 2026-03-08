@@ -1,0 +1,3227 @@
+[
+  {
+    "id": "archer",
+    "name": "Archer",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 5,
+      "armor": 0,
+      "speed": 1.25,
+      "health": 70
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Cheap ranged infantry with good damage vs. unarmored targets.\n+ High rate of fire\n- Weak against high ranged armor targets\n- Countered by Horsemen"
+  },
+  {
+    "id": "baghlah",
+    "name": "Baghlah",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 35,
+      "armor": 3,
+      "speed": 1.375,
+      "health": 450
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Ship equipped with broadside ballistae.\n+ Strong against Arrow Ships\n- Lower maneuverability"
+  },
+  {
+    "id": "battering-ram",
+    "name": "Battering Ram",
+    "type": "Siege",
+    "age": 1,
+    "stats": {
+      "attack": 200,
+      "armor": 0,
+      "speed": 0.75,
+      "health": 370
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Durable infantry transport effective against buildings and walls.\n+ High ranged armor\n+ High health\n- Takes bonus damage from melee attacks\n- Can only attack buildings\n- Slow movement speed"
+  },
+  {
+    "id": "camel-archer",
+    "name": "Camel Archer",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 11,
+      "armor": 0,
+      "speed": 1.625,
+      "health": 150
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Highly mobile and durable ranged unit.\n+Bonus damage vs Spearmen\n-High cost"
+  },
+  {
+    "id": "camel-rider",
+    "name": "Camel Rider",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 14,
+      "armor": 0,
+      "speed": 1.625,
+      "health": 270
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Highly mobile and durable melee unit effective against all cavalry.\n+Bonus damage to cavalry\n+Causes enemy cavalry to deal less damage\n-High cost"
+  },
+  {
+    "id": "counterweight-trebuchet",
+    "name": "Counterweight Trebuchet",
+    "type": "Siege",
+    "age": 3,
+    "stats": {
+      "attack": 40,
+      "armor": 0,
+      "speed": 0.625,
+      "health": 140
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Powerful siege engine effective at destroying buildings and walls over a great distance.\n+ Bonus damage vs buildings\n- Must be set up to fire\n- Inaccurate against units"
+  },
+  {
+    "id": "crossbowman",
+    "name": "Crossbowman",
+    "type": "Ranged",
+    "age": 3,
+    "stats": {
+      "attack": 11,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 80
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "High damage ranged unit best against heavy targets.\n+ Anti-heavy specialist\n- Low health\n- Countered by Horsemen"
+  },
+  {
+    "id": "culverin",
+    "name": "Culverin",
+    "type": "Siege",
+    "age": 4,
+    "stats": {
+      "attack": 40,
+      "armor": 0,
+      "speed": 0.625,
+      "health": 200
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Long-range mobile cannon with bonus vs buildings.\n+ Effective against Defenses\n+ Does not require setup to fire"
+  },
+  {
+    "id": "dhow",
+    "name": "Dhow",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 6,
+      "armor": 1,
+      "speed": 1.75,
+      "health": 300
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Light war vessel armed with a crew of archers.\n+ Increased maneuverability and speed.\n+ Benefits from ranged damage Blacksmith technology"
+  },
+  {
+    "id": "explosive-dhow",
+    "name": "Explosive Dhow",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 95,
+      "armor": 0,
+      "speed": 2,
+      "health": 145
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Small ship packed with explosives. Detonates when killed, damaging any units in the area.\n- Damage is reduced further from the explosion center\n- No weapons other than self-destruction"
+  },
+  {
+    "id": "fishing-boat",
+    "name": "Fishing Boat",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.5,
+      "health": 100
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Small boat that gathers Food from either Deep Water Fish or Shoreline Fish. Drops off gathered resources at the Dock.\n+ Can repair\n- No combat"
+  },
+  {
+    "id": "ghulam",
+    "name": "Ghulam",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "attack": 10,
+      "armor": 4,
+      "speed": 1.1875,
+      "health": 195
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Tough infantry that deal two attacks in rapid succession.\n+ High armor\n+ Higher attack damage on charge\n- Lower base attack damage than a Man-at-Arms\n- Slow movement\n- Countered by Knights, Lancers, and Crossbowmen"
+  },
+  {
+    "id": "handcannoneer",
+    "name": "Handcannoneer",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 38,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 130
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Powerful all-purpose ranged infantry.\n+ High damage\n- High cost\n- Slow movement speed\n- Countered by Horsemen"
+  },
+  {
+    "id": "horseman",
+    "name": "Horseman",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 9,
+      "armor": 2,
+      "speed": 1.875,
+      "health": 125
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Fast cavalry effective at raiding, flanking, and countering ranged units.\n+ High movement speed\n- Weak against melee units\n- Countered by Spearmen"
+  },
+  {
+    "id": "imam",
+    "name": "Imam",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 90
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Support unit with no combat capability. Can pick up Relics, convert enemy units, and capture Sacred Sites.\n+ Heals friendly units\n- Slow movement speed"
+  },
+  {
+    "id": "lancer",
+    "name": "Lancer",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 24,
+      "armor": 4,
+      "speed": 1.625,
+      "health": 230
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Expensive cavalry with high damage and melee armor. Effective against melee units.\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "mangonel",
+    "name": "Mangonel",
+    "type": "Siege",
+    "age": 3,
+    "stats": {
+      "attack": 10,
+      "armor": 0,
+      "speed": 0.75,
+      "health": 130
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Fires multiple projectiles dealing damage in an area.\n+ Effective against massed units\n- Must be set up to fire"
+  },
+  {
+    "id": "scout",
+    "name": "Scout",
+    "type": "Cavalry",
+    "age": 1,
+    "stats": {
+      "attack": 1,
+      "armor": 0,
+      "speed": 1.625,
+      "health": 110
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Lightly armed cavalry effective at exploring the world, hunting wildlife, and herding Sheep.\n+ Able to see into Stealth Forests\n+ Health regeneration\n+ High movement speed\n- Very weak in combat"
+  },
+  {
+    "id": "spearman",
+    "name": "Spearman",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 7,
+      "armor": 0,
+      "speed": 1.25,
+      "health": 80
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Infantry best used against mounted units.\n+ Anti-cavalry specialist\n+ Additional damage against Elephants\n- Weak against heavy infantry\n- Countered by Archers"
+  },
+  {
+    "id": "springald",
+    "name": "Springald",
+    "type": "Siege",
+    "age": 3,
+    "stats": {
+      "attack": 14,
+      "armor": 3,
+      "speed": 0.875,
+      "health": 85
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Anti-unit siege weapon. Fires bolts that pierce multiple units.\n+ Does not require setup to fire\n+ Bonus damage vs. melee infantry\n- Trivial damage vs. buildings"
+  },
+  {
+    "id": "trade-caravan",
+    "name": "Trade Caravan",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.5625,
+      "health": 60
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Traders generate Gold by travelling between their Home Market and a Trade Post or another player's Market. Greater distances between the Home Market and trade destination will generate higher amounts of Gold.\nThe Home Market or Trade destination may be changed at any time."
+  },
+  {
+    "id": "trade-ship",
+    "name": "Trade Ship",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.5,
+      "health": 225
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Trade Ships generate Gold and Wood when assigned to a trade route with a Coastal Trade Post or another player's Dock.\n- No combat"
+  },
+  {
+    "id": "transport-ship",
+    "name": "Transport Ship",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.5,
+      "health": 400
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Large oared vessel able to transport land units across water.\n+ Can be garrisoned by any unit\n+ Uses sight range of units in garrison\n- No combat"
+  },
+  {
+    "id": "villager",
+    "name": "Villager",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 10,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 50
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Gathers Wood, Food, Stone, and Gold. Builds and repairs buildings and can repair siege engines and naval units.\n- Weak in combat"
+  },
+  {
+    "id": "xebec",
+    "name": "Xebec",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 45,
+      "armor": 5,
+      "speed": 1.25,
+      "health": 700
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Large sailed war vessel armed with broadside cannons.\n+ Anti-structure specialist\n- Low movement speed"
+  },
+  {
+    "id": "atabeg",
+    "name": "Atabeg",
+    "type": "Cavalry",
+    "age": 1,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1,
+      "health": 90
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Can be garrisoned into any military production building to grant +20% health to newly trained units."
+  },
+  {
+    "id": "bedouin-skirmisher",
+    "name": "Bedouin Skirmisher",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 8,
+      "armor": 1,
+      "speed": 1.25,
+      "health": 90
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Ranged infantry wielding a javelin to fend off lightly armored enemies.\n+ Bonus against light infantry\n+ Long Range\n- Weak against cavalry\n\nRequires the Trade Wing - Bazaar"
+  },
+  {
+    "id": "bedouin-swordsman",
+    "name": "Bedouin Swordsman",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 11,
+      "armor": 0,
+      "speed": 1.25,
+      "health": 160
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Master Swordsman who excels in melee combat\n+ Bonus vs Melee units\n- Weak to ranged units\n\nRequires the Trade Wing - Bazaar"
+  },
+  {
+    "id": "camel-lancer",
+    "name": "Camel Lancer",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 22,
+      "armor": 4,
+      "speed": 1.625,
+      "health": 210
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Higher mobility Lancer with a more powerful charge, but less powerful melee attack. Effective against most units.\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "dervish",
+    "name": "Dervish",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.625,
+      "health": 120
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Mounted Religious unit. Can pick up Relics, convert enemy units, and capture Sacred Sites.\n+ Uses a powerful Mass Heal ability to heal friendly units in an area.\n+ Gains increased Healing when carrying a relic.\n+ High speed."
+  },
+  {
+    "id": "desert-raider",
+    "name": "Desert Raider",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 13,
+      "armor": 5,
+      "speed": 1.625,
+      "health": 120
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Versatile Cavalry unit that can swap between ranged and melee attacks with a toggle.\n+ Effective against Light Infantry in Ranged Mode\n+ Effective against Cavalry in Melee Mode\n- High cost\n- Weak to Ranged units"
+  },
+  {
+    "id": "manjaniq",
+    "name": "Manjaniq",
+    "type": "Siege",
+    "age": 3,
+    "stats": {
+      "attack": 10,
+      "armor": 0,
+      "speed": 0.75,
+      "health": 130
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Fires multiple projectiles dealing damage in an area.\n+ Effective against massed units\n+ Can use Incendiary projectiles for devastating area damage\n - Must be set up to fire"
+  },
+  {
+    "id": "tower-of-the-sultan",
+    "name": "Tower of the Sultan",
+    "type": "Siege",
+    "age": 3,
+    "stats": {
+      "attack": 600,
+      "armor": 0,
+      "speed": 0.5,
+      "health": 800
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Massive infantry transport effective against buildings and walls. Move speed increases for each unit garrisoned inside.\n+ Fires arrows\n+ High ranged armor\n+ High health\n- Slow move speed when empty"
+  },
+  {
+    "id": "arbaletrier",
+    "name": "Arbalétrier",
+    "type": "Ranged",
+    "age": 3,
+    "stats": {
+      "attack": 11,
+      "armor": 1,
+      "speed": 1.125,
+      "health": 80
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "High damage ranged unit with a defensive pavise shield. Best used when supported by others.\n+ Anti-heavy specialist\n+ Comes with melee armor\n- Low health\n- Countered by Horsemen\n\nMercenary that can be purchased per 4 units for a total of 440 Olive Oil.\n\nThis Mercenary can only be purchased on Mercenary Houses built near a neutral Trade Post that list this unit. The chance of this unit being available on a Trade Post is 20%."
+  },
+  {
+    "id": "bombard",
+    "name": "Bombard",
+    "type": "Siege",
+    "age": 4,
+    "stats": {
+      "attack": 55,
+      "armor": 0,
+      "speed": 0.75,
+      "health": 210
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Intimidating siege gun excellent against buildings or any stubborn targets.\n+ High damage\n- Must be set up to fire"
+  },
+  {
+    "id": "carrack",
+    "name": "Carrack",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 45,
+      "armor": 5,
+      "speed": 1.25,
+      "health": 700
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Large sailed war vessel armed with broadside cannons.\n+ Anti-structure specialist\n- Low movement speed"
+  },
+  {
+    "id": "cataphract",
+    "name": "Cataphract",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 27,
+      "armor": 4,
+      "speed": 1.625,
+      "health": 360
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Expensive cavalry with high damage and a powerful Trample ability that charges through enemies.\n+ Heavy armor\n+ Trample deals area damage\n- No base charge attack\n- Slower move speed\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "cheirosiphon",
+    "name": "Cheirosiphon",
+    "type": "Siege",
+    "age": 3,
+    "stats": {
+      "attack": 10,
+      "armor": 0,
+      "speed": 0.75,
+      "health": 310
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Durable infantry transport equipped with Greek Fire, effective against Buildings and Walls.\n+ Greek Fire persists on ground\n+ High ranged armor\n+ High health\n- Only attacks buildings\n- Slow move speed"
+  },
+  {
+    "id": "demolition-ship",
+    "name": "Demolition Ship",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 95,
+      "armor": 0,
+      "speed": 2,
+      "health": 145
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Small ship packed with explosives. Detonates when killed, damaging any units in the area.\n- Damage is reduced further from the explosion center\n- No weapons other than self-destruction"
+  },
+  {
+    "id": "dromon",
+    "name": "Dromon",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 7,
+      "armor": 4,
+      "speed": 1.625,
+      "health": 500
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Military ship equipped a flamethrower that can be upgraded to use Greek Fire.\n+ Strong against Arrow Ships\n- Low weapon range\n- Countered by Demolition Ships"
+  },
+  {
+    "id": "galley",
+    "name": "Galley",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 6,
+      "armor": 1,
+      "speed": 1.75,
+      "health": 300
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Oared war vessel armed with a crew of archers.\n+ Increased maneuverability\n+ Benefits from ranged damage Blacksmith technology"
+  },
+  {
+    "id": "grenadier",
+    "name": "Grenadier",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 12,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 150
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Advanced ranged infantry with thrown explosive canisters that deal damage in a small area.\n+ Deals area damage\n- Low single target damage\n- Slow movement speed\n\nMercenary that can be purchased per 2 units for a total of 480 Olive Oil.\n\nRequires the Silk Road Contract."
+  },
+  {
+    "id": "horse-archer",
+    "name": "Horse Archer",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 10,
+      "armor": 0,
+      "speed": 1.625,
+      "health": 85
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Highly mobile ranged cavalry effective against slower melee units.\n+ High mobility\n- Weak vs ranged units\n\nMercenary that can be purchased per 3 units for a total of 330 Olive Oil.\n\nThis Mercenary can only be purchased on Mercenary Houses built near a neutral Trade Post that list this unit. The chance of this unit being available on a Trade Post is 20%."
+  },
+  {
+    "id": "huihui-pao",
+    "name": "Huihui Pao",
+    "type": "Siege",
+    "age": 4,
+    "stats": {
+      "attack": 75,
+      "armor": 0,
+      "speed": 0.625,
+      "health": 260
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Massive siege engine with incredible range, extra effective at destroying buildings and walls.\n+ Extremely long range\n- Must be set up to fire\n\nMercenary that can be purchased for 1000 Olive Oil."
+  },
+  {
+    "id": "javelin-thrower",
+    "name": "Javelin Thrower",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 8,
+      "armor": 3,
+      "speed": 1.25,
+      "health": 70
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Ranged infantry effective against other ranged units.\n+ Anti-ranged specialist\n+ Increased weapon range\n+ Comes with ranged armor\n- Low health\n- Countered by Horsemen"
+  },
+  {
+    "id": "keshik",
+    "name": "Keshik",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 15,
+      "armor": 3,
+      "speed": 1.625,
+      "health": 150
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Expensive cavalry with high damage and a powerful charge attack. Effective against most units.\n+ Heavy armor\n+ Strong in melee combat\n+ Restores health after every attack\n- Less health than Lancers\n- Countered by Spearmen and Crossbowmen\n\nMercenary that can be purchased per 2 units for a total of 400 Olive Oil.\n\nRequires the Eastern Mercenary Contract."
+  },
+  {
+    "id": "landsknecht",
+    "name": "Landsknecht",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "attack": 17,
+      "armor": 0,
+      "speed": 1.25,
+      "health": 85
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Brave unarmored infantry with an enormous two-handed sword, effective in mixed armies.\n+ Melee attack deals area damage\n- Low health\n- Countered by Archers\n\nMercenary that can be purchased per 3 units for a total of 480 Olive Oil.\n\nRequires the Western Mercenary Contract."
+  },
+  {
+    "id": "limitanei",
+    "name": "Limitanei",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 7,
+      "armor": 0,
+      "speed": 1.25,
+      "health": 90
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Infantry best used against cavalry. Can enter Shield Wall to take reduced ranged damage.\n+ Anti-cavalry specialist\n+ Additional damage against Elephants\n+ Increased health\n- Shield Wall reduces move speed\n- Weak vs heavy infantry\n- Countered by Archers"
+  },
+  {
+    "id": "longbowman",
+    "name": "Longbowman",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 6,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 70
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Cheap long-ranged infantry with good damage vs. unarmored targets.\n+ Long range\n+ Can construct Palings to fend off cavalry charges\n- Slow movement speed\n- Countered by Horsemen\n\nMercenary that can be purchased per 5 units for a total of 470 Olive Oil.\n\nRequires the Western Mercenary Contract."
+  },
+  {
+    "id": "mangudai",
+    "name": "Mangudai",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 5,
+      "armor": 0,
+      "speed": 1.5625,
+      "health": 85
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Confounding mobile ranged cavalry that can fire at a slower rate while moving.\n+ High rate of fire\n- Low weapon range\n\nMercenary that can be purchased per 3 units for a total of 435 Olive Oil.\n\nThis Mercenary can only be purchased on Mercenary Houses built near a neutral Trade Post that list this unit. The chance of this unit being available on a Trade Post is 20%."
+  },
+  {
+    "id": "monk",
+    "name": "Monk",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 90
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Support unit with no combat capability. Can pick up Relics, convert enemy units, and capture Sacred Sites starting in the Castle Age (III).\n+ Heals friendly units\n- Slow movement speed"
+  },
+  {
+    "id": "musofadi-warrior",
+    "name": "Musofadi Warrior",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 8,
+      "armor": 0,
+      "speed": 1.375,
+      "health": 95
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Infantry effective at ambush attacks and countering heavy targets.\n+ Can enter stealth\n+ Anti-heavy specialist\n- Low health\n- Countered by Archers\n- Capital Town Centers, Outposts, and Scouts can spot stealth\n\nMercenary that can be purchased per 5 units for a total of 360 Olive Oil.\n\nThis Mercenary can only be purchased on Mercenary Houses built near a neutral Trade Post that list this unit. The chance of this unit being available on a Trade Post is 20%."
+  },
+  {
+    "id": "nest-of-bees",
+    "name": "Nest of Bees",
+    "type": "Siege",
+    "age": 3,
+    "stats": {
+      "attack": 6,
+      "armor": 0,
+      "speed": 0.8125,
+      "health": 120
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Innovative field weapon capable of firing a barrage of rockets to damage defensive positions and clumped enemy troops.\n+ Good area of effect damage against most targets\n- Slowest movement speed\n- Weak if surrounded\n\nMercenary that can be purchased for 600 Olive Oil."
+  },
+  {
+    "id": "royal-cannon",
+    "name": "Royal Cannon",
+    "type": "Siege",
+    "age": 4,
+    "stats": {
+      "attack": 60,
+      "armor": 0,
+      "speed": 0.875,
+      "health": 190
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Most powerful siege cannon. Excellent against buildings or any stubborn targets.\n+ Bonus damage to buildings\n\nMercenary that can be purchased for 900 Olive Oil."
+  },
+  {
+    "id": "royal-knight",
+    "name": "Royal Knight",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 19,
+      "armor": 3,
+      "speed": 1.625,
+      "health": 190
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Gain bonus damage for 5 seconds after charging. Effective against most units.\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen\n\nMercenary that can be purchased per 2 units for a total of 460 Olive Oil.\n\nThis Mercenary can only be purchased on Mercenary Houses built near a neutral Trade Post that list this unit. The chance of this unit being available on a Trade Post is 20%."
+  },
+  {
+    "id": "siege-tower",
+    "name": "Siege Tower",
+    "type": "Siege",
+    "age": 2,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 0.8125,
+      "health": 480
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Tall infantry transport with no combat capability. Allows garrisoned infantry to be unloaded directly onto Stone Walls.\n+ High ranged armor\n- Cannot attack\n- Slow movement speed"
+  },
+  {
+    "id": "sipahi",
+    "name": "Sipahi",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 12,
+      "armor": 2,
+      "speed": 1.75,
+      "health": 145
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Fast cavalry effective at raiding, flanking, and countering ranged units. Can gain attack speed at the cost of melee defense.\n+ High movement speed\n+ Strong against ranged units\n- Weak against melee units\n- Countered by Spearmen\n\nMercenary that can be purchased per 3 units for a total of 450 Olive Oil.\n\nThis Mercenary can only be purchased on Mercenary Houses built near a neutral Trade Post that list this unit. The chance of this unit being available on a Trade Post is 20%."
+  },
+  {
+    "id": "streltsy",
+    "name": "Streltsy",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 38,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 130
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Most powerful ranged infantry with reasonable melee capabilities. Increased attack speed while stationary.\n+ High damage\n+ Lower cost than Handcannoneer\n- Slow movement speed\n\nMercenary that can be purchased per 3 units for a total of 720 Olive Oil.\n\nRequires the Western Mercenary Contract."
+  },
+  {
+    "id": "tower-elephant",
+    "name": "Tower Elephant",
+    "type": "Cavalry",
+    "age": 4,
+    "stats": {
+      "attack": 30,
+      "armor": 7,
+      "speed": 0.875,
+      "health": 600
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Powerful ranged cavalry that can fire while moving.\n+ High health\n+ Mounted with powerful Archers\n+ Capable of attacking Stone Walls\n- Slow movement speed\n\nMercenary that can be purchased for 1000 Olive Oil.\n\nRequires the Eastern Mercenary Contract."
+  },
+  {
+    "id": "trader",
+    "name": "Trader",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1,
+      "health": 90
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Traders generate Gold by travelling between their Home Market and a Trade Post or another player's Market. Greater distances between the Home Market and trade destination will generate higher amounts of Gold.\nThe Home Market or Trade destination may be changed at any time."
+  },
+  {
+    "id": "varangian-guard",
+    "name": "Varangian Guard",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "attack": 13,
+      "armor": 5,
+      "speed": 1.125,
+      "health": 140
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Tough infantry with good damage. Can use Berserking to increase damage for reduced armor.\n+ Heavy armor\n+ Increases armor of Transports\n+ Disembarking from Transport Ships grants move speed\n+ Increased armor near allied Wonders\n- Slow move speed\n- Countered by Crossbowmen"
+  },
+  {
+    "id": "war-elephant",
+    "name": "War Elephant",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 50,
+      "armor": 4,
+      "speed": 1,
+      "health": 800
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Heavy cavalry effective against cavalry, siege engines, walls, and buildings.\n+ High health and armor\n+ Mounted with an advanced Spearman\n+ Capable of attacking Stone Walls\n- Slow movement speed\n\nMercenary that can be purchased for 680 Olive Oil.\n\nThis Mercenary can only be purchased on Mercenary Houses built near a neutral Trade Post that list this unit. The chance of this unit being available on a Trade Post is 20%."
+  },
+  {
+    "id": "zhuge-nu",
+    "name": "Zhuge Nu",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 4,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 70
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Fires bolts with a ferocious damage potential against enemy units.\n+ High rate of fire\n- Ineffective vs high ranged armor targets\n- Countered by Horsemen\n\nMercenary that can be purchased per 5 units for a total of 360 Olive Oil.\n\nThis Mercenary can only be purchased on Mercenary Houses built near a neutral Trade Post that list this unit. The chance of this unit being available on a Trade Post is 20%."
+  },
+  {
+    "id": "baochuan",
+    "name": "Baochuan",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 45,
+      "armor": 5,
+      "speed": 1.25,
+      "health": 700
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Large sailed war vessel armed with broadside cannons.\n+ Anti-structure specialist\n- Low movement speed"
+  },
+  {
+    "id": "clocktower-battering-ram",
+    "name": "Clocktower Battering Ram",
+    "type": "Siege",
+    "age": 3,
+    "stats": {
+      "attack": 200,
+      "armor": 0,
+      "speed": 0.75,
+      "health": 370
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Durable infantry transport effective against buildings and walls.\n+ High ranged armor\n+ High health\n- Takes bonus damage from melee attacks\n- Can only attack buildings\n- Slow movement speed"
+  },
+  {
+    "id": "clocktower-bombard",
+    "name": "Clocktower Bombard",
+    "type": "Siege",
+    "age": 4,
+    "stats": {
+      "attack": 55,
+      "armor": 0,
+      "speed": 0.75,
+      "health": 210
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Intimidating siege gun excellent against buildings or any stubborn targets.\n+ High damage\n- Must be set up to fire"
+  },
+  {
+    "id": "clocktower-counterweight-trebuchet",
+    "name": "Clocktower Counterweight Trebuchet",
+    "type": "Siege",
+    "age": 3,
+    "stats": {
+      "attack": 40,
+      "armor": 0,
+      "speed": 0.625,
+      "health": 140
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Powerful siege engine effective at destroying buildings and walls over a great distance.\n+ Bonus damage vs buildings\n- Must be set up to fire\n- Inaccurate against units"
+  },
+  {
+    "id": "clocktower-nest-of-bees",
+    "name": "Clocktower Nest of Bees",
+    "type": "Siege",
+    "age": 3,
+    "stats": {
+      "attack": 6,
+      "armor": 0,
+      "speed": 0.8125,
+      "health": 120
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Innovative field weapon capable of firing a barrage of rockets to damage defensive positions and clumped enemy troops.\n+ Good area of effect damage against most targets\n- Slowest movement speed\n- Weak if surrounded"
+  },
+  {
+    "id": "clocktower-springald",
+    "name": "Clocktower Springald",
+    "type": "Siege",
+    "age": 3,
+    "stats": {
+      "attack": 14,
+      "armor": 3,
+      "speed": 0.875,
+      "health": 85
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Anti-unit siege weapon. Fires bolts that pierce multiple units.\n+ Does not require setup to fire\n+ Bonus damage vs. melee infantry\n- Trivial damage vs. buildings"
+  },
+  {
+    "id": "explosive-junk",
+    "name": "Explosive Junk",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 95,
+      "armor": 0,
+      "speed": 2,
+      "health": 145
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Small ship packed with explosives. Detonates when killed, damaging any units in the area.\n- Damage is reduced further from the explosion center\n- No weapons other than self-destruction"
+  },
+  {
+    "id": "fire-lancer",
+    "name": "Fire Lancer",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 11,
+      "armor": 1,
+      "speed": 1.625,
+      "health": 155
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Cavalry wielding explosive-tipped lances.\n+ Charge deals area damage\n+ Effective at raiding buildings and siege engines\n+ Good ranged armor\n- Weak in melee combat\n- Countered by Spearmen"
+  },
+  {
+    "id": "imperial-official",
+    "name": "Imperial Official",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 75
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Economic support unit with no combat capability. Automatically gathers Tax (Gold) from buildings.\n+ Can supervise buildings to improve their efficiency\n- Only a certain number of Officials can exist at a time"
+  },
+  {
+    "id": "junk",
+    "name": "Junk",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 6,
+      "armor": 1,
+      "speed": 1.75,
+      "health": 300
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Oared war vessel armed with a crew of archers.\n+ Increased maneuverability\n+ Benefits from ranged damage Blacksmith technology"
+  },
+  {
+    "id": "palace-guard",
+    "name": "Palace Guard",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "attack": 12,
+      "armor": 3,
+      "speed": 1.375,
+      "health": 155
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Tough infantry with good damage. Move faster than Men-At-Arms, but with reduced armor.\n+ Heavy armor\n- Countered by Knights, Lancers, and Crossbowmen."
+  },
+  {
+    "id": "war-junk",
+    "name": "War Junk",
+    "type": "Ranged",
+    "age": 3,
+    "stats": {
+      "attack": 35,
+      "armor": 3,
+      "speed": 1.375,
+      "health": 450
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Ship equipped with broadside ballistae.\n+ Strong against Arrow Ships\n- Lower maneuverability"
+  },
+  {
+    "id": "ghazi-raider",
+    "name": "Ghazi Raider",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 12,
+      "armor": 2,
+      "speed": 1.875,
+      "health": 135
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Fast cavalry effective at raiding, flanking, and countering ranged units.\n+ High movement speed\n+ Increased effectiveness against heavy units\n- Countered by Spearmen"
+  },
+  {
+    "id": "man-at-arms",
+    "name": "Man-at-Arms",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "attack": 12,
+      "armor": 4,
+      "speed": 1.125,
+      "health": 155
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Tough infantry with good damage.\n+ High armor\n- Slow movement\n- Countered by Knights, Lancers, and Crossbowmen"
+  },
+  {
+    "id": "scholar",
+    "name": "Scholar",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 90
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Support unit with no combat capability. Can be garrisoned in a Mosque or Madrasa to research technology more quickly. Can pick up Relics, convert enemy units, and capture Sacred Sites starting in the Castle Age (III).\n+ Heals friendly units\n- Low health"
+  },
+  {
+    "id": "sultans-elite-tower-elephant",
+    "name": "Sultan's Elite Tower Elephant",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 30,
+      "armor": 7,
+      "speed": 0.875,
+      "health": 600
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Powerful ranged cavalry that can fire while moving.\n+ High health\n+ Mounted with Handcannoneers\n+ Capable of attacking Stone Walls\n- Slow movement speed"
+  },
+  {
+    "id": "hulk",
+    "name": "Hulk",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 35,
+      "armor": 3,
+      "speed": 1.375,
+      "health": 450
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Ship equipped with broadside ballistae.\n+ Strong against Arrow Ships\n- Lower maneuverability"
+  },
+  {
+    "id": "king",
+    "name": "King",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 16,
+      "armor": 2,
+      "speed": 1.6875,
+      "health": 220
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "A mighty King, a powerful heavy cavalry unit. Heals nearby out of combat units by 2 health every 1 seconds.\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "knight",
+    "name": "Knight",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 24,
+      "armor": 4,
+      "speed": 1.625,
+      "health": 230
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Expensive cavalry with high damage and melee armor. Effective against melee units.\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "ribauldequin",
+    "name": "Ribauldequin",
+    "type": "Siege",
+    "age": 4,
+    "stats": {
+      "attack": 42,
+      "armor": 10,
+      "speed": 0.875,
+      "health": 215
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Five-barreled gunpowder weapon effective against massed units. Deals little damage to buildings.\n+ Can hit multiple targets in a single volley\n- Short range\n- Low ranged armor"
+  },
+  {
+    "id": "wynguard-army",
+    "name": "Wynguard Army",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": null,
+      "health": 100
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Produces an army of 2 Spearmen, 2 Crossbowmen, and a Trebuchet."
+  },
+  {
+    "id": "wynguard-footman",
+    "name": "Wynguard Footman",
+    "type": "Infantry",
+    "age": 4,
+    "stats": {
+      "attack": 20,
+      "armor": 3,
+      "speed": 1.125,
+      "health": 280
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Specialized man at arms with high health and pierce armor.\n- Slow movement\n- Countered by Crossbowmen"
+  },
+  {
+    "id": "wynguard-footmen",
+    "name": "Wynguard Footmen",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": null,
+      "health": 100
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Produces an army of 6 Wynguard Footmen."
+  },
+  {
+    "id": "wynguard-raiders",
+    "name": "Wynguard Raiders",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": null,
+      "health": 100
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Produces an army of 3 Horsemen and 3 Knights."
+  },
+  {
+    "id": "wynguard-ranger",
+    "name": "Wynguard Ranger",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 12,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 125
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Master longbowmen with increased range and damage, good vs. unarmored targets.\n+ Long range\n+ Can construct Palings to fend off cavalry charges\n- Slow movement speed\n- Countered by Horsemen"
+  },
+  {
+    "id": "wynguard-rangers",
+    "name": "Wynguard Rangers",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": null,
+      "health": 100
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Produces an army of 6 Wynguard Rangers."
+  },
+  {
+    "id": "cannon",
+    "name": "Cannon",
+    "type": "Siege",
+    "age": 4,
+    "stats": {
+      "attack": 60,
+      "armor": 0,
+      "speed": 0.875,
+      "health": 190
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Most powerful siege cannon. Excellent against buildings or any stubborn targets.\n+ Bonus damage to buildings"
+  },
+  {
+    "id": "galleass",
+    "name": "Galleass",
+    "type": "Ranged",
+    "age": 3,
+    "stats": {
+      "attack": 130,
+      "armor": 1,
+      "speed": 1,
+      "health": 700
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Large oared vessel with a powerful forward mounted bombard.\n+ Long Range\n+ Anti-structure specialist"
+  },
+  {
+    "id": "royal-culverin",
+    "name": "Royal Culverin",
+    "type": "Siege",
+    "age": 3,
+    "stats": {
+      "attack": 40,
+      "armor": 0,
+      "speed": 0.625,
+      "health": 200
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Long-range mobile cannon with bonus vs buildings.\n+ Effective against Defenses\n+ Does not require setup to fire"
+  },
+  {
+    "id": "royal-ribauldequin",
+    "name": "Royal Ribauldequin",
+    "type": "Siege",
+    "age": 3,
+    "stats": {
+      "attack": 42,
+      "armor": 10,
+      "speed": 0.875,
+      "health": 215
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Five-barreled gunpowder weapon effective against massed units. Deals little damage to buildings.\n+ Can hit multiple targets in a single volley\n- Short range\n- Low ranged armor"
+  },
+  {
+    "id": "war-cog",
+    "name": "War Cog",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 35,
+      "armor": 4,
+      "speed": 1.375,
+      "health": 450
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Ship equipped with broadside ballistae.\n+ Strong against Arrow Ships\n- Lower maneuverability"
+  },
+  {
+    "id": "batu-khan",
+    "name": "Batu Khan",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 10,
+      "armor": 3,
+      "speed": 1.625,
+      "health": 190
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Melee cavalry leader that buffs the attack damage of nearby allies while the Khan is attacking. Can only be recruited from the Golden Tent.\n+ Durable heavy cavalry\n+ Automatically improves with each Age\n- Only one Khan per Golden Horde player"
+  },
+  {
+    "id": "kharash",
+    "name": "Kharash",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 6,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 50
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Low health and damage melee infantry that passively increases the armor of nearby units.\n+ Low cost and large recruitment batch \n- Weak against all types"
+  },
+  {
+    "id": "kipchak-archer",
+    "name": "Kipchak Archer",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 10,
+      "armor": 0,
+      "speed": 1.625,
+      "health": 105
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Highly mobile ranged cavalry effective against slower melee units and will cause units hit to bleed. Any healing will remove the bleed.\n+ High mobility\n- Low damage\n- Weak vs ranged units"
+  },
+  {
+    "id": "light-junk",
+    "name": "Light Junk",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 6,
+      "armor": 1,
+      "speed": 1.75,
+      "health": 300
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Light war vessel armed with a crew of archers.\n+ Increased maneuverability and speed.\n+ Benefits from ranged damage Blacksmith technology"
+  },
+  {
+    "id": "rus-tribute",
+    "name": "Rus Tribute",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "attack": 12,
+      "armor": 2,
+      "speed": 1.25,
+      "health": 200
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Rus heavy infantry called into service by the Golden Horde.\n+ Faster than other heavy infantry\n+ Faster attack speed\n+ Additional damage against cavalry\n- Less armored\n- Countered by Knights, Lancers, and Crossbowmen"
+  },
+  {
+    "id": "shaman",
+    "name": "Shaman",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 90
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Support unit with no combat capability. Can pick up Relics, convert enemy units, and capture Sacred Sites.\n+ Heals friendly units\n- Slow movement speed"
+  },
+  {
+    "id": "torguud",
+    "name": "Torguud",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 10,
+      "armor": 3,
+      "speed": 1.625,
+      "health": 220
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Expensive cavalry with high health and melee armor. Effective against melee units. Protects the Khan when nearby by redirecting damage to themselves and can heal the Khan while out of combat. \n+ Heavy armor\n+ High Health\n+ Automatically improves with each Age\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "traction-trebuchet",
+    "name": "Traction Trebuchet",
+    "type": "Siege",
+    "age": 3,
+    "stats": {
+      "attack": 40,
+      "armor": 0,
+      "speed": 0.875,
+      "health": 125
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Powerful siege engine effective at destroying buildings and walls over a long distance.\n+ Bonus damage vs buildings\n+ High mobility\n- Must be set up to fire\n- Inaccurate against units"
+  },
+  {
+    "id": "black-rider",
+    "name": "Black Rider",
+    "type": "Cavalry",
+    "age": 4,
+    "stats": {
+      "attack": 45,
+      "armor": 4,
+      "speed": 1.625,
+      "health": 225
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Expensive cavalry with high armor and a powerful arquebus. Effective against melee units. Has the Caracole ability.\nOnly 5 Riders can be trained for each standing Keep built.\n+ Heavy armor\n- Countered by Crossbowmen"
+  },
+  {
+    "id": "prelate",
+    "name": "Prelate",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 90
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Support unit with no combat capability. Automatically inspires Villagers to greatly improve their gather rate. Can pick up Relics, convert enemy units, and capture Sacred Sites starting in the Castle Age (III).\n+ Heals friendly units\n- Low health"
+  },
+  {
+    "id": "demilancer",
+    "name": "Veteran Demilancer",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": null,
+      "health": 100
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Unique heavy cavalry with moderate damage and durability. Effective frontline unit.\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "earls-guard",
+    "name": "Earl's Guard",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": null,
+      "health": 100
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Tough infantry with good damage. Periodically throws Daggers at nearby enemies.\n+ High armor\n- Slow movement\n- Countered by Knights, Lancers, and Crossbowmen"
+  },
+  {
+    "id": "earls-retinue",
+    "name": "Earl's Retinue",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": null,
+      "health": 100
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Produces an army of 6 Demilancers and 2 Hobelar."
+  },
+  {
+    "id": "garrison-command",
+    "name": "Garrison Command",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": null,
+      "health": 100
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Produces an army of 8 Spearman and 1 Earl's Guard."
+  },
+  {
+    "id": "gunpowder-contingent",
+    "name": "Gunpowder Contingent",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": null,
+      "health": 100
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Produces an army of 2 Ribauldequins and 1 Culverin."
+  },
+  {
+    "id": "hobelar",
+    "name": "Hobelar",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 7,
+      "armor": 3,
+      "speed": 1.875,
+      "health": 100
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Cheap cavalry effective at raiding, flanking, and countering ranged units.\n+ Cheaper than a normal Horseman\n+ High movement speed\n- Weak against melee units\n- Countered by Spearmen"
+  },
+  {
+    "id": "lord-of-lancaster",
+    "name": "Lord of Lancaster",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 14,
+      "armor": 2,
+      "speed": 1.125,
+      "health": 170
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "A powerful Lord of Lancaster, fights effectively and grants nearby military units +5% max health.\n+ High health.\n+ Improves nearby units.\n- Slow movement.\n- Countered by Knights, Lancers, and Crossbowmen."
+  },
+  {
+    "id": "yeoman",
+    "name": "Yeoman",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 5,
+      "armor": 0,
+      "speed": 1.3125,
+      "health": 70
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Quick and long-ranged infantry with good damage vs. unarmored targets.\n+ Long Range\n+ Fast movement speed\n- Countered by Horsemen"
+  },
+  {
+    "id": "atakebune",
+    "name": "Atakebune",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 40,
+      "armor": 5,
+      "speed": 1.25,
+      "health": 650
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Large sailed war vessel armed with rockets.\n+ Anti-structure specialist\n- Vulnerable vs. Incendiary Ships\n- Low movement speed"
+  },
+  {
+    "id": "buddhist-monk",
+    "name": "Buddhist Monk",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.25,
+      "health": 90
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Support unit with the ability to decrease enemy attack damage. Can pick up Relics, convert enemy units, and capture Sacred Sites.\n+ Reduced cost\n+ Conversion enhances friendly unit damage\n+ Automatically reduces enemy attack damage\n+ Heals units"
+  },
+  {
+    "id": "handcannon-ashigaru",
+    "name": "Handcannon Ashigaru",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 38,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 130
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Powerful all-purpose ranged infantry.\n+ High damage\n- High cost\n- Slow movement speed\n- Countered by Horsemen"
+  },
+  {
+    "id": "katana-bannerman",
+    "name": "Katana Bannerman",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 8,
+      "armor": 3,
+      "speed": 1.375,
+      "health": 155
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Samurai with an aura that increases damage of melee infantry. Comes with the Deflective Armor ability that periodically blocks attacks.\n+ Banner drops on death\n+ Heavy armor\n+ Increased move speed\n- Countered by Knights, Lancers, and Crossbowmen"
+  },
+  {
+    "id": "mounted-samurai",
+    "name": "Mounted Samurai",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 24,
+      "armor": 4,
+      "speed": 1.625,
+      "health": 230
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Expensive cavalry with high damage and a powerful charge attack. Comes with the Deflective Armor ability that periodically blocks attacks.\n+ Heavy armor\n+ Deflective Armor recharges out of combat\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "onna-bugeisha",
+    "name": "Onna-Bugeisha",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 6,
+      "armor": 0,
+      "speed": 1.5,
+      "health": 85
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Light melee infantry with fast attack speed and long weapon range.\n+ Fast attack speed\n+ Fast move speed\n+ Long weapon range\n- Weak against heavy targets\n- Countered by Archers, Knights"
+  },
+  {
+    "id": "onna-musha",
+    "name": "Onna-Musha",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 10,
+      "armor": 0,
+      "speed": 1.625,
+      "health": 80
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Highly mobile ranged cavalry effective against heavy units.\n+ Fast move speed\n+ Long weapon range\n+ Bonus damage vs. heavy units\n- Weak vs ranged units"
+  },
+  {
+    "id": "ozutsu",
+    "name": "Ozutsu",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 28,
+      "armor": 4,
+      "speed": 1,
+      "health": 160
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Ranged infantry equipped with a huge gunpowder weapon that has good weapon range, siege, and splash damage.\n+ Anti-building\n+ Area damage\n- Slow move speed\n- Slow attack speed\n- Countered by Horsemen and Crossbowmen"
+  },
+  {
+    "id": "samurai",
+    "name": "Samurai",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 8,
+      "armor": 2,
+      "speed": 1.125,
+      "health": 100
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Heavy infantry with good damage and defense. Comes with the Deflective Armor ability that periodically blocks attacks.\n+ Heavy armor\n+ Deflective Armor recharges out of combat\n- Slow move speed\n- Countered by Knights, Lancers, and Crossbowmen"
+  },
+  {
+    "id": "shinobi",
+    "name": "Shinobi",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 20,
+      "armor": 0,
+      "speed": 1.375,
+      "health": 80
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Melee infantry that specializes in scouting, sabotage, and assassination.\n+ Disguise as enemy Villagers\n+ Bonus damage vs. melee\n+ Health regeneration\n- Capital Town Centers, Outposts, and Scouts can spot disguises\n\nHeals passively."
+  },
+  {
+    "id": "shinto-priest",
+    "name": "Shinto Priest",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 90
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Support unit with unique privileges to hold and deposit Yorishiro into buildings. Can pick up Relics, convert enemy units, and capture Sacred Sites.\n+ Yorishiro provide unique bonuses\n+ Heals friendly units\n- Slow move speed"
+  },
+  {
+    "id": "uma-bannerman",
+    "name": "Uma Bannerman",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 16,
+      "armor": 3,
+      "speed": 1.625,
+      "health": 230
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Mounted Samurai with an aura that increases damage of cavalry. Comes with the Deflective Armor ability that periodically blocks attacks.\n+ Banner drops on death\n+ Fast move speed\n+ Heavy armor\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "yumi-ashigaru",
+    "name": "Yumi Ashigaru",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 4,
+      "armor": 0,
+      "speed": 1.375,
+      "health": 65
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Quick and cheap ranged infantry with good damage vs. unarmored targets.\n+ Increased move speed\n+ Cheaper than Archers\n- Reduced health\n- Weak against high ranged armor targets\n- Countered by Horsemen"
+  },
+  {
+    "id": "yumi-bannerman",
+    "name": "Yumi Bannerman",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 5,
+      "armor": 1,
+      "speed": 1.375,
+      "health": 140
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Ranged Samurai with an aura that increases damage of ranged infantry. Comes with the Deflective Armor ability that periodically blocks attacks.\n+ Banner drops on death\n+ Fast move speed\n- Weak against high ranged armor targets\n- Countered by Horsemen"
+  },
+  {
+    "id": "jeanne-darc-blast-cannon",
+    "name": "Jeanne d'Arc - Blast Cannon",
+    "type": "Cavalry",
+    "age": 4,
+    "stats": {
+      "attack": 40,
+      "armor": 5,
+      "speed": 1.625,
+      "health": 480
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Elite siege cavalry leader with high damage. Exceptionally effective vs buildings. If Jeanne is defeated, she will reappear at a Town Center. \n+ Heavy armor\n+ Good damage vs buildings\n- Countered only by superior numbers"
+  },
+  {
+    "id": "jeanne-darc-hunter",
+    "name": "Jeanne d'Arc - Hunter",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 5,
+      "armor": 0,
+      "speed": 1.375,
+      "health": 225
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Strong ranged infantry with good damage vs unarmored targets, and bonus damage vs spearmen. If Jeanne is defeated, she can be brought back at a Town Center.\n+ High rate of fire\n- Countered by Horsemen"
+  },
+  {
+    "id": "jeanne-darc-knight",
+    "name": "Jeanne d'Arc - Knight",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 16,
+      "armor": 4,
+      "speed": 1.625,
+      "health": 360
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Powerful heavy cavalry leader with high damage and health. If Jeanne is defeated, she can be brought back at a Town Center.\n+ Heavy armor\n+ Fast movement\n- Countered by Spearmen"
+  },
+  {
+    "id": "jeanne-darc-markswoman",
+    "name": "Jeanne d'Arc - Markswoman",
+    "type": "Cavalry",
+    "age": 4,
+    "stats": {
+      "attack": 28,
+      "armor": 2,
+      "speed": 1.625,
+      "health": 400
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Elite heavy siege cavalry leader with high damage. Exceptionally effective vs buildings. If Jeanne is defeated, she will reappear at a Town Center.\n+ Heavy armor \n+ Long range \n+ Good damage vs buildings\n- Countered only by superior buildings"
+  },
+  {
+    "id": "jeanne-darc-mounted-archer",
+    "name": "Jeanne d'Arc - Mounted Archer",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 15,
+      "armor": 1,
+      "speed": 1.625,
+      "health": 280
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "A powerful cavalry archer with exceptional range and damage. If Jeanne is defeated, she can be brought back at a Town Center.\n+ Long range\n+ Good damage\n- Countered by Horsemen"
+  },
+  {
+    "id": "jeanne-darc-peasant",
+    "name": "Jeanne d'Arc - Peasant",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 6,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 150
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Jeanne gathers resources and constructs buildings as a Villager. She constructs buildings more quickly, and generates more XP while constructing buildings compared to other tasks. If Jeanne is defeated, she can be brought back at a Town Center. \n - Weak in combat"
+  },
+  {
+    "id": "jeanne-darc-woman-at-arms",
+    "name": "Jeanne d'Arc - Woman-at-Arms",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 10,
+      "armor": 3,
+      "speed": 1.375,
+      "health": 225
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Strong heavy infantry leader with good armor and health. If Jeanne is defeated, she can be brought back at a Town Center.\n+ Heavy armor\n- Countered by Knights, Lancers, and Crossbowmen"
+  },
+  {
+    "id": "jeannes-champion",
+    "name": "Jeanne's Champion",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "attack": 13,
+      "armor": 3,
+      "speed": 1.125,
+      "health": 175
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Tough infantry that excels at countering Spearmen.\n+ High armor\n+ Bonus damage against Spearmen\n- Slow move speed\n- Countered by Knights, Lancers, and Crossbowmen\n\nUpgrades to Elite when Jeanne reaches level 4."
+  },
+  {
+    "id": "jeannes-rider",
+    "name": "Jeanne's Rider",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 13,
+      "armor": 6,
+      "speed": 1.875,
+      "health": 170
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Fast cavalry effective at raiding, flanking, and countering Crossbowmen.\n+ High movement speed\n+ Bonus damage against Crossbowmen\n- Weak against melee units\n- Countered by Spearmen\n\nUpgrades to Elite when Jeanne reaches level 4."
+  },
+  {
+    "id": "chevalier-confrere",
+    "name": "Chevalier Confrere",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 14,
+      "armor": 2,
+      "speed": 1.625,
+      "health": 160
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Heavy cavalry with high damage. Gains health from nearby Heavy Cavalry.\n+ Cheaper than a regular knight\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "condottiero",
+    "name": "Condottiero",
+    "type": "Infantry",
+    "age": 4,
+    "stats": {
+      "attack": 16,
+      "armor": 2,
+      "speed": 1.4375,
+      "health": 195
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Fast Heavy Infantry that deals more and takes less damage from Gunpowder units.\n+ High damage\n+ Moves quickly\n- High Gold cost"
+  },
+  {
+    "id": "genitour",
+    "name": "Genitour",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 6,
+      "armor": 4,
+      "speed": 1.625,
+      "health": 105
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Highly mobile ranged cavalry that throws javelins.\n+ High mobility\n+ Exceptional versus ranged units\n+ High ranged armor\n- Weak versus Melee"
+  },
+  {
+    "id": "genoese-crossbowman",
+    "name": "Genoese Crossbowman",
+    "type": "Ranged",
+    "age": 3,
+    "stats": {
+      "attack": 21,
+      "armor": 1,
+      "speed": 1.06,
+      "health": 110
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "High damage ranged unit effective against Melee Infantry.\n+ High damage\n- Low health\n- Countered by Horseman"
+  },
+  {
+    "id": "heavy-spearman",
+    "name": "Heavy Spearman",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "attack": 11,
+      "armor": 4,
+      "speed": 1.125,
+      "health": 140
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Heavy Infantry excellent against mounted units.\n+ Stronger when close to Fortresses\n+ Anti-cavalry specialist\n+ High armor\n+ Has a stronger spearwall\n- Countered by Crossbowmen"
+  },
+  {
+    "id": "hospitaller-knight",
+    "name": "Hospitaller Knight",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 10,
+      "armor": 2,
+      "speed": 1.25,
+      "health": 145
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Tough infantry with good damage, heals friendly units.\n+ High armor\n- Slow movement\n- Countered by Knights, Lancers, and Crossbowmen"
+  },
+  {
+    "id": "serjeant",
+    "name": "Serjeant",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 10,
+      "armor": 4,
+      "speed": 1.25,
+      "health": 105
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Sturdy infantry that throws axes which deal melee damage from range.\n+ Strong versus melee units\n- Weak versus ranged units"
+  },
+  {
+    "id": "szlachta-cavalry",
+    "name": "Szlachta Cavalry",
+    "type": "Cavalry",
+    "age": 4,
+    "stats": {
+      "attack": 30,
+      "armor": 2,
+      "speed": 1.725,
+      "health": 330
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Expensive cavalry with high damage and ranged armor. Slows enemy's attack speed when attacking.\n+ Heavy armor\n+ Strong versus Light Infantry\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "templar-brother",
+    "name": "Templar Brother",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 24,
+      "armor": 4,
+      "speed": 1.625,
+      "health": 275
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Expensive cavalry with high damage and melee armor. Effective against melee units.\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "teutonic-knight",
+    "name": "Teutonic Knight",
+    "type": "Infantry",
+    "age": 4,
+    "stats": {
+      "attack": 24,
+      "armor": 6,
+      "speed": 0.975,
+      "health": 310
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Extremely powerful and Expensive Heavy Infantry. Lowers the armor of nearby enemy units. Becomes more powerful after defeating an enemy.\n+ Excellent in melee combat\n- Weak to Crossbowmen\n- Low Mobility"
+  },
+  {
+    "id": "venetian-galley",
+    "name": "Venetian Galley",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 25,
+      "armor": 1,
+      "speed": 1,
+      "health": 700
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Large oared vessel with a long range forward mounted Trebuchet.\n+ Long Range\n+ Anti-structure specialist"
+  },
+  {
+    "id": "venetian-trader",
+    "name": "Venetian Trader",
+    "type": "Infantry",
+    "age": 4,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.875,
+      "health": 120
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "An expensive and fast Trader that generates Gold by travelling between its Home Market and a Trade Post or another player's Market. Greater distances between the Home Market and trade destination will generate higher amounts of Gold.\nYou may have a maximum of 5 Venetian Traders."
+  },
+  {
+    "id": "atgeirmadr",
+    "name": "Atgeirmaðr",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 7,
+      "armor": 0,
+      "speed": 1.25,
+      "health": 90
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Infantry best used against mounted units. Attacks faster with nearby Varangians.\n+ Anti-cavalry specialist\n+ Additional damage against Elephants\n- Weak against armored infantry\n- Countered by Archers"
+  },
+  {
+    "id": "attack-ship",
+    "name": "Attack Ship",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 35,
+      "armor": 3,
+      "speed": 1.375,
+      "health": 450
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Ship equipped with broadside ballistae.\n+ Strong against Arrow Ships\n- Lower maneuverability"
+  },
+  {
+    "id": "bogmadr",
+    "name": "Bogmaðr",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 5,
+      "armor": 0,
+      "speed": 1.25,
+      "health": 80
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Ranged infantry with good damage vs. unarmored targets. Has an ability to pierce enemy armor for reduced move speed.\n+ High rate of fire\n- Weak against armored targets\n- Countered by Horsemen"
+  },
+  {
+    "id": "hippodrome-horseman",
+    "name": "Hippodrome Horseman",
+    "type": "Cavalry",
+    "age": 1,
+    "stats": {
+      "attack": 13,
+      "armor": 2,
+      "speed": 1.875,
+      "health": 220
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Fast cavalry that enhances damage of nearby cavalry.\n+ High movement speed\n+ Health regeneration\n- Weak against melee units\n- Countered by Spearmen"
+  },
+  {
+    "id": "hippodrome-riddari",
+    "name": "Hippodrome Riddari",
+    "type": "Cavalry",
+    "age": 1,
+    "stats": {
+      "attack": 29,
+      "armor": 4,
+      "speed": 1.7,
+      "health": 280
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Elite varangian cavalry that can enhance the movement speed of nearby infantry. \n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "hippodrome-scout",
+    "name": "Hippodrome Scout",
+    "type": "Cavalry",
+    "age": 1,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.625,
+      "health": 220
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Lightly armed cavalry with increased vision and damage. Comes with an aura that increases damage of torches.\n+ Able to see into Stealth Forests\n+ Health regeneration\n+ High movement speed\n- Very weak in combat"
+  },
+  {
+    "id": "riddari",
+    "name": "Riddari",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 24,
+      "armor": 4,
+      "speed": 1.7,
+      "health": 240
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Cavalry with high damage and melee armor. Has an ability to throw axes from range.\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "warship",
+    "name": "Warship",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 45,
+      "armor": 5,
+      "speed": 1.25,
+      "health": 700
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Large sailed war vessel armed with broadside cannons.\n+ Anti-structure specialist\n- Low movement speed"
+  },
+  {
+    "id": "donso",
+    "name": "Donso",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 7,
+      "armor": 1,
+      "speed": 1.25,
+      "health": 80
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Infantry best used against mounted units. Periodically throws a javelin when attacking from ranged.\n+ Anti-cavalry specialist\n+ Additional damage against Elephants\n+ Comes with melee armor\n- Weak against heavy infantry\n- Countered by Archers and Longbowmen"
+  },
+  {
+    "id": "freeborn-warrior",
+    "name": "Freeborn Warrior",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "attack": 9,
+      "armor": 5,
+      "speed": 1.375,
+      "health": 175
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Infantry with high ranged armor and bonus against ranged.\n+ Strong against ranged units\n-weak against heavy melee units"
+  },
+  {
+    "id": "hunting-canoe",
+    "name": "Hunting Canoe",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 6,
+      "armor": 1,
+      "speed": 1.75,
+      "health": 300
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Light war vessel armed with a crew of archers.\n+ Increased maneuverability and speed.\n+ Benefits from ranged damage Blacksmith technology"
+  },
+  {
+    "id": "mansa-javelineer",
+    "name": "Mansa Javelineer",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 8,
+      "armor": 3,
+      "speed": 1.3125,
+      "health": 70
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Ranged infantry effective against other ranged units. Moves faster and deals poison damage.\n+ Anti-ranged specialist\n+ Increased weapon range\n+ Comes with ranged armor\n- Low health\n- Countered by Horsemen"
+  },
+  {
+    "id": "mansa-musofadi-warrior",
+    "name": "Mansa Musofadi Warrior",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 9,
+      "armor": 4,
+      "speed": 1.375,
+      "health": 105
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Infantry effective at ambush attacks and countering heavy targets. Has additional melee armor and health.\n+ Can enter stealth\n+ Anti-heavy specialist\n- Low health\n- Countered by Archers\n- Capital Town Centers, Outposts, and Scouts can spot stealth"
+  },
+  {
+    "id": "musofadi-gunner",
+    "name": "Musofadi Gunner",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 41,
+      "armor": 0,
+      "speed": 1.25,
+      "health": 130
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Powerful ranged infantry effective at ambush attacks.\n+ Increased movement speed\n+ Can enter stealth\n+ High damage\n- High cost"
+  },
+  {
+    "id": "sofa",
+    "name": "Sofa",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 17,
+      "armor": 2,
+      "speed": 1.725,
+      "health": 160
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Cheaper heavy cavalry for reduced health and armor.\n+ High movement speed\n+ Cheaper cost\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "war-canoe",
+    "name": "War Canoe",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 35,
+      "armor": 3,
+      "speed": 1.375,
+      "health": 450
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Ship equipped with broadside ballistae.\n+ Strong against Arrow Ships\n- Lower maneuverability"
+  },
+  {
+    "id": "warrior-scout",
+    "name": "Warrior Scout",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 7,
+      "armor": 0,
+      "speed": 1.75,
+      "health": 110
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Fast cavalry effective at raiding, exploring the world, hunting wildlife, and herding Sheep.\n+ Increased health regeneration\n+ Increased move speed\n+ Able to see into Stealth Forests\n- Weak in combat"
+  },
+  {
+    "id": "khaganate-horse-archer",
+    "name": "Khaganate Elite Horse Archer",
+    "type": "Cavalry",
+    "age": 4,
+    "stats": {
+      "attack": 12,
+      "armor": 0,
+      "speed": 1.625,
+      "health": 100
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Highly mobile ranged cavalry effective against slower melee units.\n+ High mobility\n- Weak vs ranged units\n\nRandomly spawns 5 at the time from the Khaganate Palace."
+  },
+  {
+    "id": "khaganate-knight",
+    "name": "Khaganate Elite Knight",
+    "type": "Cavalry",
+    "age": 4,
+    "stats": {
+      "attack": 29,
+      "armor": 5,
+      "speed": 1.625,
+      "health": 270
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Expensive cavalry with high damage and melee armor. Effective against melee units.\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen\n\nRandomly spawns 3 at the time from the Khaganate Palace."
+  },
+  {
+    "id": "khaganate-mangudai",
+    "name": "Khaganate Elite Mangudai",
+    "type": "Cavalry",
+    "age": 4,
+    "stats": {
+      "attack": 8,
+      "armor": 0,
+      "speed": 1.5625,
+      "health": 120
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Confounding mobile ranged cavalry that can fire at a slower rate while moving.\n+ High rate of fire\n- Low weapon range\n\nRandomly spawns from the Khaganate Palace."
+  },
+  {
+    "id": "khaganate-nest-of-bees",
+    "name": "Khaganate Nest of Bees",
+    "type": "Siege",
+    "age": 4,
+    "stats": {
+      "attack": 6,
+      "armor": 0,
+      "speed": 0.8125,
+      "health": 120
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Innovative field weapon capable of firing a barrage of rockets to damage defensive positions and clumped enemy troops.\n+ Good area of effect damage against most targets\n- Slowest movement speed\n- Weak if surrounded\n\nRandomly spawns from the Khaganate Palace."
+  },
+  {
+    "id": "khaganate-palace-guard",
+    "name": "Khaganate Elite Palace Guard",
+    "type": "Infantry",
+    "age": 4,
+    "stats": {
+      "attack": 14,
+      "armor": 4,
+      "speed": 1.375,
+      "health": 180
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Tough infantry with good damage. Move faster than Men-At-Arms, but with reduced armor.\n+ Heavy armor\n- Countered by Knights, Lancers, and Crossbowmen.\n\nRandomly spawns 5 at the time from the Khaganate Palace."
+  },
+  {
+    "id": "khaganate-warrior-monk",
+    "name": "Khaganate Warrior Monk",
+    "type": "Cavalry",
+    "age": 4,
+    "stats": {
+      "attack": 11,
+      "armor": 0,
+      "speed": 1.625,
+      "health": 190
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Military-minded support unit that improves combat capabilities of nearby units after it attacks. Can pick up Relics, convert enemy units, and capture Sacred Sites.\n+ Heals friendly units\n+ High utility in large armies\n- Low damage\n\nRandomly spawns 2 at the time from the Khaganate Palace."
+  },
+  {
+    "id": "khan",
+    "name": "Khan",
+    "type": "Cavalry",
+    "age": 1,
+    "stats": {
+      "attack": 2,
+      "armor": 0,
+      "speed": 1.625,
+      "health": 90
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Ranged Cavalry Leader able to use Signal Arrows to enhance nearby military units. Reappears at a Town Center if killed.\n+ Vision and herding of a Scout\n+ Automatically improves with each Age\n- Only one Khan per Mongol player"
+  },
+  {
+    "id": "khans-hunter",
+    "name": "Khan's Hunter",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 4,
+      "armor": 0,
+      "speed": 1.5625,
+      "health": 75
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Supporting Cavalry Archer that can fire while moving. Has the Khan's Hunter Aura that improves the range of nearby ranged units.\n+High Mobility\n+Excellent Vision\n-Low Health"
+  },
+  {
+    "id": "gilded-archer",
+    "name": "Gilded Archer",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 6,
+      "armor": 0,
+      "speed": 1.25,
+      "health": 125
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Ranged infantry with good damage vs. unarmored targets and increased fire rate and longer weapon range than standard Archers.\n+ Increased weapon range\n+ Faster attack speed\n- Weak against armored targets\n- Countered by Horsemen"
+  },
+  {
+    "id": "gilded-crossbowman",
+    "name": "Gilded Crossbowman",
+    "type": "Ranged",
+    "age": 3,
+    "stats": {
+      "attack": 15,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 140
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Crossbowmen with increased range and exceptionally high damage against heavy units.\n+ Anti-heavy specialist\n+ Long range\n- Low health\n- Countered by Horsemen"
+  },
+  {
+    "id": "gilded-handcannoneer",
+    "name": "Gilded Handcannoneer",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "attack": 41,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 250
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "More powerful all-purpose ranged infantry with increased attack speed.\n+ High damage\n+ Increased attack speed\n- High cost\n- Slow movement speed\n- Countered by Horsemen"
+  },
+  {
+    "id": "gilded-horseman",
+    "name": "Gilded Horseman",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 15,
+      "armor": 2,
+      "speed": 1.875,
+      "health": 250
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Fast cavalry effective at raiding, flanking, and countering ranged units.\n+ High movement speed\n- Weak against melee units\n- Countered by Spearmen"
+  },
+  {
+    "id": "gilded-knight",
+    "name": "Gilded Knight",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 36,
+      "armor": 5,
+      "speed": 1.625,
+      "health": 400
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Expensive cavalry with a powerful charge.\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "gilded-landsknecht",
+    "name": "Gilded Landsknecht",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "attack": 21,
+      "armor": 0,
+      "speed": 1.25,
+      "health": 180
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Brave unarmored infantry with an enormous two-handed sword, effective in mixed armies.\n+ Melee attack deals area damage\n- Low health\n- Countered by Archers"
+  },
+  {
+    "id": "gilded-man-at-arms",
+    "name": "Early Gilded Man-at-Arms",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 14,
+      "armor": 3,
+      "speed": 1.125,
+      "health": 230
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Tough infantry with good damage.\n+ High armor\n- Slow movement\n- Countered by Knights, Lancers, and Crossbowmen"
+  },
+  {
+    "id": "gilded-spearman",
+    "name": "Gilded Spearman",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 10,
+      "armor": 1,
+      "speed": 1.25,
+      "health": 160
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Infantry best used against mounted units.\n+ Anti-cavalry specialist\n+ Additional damage against Elephants\n- Weak against heavy infantry\n- Countered by Archers"
+  },
+  {
+    "id": "gilded-villager",
+    "name": "Gilded Villager",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 7,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 65
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Gathers Wood, Food, Stone, and Gold. Builds and repairs buildings and can repair siege engines and naval units. Gathers resources 28% quicker and builds and repairs 20% faster than regular Villagers.\n- Weak in combat"
+  },
+  {
+    "id": "akinji",
+    "name": "Akinji",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 7,
+      "armor": 0,
+      "speed": 1.625,
+      "health": 95
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Highly mobile long ranged cavalry which fires two arrows in quick succession. \n+ High mobility\n- Weak vs ranged units"
+  },
+  {
+    "id": "grand-galley",
+    "name": "Grand Galley",
+    "type": "Ranged",
+    "age": 3,
+    "stats": {
+      "attack": 35,
+      "armor": 0,
+      "speed": 1,
+      "health": 750
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Large oared vessel which can be upgraded into a naval Military School.\n+ Large hold which can be garrisoned by any unit once upgraded into a Military School\n+ Very long range\n- Lower damage"
+  },
+  {
+    "id": "great-bombard",
+    "name": "Great Bombard",
+    "type": "Siege",
+    "age": 4,
+    "stats": {
+      "attack": 70,
+      "armor": 0,
+      "speed": 0.75,
+      "health": 250
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Largest cannon that can be fielded. Excellent against buildings or groups of targets.\n+ High damage\n+ Area damage\n+ Long Range\n- Must be set up to fire"
+  },
+  {
+    "id": "janissary",
+    "name": "Janissary",
+    "type": "Ranged",
+    "age": 3,
+    "stats": {
+      "attack": 16,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 90
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Powerful infantry effective against cavalry and can repair siege engines.\n+ High damage\n+ Bonus damage against cavalry\n- High cost\n- Slow movement speed\n- Receives additional damage from Archers."
+  },
+  {
+    "id": "mehter",
+    "name": "Mehter",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.875,
+      "health": 160
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "War drummer that enhances units in an area, except Villagers and Traders.\n+ War drum military enhancements\n+ High movement speed\n- No weapons"
+  },
+  {
+    "id": "lodya-attack-ship",
+    "name": "Lodya Attack Ship",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 35,
+      "armor": 3,
+      "speed": 1.375,
+      "health": 450
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Ship equipped with broadside ballistae.\n+ Strong against Arrow Ships\n- Lower maneuverability"
+  },
+  {
+    "id": "lodya-demolition-ship",
+    "name": "Lodya Demolition Ship",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 95,
+      "armor": 0,
+      "speed": 2,
+      "health": 145
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Small ship packed with explosives. Detonates when killed, damaging any units in the area.\n+ The Lodya can be converted to any other type of ship\n- Damage is reduced further from the explosion center\n- No weapons other than self-destruction"
+  },
+  {
+    "id": "lodya-fishing-boat",
+    "name": "Lodya Fishing Boat",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.5,
+      "health": 200
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Small boat that gathers Food from either Deep Water Fish or Shoreline Fish. Does not require a Dock to drop off gathered Food and gathers faster than a regular Fishing Boat.\n- No combat\nThe Lodya Fishing Boat can be converted to any other type of ship."
+  },
+  {
+    "id": "lodya-galley",
+    "name": "Lodya Galley",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "attack": 6,
+      "armor": 1,
+      "speed": 1.75,
+      "health": 300
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Oared war vessel armed with a crew of archers.\n+ Increased maneuverability\n+ Benefits from ranged damage Blacksmith technology"
+  },
+  {
+    "id": "lodya-trade-ship",
+    "name": "Lodya Trade Ship",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.5,
+      "health": 225
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Trade Ships generate Gold and Wood when assigned to a trade route with a Coastal Trade Post or another player's Dock.\nThe Lodya can be converted to any other type of ship."
+  },
+  {
+    "id": "lodya-transport-ship",
+    "name": "Lodya Transport Ship",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.5,
+      "health": 400
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Can be garrisoned by any unit and uses their sight range. Allows garrisoned units to be transport across water.\nThe Lodya can be converted to any other type of ship."
+  },
+  {
+    "id": "militia",
+    "name": "Militia",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 6,
+      "armor": 0,
+      "speed": 1.5,
+      "health": 85
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Light melee infantry equipped with a polearm.\n+ Fast moving\n- Countered by Archers\n- Can't garrison\n- Loses life over time"
+  },
+  {
+    "id": "warrior-monk",
+    "name": "Warrior Monk",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 11,
+      "armor": 0,
+      "speed": 1.625,
+      "health": 190
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Military-minded support unit that improves combat capabilities of nearby units after it attacks. Can pick up Relics, convert enemy units, and capture Sacred Sites.\n+ Heals friendly units\n+ High utility in large armies\n- Low damage"
+  },
+  {
+    "id": "daimyo",
+    "name": "Daimyo",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 18,
+      "armor": 2,
+      "speed": 1.625,
+      "health": 240
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "High health and damage melee cavalry that provides an aura that increases attack speed of nearby military units. Effective against melee units. Limited to one per Daimyo Estate built.\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "ikko-ikki-monk",
+    "name": "Ikko-ikki Monk",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "attack": 13,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 160
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Warrior Monk with strong combat capabilities that heals nearby units when attacking. Does not have a targeted heal ability.\n+ Can heal themselves\n- Slow move speed"
+  },
+  {
+    "id": "kanabo-samurai",
+    "name": "Kanabo Samurai",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 3,
+      "armor": 1,
+      "speed": 1.125,
+      "health": 185
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Tough infantry with good damage. Deals +6% of enemy max health as bonus damage.\n+ High health\n+ Strong against high health units \n- Slow move speed\n- Countered by Crossbowmen"
+  },
+  {
+    "id": "mounted-samurai-levy",
+    "name": "Mounted Samurai Levy",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 24,
+      "armor": 4,
+      "speed": 1.625,
+      "health": 230
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Expensive cavalry with high damage and a powerful charge attack.\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen"
+  },
+  {
+    "id": "naginata-samurai",
+    "name": "Naginata Samurai",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 8,
+      "armor": 2,
+      "speed": 1.125,
+      "health": 100
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Heavy infantry with good damage and defense.\n+ Heavy armor\n- Slow move speed\n- Countered by Knights, Lancers, and Crossbowmen"
+  },
+  {
+    "id": "naginata-samurai-levy",
+    "name": "Naginata Samurai Levy",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 8,
+      "armor": 2,
+      "speed": 1.125,
+      "health": 100
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Heavy infantry with good damage and defense.\n+ Heavy armor\n- Slow move speed\n- Countered by Knights, Lancers, and Crossbowmen"
+  },
+  {
+    "id": "spearman-levy",
+    "name": "Spearman Levy",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 7,
+      "armor": 0,
+      "speed": 1.25,
+      "health": 80
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Infantry best used against mounted units.\n+ Anti-cavalry specialist\n+ Additional damage against Elephants\n- Weak against heavy infantry\n- Countered by Archers"
+  },
+  {
+    "id": "tanegashima-ashigaru",
+    "name": "Tanegashima Ashigaru",
+    "type": "Ranged",
+    "age": 3,
+    "stats": {
+      "attack": 15,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 95
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Powerful ranged infantry that is effective against armored units.\n+ High damage\n- High cost\n- Slow movement speed\n- Countered by Horsemen"
+  },
+  {
+    "id": "tanegashima-ashigaru-levy",
+    "name": "Tanegashima Ashigaru Levy",
+    "type": "Ranged",
+    "age": 3,
+    "stats": {
+      "attack": 15,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 90
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Powerful ranged infantry that is effective against armored units.\n+ High damage\n- High cost\n- Slow movement speed\n- Countered by Horsemen"
+  },
+  {
+    "id": "yari-cavalry",
+    "name": "Yari Cavalry",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 9,
+      "armor": 2,
+      "speed": 1.875,
+      "health": 135
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Fast cavalry effective at raiding, flanking, and countering ranged units. Bonus damage against cavalry.\n+ High movement speed\n- Weak against melee units\n- Countered by Spearmen"
+  },
+  {
+    "id": "yari-cavalry-levy",
+    "name": "Yari Cavalry Levy",
+    "type": "Cavalry",
+    "age": 1,
+    "stats": {
+      "attack": 9,
+      "armor": 2,
+      "speed": 1.875,
+      "health": 135
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Fast cavalry effective at raiding, flanking, and countering ranged units. Bonus damage against cavalry.\n+ High movement speed\n- Weak against melee units\n- Countered by Spearmen"
+  },
+  {
+    "id": "yatai",
+    "name": "Yatai",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 0.875,
+      "health": 370
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Collects Food from nearby sources without consuming them in addition to a base rate of 20 Food every minute. After collecting enough Food it will send a trader to its Home Matsuri, which improves the Matsuri gather rate aura by 5%, +250 health and grants +50 additional Food. \nFood sources overlapped by multiple Yatai are only counted once and Boar do not retaliate while near a Yatai. The Yatai is limited to 3 and is increased by +1 per age up."
+  },
+  {
+    "id": "yumi-ashigaru-levy",
+    "name": "Yumi Ashigaru Levy",
+    "type": "Ranged",
+    "age": 1,
+    "stats": {
+      "attack": 4,
+      "armor": 0,
+      "speed": 1.375,
+      "health": 65
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Quick and cheap ranged infantry with good damage vs. unarmored targets.\n+ Increased move speed\n+ Cheaper than Archers\n- Reduced health\n- Weak against high ranged armor targets\n- Countered by Horsemen"
+  },
+  {
+    "id": "amir-warrior",
+    "name": "Amir Warrior",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "attack": 12,
+      "armor": 5,
+      "speed": 1.125,
+      "health": 180
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Powerful Heavy Infantry trained for free that excels in combat near to Tughlaqabad Forts. \n+ No population cost\n+ High health and armor\n- Rapidly loses strength away from Tughlaqabad Forts\n- Countered by Crossbowmen"
+  },
+  {
+    "id": "ballista-elephant",
+    "name": "Ballista Elephant",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "attack": 17,
+      "armor": 2,
+      "speed": 1,
+      "health": 400
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Ballista mounted elephant effective at dealing with melee infantry and hitting multiple targets.\n+ High health and armor\n+ Bonus damage vs. melee\n- Slow movement speed"
+  },
+  {
+    "id": "healer-elephant",
+    "name": "Healer Elephant",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 15,
+      "armor": 3,
+      "speed": 1,
+      "health": 400
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Support elephant with two mounted Imams that individually heal allied units. Gains additional damage from nearby melee infantry and captures Sacred Sites.\n+ High health and armor\n- Slow movement speed\n- Countered by Spearman & Crossbowmen"
+  },
+  {
+    "id": "raider-elephant",
+    "name": "Raider Elephant",
+    "type": "Cavalry",
+    "age": 2,
+    "stats": {
+      "attack": 18,
+      "armor": 3,
+      "speed": 1.6,
+      "health": 235
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Fast elephant effective at raiding, flanking, and countering ranged units. Can use the Trample ability to bypass any unit to deal damage in an area.\n+ High health\n+ Fast movement speed\n+ Charges longer distances\n- Countered by Spearmen"
+  },
+  {
+    "id": "worker-elephant",
+    "name": "Worker Elephant",
+    "type": "Infantry",
+    "age": 2,
+    "stats": {
+      "attack": 0,
+      "armor": 0,
+      "speed": 1.125,
+      "health": 500
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Hardworking support Elephant.\n+ Universal resource drop-off\n+ Bonus to all resources dropped off\n+ Requires no Population - maximum 20\n- Slow movement speed"
+  },
+  {
+    "id": "imperial-guard",
+    "name": "Imperial Guard",
+    "type": "Cavalry",
+    "age": 4,
+    "stats": {
+      "attack": 28,
+      "armor": 10,
+      "speed": 1.625,
+      "health": 340
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Expensive cavalry with high damage and melee armor. Effective against melee units.\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen\n\nRequires Dynastic Protectors researched at Zhu Xi's Library."
+  },
+  {
+    "id": "shaolin-monk",
+    "name": "Shaolin Monk",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "attack": 15,
+      "armor": 2,
+      "speed": 1.1875,
+      "health": 170
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Monk with strong combat capabilities.\n+ Strong against ranged units \n+ Can heal themselves\n- Cannot heal others"
+  },
+  {
+    "id": "yuan-raider",
+    "name": "Yuan Raider",
+    "type": "Cavalry",
+    "age": 4,
+    "stats": {
+      "attack": 15,
+      "armor": 4,
+      "speed": 2,
+      "health": 200
+    },
+    "strengths": [],
+    "weaknesses": [],
+    "description": "Extremely swift light cavalry which deals bonus damage to economic units.\n+ Fast move speed\n+ Bonus damage vs Villagers\n- Weak in melee combat\n- Countered by Spearmen\n\nRequires Dynastic Protectors researched at Zhu Xi's Library."
+  }
+]

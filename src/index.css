@@ -1,0 +1,70 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+@theme {
+  --color-brand-gold: #D4AF37;
+  --color-brand-blue: #4169E1;
+  --color-brand-dark: #121212;
+  --color-brand-card: rgba(30, 40, 60, 0.6);
+  --color-brand-card-hover: rgba(40, 50, 80, 0.8);
+  --color-brand-border: rgba(212, 175, 55, 0.3);
+  --color-brand-border-glow: rgba(212, 175, 55, 0.6);
+}
+
+:root {
+  background-color: var(--color-brand-dark);
+  color: #f8f8f2;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image: radial-gradient(circle at top, #1a2542 0%, #121212 50%);
+  background-attachment: fixed;
+}
+
+@utility glass {
+  background: var(--color-brand-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-brand-border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+}
+
+@utility glass-hover {
+  background: var(--color-brand-card-hover);
+  border-color: var(--color-brand-border-glow);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+}
+
+@utility sfumato-mask {
+  mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+}
+
+/* Elegant Scrollbar */
+.elegant-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.elegant-scrollbar::-webkit-scrollbar-track {
+  background: rgba(18, 18, 18, 0.5);
+}
+
+.elegant-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #D4AF37/20, #D4AF37/40);
+  border-radius: 10px;
+}
+
+.elegant-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #D4AF37/60;
+}
+
+/* Firefox */
+.elegant-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.3) rgba(18, 18, 18, 0.5);
+}
