@@ -36,9 +36,9 @@ export function CustomSelect({ options, value, onChange, label }: CustomSelectPr
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full bg-black/40 backdrop-blur-md border border-[#D4AF37]/20 hover:border-yellow-500/50 rounded-xl px-4 py-2.5 text-sm text-white flex items-center justify-between transition-all duration-300 shadow-lg group"
+          className="w-full h-[42px] bg-black/40 backdrop-blur-md border border-[#D4AF37]/20 hover:border-yellow-500/50 rounded-xl px-2.5 sm:px-4 text-xs sm:text-sm text-white flex items-center justify-between transition-all duration-300 shadow-lg group gap-2"
         >
-          <span className="font-medium">{selectedOption?.label}</span>
+          <span className="font-medium truncate">{selectedOption?.label}</span>
           <ChevronDown 
             size={16} 
             className={`text-yellow-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} 
