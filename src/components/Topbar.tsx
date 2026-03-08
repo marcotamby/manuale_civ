@@ -11,7 +11,7 @@ interface TopbarProps {
 }
 
 export function Topbar({}: TopbarProps) {
-  const { isAuthenticated, isAdmin, user, logout } = useAuth();
+  const { isAuthenticated, isAdmin, user, logout, openLoginModal } = useAuth();
 
   return (
     <div className="w-full glass border-b border-[#D4AF37]/20 flex flex-col md:flex-row items-start md:items-center justify-between p-4 md:px-10 md:py-4 z-10 shrink-0 gap-4">
@@ -29,7 +29,7 @@ export function Topbar({}: TopbarProps) {
       </div>
 
       <div className="flex items-center ml-auto">
-        {isAuthenticated && isAdmin && (
+        {isAuthenticated && isAdmin ? (
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-yellow-500">
               <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center border border-yellow-500/50">
@@ -47,6 +47,17 @@ export function Topbar({}: TopbarProps) {
               Esci
             </button>
           </div>
+        ) : (
+          <button
+            onClick={openLoginModal}
+            title="Accesso Admin"
+            className="text-gray-500 hover:text-yellow-500 transition-colors p-2 rounded-lg hover:bg-white/5"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </button>
         )}
       </div>
     </div>
