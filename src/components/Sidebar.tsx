@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useCivData } from './CivContext';
 import { useAuth } from './AuthContext';
-import { Home as HomeIcon, Map as MapIcon, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Home as HomeIcon, Heart, Search, X, Settings, LogOut, ChevronRight, User } from 'lucide-react';
 
 interface SidebarProps {
   selectedCiv: string;

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Home as HomeIcon } from 'lucide-react';
 import { Sidebar } from './components/Sidebar';
 import { Topbar } from './components/Topbar';
 import { UnitDetailModal } from './components/UnitDetailModal';
@@ -51,7 +52,8 @@ function App() {
     const diffX = touchEndX - touchStartX.current;
 
     // If swipe right and sidebar is closed, open it
-    if (diffX > 50 && !isSidebarOpen) {
+    const canShowSidebar = currentPage !== 'home' || favorites.length > 0;
+    if (diffX > 50 && !isSidebarOpen && canShowSidebar) {
       setIsSidebarOpen(true);
     }
     touchStartX.current = null;
@@ -127,12 +129,9 @@ function App() {
               <button
                 onClick={() => setCurrentPage('home')}
                 title="Torna alla Home"
-                className="p-2 glass rounded-lg hover:bg-white/10 transition-colors"
+                className="p-2 glass rounded-lg hover:bg-white/10 transition-colors text-yellow-500"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="19" y1="12" x2="5" y2="12"></line>
-                  <polyline points="12 19 5 12 12 5"></polyline>
-                </svg>
+                <HomeIcon size={20} />
               </button>
 
               {(currentPage !== 'home' || favorites.length > 0) && (
