@@ -20,9 +20,36 @@ interface CivViewProps {
 
 export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const { civilizations: civilizationsData, refreshCivs } = useCivData();
-  const [activeTab, setActiveTab] = useState<Tab>('caratteristiche');
-  const [activeAge, setActiveAge] = useState<1|2|3|4>(1);
-  const [unitView, setUnitView] = useState<'units' | 'techtree'>('units');
+  
+  // Persist local state for this view
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    return (sessionStorage.getItem('activeTab') as Tab) || 'caratteristiche';
+  });
+  const [activeAge, setActiveAge] = useState<1|2|3|4>(() => {
+    return (Number(sessionStorage.getItem('activeAge')) as 1|2|3|4) || 1;
+  });
+  const [unitView, setUnitView] = useState<'units' | 'techtree'>(() => {
+    return (sessionStorage.getItem('unitView') as 'units' | 'techtree') || 'units';
+  });
+
+  // No longer needed here as handlers deal with it
+  // useEffect would be better but handlers are already syncing to sessionStorage
+  
+  // Update whenever they change
+  const handleTabChange = (tab: Tab) => {
+    setActiveTab(tab);
+    sessionStorage.setItem('activeTab', tab);
+  };
+
+  const handleAgeChange = (age: number) => {
+    setActiveAge(age as 1|2|3|4);
+    sessionStorage.setItem('activeAge', age.toString());
+  };
+
+  const handleUnitViewChange = (view: 'units' | 'techtree') => {
+    setUnitView(view);
+    sessionStorage.setItem('unitView', view);
+  };
   const [localCivs, setLocalCivs] = useState<Record<string, Civilization>>({});
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const { isAdmin } = useAuth();
@@ -92,7 +119,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           {tabs.map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabChange(tab.id)}
               className={`flex items-center gap-2 px-5 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'border-yellow-500 text-yellow-400'
@@ -182,7 +209,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         ? 'bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] scale-105'
                         : 'text-gray-400 hover:text-white hover:bg-white/5'
                     }`}
-                    onClick={() => setActiveAge(age as 1|2|3|4)}
+                    onClick={() => handleAgeChange(age)}
                   >
                     Age {"I II III IV".split(" ")[age - 1]}
                   </button>
@@ -192,13 +219,13 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <div className="flex gap-2 glass rounded-2xl p-1.5">
                 <button
                   className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${unitView === 'units' ? 'bg-blue-600/50 text-white border border-blue-500/30' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-                  onClick={() => setUnitView('units')}
+                  onClick={() => handleUnitViewChange('units')}
                 >
                   Unità & Tecnologie
                 </button>
                 <button
                   className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${unitView === 'techtree' ? 'bg-blue-600/50 text-white border border-blue-500/30' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-                  onClick={() => setUnitView('techtree')}
+                  onClick={() => handleUnitViewChange('techtree')}
                 >
                   Tech Tree
                 </button>
@@ -268,7 +295,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 <h3 className="text-xl font-bold text-white mb-2">Build Orders in arrivo</h3>
                 <p className="text-sm text-gray-500 max-w-sm">I build order per questa civiltà saranno aggiunti presto dai contributori della community.</p>
                 <button 
-                  onClick={() => setActiveTab('proponi')}
+                  onClick={() => handleTabChange('proponi')}
                   className="mt-6 px-8 py-3 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/30 rounded-xl text-sm text-yellow-500 font-bold transition-all"
                 >
                   Proponi un Build Order →
