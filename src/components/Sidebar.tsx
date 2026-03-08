@@ -1,12 +1,12 @@
 import { useRef } from 'react';
 import { useCivData } from './CivContext';
 import { useAuth } from './AuthContext';
-import { Home as HomeIcon, Heart, Search, X, Settings, LogOut, ChevronRight, User } from 'lucide-react';
+import { Home as HomeIcon, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface SidebarProps {
   selectedCiv: string;
   onSelectCiv: (civId: string) => void;
-  onSelectPage: (page: 'home' | 'maps' | 'civ') => void;
+  onSelectPage: (page: 'home' | 'civ' | 'compare') => void;
   isOpen: boolean;
   onClose: () => void;
   onOpen?: () => void;
