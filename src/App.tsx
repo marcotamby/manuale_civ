@@ -5,7 +5,6 @@ import { Topbar } from './components/Topbar';
 import { UnitDetailModal } from './components/UnitDetailModal';
 import { Home } from './components/Home';
 import { CivView } from './components/CivView';
-import { MapsView } from './components/MapsView';
 import { CompareView } from './components/CompareView';
 import { CookieBanner } from './components/CookieBanner';
 import { useCivData } from './components/CivContext';
