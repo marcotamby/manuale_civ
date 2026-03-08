@@ -22,7 +22,7 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
             <BarChart2 size={40} className="text-blue-500" />
             Confronto Civiltà
           </h1>
-          <p className="text-gray-400 italic">Analisi fianco a fianco di {civ1!.name} e {civ2!.name}.</p>
+          <p className="text-gray-400 italic text-sm md:text-base">Analisi fianco a fianco di {civ1!.name} e {civ2!.name}.</p>
         </div>
         <button
           onClick={onClose}
@@ -32,7 +32,7 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
         </button>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto pb-20">
+      <div className="grid grid-cols-2 gap-3 md:gap-8 max-w-7xl mx-auto pb-20">
         {[civ1, civ2].map((civ, idx) => (
           <div key={civ!.id} className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${idx * 150}ms` }}>
             {/* Header Card */}
@@ -40,16 +40,16 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
               <div className="absolute inset-0 opacity-10 transition-transform duration-700 group-hover:scale-110">
                 <img src={civ!.flag} alt="" className="w-full h-full object-cover blur-xl" />
               </div>
-              <div className="relative flex items-center gap-6">
-                <img src={civ!.flag} alt={civ!.name} className="w-20 h-20 object-contain drop-shadow-2xl" />
+              <div className="relative flex flex-col md:flex-row items-center gap-3 md:gap-6 text-center md:text-left">
+                <img src={civ!.flag} alt={civ!.name} className="w-12 h-12 md:w-20 md:h-20 object-contain drop-shadow-2xl" />
                 <div>
-                  <h2 className="text-3xl font-bold text-white mb-2">{civ!.name}</h2>
-                  <span className={`text-xs font-bold px-3 py-1 rounded-full border ${
+                  <h2 className="text-lg md:text-3xl font-bold text-white mb-1 md:mb-2">{civ!.name}</h2>
+                  <span className={`text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full border ${
                     civ!.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/10' :
                     civ!.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-500/40 bg-yellow-500/10' :
                     'text-red-400 border-red-500/40 bg-red-500/10'
                   }`}>
-                    Difficoltà: {civ!.difficulty}
+                    {civ!.difficulty}
                   </span>
                 </div>
               </div>
@@ -72,7 +72,7 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
               </h3>
               <div className="grid grid-cols-1 gap-3">
                 {civ!.passiveBonuses.slice(0, 4).map((bonus, bIdx) => (
-                  <div key={bIdx} className="glass p-4 rounded-xl border border-white/5 text-sm text-gray-300">
+                  <div key={bIdx} className="glass p-2 md:p-4 rounded-xl border border-white/5 text-[10px] md:text-sm text-gray-300">
                     {bonus}
                   </div>
                 ))}
