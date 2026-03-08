@@ -15,7 +15,9 @@ import { LoginModal } from './components/LoginModal';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'civ' | 'compare'>(() => {
-    return (sessionStorage.getItem('aoe4_currentPage') as any) || 'home';
+    const saved = sessionStorage.getItem('aoe4_currentPage');
+    if (saved === 'home' || saved === 'civ' || saved === 'compare') return saved;
+    return 'home';
   });
   const [selectedCiv, setSelectedCiv] = useState<string>(() => {
     return sessionStorage.getItem('aoe4_selectedCiv') || 'english';
@@ -103,7 +105,7 @@ function App() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {(currentPage !== 'home' || favorites.length > 0) && (
+      {((currentPage !== 'home' || favorites.length > 0) && (currentPage !== 'home' || isSidebarOpen)) && (
         <Sidebar
           selectedCiv={selectedCiv}
           onSelectCiv={handleSelectCiv}

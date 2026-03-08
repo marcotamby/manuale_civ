@@ -10,7 +10,7 @@ interface TopbarProps {
   setActiveFilter: (f: FilterType) => void;
 }
 
-export function Topbar({}: TopbarProps) {
+export function Topbar(_props: TopbarProps) {
   const { isAuthenticated, isAdmin, user, logout, openLoginModal } = useAuth();
 
   return (

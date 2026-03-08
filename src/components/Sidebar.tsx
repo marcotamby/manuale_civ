@@ -10,7 +10,7 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onOpen?: () => void;
-  currentPage: 'home' | 'civ' | 'maps' | 'compare';
+  currentPage: 'home' | 'civ' | 'compare';
 }
 
 export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClose, onOpen, currentPage }: SidebarProps) {
