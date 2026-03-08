@@ -40,9 +40,9 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
       alert('Modifiche salvate con successo nel database!');
       onSave(editedCiv);
       onClose();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error saving civilization:', err);
-      alert('Errore durante il salvataggio.');
+      alert(`Errore durante il salvataggio: ${err?.message || JSON.stringify(err)}`);
     } finally {
       setIsSaving(false);
     }
