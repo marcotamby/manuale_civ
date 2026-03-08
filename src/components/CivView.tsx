@@ -9,10 +9,7 @@ import { AdminCivEditorModal } from './AdminCivEditorModal';
 import { useAuth } from './AuthContext';
 import type { Civilization } from '../data/aoe4Data';
 import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight } from 'lucide-react';
-import LiteYouTubeEmbed from 'react-lite-youtube-embed';
-import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
-
-type Tab = 'caratteristiche' | 'units' | 'buildorders' | 'matchups' | 'video' | 'proponi';
+type Tab = 'caratteristiche' | 'units' | 'buildorders' | 'matchups' | 'video' | 'proponi' | 'admin-edit';
 
 // Initial data is now handled in Supabase database
 
@@ -166,7 +163,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             {isAdmin && (
               <div className="p-4 bg-purple-500/10 border border-purple-500/30 rounded-xl text-sm text-purple-300 flex items-center gap-3">
                 < Shield size={20} className="shrink-0" />
-                <span>🛡️ <strong>Admin:</strong> Puoi modificare direttamente i contenuti di questa sezione nella tab "Proponi Modifica".</span>
+                <span>🛡️ <strong>Admin:</strong> Puoi modificare direttamente i contenuti di questa sezione nella tab "Modifica (Admin)".</span>
               </div>
             )}
           </div>
@@ -308,18 +305,41 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {civ.videos && civ.videos.length > 0 ? (
-                civ.videos.map((vidId, index) => (
-                  <div key={`${vidId}-${index}`} className="group relative">
-                    <div className="aspect-video w-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black relative">
-                      <LiteYouTubeEmbed 
-                        id={vidId}
-                        title="YouTube Video"
-                        poster="maxresdefault"
-                        wrapperClass="yt-lite w-full h-full absolute inset-0"
+                civ.videos.map((vidId, index) => {
+                  // If the ID is actually a full URL, extract the ID
+                  let finalId = vidId;
+                  try {
+                    if (vidId.includes('youtube.com') || vidId.includes('youtu.be')) {
+                      const url = new URL(vidId);
+                      finalId = url.searchParams.get('v') || url.pathname.slice(1) || vidId;
+                    }
+                  } catch(e) {}
+                  
+                  return (
+                    <a 
+                      key={`${finalId}-${index}`} 
+                      href={`https://www.youtube.com/watch?v=${finalId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group relative block aspect-video w-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black transition-transform hover:scale-105 hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]"
+                    >
+                      <img 
+                        src={`https://img.youtube.com/vi/${finalId}/maxresdefault.jpg`} 
+                        alt="Video Thumbnail"
+                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                        onError={(e) => {
+                          // Fallback to hqdefault if maxresdefault doesn't exist
+                          (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${finalId}/hqdefault.jpg`;
+                        }}
                       />
-                    </div>
-                  </div>
-                ))
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-16 h-12 bg-red-600/90 rounded-2xl flex items-center justify-center group-hover:bg-red-500 transition-colors shadow-lg">
+                          <Play size={24} fill="currentColor" className="text-white ml-1" />
+                        </div>
+                      </div>
+                    </a>
+                  );
+                })
               ) : (
                 <div className="glass p-12 rounded-3xl border border-white/5 text-center flex flex-col items-center">
                   <Play size={48} className="text-gray-600 mb-4" />

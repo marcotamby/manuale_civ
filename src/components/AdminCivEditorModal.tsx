@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Download, Save, X, Loader2, Play, Map } from 'lucide-react';
+import { Download, Save, X, Loader2, Play, Map, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import type { Civilization } from '../data/aoe4Data';
 
@@ -62,6 +62,31 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
     const newBonuses = [...editedCiv.passiveBonuses];
     newBonuses[index] = value;
     setEditedCiv({ ...editedCiv, passiveBonuses: newBonuses });
+  };
+
+  const updateArrayField = <T extends keyof Civilization>(field: T, index: number, key: string, value: any) => {
+    const newArr = [...(editedCiv[field] as any[])];
+    newArr[index] = { ...newArr[index], [key]: value };
+    
+    // Convert numbers for stats or age
+    if (['attack', 'armor', 'speed', 'health'].includes(key)) {
+        newArr[index].stats = { ...newArr[index].stats, [key]: Number(value) };
+        delete newArr[index][key];
+    } else if (key === 'age') {
+        newArr[index][key] = Number(value);
+    }
+    
+    setEditedCiv({ ...editedCiv, [field]: newArr });
+  };
+
+  const removeFromArray = <T extends keyof Civilization>(field: T, index: number) => {
+    const newArr = [...(editedCiv[field] as any[])];
+    newArr.splice(index, 1);
+    setEditedCiv({ ...editedCiv, [field]: newArr });
+  };
+
+  const addToArray = <T extends keyof Civilization>(field: T, item: any) => {
+    setEditedCiv({ ...editedCiv, [field]: [...(editedCiv[field] as any[] || []), item] });
   };
 
   return (
@@ -164,50 +189,143 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-white/5 font-mono text-xs">
-            <div className="space-y-2">
-              <label className="block font-bold text-gray-400 flex items-center gap-2">
-                <Map size={14} className="text-yellow-500" /> Build Orders
-              </label>
-              <textarea 
-                value={JSON.stringify(editedCiv.buildOrders || [], null, 2)}
-                onChange={e => { try { setEditedCiv({...editedCiv, buildOrders: JSON.parse(e.target.value)}); } catch (err) {} }}
-                rows={8}
-                className="w-full bg-black/60 border border-gray-700 rounded-lg px-3 py-2 text-white focus:border-yellow-500/50 transition-colors resize-none"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="block font-bold text-gray-400 flex items-center gap-2">
-                <span className="text-blue-500">⚔️</span> Unità Uniche
-              </label>
-              <textarea 
-                value={JSON.stringify(editedCiv.uniqueUnits || [], null, 2)}
-                onChange={e => { try { setEditedCiv({...editedCiv, uniqueUnits: JSON.parse(e.target.value)}); } catch (err) {} }}
-                rows={8}
-                className="w-full bg-black/60 border border-gray-700 rounded-lg px-3 py-2 text-white focus:border-blue-500/50 transition-colors resize-none"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="block font-bold text-gray-400 flex items-center gap-2">
-                <span className="text-green-500">🧬</span> Tecnologie
-              </label>
-              <textarea 
-                value={JSON.stringify(editedCiv.technologies || [], null, 2)}
-                onChange={e => { try { setEditedCiv({...editedCiv, technologies: JSON.parse(e.target.value)}); } catch (err) {} }}
-                rows={8}
-                className="w-full bg-black/60 border border-gray-700 rounded-lg px-3 py-2 text-white focus:border-green-500/50 transition-colors resize-none"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="block font-bold text-gray-400 flex items-center gap-2">
-                <span className="text-purple-500">🏛️</span> Landmarks
-              </label>
-              <textarea 
-                value={JSON.stringify(editedCiv.landmarks || [], null, 2)}
-                onChange={e => { try { setEditedCiv({...editedCiv, landmarks: JSON.parse(e.target.value)}); } catch (err) {} }}
-                rows={8}
-                className="w-full bg-black/60 border border-gray-700 rounded-lg px-3 py-2 text-white focus:border-purple-500/50 transition-colors resize-none"
-              />
+          <div className="pt-6 border-t border-purple-500/20">
+            <h3 className="text-xl font-bold text-white mb-4">Dati Strutturati (Visual Editor)</h3>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              
+              {/* Unità Uniche */}
+              <div className="bg-black/30 border border-blue-500/30 rounded-xl p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="font-bold text-blue-400 flex items-center gap-2"><span className="text-xl">⚔️</span> Unità Uniche</h4>
+                  <button onClick={() => addToArray('uniqueUnits', { id: 'new-unit', name: 'Nuova Unità', type: 'Infantry', age: 2, stats: { attack: 0, armor: 0, speed: 1, health: 100 }, strengths: [], weaknesses: [], description: '' })} className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded flex items-center gap-1">
+                    <Plus size={14} /> Aggiungi
+                  </button>
+                </div>
+                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                  {(editedCiv.uniqueUnits || []).map((u, idx) => (
+                    <div key={idx} className="bg-black/50 border border-gray-700 rounded-lg p-3 relative group">
+                      <button onClick={() => removeFromArray('uniqueUnits', idx)} className="absolute top-2 right-2 text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Trash2 size={16} />
+                      </button>
+                      <div className="grid grid-cols-2 gap-2 mb-2">
+                        <input type="text" value={u.name} onChange={e => updateArrayField('uniqueUnits', idx, 'name', e.target.value)} placeholder="Nome Unità" className="bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600 w-full" />
+                        <select value={u.type} onChange={e => updateArrayField('uniqueUnits', idx, 'type', e.target.value)} className="bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600 w-full">
+                          <option value="Infantry">Infantry</option><option value="Cavalry">Cavalry</option><option value="Ranged">Ranged</option><option value="Siege">Siege</option>
+                        </select>
+                      </div>
+                      <div className="grid grid-cols-5 gap-1 mb-2">
+                        <input type="number" min="1" max="4" value={u.age} onChange={e => updateArrayField('uniqueUnits', idx, 'age', e.target.value)} title="Age" className="bg-gray-800 text-white text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                        <input type="number" value={u.stats?.attack || 0} onChange={e => updateArrayField('uniqueUnits', idx, 'attack', e.target.value)} title="Attack" className="bg-gray-800 text-red-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                        <input type="number" value={u.stats?.armor || 0} onChange={e => updateArrayField('uniqueUnits', idx, 'armor', e.target.value)} title="Armor" className="bg-gray-800 text-gray-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                        <input type="number" value={u.stats?.health || 0} onChange={e => updateArrayField('uniqueUnits', idx, 'health', e.target.value)} title="Health" className="bg-gray-800 text-green-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                        <input type="number" step="0.1" value={u.stats?.speed || 0} onChange={e => updateArrayField('uniqueUnits', idx, 'speed', e.target.value)} title="Speed" className="bg-gray-800 text-blue-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                      </div>
+                      <textarea value={u.description} onChange={e => updateArrayField('uniqueUnits', idx, 'description', e.target.value)} placeholder="Descrizione" rows={2} className="bg-gray-800 text-white text-xs rounded px-2 py-1 border border-gray-600 w-full resize-none" />
+                    </div>
+                  ))}
+                  {(!editedCiv.uniqueUnits || editedCiv.uniqueUnits.length === 0) && <p className="text-gray-500 text-sm italic text-center py-4">Nessuna unità unica</p>}
+                </div>
+              </div>
+
+              {/* Tecnologie */}
+              <div className="bg-black/30 border border-green-500/30 rounded-xl p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="font-bold text-green-400 flex items-center gap-2"><span className="text-xl">🧬</span> Tecnologie</h4>
+                  <button onClick={() => addToArray('technologies', { id: 'new-tech', name: 'Nuova Tech', age: 2, building: 'Blacksmith', description: '' })} className="text-xs bg-green-600 hover:bg-green-500 text-white px-2 py-1 rounded flex items-center gap-1">
+                    <Plus size={14} /> Aggiungi
+                  </button>
+                </div>
+                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                  {(editedCiv.technologies || []).map((t, idx) => (
+                    <div key={idx} className="bg-black/50 border border-gray-700 rounded-lg p-3 relative group">
+                      <button onClick={() => removeFromArray('technologies', idx)} className="absolute top-2 right-2 text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Trash2 size={16} />
+                      </button>
+                      <div className="grid grid-cols-12 gap-2 mb-2">
+                        <input type="text" value={t.name} onChange={e => updateArrayField('technologies', idx, 'name', e.target.value)} placeholder="Nome Tecnologia" className="col-span-6 bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600" />
+                        <input type="text" value={t.building} onChange={e => updateArrayField('technologies', idx, 'building', e.target.value)} placeholder="Edificio" className="col-span-4 bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600" />
+                        <input type="number" min="1" max="4" value={t.age} onChange={e => updateArrayField('technologies', idx, 'age', e.target.value)} title="Age" className="col-span-2 bg-gray-800 text-white text-sm rounded px-1 py-1 text-center border border-gray-600" />
+                      </div>
+                      <textarea value={t.description} onChange={e => updateArrayField('technologies', idx, 'description', e.target.value)} placeholder="Descrizione" rows={2} className="bg-gray-800 text-white text-xs rounded px-2 py-1 border border-gray-600 w-full resize-none" />
+                    </div>
+                  ))}
+                  {(!editedCiv.technologies || editedCiv.technologies.length === 0) && <p className="text-gray-500 text-sm italic text-center py-4">Nessuna tecnologia</p>}
+                </div>
+              </div>
+
+              {/* Landmarks */}
+              <div className="bg-black/30 border border-purple-500/30 rounded-xl p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="font-bold text-purple-400 flex items-center gap-2"><span className="text-xl">🏛️</span> Landmarks</h4>
+                  <button onClick={() => addToArray('landmarks', { id: 'new-landmark', name: 'Nuovo Landmark', age: 2, type: 'Economic', description: '' })} className="text-xs bg-purple-600 hover:bg-purple-500 text-white px-2 py-1 rounded flex items-center gap-1">
+                    <Plus size={14} /> Aggiungi
+                  </button>
+                </div>
+                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                  {(editedCiv.landmarks || []).map((l, idx) => (
+                    <div key={idx} className="bg-black/50 border border-gray-700 rounded-lg p-3 relative group">
+                      <button onClick={() => removeFromArray('landmarks', idx)} className="absolute top-2 right-2 text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Trash2 size={16} />
+                      </button>
+                      <div className="grid grid-cols-12 gap-2 mb-2">
+                        <input type="text" value={l.name} onChange={e => updateArrayField('landmarks', idx, 'name', e.target.value)} placeholder="Nome Landmark" className="col-span-6 bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600" />
+                        <select value={l.type} onChange={e => updateArrayField('landmarks', idx, 'type', e.target.value)} className="col-span-4 bg-gray-800 text-white text-xs rounded px-1 py-1 border border-gray-600">
+                          <option value="Military">Military</option><option value="Economic">Economic</option><option value="Defensive">Defensive</option><option value="Religious">Religious</option><option value="Technology">Technology</option>
+                        </select>
+                        <input type="number" min="2" max="4" value={l.age} onChange={e => updateArrayField('landmarks', idx, 'age', e.target.value)} title="Age" className="col-span-2 bg-gray-800 text-white text-sm rounded px-1 py-1 text-center border border-gray-600" />
+                      </div>
+                      <textarea value={l.description} onChange={e => updateArrayField('landmarks', idx, 'description', e.target.value)} placeholder="Descrizione" rows={2} className="bg-gray-800 text-white text-xs rounded px-2 py-1 border border-gray-600 w-full resize-none" />
+                    </div>
+                  ))}
+                  {(!editedCiv.landmarks || editedCiv.landmarks.length === 0) && <p className="text-gray-500 text-sm italic text-center py-4">Nessun landmark</p>}
+                </div>
+              </div>
+
+              {/* Build Orders */}
+              <div className="bg-black/30 border border-yellow-500/30 rounded-xl p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="font-bold text-yellow-400 flex items-center gap-2"><Map size={18}/> Build Orders</h4>
+                  <button onClick={() => addToArray('buildOrders', { id: 'new-buildorder', title: 'Nuovo Build Order', difficulty: 'Medium', description: '', steps: [] })} className="text-xs bg-yellow-600 hover:bg-yellow-500 text-white px-2 py-1 rounded flex items-center gap-1">
+                    <Plus size={14} /> Aggiungi
+                  </button>
+                </div>
+                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                  {(editedCiv.buildOrders || []).map((bo, idx) => (
+                    <div key={idx} className="bg-black/50 border border-gray-700 rounded-lg p-3 relative group">
+                      <button onClick={() => removeFromArray('buildOrders', idx)} className="absolute top-2 right-2 text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                        <Trash2 size={16} />
+                      </button>
+                      <div className="grid grid-cols-3 gap-2 mb-2 pr-6">
+                        <input type="text" value={bo.title} onChange={e => updateArrayField('buildOrders', idx, 'title', e.target.value)} placeholder="Titolo" className="col-span-2 bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600" />
+                        <select value={bo.difficulty} onChange={e => updateArrayField('buildOrders', idx, 'difficulty', e.target.value)} className="col-span-1 bg-gray-800 text-white text-xs rounded px-1 py-1 border border-gray-600">
+                          <option value="Easy">Easy</option><option value="Medium">Medium</option><option value="Advanced">Advanced</option>
+                        </select>
+                      </div>
+                      <textarea value={bo.description} onChange={e => updateArrayField('buildOrders', idx, 'description', e.target.value)} placeholder="Descrizione Strategia" rows={2} className="bg-gray-800 text-white text-xs rounded px-2 py-1 border border-gray-600 w-full resize-none mb-2" />
+                      
+                      {/* Steps (Simplified handling via raw text to keep it usable without infinite nesting) */}
+                      <label className="text-xs text-gray-400 font-bold block mb-1">Passaggi (Formato Testo: Minuto - Azione, uno per riga)</label>
+                      <textarea 
+                        value={bo.steps.map(s => `${s.time || ''} - ${s.action}`).join('\n')}
+                        onChange={e => {
+                          const rawLines = e.target.value.split('\n');
+                          const mappedSteps = rawLines.map(line => {
+                            const [timePart, ...actionParts] = line.split('-');
+                            return { time: timePart.trim(), action: actionParts.join('-').trim() || timePart.trim() }; // basic parsing
+                          }).filter(s => s.action);
+                          updateArrayField('buildOrders', idx, 'steps', mappedSteps);
+                        }}
+                        placeholder="0:00 - Coda villici&#10;0:30 - Costruisci Casa" 
+                        rows={4} 
+                        className="bg-gray-900 text-yellow-300 font-mono text-xs rounded px-2 py-1 border border-gray-600 w-full resize-y" 
+                      />
+                    </div>
+                  ))}
+                  {(!editedCiv.buildOrders || editedCiv.buildOrders.length === 0) && <p className="text-gray-500 text-sm italic text-center py-4">Nessun build order</p>}
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
