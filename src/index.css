@@ -26,6 +26,29 @@ body {
   background-attachment: fixed;
 }
 
+/* Apply scrollbar globally */
+html, body, .elegant-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.3) rgba(18, 18, 18, 0.1);
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(18, 18, 18, 0.2);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.4));
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.5);
+}
+
 @utility glass {
   background: var(--color-brand-card);
   backdrop-filter: blur(12px);
@@ -45,26 +68,8 @@ body {
   -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
 }
 
-/* Elegant Scrollbar */
-.elegant-scrollbar::-webkit-scrollbar {
-  width: 5px;
-}
-
-.elegant-scrollbar::-webkit-scrollbar-track {
-  background: rgba(18, 18, 18, 0.5);
-}
-
-.elegant-scrollbar::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #D4AF37/20, #D4AF37/40);
-  border-radius: 10px;
-}
-
-.elegant-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #D4AF37/60;
-}
-
-/* Firefox */
-.elegant-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(212, 175, 55, 0.3) rgba(18, 18, 18, 0.5);
+/* Sidebar Desktop Spacing Helper */
+@utility sidebar-desktop-spacing {
+  padding-left: 1rem;
+  padding-right: 1rem;
 }

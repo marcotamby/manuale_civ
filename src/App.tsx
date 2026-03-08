@@ -26,9 +26,13 @@ function App() {
 
   useEffect(() => {
     sessionStorage.setItem('aoe4_selectedCiv', selectedCiv);
-    // Scroll to top on civ change
-    const mainContent = document.querySelector('main > div:last-child');
-    if (mainContent) mainContent.scrollTop = 0;
+    // Scroll to top on civ change - try multiple selectors for robustness
+    const selectors = ['.main-content-area', '.civ-view-container'];
+    selectors.forEach(selector => {
+      const container = document.querySelector(selector);
+      if (container) container.scrollTop = 0;
+    });
+    window.scrollTo(0, 0);
   }, [selectedCiv, currentPage]);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -93,7 +97,7 @@ function App() {
 
   return (
     <div 
-      className="flex h-screen overflow-hidden bg-[var(--color-brand-dark)] text-white font-sans"
+      className="flex h-screen overflow-hidden bg-[var(--color-brand-dark)] text-white font-sans md:sidebar-desktop-spacing"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -179,7 +183,7 @@ function App() {
             </div>
           )}
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto main-content-area elegant-scrollbar">
             {currentPage === 'home' && (
               <Home 
                 onSelectCiv={handleSelectCiv} 

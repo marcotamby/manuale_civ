@@ -69,7 +69,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   if (!civ) return <div className="text-gray-400 p-8">Civiltà non trovata.</div>;
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto overflow-x-hidden civ-view-container">
       {/* Civ Hero Header */}
       <div className="relative px-6 pt-8 pb-6 glass border-b border-[#D4AF37]/20 overflow-hidden">
         <div className="absolute inset-0 opacity-5">
@@ -115,7 +115,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
       {/* Tabs */}
       <div className="relative sticky top-0 bg-[var(--color-brand-dark)] z-10 border-b border-[#D4AF37]/15">
-        <div className="px-4 overflow-x-auto no-scrollbar flex gap-0 min-w-max relative">
+        <div className="px-4 overflow-x-auto no-scrollbar flex gap-0 min-w-max relative max-w-full">
           {tabs.map(tab => (
             <button
               key={tab.id}

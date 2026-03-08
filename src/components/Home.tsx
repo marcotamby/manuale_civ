@@ -53,11 +53,19 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
               }`}
             >
               <BarChart2 size={16} />
-              <BarChart2 size={16} />
               <span>{isCompareMode ? 'Annulla' : 'Confronta'}</span>
             </button>
+            {isCompareMode && selectedForCompare.length === 2 && (
+              <button
+                onClick={handleStartCompare}
+                className="animate-in fade-in zoom-in duration-300 flex items-center gap-2 px-4 py-2 bg-yellow-600/80 text-white font-bold rounded-lg shadow-lg border border-yellow-500/50 hover:bg-yellow-500 transition-all text-sm"
+              >
+                Vai ({selectedForCompare.length})
+              </button>
+            )}
+          </div>
 
-            {/* Mobile quick button for favorites */}
+          <div className="flex items-center gap-2 glass p-1 rounded-xl">
             <button
               onClick={() => setDifficultyFilter(difficultyFilter === 'Preferiti' ? 'Tutte' : 'Preferiti')}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-bold transition-all ${
@@ -67,17 +75,8 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
               }`}
             >
               <Heart size={16} fill={difficultyFilter === 'Preferiti' ? 'currentColor' : 'none'} />
-              <span className="md:hidden">Preferiti</span>
+              <span className="hidden xs:inline">Preferiti</span>
             </button>
-
-            {isCompareMode && selectedForCompare.length === 2 && (
-              <button
-                onClick={handleStartCompare}
-                className="animate-in fade-in zoom-in duration-300 flex items-center gap-2 px-4 py-2 bg-yellow-600/80 text-white font-bold rounded-lg shadow-lg border border-yellow-500/50 hover:bg-yellow-500 transition-all text-sm"
-              >
-                Confronta ({selectedForCompare.length})
-              </button>
-            )}
           </div>
 
           <CustomSelect
@@ -95,7 +94,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
         </div>
       </header>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6 pb-20">
+      <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2 md:gap-4 pb-20">
         {filteredCivs.map(civ => {
           const isSelected = selectedForCompare.includes(civ.id);
           const isFavorite = favorites.includes(civ.id);
@@ -104,7 +103,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
             <div 
               key={civ.id}
               onClick={() => handleCardClick(civ.id)}
-              className={`group relative h-72 rounded-2xl cursor-pointer overflow-hidden border transition-all duration-500 ${
+              className={`group relative h-40 md:h-56 rounded-xl cursor-pointer overflow-hidden border transition-all duration-500 ${
                 isSelected 
                   ? 'border-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.4)] scale-[0.98]' 
                   : 'border-[#D4AF37]/20 hover:border-yellow-400 hover:shadow-[0_0_30px_rgba(212,175,55,0.25)] hover:-translate-y-1'
@@ -127,8 +126,8 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
               {/* Selection Indicator */}
               {isCompareMode && (
                 <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${isSelected ? 'bg-blue-600/20' : 'bg-black/40 opacity-0 group-hover:opacity-100'}`}>
-                  <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-blue-600 border-white scale-110' : 'border-white/50'}`}>
-                    {isSelected && <BarChart2 size={24} className="text-white" />}
+                  <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-blue-600 border-white scale-110' : 'border-white/50'}`}>
+                    {isSelected && <BarChart2 size={16} className="text-white" />}
                   </div>
                 </div>
               )}
@@ -162,9 +161,9 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
               )}
 
               {/* Text at bottom */}
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-yellow-400 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{civ.name}</h3>
-                <p className="text-xs text-gray-300 line-clamp-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{civ.shortDescription}</p>
+              <div className="absolute bottom-0 left-0 right-0 p-2 md:p-3">
+                <h3 className="text-sm md:text-base font-bold text-white mb-0.5 group-hover:text-yellow-400 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{civ.name}</h3>
+                <p className="text-[10px] text-gray-300 line-clamp-1 opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{civ.shortDescription}</p>
               </div>
             </div>
           );
