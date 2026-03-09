@@ -17,6 +17,7 @@ export interface Unit {
   strengths: string[];
   weaknesses: string[];
   description: string;
+  excludedCivs?: string[];
 }
 
 export interface Technology {
@@ -73,7 +74,8 @@ export const unitsList: Unit[] = [
     stats: { attack: 5, armor: 0, speed: 1.25, health: 70 },
     strengths: ["Spearmen","Crossbowmen"],
     weaknesses: ["Cavalry","Man-at-Arms"],
-    description: "Cheap ranged infantry with good damage vs. unarmored targets.\n+ High rate of fire\n- Weak against high ranged armor targets\n- Countered by Horsemen"
+    description: "Cheap ranged infantry with good damage vs. unarmored targets.\n+ High rate of fire\n- Weak against high ranged armor targets\n- Countered by Horsemen",
+    excludedCivs: ['english', 'japanese', 'lancaster', 'macedonian', 'orderofthedragon', 'sengoku', 'zhuxi']
   },
   {
     id: "crossbowman",
@@ -83,7 +85,8 @@ export const unitsList: Unit[] = [
     stats: { attack: 11, armor: 0, speed: 1.13, health: 80 },
     strengths: ["Heavy Infantry","Heavy Cavalry"],
     weaknesses: ["Light Cavalry","Archers"],
-    description: "High damage ranged unit best against heavy targets.\n+ Anti-heavy specialist\n- Low health\n- Countered by Horsemen"
+    description: "High damage ranged unit best against heavy targets.\n+ Anti-heavy specialist\n- Low health\n- Countered by Horsemen",
+    excludedCivs: ['french', 'japanese', 'jeannedarc', 'malians', 'orderofthedragon', 'sengoku']
   },
   {
     id: "handcannoneer",
@@ -93,7 +96,8 @@ export const unitsList: Unit[] = [
     stats: { attack: 38, armor: 0, speed: 1.13, health: 130 },
     strengths: ["Infantry","Cavalry"],
     weaknesses: ["Mangonels","Archers"],
-    description: "Powerful all-purpose ranged infantry.\n+ High damage\n- High cost\n- Slow movement speed\n- Countered by Horsemen"
+    description: "Powerful all-purpose ranged infantry.\n+ High damage\n- High cost\n- Slow movement speed\n- Countered by Horsemen",
+    excludedCivs: ['japanese', 'malians', 'orderofthedragon', 'ottomans', 'rus', 'sengoku', 'templar', 'zhuxi']
   },
   {
     id: "mangonel",
@@ -103,7 +107,8 @@ export const unitsList: Unit[] = [
     stats: { attack: 10, armor: 0, speed: 0.75, health: 130 },
     strengths: ["Ranged Infantry","Light Infantry"],
     weaknesses: ["Springalds","Cavalry"],
-    description: "Fires multiple projectiles dealing damage in an area.\n+ Effective against massed units\n- Must be set up to fire"
+    description: "Fires multiple projectiles dealing damage in an area.\n+ Effective against massed units\n- Must be set up to fire",
+    excludedCivs: ['ayyubids', 'chinese', 'zhuxi']
   },
   {
     id: "spearman",
@@ -113,7 +118,8 @@ export const unitsList: Unit[] = [
     stats: { attack: 7, armor: 0, speed: 1.25, health: 80 },
     strengths: ["Cavalry"],
     weaknesses: ["Archers","Heavy Infantry"],
-    description: "Infantry best used against mounted units.\n+ Anti-cavalry specialist\n+ Additional damage against Elephants\n- Weak against heavy infantry\n- Countered by Archers"
+    description: "Infantry best used against mounted units.\n+ Anti-cavalry specialist\n+ Additional damage against Elephants\n- Weak against heavy infantry\n- Countered by Archers",
+    excludedCivs: ['byzantines', 'macedonian', 'malians', 'orderofthedragon']
   },
   {
     id: "springald",
@@ -123,7 +129,8 @@ export const unitsList: Unit[] = [
     stats: { attack: 14, armor: 3, speed: 0.88, health: 85 },
     strengths: ["Siege"],
     weaknesses: ["Melee Units"],
-    description: "Anti-unit siege weapon. Fires bolts that pierce multiple units.\n+ Does not require setup to fire\n+ Bonus damage vs. melee infantry\n- Trivial damage vs. buildings"
+    description: "Anti-unit siege weapon. Fires bolts that pierce multiple units.\n+ Does not require setup to fire\n+ Bonus damage vs. melee infantry\n- Trivial damage vs. buildings",
+    excludedCivs: ['tughlaq']
   },
   {
     id: "bombard",
@@ -133,7 +140,8 @@ export const unitsList: Unit[] = [
     stats: { attack: 55, armor: 0, speed: 0.75, health: 210 },
     strengths: ["Buildings"],
     weaknesses: ["Melee Units"],
-    description: "Intimidating siege gun excellent against buildings or any stubborn targets.\n+ High damage\n- Must be set up to fire"
+    description: "Intimidating siege gun excellent against buildings or any stubborn targets.\n+ High damage\n- Must be set up to fire",
+    excludedCivs: ['abbasid', 'ayyubids', 'french', 'hre', 'jeannedarc', 'lancaster', 'orderofthedragon', 'ottomans', 'templar']
   },
   {
     id: "man-at-arms",
@@ -143,7 +151,8 @@ export const unitsList: Unit[] = [
     stats: { attack: 12, armor: 4, speed: 1.13, health: 155 },
     strengths: ["Light Infantry","Archers"],
     weaknesses: ["Crossbowmen","Heavy Cavalry"],
-    description: "Tough infantry with good damage.\n+ High armor\n- Slow movement\n- Countered by Knights, Lancers, and Crossbowmen"
+    description: "Tough infantry with good damage.\n+ High armor\n- Slow movement\n- Countered by Knights, Lancers, and Crossbowmen",
+    excludedCivs: ['abbasid', 'ayyubids', 'byzantines', 'chinese', 'japanese', 'lancaster', 'macedonian', 'malians', 'orderofthedragon', 'sengoku', 'zhuxi']   
   },
   {
     id: "knight",
@@ -153,7 +162,8 @@ export const unitsList: Unit[] = [
     stats: { attack: 24, armor: 4, speed: 1.63, health: 230 },
     strengths: ["Archers","Swordsmen"],
     weaknesses: ["Spearmen","Camels"],
-    description: "Expensive cavalry with high damage and melee armor. Effective against melee units.\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen"
+    description: "Expensive cavalry with high damage and melee armor. Effective against melee units.\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen",
+    excludedCivs: ['abbasid', 'ayyubids', 'delhi', 'byzantines', 'chinese', 'french', 'goldenhorde', 'japanese', 'jeannedarc', 'macedonian', 'malians', 'mongols', 'orderofthedragon', 'ottomans', 'sengoku', 'templar', 'tughlaq', 'zhuxi']
   }
 ];
 
@@ -342,7 +352,7 @@ export const civilizationsData: Civilization[] = [
     ],
     uniqueUnits: [
       {
-        id: "king",
+        id: "king-2",
         name: "King",
         type: "Cavalry",
         age: 2,
@@ -352,7 +362,7 @@ export const civilizationsData: Civilization[] = [
         description: "A powerful leader that heals nearby out-of-combat units by +2 HP/s."
       },
       {
-        id: "longbowman",
+        id: "longbowman-2",
         name: "Longbowman",
         type: "Ranged",
         age: 2,
@@ -362,7 +372,17 @@ export const civilizationsData: Civilization[] = [
         description: "Long-ranged archer unit capable of deploying defensive palings against cavalry."
       },
       {
-        id: "wynguard-ranger",
+        id: "man-at-arms-1",
+        name: "Vanguard Man-at-Arms",
+        type: "Infantry",
+        age: 1,
+        stats: { attack: 8, armor: 3, speed: 1.12, health: 100 },
+        strengths: ["Light Infantry", "Archers"],
+        weaknesses: ["Crossbowmen", "Heavy Cavalry"],
+        description: "Tough early infantry available in the Dark Age with good damage and armor."
+      },
+      {
+        id: "wynguard-ranger-4",
         name: "Wynguard Ranger",
         type: "Ranged",
         age: 4,
@@ -372,7 +392,7 @@ export const civilizationsData: Civilization[] = [
         description: "Elite variant of the Longbowman with significantly higher damage and health."
       },
       {
-        id: "wynguard-footman",
+        id: "wynguard-footman-4",
         name: "Wynguard Footman",
         type: "Infantry",
         age: 4,

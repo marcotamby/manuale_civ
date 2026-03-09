@@ -1,59 +1,130 @@
-import { createClient } from '@supabase/supabase-js';
-import dotenv from 'dotenv';
+import fs from 'fs';
 import path from 'path';
 
-dotenv.config();
-
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL!,
-  process.env.VITE_SUPABASE_ANON_KEY!
-);
-
-const INITIAL_CIV_VIDEOS: Record<string, string[]> = {
-  'english': ['tB98m5TWOfU', 'fyHjmbag8ao', 'xWoBZ6RyPno'],
-  'french': ['ke1j9wULVMw', 'pAPlT9T5G7Y'],
-  'hre': ['50FBAal_5MY', '9tF33wSHaVc', 'xFRGNXAUe34'],
-  'rus': ['bmHZc7agrU0', '9tF33wSHaVc'],
-  'chinese': ['13Vg4Um-gTM', '1Xv7KzxSxV0'],
-  'delhi': ['OwTuGgYt9CM', 'ox4pEuivqcM', 'd_aIoM5Seq0', '1tmWiCZBsnk', '8-k8Gzx_f8w', 'vjM4rDqfocE', 'oc_3Z1VhdzA'],
-  'abbasid': ['8-O-mR_B4uE', '8-k8Gzx_f8w', 'vjM4rDqfocE'],
-  'mongols': ['x66WfzK3d2s', 'CSBO_dQhYy4', 'stGrmOcwWBY', 'ox4pEuivqcM'],
-  'malians': ['ZK5fPbCzeeI'],
-  'ottomans': ['zRNJZ0tmqS8', 'xFRGNXAUe34'],
-  'japanese': ['bmHZc7agrU0', 'WYleGQJH6CI', 'HxlVI2JmSGI', 'xWoBZ6RyPno'],
-  'byzantines': ['R6duDrI-rxI', 'Ra8hy4Fw-Uo', '3TpCRZJGVi8', '5Z1prUa8Bqg', 'pAPlT9T5G7Y', 'oc_3Z1VhdzA'],
-  'ayyubids': ['WYleGQJH6CI', '50-nZof-uGM'],
-  'zhuxi': ['50-nZof-uGM'],
-  'orderofthedragon': ['zhSvMC6euco', '50FBAal_5MY', '5Z1prUa8Bqg'],
-  'jeannedarc': ['R6duDrI-rxI', '3TpCRZJGVi8', 'd_aIoM5Seq0', '1tmWiCZBsnk', '1Xv7KzxSxV0'],
-  'sengoku': ['H92Vl2QUiJs'],
-  'macedonian': ['p5DkJ1n4DHI', 'Zhoru1aK8Iw'],
-  'goldenhorde': ['Skfh1-iTtfg'],
-  'lancaster': ['BlUjHRlpSFU', 'fyHjmbag8ao', 'R5ZvaFmTobU', 'stGrmOcwWBY', 'RONBa3ydUD0'],
-  'templar': ['0Ld_Kum3sh0', 'R5ZvaFmTobU', 'RONBa3ydUD0'],
+const civIdMap: Record<string, string> = {
+  "abbasid": "abbasid_dynasty",
+  "ayyubids": "ayyubids",
+  "delhi": "delhi_sultanate",
+  "byzantines": "byzantines",
+  "chinese": "chinese",
+  "english": "english",
+  "french": "french",
+  "goldenhorde": "golden_horde",
+  "hre": "holy_roman_empire",
+  "japanese": "japanese",
+  "jeannedarc": "jeanne_d_arc",
+  "lancaster": "house_of_lancaster",
+  "macedonian": "macedonian_dynasty",
+  "malians": "malians",
+  "mongols": "mongols",
+  "orderofthedragon": "order_of_the_dragon",
+  "ottomans": "ottomans",
+  "rus": "rus",
+  "sengoku": "sengoku_daimyo",
+  "templar": "knights_templar",
+  "tughlaq": "tughlaq_dynasty",
+  "zhuxi": "zhu_xis_legacy"
 };
 
-async function syncDynamicData() {
-    console.log('🚀 Sincronizzazione video e build orders...');
+const genericBaseIds = ["archer", "crossbowman", "handcannoneer", "mangonel", "spearman", "springald", "bombard", "man-at-arms", "knight"];
 
-    for (const [civId, videos] of Object.entries(INITIAL_CIV_VIDEOS)) {
-        console.log(`📡 Aggiornamento ${civId}...`);
-        const { error } = await supabase
-            .from('civilizations')
-            .update({ 
-                videos: videos,
-                build_orders: [] // Inizialmente vuoti
-            })
-            .eq('id', civId);
-
-        if (error) {
-            console.error(`❌ Errores su ${civId}:`, error.message);
-        } else {
-            console.log(`✅ ${civId} aggiornata.`);
-        }
-    }
-
-    console.log('🎉 Sincronizzazione completata!');
+function cleanText(txt: string) {
+  return txt.replace(/<[^>]*>?/gm, '').trim();
 }
 
-syncDynamicData();
+function determineUnitType(classes: string[], name: string) {
+  const clsStr = classes.join(' ').toLowerCase();
+  const nameStr = name.toLowerCase();
+  
+  if (clsStr.includes('cavalry') || clsStr.includes('camel') || clsStr.includes('elephant')) return 'Cavalry';
+  if (clsStr.includes('archer') || clsStr.includes('ranged') || clsStr.includes('gunpowder')) return 'Ranged';
+  if (clsStr.includes('siege') || nameStr.includes('ram') || nameStr.includes('trebuchet')) return 'Siege';
+  return 'Infantry';
+}
+
+function determineLandmarkType(classes: string[], description: string) {
+  const clsStr = classes.join(' ').toLowerCase();
+  const descStr = description.toLowerCase();
+  
+  if (clsStr.includes('religious') || descStr.includes('monastery') || descStr.includes('relic') || descStr.includes('heal')) return 'Religious';
+  if (clsStr.includes('defensive') || descStr.includes('keep') || descStr.includes('defense') || descStr.includes('tower')) return 'Defensive';
+  if (clsStr.includes('economic') || descStr.includes('gold') || descStr.includes('resource') || descStr.includes('market')) return 'Economic';
+  if (clsStr.includes('technology') || descStr.includes('research') || descStr.includes('upgrade')) return 'Technology';
+  return 'Military';
+}
+
+async function run() {
+  const result: any = {};
+  
+  for (const [ourId, apiId] of Object.entries(civIdMap)) {
+    try {
+      const res = await fetch(`https://raw.githubusercontent.com/aoe4world/data/main/civilizations/${apiId}.json`);
+      if (!res.ok) {
+        console.log(`[SKIP] Could not fetch ${apiId}`);
+        continue;
+      }
+      const data = await res.json();
+      
+      const units = data.units?.data || [];
+      const buildings = data.buildings?.data || [];
+      
+      const uniqueUnits = units
+        .filter((u: any) => !genericBaseIds.includes(u.baseId))
+        .filter((u: any) => u.type === 'unit' && !u.classes.includes('worker') && !u.classes.includes('ship') && !u.id.includes('villager') && !u.id.includes('trader') && !u.id.includes('scout'))
+        // get the highest age version if there are multiple (or first appearing) -> just get the lowest age one to show it
+        .reduce((acc: any[], current: any) => {
+            const x = acc.find(item => item.baseId === current.baseId);
+            if (!x || current.age < x.age) {
+                if (x) acc.splice(acc.indexOf(x), 1);
+                acc.push(current);
+            }
+            return acc;
+         }, [])
+        .map((u: any) => {
+            const w = u.weapons?.[0] || { damage: 0 };
+            const a = u.armor?.[0] || { value: 0 };
+            return {
+              id: u.id,
+              name: u.name,
+              type: determineUnitType(u.classes, u.name),
+              age: u.age,
+              stats: {
+                attack: w.damage || 0,
+                armor: a.value || 0,
+                speed: u.movement?.speed || 1.0,
+                health: u.hitpoints || 100
+              },
+              strengths: [u.classes.join(', ')],
+              weaknesses: [],
+              description: cleanText(u.description || '')
+            };
+        });
+
+      const landmarks = buildings
+        .filter((b: any) => b.classes.includes('landmark'))
+        .map((b: any) => {
+            return {
+              id: b.id,
+              name: b.name,
+              age: b.age,
+              type: determineLandmarkType(b.classes, cleanText(b.description || '')),
+              description: cleanText(b.description || '')
+            };
+        });
+
+      result[ourId] = {
+        uniqueUnits,
+        landmarks
+      };
+      
+      console.log(`Processed ${ourId}: ${uniqueUnits.length} unique units, ${landmarks.length} landmarks`);
+    } catch(e) {
+      console.error(`Error processing ${ourId}:`, e);
+    }
+  }
+
+  fs.writeFileSync(path.join(process.cwd(), 'src', 'data', 'generated_civ_data.json'), JSON.stringify(result, null, 2));
+  console.log("Written to src/data/generated_civ_data.json");
+}
+
+run();
