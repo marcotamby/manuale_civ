@@ -320,31 +320,42 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
         {/* === VIDEO === */}
         {activeTab === 'video' && (
-          <div className="max-w-4xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div className="w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
               <div>
-                <h2 className="text-2xl font-bold text-white mb-1 flex items-center gap-2">
-                  <Play className="text-red-500" size={24} />
+                <h2 className="text-3xl font-bold text-white flex items-center gap-3">
+                  <Play className="text-red-500" size={32} />
                   Video Guida & Gameplay
                 </h2>
-                <p className="text-sm text-gray-400">Tutorial e partite commentate da <span className="text-red-400 font-bold">marcotamby_aoe</span>.</p>
+                <p className="text-gray-400 mt-1">Tutorial e partite commentate da <span className="text-red-500 font-bold">marcotamby_aoe</span>.</p>
               </div>
+              
+              <a 
+                href="https://www.youtube.com/@marcotamby_aoe" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-red-600/20 hover:scale-105 active:scale-95 self-start md:self-center"
+              >
+                <Play size={14} fill="currentColor" />
+                VISITA IL CANALE YOUTUBE
+              </a>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
               {civ.videos && civ.videos.length > 0 ? (
                 civ.videos.map((vidId, index) => {
                   // If the ID is actually a full URL, extract the ID
                   let finalId = vidId;
                   try {
-                    if (vidId.includes('youtube.com') || vidId.includes('youtu.be')) {
-                      const url = new URL(vidId);
-                      finalId = url.searchParams.get('v') || url.pathname.slice(1) || vidId;
+                    const vidIdTrim = vidId.trim();
+                    if (vidIdTrim.includes('youtube.com') || vidIdTrim.includes('youtu.be')) {
+                      const url = new URL(vidIdTrim);
+                      finalId = url.searchParams.get('v') || url.pathname.slice(1) || vidIdTrim;
                     }
                   } catch(e) {}
                   
                   return (
-                    <div key={`${finalId}-${index}`} className="space-y-4">
+                    <div key={`${finalId}-${index}`} className="flex flex-col h-full">
                       <a 
                         href={`https://www.youtube.com/watch?v=${finalId}`}
                         target="_blank"
@@ -361,26 +372,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                           }}
                         />
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-16 h-12 bg-red-600/90 rounded-2xl flex items-center justify-center group-hover:bg-red-500 transition-colors shadow-lg">
-                            <Play size={24} fill="currentColor" className="text-white ml-1" />
+                          <div className="w-12 h-9 bg-red-600/90 rounded-2xl flex items-center justify-center group-hover:bg-red-500 transition-colors shadow-lg">
+                            <Play size={18} fill="currentColor" className="text-white ml-0.5" />
                           </div>
                         </div>
                       </a>
-
-                      {/* Pulsante YouTube Canale posizionato sotto il PRIMO video */}
-                      {index === 0 && (
-                        <div className="flex justify-center">
-                          <a 
-                            href="https://www.youtube.com/@marcotamby_aoe" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-full text-[10px] uppercase tracking-wider font-bold transition-all shadow-lg shadow-red-600/20 hover:scale-105 active:scale-95"
-                          >
-                            <Play size={10} fill="currentColor" />
-                            Canale YouTube
-                          </a>
-                        </div>
-                      )}
                     </div>
                   );
                 })
