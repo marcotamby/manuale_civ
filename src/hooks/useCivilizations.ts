@@ -29,7 +29,9 @@ export function useCivilizations() {
         technologies: row.technologies || [],
         landmarks: row.landmarks || [],
         videos: row.videos || [],
-        buildOrders: row.build_orders || []
+        buildOrders: row.build_orders || [],
+        strengths: row.strengths || [],
+        weaknesses: row.weaknesses || []
       }));
 
       setCivs(formattedCivs);

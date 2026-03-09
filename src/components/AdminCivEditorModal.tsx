@@ -27,7 +27,24 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
   // Sync state with props when modal opens or civ changes
   useEffect(() => {
     if (isOpen) {
-      setEditedCiv(civ);
+      let defaultStrengths = civ.strengths || [];
+      if (defaultStrengths.length === 0) {
+        const generated = [];
+        if (civ.uniqueUnits?.length > 0) {
+          generated.push(`Accesso a unità uniche: ${civ.uniqueUnits.map(u => u.name).join(', ')}`);
+        }
+        if (civ.technologies?.length > 0) {
+          generated.push(`Tecnologie esclusive: ${civ.technologies.map(t => t.name).join(', ')}`);
+        }
+        if (generated.length > 0) {
+          defaultStrengths = generated;
+        }
+      }
+
+      setEditedCiv({
+        ...civ,
+        strengths: defaultStrengths
+      });
       setStepsTexts({}); // Reset the steps cache to force recalculation from bo.steps
     }
   }, [civ, isOpen]);
@@ -64,8 +81,12 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
       });
       
       setTimeout(() => {
-        onSave(editedCiv);
-        onClose();
+        onSave({
+          ...editedCiv,
+          strengths: editedCiv.strengths?.filter(s => s.trim() !== '') || [],
+          weaknesses: editedCiv.weaknesses?.filter(s => s.trim() !== '') || []
+        });
+        // Il pannello NON si chiude più in automatico: l'utente utilizzerà la X.
       }, 1500);
     } catch (err: any) {
       console.error('Error saving civilization:', err);
