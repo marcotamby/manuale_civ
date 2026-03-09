@@ -344,49 +344,53 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   } catch(e) {}
                   
                   return (
-                    <a 
-                      key={`${finalId}-${index}`} 
-                      href={`https://www.youtube.com/watch?v=${finalId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group relative block aspect-video w-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black transition-transform hover:scale-105 hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]"
-                    >
-                      <img 
-                        src={`https://img.youtube.com/vi/${finalId}/maxresdefault.jpg`} 
-                        alt="Video Thumbnail"
-                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                        onError={(e) => {
-                          // Fallback to hqdefault if maxresdefault doesn't exist
-                          (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${finalId}/hqdefault.jpg`;
-                        }}
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-16 h-12 bg-red-600/90 rounded-2xl flex items-center justify-center group-hover:bg-red-500 transition-colors shadow-lg">
-                          <Play size={24} fill="currentColor" className="text-white ml-1" />
+                    <div key={`${finalId}-${index}`} className="space-y-4">
+                      <a 
+                        href={`https://www.youtube.com/watch?v=${finalId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group relative block aspect-video w-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black transition-transform hover:scale-105 hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]"
+                      >
+                        <img 
+                          src={`https://img.youtube.com/vi/${finalId}/maxresdefault.jpg`} 
+                          alt="Video Thumbnail"
+                          className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                          onError={(e) => {
+                            // Fallback to hqdefault if maxresdefault doesn't exist
+                            (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${finalId}/hqdefault.jpg`;
+                          }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-16 h-12 bg-red-600/90 rounded-2xl flex items-center justify-center group-hover:bg-red-500 transition-colors shadow-lg">
+                            <Play size={24} fill="currentColor" className="text-white ml-1" />
+                          </div>
                         </div>
-                      </div>
-                    </a>
+                      </a>
+
+                      {/* Pulsante YouTube Canale posizionato sotto il PRIMO video */}
+                      {index === 0 && (
+                        <div className="flex justify-center">
+                          <a 
+                            href="https://www.youtube.com/@marcotamby_aoe" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-full text-[10px] uppercase tracking-wider font-bold transition-all shadow-lg shadow-red-600/20 hover:scale-105 active:scale-95"
+                          >
+                            <Play size={10} fill="currentColor" />
+                            Canale YouTube
+                          </a>
+                        </div>
+                      )}
+                    </div>
                   );
                 })
               ) : (
-                <div className="glass p-12 rounded-3xl border border-white/5 text-center flex flex-col items-center">
+                <div className="glass p-12 rounded-3xl border border-white/5 text-center flex flex-col items-center col-span-full">
                   <Play size={48} className="text-gray-600 mb-4" />
                   <h3 className="text-lg font-bold text-gray-400 mb-2">Video non ancora disponibili</h3>
                   <p className="text-sm text-gray-500">Stiamo preparando delle guide video dedicate a questa civiltà.</p>
                 </div>
               )}
-            </div>
-
-            <div className="flex justify-start mt-4">
-              <a 
-                href="https://www.youtube.com/@marcotamby_aoe" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-red-600/20"
-              >
-                <Play size={18} fill="currentColor" />
-                Visita il Canale YouTube
-              </a>
             </div>
           </div>
         )}

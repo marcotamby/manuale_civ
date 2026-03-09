@@ -6,7 +6,7 @@ import type { YouTubeVideo } from '../services/YouTubeService';
 interface YouTubePickerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (videoId: string) => void;
+  onSelect: (videoIds: string[]) => void;
   selectedIds: string[];
 }
 
@@ -14,18 +14,31 @@ export function YouTubePickerModal({ isOpen, onClose, onSelect, selectedIds }: Y
   const [videos, setVideos] = useState<YouTubeVideo[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
+  const [pendingSelection, setPendingSelection] = useState<string[]>(selectedIds);
 
   useEffect(() => {
     if (isOpen) {
       loadVideos();
+      setPendingSelection(selectedIds);
     }
-  }, [isOpen]);
+  }, [isOpen, selectedIds]);
 
   const loadVideos = async () => {
     setLoading(true);
     const data = await fetchRecentVideos();
     setVideos(data);
     setLoading(false);
+  };
+
+  const handleToggleVideo = (id: string) => {
+    setPendingSelection(prev => 
+      prev.includes(id) ? prev.filter(v => v !== id) : [...prev, id]
+    );
+  };
+
+  const handleConfirm = () => {
+    onSelect(pendingSelection);
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -36,7 +49,7 @@ export function YouTubePickerModal({ isOpen, onClose, onSelect, selectedIds }: Y
 
   return (
     <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4 backdrop-blur-md">
-      <div className="bg-[#0f1115] border border-red-500/30 rounded-2xl w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(239,68,68,0.2)]">
+      <div className="bg-[#0f1115] border border-red-500/30 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(239,68,68,0.3)]">
         
         <div className="p-6 border-b border-white/10 flex justify-between items-center bg-red-500/5">
           <div className="flex items-center gap-3">
@@ -45,7 +58,7 @@ export function YouTubePickerModal({ isOpen, onClose, onSelect, selectedIds }: Y
             </div>
             <div>
               <h3 className="text-xl font-bold text-white">Sfoglia Canale YouTube</h3>
-              <p className="text-xs text-gray-400">Seleziona i video di @marcotamby_aoe</p>
+              <p className="text-xs text-gray-400">Archivio video di @marcotamby_aoe ({videos.length} video trovati)</p>
             </div>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors p-2 bg-white/5 rounded-lg">
@@ -53,12 +66,12 @@ export function YouTubePickerModal({ isOpen, onClose, onSelect, selectedIds }: Y
           </button>
         </div>
 
-        <div className="p-6 border-b border-white/10 bg-black/20">
-          <div className="relative">
+        <div className="p-6 border-b border-white/10 bg-black/20 flex gap-4">
+          <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input 
               type="text"
-              placeholder="Cerca tra i video recenti..."
+              placeholder="Cerca tra tutti i video del canale..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white focus:border-red-500/50 outline-none transition-all"
@@ -70,16 +83,16 @@ export function YouTubePickerModal({ isOpen, onClose, onSelect, selectedIds }: Y
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 text-gray-400 gap-4">
               <Loader2 size={40} className="animate-spin text-red-500" />
-              <p>Caricamento video dal canale...</p>
+              <p>Caricamento archivio video...</p>
             </div>
           ) : filteredVideos.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredVideos.map(video => {
-                const isSelected = selectedIds.includes(video.id);
+                const isSelected = pendingSelection.includes(video.id);
                 return (
                   <div 
                     key={video.id}
-                    onClick={() => onSelect(video.id)}
+                    onClick={() => handleToggleVideo(video.id)}
                     className={`group cursor-pointer rounded-xl overflow-hidden border transition-all duration-300 transform hover:-translate-y-1 ${
                       isSelected 
                         ? 'border-red-500 ring-2 ring-red-500/20 bg-red-500/5' 
@@ -109,16 +122,30 @@ export function YouTubePickerModal({ isOpen, onClose, onSelect, selectedIds }: Y
             </div>
           ) : (
             <div className="text-center py-20 text-gray-500">
-              <p>Nessun video trovato con questo nome.</p>
+              <p>Nessun video trovato con questo nome nell'archivio.</p>
             </div>
           )}
         </div>
 
-        <div className="p-4 bg-black/40 border-t border-white/10 flex justify-between items-center text-xs text-gray-500 italic">
-          <p>Mostrando gli ultimi 15 video del canale.</p>
-          <button onClick={loadVideos} className="text-red-400 hover:text-red-300 flex items-center gap-1 transition-colors">
-            Aggiorna lista
-          </button>
+        <div className="p-6 bg-black/40 border-t border-white/10 flex justify-between items-center shadow-[0_-10px_20px_rgba(0,0,0,0.5)]">
+          <div className="text-sm text-gray-400">
+            <span className="text-red-500 font-bold">{pendingSelection.length}</span> video selezionati
+          </div>
+          <div className="flex gap-4">
+            <button 
+              onClick={onClose}
+              className="px-6 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl transition-all"
+            >
+              Annulla
+            </button>
+            <button 
+              onClick={handleConfirm}
+              className="px-8 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-red-600/30 transition-all active:scale-95"
+            >
+              <CheckCircle2 size={18} />
+              Conferma Selezione
+            </button>
+          </div>
         </div>
       </div>
     </div>

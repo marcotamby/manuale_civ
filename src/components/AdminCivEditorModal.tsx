@@ -383,19 +383,11 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
         isOpen={isYoutubePickerOpen}
         onClose={() => setIsYoutubePickerOpen(false)}
         selectedIds={editedCiv.videos || []}
-        onSelect={(videoId) => {
-          const currentVideos = editedCiv.videos || [];
-          if (currentVideos.includes(videoId)) {
-            setEditedCiv({
-              ...editedCiv, 
-              videos: currentVideos.filter(id => id !== videoId)
-            });
-          } else {
-            setEditedCiv({
-              ...editedCiv, 
-              videos: [...currentVideos, videoId]
-            });
-          }
+        onSelect={(videoIds) => {
+          setEditedCiv({
+            ...editedCiv, 
+            videos: videoIds
+          });
         }}
       />
     </div>
