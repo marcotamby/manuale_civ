@@ -49,7 +49,9 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
           build_orders: editedCiv.buildOrders,
           unique_units: editedCiv.uniqueUnits,
           technologies: editedCiv.technologies,
-          landmarks: editedCiv.landmarks
+          landmarks: editedCiv.landmarks,
+          strengths: editedCiv.strengths,
+          weaknesses: editedCiv.weaknesses
         })
         .eq('id', civ.id);
 
@@ -158,6 +160,34 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                   value={editedCiv.shortDescription}
                   onChange={e => setEditedCiv({...editedCiv, shortDescription: e.target.value})}
                   rows={4}
+                  className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors resize-y"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-300 mb-1">Punti di Forza</label>
+                <textarea 
+                  value={editedCiv.strengths?.join('\n') || ''}
+                  onChange={e => {
+                    const values = e.target.value.split('\n').filter(Boolean);
+                    setEditedCiv({...editedCiv, strengths: values});
+                  }}
+                  rows={4}
+                  placeholder="Inserisci un punto di forza per riga..."
+                  className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors resize-y"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-300 mb-1">Punti di Debolezza</label>
+                <textarea 
+                  value={editedCiv.weaknesses?.join('\n') || ''}
+                  onChange={e => {
+                    const values = e.target.value.split('\n').filter(Boolean);
+                    setEditedCiv({...editedCiv, weaknesses: values});
+                  }}
+                  rows={4}
+                  placeholder="Inserisci un punto di debolezza per riga..."
                   className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors resize-y"
                 />
               </div>

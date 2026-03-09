@@ -166,13 +166,21 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               </h2>
               <div className="glass p-5 rounded-xl border border-green-500/20 text-gray-300 text-sm leading-relaxed">
                 <ul className="space-y-3 list-disc list-inside">
-                  {civ.uniqueUnits.length > 0 && (
-                    <li>Accesso a unità uniche: <strong className="text-green-400">{civ.uniqueUnits.map(u => u.name).join(', ')}</strong></li>
+                  {civ.strengths && civ.strengths.length > 0 ? (
+                    civ.strengths.map((str, idx) => (
+                      <li key={idx}><strong className="text-green-400">{str}</strong></li>
+                    ))
+                  ) : (
+                    <>
+                      {civ.uniqueUnits.length > 0 && (
+                        <li>Accesso a unità uniche: <strong className="text-green-400">{civ.uniqueUnits.map(u => u.name).join(', ')}</strong></li>
+                      )}
+                      {civ.technologies.length > 0 && (
+                        <li>Tecnologie esclusive: <strong className="text-green-400">{civ.technologies.map(t => t.name).join(', ')}</strong></li>
+                      )}
+                      <li className="text-gray-400 italic">Vedi sezione Unità & Landmarks per i dettagli specifici.</li>
+                    </>
                   )}
-                  {civ.technologies.length > 0 && (
-                    <li>Tecnologie esclusive: <strong className="text-green-400">{civ.technologies.map(t => t.name).join(', ')}</strong></li>
-                  )}
-                  <li className="text-gray-400 italic">Vedi sezione Unità & Landmarks per i dettagli specifici.</li>
                 </ul>
               </div>
             </section>
@@ -182,8 +190,16 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 <ChevronDown className="text-red-400" size={20} />
                 Punti di Debolezza
               </h2>
-              <div className="glass p-5 rounded-xl border border-red-500/20 text-gray-300 text-sm italic">
-                <p className="text-gray-400">Informazioni di debolezza specifiche saranno aggiunte dalla community tramite "Proponi Modifica".</p>
+              <div className="glass p-5 rounded-xl border border-red-500/20 text-gray-300 text-sm leading-relaxed">
+                {civ.weaknesses && civ.weaknesses.length > 0 ? (
+                  <ul className="space-y-3 list-disc list-inside">
+                    {civ.weaknesses.map((wk, idx) => (
+                      <li key={idx}><strong className="text-red-400">{wk}</strong></li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-400 italic">Informazioni di debolezza specifiche saranno aggiunte dalla community tramite "Proponi Modifica".</p>
+                )}
               </div>
             </section>
 

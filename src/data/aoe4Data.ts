@@ -64,6 +64,8 @@ export interface Civilization {
   landmarks: Landmark[];
   videos?: string[];
   buildOrders?: BuildOrder[];
+  strengths?: string[];
+  weaknesses?: string[];
 }
 
 export const unitsList: Unit[] = [
