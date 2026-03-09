@@ -7,9 +7,9 @@ export function useCivilizations() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchCivs = async () => {
+  const fetchCivs = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const { data, error: sbError } = await supabase
         .from('civilizations')
         .select('*')
@@ -44,8 +44,8 @@ export function useCivilizations() {
   };
 
   useEffect(() => {
-    fetchCivs();
+    fetchCivs(true);
   }, []);
 
-  return { civs, loading, error, refreshCivs: fetchCivs };
+  return { civs, loading, error, refreshCivs: () => fetchCivs(false) };
 }
