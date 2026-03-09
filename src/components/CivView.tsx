@@ -147,7 +147,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             <section>
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <Zap className="text-yellow-500" size={20} />
-                Bonus Passivi
+                Bonus
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {civ.passiveBonuses.map((bonus, idx) => (
