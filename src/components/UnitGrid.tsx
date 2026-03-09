@@ -59,7 +59,8 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filteredLandmarks.map(landmark => {
-              const imgUrl = `https://data.aoe4world.com/images/buildings/${landmark.id}.png`;
+              const baseId = landmark.imageId || landmark.id;
+              const imgUrl = `https://data.aoe4world.com/images/buildings/${baseId}.png`;
               return (
               <div key={landmark.id} className="glass p-4 md:p-5 rounded-2xl border-t-2 border-t-yellow-500/50 hover:glass-hover transition-all group flex flex-col md:flex-row gap-4 items-center">
                 <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl bg-black/40 border border-white/10 flex-shrink-0 overflow-hidden flex items-center justify-center p-2 relative">
@@ -71,7 +72,12 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
                     alt={landmark.name}
                     className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-500 relative z-10"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).style.opacity = '0';
+                      const target = e.target as HTMLImageElement;
+                      if (!target.src.includes(`-${landmark.age - 1}.png`)) {
+                         target.src = `https://data.aoe4world.com/images/buildings/${baseId}-${landmark.age - 1}.png`;
+                      } else {
+                         target.style.opacity = '0';
+                      }
                     }}
                   />
                 </div>
