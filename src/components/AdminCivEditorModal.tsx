@@ -50,8 +50,8 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
           unique_units: editedCiv.uniqueUnits,
           technologies: editedCiv.technologies,
           landmarks: editedCiv.landmarks,
-          strengths: editedCiv.strengths,
-          weaknesses: editedCiv.weaknesses
+          strengths: editedCiv.strengths?.filter(s => s.trim() !== '') || [],
+          weaknesses: editedCiv.weaknesses?.filter(s => s.trim() !== '') || []
         })
         .eq('id', civ.id);
 
@@ -240,7 +240,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                   <textarea 
                     value={editedCiv.strengths?.join('\n') || ''}
                     onChange={e => {
-                      const values = e.target.value.split('\n').filter(Boolean);
+                      const values = e.target.value.split('\n');
                       setEditedCiv({...editedCiv, strengths: values});
                     }}
                     rows={4}
@@ -254,7 +254,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                   <textarea 
                     value={editedCiv.weaknesses?.join('\n') || ''}
                     onChange={e => {
-                      const values = e.target.value.split('\n').filter(Boolean);
+                      const values = e.target.value.split('\n');
                       setEditedCiv({...editedCiv, weaknesses: values});
                     }}
                     rows={4}
