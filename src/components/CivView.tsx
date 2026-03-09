@@ -366,6 +366,17 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                           src={`https://img.youtube.com/vi/${finalId}/maxresdefault.jpg`} 
                           alt="Video Thumbnail"
                           className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                          onLoad={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            // YouTube returns a 120x90 placeholder if the requested resolution doesn't exist
+                            if (target.naturalWidth === 120 && target.naturalHeight === 90) {
+                              if (target.src.includes('maxresdefault.jpg')) {
+                                target.src = `https://img.youtube.com/vi/${finalId}/hqdefault.jpg`;
+                              } else if (target.src.includes('hqdefault.jpg')) {
+                                target.src = `https://img.youtube.com/vi/${finalId}/mqdefault.jpg`;
+                              }
+                            }
+                          }}
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             if (target.src.includes('maxresdefault.jpg')) {
