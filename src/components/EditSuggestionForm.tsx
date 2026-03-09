@@ -106,7 +106,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
             className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors [&>option]:bg-[#1a1c23] [&>option]:text-white"
           >
             <option value="">Seleziona sezione...</option>
-            <option value="caratteristiche">Caratteristiche</option>
+            <option value="caratteristiche">Descrizione</option>
             <option value="punti_di_forza">Punti di Forza</option>
             <option value="punti_di_debolezza">Punti di Debolezza</option>
             <option value="bonus">Bonus</option>

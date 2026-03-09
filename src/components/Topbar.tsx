@@ -1,5 +1,7 @@
-import { User } from 'lucide-react';
+import { User, Bell } from 'lucide-react';
 import { useAuth } from './AuthContext';
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabaseClient';
 
 export type FilterType = 'Tutte' | 'Fanteria' | 'Cavalleria' | 'Arcieri' | 'Assedio';
 
@@ -13,6 +15,43 @@ interface TopbarProps {
 
 export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
   const { isAuthenticated, isAdmin, user, logout, openLoginModal } = useAuth();
+  const [pendingCount, setPendingCount] = useState(0);
+
+  const fetchPendingCount = async () => {
+    try {
+      const { count, error } = await supabase
+        .from('suggestions')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+      
+      if (error) throw error;
+      setPendingCount(count || 0);
+    } catch (err) {
+      console.error('Error fetching pending suggestions count:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated && isAdmin) {
+      fetchPendingCount();
+
+      // Real-time subscription to suggestions table
+      const channel = supabase
+        .channel('suggestions-count')
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'suggestions' 
+        }, () => {
+          fetchPendingCount();
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [isAuthenticated, isAdmin]);
 
   return (
     <div className="w-full bg-gradient-to-r from-[#0d1424] via-[#1a1c32] to-[#0d1424] border-b border-yellow-500/20 flex flex-col md:flex-row items-center justify-between px-4 py-4 md:px-10 md:py-5 z-10 shrink-0 gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative overflow-hidden">
@@ -56,9 +95,14 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
             </div>
             <button 
               onClick={onOpenAdminDashboard}
-              className="text-xs text-yellow-500 hover:text-white transition-colors border border-yellow-500/20 px-3 py-1.5 rounded hover:bg-yellow-500/10 font-sans tracking-wider uppercase flex items-center gap-1"
+              className="relative text-xs text-yellow-500 hover:text-white transition-colors border border-yellow-500/20 px-3 py-1.5 rounded hover:bg-yellow-500/10 font-sans tracking-wider uppercase flex items-center gap-1"
             >
               Proposte
+              {pendingCount > 0 && (
+                <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white shadow-lg animate-bounce duration-500 ring-2 ring-[#0d1424]">
+                  {pendingCount}
+                </span>
+              )}
             </button>
             <button 
               onClick={logout}
