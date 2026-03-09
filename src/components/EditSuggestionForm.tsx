@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext';
 import { User } from 'lucide-react';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
+import { supabase } from '../lib/supabaseClient';
 
 interface SuggestionFormProps {
   civName: string;
@@ -13,29 +14,53 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
   const [section, setSection] = useState('');
   const [suggestion, setSuggestion] = useState('');
   const [source, setSource] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
     isVisible: false,
     message: '',
     type: 'success'
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
       openLoginModal();
       return;
     }
-    console.log('Proposta inviata:', { civName, section, suggestion, source, user: user?.name });
     
-    setToast({
-      isVisible: true,
-      message: 'Proposta inviata con successo!',
-      type: 'success'
-    });
-    
-    setSection('');
-    setSuggestion('');
-    setSource('');
+    try {
+      setIsSubmitting(true);
+      
+      const { error } = await supabase.from('suggestions').insert({
+        civ_name: civName,
+        section,
+        suggestion_text: suggestion,
+        source: source || null,
+        user_name: user?.name || null,
+        user_email: user?.email || null,
+      });
+
+      if (error) throw error;
+      
+      setToast({
+        isVisible: true,
+        message: 'Proposta inviata con successo!',
+        type: 'success'
+      });
+      
+      setSection('');
+      setSuggestion('');
+      setSource('');
+    } catch (err: any) {
+      console.error('Error submitting suggestion:', err);
+      setToast({
+        isVisible: true,
+        message: `Errore: ${err.message || 'Impossibile inviare la proposta'}`,
+        type: 'error'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isAuthenticated) {
@@ -116,9 +141,17 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
 
         <button
           type="submit"
-          className="w-full sm:w-auto sm:px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium shadow-lg shadow-blue-500/20 transition-all mt-2"
+          disabled={isSubmitting}
+          className="w-full sm:w-auto sm:px-8 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium shadow-lg shadow-blue-500/20 transition-all mt-2 flex items-center justify-center gap-2"
         >
-          Invia Proposta
+          {isSubmitting ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Invio in corso...
+            </>
+          ) : (
+            'Invia Proposta'
+          )}
         </button>
       </form>
 

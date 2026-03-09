@@ -12,6 +12,7 @@ import { useCivData } from './components/CivContext';
 import type { Unit } from './data/aoe4Data';
 import { useAuth } from './components/AuthContext';
 import { LoginModal } from './components/LoginModal';
+import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
   }, [location.pathname]);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false);
   const touchStartX = useRef<number | null>(null);
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -59,7 +61,7 @@ function App() {
     }
     touchStartX.current = null;
   };
-  const { favorites, isLoginModalOpen, closeLoginModal } = useAuth();
+  const { favorites, isLoginModalOpen, closeLoginModal, isAuthenticated, isAdmin } = useAuth();
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const { civilizations: civilizationsData, loading, error } = useCivData();
@@ -125,6 +127,7 @@ function App() {
           setSearchQuery={() => {}}
           activeFilter="Tutte"
           setActiveFilter={() => {}}
+          onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
         />
 
         <div className="flex-1 overflow-hidden flex flex-col">
@@ -206,6 +209,12 @@ function App() {
 
       <CookieBanner />
       <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
+      {isAuthenticated && isAdmin && (
+        <AdminDashboardModal
+          isOpen={isAdminDashboardOpen}
+          onClose={() => setIsAdminDashboardOpen(false)}
+        />
+      )}
     </div>
   );
 }

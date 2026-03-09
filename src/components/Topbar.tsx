@@ -8,9 +8,10 @@ interface TopbarProps {
   setSearchQuery: (q: string) => void;
   activeFilter: string;
   setActiveFilter: (f: FilterType) => void;
+  onOpenAdminDashboard?: () => void;
 }
 
-export function Topbar(_props: TopbarProps) {
+export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
   const { isAuthenticated, isAdmin, user, logout, openLoginModal } = useAuth();
 
   return (
@@ -53,6 +54,12 @@ export function Topbar(_props: TopbarProps) {
                 <span className="text-[10px] text-yellow-600 font-bold uppercase tracking-wider">Admin</span>
               </div>
             </div>
+            <button 
+              onClick={onOpenAdminDashboard}
+              className="text-xs text-yellow-500 hover:text-white transition-colors border border-yellow-500/20 px-3 py-1.5 rounded hover:bg-yellow-500/10 font-sans tracking-wider uppercase flex items-center gap-1"
+            >
+              Proposte
+            </button>
             <button 
               onClick={logout}
               className="text-xs text-gray-400 hover:text-white transition-colors border border-white/10 px-3 py-1.5 rounded hover:bg-white/5 font-sans tracking-wider uppercase"
