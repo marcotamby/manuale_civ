@@ -35,6 +35,7 @@ async function syncAllData() {
                 id: civ.id,
                 name: civ.name,
                 difficulty: civ.difficulty,
+                flag: civ.flag,
                 short_description: civ.shortDescription,
                 passive_bonuses: civ.passiveBonuses,
                 unique_units: civ.uniqueUnits,

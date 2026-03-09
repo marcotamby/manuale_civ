@@ -210,10 +210,21 @@ export const civilizationsData: Civilization[] = [
     ],
     technologies: [],
     landmarks: [
-      { id: "economic-wing", name: "Economic Wing", age: 2, type: "Economic", description: "Unlocks gathering and agricultural bonuses." },
-      { id: "military-wing", name: "Military Wing", age: 2, type: "Military", description: "Provides bonuses to infantry and camel units." },
-      { id: "culture-wing", name: "Culture Wing", age: 3, type: "Technology", description: "Bonuses for research speed and healing." },
-      { id: "trade-wing", name: "Trade Wing", age: 4, type: "Economic", description: "Enhances traders and market resource generation." }
+      { id: "house-of-wisdom", name: "House of Wisdom (Costruita in Età I)", age: 1, type: "Technology", description: "L'edificio centrale da cui si ricercano le Ali per avanzare d'età. Le ali sbloccano potenti tecnologie esclusive." },
+      { id: "economic-wing-2", name: "Ala Economica", age: 2, type: "Economic", description: "Sblocca tecnologie come Fresh Foodstuffs (-35% costo abitanti), Agriculture e Improved Processing. Può essere scelta in Età 2, 3 o 4." },
+      { id: "military-wing-2", name: "Ala Militare", age: 2, type: "Military", description: "Sblocca tecnologie per potenziare la fanteria e i cammelli (Boot Camp, Camel Support, Camel Shields). Può essere scelta in Età 2, 3 o 4." },
+      { id: "culture-wing-2", name: "Ala Culturale", age: 2, type: "Technology", description: "Sblocca tecnologie chiave come Preservation of Knowledge (-30% costo ricerche) e cure mediche. Può essere scelta in Età 2, 3 o 4." },
+      { id: "trade-wing-2", name: "Ala Commerciale", age: 2, type: "Economic", description: "Migliora enormemente il commercio, fornendo bonus difensivi e risorse secondarie ai mercanti. Può essere scelta in Età 2, 3 o 4." },
+      
+      { id: "economic-wing-3", name: "Ala Economica", age: 3, type: "Economic", description: "Sblocca tecnologie come Fresh Foodstuffs, Agriculture e Improved Processing." },
+      { id: "military-wing-3", name: "Ala Militare", age: 3, type: "Military", description: "Sblocca tecnologie infanteria e cammelli. Fornisce inoltre truppe immediate se costruita." },
+      { id: "culture-wing-3", name: "Ala Culturale", age: 3, type: "Technology", description: "Sblocca Preservation of Knowledge e Medical Centers." },
+      { id: "trade-wing-3", name: "Ala Commerciale", age: 3, type: "Economic", description: "Migliora l'economia del mercato e dei commercianti." },
+
+      { id: "economic-wing-4", name: "Ala Economica", age: 4, type: "Economic", description: "Completa i potenziamenti agricoli e della raccolta." },
+      { id: "military-wing-4", name: "Ala Militare", age: 4, type: "Military", description: "Completa i potenziamenti bellici per fanteria e cavalieri su cammello." },
+      { id: "culture-wing-4", name: "Ala Culturale", age: 4, type: "Technology", description: "Permette agli Imām di convertire le unità senza reliquia." },
+      { id: "trade-wing-4", name: "Ala Commerciale", age: 4, type: "Economic", description: "Permette ai commercianti di riportare risorse secondarie preziose." }
     ]
   },
   {
@@ -230,10 +241,21 @@ export const civilizationsData: Civilization[] = [
     ],
     technologies: [],
     landmarks: [
-      { id: "military-wing-ayyubid", name: "Military Wing", age: 2, type: "Military", description: "Reinforcements and infantry armor bonuses." },
-      { id: "economic-wing-ayyubid", name: "Economic Wing", age: 2, type: "Economic", description: "Villager growth and logistics bonuses." },
-      { id: "culture-wing-ayyubid", name: "Culture Wing", age: 3, type: "Religious", description: "Healing and research speed bonuses." },
-      { id: "trade-wing-ayyubid", name: "Trade Wing", age: 4, type: "Economic", description: "Bazaar and trade gold bonuses." }
+      { id: "house-of-wisdom-ay", name: "House of Wisdom (Costruita in Età I)", age: 1, type: "Technology", description: "Dalla House of Wisdom si scelgono le Ali per avanzare. A differenza degli Abbasidi, le ali forniscono bonus immediati unici tra due scelte per ala." },
+      { id: "culture-wing-logistics-2", name: "Ala Culturale (Curatori / Avanzamento)", age: 2, type: "Religious", description: "Scegli tra Dervisci gratuiti (Logistica) o avanzamenti d'età più veloci ed economici (Avanzamento). Disponibile in tutte le età." },
+      { id: "economic-wing-growth-2", name: "Ala Economica (Crescita / Industria)", age: 2, type: "Economic", description: "Scegli tra la creazione automatica di abitanti extra (Crescita) o grandi carichi di legno gratuiti (Industria). Disponibile in tutte le età." },
+      { id: "military-wing-smith-2", name: "Ala Militare (Fabbri / Rinforzi)", age: 2, type: "Military", description: "Scegli tra potenziamenti da Fabbro automatici gratuiti (Maestri Fabbri) o un flusso costante di Desert Raiders gratuiti (Rinforzi). Disponibile in tutte le età." },
+      { id: "trade-wing-bazaar-2", name: "Ala Commerciale (Bazar / Consiglieri)", age: 2, type: "Economic", description: "Scegli tra mercanti neutrali che offrono scambi eccellenti (Bazar) o potenti Atabeg che supportano le guarnigioni (Consiglieri). Disponibile in tutte le età." },
+
+      { id: "culture-wing-logistics-3", name: "Ala Culturale (Curatori / Avanzamento)", age: 3, type: "Religious", description: "Ottieni Dervisci (Logistica) o sconti sull'avanzamento d'età (Avanzamento)." },
+      { id: "economic-wing-growth-3", name: "Ala Economica (Crescita / Industria)", age: 3, type: "Economic", description: "Abitanti gratuiti extra (Crescita) o legna immediata (Industria)." },
+      { id: "military-wing-smith-3", name: "Ala Militare (Fabbri / Rinforzi)", age: 3, type: "Military", description: "Upgrades del fabbro gratuiti e istantanei (Maestri Fabbri) o spawn periodico di Desert Raiders d'élite (Rinforzi)." },
+      { id: "trade-wing-bazaar-3", name: "Ala Commerciale (Bazar / Consiglieri)", age: 3, type: "Economic", description: "Genera scambi speciali al Bazar (Bazar) o fornisce preziosi Atabeg per potenziare la salute dell'esercito (Consiglieri)." },
+      
+      { id: "culture-wing-logistics-4", name: "Ala Culturale (Curatori / Avanzamento)", age: 4, type: "Religious", description: "Dervisci o avanzamento d'età finale." },
+      { id: "economic-wing-growth-4", name: "Ala Economica (Crescita / Industria)", age: 4, type: "Economic", description: "Enorme flusso di abitanti rapidi o massiccia iniezione di legno." },
+      { id: "military-wing-smith-4", name: "Ala Militare (Fabbri / Rinforzi)", age: 4, type: "Military", description: "Garantisce gli ultimi potenziamenti fabbro o grandi spawn di incursori del deserto." },
+      { id: "trade-wing-bazaar-4", name: "Ala Commerciale (Bazar / Consiglieri)", age: 4, type: "Economic", description: "Ultimi scambi neutri iper-convenienti o Atabeg supremi." }
     ]
   },
   {
@@ -276,7 +298,8 @@ export const civilizationsData: Civilization[] = [
       { id: "imperial-hippodrome", name: "Imperial Hippodrome", age: 2, type: "Military", description: "Unlocks Triumph ability for cavalry speed/heal." },
       { id: "cistern-first-hill", name: "Cistern of the First Hill", age: 3, type: "Defensive", description: "Acts as a large Cistern; provides healing flasks." },
       { id: "golden-horn-tower", name: "Golden Horn Tower", age: 3, type: "Military", description: "Periodically spawns free Mercenary units." },
-      { id: "foreign-engineering", name: "Foreign Engineering Company", age: 4, type: "Military", description: "Produces unique mercenary siege units." }
+      { id: "foreign-engineering", name: "Foreign Engineering Company", age: 4, type: "Military", description: "Produces unique mercenary siege units." },
+      { id: "palatine-school", name: "Palatine School", age: 4, type: "Technology", description: "Acts as a University; produces free elite mercenary units when researching technologies." }
     ]
   },
   {
