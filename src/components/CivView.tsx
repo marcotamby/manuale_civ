@@ -367,8 +367,12 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                           alt="Video Thumbnail"
                           className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
                           onError={(e) => {
-                            // Fallback to hqdefault if maxresdefault doesn't exist
-                            (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${finalId}/hqdefault.jpg`;
+                            const target = e.target as HTMLImageElement;
+                            if (target.src.includes('maxresdefault.jpg')) {
+                              target.src = `https://img.youtube.com/vi/${finalId}/hqdefault.jpg`;
+                            } else if (target.src.includes('hqdefault.jpg')) {
+                              target.src = `https://img.youtube.com/vi/${finalId}/mqdefault.jpg`;
+                            }
                           }}
                         />
                         <div className="absolute inset-0 flex items-center justify-center">
