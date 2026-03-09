@@ -1,4 +1,4 @@
-import { User, Bell } from 'lucide-react';
+import { User } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
