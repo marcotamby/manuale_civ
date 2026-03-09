@@ -12,31 +12,30 @@ import { useCivData } from './components/CivContext';
 import type { Unit } from './data/aoe4Data';
 import { useAuth } from './components/AuthContext';
 import { LoginModal } from './components/LoginModal';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'civ' | 'compare'>(() => {
-    const saved = sessionStorage.getItem('aoe4_currentPage');
-    if (saved === 'home' || saved === 'civ' || saved === 'compare') return saved;
-    return 'home';
-  });
-  const [selectedCiv, setSelectedCiv] = useState<string>(() => {
-    return sessionStorage.getItem('aoe4_selectedCiv') || 'english';
-  });
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isHome = location.pathname === '/';
+  const isCompare = location.pathname.startsWith('/compare');
+  const isCiv = location.pathname.startsWith('/civ/');
+  
+  const selectedCivMatch = location.pathname.match(/^\/civ\/([^/]+)/);
+  const selectedCiv = selectedCivMatch ? selectedCivMatch[1] : '';
+
+  const currentPage = isHome ? 'home' : isCompare ? 'compare' : isCiv ? 'civ' : 'home';
 
   useEffect(() => {
-    sessionStorage.setItem('aoe4_currentPage', currentPage);
-  }, [currentPage]);
-
-  useEffect(() => {
-    sessionStorage.setItem('aoe4_selectedCiv', selectedCiv);
-    // Scroll to top on civ change - try multiple selectors for robustness
+    // Scroll to top on route change
     const selectors = ['.main-content-area', '.civ-view-container'];
     selectors.forEach(selector => {
       const container = document.querySelector(selector);
       if (container) container.scrollTop = 0;
     });
     window.scrollTo(0, 0);
-  }, [selectedCiv, currentPage]);
+  }, [location.pathname]);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const touchStartX = useRef<number | null>(null);
@@ -66,14 +65,13 @@ function App() {
   const { civilizations: civilizationsData, loading, error } = useCivData();
 
   const handleSelectCiv = (civId: string) => {
-    setSelectedCiv(civId);
-    setCurrentPage('civ');
+    navigate(`/civ/${civId}`);
     setIsSidebarOpen(false);
   };
 
   const handleCompare = (civIds: string[]) => {
     setCompareIds(civIds);
-    setCurrentPage('compare');
+    navigate('/compare');
   };
 
   const civIndex = civilizationsData.findIndex((c) => c.id === selectedCiv);
@@ -109,7 +107,11 @@ function App() {
         <Sidebar
           selectedCiv={selectedCiv}
           onSelectCiv={handleSelectCiv}
-          onSelectPage={setCurrentPage}
+          onSelectPage={(page) => {
+            if (page === 'home') navigate('/');
+            else if (page === 'compare') navigate('/compare');
+            // civ navigation is handled by onSelectCiv calling navigate
+          }}
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
           onOpen={() => setIsSidebarOpen(true)}
@@ -129,7 +131,7 @@ function App() {
           {currentPage !== 'home' && (
             <div className="flex items-center gap-3 px-4 md:px-6 py-2 shrink-0">
               <button
-                onClick={() => setCurrentPage('home')}
+                onClick={() => navigate('/')}
                 title="Dashboard"
                 className="md:hidden p-2 glass rounded-lg hover:bg-white/10 transition-colors text-yellow-500"
               >
@@ -185,18 +187,12 @@ function App() {
           )}
 
           <div className="flex-1 overflow-y-auto overflow-x-hidden w-full main-content-area elegant-scrollbar md:md-content-padding">
-            {currentPage === 'home' && (
-              <Home 
-                onSelectCiv={handleSelectCiv} 
-                onCompareCivs={handleCompare}
-              />
-            )}
-            {currentPage === 'civ' && (
-              <CivView civId={selectedCiv} onSelectUnit={setSelectedUnit} />
-            )}
-            {currentPage === 'compare' && (
-              <CompareView civIds={compareIds} onClose={() => setCurrentPage('home')} />
-            )}
+            <Routes>
+              <Route path="/" element={<Home onSelectCiv={handleSelectCiv} onCompareCivs={handleCompare} />} />
+              <Route path="/civ/:civId" element={<CivView civId={selectedCiv} onSelectUnit={setSelectedUnit} />} />
+              <Route path="/civ/:civId/:tab" element={<CivView civId={selectedCiv} onSelectUnit={setSelectedUnit} />} />
+              <Route path="/compare" element={<CompareView civIds={compareIds} onClose={() => navigate('/')} />} />
+            </Routes>
           </div>
         </div>
       </main>

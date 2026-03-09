@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useCivData } from './CivContext';
 import type { Unit } from '../data/aoe4Data';
 import { UnitGrid } from './UnitGrid';
@@ -21,10 +22,11 @@ interface CivViewProps {
 export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const { civilizations: civilizationsData, refreshCivs } = useCivData();
   
-  // Persist local state for this view
-  const [activeTab, setActiveTab] = useState<Tab>(() => {
-    return (sessionStorage.getItem('activeTab') as Tab) || 'caratteristiche';
-  });
+  const { tab } = useParams<{ tab?: string }>();
+  const navigate = useNavigate();
+
+  const validTabs: Tab[] = ['caratteristiche', 'units', 'buildorders', 'matchups', 'video', 'proponi', 'admin-edit'];
+  const activeTab: Tab = (validTabs.includes(tab as Tab)) ? (tab as Tab) : 'caratteristiche';
   const [activeAge, setActiveAge] = useState<1|2|3|4>(() => {
     return (Number(sessionStorage.getItem('activeAge')) as 1|2|3|4) || 1;
   });
@@ -36,9 +38,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   // useEffect would be better but handlers are already syncing to sessionStorage
   
   // Update whenever they change
-  const handleTabChange = (tab: Tab) => {
-    setActiveTab(tab);
-    sessionStorage.setItem('activeTab', tab);
+  const handleTabChange = (newTab: Tab) => {
+    navigate(`/civ/${civId}/${newTab}`);
   };
 
   const handleAgeChange = (age: number) => {
