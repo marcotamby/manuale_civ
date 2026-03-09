@@ -131,7 +131,7 @@ function App() {
               <button
                 onClick={() => setCurrentPage('home')}
                 title="Dashboard"
-                className="p-2 glass rounded-lg hover:bg-white/10 transition-colors text-yellow-500"
+                className="md:hidden p-2 glass rounded-lg hover:bg-white/10 transition-colors text-yellow-500"
               >
                 <HomeIcon size={20} />
               </button>

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Save, X, Loader2, Play, Map, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { YouTubePickerModal } from './YouTubePickerModal';
+import { Toast } from './Toast';
+import type { ToastType } from './Toast';
 import type { Civilization } from '../data/aoe4Data';
 
 interface AdminCivEditorModalProps {
@@ -16,6 +18,11 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
   const [isSaving, setIsSaving] = useState(false);
   const [isYoutubePickerOpen, setIsYoutubePickerOpen] = useState(false);
   const [stepsTexts, setStepsTexts] = useState<Record<number, string>>({});
+  const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
+    isVisible: false,
+    message: '',
+    type: 'success'
+  });
 
   if (!isOpen) return null;
 
@@ -40,12 +47,23 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
 
       if (error) throw error;
       
-      alert('Modifiche salvate con successo nel database!');
-      onSave(editedCiv);
-      onClose();
+      setToast({
+        isVisible: true,
+        message: 'Modifiche salvate con successo!',
+        type: 'success'
+      });
+      
+      setTimeout(() => {
+        onSave(editedCiv);
+        onClose();
+      }, 1500);
     } catch (err: any) {
       console.error('Error saving civilization:', err);
-      alert(`Errore durante il salvataggio: ${err?.message || JSON.stringify(err)}`);
+      setToast({
+        isVisible: true,
+        message: `Errore: ${err?.message || 'Errore nel salvataggio'}`,
+        type: 'error'
+      });
     } finally {
       setIsSaving(false);
     }
@@ -389,6 +407,13 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
             videos: videoIds
           });
         }}
+      />
+
+      <Toast 
+        isVisible={toast.isVisible}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ ...toast, isVisible: false })}
       />
     </div>
   );

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from './AuthContext';
 import { User } from 'lucide-react';
+import { Toast } from './Toast';
+import type { ToastType } from './Toast';
 
 interface SuggestionFormProps {
   civName: string;
@@ -11,7 +13,11 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
   const [section, setSection] = useState('');
   const [suggestion, setSuggestion] = useState('');
   const [source, setSource] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
+    isVisible: false,
+    message: '',
+    type: 'success'
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,8 +26,13 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
       return;
     }
     console.log('Proposta inviata:', { civName, section, suggestion, source, user: user?.name });
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 4000);
+    
+    setToast({
+      isVisible: true,
+      message: 'Proposta inviata con successo!',
+      type: 'success'
+    });
+    
     setSection('');
     setSuggestion('');
     setSource('');
@@ -58,11 +69,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
         Hai informazioni più accurate su questa civiltà? Proponi una modifica e il nostro team la esaminerà.
       </p>
 
-      {submitted && (
-        <div className="mb-4 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-green-400 text-sm">
-          ✓ Proposta inviata con successo! Grazie per il contributo.
-        </div>
-      )}
+
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
@@ -114,6 +121,13 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
           Invia Proposta
         </button>
       </form>
+
+      <Toast 
+        isVisible={toast.isVisible}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ ...toast, isVisible: false })}
+      />
     </div>
   );
 }
