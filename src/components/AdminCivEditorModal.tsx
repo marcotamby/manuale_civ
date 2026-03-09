@@ -146,7 +146,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                 <select 
                   value={editedCiv.difficulty}
                   onChange={e => setEditedCiv({...editedCiv, difficulty: e.target.value as any})}
-                  className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors"
+                  className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors [&>option]:bg-[#1a1c23] [&>option]:text-white"
                 >
                   <option value="Facile">Facile</option>
                   <option value="Medio">Medio</option>
@@ -164,33 +164,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-bold text-gray-300 mb-1">Punti di Forza</label>
-                <textarea 
-                  value={editedCiv.strengths?.join('\n') || ''}
-                  onChange={e => {
-                    const values = e.target.value.split('\n').filter(Boolean);
-                    setEditedCiv({...editedCiv, strengths: values});
-                  }}
-                  rows={4}
-                  placeholder="Inserisci un punto di forza per riga..."
-                  className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors resize-y"
-                />
-              </div>
 
-              <div>
-                <label className="block text-sm font-bold text-gray-300 mb-1">Punti di Debolezza</label>
-                <textarea 
-                  value={editedCiv.weaknesses?.join('\n') || ''}
-                  onChange={e => {
-                    const values = e.target.value.split('\n').filter(Boolean);
-                    setEditedCiv({...editedCiv, weaknesses: values});
-                  }}
-                  rows={4}
-                  placeholder="Inserisci un punto di debolezza per riga..."
-                  className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors resize-y"
-                />
-              </div>
 
               <div>
                 <div className="flex justify-between items-end mb-1">
@@ -230,7 +204,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
             </div>
 
             <div className="space-y-4">
-              <label className="block text-sm font-bold text-gray-300 mb-1">Bonus Passivi</label>
+              <label className="block text-sm font-bold text-gray-300 mb-1">Bonus</label>
               <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                 {editedCiv.passiveBonuses.map((bonus: string, idx: number) => (
                   <div key={idx} className="flex gap-2">
@@ -259,6 +233,36 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
               >
                 + Aggiungi Bonus
               </button>
+
+              <div className="pt-4 mt-6 border-t border-gray-600/30 space-y-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-300 mb-1">Punti di Forza</label>
+                  <textarea 
+                    value={editedCiv.strengths?.join('\n') || ''}
+                    onChange={e => {
+                      const values = e.target.value.split('\n').filter(Boolean);
+                      setEditedCiv({...editedCiv, strengths: values});
+                    }}
+                    rows={4}
+                    placeholder="Inserisci un punto di forza per riga..."
+                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors resize-y"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-300 mb-1">Punti di Debolezza</label>
+                  <textarea 
+                    value={editedCiv.weaknesses?.join('\n') || ''}
+                    onChange={e => {
+                      const values = e.target.value.split('\n').filter(Boolean);
+                      setEditedCiv({...editedCiv, weaknesses: values});
+                    }}
+                    rows={4}
+                    placeholder="Inserisci un punto di debolezza per riga..."
+                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors resize-y"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
