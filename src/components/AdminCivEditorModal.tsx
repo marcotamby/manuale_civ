@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, X, Loader2, Play, Map, Plus, Trash2 } from 'lucide-react';
+import { Save, X, Loader2, Play, Map, Plus, Trash2, CheckCircle } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { YouTubePickerModal } from './YouTubePickerModal';
 import { Toast } from './Toast';
@@ -16,6 +16,7 @@ interface AdminCivEditorModalProps {
 export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEditorModalProps) {
   const [editedCiv, setEditedCiv] = useState<Civilization>(civ);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSaveSuccess, setIsSaveSuccess] = useState(false);
   const [isYoutubePickerOpen, setIsYoutubePickerOpen] = useState(false);
   const [stepsTexts, setStepsTexts] = useState<Record<number, string>>({});
   const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
@@ -80,14 +81,18 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
         type: 'success'
       });
       
+      setIsSaveSuccess(true);
+      
+      onSave({
+        ...editedCiv,
+        strengths: editedCiv.strengths?.filter(s => s.trim() !== '') || [],
+        weaknesses: editedCiv.weaknesses?.filter(s => s.trim() !== '') || []
+      });
+
       setTimeout(() => {
-        onSave({
-          ...editedCiv,
-          strengths: editedCiv.strengths?.filter(s => s.trim() !== '') || [],
-          weaknesses: editedCiv.weaknesses?.filter(s => s.trim() !== '') || []
-        });
-        // Il pannello NON si chiude più in automatico: l'utente utilizzerà la X.
-      }, 1500);
+        setIsSaveSuccess(false);
+      }, 2000);
+      
     } catch (err: any) {
       console.error('Error saving civilization:', err);
       setToast({
@@ -447,15 +452,25 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
           </div>
         </div>
 
-        <div className="p-6 border-t border-purple-500/20 bg-black/40 flex justify-end items-center gap-4">
+        <div className="p-6 border-t border-purple-500/20 bg-black/40 flex justify-center items-center gap-4">
 
           <button 
             onClick={handleSave}
-            disabled={isSaving}
-            className="px-8 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-purple-600/30 transition-all disabled:opacity-50"
+            disabled={isSaving || isSaveSuccess}
+            className={`px-8 py-3 text-white rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all disabled:opacity-50 ${
+              isSaveSuccess 
+                ? 'bg-green-600 hover:bg-green-500 shadow-green-600/30' 
+                : 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/30'
+            }`}
           >
-            {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-            {isSaving ? 'Salvataggio...' : 'Salva nel Database'}
+            {isSaving ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : isSaveSuccess ? (
+              <CheckCircle size={18} />
+            ) : (
+              <Save size={18} />
+            )}
+            {isSaving ? 'Salvataggio...' : isSaveSuccess ? 'Salvato con successo' : 'Salva nel Database'}
           </button>
         </div>
       </div>
