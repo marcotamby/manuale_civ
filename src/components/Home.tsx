@@ -109,14 +109,18 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
               }`}
             >
               {/* Full Cover Flag Background */}
-              <div className="absolute inset-0">
+              <div className="absolute inset-0 bg-[#1a1c23]"> {/* Placeholder background color */}
                 <img 
                   src={civ.flag} 
                   alt={civ.name}
                   loading={filteredCivs.indexOf(civ) < 12 ? "eager" : "lazy"}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  onLoad={(e) => {
+                    (e.target as HTMLImageElement).classList.remove('opacity-0');
+                  }}
+                  className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 opacity-0"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>';
+                    (e.target as HTMLImageElement).classList.remove('opacity-0');
                   }}
                 />
                 {/* Cinematic Vignette Overlay */}
