@@ -62,7 +62,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     { id: 'units', label: 'Unità & Landmarks', icon: <Sword size={16} /> },
     { id: 'buildorders', label: 'Build Orders', icon: <Map size={16} /> },
     { id: 'matchups', label: 'Matchups', icon: <BarChart2 size={16} /> },
-    { id: 'video', label: 'Video Guida', icon: <Play size={16} /> },
+    { id: 'video', label: 'Video Guide', icon: <Play size={16} /> },
     { id: 'proponi', label: 'Proponi Modifica', icon: <Edit size={16} /> },
   ];
 
@@ -321,11 +321,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         {/* === VIDEO === */}
         {activeTab === 'video' && (
           <div className="w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
-              <div>
+            <div className="flex flex-col md:flex-row md:items-center gap-6 mb-2">
+              <div className="flex flex-col">
                 <h2 className="text-3xl font-bold text-white flex items-center gap-3">
                   <Play className="text-red-500" size={32} />
-                  Video Guida & Gameplay
+                  Video Guide & Gameplay
                 </h2>
                 <p className="text-gray-400 mt-1">Tutorial e partite commentate da <span className="text-red-500 font-bold">marcotamby_aoe</span>.</p>
               </div>
@@ -334,7 +334,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 href="https://www.youtube.com/@marcotamby_aoe" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-red-600/20 hover:scale-105 active:scale-95 self-start md:self-center"
+                className="flex items-center gap-2 px-6 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-[11px] uppercase tracking-wider font-extrabold transition-all shadow-lg shadow-red-600/20 hover:scale-105 active:scale-95 self-start md:self-center"
               >
                 <Play size={14} fill="currentColor" />
                 VISITA IL CANALE YOUTUBE
@@ -381,10 +381,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   );
                 })
               ) : (
-                <div className="glass p-12 rounded-3xl border border-white/5 text-center flex flex-col items-center col-span-full">
-                  <Play size={48} className="text-gray-600 mb-4" />
-                  <h3 className="text-lg font-bold text-gray-400 mb-2">Video non ancora disponibili</h3>
-                  <p className="text-sm text-gray-500">Stiamo preparando delle guide video dedicate a questa civiltà.</p>
+                <div className="glass p-8 rounded-2xl border border-white/5 text-center flex flex-col items-center justify-center aspect-video max-w-[300px] bg-black/20">
+                  <Play size={32} className="text-gray-600 mb-3" />
+                  <h3 className="text-base font-bold text-gray-400 mb-1">Video in arrivo</h3>
+                  <p className="text-xs text-gray-500 px-4 leading-tight">Guide dedicate in fase di preparazione.</p>
                 </div>
               )}
             </div>
