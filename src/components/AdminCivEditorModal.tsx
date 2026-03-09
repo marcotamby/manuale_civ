@@ -75,12 +75,6 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
 
       if (error) throw error;
       
-      setToast({
-        isVisible: true,
-        message: 'Modifiche salvate con successo!',
-        type: 'success'
-      });
-      
       setIsSaveSuccess(true);
       
       onSave({
@@ -457,16 +451,18 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
           <button 
             onClick={handleSave}
             disabled={isSaving || isSaveSuccess}
-            className={`px-8 py-3 text-white rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all disabled:opacity-50 ${
+            className={`px-8 py-3 text-white rounded-xl font-bold flex items-center gap-2 transition-all ${
+              isSaving ? 'opacity-50 cursor-not-allowed' : ''
+            } ${
               isSaveSuccess 
-                ? 'bg-green-600 hover:bg-green-500 shadow-green-600/30' 
-                : 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/30'
+                ? 'bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.8)] border border-green-400 scale-105 duration-300' 
+                : 'bg-purple-600 hover:bg-purple-500 shadow-lg shadow-purple-600/30'
             }`}
           >
             {isSaving ? (
               <Loader2 size={18} className="animate-spin" />
             ) : isSaveSuccess ? (
-              <CheckCircle size={18} />
+              <CheckCircle size={18} className="animate-in zoom-in duration-300" />
             ) : (
               <Save size={18} />
             )}
