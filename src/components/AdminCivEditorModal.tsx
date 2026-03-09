@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Save, X, Loader2, Play, Map, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { YouTubePickerModal } from './YouTubePickerModal';
@@ -23,6 +23,14 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
     message: '',
     type: 'success'
   });
+
+  // Sync state with props when modal opens or civ changes
+  useEffect(() => {
+    if (isOpen) {
+      setEditedCiv(civ);
+      setStepsTexts({}); // Reset the steps cache to force recalculation from bo.steps
+    }
+  }, [civ, isOpen]);
 
   if (!isOpen) return null;
 
