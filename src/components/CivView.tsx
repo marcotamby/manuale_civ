@@ -377,7 +377,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               )}
             </div>
 
-            <div className="flex justify-center mt-4">
+            <div className="flex justify-start mt-4">
               <a 
                 href="https://www.youtube.com/@marcotamby_aoe" 
                 target="_blank" 

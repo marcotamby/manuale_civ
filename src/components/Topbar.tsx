@@ -43,7 +43,7 @@ export function Topbar(_props: TopbarProps) {
       {/* Auth / Right side */}
       <div className="flex items-center justify-center md:justify-end w-full md:w-1/3">
         {isAuthenticated && isAdmin ? (
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 font-sans">
             <div className="flex items-center gap-2 text-yellow-500">
               <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30">
                 <User size={16} />
@@ -55,7 +55,7 @@ export function Topbar(_props: TopbarProps) {
             </div>
             <button 
               onClick={logout}
-              className="text-xs text-gray-400 hover:text-white transition-colors border border-white/10 px-3 py-1.5 rounded hover:bg-white/5 font-cinzel tracking-wider uppercase"
+              className="text-xs text-gray-400 hover:text-white transition-colors border border-white/10 px-3 py-1.5 rounded hover:bg-white/5 font-sans tracking-wider uppercase"
             >
               Esci
             </button>

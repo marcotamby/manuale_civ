@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Save, X, Loader2, Play, Map, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { YouTubePickerModal } from './YouTubePickerModal';
 import type { Civilization } from '../data/aoe4Data';
 
 interface AdminCivEditorModalProps {
@@ -13,6 +14,7 @@ interface AdminCivEditorModalProps {
 export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEditorModalProps) {
   const [editedCiv, setEditedCiv] = useState<Civilization>(civ);
   const [isSaving, setIsSaving] = useState(false);
+  const [isYoutubePickerOpen, setIsYoutubePickerOpen] = useState(false);
   const [stepsTexts, setStepsTexts] = useState<Record<number, string>>({});
 
   if (!isOpen) return null;
@@ -135,10 +137,19 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-300 mb-1 flex items-center gap-2">
-                  <Play size={16} className="text-red-500" />
-                  Video YouTube (Link o ID)
-                </label>
+                <div className="flex justify-between items-end mb-1">
+                  <label className="text-sm font-bold text-gray-300 flex items-center gap-2">
+                    <Play size={16} className="text-red-500" />
+                    Video YouTube (Link o ID)
+                  </label>
+                  <button 
+                    type="button"
+                    onClick={() => setIsYoutubePickerOpen(true)}
+                    className="text-[10px] bg-red-600 hover:bg-red-500 text-white px-2 py-1 rounded flex items-center gap-1 transition-all shadow-lg shadow-red-600/20 active:scale-95 z-10"
+                  >
+                    <Play size={10} fill="currentColor" /> Sfoglia Canale
+                  </button>
+                </div>
                 <textarea 
                   value={editedCiv.videos?.join(', ') || ''}
                   onChange={e => {
@@ -367,6 +378,26 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
           </button>
         </div>
       </div>
+
+      <YouTubePickerModal 
+        isOpen={isYoutubePickerOpen}
+        onClose={() => setIsYoutubePickerOpen(false)}
+        selectedIds={editedCiv.videos || []}
+        onSelect={(videoId) => {
+          const currentVideos = editedCiv.videos || [];
+          if (currentVideos.includes(videoId)) {
+            setEditedCiv({
+              ...editedCiv, 
+              videos: currentVideos.filter(id => id !== videoId)
+            });
+          } else {
+            setEditedCiv({
+              ...editedCiv, 
+              videos: [...currentVideos, videoId]
+            });
+          }
+        }}
+      />
     </div>
   );
 }
