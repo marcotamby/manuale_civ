@@ -808,7 +808,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "zhuxi",
     name: "Eredità di Zhu Xi",
-    flag: "/civs/Zhu Xi's Legacy.png",
+    flag: "/civs/Zhu Xis Legacy.png",
     difficulty: "Difficile",
     shortDescription: "A fast-paced Imperial variant of the Chinese emphasizing early Dynasties.",
     passiveBonuses: ["Cheaper officials and streamlined access to powerful Shaolin Monks and Chu Ko Nu.", "Earlier access to robust technologies."],
