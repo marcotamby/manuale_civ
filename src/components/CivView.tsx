@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCivData } from './CivContext';
 import type { Unit } from '../data/aoe4Data';
@@ -54,6 +54,22 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const [localCivs, setLocalCivs] = useState<Record<string, Civilization>>({});
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const { isAdmin } = useAuth();
+  
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 2);
+    }
+  };
+
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener('resize', checkScroll);
+    return () => window.removeEventListener('resize', checkScroll);
+  }, []);
 
   const baseCiv = civilizationsData.find(c => c.id === civId);
   const civ = baseCiv ? (localCivs[civId] || baseCiv) : undefined;
@@ -115,7 +131,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       </div>
 
       <div className="relative sticky top-0 bg-[var(--color-brand-dark)] z-10 border-b border-[#D4AF37]/15 w-full">
-        <div className="px-4 overflow-x-auto flex flex-nowrap gap-0 relative w-full">
+        <div 
+          ref={scrollContainerRef}
+          onScroll={checkScroll}
+          className="px-4 overflow-x-auto flex flex-nowrap gap-0 relative w-full no-scrollbar"
+        >
           {tabs.map(tab => (
             <button
               key={tab.id}
@@ -133,9 +153,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         </div>
         
         {/* Mobile Scroll Indicator */}
-        <div className="md:hidden absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[var(--color-brand-dark)] to-transparent pointer-events-none flex items-center justify-end pr-2">
-          <ChevronRight size={16} className="text-yellow-500/70 animate-pulse" />
-        </div>
+        {canScrollRight && (
+          <div className="md:hidden absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[var(--color-brand-dark)] to-transparent pointer-events-none flex items-center justify-end pr-2">
+            <ChevronRight size={16} className="text-yellow-500/70 animate-pulse" />
+          </div>
+        )}
       </div>
 
       {/* Tab Content */}

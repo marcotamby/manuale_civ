@@ -127,23 +127,23 @@ export function YouTubePickerModal({ isOpen, onClose, onSelect, selectedIds }: Y
           )}
         </div>
 
-        <div className="p-6 bg-black/40 border-t border-white/10 flex justify-between items-center shadow-[0_-10px_20px_rgba(0,0,0,0.5)]">
-          <div className="text-sm text-gray-400">
+        <div className="p-4 sm:p-6 bg-black/40 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]">
+          <div className="text-sm text-gray-400 w-full text-center md:text-left">
             <span className="text-red-500 font-bold">{pendingSelection.length}</span> video selezionati
           </div>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row w-full md:w-auto gap-3">
             <button 
               onClick={onClose}
-              className="px-6 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl transition-all"
+              className="w-full sm:w-1/3 md:w-auto px-6 py-3 md:py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl transition-all whitespace-nowrap"
             >
               Annulla
             </button>
             <button 
               onClick={handleConfirm}
-              className="px-8 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-red-600/30 transition-all active:scale-95"
+              className="w-full sm:w-2/3 md:w-auto justify-center px-8 py-3 md:py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-red-600/30 transition-all active:scale-95 whitespace-nowrap"
             >
-              <CheckCircle2 size={18} />
-              Conferma Selezione
+              <CheckCircle2 size={18} className="shrink-0" />
+              <span>Conferma Selezione</span>
             </button>
           </div>
         </div>

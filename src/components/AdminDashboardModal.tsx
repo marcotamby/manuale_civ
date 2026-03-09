@@ -58,23 +58,49 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const handleUpdateStatus = async (sugg: Suggestion, newStatus: 'implemented' | 'rejected') => {
     try {
       if (newStatus === 'implemented') {
+        const { data: currentCiv, error: fetchError } = await supabase
+          .from('civilizations')
+          .select('*')
+          .eq('name', sugg.civ_name)
+          .single();
+
+        if (fetchError) throw fetchError;
+
         let updateData: any = null;
+        const newLines = sugg.suggestion_text.split('\n').map(s => s.trim()).filter(s => s !== '');
         
+        const safeArray = (val: any) => Array.isArray(val) ? val : [];
+
         switch (sugg.section) {
           case 'caratteristiche':
-            updateData = { description: sugg.suggestion_text };
+            updateData = { short_description: (currentCiv.short_description || '') + '\n\nAddendum:\n' + sugg.suggestion_text };
             break;
           case 'bonus':
-            updateData = { passiveBonuses: sugg.suggestion_text.split('\n').filter(s => s.trim() !== '') };
+            updateData = { passive_bonuses: [...safeArray(currentCiv.passive_bonuses), ...newLines] };
             break;
           case 'punti_di_forza':
-            updateData = { strengths: sugg.suggestion_text.split('\n').filter(s => s.trim() !== '') };
+            updateData = { strengths: [...safeArray(currentCiv.strengths), ...newLines] };
             break;
           case 'punti_di_debolezza':
-            updateData = { weaknesses: sugg.suggestion_text.split('\n').filter(s => s.trim() !== '') };
+            updateData = { weaknesses: [...safeArray(currentCiv.weaknesses), ...newLines] };
+            break;
+          case 'build_order':
+            const newBO = {
+              id: `bo-${Date.now()}`,
+              title: `Proposta Community - ${new Date().toLocaleDateString('it-IT')}`,
+              description: sugg.suggestion_text,
+              difficulty: 'Medium',
+              steps: [{ action: 'Vedi sopra per i dettagli della strategia.' }]
+            };
+            updateData = { build_orders: [...safeArray(currentCiv.build_orders), newBO] };
+            break;
+          case 'unita':
+          case 'tecnologie':
+          case 'matchup':
+          case 'altro':
+            updateData = { short_description: (currentCiv.short_description || '') + `\n\nAddendum (${sugg.section}):\n` + sugg.suggestion_text };
             break;
           default:
-            // For complex structures, we cannot auto update safely
             break;
         }
 
@@ -82,7 +108,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
           const { error: civUpdateError } = await supabase
             .from('civilizations')
             .update(updateData)
-            .eq('name', sugg.civ_name);
+            .eq('id', currentCiv.id);
             
           if (civUpdateError) throw civUpdateError;
         }
@@ -105,7 +131,11 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       setSuggestions(prev => prev.filter(s => s.id !== sugg.id));
     } catch (err: any) {
       console.error('Error updating suggestion:', err);
-      setToast({ isVisible: true, message: 'Errore durante l\'aggiornamento', type: 'error' });
+      setToast({ 
+        isVisible: true, 
+        message: `Errore: ${err.message || 'Aggiornamento fallito'}`, 
+        type: 'error' 
+      });
     }
   };
 
