@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Inter:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Inter:wght@400;500;700&family=Syncopate:wght@400;700&display=swap');
 
 @theme {
   --color-brand-gold: #D4AF37;
@@ -10,6 +10,7 @@
   --color-brand-border: rgba(212, 175, 55, 0.3);
   --color-brand-border-glow: rgba(212, 175, 55, 0.6);
   --font-cinzel: 'Cinzel', serif;
+  --font-sackers: 'Syncopate', sans-serif;
 }
 
 :root {
