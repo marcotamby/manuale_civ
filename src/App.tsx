@@ -13,6 +13,7 @@ import type { Unit } from './data/aoe4Data';
 import { useAuth } from './components/AuthContext';
 import { LoginModal } from './components/LoginModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
+import { PrivacyPage } from './components/PrivacyPage';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 
 function App() {
@@ -195,6 +196,7 @@ function App() {
               <Route path="/civ/:civId" element={<CivView civId={selectedCiv} onSelectUnit={setSelectedUnit} />} />
               <Route path="/civ/:civId/:tab" element={<CivView civId={selectedCiv} onSelectUnit={setSelectedUnit} />} />
               <Route path="/compare" element={<CompareView civIds={compareIds} onClose={() => navigate('/')} />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
             </Routes>
           </div>
         </div>

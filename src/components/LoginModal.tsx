@@ -16,26 +16,9 @@ interface LoginModalProps {
 
 export function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const { login } = useAuth();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   if (!isOpen) return null;
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (username.trim().length === 0) {
-      setError('Inserisci un nome utente valido.');
-      return;
-    }
-    if (password !== 'admin' && username.toLowerCase() === 'admin') {
-      setError('Password errata per admin.');
-      return;
-    }
-    
-    login({ name: username });
-    onClose();
-  };
 
   const handleGoogleSuccess = (credentialResponse: any) => {
     const decoded: any = jwtDecode(credentialResponse.credential);
@@ -62,8 +45,12 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
         <h2 className="text-2xl font-bold mb-6 text-white text-center italic font-serif">Accedi</h2>
 
-        <div className="flex flex-col gap-4">
-          <div className="flex justify-center mb-2">
+        <div className="flex flex-col gap-6">
+          <p className="text-gray-400 text-center text-sm">
+            Esegui l'accesso con il tuo account Google per poter proporre modifiche e salvare le tue civiltà preferite.
+          </p>
+
+          <div className="flex justify-center my-4">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={() => setError('Errore durante il login con Google')}
@@ -73,44 +60,11 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
             />
           </div>
 
-          <div className="flex items-center gap-4 my-2">
-            <div className="h-[1px] bg-gray-700 flex-1" />
-            <span className="text-xs text-gray-500 uppercase font-bold">Oppure</span>
-            <div className="h-[1px] bg-gray-700 flex-1" />
-          </div>
-
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Username</label>
-              <input 
-                type="text" 
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-colors"
-                placeholder="Inserisci nome utente..."
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Password</label>
-              <input 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-colors"
-                placeholder="Inserisci password..."
-              />
-            </div>
-
-            {error && <p className="text-red-400 text-sm italic">{error}</p>}
-
-            <button 
-              type="submit"
-              className="w-full bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-600 hover:to-blue-500 text-white font-bold py-3 rounded-xl shadow-lg border border-white/10 transition-all mt-2"
-            >
-              Log In
-            </button>
-          </form>
+          {error && <p className="text-red-400 text-center text-sm italic">{error}</p>}
+          
+          <p className="text-[10px] text-gray-500 text-center italic">
+            Accedendo accetti la nostra informativa sulla privacy.
+          </p>
         </div>
       </div>
     </div>
