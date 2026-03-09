@@ -55,12 +55,43 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     }
   }, [isOpen]);
 
-  const handleUpdateStatus = async (id: string, newStatus: 'implemented' | 'rejected') => {
+  const handleUpdateStatus = async (sugg: Suggestion, newStatus: 'implemented' | 'rejected') => {
     try {
+      if (newStatus === 'implemented') {
+        let updateData: any = null;
+        
+        switch (sugg.section) {
+          case 'caratteristiche':
+            updateData = { description: sugg.suggestion_text };
+            break;
+          case 'bonus':
+            updateData = { passiveBonuses: sugg.suggestion_text.split('\n').filter(s => s.trim() !== '') };
+            break;
+          case 'punti_di_forza':
+            updateData = { strengths: sugg.suggestion_text.split('\n').filter(s => s.trim() !== '') };
+            break;
+          case 'punti_di_debolezza':
+            updateData = { weaknesses: sugg.suggestion_text.split('\n').filter(s => s.trim() !== '') };
+            break;
+          default:
+            // For complex structures, we cannot auto update safely
+            break;
+        }
+
+        if (updateData) {
+          const { error: civUpdateError } = await supabase
+            .from('civilizations')
+            .update(updateData)
+            .eq('name', sugg.civ_name);
+            
+          if (civUpdateError) throw civUpdateError;
+        }
+      }
+
       const { error } = await supabase
         .from('suggestions')
         .update({ status: newStatus })
-        .eq('id', id);
+        .eq('id', sugg.id);
 
       if (error) throw error;
 
@@ -71,7 +102,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       });
 
       // Rimuovi dalla lista locale
-      setSuggestions(prev => prev.filter(s => s.id !== id));
+      setSuggestions(prev => prev.filter(s => s.id !== sugg.id));
     } catch (err: any) {
       console.error('Error updating suggestion:', err);
       setToast({ isVisible: true, message: 'Errore durante l\'aggiornamento', type: 'error' });
@@ -152,7 +183,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                     
                     <div className="flex md:flex-col gap-3 shrink-0 items-center md:items-end justify-center">
                       <button 
-                        onClick={() => handleUpdateStatus(sugg.id, 'implemented')}
+                        onClick={() => handleUpdateStatus(sugg, 'implemented')}
                         className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-green-600/20 hover:bg-green-600/40 text-green-400 rounded-lg border border-green-500/30 transition-colors font-medium text-sm"
                         title="Segna come completata"
                       >
@@ -160,7 +191,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                       </button>
                       
                       <button 
-                        onClick={() => handleUpdateStatus(sugg.id, 'rejected')}
+                        onClick={() => handleUpdateStatus(sugg, 'rejected')}
                         className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/40 text-red-400 rounded-lg border border-red-500/30 transition-colors font-medium text-sm"
                         title="Rifiuta proposta"
                       >
