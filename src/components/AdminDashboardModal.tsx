@@ -32,6 +32,8 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
   const [rejectionModalSugg, setRejectionModalSugg] = useState<Suggestion | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
+  const [pendingNotifCount, setPendingNotifCount] = useState(0);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   const fetchSuggestions = async () => {
     try {
@@ -44,6 +46,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
       if (error) throw error;
       setSuggestions(data || []);
+      await fetchPendingNotifCount();
     } catch (err: any) {
       console.error('Error fetching suggestions:', err);
       setToast({ isVisible: true, message: 'Errore nel caricamento delle proposte', type: 'error' });
@@ -52,11 +55,52 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     }
   };
 
+  const fetchPendingNotifCount = async () => {
+    try {
+      const { count, error } = await supabase
+        .from('suggestions')
+        .select('*', { count: 'exact', head: true })
+        .neq('status', 'pending')
+        .eq('notified', false);
+      
+      if (!error) setPendingNotifCount(count || 0);
+    } catch (err) {
+      console.error('Error fetching pending notifications:', err);
+    }
+  };
+
   useEffect(() => {
     if (isOpen) {
       fetchSuggestions();
     }
   }, [isOpen]);
+
+  const handleSendNotifications = async () => {
+    if (pendingNotifCount === 0) return;
+    
+    try {
+      setIsSendingEmail(true);
+      const { data, error } = await supabase.functions.invoke('batch-send-notifications');
+
+      if (error) throw error;
+
+      setToast({
+        isVisible: true,
+        message: `Inviate ${pendingNotifCount} notifiche con successo!`,
+        type: 'success'
+      });
+      setPendingNotifCount(0);
+    } catch (err: any) {
+      console.error('Error sending notifications:', err);
+      setToast({
+        isVisible: true,
+        message: `Errore nell'invio: ${err.message}`,
+        type: 'error'
+      });
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
 
   const handleUpdateStatus = async (sugg: Suggestion, newStatus: 'implemented' | 'rejected', reason?: string) => {
     try {
@@ -139,6 +183,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       setSuggestions(prev => prev.filter(s => s.id !== sugg.id));
       setRejectionModalSugg(null);
       setRejectionReason('');
+      fetchPendingNotifCount();
     } catch (err: any) {
       console.error('Error updating suggestion:', err);
       setToast({ 
@@ -202,12 +247,29 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
               <p className="text-xs text-gray-400">Revisiona i suggerimenti della community</p>
             </div>
           </div>
-          <button 
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
-          >
-            <X size={24} />
-          </button>
+          
+          <div className="flex items-center gap-2">
+            {pendingNotifCount > 0 && (
+              <button
+                onClick={handleSendNotifications}
+                disabled={isSendingEmail}
+                className="flex items-center gap-2 px-4 py-2 bg-yellow-600/20 hover:bg-yellow-600/40 text-yellow-400 rounded-lg border border-yellow-500/30 transition-all font-bold text-sm"
+              >
+                {isSendingEmail ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <CheckCircle size={16} />
+                )}
+                Invia {pendingNotifCount} Notifiche
+              </button>
+            )}
+            <button 
+              onClick={onClose}
+              className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+            >
+              <X size={24} />
+            </button>
+          </div>
         </div>
 
         <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
@@ -217,10 +279,25 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
               <p className="text-gray-400">Caricamento proposte...</p>
             </div>
           ) : suggestions.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-60 text-center glass rounded-xl border border-white/5">
+            <div className="flex flex-col items-center justify-center h-60 text-center glass rounded-xl border border-white/5 p-8">
               <Inbox size={48} className="text-gray-600 mb-4" />
               <h3 className="text-xl font-bold text-white mb-2">Nessuna proposta in sospeso</h3>
-              <p className="text-gray-400 text-sm">Hai gestito tutti i suggerimenti della community!</p>
+              <p className="text-gray-400 text-sm mb-6">Hai gestito tutti i suggerimenti della community!</p>
+              
+              {pendingNotifCount > 0 && (
+                <button
+                  onClick={handleSendNotifications}
+                  disabled={isSendingEmail}
+                  className="flex items-center gap-3 px-8 py-4 bg-yellow-600 hover:bg-yellow-500 text-white rounded-xl transition-all font-bold shadow-lg shadow-yellow-600/20 group"
+                >
+                  {isSendingEmail ? (
+                    <Loader2 size={20} className="animate-spin" />
+                  ) : (
+                    <CheckCircle size={20} className="group-hover:scale-110 transition-transform" />
+                  )}
+                  Invia {pendingNotifCount} Notifiche Ora
+                </button>
+              )}
             </div>
           ) : (
             <div className="space-y-4">
