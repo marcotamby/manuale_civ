@@ -75,8 +75,8 @@ export const unitsList: Unit[] = [
     type: "Ranged",
     age: 2,
     stats: { attack: 5, armor: 0, speed: 1.25, health: 70 },
-    strengths: ["Spearmen","Crossbowmen"],
-    weaknesses: ["Cavalry","Man-at-Arms"],
+    strengths: ["Spearmen", "Crossbowmen"],
+    weaknesses: ["Cavalry", "Man-at-Arms"],
     description: "Cheap ranged infantry with good damage vs. unarmored targets.\n+ High rate of fire\n- Weak against high ranged armor targets\n- Countered by Horsemen",
     excludedCivs: ['english', 'japanese', 'lancaster', 'macedonian', 'orderofthedragon', 'sengoku', 'zhuxi']
   },
@@ -86,8 +86,8 @@ export const unitsList: Unit[] = [
     type: "Ranged",
     age: 3,
     stats: { attack: 11, armor: 0, speed: 1.13, health: 80 },
-    strengths: ["Heavy Infantry","Heavy Cavalry"],
-    weaknesses: ["Light Cavalry","Archers"],
+    strengths: ["Heavy Infantry", "Heavy Cavalry"],
+    weaknesses: ["Light Cavalry", "Archers"],
     description: "High damage ranged unit best against heavy targets.\n+ Anti-heavy specialist\n- Low health\n- Countered by Horsemen",
     excludedCivs: ['french', 'japanese', 'jeannedarc', 'malians', 'orderofthedragon', 'sengoku']
   },
@@ -97,8 +97,8 @@ export const unitsList: Unit[] = [
     type: "Ranged",
     age: 4,
     stats: { attack: 38, armor: 0, speed: 1.13, health: 130 },
-    strengths: ["Infantry","Cavalry"],
-    weaknesses: ["Mangonels","Archers"],
+    strengths: ["Infantry", "Cavalry"],
+    weaknesses: ["Mangonels", "Archers"],
     description: "Powerful all-purpose ranged infantry.\n+ High damage\n- High cost\n- Slow movement speed\n- Countered by Horsemen",
     excludedCivs: ['japanese', 'malians', 'orderofthedragon', 'ottomans', 'rus', 'sengoku', 'templar', 'zhuxi']
   },
@@ -108,8 +108,8 @@ export const unitsList: Unit[] = [
     type: "Siege",
     age: 3,
     stats: { attack: 10, armor: 0, speed: 0.75, health: 130 },
-    strengths: ["Ranged Infantry","Light Infantry"],
-    weaknesses: ["Springalds","Cavalry"],
+    strengths: ["Ranged Infantry", "Light Infantry"],
+    weaknesses: ["Springalds", "Cavalry"],
     description: "Fires multiple projectiles dealing damage in an area.\n+ Effective against massed units\n- Must be set up to fire",
     excludedCivs: ['ayyubids', 'chinese', 'zhuxi']
   },
@@ -120,7 +120,7 @@ export const unitsList: Unit[] = [
     age: 1,
     stats: { attack: 7, armor: 0, speed: 1.25, health: 80 },
     strengths: ["Cavalry"],
-    weaknesses: ["Archers","Heavy Infantry"],
+    weaknesses: ["Archers", "Heavy Infantry"],
     description: "Infantry best used against mounted units.\n+ Anti-cavalry specialist\n+ Additional damage against Elephants\n- Weak against heavy infantry\n- Countered by Archers",
     excludedCivs: ['byzantines', 'macedonian', 'malians', 'orderofthedragon']
   },
@@ -152,10 +152,10 @@ export const unitsList: Unit[] = [
     type: "Infantry",
     age: 3,
     stats: { attack: 12, armor: 4, speed: 1.13, health: 155 },
-    strengths: ["Light Infantry","Archers"],
-    weaknesses: ["Crossbowmen","Heavy Cavalry"],
+    strengths: ["Light Infantry", "Archers"],
+    weaknesses: ["Crossbowmen", "Heavy Cavalry"],
     description: "Tough infantry with good damage.\n+ High armor\n- Slow movement\n- Countered by Knights, Lancers, and Crossbowmen",
-    excludedCivs: ['abbasid', 'ayyubids', 'byzantines', 'chinese', 'japanese', 'lancaster', 'macedonian', 'malians', 'orderofthedragon', 'sengoku', 'zhuxi']   
+    excludedCivs: ['abbasid', 'ayyubids', 'byzantines', 'chinese', 'japanese', 'lancaster', 'macedonian', 'malians', 'orderofthedragon', 'sengoku', 'zhuxi']
   },
   {
     id: "knight",
@@ -163,8 +163,8 @@ export const unitsList: Unit[] = [
     type: "Cavalry",
     age: 3,
     stats: { attack: 24, armor: 4, speed: 1.63, health: 230 },
-    strengths: ["Archers","Swordsmen"],
-    weaknesses: ["Spearmen","Camels"],
+    strengths: ["Archers", "Swordsmen"],
+    weaknesses: ["Spearmen", "Camels"],
     description: "Expensive cavalry with high damage and melee armor. Effective against melee units.\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen",
     excludedCivs: ['abbasid', 'ayyubids', 'delhi', 'byzantines', 'chinese', 'french', 'goldenhorde', 'japanese', 'jeannedarc', 'macedonian', 'malians', 'mongols', 'orderofthedragon', 'ottomans', 'sengoku', 'templar', 'tughlaq', 'zhuxi']
   }
@@ -218,7 +218,7 @@ export const civilizationsData: Civilization[] = [
       { id: "military-wing-2", imageId: "military-wing", name: "Ala Militare", age: 2, type: "Military", description: "Sblocca tecnologie per potenziare la fanteria e i cammelli (Boot Camp, Camel Support, Camel Shields). Può essere scelta in Età 2, 3 o 4." },
       { id: "culture-wing-2", imageId: "culture-wing", name: "Ala Culturale", age: 2, type: "Technology", description: "Sblocca tecnologie chiave come Preservation of Knowledge (-30% costo ricerche) e cure mediche. Può essere scelta in Età 2, 3 o 4." },
       { id: "trade-wing-2", imageId: "trade-wing", name: "Ala Commerciale", age: 2, type: "Economic", description: "Migliora enormemente il commercio, fornendo bonus difensivi e risorse secondarie ai mercanti. Può essere scelta in Età 2, 3 o 4." },
-      
+
       { id: "economic-wing-3", imageId: "economic-wing", name: "Ala Economica", age: 3, type: "Economic", description: "Sblocca tecnologie come Fresh Foodstuffs, Agriculture e Improved Processing." },
       { id: "military-wing-3", imageId: "military-wing", name: "Ala Militare", age: 3, type: "Military", description: "Sblocca tecnologie infanteria e cammelli. Fornisce inoltre truppe immediate se costruita." },
       { id: "culture-wing-3", imageId: "culture-wing", name: "Ala Culturale", age: 3, type: "Technology", description: "Sblocca Preservation of Knowledge e Medical Centers." },
@@ -254,7 +254,7 @@ export const civilizationsData: Civilization[] = [
       { id: "economic-wing-growth-3", imageId: "economic-wing", name: "Ala Economica (Crescita / Industria)", age: 3, type: "Economic", description: "Abitanti gratuiti extra (Crescita) o legna immediata (Industria)." },
       { id: "military-wing-smith-3", imageId: "military-wing", name: "Ala Militare (Fabbri / Rinforzi)", age: 3, type: "Military", description: "Upgrades del fabbro gratuiti e istantanei (Maestri Fabbri) o spawn periodico di Desert Raiders d'élite (Rinforzi)." },
       { id: "trade-wing-bazaar-3", imageId: "trade-wing", name: "Ala Commerciale (Bazar / Consiglieri)", age: 3, type: "Economic", description: "Genera scambi speciali al Bazar (Bazar) o fornisce preziosi Atabeg per potenziare la salute dell'esercito (Consiglieri)." },
-      
+
       { id: "culture-wing-logistics-4", imageId: "culture-wing", name: "Ala Culturale (Curatori / Avanzamento)", age: 4, type: "Religious", description: "Dervisci o avanzamento d'età finale." },
       { id: "economic-wing-growth-4", imageId: "economic-wing", name: "Ala Economica (Crescita / Industria)", age: 4, type: "Economic", description: "Enorme flusso di abitanti rapidi o massiccia iniezione di legno." },
       { id: "military-wing-smith-4", imageId: "military-wing", name: "Ala Militare (Fabbri / Rinforzi)", age: 4, type: "Military", description: "Garantisce gli ultimi potenziamenti fabbro o grandi spawn di incursori del deserto." },
@@ -310,18 +310,25 @@ export const civilizationsData: Civilization[] = [
     name: "Cinesi",
     flag: "/civs/Chinese.webp",
     difficulty: "Difficile",
-    shortDescription: "A booming civilization with rapid construction, powerful dynasties, and gunpowder.",
-    passiveBonuses: ["Villagers construct defenses 50% faster and all other buildings 100% faster.", "Can build both Landmarks in an Age to unlock powerful Dynasties."],
+    shortDescription: "Civiltà flessibile che si evolve attraverso le Grandi Dinastie. Costruisce velocemente, tassa le risorse e padroneggia la polvere da sparo.",
+    passiveBonuses: [
+      "Inizia nella Dinastia Tang: +30% raggio visivo degli Esploratori e accesso al Villaggio.",
+      "Unità addestrate, tecnologie ricercate e risorse restituite generano Tasse (Oro) raccoglibili dagli Ufficiali Imperiali.",
+      "Costruisce entrambi i Landmark di un'Età per sbloccare una Dinastia con bonus unici (Song, Yuan, Ming).",
+      "I Villici costruiscono difese +50% più veloci e tutti gli altri edifici +100% più velocemente.",
+      "La tecnologia Chimica è gratuita in Età I: difese usano Feritoie a Cannone invece di quelle standard.",
+      "I Cantieri Navali lavorano il +10% più velocemente."
+    ],
     uniqueUnits: [
       {
         id: "imperial-official",
-        name: "Imperial Official",
+        name: "Ufficiale Imperiale",
         type: "Infantry",
         age: 1,
         stats: { attack: 0, armor: 0, speed: 1.12, health: 75 },
-        strengths: ["Economic Buff", "Tax Collection"],
-        weaknesses: ["Everything"],
-        description: "Collects tax gold and supervises buildings for production bonuses."
+        strengths: ["Supervisione Edifici", "Raccolta Tasse"],
+        weaknesses: ["Tutto"],
+        description: "Raccoglie Oro (Tasse) e usa 'Supervisiona' per aumentare del +150% la produzione degli edifici militari, o il +20% delle risorse dei Villici."
       },
       {
         id: "zhuge-nu",
@@ -329,29 +336,59 @@ export const civilizationsData: Civilization[] = [
         type: "Ranged",
         age: 2,
         stats: { attack: 12, armor: 0, speed: 1.12, health: 70 },
-        strengths: ["Light Infantry"],
-        weaknesses: ["Knights", "Horsemen"],
-        description: "Rapid-fire crossbowman that fires 3 bolts per attack."
+        strengths: ["Fanteria Leggera"],
+        weaknesses: ["Cavalieri", "Cavalleggeri"],
+        description: "Balestriere a fuoco rapido che spara 3 dardi per attacco. Sblocato con la Dinastia Song."
       },
       {
         id: "palace-guard",
-        name: "Palace Guard",
+        name: "Guardia del Palazzo",
         type: "Infantry",
         age: 3,
         stats: { attack: 12, armor: 3, speed: 1.25, health: 155 },
-        strengths: ["Light Infantry", "Archers"],
-        weaknesses: ["Knights", "Crossbowmen"],
-        description: "Faster variant of the Man-at-Arms with high durability."
+        strengths: ["Fanteria Leggera", "Arcieri"],
+        weaknesses: ["Cavalieri", "Balestrieri"],
+        description: "Rimpiazza l'Uomo d'Arme. Stessa forza ma con velocità superiore e meno armatura."
+      },
+      {
+        id: "nest-of-bees",
+        name: "Nido delle Api",
+        type: "Siege",
+        age: 3,
+        stats: { attack: 8, armor: 0, speed: 0.75, health: 130 },
+        strengths: ["Fanteria Ammassata", "Unità Leggere"],
+        weaknesses: ["Cavalieri", "Springalds"],
+        description: "Rimpiazza il Mangonel. Lancia una raffica di razzi che causano danni ad area. Letale contro unità raggruppate."
+      },
+      {
+        id: "fire-lancer",
+        name: "Lanciere di Fuoco",
+        type: "Cavalry",
+        age: 3,
+        stats: { attack: 20, armor: 0, speed: 1.62, health: 130 },
+        strengths: ["Macchine da Assedio", "Edifici"],
+        weaknesses: ["Lancieri", "Balestrieri"],
+        description: "Cavalleria leggera con attacco esplosivo in carica, ottima contro macchinari d'assedio ed edifici. Sblocato con la Dinastia Yuan."
+      },
+      {
+        id: "grenadier",
+        name: "Granatiere",
+        type: "Ranged",
+        age: 4,
+        stats: { attack: 25, armor: 0, speed: 1.12, health: 100 },
+        strengths: ["Unità Raggruppate", "Fanteria Pesante"],
+        weaknesses: ["Cavalleria", "Arcieri"],
+        description: "Fanteria a polvere da sparo che lancia granate con danno ad area. Sblocato con la Dinastia Ming."
       }
     ],
     technologies: [],
     landmarks: [
-      { id: "imperial-academy", name: "Imperial Academy", age: 2, type: "Economic", description: "Increases tax gold generated by nearby buildings by +100%." },
-      { id: "barbican-of-the-sun", name: "Barbican of the Sun", age: 2, type: "Defensive", description: "Strong fortification with a long-range cannon." },
-      { id: "astronomical-clocktower", name: "Astronomical Clocktower", age: 3, type: "Military", description: "Produces siege units with +50% health." },
-      { id: "imperial-palace", name: "Imperial Palace", age: 3, type: "Economic", description: "Large vision; reveals enemy villager locations." },
-      { id: "great-wall-gatehouse", name: "Great Wall Gatehouse", age: 4, type: "Defensive", description: "Increases health of Stone Walls/Gates by +100%." },
-      { id: "spirit-way", name: "Spirit Way", age: 4, type: "Military", description: "Reduces Dynasty unit costs by -30% nearby." }
+      { id: "imperial-academy", name: "Accademia Imperiale", age: 2, type: "Economic", description: "Genera Oro dalle Tasse al +100% per gli edifici vicini. Agisce anche come avanzamento d'età." },
+      { id: "barbican-of-the-sun", name: "Barbacane del Sole", age: 2, type: "Defensive", description: "Fortezza con potente cannone a lungo raggio. Difese superiori allo standard." },
+      { id: "astronomical-clocktower", name: "Torre dell'Orologio Astronomico", age: 3, type: "Military", description: "Produce macchine d'assedio con +50% HP. Include versioni esclusive di Springald, Trebuchet, Bombarda e Nido delle Api." },
+      { id: "imperial-palace", name: "Palazzo Imperiale", age: 3, type: "Economic", description: "Ampio raggio visivo. Con tecnologia 'Spie Imperiali' rivela la posizione dei Villici nemici." },
+      { id: "great-wall-gatehouse", name: "Porta della Grande Muraglia", age: 4, type: "Defensive", description: "Sblocca la Grande Muraglia. Aumenta la salute delle Mura di Pietra e Porte del +100%." },
+      { id: "spirit-way", name: "Via degli Spiriti", age: 4, type: "Military", description: "Riduce il costo delle unità della Dinastia del -30% nelle vicinanze." }
     ]
   },
   {
