@@ -9,17 +9,23 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS'
 };
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: CORS_HEADERS, status: 204 })
   }
 
   const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
-  console.log('Function invoked. Starting batch notification process...')
+  const timestamp = new Date().toISOString()
+  console.log(`[${timestamp}] Function invoked.`)
+
+  if (!RESEND_API_KEY) {
+    console.error('CRITICAL: RESEND_API_KEY is not defined in secrets!')
+    return new Response(JSON.stringify({ error: 'Resend API Key missing' }), { 
+      status: 500, headers: CORS_HEADERS 
+    })
+  }
 
   try {
-    // 1. Fetch suggestions that need notification
-    console.log('Fetching pending suggestions...')
+    console.log('Fetching suggestions with notified=false...')
     const { data: suggestions, error: fetchError } = await supabase
       .from('suggestions')
       .select('*')
@@ -28,68 +34,57 @@ serve(async (req) => {
 
     if (fetchError) {
       console.error('Fetch error:', fetchError)
-      return new Response(JSON.stringify({ error: fetchError.message }), { 
-        status: 500,
-        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      return new Response(JSON.stringify({ error: `Fetch error: ${fetchError.message}` }), { 
+        status: 500, headers: CORS_HEADERS 
       })
     }
 
-    console.log(`Found ${suggestions?.length || 0} suggestions to notify.`)
+    const count = suggestions?.length || 0
+    console.log(`Found ${count} suggestions back from DB.`)
 
-    if (!suggestions || suggestions.length === 0) {
+    if (count === 0) {
       return new Response(JSON.stringify({ message: 'No pending notifications' }), { 
-        status: 200,
-        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+        status: 200, headers: CORS_HEADERS 
       })
     }
 
-    // 2. Group by email
     const groups: Record<string, any[]> = {}
+    let noEmailCount = 0
     suggestions.forEach(s => {
-      if (s.user_email) {
+      if (s.user_email && s.user_email.trim() !== '') {
         if (!groups[s.user_email]) groups[s.user_email] = []
         groups[s.user_email].push(s)
+      } else {
+        noEmailCount++
       }
     })
 
-    console.log(`Grouped into ${Object.keys(groups).length} email distinct users.`)
-    console.log(`Grouped into ${Object.keys(groups).length} email distinct users.`)
+    console.log(`Groups: ${Object.keys(groups).length}. suggestions without email: ${noEmailCount}`)
 
-    // 3. Send emails in parallel
+    const emailResults = []
     const emailPromises = Object.entries(groups).map(async ([email, userSuggestions]) => {
-      console.log(`Preparing notifications for ${email}...`)
-      const approved = userSuggestions.filter(s => s.status === 'implemented')
-      const rejected = userSuggestions.filter(s => s.status === 'rejected')
-
-      // Get user name from the first suggestion (they should be consistent)
+      console.log(`Processing email for: ${email} (${userSuggestions.length} items)`)
       const fullName = userSuggestions[0]?.user_name || ''
       const firstName = fullName.split(' ')[0]
       const greeting = firstName ? `Ciao ${firstName}` : 'Ciao'
 
-      let html = `<h1>Aggiornamento sulle tue proposte - Manuale Civ</h1>`
-      html += `<p>${greeting},</p><p>Abbiamo revisionato i tuoi recenti contributi. Ecco il riepilogo:</p>`
+      let html = `<h1>Novità sulle tue proposte - Manuale Civ</h1>`
+      html += `<p>${greeting},</p><p>Ecco l'esito dei tuoi suggerimenti:</p>`
+
+      const approved = userSuggestions.filter(s => s.status === 'implemented')
+      const rejected = userSuggestions.filter(s => s.status === 'rejected')
 
       if (approved.length > 0) {
-        html += `<h3>✅ Proposte Approvate:</h3><ul>`
-        approved.forEach(s => {
-          html += `<li><strong>${s.civ_name}</strong> (${s.section}): <em>"${s.suggestion_text.substring(0, 50)}..."</em></li>`
-        })
+        html += `<h3>✅ Approvate:</h3><ul>`
+        approved.forEach(s => html += `<li>${s.civ_name}: ${s.section}</li>`)
         html += `</ul>`
       }
-
       if (rejected.length > 0) {
-        html += `<h3>❌ Proposte non accettate:</h3><ul>`
-        rejected.forEach(s => {
-          html += `<li><strong>${s.civ_name}</strong>: <em>"${s.suggestion_text.substring(0, 50)}..."</em><br/>
-                  <small style="color: #666">Motivo: ${s.rejection_reason || 'Nessun motivo specificato'}</small></li>`
-        })
+        html += `<h3>❌ Non accettate:</h3><ul>`
+        rejected.forEach(s => html += `<li>${s.civ_name}: ${s.rejection_reason || 'N/A'}</li>`)
         html += `</ul>`
       }
 
-      html += `<p>Puoi vedere i cambiamenti direttamente sul sito <a href="https://manualeciv.vercel.app">Manuale Civ</a>.</p>`
-      html += `<p>Grazie per il tuo supporto!</p>`
-
-      console.log(`Sending email via Resend to ${email}...`)
       try {
         const res = await fetch('https://api.resend.com/emails', {
           method: 'POST',
@@ -100,44 +95,47 @@ serve(async (req) => {
           body: JSON.stringify({
             from: 'Manuale Civ <noreply@resend.dev>',
             to: [email],
-            subject: `Riepilogo aggiornamenti proposte - Manuale Civ`,
+            subject: `Aggiornamento proposte Manuale Civ`,
             html,
           })
         })
-        const resData = await res.json().catch(() => ({}))
-        console.log(`Resend response for ${email}:`, { status: res.status, ok: res.ok })
-        return { email, success: res.ok, status: res.status }
+        const data = await res.json().catch(() => ({}))
+        console.log(`Resend response for ${email}:`, res.status, data)
+        return { email, ok: res.ok, status: res.status, data }
       } catch (err: any) {
-        console.error(`Error sending to ${email}:`, err.message)
-        return { email, success: false, error: err.message }
+        console.error(`Fetch error for ${email}:`, err.message)
+        return { email, ok: false, error: err.message }
       }
     })
 
     const results = await Promise.all(emailPromises)
-
-    // 4. Mark as notified
     console.log('Marking suggestions as notified in DB...')
-    const idsToUpdate = suggestions.map(s => s.id)
     const { error: updateError } = await supabase
       .from('suggestions')
       .update({ notified: true })
-      .in('id', idsToUpdate)
+      .in('id', suggestions.map(s => s.id))
 
     if (updateError) {
-      console.error('Update notified error:', updateError)
-    } else {
-      console.log('Successfully updated notified status in DB.')
+      console.error('DB Update error:', updateError)
+      return new Response(JSON.stringify({ error: `DB Update error: ${updateError.message}`, results }), { 
+        status: 500, headers: CORS_HEADERS 
+      })
     }
 
-    return new Response(JSON.stringify({ results }), { 
-      status: 200,
-      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+    return new Response(JSON.stringify({ 
+      success: true, 
+      count, 
+      notified: suggestions.length,
+      emailResults: results 
+    }), { 
+      status: 200, 
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } 
     })
+
   } catch (err: any) {
-    console.error('Unhandled function error:', err)
+    console.error('Global error:', err.message)
     return new Response(JSON.stringify({ error: err.message }), { 
-      status: 500,
-      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      status: 500, headers: CORS_HEADERS 
     })
   }
 });
