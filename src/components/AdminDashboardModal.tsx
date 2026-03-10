@@ -97,8 +97,20 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       setPendingNotifCount(0);
     } catch (err: any) {
       console.error('Full notification error:', err);
-      // Give the user the real error message but also the tip about the email
-      const errorMsg = err.message || 'Errore sconosciuto';
+      let errorMsg = 'Errore sconosciuto';
+      
+      // Try to extract technical message from Supabase Function error
+      if (err.context && typeof err.context.json === 'function') {
+        try {
+          const body = await err.context.json();
+          errorMsg = body.error || body.message || errorMsg;
+        } catch (e) {
+          errorMsg = err.message || errorMsg;
+        }
+      } else {
+        errorMsg = err.message || errorMsg;
+      }
+
       setToast({
         isVisible: true,
         message: `Errore: ${errorMsg}. Controlla l'email: potrebbe essere partita comunque!`,
