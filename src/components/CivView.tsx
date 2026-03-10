@@ -53,6 +53,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     sessionStorage.setItem('unitView', view);
   };
   const [localCivs, setLocalCivs] = useState<Record<string, Civilization>>({});
+  const [expandedBOs, setExpandedBOs] = useState<Set<string>>(new Set());
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const { isAdmin } = useAuth();
 
@@ -291,24 +292,26 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <p className="text-sm text-gray-400">Strategie ottimizzate per dominare la partita.</p>
             </div>
 
-            {civ.buildOrders && civ.buildOrders.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {civ.buildOrders.map((bo) => (
-                  <div key={bo.id} className="glass p-6 rounded-2xl border border-white/5 hover:border-yellow-500/30 transition-all group">
-                    <div className="flex justify-between items-start mb-4">
-                      <h3 className="text-xl font-bold text-white group-hover:text-yellow-400 transition-colors">{bo.title}</h3>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${bo.difficulty === 'Easy' ? 'text-green-400 border-green-400/30' :
-                        bo.difficulty === 'Medium' ? 'text-yellow-400 border-yellow-400/30' :
-                          'text-red-400 border-red-400/30'
-                        }`}>
-                        {bo.difficulty}
-                      </span>
-                    </div>
-                    <div className="text-sm text-gray-400 mb-6 line-clamp-2">
-                      <ResourceText text={bo.description} />
-                    </div>
+            {civ.buildOrders.map((bo) => {
+              const isExpanded = expandedBOs.has(bo.id);
+              return (
+                <div key={bo.id} className={`glass p-6 rounded-2xl border border-white/5 transition-all group h-fit ${isExpanded ? 'md:col-span-2' : ''}`}>
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-bold text-white group-hover:text-yellow-400 transition-colors">{bo.title}</h3>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${bo.difficulty === 'Easy' ? 'text-green-400 border-green-400/30' :
+                      bo.difficulty === 'Medium' ? 'text-yellow-400 border-yellow-400/30' :
+                        'text-red-400 border-red-400/30'
+                      }`}>
+                      {bo.difficulty}
+                    </span>
+                  </div>
 
-                    <div className="space-y-4">
+                  <div className={`text-sm text-gray-400 mb-6 ${isExpanded ? '' : 'line-clamp-2'}`}>
+                    <ResourceText text={bo.description} />
+                  </div>
+
+                  {isExpanded && bo.steps && bo.steps.length > 0 && (
+                    <div className="space-y-4 mb-6 animate-in slide-in-from-top-2 duration-300">
                       {bo.steps.map((step, sIdx) => (
                         <div key={sIdx} className="flex flex-col gap-1">
                           <div className="flex gap-3 text-[13px] leading-relaxed">
@@ -327,23 +330,44 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         </div>
                       ))}
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="glass p-10 rounded-3xl border border-yellow-500/20 text-center flex flex-col items-center">
-                <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mb-4 border border-yellow-500/20">
-                  <Map size={32} className="text-yellow-500" />
+                  )}
+
+                  <button
+                    onClick={() => {
+                      const newExpanded = new Set(expandedBOs);
+                      if (isExpanded) newExpanded.delete(bo.id);
+                      else newExpanded.add(bo.id);
+                      setExpandedBOs(newExpanded);
+                    }}
+                    className="flex items-center gap-2 text-xs font-bold text-yellow-500/80 hover:text-yellow-400 transition-colors"
+                  >
+                    {isExpanded ? (
+                      <>
+                        <ChevronUp size={14} /> Chiudi dettagli
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown size={14} /> Mostra dettagli strategia
+                      </>
+                    )}
+                  </button>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Build Orders in arrivo</h3>
-                <p className="text-sm text-gray-500 max-w-sm">I build order per questa civiltà saranno aggiunti presto dai contributori della community.</p>
-                <button
-                  onClick={() => handleTabChange('proponi')}
-                  className="mt-6 px-8 py-3 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/30 rounded-xl text-sm text-yellow-500 font-bold transition-all"
-                >
-                  Proponi un Build Order →
-                </button>
+              );
+            })}
+            ) : (
+            <div className="glass p-10 rounded-3xl border border-yellow-500/20 text-center flex flex-col items-center">
+              <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mb-4 border border-yellow-500/20">
+                <Map size={32} className="text-yellow-500" />
               </div>
+              <h3 className="text-xl font-bold text-white mb-2">Build Orders in arrivo</h3>
+              <p className="text-sm text-gray-500 max-w-sm">I build order per questa civiltà saranno aggiunti presto dai contributori della community.</p>
+              <button
+                onClick={() => handleTabChange('proponi')}
+                className="mt-6 px-8 py-3 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/30 rounded-xl text-sm text-yellow-500 font-bold transition-all"
+              >
+                Proponi un Build Order →
+              </button>
+            </div>
             )}
           </div>
         )}
