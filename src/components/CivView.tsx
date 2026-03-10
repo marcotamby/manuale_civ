@@ -400,7 +400,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         <img
                           src={`https://img.youtube.com/vi/${finalId}/maxresdefault.jpg`}
                           alt="Video Thumbnail"
-                          className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                          className="w-full h-full object-cover opacity-100 md:opacity-80 md:group-hover:opacity-100 transition-opacity"
                           onLoad={(e) => {
                             const target = e.target as HTMLImageElement;
                             if (target.naturalWidth === 120 && target.naturalHeight === 90) {

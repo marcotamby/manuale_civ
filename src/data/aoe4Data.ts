@@ -383,12 +383,12 @@ export const civilizationsData: Civilization[] = [
     ],
     technologies: [],
     landmarks: [
-      { id: "imperial-academy", name: "Accademia Imperiale", age: 2, type: "Economic", description: "Genera Oro dalle Tasse al +100% per gli edifici vicini. Agisce anche come avanzamento d'età." },
-      { id: "barbican-of-the-sun", name: "Barbacane del Sole", age: 2, type: "Defensive", description: "Fortezza con potente cannone a lungo raggio. Difese superiori allo standard." },
-      { id: "astronomical-clocktower", name: "Torre dell'Orologio Astronomico", age: 3, type: "Military", description: "Produce macchine d'assedio con +50% HP. Include versioni esclusive di Springald, Trebuchet, Bombarda e Nido delle Api." },
-      { id: "imperial-palace", name: "Palazzo Imperiale", age: 3, type: "Economic", description: "Ampio raggio visivo. Con tecnologia 'Spie Imperiali' rivela la posizione dei Villici nemici." },
-      { id: "great-wall-gatehouse", name: "Porta della Grande Muraglia", age: 4, type: "Defensive", description: "Sblocca la Grande Muraglia. Aumenta la salute delle Mura di Pietra e Porte del +100%." },
-      { id: "spirit-way", name: "Via degli Spiriti", age: 4, type: "Military", description: "Riduce il costo delle unità della Dinastia del -30% nelle vicinanze." }
+      { id: "imperial-academy", name: "Imperial Academy", age: 2, type: "Economic", description: "Genera Oro dalle Tasse al +100% per gli edifici vicini." },
+      { id: "barbican-of-the-sun", name: "Barbican of the Sun", age: 2, type: "Defensive", description: "Fortezza con potente cannone a lungo raggio." },
+      { id: "astronomical-clocktower", name: "Astronomical Clocktower", age: 3, type: "Military", description: "Produce macchine d'assedio con +50% HP. Include Springald, Trebuchet, Bombarda e Nido delle Api esclusive." },
+      { id: "imperial-palace", name: "Imperial Palace", age: 3, type: "Economic", description: "Ampio raggio visivo. Con 'Spie Imperiali' rivela la posizione dei Villici nemici." },
+      { id: "great-wall-gatehouse", name: "Great Wall Gatehouse", age: 4, type: "Defensive", description: "Sblocca la Grande Muraglia. Aumenta la salute delle Mura di Pietra e Porte del +100%." },
+      { id: "spirit-way", name: "Spirit Way", age: 4, type: "Military", description: "Riduce il costo delle unità della Dinastia del -30% nelle vicinanze." }
     ]
   },
   {
