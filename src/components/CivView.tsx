@@ -210,7 +210,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             <section>
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <ChevronDown className="text-red-400" size={20} />
-                Punti di Debolezza
+                Punti Deboli
               </h2>
               <div className="glass p-5 rounded-xl border border-red-500/20 text-gray-300 text-sm leading-relaxed">
                 {civ.weaknesses && civ.weaknesses.length > 0 ? (
@@ -220,7 +220,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-gray-400 italic">Informazioni di debolezza specifiche saranno aggiunte dalla community tramite "Proponi Modifica".</p>
+                  <p className="text-gray-400 italic">I punti deboli specifici saranno aggiunti dalla community tramite "Proponi Modifica".</p>
                 )}
               </div>
             </section>

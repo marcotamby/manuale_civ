@@ -270,7 +270,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-gray-300 mb-1">Punti di Debolezza</label>
+                  <label className="block text-sm font-bold text-gray-300 mb-1">Punti Deboli</label>
                   <textarea 
                     value={editedCiv.weaknesses?.join('\n') || ''}
                     onChange={e => {
@@ -278,7 +278,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                       setEditedCiv({...editedCiv, weaknesses: values});
                     }}
                     rows={4}
-                    placeholder="Inserisci un punto di debolezza per riga..."
+                    placeholder="Inserisci un punto debole per riga..."
                     className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors resize-y"
                   />
                 </div>

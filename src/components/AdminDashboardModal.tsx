@@ -217,7 +217,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                         className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-green-600/20 hover:bg-green-600/40 text-green-400 rounded-lg border border-green-500/30 transition-colors font-medium text-sm"
                         title="Segna come completata"
                       >
-                        <CheckCircle size={18} /> Approva/Fatto
+                        <CheckCircle size={18} /> Approva
                       </button>
                       
                       <button 

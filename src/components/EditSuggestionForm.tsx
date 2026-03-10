@@ -108,12 +108,9 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
             <option value="">Seleziona sezione...</option>
             <option value="caratteristiche">Descrizione</option>
             <option value="punti_di_forza">Punti di Forza</option>
-            <option value="punti_di_debolezza">Punti di Debolezza</option>
+            <option value="punti_di_debolezza">Punti Deboli</option>
             <option value="bonus">Bonus</option>
-            <option value="unita">Unità Uniche</option>
-            <option value="tecnologie">Tecnologie</option>
             <option value="build_order">Build Order</option>
-            <option value="matchup">Matchup / Consigli</option>
             <option value="altro">Altro</option>
           </select>
         </div>
