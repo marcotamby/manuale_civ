@@ -11,9 +11,8 @@ import { useAuth } from './AuthContext';
 import type { Civilization } from '../data/aoe4Data';
 import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight, Clock } from 'lucide-react';
 import { ResourceText } from './ResourceText';
-type Tab = 'caratteristiche' | 'units' | 'buildorders' | 'matchups' | 'video' | 'proponi' | 'admin-edit';
 
-// Initial data is now handled in Supabase database
+type Tab = 'caratteristiche' | 'units' | 'buildorders' | 'matchups' | 'video' | 'proponi' | 'admin-edit';
 
 interface CivViewProps {
   civId: string;
@@ -22,7 +21,6 @@ interface CivViewProps {
 
 export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const { civilizations: civilizationsData, refreshCivs } = useCivData();
-
   const { tab } = useParams<{ tab?: string }>();
   const navigate = useNavigate();
 
@@ -35,10 +33,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     return (sessionStorage.getItem('unitView') as 'units' | 'techtree') || 'units';
   });
 
-  // No longer needed here as handlers deal with it
-  // useEffect would be better but handlers are already syncing to sessionStorage
-
-  // Update whenever they change
   const handleTabChange = (newTab: Tab) => {
     navigate(`/civ/${civId}/${newTab}`);
   };
@@ -52,6 +46,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     setUnitView(view);
     sessionStorage.setItem('unitView', view);
   };
+
   const [localCivs, setLocalCivs] = useState<Record<string, Civilization>>({});
   const [expandedBOs, setExpandedBOs] = useState<Set<string>>(new Set());
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -108,7 +103,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               </h1>
               <span className={`text-xs font-bold px-3 py-1 rounded-full border ${civ.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/10' :
                 civ.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-500/40 bg-yellow-500/10' :
-                  'text-red-400 border-red-500/40 bg-red-500/10'
+                  'text-red-400 border-red-400/30 bg-red-500/10'
                 }`}>
                 {civ.difficulty}
               </span>
@@ -152,7 +147,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           ))}
         </div>
 
-        {/* Mobile Scroll Indicator */}
         {canScrollRight && (
           <div className="md:hidden absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[var(--color-brand-dark)] to-transparent pointer-events-none flex items-center justify-end pr-2">
             <ChevronRight size={16} className="text-yellow-500/70 animate-pulse" />
@@ -160,10 +154,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         )}
       </div>
 
-      {/* Tab Content */}
       <div className="p-4 md:p-8">
-
-        {/* === CARATTERISTICHE === */}
         {activeTab === 'caratteristiche' && (
           <div className="space-y-8 max-w-4xl">
             <section>
@@ -224,17 +215,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 )}
               </div>
             </section>
-
-            {isAdmin && (
-              <div className="p-4 bg-purple-500/10 border border-purple-500/30 rounded-xl text-sm text-purple-300 flex items-center gap-3">
-                < Shield size={20} className="shrink-0" />
-                <span>🛡️ <strong>Admin:</strong> Puoi modificare direttamente i contenuti di questa sezione nella tab "Modifica (Admin)".</span>
-              </div>
-            )}
           </div>
         )}
 
-        {/* === UNITS & LANDMARKS === */}
         {activeTab === 'units' && (
           <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-6">
@@ -252,7 +235,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   </button>
                 ))}
               </div>
-
               <div className="flex gap-2 glass rounded-2xl p-1.5">
                 <button
                   className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${unitView === 'units' ? 'bg-blue-600/50 text-white border border-blue-500/30' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
@@ -268,20 +250,14 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 </button>
               </div>
             </div>
-
             {unitView === 'units' ? (
-              <UnitGrid
-                civId={civId}
-                age={activeAge}
-                onSelectUnit={onSelectUnit}
-              />
+              <UnitGrid civId={civId} age={activeAge} onSelectUnit={onSelectUnit} />
             ) : (
               <TechTree civId={civId} />
             )}
           </div>
         )}
 
-        {/* === BUILD ORDERS === */}
         {activeTab === 'buildorders' && (
           <div className="max-w-4xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div>
@@ -292,87 +268,89 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <p className="text-sm text-gray-400">Strategie ottimizzate per dominare la partita.</p>
             </div>
 
-            {civ.buildOrders.map((bo) => {
-              const isExpanded = expandedBOs.has(bo.id);
-              return (
-                <div key={bo.id} className={`glass p-6 rounded-2xl border border-white/5 transition-all group h-fit ${isExpanded ? 'md:col-span-2' : ''}`}>
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-xl font-bold text-white group-hover:text-yellow-400 transition-colors">{bo.title}</h3>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${bo.difficulty === 'Easy' ? 'text-green-400 border-green-400/30' :
-                      bo.difficulty === 'Medium' ? 'text-yellow-400 border-yellow-400/30' :
-                        'text-red-400 border-red-400/30'
-                      }`}>
-                      {bo.difficulty}
-                    </span>
-                  </div>
+            {civ.buildOrders && civ.buildOrders.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {civ.buildOrders.map((bo) => {
+                  const isExpanded = expandedBOs.has(bo.id);
+                  return (
+                    <div key={bo.id} className={`glass p-6 rounded-2xl border border-white/5 transition-all group h-fit ${isExpanded ? 'md:col-span-2' : ''}`}>
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="text-xl font-bold text-white group-hover:text-yellow-400 transition-colors">{bo.title}</h3>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${bo.difficulty === 'Easy' ? 'text-green-400 border-green-400/30' :
+                          bo.difficulty === 'Medium' ? 'text-yellow-400 border-yellow-400/30' :
+                            'text-red-400 border-red-400/30'
+                          }`}>
+                          {bo.difficulty}
+                        </span>
+                      </div>
 
-                  <div className={`text-sm text-gray-400 mb-6 ${isExpanded ? '' : 'line-clamp-2'}`}>
-                    <ResourceText text={bo.description} />
-                  </div>
+                      <div className={`text-sm text-gray-400 mb-6 ${isExpanded ? '' : 'line-clamp-2'}`}>
+                        <ResourceText text={bo.description} />
+                      </div>
 
-                  {isExpanded && bo.steps && bo.steps.length > 0 && (
-                    <div className="space-y-4 mb-6 animate-in slide-in-from-top-2 duration-300">
-                      {bo.steps.map((step, sIdx) => (
-                        <div key={sIdx} className="flex flex-col gap-1">
-                          <div className="flex gap-3 text-[13px] leading-relaxed">
-                            {step.time && (
-                              <span className="text-yellow-500 font-mono w-10 shrink-0 font-bold flex items-center gap-1">
-                                <Clock size={10} /> {step.time}
-                              </span>
-                            )}
-                            <ResourceText text={step.action} className="text-gray-200 font-medium" />
-                          </div>
-                          {step.note && (
-                            <div className="ml-13 pl-3 border-l border-white/10">
-                              <ResourceText text={step.note} className="text-[11px] text-gray-500 italic" />
+                      {isExpanded && bo.steps && bo.steps.length > 0 && (
+                        <div className="space-y-4 mb-6 animate-in slide-in-from-top-2 duration-300">
+                          {bo.steps.map((step, sIdx) => (
+                            <div key={sIdx} className="flex flex-col gap-1">
+                              <div className="flex gap-3 text-[13px] leading-relaxed">
+                                {step.time && (
+                                  <span className="text-yellow-500 font-mono w-10 shrink-0 font-bold flex items-center gap-1">
+                                    <Clock size={10} /> {step.time}
+                                  </span>
+                                )}
+                                <ResourceText text={step.action} className="text-gray-200 font-medium" />
+                              </div>
+                              {step.note && (
+                                <div className="ml-13 pl-3 border-l border-white/10">
+                                  <ResourceText text={step.note} className="text-[11px] text-gray-500 italic" />
+                                </div>
+                              )}
                             </div>
-                          )}
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  )}
+                      )}
 
-                  <button
-                    onClick={() => {
-                      const newExpanded = new Set(expandedBOs);
-                      if (isExpanded) newExpanded.delete(bo.id);
-                      else newExpanded.add(bo.id);
-                      setExpandedBOs(newExpanded);
-                    }}
-                    className="flex items-center gap-2 text-xs font-bold text-yellow-500/80 hover:text-yellow-400 transition-colors"
-                  >
-                    {isExpanded ? (
-                      <>
-                        <ChevronUp size={14} /> Chiudi dettagli
-                      </>
-                    ) : (
-                      <>
-                        <ChevronDown size={14} /> Mostra dettagli strategia
-                      </>
-                    )}
-                  </button>
-                </div>
-              );
-            })}
-            ) : (
-            <div className="glass p-10 rounded-3xl border border-yellow-500/20 text-center flex flex-col items-center">
-              <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mb-4 border border-yellow-500/20">
-                <Map size={32} className="text-yellow-500" />
+                      <button
+                        onClick={() => {
+                          const newExpanded = new Set(expandedBOs);
+                          if (isExpanded) newExpanded.delete(bo.id);
+                          else newExpanded.add(bo.id);
+                          setExpandedBOs(newExpanded);
+                        }}
+                        className="flex items-center gap-2 text-xs font-bold text-yellow-500/80 hover:text-yellow-400 transition-colors"
+                      >
+                        {isExpanded ? (
+                          <>
+                            <ChevronUp size={14} /> Chiudi dettagli
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown size={14} /> Mostra dettagli strategia
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Build Orders in arrivo</h3>
-              <p className="text-sm text-gray-500 max-w-sm">I build order per questa civiltà saranno aggiunti presto dai contributori della community.</p>
-              <button
-                onClick={() => handleTabChange('proponi')}
-                className="mt-6 px-8 py-3 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/30 rounded-xl text-sm text-yellow-500 font-bold transition-all"
-              >
-                Proponi un Build Order →
-              </button>
-            </div>
+            ) : (
+              <div className="glass p-10 rounded-3xl border border-yellow-500/20 text-center flex flex-col items-center">
+                <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mb-4 border border-yellow-500/20">
+                  <Map size={32} className="text-yellow-500" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Build Orders in arrivo</h3>
+                <p className="text-sm text-gray-500 max-w-sm">I build order per questa civiltà saranno aggiunti presto dai contributori della community.</p>
+                <button
+                  onClick={() => handleTabChange('proponi')}
+                  className="mt-6 px-8 py-3 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/30 rounded-xl text-sm text-yellow-500 font-bold transition-all"
+                >
+                  Proponi un Build Order →
+                </button>
+              </div>
             )}
           </div>
         )}
 
-        {/* === MATCHUPS === */}
         {activeTab === 'matchups' && (
           <div className="space-y-4">
             <div>
@@ -386,7 +364,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           </div>
         )}
 
-        {/* === VIDEO === */}
         {activeTab === 'video' && (
           <div className="w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex flex-col md:flex-row md:items-center gap-6 mb-2">
@@ -397,7 +374,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 </h2>
                 <p className="text-gray-400 mt-1">Tutorial e partite commentate da <span className="text-red-500 font-bold">marcotamby_aoe</span>.</p>
               </div>
-
               <a
                 href="https://www.youtube.com/@marcotamby_aoe"
                 target="_blank"
@@ -412,16 +388,13 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
               {civ.videos && civ.videos.length > 0 ? (
                 civ.videos.map((vidId, index) => {
-                  // If the ID is actually a full URL, extract the ID
-                  let finalId = vidId;
-                  try {
-                    const vidIdTrim = vidId.trim();
-                    if (vidIdTrim.includes('youtube.com') || vidIdTrim.includes('youtu.be')) {
-                      const url = new URL(vidIdTrim);
-                      finalId = url.searchParams.get('v') || url.pathname.slice(1) || vidIdTrim;
-                    }
-                  } catch (e) { }
-
+                  let finalId = vidId.trim();
+                  if (finalId.includes('youtube.com') || finalId.includes('youtu.be')) {
+                    try {
+                      const url = new URL(finalId);
+                      finalId = url.searchParams.get('v') || url.pathname.slice(1) || finalId;
+                    } catch (e) { }
+                  }
                   return (
                     <div key={`${finalId}-${index}`} className="flex flex-col h-full">
                       <a
@@ -436,21 +409,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                           className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
                           onLoad={(e) => {
                             const target = e.target as HTMLImageElement;
-                            // YouTube returns a 120x90 placeholder if the requested resolution doesn't exist
                             if (target.naturalWidth === 120 && target.naturalHeight === 90) {
-                              if (target.src.includes('maxresdefault.jpg')) {
-                                target.src = `https://img.youtube.com/vi/${finalId}/hqdefault.jpg`;
-                              } else if (target.src.includes('hqdefault.jpg')) {
-                                target.src = `https://img.youtube.com/vi/${finalId}/mqdefault.jpg`;
-                              }
-                            }
-                          }}
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            if (target.src.includes('maxresdefault.jpg')) {
                               target.src = `https://img.youtube.com/vi/${finalId}/hqdefault.jpg`;
-                            } else if (target.src.includes('hqdefault.jpg')) {
-                              target.src = `https://img.youtube.com/vi/${finalId}/mqdefault.jpg`;
                             }
                           }}
                         />
@@ -474,7 +434,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           </div>
         )}
 
-        {/* === PROPONI MODIFICA === */}
         {activeTab === 'proponi' && (
           <div className="max-w-xl">
             <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
@@ -484,7 +443,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             <EditSuggestionForm civName={civ.name} />
           </div>
         )}
-
       </div>
 
       {civ && isAdmin && (
