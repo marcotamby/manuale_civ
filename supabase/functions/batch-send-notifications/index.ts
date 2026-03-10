@@ -10,7 +10,6 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS'
 };
 serve(async (req) => {
-  // CORS Preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: CORS_HEADERS, status: 204 })
   }
@@ -19,7 +18,7 @@ serve(async (req) => {
   
   try {
     const timestamp = new Date().toISOString()
-    console.log(`[DEBUG v2.3][${timestamp}] Function invoked.`)
+    console.log(`[LOG][${timestamp}] Function invoked.`)
 
     const { data: suggestions, error: fetchError } = await supabase
       .from('suggestions')
@@ -28,7 +27,7 @@ serve(async (req) => {
       .eq('notified', false)
 
     if (fetchError) {
-       console.error(`[DEBUG v2.3] Fetch error: ${fetchError.message}`)
+       console.error(`Fetch error: ${fetchError.message}`)
        return new Response(JSON.stringify({ error: fetchError.message }), { 
          status: 500, 
          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } 
@@ -53,16 +52,55 @@ serve(async (req) => {
 
     const emailResults = []
     for (const [email, userSuggestions] of Object.entries(groups)) {
-      console.log(`[DEBUG v2.3] Sending to ${email}...`)
-      
       const firstName = (userSuggestions[0]?.user_name || '').split(' ')[0]
       const greeting = firstName ? `Ciao ${firstName}` : 'Ciao'
-      let html = `<h1>Novità sulle tue proposte - Manuale Civ</h1><p>${greeting},</p><p>Esito suggerimenti:</p><ul>`
+      
+      let itemsHtml = ''
       userSuggestions.forEach(s => {
         const isApp = s.status === 'implemented'
-        html += `<li>${isApp ? '✅' : '❌'} ${s.civ_name}: ${isApp ? s.section : (s.rejection_reason || 'N/A')}</li>`
+        itemsHtml += `
+          <div style="margin-bottom: 12px; padding: 12px; background-color: #f9fafb; border-radius: 8px; border-left: 4px solid ${isApp ? '#10b981' : '#ef4444'};">
+            <div style="font-weight: bold; color: #111827; margin-bottom: 4px;">
+              ${isApp ? '✅ Implementata' : '❌ Non approvata'} - ${s.civ_name}
+            </div>
+            <div style="font-size: 14px; color: #4b5563;">
+              <strong>Sezione:</strong> ${s.section}<br/>
+              ${!isApp && s.rejection_reason ? `<strong>Motivo:</strong> ${s.rejection_reason}` : ''}
+            </div>
+          </div>`
       })
-      html += `</ul>`
+
+      const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1f2937; margin: 0; padding: 0; background-color: #f3f4f6;">
+          <div style="max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 30px; text-align: center;">
+              <h1 style="color: #f8fafc; margin: 0; font-size: 24px; letter-spacing: 0.05em;">Manuale Civ</h1>
+            </div>
+            <div style="padding: 30px;">
+              <h2 style="margin-top: 0; color: #111827;">${greeting},</h2>
+              <p style="color: #4b5563; font-size: 16px;">Ci sono novità riguardo i suggerimenti che hai inviato per migliorare il manuale di Age of Empires 4.</p>
+              
+              <div style="margin-top: 25px;">
+                ${itemsHtml}
+              </div>
+
+              <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center;">
+                <p style="font-size: 14px; color: #9ca3af; margin-bottom: 20px;">Grazie per il tuo contributo alla community!</p>
+                <a href="https://manualeciv.vercel.app" style="display: inline-block; background-color: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">Torna al Manuale</a>
+              </div>
+            </div>
+            <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+              <p style="font-size: 12px; color: #9ca3af; margin: 0;">&copy; ${new Date().getFullYear()} Manuale Civ. Tutti i diritti riservati.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
 
       try {
         const controller = new AbortController()
@@ -83,34 +121,33 @@ serve(async (req) => {
           signal: controller.signal
         })
         clearTimeout(timeoutId)
-        console.log(`[DEBUG v2.3] Resend response for ${email}: ${res.status}`)
+        console.log(`Resend response for ${email}: ${res.status}`)
         emailResults.push({ email, ok: res.ok, status: res.status })
       } catch (err: any) {
-        console.error(`[DEBUG v2.3] Error sending to ${email}: ${err.message}`)
+        console.error(`Error sending to ${email}: ${err.message}`)
         emailResults.push({ email, ok: false, error: err.message })
       }
     }
 
-    // Final database update
     const ids = suggestions.map(s => s.id)
     const { error: updateError } = await supabase.from('suggestions').update({ notified: true }).in('id', ids)
 
     if (updateError) {
-      console.error(`[DEBUG v2.3] Update DB error: ${updateError.message}`)
+      console.error(`Update DB error: ${updateError.message}`)
     }
 
     return new Response(JSON.stringify({ 
       success: true, 
       count, 
       emailResults,
-      debug: 'v2.3'
+      version: '2.4'
     }), { 
       status: 200, 
       headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } 
     })
 
   } catch (err: any) {
-    console.error(`[DEBUG v2.3] Global error: ${err.message}`)
+    console.error(`Global error: ${err.message}`)
     return new Response(JSON.stringify({ error: err.message }), { 
       status: 500, 
       headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } 

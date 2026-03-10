@@ -86,8 +86,6 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
       const functionUrl = `${supabaseUrl}/functions/v1/batch-send-notifications`;
 
-      console.log('[DEBUG v2.3] Calling Edge Function:', functionUrl);
-      
       const response = await fetch(functionUrl, {
         method: 'POST',
         headers: {
@@ -98,7 +96,6 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       });
 
       const result = await response.json();
-      console.log('[DEBUG v2.3] Response Status:', response.status, result);
 
       if (!response.ok) {
         throw new Error(result.error || result.message || `HTTP ${response.status}`);
@@ -111,11 +108,11 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       });
       setPendingNotifCount(0);
     } catch (err: any) {
-      console.error('Full notification error (DEBUG v2.3):', err);
+      console.error('Notification error:', err);
       
       setToast({
         isVisible: true,
-        message: `[DEBUG v2.3] Errore: ${err.message}. Controlla l'email.`,
+        message: `Si è verificato un errore: ${err.message}. Riprova più tardi.`,
         type: 'error'
       });
     } finally {
