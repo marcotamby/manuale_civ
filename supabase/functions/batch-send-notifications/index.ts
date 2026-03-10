@@ -15,7 +15,7 @@ serve(async (req) => {
   }
 
   const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
-  
+
   try {
     const timestamp = new Date().toISOString()
     console.log(`[LOG][${timestamp}] Function invoked.`)
@@ -27,18 +27,18 @@ serve(async (req) => {
       .eq('notified', false)
 
     if (fetchError) {
-       console.error(`Fetch error: ${fetchError.message}`)
-       return new Response(JSON.stringify({ error: fetchError.message }), { 
-         status: 500, 
-         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } 
-       })
+      console.error(`Fetch error: ${fetchError.message}`)
+      return new Response(JSON.stringify({ error: fetchError.message }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      })
     }
 
     const count = suggestions?.length || 0
     if (count === 0) {
-      return new Response(JSON.stringify({ message: 'No pending notifications', success: true }), { 
-        status: 200, 
-        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } 
+      return new Response(JSON.stringify({ message: 'No pending notifications', success: true }), {
+        status: 200,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
       })
     }
 
@@ -54,7 +54,7 @@ serve(async (req) => {
     for (const [email, userSuggestions] of Object.entries(groups)) {
       const firstName = (userSuggestions[0]?.user_name || '').split(' ')[0]
       const greeting = firstName ? `Ciao ${firstName}` : 'Ciao'
-      
+
       let itemsHtml = ''
       userSuggestions.forEach(s => {
         const isApp = s.status === 'implemented'
@@ -113,7 +113,7 @@ serve(async (req) => {
             'Authorization': `Bearer ${RESEND_API_KEY}`
           },
           body: JSON.stringify({
-            from: 'Manuale Civ <onboarding@resend.dev>',
+            from: 'Manuale Civ <noreply@aoe4guide.it>',
             to: [email],
             subject: `Aggiornamento proposte Manuale Civ`,
             html,
@@ -136,21 +136,21 @@ serve(async (req) => {
       console.error(`Update DB error: ${updateError.message}`)
     }
 
-    return new Response(JSON.stringify({ 
-      success: true, 
-      count, 
+    return new Response(JSON.stringify({
+      success: true,
+      count,
       emailResults,
       version: '2.4'
-    }), { 
-      status: 200, 
-      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } 
+    }), {
+      status: 200,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
     })
 
   } catch (err: any) {
     console.error(`Global error: ${err.message}`)
-    return new Response(JSON.stringify({ error: err.message }), { 
-      status: 500, 
-      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } 
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
     })
   }
 });
