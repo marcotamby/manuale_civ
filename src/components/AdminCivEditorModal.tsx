@@ -404,10 +404,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                         <Trash2 size={16} />
                       </button>
                       <div className="grid grid-cols-3 gap-2 mb-2 pr-6">
-                        <input type="text" value={bo.title} onChange={e => updateArrayField('buildOrders', idx, 'title', e.target.value)} placeholder="Titolo" className="col-span-2 bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600" />
-                        <select value={bo.difficulty} onChange={e => updateArrayField('buildOrders', idx, 'difficulty', e.target.value)} className="col-span-1 bg-gray-800 text-white text-xs rounded px-1 py-1 border border-gray-600">
-                          <option value="Easy">Easy</option><option value="Medium">Medium</option><option value="Advanced">Advanced</option>
-                        </select>
+                        <input type="text" value={bo.title} onChange={e => updateArrayField('buildOrders', idx, 'title', e.target.value)} placeholder="Titolo" className="col-span-3 bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600" />
                       </div>
                       <div className="mb-2">
                         <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Descrizione / Strategia (Legacy)</label>
