@@ -80,7 +80,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     
     try {
       setIsSendingEmail(true);
-      const { data, error } = await supabase.functions.invoke('batch-send-notifications');
+      const { error } = await supabase.functions.invoke('batch-send-notifications');
 
       if (error) throw error;
 
@@ -249,20 +249,6 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
           </div>
           
           <div className="flex items-center gap-2">
-            {pendingNotifCount > 0 && (
-              <button
-                onClick={handleSendNotifications}
-                disabled={isSendingEmail}
-                className="flex items-center gap-2 px-4 py-2 bg-yellow-600/20 hover:bg-yellow-600/40 text-yellow-400 rounded-lg border border-yellow-500/30 transition-all font-bold text-sm"
-              >
-                {isSendingEmail ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  <CheckCircle size={16} />
-                )}
-                Invia {pendingNotifCount} Notifiche
-              </button>
-            )}
             <button 
               onClick={onClose}
               className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
@@ -279,25 +265,10 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
               <p className="text-gray-400">Caricamento proposte...</p>
             </div>
           ) : suggestions.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-60 text-center glass rounded-xl border border-white/5 p-8">
+            <div className="flex flex-col items-center justify-center h-60 text-center glass rounded-xl border border-white/5">
               <Inbox size={48} className="text-gray-600 mb-4" />
               <h3 className="text-xl font-bold text-white mb-2">Nessuna proposta in sospeso</h3>
-              <p className="text-gray-400 text-sm mb-6">Hai gestito tutti i suggerimenti della community!</p>
-              
-              {pendingNotifCount > 0 && (
-                <button
-                  onClick={handleSendNotifications}
-                  disabled={isSendingEmail}
-                  className="flex items-center gap-3 px-8 py-4 bg-yellow-600 hover:bg-yellow-500 text-white rounded-xl transition-all font-bold shadow-lg shadow-yellow-600/20 group"
-                >
-                  {isSendingEmail ? (
-                    <Loader2 size={20} className="animate-spin" />
-                  ) : (
-                    <CheckCircle size={20} className="group-hover:scale-110 transition-transform" />
-                  )}
-                  Invia {pendingNotifCount} Notifiche Ora
-                </button>
-              )}
+              <p className="text-gray-400 text-sm">Hai gestito tutti i suggerimenti della community!</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -361,6 +332,27 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
             </div>
           )}
         </div>
+
+        {/* Fixed Footer with Send Notifications Button */}
+        {pendingNotifCount > 0 && (
+          <div className="p-6 border-t border-[#D4AF37]/20 bg-gradient-to-r from-[#0d1424] to-[#1a1c32] flex justify-center sticky bottom-0 rounded-b-2xl z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+            <button
+              onClick={handleSendNotifications}
+              disabled={isSendingEmail}
+              className="flex items-center gap-4 px-12 py-4 bg-yellow-600 hover:bg-yellow-500 text-white rounded-xl transition-all font-bold shadow-xl shadow-yellow-600/30 group animate-in slide-in-from-bottom duration-500 hover:scale-105 active:scale-95"
+            >
+              {isSendingEmail ? (
+                <Loader2 size={24} className="animate-spin" />
+              ) : (
+                <CheckCircle size={24} className="group-hover:scale-110 transition-transform" />
+              )}
+              <div className="text-left">
+                <div className="text-lg leading-tight">Invia {pendingNotifCount} Notifiche Ora</div>
+                <div className="text-[11px] opacity-70 font-normal uppercase tracking-widest">Invia il riepilogo email agli utenti</div>
+              </div>
+            </button>
+          </div>
+        )}
       </div>
       <Toast 
         isVisible={toast.isVisible}
