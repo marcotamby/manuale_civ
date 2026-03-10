@@ -30,6 +30,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     type: 'success'
   });
 
+  const [rejectionModalSugg, setRejectionModalSugg] = useState<Suggestion | null>(null);
+  const [rejectionReason, setRejectionReason] = useState('');
+
   const fetchSuggestions = async () => {
     try {
       setIsLoading(true);
@@ -55,7 +58,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     }
   }, [isOpen]);
 
-  const handleUpdateStatus = async (sugg: Suggestion, newStatus: 'implemented' | 'rejected') => {
+  const handleUpdateStatus = async (sugg: Suggestion, newStatus: 'implemented' | 'rejected', reason?: string) => {
     try {
       if (newStatus === 'implemented') {
         const { data: currentCiv, error: fetchError } = await supabase
@@ -114,9 +117,14 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
         }
       }
 
+      const updatePayload: any = { status: newStatus };
+      if (newStatus === 'rejected' && reason) {
+        updatePayload.rejection_reason = reason;
+      }
+
       const { error } = await supabase
         .from('suggestions')
-        .update({ status: newStatus })
+        .update(updatePayload)
         .eq('id', sugg.id);
 
       if (error) throw error;
@@ -129,6 +137,8 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
       // Rimuovi dalla lista locale
       setSuggestions(prev => prev.filter(s => s.id !== sugg.id));
+      setRejectionModalSugg(null);
+      setRejectionReason('');
     } catch (err: any) {
       console.error('Error updating suggestion:', err);
       setToast({ 
@@ -143,8 +153,45 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm shadow-2xl">
-      <div className="bg-[#0f1423] border border-[#D4AF37]/30 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-[0_0_40px_rgba(0,0,0,0.8)] filter drop-shadow-2xl">
+      <div className="bg-[#0f1423] border border-[#D4AF37]/30 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-[0_0_40px_rgba(0,0,0,0.8)] filter drop-shadow-2xl relative">
         
+        {/* Rejection Modal Overlay */}
+        {rejectionModalSugg && (
+          <div className="absolute inset-0 z-[60] bg-black/60 backdrop-blur-md rounded-2xl flex items-center justify-center p-6 text-center">
+            <div className="bg-[#1a1c32] border border-red-500/30 p-8 rounded-2xl max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-300">
+              <XCircle size={48} className="text-red-500 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-white mb-2">Perché scarti la proposta?</h3>
+              <p className="text-sm text-gray-400 mb-6">L'utente riceverà un'email con questa motivazione.</p>
+              
+              <textarea
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                placeholder="Esempio: Informazione già presente o non accurata..."
+                className="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-3 text-white text-sm mb-6 focus:border-red-500 transition-colors h-32 resize-none"
+              />
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setRejectionModalSugg(null);
+                    setRejectionReason('');
+                  }}
+                  className="flex-1 px-4 py-2 border border-gray-600 text-gray-400 rounded-lg hover:bg-white/5 transition-colors font-medium"
+                >
+                  Annulla
+                </button>
+                <button
+                  onClick={() => handleUpdateStatus(rejectionModalSugg, 'rejected', rejectionReason)}
+                  disabled={!rejectionReason.trim()}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-all font-bold shadow-lg shadow-red-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Conferma Scarto
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center justify-between p-6 border-b border-[#D4AF37]/20 bg-gradient-to-r from-[#0d1424] to-[#1a1c32] rounded-t-2xl shrink-0">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20 text-blue-400">
@@ -205,6 +252,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                         <div className="text-gray-500">
                           <strong>Autore:</strong> {sugg.user_name || 'Anonimo'}
                         </div>
+                        <div className="text-gray-500 text-blue-400/80">
+                          <strong>Email:</strong> {sugg.user_email || 'Non fornita'}
+                        </div>
                         <div className="text-gray-500">
                           <strong>Data:</strong> {new Date(sugg.created_at).toLocaleString('it-IT')}
                         </div>
@@ -221,7 +271,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                       </button>
                       
                       <button 
-                        onClick={() => handleUpdateStatus(sugg, 'rejected')}
+                        onClick={() => setRejectionModalSugg(sugg)}
                         className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/40 text-red-400 rounded-lg border border-red-500/30 transition-colors font-medium text-sm"
                         title="Rifiuta proposta"
                       >
