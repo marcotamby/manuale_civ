@@ -409,6 +409,16 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                           <option value="Easy">Easy</option><option value="Medium">Medium</option><option value="Advanced">Advanced</option>
                         </select>
                       </div>
+                      <div className="mb-2">
+                        <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Descrizione / Strategia (Legacy)</label>
+                        <textarea
+                          value={bo.description || ''}
+                          onChange={e => updateArrayField('buildOrders', idx, 'description', e.target.value)}
+                          placeholder="Descrizione testuale della strategia..."
+                          rows={3}
+                          className="w-full bg-gray-900 border border-gray-700/50 rounded px-2 py-1 text-xs text-gray-300 focus:border-blue-500 outline-none"
+                        />
+                      </div>
                       {/* Steps (Structured handling) */}
                       <div className="mt-4 space-y-3">
                         <div className="flex justify-between items-center mb-1">
