@@ -62,7 +62,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
         .select('*', { count: 'exact', head: true })
         .neq('status', 'pending')
         .eq('notified', false);
-      
+
       if (!error) setPendingNotifCount(count || 0);
     } catch (err) {
       console.error('Error fetching pending notifications:', err);
@@ -77,28 +77,17 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
   const handleSendNotifications = async () => {
     if (pendingNotifCount === 0) return;
-    
+
     try {
       setIsSendingEmail(true);
       setToast({ isVisible: false, message: '', type: 'success' });
-      
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-      const functionUrl = `${supabaseUrl}/functions/v1/batch-send-notifications`;
 
-      const response = await fetch(functionUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseKey}`
-        },
-        body: JSON.stringify({})
+      const { data: result, error: invokeError } = await supabase.functions.invoke('batch-send-notifications', {
+        body: {}
       });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || result.message || `HTTP ${response.status}`);
+      if (invokeError) {
+        throw new Error(invokeError.message || 'Errore durante l\'invio delle notifiche');
       }
 
       setToast({
@@ -109,7 +98,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       setPendingNotifCount(0);
     } catch (err: any) {
       console.error('Notification error:', err);
-      
+
       setToast({
         isVisible: true,
         message: `Si è verificato un errore: ${err.message}. Riprova più tardi.`,
@@ -133,7 +122,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
         let updateData: any = null;
         const newLines = sugg.suggestion_text.split('\n').map(s => s.trim()).filter(s => s !== '');
-        
+
         const safeArray = (val: any) => Array.isArray(val) ? val : [];
 
         switch (sugg.section) {
@@ -174,7 +163,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
             .from('civilizations')
             .update(updateData)
             .eq('id', currentCiv.id);
-            
+
           if (civUpdateError) throw civUpdateError;
         }
       }
@@ -204,10 +193,10 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       fetchPendingNotifCount();
     } catch (err: any) {
       console.error('Error updating suggestion:', err);
-      setToast({ 
-        isVisible: true, 
-        message: `Errore: ${err.message || 'Aggiornamento fallito'}`, 
-        type: 'error' 
+      setToast({
+        isVisible: true,
+        message: `Errore: ${err.message || 'Aggiornamento fallito'}`,
+        type: 'error'
       });
     }
   };
@@ -217,7 +206,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm shadow-2xl">
       <div className="bg-[#0f1423] border border-[#D4AF37]/30 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-[0_0_40px_rgba(0,0,0,0.8)] filter drop-shadow-2xl relative">
-        
+
         {/* Rejection Modal Overlay */}
         {rejectionModalSugg && (
           <div className="absolute inset-0 z-[60] bg-black/60 backdrop-blur-md rounded-2xl flex items-center justify-center p-6 text-center">
@@ -225,14 +214,14 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
               <XCircle size={48} className="text-red-500 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-white mb-2">Perché scarti la proposta?</h3>
               <p className="text-sm text-gray-400 mb-6">L'utente riceverà un'email con questa motivazione.</p>
-              
+
               <textarea
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 placeholder="Esempio: Informazione già presente o non accurata..."
                 className="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-3 text-white text-sm mb-6 focus:border-red-500 transition-colors h-32 resize-none"
               />
-              
+
               <div className="flex gap-3">
                 <button
                   onClick={() => {
@@ -265,9 +254,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
               <p className="text-xs text-gray-400">Revisiona i suggerimenti della community</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2">
-            <button 
+            <button
               onClick={onClose}
               className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
             >
@@ -293,7 +282,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
               {suggestions.map((sugg) => (
                 <div key={sugg.id} className="bg-black/40 border border-[#D4AF37]/30 rounded-xl p-5 hover:border-blue-500/50 transition-colors relative overflow-hidden group">
                   <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/50 hidden group-hover:block blur-sm"></div>
-                  
+
                   <div className="flex flex-col md:flex-row justify-between gap-6 relative z-10">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-3">
@@ -304,11 +293,11 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                           Sezione: <span className="text-white font-medium">{sugg.section}</span>
                         </span>
                       </div>
-                      
+
                       <div className="bg-black/50 p-4 rounded-lg border border-gray-700/50 mb-4">
                         <p className="text-gray-200 text-sm whitespace-pre-wrap leading-relaxed">{sugg.suggestion_text}</p>
                       </div>
-                      
+
                       <div className="flex flex-wrap items-center gap-4 text-xs">
                         {sugg.source && (
                           <div className="flex items-center gap-1 text-yellow-400/80 bg-yellow-400/10 px-2 py-1 rounded">
@@ -326,17 +315,17 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex md:flex-col gap-3 shrink-0 items-center md:items-end justify-center">
-                      <button 
+                      <button
                         onClick={() => handleUpdateStatus(sugg, 'implemented')}
                         className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-green-600/20 hover:bg-green-600/40 text-green-400 rounded-lg border border-green-500/30 transition-colors font-medium text-sm"
                         title="Segna come completata"
                       >
                         <CheckCircle size={18} /> Approva
                       </button>
-                      
-                      <button 
+
+                      <button
                         onClick={() => setRejectionModalSugg(sugg)}
                         className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/40 text-red-400 rounded-lg border border-red-500/30 transition-colors font-medium text-sm"
                         title="Rifiuta proposta"
@@ -372,7 +361,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
           </div>
         )}
       </div>
-      <Toast 
+      <Toast
         isVisible={toast.isVisible}
         message={toast.message}
         type={toast.type}
