@@ -23,7 +23,7 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
         .from('suggestions')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'pending');
-      
+
       if (error) throw error;
       setPendingCount(count || 0);
     } catch (err) {
@@ -38,10 +38,10 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
       // Real-time subscription to suggestions table
       const channel = supabase
         .channel('suggestions-count')
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
-          table: 'suggestions' 
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'suggestions'
         }, () => {
           fetchPendingCount();
         })
@@ -55,7 +55,7 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
 
   return (
     <div className="w-full bg-gradient-to-r from-[#0d1424] via-[#1a1c32] to-[#0d1424] border-b border-yellow-500/20 flex flex-col md:flex-row items-center justify-between px-4 py-4 md:px-10 md:py-5 z-10 shrink-0 gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative overflow-hidden">
-      
+
       {/* Decorative top border glow effect */}
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent"></div>
 
@@ -81,46 +81,65 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
       </div>
 
       {/* Auth / Right side */}
-      <div className="flex items-center justify-center md:justify-end w-full md:w-1/3">
-        {isAuthenticated && isAdmin ? (
-          <div className="flex items-center gap-4 font-sans">
-            <div className="flex items-center gap-2 text-yellow-500">
-              <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30">
-                <User size={16} />
+      <div className="flex items-center justify-center md:justify-end w-full md:w-1/3 gap-4">
+        {isAuthenticated ? (
+          isAdmin ? (
+            <div className="flex items-center gap-4 font-sans">
+              <div className="flex items-center gap-2 text-yellow-500">
+                <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30">
+                  <User size={16} />
+                </div>
+                <div className="flex flex-col text-left">
+                  <span className="font-medium hidden sm:block text-sm leading-none text-white/90">{user?.name}</span>
+                  <span className="text-[10px] text-yellow-600 font-bold uppercase tracking-wider">Admin</span>
+                </div>
               </div>
-              <div className="flex flex-col text-left">
-                <span className="font-medium hidden sm:block text-sm leading-none text-white/90">{user?.name}</span>
-                <span className="text-[10px] text-yellow-600 font-bold uppercase tracking-wider">Admin</span>
-              </div>
+              <button
+                onClick={onOpenAdminDashboard}
+                className="relative text-xs text-yellow-500 hover:text-white transition-colors border border-yellow-500/20 px-3 py-1.5 rounded hover:bg-yellow-500/10 font-sans tracking-wider uppercase flex items-center gap-1"
+              >
+                Proposte
+                {pendingCount > 0 && (
+                  <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white shadow-lg animate-bounce duration-500 ring-2 ring-[#0d1424]">
+                    {pendingCount}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={logout}
+                className="text-xs text-gray-400 hover:text-white transition-colors border border-white/10 px-3 py-1.5 rounded hover:bg-white/5 font-sans tracking-wider uppercase"
+              >
+                Esci
+              </button>
             </div>
-            <button 
-              onClick={onOpenAdminDashboard}
-              className="relative text-xs text-yellow-500 hover:text-white transition-colors border border-yellow-500/20 px-3 py-1.5 rounded hover:bg-yellow-500/10 font-sans tracking-wider uppercase flex items-center gap-1"
-            >
-              Proposte
-              {pendingCount > 0 && (
-                <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white shadow-lg animate-bounce duration-500 ring-2 ring-[#0d1424]">
-                  {pendingCount}
+          ) : (
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => (window as any).openProfileModal?.()}
+                className="relative p-2 rounded-full bg-blue-600/10 border border-blue-500/30 text-blue-400 hover:bg-blue-600/20 hover:border-blue-500/50 transition-all group"
+                title="Il Tuo Profilo"
+              >
+                <User size={20} />
+                {/* Notification Badge Placeholder */}
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[9px] font-bold text-white shadow-lg group-hover:scale-110 transition-transform ring-1 ring-[#0d1424]">
+                  2
                 </span>
-              )}
-            </button>
-            <button 
-              onClick={logout}
-              className="text-xs text-gray-400 hover:text-white transition-colors border border-white/10 px-3 py-1.5 rounded hover:bg-white/5 font-sans tracking-wider uppercase"
-            >
-              Esci
-            </button>
-          </div>
+              </button>
+              <button
+                onClick={logout}
+                className="text-xs text-gray-400 hover:text-white transition-colors border border-white/10 px-3 py-1.5 rounded hover:bg-white/5 font-sans tracking-wider uppercase"
+              >
+                Esci
+              </button>
+            </div>
+          )
         ) : (
           <button
             onClick={openLoginModal}
-            title="Accesso Admin"
-            className="text-gray-500/70 hover:text-yellow-500/90 transition-colors p-2 rounded hover:bg-yellow-500/10"
+            className="flex items-center gap-2 px-6 py-2 bg-yellow-600/10 hover:bg-yellow-600/20 text-yellow-500 font-bold rounded-lg border border-yellow-500/30 transition-all shadow-[0_0_15px_rgba(212,175,55,0.1)] hover:shadow-[0_0_20px_rgba(212,175,55,0.2)] uppercase text-xs tracking-widest"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
+            <User size={14} />
+            Accedi
           </button>
         )}
       </div>

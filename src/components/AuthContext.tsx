@@ -5,6 +5,7 @@ interface UserData {
   name: string | null;
   email?: string;
   picture?: string;
+  rank?: string;
 }
 
 interface AuthContextType {
@@ -18,6 +19,7 @@ interface AuthContextType {
   login: (userData: UserData) => void;
   logout: () => void;
   toggleFavorite: (civId: string) => void;
+  updateRank: (rank: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -62,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log('🛡️ Local development detected: Admin bypass active.');
       setIsAdmin(true);
       setIsAuthenticated(true);
-      setUser({ name: 'Local Admin (Dev)', email: 'admin@localhost' });
+      setUser({ name: 'Local Admin (Dev)', email: 'admin@localhost', rank: localStorage.getItem('auth_user_rank') || 'Unranked' });
     }
   }, []);
 
@@ -72,9 +74,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [favorites]);
 
   const login = (userData: UserData) => {
+    const savedRank = localStorage.getItem('auth_user_rank') || 'Unranked';
+    const enrichedUser = { ...userData, rank: savedRank };
+
     setIsAuthenticated(true);
-    setUser(userData);
-    localStorage.setItem('auth_user', JSON.stringify(userData));
+    setUser(enrichedUser);
+    localStorage.setItem('auth_user', JSON.stringify(enrichedUser));
     const adminEmails = ['marcotamby@gmail.com', 'marco.tamborrino.94@gmail.com'];
     if (userData.name?.toLowerCase() === 'admin' || (userData.email && adminEmails.includes(userData.email))) {
       setIsAdmin(true);
@@ -88,10 +93,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('auth_user');
   };
 
+  const updateRank = (rank: string) => {
+    if (user) {
+      const updatedUser = { ...user, rank };
+      setUser(updatedUser);
+      localStorage.setItem('auth_user', JSON.stringify(updatedUser));
+      localStorage.setItem('auth_user_rank', rank);
+    }
+  };
+
   const toggleFavorite = (civId: string) => {
-    setFavorites(prev => 
-      prev.includes(civId) 
-        ? prev.filter(id => id !== civId) 
+    setFavorites(prev =>
+      prev.includes(civId)
+        ? prev.filter(id => id !== civId)
         : [...prev, civId]
     );
   };
@@ -100,17 +114,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const closeLoginModal = () => setIsLoginModalOpen(false);
 
   return (
-    <AuthContext.Provider value={{ 
-      isAuthenticated, 
-      isAdmin, 
-      user, 
-      favorites, 
+    <AuthContext.Provider value={{
+      isAuthenticated,
+      isAdmin,
+      user,
+      favorites,
       isLoginModalOpen,
       openLoginModal,
       closeLoginModal,
-      login, 
-      logout, 
-      toggleFavorite 
+      login,
+      logout,
+      toggleFavorite,
+      updateRank
     }}>
       {children}
     </AuthContext.Provider>

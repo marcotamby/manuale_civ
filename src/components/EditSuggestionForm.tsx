@@ -4,6 +4,7 @@ import { User } from 'lucide-react';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
 import { supabase } from '../lib/supabaseClient';
+import { Plus, Trash2, Clock, FileText } from 'lucide-react';
 
 interface SuggestionFormProps {
   civName: string;
@@ -21,33 +22,55 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
     type: 'success'
   });
 
+  // Build Order structured state
+  const [boSteps, setBoSteps] = useState<{ time: string; action: string; notes: string }[]>([
+    { time: '', action: '', notes: '' }
+  ]);
+
+  const addStep = () => setBoSteps([...boSteps, { time: '', action: '', notes: '' }]);
+  const removeStep = (index: number) => setBoSteps(boSteps.filter((_, i) => i !== index));
+  const updateStep = (index: number, field: string, value: string) => {
+    const newSteps = [...boSteps];
+    (newSteps[index] as any)[field] = value;
+    setBoSteps(newSteps);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
       openLoginModal();
       return;
     }
-    
+
     try {
       setIsSubmitting(true);
-      
+
+      let finalSuggestion = suggestion;
+      if (section === 'build_order') {
+        finalSuggestion = "BUILD ORDER STRUTTURATO:\n\n" + boSteps
+          .filter(s => s.action.trim() !== '')
+          .map(s => `${s.time ? `[${s.time}] ` : ''}${s.action}${s.notes ? `\n   Note: ${s.notes}` : ''}`)
+          .join('\n\n');
+      }
+
       const { error } = await supabase.from('suggestions').insert({
         civ_name: civName,
         section,
-        suggestion_text: suggestion,
+        suggestion_text: finalSuggestion,
         source: source || null,
         user_name: user?.name || null,
         user_email: user?.email || null,
+        user_rank: user?.rank || null,
       });
 
       if (error) throw error;
-      
+
       setToast({
         isVisible: true,
         message: 'Proposta inviata con successo!',
         type: 'success'
       });
-      
+
       setSection('');
       setSuggestion('');
       setSource('');
@@ -73,7 +96,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
         <p className="text-sm text-gray-400 max-w-sm mb-6">
           Per garantire la qualità dei contributi, ti chiediamo di effettuare l'accesso tramite Google per proporre modifiche.
         </p>
-        <button 
+        <button
           onClick={openLoginModal}
           className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg transition-all"
         >
@@ -89,7 +112,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
         <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
         Loggato come <strong>{user?.name}</strong>
       </div>
-      
+
       <p className="text-gray-400 text-sm mb-6">
         Hai informazioni più accurate su questa civiltà? Proponi una modifica e il nostro team la esaminerà.
       </p>
@@ -116,16 +139,84 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">Descrivi la modifica proposta</label>
+          <label className="block text-sm font-medium text-gray-300 mb-1">Descrizione (opzionale)</label>
           <textarea
             value={suggestion}
             onChange={(e) => setSuggestion(e.target.value)}
-            required
-            rows={5}
+            rows={section === 'build_order' ? 2 : 5}
             className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors resize-y"
-            placeholder="Descrivi dettagliatamente la modifica che proponi..."
+            placeholder={section === 'build_order' ? "Breve introduzione alla strategia..." : "Descrivi dettagliatamente la modifica che proponi..."}
           />
         </div>
+
+        {section === 'build_order' && (
+          <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium text-blue-400">Passaggi Build Order</label>
+              <button
+                type="button"
+                onClick={addStep}
+                className="flex items-center gap-1 text-xs bg-blue-600/20 text-blue-400 px-3 py-1.5 rounded-lg border border-blue-500/30 hover:bg-blue-600/40 transition-all font-bold"
+              >
+                <Plus size={14} /> Aggiungi Step
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {boSteps.map((step, index) => (
+                <div key={index} className="glass p-4 rounded-xl border border-white/5 relative group">
+                  <div className="grid grid-cols-12 gap-3">
+                    <div className="col-span-3">
+                      <div className="relative">
+                        <Clock size={12} className="absolute left-3 top-3.5 text-gray-500" />
+                        <input
+                          type="text"
+                          placeholder="Min:Sec"
+                          value={step.time}
+                          onChange={(e) => updateStep(index, 'time', e.target.value)}
+                          className="w-full bg-black/40 border border-gray-700 rounded-lg pl-8 pr-2 py-2.5 text-xs text-white focus:border-blue-500 outline-none"
+                        />
+                      </div>
+                    </div>
+                    <div className="col-span-8">
+                      <input
+                        type="text"
+                        placeholder="Azione (es: manda 6 a cibo)"
+                        value={step.action}
+                        onChange={(e) => updateStep(index, 'action', e.target.value)}
+                        className="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2.5 text-xs text-white focus:border-blue-500 outline-none"
+                        required={index === 0}
+                      />
+                    </div>
+                    <div className="col-span-1 flex items-center justify-end">
+                      {boSteps.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeStep(index)}
+                          className="text-gray-500 hover:text-red-500 transition-colors p-1"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+                    </div>
+                    <div className="col-span-12">
+                      <div className="relative">
+                        <FileText size={12} className="absolute left-3 top-3.5 text-gray-500" />
+                        <input
+                          type="text"
+                          placeholder="Note extra o consigli..."
+                          value={step.notes}
+                          onChange={(e) => updateStep(index, 'notes', e.target.value)}
+                          className="w-full bg-black/40 border border-gray-700 rounded-lg pl-8 pr-3 py-2 text-[11px] text-gray-300 focus:border-blue-500 outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-1">Fonte (opzionale)</label>
@@ -134,7 +225,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
             value={source}
             onChange={(e) => setSource(e.target.value)}
             className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors"
-            placeholder="Patch note, AoE4World, video, ecc."
+            placeholder="AoE4 World, Pro Player (es. Beastyqt), ecc."
           />
         </div>
 
@@ -154,7 +245,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
         </button>
       </form>
 
-      <Toast 
+      <Toast
         isVisible={toast.isVisible}
         message={toast.message}
         type={toast.type}

@@ -46,11 +46,10 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
           <div className="flex items-center glass p-1 rounded-xl h-[42px]">
             <button
               onClick={() => setIsCompareMode(!isCompareMode)}
-              className={`flex items-center gap-2 px-4 h-full rounded-lg text-sm font-bold transition-all ${
-                isCompareMode 
-                  ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]' 
-                  : 'text-gray-400 hover:text-gray-200'
-              }`}
+              className={`flex items-center gap-2 px-4 h-full rounded-lg text-sm font-bold transition-all ${isCompareMode
+                ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]'
+                : 'text-gray-400 hover:text-gray-200'
+                }`}
             >
               <BarChart2 size={16} />
               <span>{isCompareMode ? 'Annulla' : 'Confronta'}</span>
@@ -68,11 +67,10 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
           <div className="flex items-center glass p-1 rounded-xl h-[42px]">
             <button
               onClick={() => setDifficultyFilter(difficultyFilter === 'Preferiti' ? 'Tutte' : 'Preferiti')}
-              className={`flex items-center gap-2 px-3 h-full rounded-lg text-sm font-bold transition-all ${
-                difficultyFilter === 'Preferiti'
-                  ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]' 
-                  : 'text-gray-400 hover:text-gray-200'
-              }`}
+              className={`flex items-center gap-2 px-3 h-full rounded-lg text-sm font-bold transition-all ${difficultyFilter === 'Preferiti'
+                ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]'
+                : 'text-gray-400 hover:text-gray-200'
+                }`}
             >
               <Heart size={16} fill={difficultyFilter === 'Preferiti' ? 'currentColor' : 'none'} />
               <span className="hidden xs:inline">Preferiti</span>
@@ -99,19 +97,18 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
           const isFavorite = favorites.includes(civ.id);
 
           return (
-            <div 
+            <div
               key={civ.id}
               onClick={() => handleCardClick(civ.id)}
-              className={`group relative h-40 md:h-56 rounded-xl cursor-pointer overflow-hidden border transition-all duration-500 ${
-                isSelected 
-                  ? 'border-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.4)] scale-[0.98]' 
-                  : 'border-[#D4AF37]/20 hover:border-yellow-400 hover:shadow-[0_0_30px_rgba(212,175,55,0.25)] hover:-translate-y-1'
-              }`}
+              className={`group relative h-40 md:h-56 rounded-xl cursor-pointer overflow-hidden border transition-all duration-500 ${isSelected
+                ? 'border-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.4)] scale-[0.98]'
+                : 'border-[#D4AF37]/20 hover:border-yellow-400 hover:shadow-[0_0_30px_rgba(212,175,55,0.25)] hover:-translate-y-1'
+                }`}
             >
               {/* Full Cover Flag Background */}
               <div className="absolute inset-0 bg-[#1a1c23]"> {/* Placeholder background color */}
-                <img 
-                  src={civ.flag} 
+                <img
+                  src={civ.flag}
                   alt={civ.name}
                   loading={filteredCivs.indexOf(civ) < 12 ? "eager" : "lazy"}
                   onLoad={(e) => {
@@ -138,11 +135,10 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
 
               {/* Content Top Left: Difficulty (Desktop Only) */}
               {!isCompareMode && (
-                <div className={`absolute top-3 left-3 text-[10px] font-bold px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border hidden md:block ${
-                  civ.difficulty === 'Facile' ? 'text-green-400 border-green-400/30' : 
-                  civ.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-400/30' : 
-                  'text-red-400 border-red-400/30'
-                }`}>
+                <div className={`absolute top-3 left-3 text-[10px] font-bold px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border hidden md:block ${civ.difficulty === 'Facile' ? 'text-green-400 border-green-400/30' :
+                  civ.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-400/30' :
+                    'text-red-400 border-red-400/30'
+                  }`}>
                   {civ.difficulty}
                 </div>
               )}
@@ -158,26 +154,24 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                     }
                     toggleFavorite(civ.id);
                   }}
-                  className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md border transition-all duration-300 hover:scale-125 ${
-                    isFavorite 
-                      ? 'bg-red-500 text-white border-red-400 shadow-[0_0_15px_rgba(239,68,68,0.5)]' 
-                      : 'bg-black/60 text-gray-400 border-white/10 hover:text-red-400 hover:border-red-400/50'
-                  }`}
+                  className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md border transition-all duration-300 hover:scale-125 ${isFavorite
+                    ? 'bg-red-500 text-white border-red-400 shadow-[0_0_15px_rgba(239,68,68,0.5)]'
+                    : 'bg-black/60 text-gray-400 border-white/10 hover:text-red-400 hover:border-red-400/50'
+                    }`}
                 >
-                  <Heart size={16} fill={isFavorite ? "currentColor" : "none"} />
+                  <Heart className="w-3.5 h-3.5 md:w-4 md:h-4" fill={isFavorite ? "currentColor" : "none"} />
                 </button>
               )}
 
               {/* Text at bottom */}
               <div className="absolute bottom-0 left-0 right-0 p-2 md:p-3">
                 <h3 className="text-sm md:text-base font-bold text-white mb-0.5 group-hover:text-yellow-400 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{civ.name}</h3>
-                
+
                 {/* Mobile Difficulty Badge */}
-                <div className={`text-[9px] font-bold w-fit px-1.5 py-0.5 rounded-md backdrop-blur-sm border md:hidden mb-1 ${
-                  civ.difficulty === 'Facile' ? 'text-green-400 border-green-400/30 bg-green-400/10' : 
-                  civ.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-400/30 bg-yellow-400/10' : 
-                  'text-red-400 border-red-400/30 bg-red-400/10'
-                }`}>
+                <div className={`text-[9px] font-bold w-fit px-1.5 py-0.5 rounded-md backdrop-blur-sm border md:hidden mb-1 ${civ.difficulty === 'Facile' ? 'text-green-400 border-green-400/30 bg-green-400/10' :
+                  civ.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-400/30 bg-yellow-400/10' :
+                    'text-red-400 border-red-400/30 bg-red-400/10'
+                  }`}>
                   {civ.difficulty}
                 </div>
 

@@ -12,6 +12,7 @@ import { useCivData } from './components/CivContext';
 import type { Unit } from './data/aoe4Data';
 import { useAuth } from './components/AuthContext';
 import { LoginModal } from './components/LoginModal';
+import { ProfileModal } from './components/ProfileModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { PrivacyPage } from './components/PrivacyPage';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
@@ -23,11 +24,18 @@ function App() {
   const isHome = location.pathname === '/';
   const isCompare = location.pathname.startsWith('/compare');
   const isCiv = location.pathname.startsWith('/civ/');
-  
+
   const selectedCivMatch = location.pathname.match(/^\/civ\/([^/]+)/);
   const selectedCiv = selectedCivMatch ? selectedCivMatch[1] : '';
 
   const currentPage = isHome ? 'home' : isCompare ? 'compare' : isCiv ? 'civ' : 'home';
+
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  useEffect(() => {
+    // Expose method to Topbar via window (quickest way without moving state up)
+    (window as any).openProfileModal = () => setIsProfileModalOpen(true);
+  }, []);
 
   useEffect(() => {
     // Scroll to top on route change
@@ -101,7 +109,7 @@ function App() {
   }
 
   return (
-    <div 
+    <div
       className="flex h-screen w-full overflow-hidden bg-[var(--color-brand-dark)] text-white font-sans"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
@@ -125,9 +133,9 @@ function App() {
       <main className="flex-1 flex flex-col relative overflow-hidden">
         <Topbar
           searchQuery=""
-          setSearchQuery={() => {}}
+          setSearchQuery={() => { }}
           activeFilter="Tutte"
-          setActiveFilter={() => {}}
+          setActiveFilter={() => { }}
           onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
         />
 
@@ -147,11 +155,11 @@ function App() {
                 className="md:hidden p-2 glass rounded-lg hover:bg-white/10 transition-colors"
                 title="Apri Menu"
               >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                  </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="3" y1="12" x2="21" y2="12"></line>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
               </button>
 
               {currentPage === 'civ' && (
@@ -211,6 +219,11 @@ function App() {
 
       <CookieBanner />
       <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        onSelectCiv={handleSelectCiv}
+      />
       {isAuthenticated && isAdmin && (
         <AdminDashboardModal
           isOpen={isAdminDashboardOpen}
