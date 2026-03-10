@@ -97,9 +97,11 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       setPendingNotifCount(0);
     } catch (err: any) {
       console.error('Full notification error:', err);
+      // Give the user the real error message but also the tip about the email
+      const errorMsg = err.message || 'Errore sconosciuto';
       setToast({
         isVisible: true,
-        message: `Problema di comunicazione, ma controlla l'email: potrebbe essere partita comunque!`,
+        message: `Errore: ${errorMsg}. Controlla l'email: potrebbe essere partita comunque!`,
         type: 'error'
       });
     } finally {
