@@ -10,15 +10,16 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS'
 };
 serve(async (req) => {
+  // CORS Preflight
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: CORS_HEADERS, status: 204 })
+    return new Response(null, { headers: CORS_HEADERS, status: 204 })
   }
 
   const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
   
   try {
     const timestamp = new Date().toISOString()
-    console.log(`[DEBUG v2.2][${timestamp}] Function invoked.`)
+    console.log(`[DEBUG v2.3][${timestamp}] Function invoked.`)
 
     const { data: suggestions, error: fetchError } = await supabase
       .from('suggestions')
@@ -27,13 +28,19 @@ serve(async (req) => {
       .eq('notified', false)
 
     if (fetchError) {
-       console.error(`[DEBUG v2.2] Fetch error: ${fetchError.message}`)
-       return new Response(JSON.stringify({ error: fetchError.message }), { status: 500, headers: CORS_HEADERS })
+       console.error(`[DEBUG v2.3] Fetch error: ${fetchError.message}`)
+       return new Response(JSON.stringify({ error: fetchError.message }), { 
+         status: 500, 
+         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } 
+       })
     }
 
     const count = suggestions?.length || 0
     if (count === 0) {
-      return new Response(JSON.stringify({ message: 'No pending notifications' }), { status: 200, headers: CORS_HEADERS })
+      return new Response(JSON.stringify({ message: 'No pending notifications', success: true }), { 
+        status: 200, 
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } 
+      })
     }
 
     const groups: Record<string, any[]> = {}
@@ -46,7 +53,7 @@ serve(async (req) => {
 
     const emailResults = []
     for (const [email, userSuggestions] of Object.entries(groups)) {
-      console.log(`[DEBUG v2.2] Sending to ${email}...`)
+      console.log(`[DEBUG v2.3] Sending to ${email}...`)
       
       const firstName = (userSuggestions[0]?.user_name || '').split(' ')[0]
       const greeting = firstName ? `Ciao ${firstName}` : 'Ciao'
@@ -76,10 +83,10 @@ serve(async (req) => {
           signal: controller.signal
         })
         clearTimeout(timeoutId)
-        console.log(`[DEBUG v2.2] Resend response for ${email}: ${res.status}`)
+        console.log(`[DEBUG v2.3] Resend response for ${email}: ${res.status}`)
         emailResults.push({ email, ok: res.ok, status: res.status })
       } catch (err: any) {
-        console.error(`[DEBUG v2.2] Error sending to ${email}: ${err.message}`)
+        console.error(`[DEBUG v2.3] Error sending to ${email}: ${err.message}`)
         emailResults.push({ email, ok: false, error: err.message })
       }
     }
@@ -88,20 +95,25 @@ serve(async (req) => {
     const ids = suggestions.map(s => s.id)
     const { error: updateError } = await supabase.from('suggestions').update({ notified: true }).in('id', ids)
 
+    if (updateError) {
+      console.error(`[DEBUG v2.3] Update DB error: ${updateError.message}`)
+    }
+
     return new Response(JSON.stringify({ 
       success: true, 
       count, 
       emailResults,
-      debug: 'v2.2'
+      debug: 'v2.3'
     }), { 
       status: 200, 
       headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } 
     })
 
   } catch (err: any) {
-    console.error(`[DEBUG v2.2] Global error: ${err.message}`)
+    console.error(`[DEBUG v2.3] Global error: ${err.message}`)
     return new Response(JSON.stringify({ error: err.message }), { 
-      status: 500, headers: CORS_HEADERS 
+      status: 500, 
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } 
     })
   }
 });
