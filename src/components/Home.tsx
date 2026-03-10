@@ -42,11 +42,11 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full bg-[var(--color-brand-dark)]">
       <header className="mb-6 flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-3 pb-2">
-        <div className="flex-1 flex flex-row items-center justify-end gap-1.5 md:gap-2 overflow-x-auto no-scrollbar pb-1 xs:pb-0">
+        <div className="flex-1 flex flex-row items-center justify-start xs:justify-end gap-1 md:gap-2 overflow-x-auto no-scrollbar pb-1 xs:pb-0">
           <div className="flex items-center glass p-1 rounded-xl h-[42px]">
             <button
               onClick={() => setIsCompareMode(!isCompareMode)}
-              className={`flex items-center gap-2 px-4 h-full rounded-lg text-sm font-bold transition-all ${isCompareMode
+              className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 h-full rounded-lg text-sm font-bold transition-all ${isCompareMode
                 ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]'
                 : 'text-gray-400 hover:text-gray-200'
                 }`}
@@ -57,9 +57,9 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
             {isCompareMode && selectedForCompare.length === 2 && (
               <button
                 onClick={handleStartCompare}
-                className="animate-in fade-in zoom-in duration-300 flex items-center gap-2 px-4 h-full bg-green-600 text-white font-bold rounded-lg shadow-[0_0_15px_rgba(22,163,74,0.4)] border border-green-400/50 hover:bg-green-500 transition-all text-sm ml-1"
+                className="animate-in fade-in zoom-in duration-300 flex items-center gap-2 px-3 md:px-4 h-full bg-green-600 text-white font-bold rounded-lg shadow-[0_0_15px_rgba(22,163,74,0.4)] border border-green-400/50 hover:bg-green-500 transition-all text-sm ml-1"
               >
-                Ok ({selectedForCompare.length})
+                Ok
               </button>
             )}
           </div>
