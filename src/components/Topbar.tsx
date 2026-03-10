@@ -1,5 +1,6 @@
 import { User } from 'lucide-react';
 import { useAuth } from './AuthContext';
+import { useCivData } from './CivContext';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
@@ -14,8 +15,10 @@ interface TopbarProps {
 }
 
 export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
-  const { isAuthenticated, isAdmin, user, logout, openLoginModal } = useAuth();
+  const { isAuthenticated, isAdmin, user, logout, openLoginModal, favorites } = useAuth();
+  const { civilizations } = useCivData();
   const [pendingCount, setPendingCount] = useState(0);
+  const [notificationCount, setNotificationCount] = useState(0);
 
   const fetchPendingCount = async () => {
     try {
@@ -52,6 +55,35 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
       };
     }
   }, [isAuthenticated, isAdmin]);
+
+  useEffect(() => {
+    if (!isAuthenticated || favorites.length === 0) {
+      setNotificationCount(0);
+      return;
+    }
+
+    // Calculate total content items for current favorites
+    const favCivs = civilizations.filter(c => favorites.includes(c.id));
+    const currentTotalItems = favCivs.reduce((acc, civ) => {
+      return acc + (civ.buildOrders?.length || 0) + (civ.videos?.length || 0);
+    }, 0);
+
+    // Get last seen total from localStorage
+    const lastSeenKey = `lastSeenTotal_${user?.email}`;
+    const lastSeenTotal = parseInt(localStorage.getItem(lastSeenKey) || '0');
+
+    if (currentTotalItems > lastSeenTotal) {
+      setNotificationCount(currentTotalItems - lastSeenTotal);
+    } else {
+      setNotificationCount(0);
+    }
+
+    // Function to clear notifications when profile is opened
+    (window as any).clearNotifications = () => {
+      localStorage.setItem(lastSeenKey, currentTotalItems.toString());
+      setNotificationCount(0);
+    };
+  }, [favorites, civilizations, isAuthenticated, user?.email]);
 
   return (
     <div className="w-full bg-gradient-to-r from-[#0d1424] via-[#1a1c32] to-[#0d1424] border-b border-yellow-500/20 flex flex-col md:flex-row items-center justify-between px-4 py-4 md:px-10 md:py-5 z-10 shrink-0 gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative overflow-hidden">
@@ -115,15 +147,19 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
           ) : (
             <div className="flex items-center gap-3">
               <button
-                onClick={() => (window as any).openProfileModal?.()}
+                onClick={() => {
+                  (window as any).openProfileModal?.();
+                  (window as any).clearNotifications?.();
+                }}
                 className="relative p-2 rounded-full bg-blue-600/10 border border-blue-500/30 text-blue-400 hover:bg-blue-600/20 hover:border-blue-500/50 transition-all group"
                 title="Il Tuo Profilo"
               >
                 <User size={20} />
-                {/* Notification Badge Placeholder */}
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[9px] font-bold text-white shadow-lg group-hover:scale-110 transition-transform ring-1 ring-[#0d1424]">
-                  2
-                </span>
+                {notificationCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[9px] font-bold text-white shadow-lg group-hover:scale-110 transition-transform ring-1 ring-[#0d1424]">
+                    {notificationCount}
+                  </span>
+                )}
               </button>
               <button
                 onClick={logout}
