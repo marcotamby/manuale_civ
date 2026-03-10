@@ -82,12 +82,19 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       setIsSendingEmail(true);
       setToast({ isVisible: false, message: '', type: 'success' });
 
-      const { error: invokeError } = await supabase.functions.invoke('batch-send-notifications', {
+      const { data: result, error: invokeError } = await supabase.functions.invoke('batch-send-notifications', {
         body: {}
       });
 
       if (invokeError) {
-        throw new Error(invokeError.message || 'Errore durante l\'invio delle notifiche');
+        let msg = invokeError.message;
+        if (invokeError instanceof Error && 'context' in invokeError) {
+          try {
+            const body = await (invokeError as any).context.json();
+            msg = body.error || body.message || msg;
+          } catch (e) { }
+        }
+        throw new Error(msg || 'Errore durante l\'invio delle notifiche');
       }
 
       setToast({

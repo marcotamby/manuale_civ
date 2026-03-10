@@ -1,14 +1,16 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-// Force redeploy: 2026-03-10T09:55:00Z
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS'
 };
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: CORS_HEADERS, status: 204 })
@@ -20,6 +22,14 @@ serve(async (req) => {
     const timestamp = new Date().toISOString()
     console.log(`[LOG][${timestamp}] Function invoked.`)
 
+    if (!RESEND_API_KEY) {
+      console.error("Missing RESEND_API_KEY secret.");
+      return new Response(JSON.stringify({ error: 'Configurazione mancante: RESEND_API_KEY non impostata su Supabase.' }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      })
+    }
+
     const { data: suggestions, error: fetchError } = await supabase
       .from('suggestions')
       .select('*')
@@ -28,7 +38,7 @@ serve(async (req) => {
 
     if (fetchError) {
       console.error(`Fetch error: ${fetchError.message}`)
-      return new Response(JSON.stringify({ error: fetchError.message }), {
+      return new Response(JSON.stringify({ error: `Errore DB lookup: ${fetchError.message}` }), {
         status: 500,
         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
       })
@@ -36,7 +46,8 @@ serve(async (req) => {
 
     const count = suggestions?.length || 0
     if (count === 0) {
-      return new Response(JSON.stringify({ message: 'No pending notifications', success: true }), {
+      console.log("No pending notifications found.")
+      return new Response(JSON.stringify({ message: 'Nessuna notifica in sospeso trovata.', success: true }), {
         status: 200,
         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
       })
@@ -121,8 +132,15 @@ serve(async (req) => {
           signal: controller.signal
         })
         clearTimeout(timeoutId)
-        console.log(`Resend response for ${email}: ${res.status}`)
-        emailResults.push({ email, ok: res.ok, status: res.status })
+
+        const resData = await res.json().catch(() => ({}));
+        console.log(`Resend response for ${email}: ${res.status}`, resData)
+
+        if (!res.ok) {
+          emailResults.push({ email, ok: false, status: res.status, error: resData.message || 'Errore sconosciuto da Resend' })
+        } else {
+          emailResults.push({ email, ok: true, status: res.status })
+        }
       } catch (err: any) {
         console.error(`Error sending to ${email}: ${err.message}`)
         emailResults.push({ email, ok: false, error: err.message })
@@ -140,7 +158,7 @@ serve(async (req) => {
       success: true,
       count,
       emailResults,
-      version: '2.4'
+      version: '2.5'
     }), {
       status: 200,
       headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
@@ -148,7 +166,7 @@ serve(async (req) => {
 
   } catch (err: any) {
     console.error(`Global error: ${err.message}`)
-    return new Response(JSON.stringify({ error: err.message }), {
+    return new Response(JSON.stringify({ error: `Errore globale: ${err.message}` }), {
       status: 500,
       headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
     })
