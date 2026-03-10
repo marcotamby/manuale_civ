@@ -82,7 +82,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       setIsSendingEmail(true);
       setToast({ isVisible: false, message: '', type: 'success' });
 
-      const { data: result, error: invokeError } = await supabase.functions.invoke('batch-send-notifications', {
+      const { error: invokeError } = await supabase.functions.invoke('batch-send-notifications', {
         body: {}
       });
 
