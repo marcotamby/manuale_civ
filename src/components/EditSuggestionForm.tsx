@@ -60,7 +60,6 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
         source: source || null,
         user_name: user?.name || null,
         user_email: user?.email || null,
-        user_rank: user?.rank || null,
       });
 
       if (error) throw error;

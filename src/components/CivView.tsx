@@ -273,7 +273,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 {civ.buildOrders.map((bo) => {
                   const isExpanded = expandedBOs.has(bo.id);
                   return (
-                    <div key={bo.id} className={`glass p-6 rounded-2xl border border-white/5 transition-all group h-fit ${isExpanded ? 'md:col-span-2' : ''}`}>
+                    <div key={bo.id} className={`glass p-6 rounded-2xl border border-white/5 transition-all group h-fit`}>
                       <div className="flex justify-between items-start mb-4">
                         <h3 className="text-xl font-bold text-white group-hover:text-yellow-400 transition-colors">{bo.title}</h3>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${bo.difficulty === 'Easy' ? 'text-green-400 border-green-400/30' :

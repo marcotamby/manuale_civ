@@ -9,27 +9,27 @@ interface ResourceMapping {
 const RESOURCES: ResourceMapping[] = [
     {
         keywords: ['cibo', 'food', 'carne'],
-        icon: 'https://aoe4world.com/images/resources/food.png',
+        icon: 'https://static.aoe4world.com/vite/assets/food-532c79c4.png',
         color: 'text-red-400'
     },
     {
         keywords: ['legno', 'wood'],
-        icon: 'https://aoe4world.com/images/resources/wood.png',
+        icon: 'https://static.aoe4world.com/vite/assets/wood-9297bc89.png',
         color: 'text-green-400'
     },
     {
         keywords: ['oro', 'gold'],
-        icon: 'https://aoe4world.com/images/resources/gold.png',
+        icon: 'https://static.aoe4world.com/vite/assets/gold-5ea2b4ea.png',
         color: 'text-yellow-400'
     },
     {
         keywords: ['pietra', 'stone'],
-        icon: 'https://aoe4world.com/images/resources/stone.png',
+        icon: 'https://static.aoe4world.com/vite/assets/stone-16121279.png',
         color: 'text-gray-300'
     },
     {
         keywords: ['olio', 'oil', 'olive oil'],
-        icon: 'https://aoe4world.com/images/resources/olive_oil.png',
+        icon: 'https://static.aoe4world.com/vite/assets/oliveoil-3fd54576.png',
         color: 'text-yellow-600'
     }
 ];
