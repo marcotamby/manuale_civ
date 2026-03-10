@@ -23,11 +23,11 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
   });
 
   // Build Order structured state
-  const [boSteps, setBoSteps] = useState<{ time: string; action: string; notes: string }[]>([
-    { time: '', action: '', notes: '' }
+  const [boSteps, setBoSteps] = useState<{ time: string; action: string; note: string }[]>([
+    { time: '', action: '', note: '' }
   ]);
 
-  const addStep = () => setBoSteps([...boSteps, { time: '', action: '', notes: '' }]);
+  const addStep = () => setBoSteps([...boSteps, { time: '', action: '', note: '' }]);
   const removeStep = (index: number) => setBoSteps(boSteps.filter((_, i) => i !== index));
   const updateStep = (index: number, field: string, value: string) => {
     const newSteps = [...boSteps];
@@ -49,7 +49,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
       if (section === 'build_order') {
         finalSuggestion = "BUILD ORDER STRUTTURATO:\n\n" + boSteps
           .filter(s => s.action.trim() !== '')
-          .map(s => `${s.time ? `[${s.time}] ` : ''}${s.action}${s.notes ? `\n   Note: ${s.notes}` : ''}`)
+          .map(s => `${s.time ? `[${s.time}] ` : ''}${s.action}${s.note ? `\n   Note: ${s.note}` : ''}`)
           .join('\n\n');
       }
 
@@ -205,8 +205,8 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                         <input
                           type="text"
                           placeholder="Note extra o consigli..."
-                          value={step.notes}
-                          onChange={(e) => updateStep(index, 'notes', e.target.value)}
+                          value={step.note}
+                          onChange={(e) => updateStep(index, 'note', e.target.value)}
                           className="w-full bg-black/40 border border-gray-700 rounded-lg pl-8 pr-3 py-2 text-[11px] text-gray-300 focus:border-blue-500 outline-none"
                         />
                       </div>

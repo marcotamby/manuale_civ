@@ -9,7 +9,8 @@ import { EditSuggestionForm } from './EditSuggestionForm';
 import { AdminCivEditorModal } from './AdminCivEditorModal';
 import { useAuth } from './AuthContext';
 import type { Civilization } from '../data/aoe4Data';
-import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight } from 'lucide-react';
+import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight, Clock } from 'lucide-react';
+import { ResourceText } from './ResourceText';
 type Tab = 'caratteristiche' | 'units' | 'buildorders' | 'matchups' | 'video' | 'proponi' | 'admin-edit';
 
 // Initial data is now handled in Supabase database
@@ -21,14 +22,14 @@ interface CivViewProps {
 
 export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const { civilizations: civilizationsData, refreshCivs } = useCivData();
-  
+
   const { tab } = useParams<{ tab?: string }>();
   const navigate = useNavigate();
 
   const validTabs: Tab[] = ['caratteristiche', 'units', 'buildorders', 'matchups', 'video', 'proponi', 'admin-edit'];
   const activeTab: Tab = (validTabs.includes(tab as Tab)) ? (tab as Tab) : 'caratteristiche';
-  const [activeAge, setActiveAge] = useState<1|2|3|4>(() => {
-    return (Number(sessionStorage.getItem('activeAge')) as 1|2|3|4) || 1;
+  const [activeAge, setActiveAge] = useState<1 | 2 | 3 | 4>(() => {
+    return (Number(sessionStorage.getItem('activeAge')) as 1 | 2 | 3 | 4) || 1;
   });
   const [unitView, setUnitView] = useState<'units' | 'techtree'>(() => {
     return (sessionStorage.getItem('unitView') as 'units' | 'techtree') || 'units';
@@ -36,14 +37,14 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
   // No longer needed here as handlers deal with it
   // useEffect would be better but handlers are already syncing to sessionStorage
-  
+
   // Update whenever they change
   const handleTabChange = (newTab: Tab) => {
     navigate(`/civ/${civId}/${newTab}`);
   };
 
   const handleAgeChange = (age: number) => {
-    setActiveAge(age as 1|2|3|4);
+    setActiveAge(age as 1 | 2 | 3 | 4);
     sessionStorage.setItem('activeAge', age.toString());
   };
 
@@ -54,7 +55,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const [localCivs, setLocalCivs] = useState<Record<string, Civilization>>({});
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const { isAdmin } = useAuth();
-  
+
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
@@ -93,8 +94,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           <img src={civ.flag} alt="" className="w-full h-full object-cover blur-2xl scale-150" />
         </div>
         <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-6">
-          <img 
-            src={civ.flag} 
+          <img
+            src={civ.flag}
             alt={civ.name}
             className="w-24 h-24 object-contain drop-shadow-[0_0_20px_rgba(212,175,55,0.3)] shrink-0"
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -104,11 +105,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">
                 {civ.name}
               </h1>
-              <span className={`text-xs font-bold px-3 py-1 rounded-full border ${
-                civ.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/10' :
+              <span className={`text-xs font-bold px-3 py-1 rounded-full border ${civ.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/10' :
                 civ.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-500/40 bg-yellow-500/10' :
-                'text-red-400 border-red-500/40 bg-red-500/10'
-              }`}>
+                  'text-red-400 border-red-500/40 bg-red-500/10'
+                }`}>
                 {civ.difficulty}
               </span>
               {isAdmin && (
@@ -116,7 +116,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">
                     Admin
                   </span>
-                  <button 
+                  <button
                     onClick={() => setIsEditorOpen(true)}
                     className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold rounded flex items-center gap-1 transition-all active:scale-95"
                   >
@@ -131,7 +131,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       </div>
 
       <div className="relative sticky top-0 bg-[var(--color-brand-dark)] z-10 border-b border-[#D4AF37]/15 w-full">
-        <div 
+        <div
           ref={scrollContainerRef}
           onScroll={checkScroll}
           className="px-4 overflow-x-auto flex flex-nowrap gap-0 relative w-full no-scrollbar"
@@ -140,18 +140,17 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
-              className={`flex items-center gap-2 px-5 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                activeTab === tab.id
-                  ? 'border-yellow-500 text-yellow-400'
-                  : 'border-transparent text-gray-400 hover:text-gray-200'
-              }`}
+              className={`flex items-center gap-2 px-5 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.id
+                ? 'border-yellow-500 text-yellow-400'
+                : 'border-transparent text-gray-400 hover:text-gray-200'
+                }`}
             >
               {tab.icon}
               {tab.label}
             </button>
           ))}
         </div>
-        
+
         {/* Mobile Scroll Indicator */}
         {canScrollRight && (
           <div className="md:hidden absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[var(--color-brand-dark)] to-transparent pointer-events-none flex items-center justify-end pr-2">
@@ -173,9 +172,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {civ.passiveBonuses.map((bonus, idx) => (
-                  <div key={idx} className="flex items-start gap-3 glass p-4 rounded-xl border border-white/5 hover:border-yellow-500/30 transition-colors">
+                  <div key={idx} className="flex items-start gap-3 glass p-4 rounded-xl border border-white/5 hover:border-yellow-500/30 transition-colors text-sm text-gray-300 leading-relaxed">
                     <Zap size={18} className="text-yellow-500 mt-1 shrink-0" />
-                    <p className="text-sm text-gray-300 leading-relaxed">{bonus}</p>
+                    <ResourceText text={bonus} />
                   </div>
                 ))}
               </div>
@@ -242,11 +241,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 {[1, 2, 3, 4].map((age) => (
                   <button
                     key={age}
-                    className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 ${
-                      activeAge === age
-                        ? 'bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] scale-105'
-                        : 'text-gray-400 hover:text-white hover:bg-white/5'
-                    }`}
+                    className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 ${activeAge === age
+                      ? 'bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] scale-105'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      }`}
                     onClick={() => handleAgeChange(age)}
                   >
                     Age {"I II III IV".split(" ")[age - 1]}
@@ -299,28 +297,35 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   <div key={bo.id} className="glass p-6 rounded-2xl border border-white/5 hover:border-yellow-500/30 transition-all group">
                     <div className="flex justify-between items-start mb-4">
                       <h3 className="text-xl font-bold text-white group-hover:text-yellow-400 transition-colors">{bo.title}</h3>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                        bo.difficulty === 'Easy' ? 'text-green-400 border-green-400/30' : 
-                        bo.difficulty === 'Medium' ? 'text-yellow-400 border-yellow-400/30' : 
-                        'text-red-400 border-red-400/30'
-                      }`}>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${bo.difficulty === 'Easy' ? 'text-green-400 border-green-400/30' :
+                        bo.difficulty === 'Medium' ? 'text-yellow-400 border-yellow-400/30' :
+                          'text-red-400 border-red-400/30'
+                        }`}>
                         {bo.difficulty}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-400 mb-6 line-clamp-2">{bo.description}</p>
-                    
-                    <div className="space-y-3">
-                      {bo.steps.slice(0, 3).map((step, sIdx) => (
-                        <div key={sIdx} className="flex gap-3 text-xs leading-relaxed">
-                          {step.time && (
-                            <span className="text-yellow-500 font-mono w-10 shrink-0 font-bold">{step.time}</span>
+                    <div className="text-sm text-gray-400 mb-6 line-clamp-2">
+                      <ResourceText text={bo.description} />
+                    </div>
+
+                    <div className="space-y-4">
+                      {bo.steps.map((step, sIdx) => (
+                        <div key={sIdx} className="flex flex-col gap-1">
+                          <div className="flex gap-3 text-[13px] leading-relaxed">
+                            {step.time && (
+                              <span className="text-yellow-500 font-mono w-10 shrink-0 font-bold flex items-center gap-1">
+                                <Clock size={10} /> {step.time}
+                              </span>
+                            )}
+                            <ResourceText text={step.action} className="text-gray-200 font-medium" />
+                          </div>
+                          {step.note && (
+                            <div className="ml-13 pl-3 border-l border-white/10">
+                              <ResourceText text={step.note} className="text-[11px] text-gray-500 italic" />
+                            </div>
                           )}
-                          <span className="text-gray-300">{step.action}</span>
                         </div>
                       ))}
-                      {bo.steps.length > 3 && (
-                        <p className="text-[10px] text-gray-500 italic mt-2">+ altri {bo.steps.length - 3} passaggi...</p>
-                      )}
                     </div>
                   </div>
                 ))}
@@ -332,7 +337,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Build Orders in arrivo</h3>
                 <p className="text-sm text-gray-500 max-w-sm">I build order per questa civiltà saranno aggiunti presto dai contributori della community.</p>
-                <button 
+                <button
                   onClick={() => handleTabChange('proponi')}
                   className="mt-6 px-8 py-3 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/30 rounded-xl text-sm text-yellow-500 font-bold transition-all"
                 >
@@ -368,10 +373,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 </h2>
                 <p className="text-gray-400 mt-1">Tutorial e partite commentate da <span className="text-red-500 font-bold">marcotamby_aoe</span>.</p>
               </div>
-              
-              <a 
-                href="https://www.youtube.com/@marcotamby_aoe" 
-                target="_blank" 
+
+              <a
+                href="https://www.youtube.com/@marcotamby_aoe"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-6 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-[11px] uppercase tracking-wider font-extrabold transition-all shadow-lg shadow-red-600/20 hover:scale-105 active:scale-95 self-start md:self-center"
               >
@@ -379,7 +384,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 VISITA IL CANALE YOUTUBE
               </a>
             </div>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
               {civ.videos && civ.videos.length > 0 ? (
                 civ.videos.map((vidId, index) => {
@@ -391,18 +396,18 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                       const url = new URL(vidIdTrim);
                       finalId = url.searchParams.get('v') || url.pathname.slice(1) || vidIdTrim;
                     }
-                  } catch(e) {}
-                  
+                  } catch (e) { }
+
                   return (
                     <div key={`${finalId}-${index}`} className="flex flex-col h-full">
-                      <a 
+                      <a
                         href={`https://www.youtube.com/watch?v=${finalId}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="group relative block aspect-video w-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black transition-transform hover:scale-105 hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]"
                       >
-                        <img 
-                          src={`https://img.youtube.com/vi/${finalId}/maxresdefault.jpg`} 
+                        <img
+                          src={`https://img.youtube.com/vi/${finalId}/maxresdefault.jpg`}
                           alt="Video Thumbnail"
                           className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
                           onLoad={(e) => {
@@ -459,7 +464,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       </div>
 
       {civ && isAdmin && (
-        <AdminCivEditorModal 
+        <AdminCivEditorModal
           civ={civ}
           isOpen={isEditorOpen}
           onClose={() => setIsEditorOpen(false)}
