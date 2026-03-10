@@ -41,8 +41,8 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
 
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full bg-[var(--color-brand-dark)]">
-      <header className="mb-6 flex flex-row items-center justify-between gap-2 pb-2">
-        <div className="flex-1 w-full flex flex-row flex-nowrap items-center justify-end gap-2">
+      <header className="mb-6 flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-3 pb-2">
+        <div className="flex-1 flex flex-row items-center justify-end gap-1.5 md:gap-2 overflow-x-auto no-scrollbar pb-1 xs:pb-0">
           <div className="flex items-center glass p-1 rounded-xl h-[42px]">
             <button
               onClick={() => setIsCompareMode(!isCompareMode)}
@@ -57,9 +57,9 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
             {isCompareMode && selectedForCompare.length === 2 && (
               <button
                 onClick={handleStartCompare}
-                className="animate-in fade-in zoom-in duration-300 flex items-center gap-2 px-4 h-full bg-yellow-600/80 text-white font-bold rounded-lg shadow-lg border border-yellow-500/50 hover:bg-yellow-500 transition-all text-sm ml-1"
+                className="animate-in fade-in zoom-in duration-300 flex items-center gap-2 px-4 h-full bg-green-600 text-white font-bold rounded-lg shadow-[0_0_15px_rgba(22,163,74,0.4)] border border-green-400/50 hover:bg-green-500 transition-all text-sm ml-1"
               >
-                Vai ({selectedForCompare.length})
+                Ok ({selectedForCompare.length})
               </button>
             )}
           </div>
@@ -154,12 +154,12 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                     }
                     toggleFavorite(civ.id);
                   }}
-                  className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md border transition-all duration-300 hover:scale-125 ${isFavorite
+                  className={`absolute top-2 right-2 p-1.5 rounded-full backdrop-blur-md border transition-all duration-300 hover:scale-125 ${isFavorite
                     ? 'bg-red-500 text-white border-red-400 shadow-[0_0_15px_rgba(239,68,68,0.5)]'
                     : 'bg-black/60 text-gray-400 border-white/10 hover:text-red-400 hover:border-red-400/50'
                     }`}
                 >
-                  <Heart className="w-3.5 h-3.5 md:w-4 md:h-4" fill={isFavorite ? "currentColor" : "none"} />
+                  <Heart className="w-3 h-3 md:w-4 md:h-4" fill={isFavorite ? "currentColor" : "none"} />
                 </button>
               )}
 

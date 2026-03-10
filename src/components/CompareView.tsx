@@ -44,11 +44,10 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
                 <img src={civ!.flag} alt={civ!.name} className="w-12 h-12 md:w-20 md:h-20 object-contain drop-shadow-2xl" />
                 <div>
                   <h2 className="text-lg md:text-3xl font-bold text-white mb-1 md:mb-2">{civ!.name}</h2>
-                  <span className={`text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full border ${
-                    civ!.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/10' :
-                    civ!.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-500/40 bg-yellow-500/10' :
-                    'text-red-400 border-red-500/40 bg-red-500/10'
-                  }`}>
+                  <span className={`text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full border ${civ!.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/10' :
+                      civ!.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-500/40 bg-yellow-500/10' :
+                        'text-red-400 border-red-500/40 bg-red-500/10'
+                    }`}>
                     {civ!.difficulty}
                   </span>
                 </div>
@@ -88,12 +87,14 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
                 </h3>
                 <div className="grid grid-cols-1 gap-3">
                   {civ!.uniqueUnits.map(unit => (
-                    <div key={unit.id} className="glass p-4 rounded-xl border border-white/5 flex items-center justify-between">
-                      <div>
-                        <span className="text-white font-bold block">{unit.name}</span>
-                        <span className="text-[10px] text-gray-500 uppercase">{unit.type} • Age {unit.age}</span>
+                    <div key={unit.id} className="glass p-4 rounded-xl border border-white/5 space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <span className="text-white font-bold block">{unit.name}</span>
+                          <span className="text-[10px] text-gray-400 uppercase tracking-wider">{unit.type} • Age {unit.age}</span>
+                        </div>
                       </div>
-                      <div className="text-xs text-gray-400 max-w-[60%] text-right italic">
+                      <div className="text-[13px] text-gray-300 leading-relaxed">
                         {unit.description}
                       </div>
                     </div>
