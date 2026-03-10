@@ -80,40 +80,42 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     
     try {
       setIsSendingEmail(true);
-      const { data, error } = await supabase.functions.invoke('batch-send-notifications');
+      setToast({ isVisible: false, message: '', type: 'info' });
+      
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const functionUrl = `${supabaseUrl}/functions/v1/batch-send-notifications`;
 
-      if (error) {
-        console.error('Invocation error:', error);
-        throw error;
+      console.log('[DEBUG v2.2] Calling Edge Function:', functionUrl);
+      
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseKey}`
+        },
+        body: JSON.stringify({})
+      });
+
+      const result = await response.json();
+      console.log('[DEBUG v2.2] Response Status:', response.status, result);
+
+      if (!response.ok) {
+        throw new Error(result.error || result.message || `HTTP ${response.status}`);
       }
-
-      console.log('Notifications result:', data);
 
       setToast({
         isVisible: true,
-        message: `Inviate ${pendingNotifCount} notifiche con successo!`,
+        message: 'Notifiche inviate con successo! 🎉',
         type: 'success'
       });
       setPendingNotifCount(0);
     } catch (err: any) {
-      console.error('Full notification error (DEBUG v2.1):', err);
-      let errorMsg = 'Errore sconosciuto';
+      console.error('Full notification error (DEBUG v2.2):', err);
       
-      if (err.context && typeof err.context.json === 'function') {
-        try {
-          const body = await err.context.json();
-          console.log('Server Error Body (DEBUG v2.1):', body);
-          errorMsg = body.error || body.message || JSON.stringify(body);
-        } catch (e) {
-          errorMsg = err.message || errorMsg;
-        }
-      } else {
-        errorMsg = err.message || errorMsg;
-      }
-
       setToast({
         isVisible: true,
-        message: `[DEBUG v2.1] Errore: ${errorMsg}. Controlla l'email.`,
+        message: `[DEBUG v2.2] Errore: ${err.message}. Controlla l'email.`,
         type: 'error'
       });
     } finally {
