@@ -80,9 +80,14 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     
     try {
       setIsSendingEmail(true);
-      const { error } = await supabase.functions.invoke('batch-send-notifications');
+      const { data, error } = await supabase.functions.invoke('batch-send-notifications');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Invocation error:', error);
+        throw error;
+      }
+
+      console.log('Notifications result:', data);
 
       setToast({
         isVisible: true,
@@ -91,10 +96,10 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       });
       setPendingNotifCount(0);
     } catch (err: any) {
-      console.error('Error sending notifications:', err);
+      console.error('Full notification error:', err);
       setToast({
         isVisible: true,
-        message: `Errore nell'invio: ${err.message}`,
+        message: `Problema di comunicazione, ma controlla l'email: potrebbe essere partita comunque!`,
         type: 'error'
       });
     } finally {

@@ -53,16 +53,21 @@ serve(async (req) => {
     })
 
     console.log(`Grouped into ${Object.keys(groups).length} email distinct users.`)
-    const results = []
+    console.log(`Grouped into ${Object.keys(groups).length} email distinct users.`)
 
-    // 3. Send email for each group
-    for (const [email, userSuggestions] of Object.entries(groups)) {
-      console.log(`Processing notifications for ${email}...`)
+    // 3. Send emails in parallel
+    const emailPromises = Object.entries(groups).map(async ([email, userSuggestions]) => {
+      console.log(`Preparing notifications for ${email}...`)
       const approved = userSuggestions.filter(s => s.status === 'implemented')
       const rejected = userSuggestions.filter(s => s.status === 'rejected')
 
+      // Get user name from the first suggestion (they should be consistent)
+      const fullName = userSuggestions[0]?.user_name || ''
+      const firstName = fullName.split(' ')[0]
+      const greeting = firstName ? `Ciao ${firstName}` : 'Ciao'
+
       let html = `<h1>Aggiornamento sulle tue proposte - Manuale Civ</h1>`
-      html += `<p>Ciao,</p><p>Abbiamo revisionato i tuoi recenti contributi. Ecco il riepilogo:</p>`
+      html += `<p>${greeting},</p><p>Abbiamo revisionato i tuoi recenti contributi. Ecco il riepilogo:</p>`
 
       if (approved.length > 0) {
         html += `<h3>✅ Proposte Approvate:</h3><ul>`
@@ -85,24 +90,30 @@ serve(async (req) => {
       html += `<p>Grazie per il tuo supporto!</p>`
 
       console.log(`Sending email via Resend to ${email}...`)
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${RESEND_API_KEY}`
-        },
-        body: JSON.stringify({
-          from: 'Manuale Civ <noreply@resend.dev>',
-          to: [email],
-          subject: `Riepilogo aggiornamenti proposte - Manuale Civ`,
-          html,
+      try {
+        const res = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${RESEND_API_KEY}`
+          },
+          body: JSON.stringify({
+            from: 'Manuale Civ <noreply@resend.dev>',
+            to: [email],
+            subject: `Riepilogo aggiornamenti proposte - Manuale Civ`,
+            html,
+          })
         })
-      })
-      
-      const resData = await res.json().catch(() => ({}))
-      console.log(`Resend response for ${email}:`, { status: res.status, ok: res.ok, data: resData })
-      results.push({ email, success: res.ok, resendData: resData })
-    }
+        const resData = await res.json().catch(() => ({}))
+        console.log(`Resend response for ${email}:`, { status: res.status, ok: res.ok })
+        return { email, success: res.ok, status: res.status }
+      } catch (err: any) {
+        console.error(`Error sending to ${email}:`, err.message)
+        return { email, success: false, error: err.message }
+      }
+    })
+
+    const results = await Promise.all(emailPromises)
 
     // 4. Mark as notified
     console.log('Marking suggestions as notified in DB...')
@@ -115,7 +126,7 @@ serve(async (req) => {
     if (updateError) {
       console.error('Update notified error:', updateError)
     } else {
-      console.log('Successfully updated notified status.')
+      console.log('Successfully updated notified status in DB.')
     }
 
     return new Response(JSON.stringify({ results }), { 
