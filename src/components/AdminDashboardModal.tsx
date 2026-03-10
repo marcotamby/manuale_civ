@@ -80,7 +80,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     
     try {
       setIsSendingEmail(true);
-      setToast({ isVisible: false, message: '', type: 'info' });
+      setToast({ isVisible: false, message: '', type: 'success' });
       
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
