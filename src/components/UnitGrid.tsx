@@ -44,7 +44,7 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
             {filteredLandmarks.map(landmark => {
               const baseId = landmark.imageId || landmark.id;
               
-              const getLandmarkUrl = (id: string, age: number) => {
+              const getLandmarkUrl = (id: string) => {
                 if (id.startsWith('http')) return id;
                 return `https://data.aoe4world.com/images/buildings/${id}.png`;
               };
