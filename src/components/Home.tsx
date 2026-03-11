@@ -54,7 +54,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full bg-[var(--color-brand-dark)]">
       <header className="mb-6 flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-3 pb-2">
-        <div className="flex-1 flex flex-row items-center justify-start xs:justify-end gap-1 md:gap-2 overflow-x-auto no-scrollbar pb-1 xs:pb-0">
+        <div className="flex-1 flex flex-row items-center justify-start xs:justify-end gap-1 md:gap-2 pb-1 xs:pb-0">
           <div className="flex items-center glass p-1 rounded-xl h-[42px]">
             <button
               onClick={() => setIsCompareMode(!isCompareMode)}
