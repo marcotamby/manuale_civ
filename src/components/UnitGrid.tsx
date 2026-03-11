@@ -49,7 +49,7 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
                 return `https://data.aoe4world.com/images/buildings/${id}.png`;
               };
 
-              const imgUrl = getLandmarkUrl(baseId, landmark.age);
+              const imgUrl = getLandmarkUrl(baseId);
               
               return (
               <div key={landmark.id} className="glass p-4 md:p-5 rounded-2xl border-t-2 border-t-yellow-500/50 hover:glass-hover transition-all group flex flex-col md:flex-row gap-4 items-center">
