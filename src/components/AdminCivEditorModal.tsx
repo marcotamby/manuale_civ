@@ -441,15 +441,8 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                       </div>
                       {/* Steps (Structured handling) */}
                       <div className="mt-4 space-y-3">
-                        <div className="flex justify-between items-center mb-1">
+                        <div className="flex items-center mb-1">
                           <label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Passaggi Strategia</label>
-                          <button
-                            type="button"
-                            onClick={() => updateArrayField('buildOrders', idx, 'addStep', null)}
-                            className="flex items-center gap-1 text-[10px] bg-blue-600/20 text-blue-400 px-2 py-1 rounded border border-blue-500/30 hover:bg-blue-600/40 transition-all font-bold"
-                          >
-                            <Plus size={10} /> Aggiungi Step
-                          </button>
                         </div>
 
                         <div className="space-y-2">
@@ -464,29 +457,28 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
 
                               <div className="grid grid-cols-12 gap-2">
                                 <div className="col-span-3">
-                                  <div className="relative">
-                                    <Clock size={10} className="absolute left-2 top-2.5 text-gray-500" />
+                                  <div className="relative flex items-center">
+                                    <Clock size={10} className="absolute left-2 text-gray-500" />
                                     <input
                                       type="text"
-                                      placeholder="Min:Sec"
+                                      placeholder="00:00"
                                       value={step.time || ''}
                                       onChange={(e) => updateArrayField('buildOrders', idx, 'updateStep', { stepIndex: sIdx, stepField: 'time', stepValue: e.target.value })}
-                                      className="w-full bg-gray-900 border border-gray-700/50 rounded pl-7 pr-1 py-2 text-base text-yellow-300 focus:border-blue-500 outline-none font-mono"
+                                      className="w-full bg-gray-900 border border-gray-700/50 rounded pl-7 pr-1 py-2 text-sm text-yellow-300 focus:border-blue-500 outline-none font-mono"
                                     />
                                   </div>
                                 </div>
                                 <div className="col-span-9">
-                                  <input
-                                    type="text"
+                                  <textarea
                                     placeholder="Azione..."
                                     value={step.action || ''}
                                     onChange={(e) => updateArrayField('buildOrders', idx, 'updateStep', { stepIndex: sIdx, stepField: 'action', stepValue: e.target.value })}
-                                    className="w-full bg-gray-900 border border-gray-700/50 rounded px-2 py-2 text-lg text-white focus:border-blue-500 outline-none font-bold"
+                                    rows={1}
+                                    className="w-full bg-gray-900 border border-gray-700/50 rounded px-2 py-2 text-sm text-white focus:border-blue-500 outline-none font-bold resize-y"
                                   />
                                 </div>
                                 <div className="col-span-12">
                                   <div className="relative">
-                                    <FileText size={14} className="absolute left-2 top-3 text-gray-500" />
                                     <textarea
                                       value={step.note || ''}
                                       onChange={e => {
@@ -495,8 +487,9 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                                         updateArrayField('buildOrders', idx, 'steps', newSteps);
                                       }}
                                       placeholder="Note passaggi..."
-                                      className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-[11px] text-gray-400 italic h-16 resize-none"
+                                      className="w-full bg-gray-900 border border-gray-700 rounded px-2 pt-1 pb-6 text-[11px] text-gray-400 italic h-16 resize-y"
                                     />
+                                    <FileText size={12} className="absolute left-2 bottom-2 text-gray-600" />
                                   </div>
                                 </div>
                               </div>
@@ -507,6 +500,13 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                             <p className="text-[10px] text-gray-500 italic text-center py-2 border border-dashed border-gray-700 rounded">Nessun passaggio definito</p>
                           )}
                         </div>
+                        <button
+                          type="button"
+                          onClick={() => updateArrayField('buildOrders', idx, 'addStep', null)}
+                          className="mt-2 flex items-center gap-1 text-[10px] bg-blue-600/20 text-blue-400 px-2 py-1 rounded border border-blue-500/30 hover:bg-blue-600/40 transition-all font-bold"
+                        >
+                          <Plus size={10} /> Aggiungi Step
+                        </button>
                       </div>
                     </div>
                   ))}

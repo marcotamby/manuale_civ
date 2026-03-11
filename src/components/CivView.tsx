@@ -274,12 +274,13 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   return (
                     <div
                       key={bo.id}
-                      className={`glass p-6 md:p-8 rounded-2xl border border-white/5 transition-all group h-fit cursor-pointer hover:border-yellow-500/30 ${isExpanded ? 'bg-white/[0.02]' : ''}`}
+                      className={`glass p-6 md:p-8 rounded-2xl border border-white/5 transition-all group h-fit hover:border-yellow-500/30 ${isExpanded ? 'bg-white/[0.02]' : 'cursor-pointer'}`}
                       onClick={() => {
-                        const newExpanded = new Set(expandedBOs);
-                        if (isExpanded) newExpanded.delete(bo.id);
-                        else newExpanded.add(bo.id);
-                        setExpandedBOs(newExpanded);
+                        if (!isExpanded) {
+                          const newExpanded = new Set(expandedBOs);
+                          newExpanded.add(bo.id);
+                          setExpandedBOs(newExpanded);
+                        }
                       }}
                     >
                       <div className="flex justify-between items-start mb-3">
