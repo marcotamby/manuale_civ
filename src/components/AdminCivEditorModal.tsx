@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, X, Loader2, Play, Map, Plus, Trash2, CheckCircle, Clock, FileText } from 'lucide-react';
+import { Save, X, Loader2, Play, Map, Plus, Trash2, CheckCircle, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { YouTubePickerModal } from './YouTubePickerModal';
 import { Toast } from './Toast';
@@ -441,10 +441,9 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                                         newSteps[sIdx].note = e.target.value;
                                         updateArrayField('buildOrders', idx, 'steps', newSteps);
                                       }}
-                                      placeholder="Note passaggi..."
-                                      className="w-full bg-gray-900 border border-gray-700 rounded px-2 pt-1 pb-6 text-[11px] text-gray-400 italic h-16 resize-y"
+                                      placeholder="Note aggiuntive..."
+                                      className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-2 text-[11px] text-gray-400 italic h-16 resize-y"
                                     />
-                                    <FileText size={12} className="absolute left-2 bottom-2 text-gray-600" />
                                   </div>
                                 </div>
                               </div>
