@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
-import { Trash2, Plus, User } from 'lucide-react';
+import { Trash2, Plus, User, CheckCircle } from 'lucide-react';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
 
@@ -18,6 +18,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
   const [description, setDescription] = useState(''); // For build order description
   const [text, setText] = useState(''); // For general suggestion text
   const [source, setSource] = useState(''); // For general source or build order source
+  const [isSigned, setIsSigned] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
     isVisible: false,
@@ -52,6 +53,15 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
       return;
     }
 
+    if (section === 'build_order' && isSigned && !user?.nickname) {
+      setToast({
+        isVisible: true,
+        message: 'Completa le informazioni nel tuo profilo per firmare un build order',
+        type: 'error'
+      });
+      return;
+    }
+
     try {
       setIsSubmitting(true);
 
@@ -77,8 +87,8 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
             suggestion_text: submissionText,
             user_name: user?.name || 'Anonimo',
             user_email: user?.email || '',
-            user_rank: user?.rank || 'Unranked',
-            user_nickname: user?.nickname || '',
+            user_rank: (section === 'build_order' && isSigned) ? (user?.rank || 'Unranked') : '',
+            user_nickname: (section === 'build_order' && isSigned) ? (user?.nickname || '') : '',
             status: 'pending'
           }
         ]);
@@ -97,6 +107,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
       setDescription('');
       setSource('');
       setBoSteps([{ time: '', action: '', note: '' }]); // Reset build order steps
+      setIsSigned(false);
     } catch (err: any) {
       console.error('Error submitting suggestion:', err);
       setToast({
@@ -252,6 +263,35 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                 <Plus size={16} />
                 Aggiungi Passaggio
               </button>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <div 
+                className="flex items-center gap-2 cursor-pointer group"
+                onClick={() => {
+                  if (!user?.nickname) {
+                    setToast({
+                      isVisible: true,
+                      message: 'Completa le informazioni nel tuo profilo per firmare un build order',
+                      type: 'error'
+                    });
+                  } else {
+                    setIsSigned(!isSigned);
+                  }
+                }}
+              >
+                <div className={`w-5 h-5 rounded border transition-all flex items-center justify-center ${
+                  isSigned 
+                    ? 'bg-yellow-500 border-yellow-500' 
+                    : 'border-gray-600 bg-black/40 group-hover:border-yellow-500/50'
+                }`}>
+                  {isSigned && <CheckCircle size={14} className="text-black" />}
+                </div>
+                <span className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors">Firmati</span>
+              </div>
+              {!user?.nickname && (
+                <span className="text-[10px] text-gray-500 italic">Completa il profilo per firmare</span>
+              )}
             </div>
           </div>
         )}

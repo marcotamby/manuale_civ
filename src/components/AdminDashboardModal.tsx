@@ -182,8 +182,8 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
               difficulty: 'Medium',
               steps: editedData.steps,
               source: editedData.source,
-              author_nickname: sugg.user_nickname || sugg.user_name,
-              author_rank: sugg.user_rank
+              author_nickname: sugg.user_nickname || null,
+              author_rank: sugg.user_nickname ? (sugg.user_rank || 'Unranked') : null
             };
             updateData = { build_orders: [...safeArray(currentCiv.build_orders), newBO] };
             break;
