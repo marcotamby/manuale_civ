@@ -134,10 +134,12 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
                     className="w-16 h-16 md:w-20 md:h-20 object-contain z-10 group-hover:scale-110 transition-transform duration-500 relative"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      const customImageId = unit.imageId || unit.id.toLowerCase().replace(/\s+/g, '-');
-                      if (!finalImgUrl.startsWith('http')) {
+                      const isCustomUrl = unit.imageId?.startsWith('http');
+                      const baseId = (unit.imageId || unit.id).toLowerCase().replace(/\s+/g, '-');
+                      
+                      if (!isCustomUrl) {
                         if (!target.src.endsWith('-icon.png') && !target.src.includes('-2.png') && !target.src.includes('-3.png') && !target.src.includes('-4.png')) {
-                           target.src = `https://data.aoe4world.com/images/units/${customImageId}-${unit.age}.png`;
+                           target.src = `https://data.aoe4world.com/images/units/${baseId}-${unit.age}.png`;
                         } else {
                            target.style.opacity = '0';
                         }
