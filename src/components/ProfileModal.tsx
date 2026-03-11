@@ -16,9 +16,9 @@ const RANK_ICONS: Record<string, string> = {
     'Bronze II':   'https://static.aoe4world.com/assets/rank_levels/season_3/solo_bronze_1-a193ea93b70b33ed636f2356854abe66585ef4d901dcef5a5248739970d03ccc.svg',
     'Bronze III':  'https://static.aoe4world.com/assets/rank_levels/season_3/solo_bronze_1-a193ea93b70b33ed636f2356854abe66585ef4d901dcef5a5248739970d03ccc.svg',
     // Silver
-    'Silver I':    'https://static.aoe4world.com/assets/rank_levels/season_3/solo_silver_1-af994caf7a9461b35d33d8263328b152ffb146ef8882118184c5e4e3964c9337.svg',
-    'Silver II':   'https://static.aoe4world.com/assets/rank_levels/season_3/solo_silver_1-af994caf7a9461b35d33d8263328b152ffb146ef8882118184c5e4e3964c9337.svg',
-    'Silver III':  'https://static.aoe4world.com/assets/rank_levels/season_3/solo_silver_1-af994caf7a9461b35d33d8263328b152ffb146ef8882118184c5e4e3964c9337.svg',
+    'Silver I':    'https://static.aoe4world.com/assets/rank_levels/season_3/solo_silver_1-35f0d3f20df4026a3c6569a2c5ba654bec4f75aaad68dc07714c255007bd713c.svg',
+    'Silver II':   'https://static.aoe4world.com/assets/rank_levels/season_3/solo_silver_2-985548b5dd4c500ad7b98aeeb8517bab2ef3d876d4bf80286a40d295943dce98.svg',
+    'Silver III':  'https://static.aoe4world.com/assets/rank_levels/season_3/solo_silver_3-af994caf7a9461b35d33d8263328b152ffb146ef8882118184c5e4e3964c9337.svg',
     // Gold — each has a unique confirmed hash
     'Gold I':   'https://static.aoe4world.com/assets/rank_levels/season_3/solo_gold_1-a42fe36b5df89a42efaf489e6ef10d7c5546fd36a77c5977ce34dca3e822b420.svg',
     'Gold II':  'https://static.aoe4world.com/assets/rank_levels/season_3/solo_gold_2-e1e4843093c7120ad707e9e6ff0f0674e1db471491ef8694b72271dc08478af8.svg',

@@ -18,7 +18,10 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
 
   const filteredCivs = civilizationsData.filter(civ => {
     if (difficultyFilter === 'Preferiti') return favorites.includes(civ.id);
-    return difficultyFilter === 'Tutte' || civ.difficulty === difficultyFilter;
+    if (difficultyFilter === 'Tutte') return true;
+    
+    const civDiff = civ.difficulty?.toString().trim() || '';
+    return civDiff.toLowerCase() === difficultyFilter.toLowerCase();
   });
 
   const handleCardClick = (civId: string) => {
