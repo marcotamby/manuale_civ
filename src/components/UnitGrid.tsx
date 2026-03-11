@@ -1,4 +1,5 @@
-import { civilizationsData, unitsList } from '../data/aoe4Data';
+import { unitsList } from '../data/aoe4Data';
+import { useCivData } from './CivContext';
 import type { Unit } from '../data/aoe4Data';
 import { Shield, Sword } from 'lucide-react';
 
@@ -10,6 +11,7 @@ interface UnitGridProps {
 }
 
 export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
+  const { civilizations: civilizationsData } = useCivData();
   const civ = civilizationsData.find(c => c.id === civId);
 
   // Combine generic units (filtering out excluded ones) and unique units for this civ
