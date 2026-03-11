@@ -370,7 +370,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
               <div className="bg-black/30 border border-yellow-500/30 rounded-xl p-4">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="font-bold text-yellow-400 flex items-center gap-2"><Map size={18} /> Build Orders</h4>
-                  <button onClick={() => addToArray('buildOrders', { id: 'new-buildorder', title: 'Nuovo Build Order', difficulty: 'Medium', description: '', steps: [] })} className="text-xs bg-yellow-600 hover:bg-yellow-500 text-white px-2 py-1 rounded flex items-center gap-1">
+                  <button onClick={() => addToArray('buildOrders', { id: `bo-${Date.now()}`, title: '', difficulty: 'Medium', description: '', steps: [] })} className="text-xs bg-yellow-600 hover:bg-yellow-500 text-white px-2 py-1 rounded flex items-center gap-1">
                     <Plus size={14} /> Aggiungi
                   </button>
                 </div>
