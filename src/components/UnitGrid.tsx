@@ -43,9 +43,13 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filteredLandmarks.map(landmark => {
               const baseId = landmark.imageId || landmark.id;
-              const imgUrl = baseId.startsWith('http') 
-                ? baseId 
-                : `https://data.aoe4world.com/images/buildings/${baseId}.png`;
+              
+              const getLandmarkUrl = (id: string, age: number) => {
+                if (id.startsWith('http')) return id;
+                return `https://data.aoe4world.com/images/buildings/${id}.png`;
+              };
+
+              const imgUrl = getLandmarkUrl(baseId, landmark.age);
               
               return (
               <div key={landmark.id} className="glass p-4 md:p-5 rounded-2xl border-t-2 border-t-yellow-500/50 hover:glass-hover transition-all group flex flex-col md:flex-row gap-4 items-center">
@@ -59,10 +63,12 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
                     className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-500 relative z-10"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      if (!imgUrl.startsWith('http') && !target.src.includes(`-${landmark.age - 1}.png`)) {
-                         target.src = `https://data.aoe4world.com/images/buildings/${baseId}-${landmark.age - 1}.png`;
-                      } else if (!imgUrl.startsWith('http')) {
-                         target.style.opacity = '0';
+                      if (!baseId.startsWith('http')) {
+                        if (!target.src.includes(`-${landmark.age - 1}.png`)) {
+                           target.src = `https://data.aoe4world.com/images/buildings/${baseId}-${landmark.age - 1}.png`;
+                        } else {
+                           target.style.opacity = '0';
+                        }
                       }
                     }}
                   />
@@ -95,11 +101,19 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {filteredUnits.map(unit => {
-              // Priority: 1. imageId (if URL), 2. imageId (as ID), 3. unit.id (default)
-              const baseImgId = unit.imageId || unit.id.toLowerCase().replace(/\s+/g, '-');
-              const finalImgUrl = baseImgId.startsWith('http') 
-                ? baseImgId 
-                : `https://data.aoe4world.com/images/units/${baseImgId}.png`;
+              const getUnitImageUrl = (u: any) => {
+                if (u.imageId && u.imageId.startsWith('http')) return u.imageId;
+                
+                let imgId = (u.imageId || u.id).toLowerCase().replace(/\s+/g, '-');
+                // Specific overrides from original logic
+                if (imgId === "man-at-arms-1") return "https://data.aoe4world.com/images/units/man-at-arms-1.png";
+                if (imgId === "king-2" || imgId === "king") return "https://data.aoe4world.com/images/units/king.png";
+                if (imgId === "longbowman-2") return "https://data.aoe4world.com/images/units/longbowman-2.png";
+                
+                return `https://data.aoe4world.com/images/units/${imgId}.png`;
+              };
+
+              const finalImgUrl = getUnitImageUrl(unit);
               
               return (
               <div 
@@ -120,10 +134,13 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
                     className="w-16 h-16 md:w-20 md:h-20 object-contain z-10 group-hover:scale-110 transition-transform duration-500 relative"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      if (!finalImgUrl.startsWith('http') && !target.src.endsWith('-icon.png') && !target.src.includes('-2.png') && !target.src.includes('-3.png') && !target.src.includes('-4.png')) {
-                         target.src = `https://data.aoe4world.com/images/units/${baseImgId}-${unit.age}.png`;
-                      } else {
-                         target.style.opacity = '0';
+                      const customImageId = unit.imageId || unit.id.toLowerCase().replace(/\s+/g, '-');
+                      if (!finalImgUrl.startsWith('http')) {
+                        if (!target.src.endsWith('-icon.png') && !target.src.includes('-2.png') && !target.src.includes('-3.png') && !target.src.includes('-4.png')) {
+                           target.src = `https://data.aoe4world.com/images/units/${customImageId}-${unit.age}.png`;
+                        } else {
+                           target.style.opacity = '0';
+                        }
                       }
                     }}
                   />
