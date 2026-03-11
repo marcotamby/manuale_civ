@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
-import { Trash2, Plus, User, Info, Globe, ChevronDown } from 'lucide-react';
+import { Trash2, Plus, User } from 'lucide-react';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
 
