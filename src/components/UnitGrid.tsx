@@ -18,7 +18,6 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
 
   const filteredUnits = allUnits.filter(u => u.age <= age);
 
-  const filteredTechs = civ?.technologies.filter(t => t.age <= age) || [];
   
   const filteredLandmarks = civ?.landmarks.filter(l => l.age === age) || [];
 
@@ -166,29 +165,6 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
         )}
       </div>
 
-      <div>
-        <h3 className="text-xl font-semibold mb-6 flex items-center gap-2 text-white/90">
-          <Shield className="text-gray-400" /> Technologies
-        </h3>
-        
-        {filteredTechs.length === 0 ? (
-          <div className="text-center p-12 glass rounded-xl text-gray-500">
-            No unique technologies available in this age.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredTechs.map(tech => (
-              <div key={tech.id} className="glass p-5 rounded-xl border-l-4 border-l-yellow-500">
-                <div className="flex justify-between items-center mb-2">
-                  <h4 className="font-bold text-lg">{tech.name}</h4>
-                  <span className="text-xs bg-gray-800 px-2 py-1 rounded text-gray-400">{tech.building}</span>
-                </div>
-                <p className="text-sm text-gray-400 leading-relaxed">{tech.description}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
       
     </div>
   );
