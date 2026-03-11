@@ -391,7 +391,7 @@ export const civilizationsData: Civilization[] = [
     technologies: [],
     landmarks: [
       { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
-      { id: "imperial-academy", name: "Imperial Academy", age: 2, type: "Economic", description: "Generate Oro dalle Tasse al +100% per gli edifici vicini." },
+      { id: "imperial-academy", name: "Imperial Academy", age: 2, type: "Economic", description: "Genera Oro dalle Tasse al +100% per gli edifici vicini." },
       { id: "barbican-of-the-sun", name: "Barbican of the Sun", age: 2, type: "Defensive", description: "Fortezza con potente cannone a lungo raggio." },
       { id: "astronomical-clocktower", name: "Astronomical Clocktower", age: 3, type: "Military", description: "Produce macchine d'assedio con +50% HP. Include Springald, Trebuchet, Bombarda e Nido delle Api esclusive." },
       { id: "imperial-palace", name: "Imperial Palace", age: 3, type: "Economic", description: "Ampio raggio visivo. Con 'Spie Imperiali' rivela la posizione dei Villici nemici." },
@@ -542,7 +542,9 @@ export const civilizationsData: Civilization[] = [
     passiveBonuses: ["Mobile buildings like the Mongols.", "Increased early economic and military pressure."],
     uniqueUnits: [],
     technologies: [],
-    landmarks: []
+    landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." }
+    ]
   },
   {
     id: "hre",
@@ -639,7 +641,9 @@ export const civilizationsData: Civilization[] = [
     passiveBonuses: ["Enhanced defensive networks.", "Focus on ranged superiority and area denial."],
     uniqueUnits: [],
     technologies: [],
-    landmarks: []
+    landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." }
+    ]
   },
   {
     id: "macedonian",
@@ -650,7 +654,9 @@ export const civilizationsData: Civilization[] = [
     passiveBonuses: ["Specialized infantry formations.", "Unique mercenary contracts."],
     uniqueUnits: [],
     technologies: [],
-    landmarks: []
+    landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." }
+    ]
   },
   {
     id: "malians",
@@ -742,7 +748,9 @@ export const civilizationsData: Civilization[] = [
     passiveBonuses: ["Units are individually much stronger but cost double the resources and population space."],
     uniqueUnits: [],
     technologies: [],
-    landmarks: []
+    landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." }
+    ]
   },
   {
     id: "ottomans",
@@ -826,7 +834,9 @@ export const civilizationsData: Civilization[] = [
     passiveBonuses: ["Aggressive early game melee bonuses.", "Enhanced Daimyo mechanics for military production."],
     uniqueUnits: [],
     technologies: [],
-    landmarks: []
+    landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." }
+    ]
   },
   {
     id: "templar",
@@ -837,7 +847,9 @@ export const civilizationsData: Civilization[] = [
     passiveBonuses: ["Powerful Templar Knights with charge bonuses.", "Monasteries provide unique military upgrades."],
     uniqueUnits: [],
     technologies: [],
-    landmarks: []
+    landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." }
+    ]
   },
   {
     id: "tughlaq",
@@ -848,7 +860,9 @@ export const civilizationsData: Civilization[] = [
     passiveBonuses: ["Earlier access to War Elephants.", "Stronger defensive network integration."],
     uniqueUnits: [],
     technologies: [],
-    landmarks: []
+    landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." }
+    ]
   },
   {
     id: "zhuxi",
