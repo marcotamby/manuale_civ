@@ -1,6 +1,6 @@
 import { civilizationsData, unitsList } from '../data/aoe4Data';
 import type { Unit } from '../data/aoe4Data';
-import { Shield, Sword, Zap } from 'lucide-react';
+import { Shield, Sword } from 'lucide-react';
 
 
 interface UnitGridProps {
