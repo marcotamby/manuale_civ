@@ -24,25 +24,7 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
   return (
     <div className="space-y-10">
       
-      {/* Civilization Header Info */}
-      <div className="glass p-6 rounded-2xl relative overflow-hidden">
-        <div className="absolute right-0 top-0 opacity-10 blur-3xl w-64 h-64 bg-blue-500 rounded-full mix-blend-screen pointer-events-none"></div>
-        <div className="absolute left-0 bottom-0 opacity-10 blur-3xl w-64 h-64 bg-yellow-500 rounded-full mix-blend-screen pointer-events-none"></div>
-        
-        <h2 className="text-3xl font-bold mb-2 flex items-center gap-3">
-          {civ?.name} <span className="text-sm font-normal px-3 py-1 bg-blue-600/20 text-blue-400 rounded-full border border-blue-500/30">Age {age}</span>
-        </h2>
-        <p className="text-gray-300 max-w-2xl mb-6">{civ?.shortDescription}</p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {civ?.passiveBonuses.map((bonus, idx) => (
-            <div key={idx} className="flex items-start gap-3 bg-black/20 p-3 rounded-lg border border-white/5">
-              <Zap size={18} className="text-yellow-500 mt-1 flex-shrink-0" />
-              <p className="text-sm text-gray-300">{bonus}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+
 
 
 
