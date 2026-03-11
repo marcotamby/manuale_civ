@@ -15,7 +15,7 @@ interface TopbarProps {
 }
 
 export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
-  const { isAuthenticated, isAdmin, user, logout, openLoginModal, favorites } = useAuth();
+  const { isAuthenticated, isAdmin, isSuperAdmin, user, logout, openLoginModal, favorites } = useAuth();
   const { civilizations } = useCivData();
   const [pendingCount, setPendingCount] = useState(0);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -35,7 +35,7 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
   };
 
   useEffect(() => {
-    if (isAuthenticated && isAdmin) {
+    if (isAuthenticated && isSuperAdmin) {
       fetchPendingCount();
 
       // Real-time subscription to suggestions table
@@ -54,7 +54,7 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
         supabase.removeChannel(channel);
       };
     }
-  }, [isAuthenticated, isAdmin]);
+  }, [isAuthenticated, isSuperAdmin]);
 
   useEffect(() => {
     if (!isAuthenticated || favorites.length === 0) {
@@ -123,21 +123,22 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
                 </div>
                 <div className="flex flex-col text-left">
                   <span className="font-medium hidden sm:block text-sm leading-none text-white/90">{user?.name}</span>
-                  <span className="text-[10px] text-yellow-600 font-bold uppercase tracking-wider">Admin</span>
+                  <span className="text-[10px] text-yellow-600 font-bold uppercase tracking-wider">{isSuperAdmin ? 'Admin' : 'Editor'}</span>
                 </div>
               </div>
-              <button
-                onClick={onOpenAdminDashboard}
-                className="relative text-xs text-yellow-500 hover:text-white transition-colors border border-yellow-500/20 px-3 py-1.5 rounded hover:bg-yellow-500/10 font-sans tracking-wider uppercase flex items-center gap-1"
-              >
-                Proposte
-                {pendingCount > 0 && (
-                  <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white shadow-lg animate-bounce duration-500 ring-2 ring-[#0d1424]">
-                    {pendingCount}
-                  </span>
-                )}
-              </button>
-              <button
+              {isSuperAdmin && (
+                <button
+                  onClick={onOpenAdminDashboard}
+                  className="relative text-xs text-yellow-500 hover:text-white transition-colors border border-yellow-500/20 px-3 py-1.5 rounded hover:bg-yellow-500/10 font-sans tracking-wider uppercase flex items-center gap-1"
+                >
+                  Proposte
+                  {pendingCount > 0 && (
+                    <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white shadow-lg animate-bounce duration-500 ring-2 ring-[#0d1424]">
+                      {pendingCount}
+                    </span>
+                  )}
+                </button>
+              )}              <button
                 onClick={logout}
                 className="text-xs text-gray-400 hover:text-white transition-colors border border-white/10 px-3 py-1.5 rounded hover:bg-white/5 font-sans tracking-wider uppercase"
               >

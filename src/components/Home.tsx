@@ -20,8 +20,17 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
     if (difficultyFilter === 'Preferiti') return favorites.includes(civ.id);
     if (difficultyFilter === 'Tutte') return true;
     
+    // Map Italian labels to possible DB values (some might be stored in English or with different casing)
+    const diffMap: Record<string, string[]> = {
+      'Facile': ['Facile', 'Easy'],
+      'Medio': ['Medio', 'Medium'],
+      'Difficile': ['Difficile', 'Hard', 'Difficult']
+    };
+
+    const targetValues = diffMap[difficultyFilter] || [difficultyFilter];
     const civDiff = civ.difficulty?.toString().trim() || '';
-    return civDiff.toLowerCase() === difficultyFilter.toLowerCase();
+    
+    return targetValues.some(v => v.toLowerCase() === civDiff.toLowerCase());
   });
 
   const handleCardClick = (civId: string) => {

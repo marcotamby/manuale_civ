@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, CheckCircle, XCircle, Loader2, Inbox } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { useAuth } from './AuthContext';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
 
@@ -24,6 +25,7 @@ interface AdminDashboardModalProps {
 }
 
 export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProps) {
+  const { isSuperAdmin } = useAuth();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
@@ -81,13 +83,13 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   };
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && isSuperAdmin) {
       fetchSuggestions();
     }
-  }, [isOpen]);
+  }, [isOpen, isSuperAdmin]);
 
   const handleSendNotifications = async () => {
-    if (pendingNotifCount === 0) return;
+    if (pendingNotifCount === 0 || !isSuperAdmin) return;
 
     try {
       setIsSendingEmail(true);
@@ -128,6 +130,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   };
 
   const handleUpdateStatus = async (sugg: Suggestion, newStatus: 'implemented' | 'rejected', reason?: string) => {
+    if (!isSuperAdmin) return;
     try {
       if (newStatus === 'implemented') {
         const { data: currentCiv, error: fetchError } = await supabase
@@ -237,7 +240,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !isSuperAdmin) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm shadow-2xl">

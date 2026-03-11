@@ -12,6 +12,8 @@ interface UserData {
 interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
+  isEditor: boolean;
   user: UserData | null;
   favorites: string[];
   isLoginModalOpen: boolean;
@@ -29,9 +31,26 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [isEditor, setIsEditor] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  const SUPER_ADMIN_EMAILS = ['marcotamby@gmail.com', 'marco.tamborrino.94@gmail.com'];
+  const EDITOR_EMAILS = ['alessio.bella97@gmail.com', 'contattodisparta@gmail.com'];
+
+  const checkRoles = (userData: UserData) => {
+    const email = userData.email?.toLowerCase();
+    const name = userData.name?.toLowerCase();
+    
+    const isSA = (email && SUPER_ADMIN_EMAILS.includes(email)) || name === 'admin';
+    const isEd = email && EDITOR_EMAILS.includes(email);
+    
+    setIsSuperAdmin(!!isSA);
+    setIsEditor(!!isEd);
+    setIsAdmin(!!isSA || !!isEd);
+  };
 
   // Load favorites and check for development admin bypass
   useEffect(() => {
@@ -51,10 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const parsed = JSON.parse(storedUser);
         setUser(parsed);
         setIsAuthenticated(true);
-        const adminEmails = ['marcotamby@gmail.com', 'marco.tamborrino.94@gmail.com'];
-        if (parsed.name?.toLowerCase() === 'admin' || (parsed.email && adminEmails.includes(parsed.email))) {
-          setIsAdmin(true);
-        }
+        checkRoles(parsed);
       } catch (e) {
         console.error('Failed to parse stored user', e);
       }
@@ -65,6 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (isLocalhost) {
       console.log('🛡️ Local development detected: Admin bypass active.');
       setIsAdmin(true);
+      setIsSuperAdmin(true);
       setIsAuthenticated(true);
       setUser({
         name: 'Local Admin (Dev)',
@@ -88,15 +105,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAuthenticated(true);
     setUser(enrichedUser);
     localStorage.setItem('auth_user', JSON.stringify(enrichedUser));
-    const adminEmails = ['marcotamby@gmail.com', 'marco.tamborrino.94@gmail.com'];
-    if (userData.name?.toLowerCase() === 'admin' || (userData.email && adminEmails.includes(userData.email))) {
-      setIsAdmin(true);
-    }
+    checkRoles(enrichedUser);
   };
 
   const logout = () => {
     setIsAuthenticated(false);
     setIsAdmin(false);
+    setIsSuperAdmin(false);
+    setIsEditor(false);
     setUser(null);
     localStorage.removeItem('auth_user');
   };
@@ -130,6 +146,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider value={{
       isAuthenticated,
       isAdmin,
+      isSuperAdmin,
+      isEditor,
       user,
       favorites,
       isLoginModalOpen,
