@@ -291,7 +291,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             </div>
 
             {civ.buildOrders && civ.buildOrders.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 w-full max-w-7xl mx-auto px-4 md:px-0">
                 {civ.buildOrders.map((bo) => {
                   const isExpanded = expandedBOs.has(bo.id);
                   return (
@@ -305,32 +305,32 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         setExpandedBOs(newExpanded);
                       }}
                     >
-                      <div className="flex justify-between items-start mb-4">
-                        <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-yellow-400 transition-colors uppercase tracking-tight">{bo.title}</h3>
+                      <div className="flex justify-between items-start mb-3">
+                        <h3 className="text-lg md:text-xl font-bold text-white group-hover:text-yellow-400 transition-colors uppercase tracking-tight">{bo.title}</h3>
                       </div>
 
-                      <div className={`text-base text-gray-300 leading-relaxed max-w-4xl mb-6 ${isExpanded ? '' : 'line-clamp-2 opacity-60'}`}>
+                      <div className={`text-sm text-gray-400 leading-relaxed max-w-4xl mb-6 ${isExpanded ? '' : 'line-clamp-2 opacity-60'}`}>
                         <ResourceText text={bo.description} />
                       </div>
 
                       {isExpanded && bo.steps && bo.steps.length > 0 && (
-                        <div className="space-y-5 mb-8 animate-in slide-in-from-top-2 duration-300">
+                        <div className="space-y-4 mb-8 animate-in slide-in-from-top-2 duration-300">
                           {bo.steps.map((step, sIdx) => (
                             <div key={sIdx} className="flex flex-col gap-1.5 relative pl-6 border-l border-white/5">
                               {/* Bullet point indicator */}
                               <div className="absolute left-[-5px] top-[10px] w-[10px] h-[10px] rounded-full bg-yellow-500/80 shadow-[0_0_8px_rgba(234,179,8,0.4)]" />
 
-                              <div className="flex gap-4 items-baseline">
+                              <div className="flex gap-2 items-baseline">
                                 {step.time && (
-                                  <span className="text-yellow-500 font-mono w-24 shrink-0 font-bold flex items-center gap-1 text-base md:text-lg">
-                                    <Clock size={16} /> {step.time}
+                                  <span className="text-yellow-500 font-mono w-14 shrink-0 font-bold flex items-center gap-1 text-[10px] md:text-xs">
+                                    <Clock size={12} /> {step.time}
                                   </span>
                                 )}
-                                <ResourceText text={step.action} className="text-xl md:text-2xl text-white font-extrabold tracking-tight leading-snug py-1" />
+                                <ResourceText text={step.action} className="text-sm md:text-base text-white font-semibold tracking-tight leading-snug py-0.5" />
                               </div>
                               {step.note && (
                                 <div className="pl-0 mt-1 mb-1">
-                                  <ResourceText text={step.note} className="text-sm md:text-base text-gray-400 italic leading-relaxed" />
+                                  <ResourceText text={step.note} className="text-[11px] md:text-xs text-gray-500 italic leading-relaxed" />
                                 </div>
                               )}
                             </div>
@@ -338,15 +338,15 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
                           {/* Source / Video Preview */}
                           {bo.source && (
-                            <div className="mt-8 pt-6 border-t border-white/5">
-                              <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 block">Fonte & Riferimenti</label>
+                            <div className="mt-8 pt-6 border-t border-white/5 space-y-4">
+                              <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">Fonte & Riferimenti</label>
                               {getYoutubeId(bo.source) ? (
                                 <a
                                   href={bo.source}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
-                                  className="group relative block aspect-video w-full rounded-2xl overflow-hidden border border-white/10 bg-black hover:border-red-500/50 transition-all shadow-2xl hover:shadow-red-500/10"
+                                  className="group relative block aspect-video w-full max-w-xs rounded-xl overflow-hidden border border-white/10 bg-black hover:border-red-500/50 transition-all shadow-xl hover:shadow-red-500/10"
                                 >
                                   <img
                                     src={`https://img.youtube.com/vi/${getYoutubeId(bo.source)}/hqdefault.jpg`}
@@ -364,11 +364,14 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                 </a>
                               ) : (
                                 <a
+                                  href={bo.source}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
                                   className="inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 px-4 py-3 rounded-xl border border-blue-500/20 shadow-lg"
                                 >
                                   <ExternalLink size={14} />
-                                  {bo.source.length > 40 ? bo.source.slice(0, 40) + '...' : bo.source}
+                                  {bo.source.length > 30 ? bo.source.slice(0, 30) + '...' : bo.source}
                                 </a>
                               )}
                             </div>
