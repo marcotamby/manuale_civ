@@ -68,7 +68,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
       let submissionText = '';
       if (section === 'build_order') {
         const boData = {
-          title: title || 'Nuovo Build Order',
+          title: title || '',
           description: description,
           steps: boSteps,
           source: source
@@ -197,7 +197,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Titolo Build Order</label>
               <input
                 type="text"
-                placeholder="es. Fast Castle, 2-Town Center, ecc."
+                placeholder="Titolo"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
