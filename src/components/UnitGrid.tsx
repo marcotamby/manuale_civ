@@ -43,7 +43,10 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filteredLandmarks.map(landmark => {
               const baseId = landmark.imageId || landmark.id;
-              const imgUrl = `https://data.aoe4world.com/images/buildings/${baseId}.png`;
+              const imgUrl = baseId.startsWith('http') 
+                ? baseId 
+                : `https://data.aoe4world.com/images/buildings/${baseId}.png`;
+              
               return (
               <div key={landmark.id} className="glass p-4 md:p-5 rounded-2xl border-t-2 border-t-yellow-500/50 hover:glass-hover transition-all group flex flex-col md:flex-row gap-4 items-center">
                 <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl bg-black/40 border border-white/10 flex-shrink-0 overflow-hidden flex items-center justify-center p-2 relative">
@@ -56,9 +59,9 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
                     className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-500 relative z-10"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      if (!target.src.includes(`-${landmark.age - 1}.png`)) {
+                      if (!imgUrl.startsWith('http') && !target.src.includes(`-${landmark.age - 1}.png`)) {
                          target.src = `https://data.aoe4world.com/images/buildings/${baseId}-${landmark.age - 1}.png`;
-                      } else {
+                      } else if (!imgUrl.startsWith('http')) {
                          target.style.opacity = '0';
                       }
                     }}
@@ -92,12 +95,11 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {filteredUnits.map(unit => {
-              // Format ID to match the image precisely. Generic ids usually don't have dashes but uniques might.
-              // AoE4World image URLs usually expect lowercase with dashes for spaces or base ids.
-              let imgId = unit.id.toLowerCase().replace(/\s+/g, '-');
-              if (imgId === "man-at-arms-1") imgId = "man-at-arms-1";
-              else if (imgId === "king-2") imgId = "king";
-              else if (imgId === "longbowman-2") imgId = "longbowman-2";
+              // Priority: 1. imageId (if URL), 2. imageId (as ID), 3. unit.id (default)
+              const baseImgId = unit.imageId || unit.id.toLowerCase().replace(/\s+/g, '-');
+              const finalImgUrl = baseImgId.startsWith('http') 
+                ? baseImgId 
+                : `https://data.aoe4world.com/images/units/${baseImgId}.png`;
               
               return (
               <div 
@@ -113,14 +115,13 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
                   </div>
                   
                   <img 
-                    src={`https://data.aoe4world.com/images/units/${imgId}.png`}
+                    src={finalImgUrl}
                     alt={unit.name}
                     className="w-16 h-16 md:w-20 md:h-20 object-contain z-10 group-hover:scale-110 transition-transform duration-500 relative"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      if (!target.src.endsWith('-icon.png') && !target.src.includes('-2.png') && !target.src.includes('-3.png') && !target.src.includes('-4.png')) {
-                         // Try to append an age number as fallback for generic ones that don't match
-                         target.src = `https://data.aoe4world.com/images/units/${imgId}-${unit.age}.png`;
+                      if (!finalImgUrl.startsWith('http') && !target.src.endsWith('-icon.png') && !target.src.includes('-2.png') && !target.src.includes('-3.png') && !target.src.includes('-4.png')) {
+                         target.src = `https://data.aoe4world.com/images/units/${baseImgId}-${unit.age}.png`;
                       } else {
                          target.style.opacity = '0';
                       }
