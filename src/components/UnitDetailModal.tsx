@@ -1,9 +1,11 @@
 import type { Unit } from '../data/aoe4Data';
-import { X, Shield, Sword, Heart, FastForward, CheckCircle2, XCircle, Info } from 'lucide-react';
+import { X, Shield, Sword, Heart, FastForward, CheckCircle2, XCircle, Info, Edit } from 'lucide-react';
+import { useAuth } from './AuthContext';
 
 interface UnitDetailModalProps {
   unit: Unit;
   onClose: () => void;
+  onEdit?: (id: string, isGlobal: boolean) => void;
 }
 
 import type { ElementType } from 'react';
@@ -29,7 +31,8 @@ const StatBar = ({ label, value, max, icon: Icon, colorClass }: { label: string,
   );
 };
 
-export function UnitDetailModal({ unit, onClose }: UnitDetailModalProps) {
+export function UnitDetailModal({ unit, onClose, onEdit }: UnitDetailModalProps) {
+  const { isAdmin } = useAuth();
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -59,6 +62,20 @@ export function UnitDetailModal({ unit, onClose }: UnitDetailModalProps) {
           >
             <X size={24} />
           </button>
+          
+          {isAdmin && onEdit && (
+            <button 
+              onClick={() => {
+                const isGlobal = (window as any).currentCivUniqueUnits ? !(window as any).currentCivUniqueUnits.some((uu: any) => uu.id === unit.id) : false;
+                onEdit(unit.id, isGlobal);
+                onClose();
+              }}
+              className="absolute top-4 right-16 p-2.5 bg-yellow-600 hover:bg-yellow-500 text-black rounded-full shadow-lg transition-all active:scale-95 flex items-center justify-center border border-yellow-400/50"
+              title="Modifica Unità"
+            >
+              <Edit size={20} fill="black" />
+            </button>
+          )}
         </div>
 
         {/* Content */}

@@ -15,12 +15,12 @@ interface CivDataContextType {
 const CivDataContext = createContext<CivDataContextType | undefined>(undefined);
 
 export function CivDataProvider({ children }: { children: ReactNode }) {
-  const { civs, loading, error, refreshCivs } = useCivilizations();
+  const { civs, globalUnits, loading, error, refreshCivs } = useCivilizations();
 
   return (
     <CivDataContext.Provider value={{
       civilizations: civs,
-      globalUnits: unitsList,
+      globalUnits: globalUnits.length > 0 ? globalUnits : unitsList,
       loading,
       error,
       refreshCivs

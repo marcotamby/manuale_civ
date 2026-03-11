@@ -10,6 +10,7 @@ import { CompareView } from './components/CompareView';
 import { CookieBanner } from './components/CookieBanner';
 import { useCivData } from './components/CivContext';
 import type { Unit } from './data/aoe4Data';
+import { unitsList } from './data/aoe4Data';
 import { useAuth } from './components/AuthContext';
 import { LoginModal } from './components/LoginModal';
 import { ProfileModal } from './components/ProfileModal';
@@ -214,6 +215,12 @@ function App() {
         <UnitDetailModal
           unit={selectedUnit}
           onClose={() => setSelectedUnit(null)}
+          onEdit={(id) => {
+            if ((window as any).openCivEditor) {
+              const isGlobal = unitsList.some(u => u.id === id);
+              (window as any).openCivEditor(isGlobal ? 'global-units' : 'units', id);
+            }
+          }}
         />
       )}
 

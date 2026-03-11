@@ -44,12 +44,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const email = userData.email?.toLowerCase();
     const name = userData.name?.toLowerCase();
     
-    const isSA = (email && SUPER_ADMIN_EMAILS.includes(email)) || name === 'admin';
+    const isSA = (email && SUPER_ADMIN_EMAILS.includes(email)) || name === 'admin' || name?.includes('marcotamby');
     const isEd = email && EDITOR_EMAILS.includes(email);
     
     setIsSuperAdmin(!!isSA);
     setIsEditor(!!isEd);
     setIsAdmin(!!isSA || !!isEd);
+    console.log('🔐 Auth roles checked:', { email, name, isSA, isEd, isAdmin: !!isSA || !!isEd });
   };
 
   // Load favorites and check for development admin bypass

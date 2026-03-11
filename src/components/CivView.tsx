@@ -63,7 +63,18 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const [localCivs, setLocalCivs] = useState<Record<string, Civilization>>({});
   const [expandedBOs, setExpandedBOs] = useState<Set<string>>(new Set());
   const [isEditorOpen, setIsEditorOpen] = useState(false);
-  const { isAdmin } = useAuth();
+  const [editorTarget, setEditorTarget] = useState<{ section?: string; id?: string }>({});
+  const { isAdmin, isSuperAdmin, user } = useAuth();
+
+  const openEditor = (section?: string, id?: string) => {
+    setEditorTarget({ section, id });
+    setIsEditorOpen(true);
+  };
+
+  useEffect(() => {
+    (window as any).openCivEditor = openEditor;
+    return () => { (window as any).openCivEditor = undefined; };
+  }, [civId]);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -121,15 +132,18 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 {civ.difficulty}
               </span>
               {isAdmin && (
-                <div className="flex gap-2 items-center bg-white/5 px-2 py-1 rounded-lg border border-white/10">
-                  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">
-                    Admin
-                  </span>
+                <div className="flex gap-2 items-center bg-yellow-500/10 px-3 py-1.5 rounded-lg border border-yellow-500/40 shadow-[0_0_15px_rgba(234,179,8,0.1)]">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black text-yellow-500 uppercase tracking-widest leading-none mb-1">
+                      {isSuperAdmin ? 'MODALITÀ ADMIN' : 'MODALITÀ EDITOR'}
+                    </span>
+                    <span className="text-[8px] text-yellow-500/60 font-medium leading-none">{user?.email}</span>
+                  </div>
                   <button
-                    onClick={() => setIsEditorOpen(true)}
-                    className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold rounded flex items-center gap-1 transition-all active:scale-95"
+                    onClick={() => openEditor()}
+                    className="ml-2 px-3 py-1.5 bg-yellow-600 hover:bg-yellow-500 text-black text-[10px] font-black rounded uppercase transition-all active:scale-95 flex items-center gap-1 shadow-lg"
                   >
-                    <Edit size={12} /> Modifica
+                    <Edit size={12} fill="black" /> Modifica Globale
                   </button>
                 </div>
               )}
@@ -174,6 +188,16 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <Zap className="text-yellow-500" size={20} />
                 Bonus
+                {isAdmin && (
+                  <button 
+                    onClick={() => openEditor('bonuses')} 
+                    className="p-1.5 bg-yellow-500/20 hover:bg-yellow-500/40 rounded-lg transition-all text-yellow-500 border border-yellow-500/30 flex items-center gap-1 shadow-sm group/btn"
+                    title="Modifica Bonus"
+                  >
+                    <Edit size={12} className="group-hover/btn:scale-110 transition-transform" />
+                    <span className="text-[10px] font-bold uppercase pr-1">Edit</span>
+                  </button>
+                )}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {civ.passiveBonuses.map((bonus, idx) => (
@@ -189,6 +213,16 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <ChevronUp className="text-green-400" size={20} />
                 Punti di Forza
+                {isAdmin && (
+                  <button 
+                    onClick={() => openEditor('strengths')} 
+                    className="p-1.5 bg-yellow-500/20 hover:bg-yellow-500/40 rounded-lg transition-all text-yellow-500 border border-yellow-500/30 flex items-center gap-1 shadow-sm group/btn"
+                    title="Modifica Punti di Forza"
+                  >
+                    <Edit size={12} className="group-hover/btn:scale-110 transition-transform" />
+                    <span className="text-[10px] font-bold uppercase pr-1">Edit</span>
+                  </button>
+                )}
               </h2>
               <div className="glass p-5 rounded-xl border border-green-500/20 text-gray-300 text-sm leading-relaxed">
                 <ul className="space-y-3 list-disc list-inside">
@@ -212,6 +246,16 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <ChevronDown className="text-red-400" size={20} />
                 Punti Deboli
+                {isAdmin && (
+                  <button 
+                    onClick={() => openEditor('weaknesses')} 
+                    className="p-1.5 bg-yellow-500/20 hover:bg-yellow-500/40 rounded-lg transition-all text-yellow-500 border border-yellow-500/30 flex items-center gap-1 shadow-sm group/btn"
+                    title="Modifica Punti Deboli"
+                  >
+                    <Edit size={12} className="group-hover/btn:scale-110 transition-transform" />
+                    <span className="text-[10px] font-bold uppercase pr-1">Edit</span>
+                  </button>
+                )}
               </h2>
               <div className="glass p-5 rounded-xl border border-red-500/20 text-gray-300 text-sm leading-relaxed">
                 {civ.weaknesses && civ.weaknesses.length > 0 ? (
@@ -253,7 +297,13 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 </button>
               </div>
             </div>
-            <UnitGrid civId={civId} age={activeAge} onSelectUnit={onSelectUnit} />
+            <UnitGrid 
+              civId={civId} 
+              age={activeAge} 
+              onSelectUnit={onSelectUnit} 
+              onEditUnit={(id, isGlobal) => openEditor(isGlobal ? 'global' : 'units', id)}
+              onEditLandmark={(id) => openEditor('landmarks', id)}
+            />
           </div>
         )}
 
@@ -263,6 +313,16 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <h2 className="text-2xl font-bold text-white mb-1 flex items-center gap-2">
                 <Map className="text-yellow-500" size={24} />
                 Build Orders
+                {isAdmin && (
+                  <button 
+                    onClick={() => openEditor('buildorders')} 
+                    className="p-1.5 bg-yellow-500/20 hover:bg-yellow-500/40 rounded-lg transition-all text-yellow-500 border border-yellow-500/30 flex items-center gap-1 shadow-sm group/btn"
+                    title="Modifica Build Orders"
+                  >
+                    <Edit size={12} className="group-hover/btn:scale-110 transition-transform" />
+                    <span className="text-[10px] font-bold uppercase pr-1">Edit</span>
+                  </button>
+                )}
               </h2>
               <p className="text-sm text-gray-400">Strategie ottimizzate per dominare la partita.</p>
             </div>
@@ -529,7 +589,12 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         <AdminCivEditorModal
           civ={civ}
           isOpen={isEditorOpen}
-          onClose={() => setIsEditorOpen(false)}
+          onClose={() => {
+            setIsEditorOpen(false);
+            setEditorTarget({});
+          }}
+          initialSection={editorTarget.section}
+          initialId={editorTarget.id}
           onSave={(updatedCiv) => {
             setLocalCivs(prev => ({ ...prev, [civId]: updatedCiv }));
             refreshCivs();

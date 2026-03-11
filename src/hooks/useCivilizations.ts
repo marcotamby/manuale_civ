@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { civilizationsData } from '../data/aoe4Data';
-import type { Civilization } from '../data/aoe4Data';
+import { civilizationsData, unitsList } from '../data/aoe4Data';
+import type { Civilization, Unit } from '../data/aoe4Data';
 
 export function useCivilizations() {
   const [civs, setCivs] = useState<Civilization[]>([]);
+  const [globalUnits, setGlobalUnits] = useState<Unit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,8 +41,34 @@ export function useCivilizations() {
       });
 
       setCivs(formattedCivs);
+
+      // Fetch Global Units
+      const { data: globalData, error: guError } = await supabase
+        .from('global_units')
+        .select('*')
+        .order('age');
+
+      if (guError) throw guError;
+
+      const formattedGlobalUnits: Unit[] = globalData.map((row: any) => {
+        const localUnit = (unitsList as Unit[]).find(u => u.id === row.id);
+        return {
+          id: row.id,
+          name: row.name,
+          type: row.type as any,
+          age: row.age as any,
+          stats: row.stats,
+          strengths: row.strengths || (localUnit?.strengths || []),
+          weaknesses: row.weaknesses || (localUnit?.weaknesses || []),
+          description: row.description || (localUnit?.description || ''),
+          imageId: row.image_id || localUnit?.imageId,
+          excludedCivs: localUnit?.excludedCivs || []
+        };
+      });
+
+      setGlobalUnits(formattedGlobalUnits);
     } catch (err: any) {
-      console.error('Error fetching civilizations:', err);
+      console.error('Error fetching data:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -52,5 +79,5 @@ export function useCivilizations() {
     fetchCivs(true);
   }, []);
 
-  return { civs, loading, error, refreshCivs: () => fetchCivs(false) };
+  return { civs, globalUnits, loading, error, refreshCivs: () => fetchCivs(false) };
 }

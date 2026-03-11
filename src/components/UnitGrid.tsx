@@ -1,17 +1,21 @@
 import { unitsList } from '../data/aoe4Data';
 import { useCivData } from './CivContext';
 import type { Unit } from '../data/aoe4Data';
-import { Shield, Sword } from 'lucide-react';
+import { Shield, Sword, Edit } from 'lucide-react';
+import { useAuth } from './AuthContext';
 
 
 interface UnitGridProps {
   civId: string;
   age: number;
   onSelectUnit: (unit: Unit) => void;
+  onEditUnit?: (id: string, isGlobal: boolean) => void;
+  onEditLandmark?: (id: string) => void;
 }
 
-export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
+export function UnitGrid({ civId, age, onSelectUnit, onEditUnit, onEditLandmark }: UnitGridProps) {
   const { civilizations: civilizationsData } = useCivData();
+  const { isAdmin } = useAuth();
   const civ = civilizationsData.find(c => c.id === civId);
 
   // Combine generic units (filtering out excluded ones) and unique units for this civ
@@ -79,6 +83,15 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
                     <span className="text-[10px] font-bold px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded-full border border-yellow-500/30 uppercase tracking-wider ml-2">
                       {landmark.type}
                     </span>
+                    {isAdmin && onEditLandmark && (
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); onEditLandmark(landmark.id); }} 
+                        className="p-2 bg-yellow-600 hover:bg-yellow-500 text-black rounded-xl transition-all border border-yellow-400/50 ml-2 shadow-lg"
+                        title="Modifica Landmark"
+                      >
+                        <Edit size={14} fill="black" />
+                      </button>
+                    )}
                   </div>
                   <p className="text-xs text-gray-400 leading-relaxed italic">{landmark.description}</p>
                 </div>
@@ -147,7 +160,22 @@ export function UnitGrid({ civId, age, onSelectUnit }: UnitGridProps) {
                     }}
                   />
                   
+                  
                   <Shield size={60} className="text-white/5 absolute -right-3 -bottom-3 rotate-12" />
+
+                  {isAdmin && onEditUnit && (
+                    <button 
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        const isGlobal = !civ?.uniqueUnits?.some(uu => uu.id === unit.id);
+                        onEditUnit(unit.id, isGlobal); 
+                      }} 
+                      className="absolute top-2 right-2 p-2 bg-yellow-600 hover:bg-yellow-500 text-black rounded-xl z-20 border border-yellow-400/50 transition-all shadow-xl flex items-center justify-center"
+                      title="Modifica Unità"
+                    >
+                      <Edit size={14} fill="black" />
+                    </button>
+                  )}
                 </div>
                 
                 <div className="p-4 flex-1 flex flex-col">

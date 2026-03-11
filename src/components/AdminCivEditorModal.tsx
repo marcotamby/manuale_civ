@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Save, X, Loader2, Play, Map, Plus, Trash2, CheckCircle, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { YouTubePickerModal } from './YouTubePickerModal';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
+import { useCivData } from './CivContext';
 import type { Civilization } from '../data/aoe4Data';
 
 interface AdminCivEditorModalProps {
@@ -11,10 +12,14 @@ interface AdminCivEditorModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (updatedCiv: Civilization) => void;
+  initialSection?: string;
+  initialId?: string;
 }
 
-export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEditorModalProps) {
+export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSection, initialId }: AdminCivEditorModalProps) {
+  const { globalUnits } = useCivData();
   const [editedCiv, setEditedCiv] = useState<Civilization>(civ);
+  const [editedGlobalUnits, setEditedGlobalUnits] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaveSuccess, setIsSaveSuccess] = useState(false);
   const [isYoutubePickerOpen, setIsYoutubePickerOpen] = useState(false);
@@ -23,6 +28,17 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
     message: '',
     type: 'success'
   });
+
+  // Refs for scrolling
+  const sectionRefs = {
+    bonuses: useRef<HTMLDivElement>(null),
+    strengths: useRef<HTMLDivElement>(null),
+    weaknesses: useRef<HTMLDivElement>(null),
+    units: useRef<HTMLDivElement>(null),
+    landmarks: useRef<HTMLDivElement>(null),
+    buildorders: useRef<HTMLDivElement>(null),
+    global: useRef<HTMLDivElement>(null)
+  };
 
   // Sync state with props when modal opens or civ changes
   useEffect(() => {
@@ -42,8 +58,24 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
         ...civ,
         strengths: defaultStrengths
       });
+      setEditedGlobalUnits(globalUnits);
+
+      // Handle initial section scrolling
+      if (initialSection) {
+        setTimeout(() => {
+          const ref = (sectionRefs as any)[initialSection.toLowerCase()];
+          if (ref?.current) {
+            ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Highlight the section briefly
+            ref.current.classList.add('ring-2', 'ring-purple-500', 'bg-purple-500/10');
+            setTimeout(() => {
+              ref.current?.classList.remove('ring-2', 'ring-purple-500', 'bg-purple-500/10');
+            }, 2000);
+          }
+        }, 300);
+      }
     }
-  }, [civ, isOpen]);
+  }, [civ, isOpen, globalUnits, initialSection]);
 
   const getYoutubeId = (url: string) => {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -57,7 +89,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
     try {
       setIsSaving(true);
 
-      const { error } = await supabase
+      const { error: civError } = await supabase
         .from('civilizations')
         .update({
           name: editedCiv.name,
@@ -73,7 +105,25 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
         })
         .eq('id', civ.id);
 
-      if (error) throw error;
+      if (civError) throw civError;
+
+      // Save Global Units changes
+      for (const gu of editedGlobalUnits) {
+        const { error: guError } = await supabase
+          .from('global_units')
+          .update({
+            name: gu.name,
+            type: gu.type,
+            age: gu.age,
+            stats: gu.stats,
+            strengths: gu.strengths,
+            weaknesses: gu.weaknesses,
+            description: gu.description,
+            image_id: gu.imageId
+          })
+          .eq('id', gu.id);
+        if (guError) throw guError;
+      }
 
       setIsSaveSuccess(true);
 
@@ -142,6 +192,21 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
 
   const addToArray = <T extends keyof Civilization>(field: T, item: any) => {
     setEditedCiv({ ...editedCiv, [field]: [...(editedCiv[field] as any[] || []), item] });
+  };
+
+  const updateGlobalUnit = (index: number, key: string, value: any) => {
+    const newArr = [...editedGlobalUnits];
+    if (['attack', 'armor', 'speed', 'health'].includes(key)) {
+      newArr[index] = {
+        ...newArr[index],
+        stats: { ...(newArr[index].stats || {}), [key]: Number(value) }
+      };
+    } else if (key === 'strengths' || key === 'weaknesses') {
+      newArr[index] = { ...newArr[index], [key]: value.split('\n').filter((s: string) => s.trim() !== '') };
+    } else {
+      newArr[index] = { ...newArr[index], [key]: key === 'age' ? Number(value) : value };
+    }
+    setEditedGlobalUnits(newArr);
   };
 
   return (
@@ -235,7 +300,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div ref={sectionRefs.bonuses} className="space-y-4">
               <label className="block text-sm font-bold text-gray-300 mb-1">Bonus</label>
               <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                 {editedCiv.passiveBonuses.map((bonus: string, idx: number) => (
@@ -267,7 +332,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
               </button>
 
               <div className="pt-4 mt-6 border-t border-gray-600/30 space-y-4">
-                <div>
+                <div ref={sectionRefs.strengths}>
                   <label className="block text-sm font-bold text-gray-300 mb-1">Punti di Forza</label>
                   <textarea
                     value={editedCiv.strengths?.join('\n') || ''}
@@ -281,7 +346,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                   />
                 </div>
 
-                <div>
+                <div ref={sectionRefs.weaknesses}>
                   <label className="block text-sm font-bold text-gray-300 mb-1">Punti Deboli</label>
                   <textarea
                     value={editedCiv.weaknesses?.join('\n') || ''}
@@ -304,7 +369,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
               {/* Unità Uniche */}
-              <div className="bg-black/30 border border-blue-500/30 rounded-xl p-4">
+              <div ref={sectionRefs.units} className="bg-black/30 border border-blue-500/30 rounded-xl p-4">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="font-bold text-blue-400 flex items-center gap-2"><span className="text-xl">⚔️</span> Unità Uniche</h4>
                   <button onClick={() => addToArray('uniqueUnits', { id: 'new-unit', name: 'Nuova Unità', type: 'Infantry', age: 2, stats: { attack: 0, armor: 0, speed: 1, health: 100 }, strengths: [], weaknesses: [], description: '' })} className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded flex items-center gap-1">
@@ -313,13 +378,13 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                 </div>
                 <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                   {(editedCiv.uniqueUnits || []).map((u: any, idx: number) => (
-                    <div key={idx} className="bg-black/50 border border-gray-700 rounded-lg p-3 relative group">
+                    <div key={idx} className={`bg-black/50 border border-gray-700 rounded-lg p-3 relative group transition-all duration-500 ${initialId === u.id ? 'ring-2 ring-blue-500 bg-blue-500/10' : ''}`}>
                       <button onClick={() => removeFromArray('uniqueUnits', idx)} className="absolute top-2 right-2 text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Trash2 size={16} />
                       </button>
                       <div className="grid grid-cols-2 gap-2 mb-2">
                         <input type="text" value={u.name} onChange={e => updateArrayField('uniqueUnits', idx, 'name', e.target.value)} placeholder="Nome Unità" className="bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600 w-full" />
-                        <input type="text" value={u.imageId || ''} onChange={e => updateArrayField('uniqueUnits', idx, 'imageId', e.target.value)} placeholder="Image ID (es: archer-2)" className="bg-gray-800 text-blue-300 text-sm rounded px-2 py-1 border border-gray-600 w-full" />
+                        <input type="text" value={u.imageId || ''} onChange={e => updateArrayField('uniqueUnits', idx, 'imageId', e.target.value)} placeholder="Image URL o ID (es: archer-2)" className="bg-gray-800 text-blue-300 text-sm rounded px-2 py-1 border border-gray-600 w-full" />
                       </div>
                       <div className="grid grid-cols-2 gap-2 mb-2">
                         <select value={u.type} onChange={e => updateArrayField('uniqueUnits', idx, 'type', e.target.value)} className="bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600 w-full">
@@ -333,6 +398,10 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                           <input type="number" step="0.1" value={u.stats?.speed || 0} onChange={e => updateArrayField('uniqueUnits', idx, 'speed', e.target.value)} title="Speed" className="bg-gray-800 text-blue-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
                         </div>
                       </div>
+                      <div className="grid grid-cols-2 gap-2 mb-2">
+                        <textarea value={u.strengths?.join('\n') || ''} onChange={e => updateArrayField('uniqueUnits', idx, 'strengths', e.target.value.split('\n'))} placeholder="Forti contro (uno per riga)" rows={2} className="bg-gray-800 text-green-300 text-[10px] rounded px-2 py-1 border border-gray-600 w-full resize-none" />
+                        <textarea value={u.weaknesses?.join('\n') || ''} onChange={e => updateArrayField('uniqueUnits', idx, 'weaknesses', e.target.value.split('\n'))} placeholder="Deboli contro (uno per riga)" rows={2} className="bg-gray-800 text-red-300 text-[10px] rounded px-2 py-1 border border-gray-600 w-full resize-none" />
+                      </div>
                       <textarea value={u.description} onChange={e => updateArrayField('uniqueUnits', idx, 'description', e.target.value)} placeholder="Descrizione" rows={2} className="bg-gray-800 text-white text-xs rounded px-2 py-1 border border-gray-600 w-full resize-none" />
                     </div>
                   ))}
@@ -342,7 +411,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
 
 
               {/* Landmarks */}
-              <div className="bg-black/30 border border-purple-500/30 rounded-xl p-4">
+              <div ref={sectionRefs.landmarks} className="bg-black/30 border border-purple-500/30 rounded-xl p-4">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="font-bold text-purple-400 flex items-center gap-2"><span className="text-xl">🏛️</span> Landmarks</h4>
                   <button onClick={() => addToArray('landmarks', { id: 'new-landmark', name: 'Nuovo Landmark', age: 2, type: 'Economic', description: '' })} className="text-xs bg-purple-600 hover:bg-purple-500 text-white px-2 py-1 rounded flex items-center gap-1">
@@ -361,7 +430,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                         <select value={l.type} onChange={e => updateArrayField('landmarks', idx, 'type', e.target.value)} className="col-span-3 bg-gray-800 text-white text-xs rounded px-1 py-1 border border-gray-600">
                           <option value="Military">Military</option><option value="Economic">Economic</option><option value="Defensive">Defensive</option><option value="Religious">Religious</option><option value="Technology">Technology</option>
                         </select>
-                        <input type="number" min="2" max="4" value={l.age} onChange={e => updateArrayField('landmarks', idx, 'age', e.target.value)} title="Age" className="col-span-1 bg-gray-800 text-white text-sm rounded px-1 py-1 text-center border border-gray-600" />
+                        <input type="number" min="1" max="4" value={l.age} onChange={e => updateArrayField('landmarks', idx, 'age', e.target.value)} title="Age" className="col-span-1 bg-gray-800 text-white text-sm rounded px-1 py-1 text-center border border-gray-600" />
                       </div>
                       <textarea value={l.description} onChange={e => updateArrayField('landmarks', idx, 'description', e.target.value)} placeholder="Descrizione" rows={2} className="bg-gray-800 text-white text-xs rounded px-2 py-1 border border-gray-600 w-full resize-none" />
                     </div>
@@ -371,7 +440,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
               </div>
 
               {/* Build Orders */}
-              <div className="bg-black/30 border border-yellow-500/30 rounded-xl p-4">
+              <div ref={sectionRefs.buildorders} className="bg-black/30 border border-yellow-500/30 rounded-xl p-4">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="font-bold text-yellow-400 flex items-center gap-2"><Map size={18} /> Build Orders</h4>
                   <button onClick={() => addToArray('buildOrders', { id: `bo-${Date.now()}`, title: '', difficulty: 'Medium', description: '', steps: [] })} className="text-xs bg-yellow-600 hover:bg-yellow-500 text-white px-2 py-1 rounded flex items-center gap-1">
@@ -525,6 +594,36 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                 </div>
               </div>
 
+            </div>
+
+            {/* Global Units section added at the end of Structured Data */}
+            <div ref={sectionRefs.global} className="mt-8 pt-6 border-t border-purple-500/20">
+              <h4 className="font-bold text-gray-400 flex items-center gap-2 mb-4"><span className="text-xl">🌍</span> Unità Globali (Comuni a tutte le Civ)</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar p-1">
+                {editedGlobalUnits.map((gu, idx) => (
+                  <div key={gu.id} className={`bg-black/40 border border-gray-700/50 rounded-xl p-4 transition-all duration-500 ${initialId === gu.id ? 'ring-2 ring-yellow-500 bg-yellow-500/10' : ''}`}>
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-sm font-bold text-white">{gu.name}</span>
+                      <span className="text-[10px] text-gray-500 uppercase">{gu.id}</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 mb-2">
+                       <input type="text" value={gu.imageId || ''} onChange={e => updateGlobalUnit(idx, 'imageId', e.target.value)} placeholder="Image URL o ID" className="bg-gray-800 text-blue-300 text-[10px] rounded px-2 py-1 border border-gray-600 w-full" />
+                       <div className="grid grid-cols-5 gap-1">
+                          <input type="number" min="1" max="4" value={gu.age} onChange={e => updateGlobalUnit(idx, 'age', e.target.value)} title="Age" className="bg-gray-800 text-white text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                          <input type="number" value={gu.stats?.attack || 0} onChange={e => updateGlobalUnit(idx, 'attack', e.target.value)} title="Attack" className="bg-gray-800 text-red-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                          <input type="number" value={gu.stats?.armor || 0} onChange={e => updateGlobalUnit(idx, 'armor', e.target.value)} title="Armor" className="bg-gray-800 text-gray-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                          <input type="number" value={gu.stats?.health || 0} onChange={e => updateGlobalUnit(idx, 'health', e.target.value)} title="Health" className="bg-gray-800 text-green-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                          <input type="number" step="0.1" value={gu.stats?.speed || 0} onChange={e => updateGlobalUnit(idx, 'speed', e.target.value)} title="Speed" className="bg-gray-800 text-blue-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 mb-2">
+                      <textarea value={gu.strengths?.join('\n') || ''} onChange={e => updateGlobalUnit(idx, 'strengths', e.target.value)} placeholder="Forti contro" rows={2} className="bg-gray-800 text-green-300 text-[10px] rounded px-2 py-1 border border-gray-600 w-full resize-none" />
+                      <textarea value={gu.weaknesses?.join('\n') || ''} onChange={e => updateGlobalUnit(idx, 'weaknesses', e.target.value)} placeholder="Deboli contro" rows={2} className="bg-gray-800 text-red-300 text-[10px] rounded px-2 py-1 border border-gray-600 w-full resize-none" />
+                    </div>
+                    <textarea value={gu.description} onChange={e => updateGlobalUnit(idx, 'description', e.target.value)} placeholder="Descrizione" rows={2} className="bg-gray-800 text-white text-[10px] rounded px-2 py-1 border border-gray-600 w-full resize-none" />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
