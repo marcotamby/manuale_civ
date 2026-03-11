@@ -216,6 +216,7 @@ export const civilizationsData: Civilization[] = [
     ],
     technologies: [],
     landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
       { id: "house-of-wisdom", name: "House of Wisdom (Costruita in Età I)", age: 1, type: "Technology", description: "L'edificio centrale da cui si ricercano le Ali per avanzare d'età. Le ali sbloccano potenti tecnologie esclusive." },
       { id: "economic-wing-2", imageId: "economic-wing", name: "Ala Economica", age: 2, type: "Economic", description: "Sblocca tecnologie come Fresh Foodstuffs (-35% costo abitanti), Agriculture e Improved Processing. Può essere scelta in Età 2, 3 o 4." },
       { id: "military-wing-2", imageId: "military-wing", name: "Ala Militare", age: 2, type: "Military", description: "Sblocca tecnologie per potenziare la fanteria e i cammelli (Boot Camp, Camel Support, Camel Shields). Può essere scelta in Età 2, 3 o 4." },
@@ -247,6 +248,7 @@ export const civilizationsData: Civilization[] = [
     ],
     technologies: [],
     landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
       { id: "house-of-wisdom-ay", imageId: "house-of-wisdom", name: "House of Wisdom (Costruita in Età I)", age: 1, type: "Technology", description: "Dalla House of Wisdom si scelgono le Ali per avanzare. A differenza degli Abbasidi, le ali forniscono bonus immediati unici tra due scelte per ala." },
       { id: "culture-wing-logistics-2", imageId: "culture-wing", name: "Ala Culturale (Curatori / Avanzamento)", age: 2, type: "Religious", description: "Scegli tra Dervisci gratuiti (Logistica) o avanzamenti d'età più veloci ed economici (Avanzamento). Disponibile in tutte le età." },
       { id: "economic-wing-growth-2", imageId: "economic-wing", name: "Ala Economica (Crescita / Industria)", age: 2, type: "Economic", description: "Scegli tra la creazione automatica di abitanti extra (Crescita) o grandi carichi di legno gratuiti (Industria). Disponibile in tutte le età." },
@@ -278,6 +280,7 @@ export const civilizationsData: Civilization[] = [
     ],
     technologies: [],
     landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
       { id: "dome-faith", name: "Dome of the Faith", age: 2, type: "Religious", description: "Produces Scholars at -50% cost." },
       { id: "tower-victory", name: "Tower of Victory", age: 2, type: "Military", description: "Infantry near tower gain +15% attack speed permanently." },
       { id: "compound-defender", name: "Compound of the Defender", age: 3, type: "Defensive", description: "Infantry can build stone walls; reduces stone cost." },
@@ -293,13 +296,14 @@ export const civilizationsData: Civilization[] = [
     shortDescription: "A complex defensive civilization utilizing an aqueduct network and mercenaries.",
     passiveBonuses: ["Aqueducts increase production speed and gather rates.", "Can hire foreign mercenaries using Olive Oil."],
     uniqueUnits: [
-      { id: "limitanei", name: "Limitanei", type: "Infantry", age: 2, stats: { attack: 9, armor: 0, speed: 1.12, health: 90 }, strengths: ["Cavalry"], weaknesses: ["Archers"], description: "Spearman replacement with Shield Wall ability." },
+      { id: "limitanei", name: "Limitanei", type: "Infantry", age: 1, stats: { attack: 9, armor: 0, speed: 1.12, health: 90 }, strengths: ["Cavalry"], weaknesses: ["Archers"], description: "Spearman replacement with Shield Wall ability." },
       { id: "varangian-guard", name: "Varangian Guard", type: "Infantry", age: 3, stats: { attack: 12, armor: 4, speed: 1.12, health: 160 }, strengths: ["Heavy Units"], weaknesses: ["Crossbowmen"], description: "Elite infantry that can use Berserk mode." },
       { id: "cataphract", name: "Cataphract", type: "Cavalry", age: 3, stats: { attack: 24, armor: 4, speed: 1.38, health: 280 }, strengths: ["All Ground Units"], weaknesses: ["Spearmen"], description: "Super heavy cavalry with a Trample charge." },
       { id: "cheirosiphon", name: "Cheirosiphon", type: "Siege", age: 3, stats: { attack: 0, armor: 0, speed: 0.88, health: 220 }, strengths: ["Buildings"], weaknesses: ["Melee"], description: "Greek Fire ram that deals area fire damage." }
     ],
     technologies: [],
     landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
       { id: "grand-winery", name: "Grand Winery", age: 2, type: "Economic", description: "+60% Olive Oil from nearby farms; acts as a Monastery." },
       { id: "imperial-hippodrome", name: "Imperial Hippodrome", age: 2, type: "Military", description: "Unlocks Triumph ability for cavalry speed/heal." },
       { id: "cistern-first-hill", name: "Cistern of the First Hill", age: 3, type: "Defensive", description: "Acts as a large Cistern; provides healing flasks." },
@@ -386,24 +390,14 @@ export const civilizationsData: Civilization[] = [
     ],
     technologies: [],
     landmarks: [
-      { id: "imperial-academy", name: "Imperial Academy", age: 2, type: "Economic", description: "Genera Oro dalle Tasse al +100% per gli edifici vicini." },
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
+      { id: "imperial-academy", name: "Imperial Academy", age: 2, type: "Economic", description: "Generate Oro dalle Tasse al +100% per gli edifici vicini." },
       { id: "barbican-of-the-sun", name: "Barbican of the Sun", age: 2, type: "Defensive", description: "Fortezza con potente cannone a lungo raggio." },
       { id: "astronomical-clocktower", name: "Astronomical Clocktower", age: 3, type: "Military", description: "Produce macchine d'assedio con +50% HP. Include Springald, Trebuchet, Bombarda e Nido delle Api esclusive." },
       { id: "imperial-palace", name: "Imperial Palace", age: 3, type: "Economic", description: "Ampio raggio visivo. Con 'Spie Imperiali' rivela la posizione dei Villici nemici." },
       { id: "great-wall-gatehouse", name: "Great Wall Gatehouse", age: 4, type: "Defensive", description: "Sblocca la Grande Muraglia. Aumenta la salute delle Mura di Pietra e Porte del +100%." },
       { id: "spirit-way", name: "Spirit Way", age: 4, type: "Military", description: "Riduce il costo delle unità della Dinastia del -30% nelle vicinanze." }
     ]
-  },
-  {
-    id: "delhi",
-    name: "Sultanato di Delhi",
-    flag: "/civs/Delhi Sultanate.webp",
-    difficulty: "Difficile",
-    shortDescription: "A research-focused civilization with free technologies and War Elephants.",
-    passiveBonuses: ["All technologies are free but take longer to research.", "Scholars speed up research times significantly."],
-    uniqueUnits: [],
-    technologies: [],
-    landmarks: []
   },
   {
     id: "english",
@@ -473,6 +467,7 @@ export const civilizationsData: Civilization[] = [
       { id: "tech-shattering-projectiles", name: "Shattering Projectiles", age: 4, building: "Siege Workshop", description: "Trebuchets deal AoE damage." }
     ],
     landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
       { id: "abbey-of-kings", name: "Abbey of Kings", age: 2, type: "Religious", description: "Heals nearby friendly units out of combat (+6 HP/1s). Can produce Kings." },
       { id: "council-hall", name: "Council Hall", age: 2, type: "Military", description: "Archery Range that works 100% faster. Longbowmen are 5% cheaper." },
       { id: "kings-palace", name: "King's Palace", age: 3, type: "Economic", description: "Acts as a fully functional Town Center." },
@@ -529,6 +524,7 @@ export const civilizationsData: Civilization[] = [
       { id: "tech-enlistment-incentives", name: "Enlistment Incentives", age: 4, building: "Keep", description: "Improves French influence, reducing unit cost around Keeps by 10%." }
     ],
     landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
       { id: "chamber-of-commerce", name: "Chamber of Commerce", age: 2, type: "Economic", description: "Acts as a Market. All Traders return +30% more resources." },
       { id: "school-of-cavalry", name: "School of Cavalry", age: 2, type: "Military", description: "Acts as a Stable. All Stables produce units 20% faster." },
       { id: "guild-hall", name: "Guild Hall", age: 3, type: "Economic", description: "Stores resources over time; generation speed increases with accumulation." },
@@ -579,6 +575,7 @@ export const civilizationsData: Civilization[] = [
     ],
     technologies: [],
     landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
       { id: "aachen-chapel", name: "Aachen Chapel", age: 2, type: "Economic", description: "Inspires units in a large radius if a Prelate is garrisoned." },
       { id: "meinwerk-palace", name: "Meinwerk Palace", age: 2, type: "Technology", description: "Blacksmith where technologies cost -40% and research 40% faster." },
       { id: "burgrave-palace", name: "Burgrave Palace", age: 3, type: "Military", description: "Barracks that produces infantry 400% faster (in batches)." },
@@ -602,6 +599,7 @@ export const civilizationsData: Civilization[] = [
     ],
     technologies: [],
     landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
       { id: "koka-township", name: "Koka Township", age: 2, type: "Military", description: "Produces Shinobi units." },
       { id: "kura-storehouse", name: "Kura Storehouse", age: 2, type: "Economic", description: "Acts as a Resource Drop-off; generates free Wood/Farms." },
       { id: "floating-gate", name: "Floating Gate", age: 3, type: "Religious", description: "Produces Shinto Priests and Yorishiro for building buffs." },
@@ -623,6 +621,7 @@ export const civilizationsData: Civilization[] = [
     ],
     technologies: [],
     landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
       { id: "chamber-commerce-jd", name: "Camera di Commercio", age: 2, type: "Economic", description: "Aumenta la generazione di oro dal commercio del 20%." },
       { id: "school-cavalry-jd", name: "Scuola di Cavalleria", age: 2, type: "Military", description: "Tutte le stalle producono unità il 20% più velocemente." },
       { id: "guild-hall-jd", name: "Sede della Gilda", age: 3, type: "Economic", description: "Accumula risorse nel tempo." },
@@ -668,6 +667,7 @@ export const civilizationsData: Civilization[] = [
     ],
     technologies: [],
     landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
       { id: "mansa-quarry", name: "Cava di Mansa", age: 2, type: "Economic", description: "Generates Gold or Stone passively (75/min)." },
       { id: "saharan-trade", name: "Rete Commerciale Sahariana", age: 2, type: "Defensive", description: "Toll Outpost that generates Food from trade." },
       { id: "farimba-garrison", name: "Guarnigione di Farimba", age: 3, type: "Military", description: "Trains specialized units in batches for Gold." },
@@ -724,6 +724,7 @@ export const civilizationsData: Civilization[] = [
       { id: "tech-stone-commerce", name: "Stone Commerce", age: 4, building: "Market", description: "Traders also provide stone alongside gold." }
     ],
     landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
       { id: "deer-stones", name: "Deer Stones", age: 2, type: "Military", description: "Grants Yam Network speed aura and special archer units." },
       { id: "silver-tree", name: "The Silver Tree", age: 2, type: "Economic", description: "Acts as a Market. Trader production +40% faster and -40% cheaper." },
       { id: "kurultai", name: "Kurultai", age: 3, type: "Military", description: "Heals nearby units and provides +20% damage bonus with Khan." },
@@ -758,6 +759,7 @@ export const civilizationsData: Civilization[] = [
     ],
     technologies: [],
     landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
       { id: "sultanhani", name: "Sultanhani Trade Network", age: 2, type: "Economic", description: "Garrisons Traders to generate Gold over time." },
       { id: "twin-minaret", name: "Twin Minaret Medrese", age: 2, type: "Economic", description: "Acts as a Mill; spawns infinite Berry Bushes." },
       { id: "istanbul-palace", name: "Istanbul Imperial Palace", age: 3, type: "Technology", description: "Increases Vizier Point generation speed." },
@@ -806,6 +808,7 @@ export const civilizationsData: Civilization[] = [
     ],
     technologies: [],
     landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
       { id: "golden-gate", name: "The Golden Gate", age: 2, type: "Economic", description: "Specialized Market with highly favorable exchange rates." },
       { id: "kremlin", name: "The Kremlin", age: 2, type: "Defensive", description: "Reinforced Wooden Fortress; can call temporary Militia." },
       { id: "high-trade-house", name: "High Trade House", age: 3, type: "Economic", description: "Generates gold from nearby trees and periodically spawns Deer." },
@@ -861,6 +864,7 @@ export const civilizationsData: Civilization[] = [
     ],
     technologies: [],
     landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
       { id: "jiangnan-tower", name: "Torre Jiangnan", age: 2, type: "Military", description: "Acts as tax drop-off; grants free units on building completion." },
       { id: "meditation-gardens", name: "Giardini della Meditazione", age: 2, type: "Economic", description: "Generates resources based on nearby deposits." },
       { id: "mount-lu", name: "Accademia del Monte Lu", age: 3, type: "Economic", description: "Improves tax collection and food gathering." },
