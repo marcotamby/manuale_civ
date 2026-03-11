@@ -1,0 +1,541 @@
+﻿[dotenv@17.3.1] injecting env (3) from .env -- tip: ÔÜí´©Å secrets for agents: https://dotenvx.com/as2
+{
+  "brokenUnits": [
+    {
+      "civ": "Rusiani",
+      "name": "Knight (Rus)",
+      "id": "rus-knight",
+      "status": 404
+    },
+    {
+      "civ": "Ottomani",
+      "name": "Cavalry",
+      "id": "sipahi",
+      "status": 404
+    },
+    {
+      "civ": "Ottomani",
+      "name": "Mehter",
+      "id": "mehter",
+      "status": 404
+    },
+    {
+      "civ": "Ottomani",
+      "name": "Janissary",
+      "id": "janissary",
+      "status": 404
+    },
+    {
+      "civ": "Ottomani",
+      "name": "Great Bombard",
+      "id": "great-bombard",
+      "status": 404
+    },
+    {
+      "civ": "Mongoli",
+      "name": "Khan",
+      "id": "khan",
+      "status": 404
+    },
+    {
+      "civ": "Mongoli",
+      "name": "Keshik",
+      "id": "keshik",
+      "status": 404
+    },
+    {
+      "civ": "Sacro Romano Impero",
+      "name": "Landsknecht",
+      "id": "landsknecht",
+      "status": 404
+    },
+    {
+      "civ": "Cinesi",
+      "name": "Zhuge Nu",
+      "id": "zhuge-nu",
+      "status": 404
+    },
+    {
+      "civ": "Cinesi",
+      "name": "Guardia del Palazzo",
+      "id": "palace-guard",
+      "status": 404
+    },
+    {
+      "civ": "Cinesi",
+      "name": "Lanciere di Fuoco",
+      "id": "fire-lancer",
+      "status": 404
+    },
+    {
+      "civ": "Cinesi",
+      "name": "Granatiere",
+      "id": "grenadier",
+      "status": 404
+    },
+    {
+      "civ": "Giovanna d'Arco",
+      "name": "Giovanna d'Arco",
+      "id": "jeanne-hero",
+      "status": 404
+    },
+    {
+      "civ": "Giovanna d'Arco",
+      "name": "Cavaliere di Giovanna",
+      "id": "jeannes-rider",
+      "status": 404
+    },
+    {
+      "civ": "Giovanna d'Arco",
+      "name": "Campione di Giovanna",
+      "id": "jeannes-champion",
+      "status": 404
+    },
+    {
+      "civ": "Eredit├á di Zhu Xi",
+      "name": "Zhuge Nu",
+      "id": "zhuge-nu-zhuxi",
+      "status": 404
+    },
+    {
+      "civ": "Eredit├á di Zhu Xi",
+      "name": "Monaco Shaolin",
+      "id": "shaolin-monk",
+      "status": 404
+    },
+    {
+      "civ": "Eredit├á di Zhu Xi",
+      "name": "Predone Yuan",
+      "id": "yuan-raider",
+      "status": 404
+    },
+    {
+      "civ": "Dinastia Abbaside",
+      "name": "Camel Archer",
+      "id": "camel-archer",
+      "status": 404
+    },
+    {
+      "civ": "Dinastia Abbaside",
+      "name": "Ghulam",
+      "id": "ghulam",
+      "status": 404
+    },
+    {
+      "civ": "Dinastia Abbaside",
+      "name": "Camel Rider",
+      "id": "camel-rider",
+      "status": 404
+    },
+    {
+      "civ": "Bizantini",
+      "name": "Limitanei",
+      "id": "limitanei",
+      "status": 404
+    },
+    {
+      "civ": "Bizantini",
+      "name": "Varangian Guard",
+      "id": "varangian-guard",
+      "status": 404
+    },
+    {
+      "civ": "Bizantini",
+      "name": "Cataphract",
+      "id": "cataphract",
+      "status": 404
+    },
+    {
+      "civ": "Bizantini",
+      "name": "Cheirosiphon",
+      "id": "cheirosiphon",
+      "status": 404
+    },
+    {
+      "civ": "Giapponesi",
+      "name": "Samurai",
+      "id": "samurai",
+      "status": 404
+    },
+    {
+      "civ": "Giapponesi",
+      "name": "Onna-Bugeisha",
+      "id": "onna-bugeisha",
+      "status": 404
+    },
+    {
+      "civ": "Giapponesi",
+      "name": "Shinobi",
+      "id": "shinobi",
+      "status": 404
+    },
+    {
+      "civ": "Giapponesi",
+      "name": "Ozutsu",
+      "id": "ozutsu",
+      "status": 404
+    },
+    {
+      "civ": "Ayyubidi",
+      "name": "Desert Raider",
+      "id": "desert-raider",
+      "status": 404
+    },
+    {
+      "civ": "Ayyubidi",
+      "name": "Camel Lancer",
+      "id": "camel-lancer",
+      "status": 404
+    },
+    {
+      "civ": "Ayyubidi",
+      "name": "Ghulam",
+      "id": "ghulam-ayyubid",
+      "status": 404
+    },
+    {
+      "civ": "Maliani",
+      "name": "Donso",
+      "id": "donso",
+      "status": 404
+    },
+    {
+      "civ": "Maliani",
+      "name": "Giavellottiere",
+      "id": "javelin-thrower",
+      "status": 404
+    },
+    {
+      "civ": "Maliani",
+      "name": "Guerriero Musofadi",
+      "id": "musofadi-warrior",
+      "status": 404
+    },
+    {
+      "civ": "Maliani",
+      "name": "Sofa",
+      "id": "sofa",
+      "status": 404
+    },
+    {
+      "civ": "Francesi",
+      "name": "Royal Knight",
+      "id": "royal-knight",
+      "status": 404
+    },
+    {
+      "civ": "Francesi",
+      "name": "Arbal├®trier",
+      "id": "arbaletrier",
+      "status": 404
+    }
+  ],
+  "brokenLandmarks": [
+    {
+      "civ": "Rusiani",
+      "name": "The Golden Gate",
+      "id": "golden-gate",
+      "status": 404
+    },
+    {
+      "civ": "Rusiani",
+      "name": "Abbey of the Trinity",
+      "id": "abbey-trinity",
+      "status": 404
+    },
+    {
+      "civ": "Ottomani",
+      "name": "Sultanhani Trade Network",
+      "id": "sultanhani",
+      "status": 404
+    },
+    {
+      "civ": "Ottomani",
+      "name": "Twin Minaret Medrese",
+      "id": "twin-minaret",
+      "status": 404
+    },
+    {
+      "civ": "Ottomani",
+      "name": "Istanbul Imperial Palace",
+      "id": "istanbul-palace",
+      "status": 404
+    },
+    {
+      "civ": "Ottomani",
+      "name": "Mehmed Imperial Armory",
+      "id": "mehmed-armory",
+      "status": 404
+    },
+    {
+      "civ": "Ottomani",
+      "name": "Sea Gate Castle",
+      "id": "sea-gate-castle",
+      "status": 404
+    },
+    {
+      "civ": "Mongoli",
+      "name": "The Silver Tree",
+      "id": "silver-tree",
+      "status": 404
+    },
+    {
+      "civ": "Mongoli",
+      "name": "The White Stupa",
+      "id": "white-stupa",
+      "status": 404
+    },
+    {
+      "civ": "Giovanna d'Arco",
+      "name": "Camera di Commercio",
+      "id": "chamber-commerce-jd",
+      "status": 404
+    },
+    {
+      "civ": "Giovanna d'Arco",
+      "name": "Scuola di Cavalleria",
+      "id": "school-cavalry-jd",
+      "status": 404
+    },
+    {
+      "civ": "Giovanna d'Arco",
+      "name": "Sede della Gilda",
+      "id": "guild-hall-jd",
+      "status": 404
+    },
+    {
+      "civ": "Giovanna d'Arco",
+      "name": "Istituto Reale",
+      "id": "royal-institute-jd",
+      "status": 404
+    },
+    {
+      "civ": "Giovanna d'Arco",
+      "name": "Collegio d'Artiglieria",
+      "id": "college-artillery-jd",
+      "status": 404
+    },
+    {
+      "civ": "Giovanna d'Arco",
+      "name": "Palazzo Rosso",
+      "id": "red-palace-jd",
+      "status": 404
+    },
+    {
+      "civ": "Eredit├á di Zhu Xi",
+      "name": "Torre Jiangnan",
+      "id": "jiangnan-tower",
+      "status": 404
+    },
+    {
+      "civ": "Eredit├á di Zhu Xi",
+      "name": "Giardini della Meditazione",
+      "id": "meditation-gardens",
+      "status": 404
+    },
+    {
+      "civ": "Eredit├á di Zhu Xi",
+      "name": "Accademia del Monte Lu",
+      "id": "mount-lu",
+      "status": 404
+    },
+    {
+      "civ": "Eredit├á di Zhu Xi",
+      "name": "Monastero Shaolin",
+      "id": "shaolin-monastery",
+      "status": 404
+    },
+    {
+      "civ": "Eredit├á di Zhu Xi",
+      "name": "Tempio del Sole",
+      "id": "temple-sun",
+      "status": 404
+    },
+    {
+      "civ": "Eredit├á di Zhu Xi",
+      "name": "Biblioteca di Zhu Xi",
+      "id": "zhuxi-library",
+      "status": 404
+    },
+    {
+      "civ": "Dinastia Abbaside",
+      "name": "Grand Winery",
+      "id": "grand-winery",
+      "status": 404
+    },
+    {
+      "civ": "Dinastia Abbaside",
+      "name": "Imperial Hippodrome",
+      "id": "imperial-hippodrome",
+      "status": 404
+    },
+    {
+      "civ": "Dinastia Abbaside",
+      "name": "Cistern of the First Hill",
+      "id": "cistern-first-hill",
+      "status": 404
+    },
+    {
+      "civ": "Dinastia Abbaside",
+      "name": "Golden Horn Tower",
+      "id": "golden-horn-tower",
+      "status": 404
+    },
+    {
+      "civ": "Dinastia Abbaside",
+      "name": "Foreign Engineering Company",
+      "id": "foreign-engineering",
+      "status": 404
+    },
+    {
+      "civ": "Dinastia Abbaside",
+      "name": "Palatine School",
+      "id": "palatine-school",
+      "status": 404
+    },
+    {
+      "civ": "Bizantini",
+      "name": "Grand Winery",
+      "id": "grand-winery",
+      "status": 404
+    },
+    {
+      "civ": "Bizantini",
+      "name": "Imperial Hippodrome",
+      "id": "imperial-hippodrome",
+      "status": 404
+    },
+    {
+      "civ": "Bizantini",
+      "name": "Cistern of the First Hill",
+      "id": "cistern-first-hill",
+      "status": 404
+    },
+    {
+      "civ": "Bizantini",
+      "name": "Golden Horn Tower",
+      "id": "golden-horn-tower",
+      "status": 404
+    },
+    {
+      "civ": "Bizantini",
+      "name": "Foreign Engineering Company",
+      "id": "foreign-engineering",
+      "status": 404
+    },
+    {
+      "civ": "Bizantini",
+      "name": "Palatine School",
+      "id": "palatine-school",
+      "status": 404
+    },
+    {
+      "civ": "Inglesi",
+      "name": "The White Tower",
+      "id": "white-tower",
+      "status": 404
+    },
+    {
+      "civ": "Giapponesi",
+      "name": "Koka Township",
+      "id": "koka-township",
+      "status": 404
+    },
+    {
+      "civ": "Giapponesi",
+      "name": "Kura Storehouse",
+      "id": "kura-storehouse",
+      "status": 404
+    },
+    {
+      "civ": "Giapponesi",
+      "name": "Floating Gate",
+      "id": "floating-gate",
+      "status": 404
+    },
+    {
+      "civ": "Giapponesi",
+      "name": "Temple of Equality",
+      "id": "temple-equality",
+      "status": 404
+    },
+    {
+      "civ": "Giapponesi",
+      "name": "Tanegashima Gunsmith",
+      "id": "tanegashima",
+      "status": 404
+    },
+    {
+      "civ": "Ayyubidi",
+      "name": "Cava di Mansa",
+      "id": "mansa-quarry",
+      "status": 404
+    },
+    {
+      "civ": "Ayyubidi",
+      "name": "Rete Commerciale Sahariana",
+      "id": "saharan-trade",
+      "status": 404
+    },
+    {
+      "civ": "Ayyubidi",
+      "name": "Guarnigione di Farimba",
+      "id": "farimba-garrison",
+      "status": 404
+    },
+    {
+      "civ": "Ayyubidi",
+      "name": "Recinto dei Fulani",
+      "id": "fulani-corral",
+      "status": 404
+    },
+    {
+      "civ": "Ayyubidi",
+      "name": "Forte della Cacciatrice",
+      "id": "fort-huntress",
+      "status": 404
+    },
+    {
+      "civ": "Ayyubidi",
+      "name": "Griot Bara",
+      "id": "griot-bara",
+      "status": 404
+    },
+    {
+      "civ": "Maliani",
+      "name": "Cava di Mansa",
+      "id": "mansa-quarry",
+      "status": 404
+    },
+    {
+      "civ": "Maliani",
+      "name": "Rete Commerciale Sahariana",
+      "id": "saharan-trade",
+      "status": 404
+    },
+    {
+      "civ": "Maliani",
+      "name": "Guarnigione di Farimba",
+      "id": "farimba-garrison",
+      "status": 404
+    },
+    {
+      "civ": "Maliani",
+      "name": "Recinto dei Fulani",
+      "id": "fulani-corral",
+      "status": 404
+    },
+    {
+      "civ": "Maliani",
+      "name": "Forte della Cacciatrice",
+      "id": "fort-huntress",
+      "status": 404
+    },
+    {
+      "civ": "Maliani",
+      "name": "Griot Bara",
+      "id": "griot-bara",
+      "status": 404
+    }
+  ]
+}

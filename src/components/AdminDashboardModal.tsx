@@ -13,6 +13,8 @@ export interface Suggestion {
   source: string | null;
   user_name: string | null;
   user_email: string | null;
+  user_rank?: string;
+  user_nickname?: string;
   status: 'pending' | 'implemented' | 'rejected';
 }
 
@@ -34,6 +36,15 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [rejectionReason, setRejectionReason] = useState('');
   const [pendingNotifCount, setPendingNotifCount] = useState(0);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [editingBOs, setEditingBOs] = useState<Record<string, any>>({});
+  const [expandedSugg, setExpandedSugg] = useState<string | null>(null);
+
+  const getYoutubeId = (url: string) => {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
 
   const fetchSuggestions = async () => {
     try {
@@ -146,12 +157,30 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
             updateData = { weaknesses: [...safeArray(currentCiv.weaknesses), ...newLines] };
             break;
           case 'build_order':
+            let boData: any;
+            try {
+              boData = JSON.parse(sugg.suggestion_text);
+            } catch (e) {
+              // Fallback for old string-based BOs
+              boData = {
+                title: `Proposta Community - ${new Date().toLocaleDateString('it-IT')}`,
+                steps: sugg.suggestion_text.split('\n').filter(l => l.trim() !== '').map(l => ({ action: l })),
+                source: sugg.source || ''
+              };
+            }
+
+            // Use edits if available
+            const editedData = editingBOs[sugg.id] || boData;
+
             const newBO = {
               id: `bo-${Date.now()}`,
-              title: `Proposta Community - ${new Date().toLocaleDateString('it-IT')}`,
-              description: sugg.suggestion_text,
+              title: editedData.title,
+              description: editedData.description || '',
               difficulty: 'Medium',
-              steps: [{ action: 'Vedi sopra per i dettagli della strategia.' }]
+              steps: editedData.steps,
+              source: editedData.source,
+              author_nickname: sugg.user_nickname || sugg.user_name,
+              author_rank: sugg.user_rank
             };
             updateData = { build_orders: [...safeArray(currentCiv.build_orders), newBO] };
             break;
@@ -292,29 +321,144 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
                   <div className="flex flex-col md:flex-row justify-between gap-6 relative z-10">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        <span className="px-3 py-1 bg-blue-600/20 text-blue-400 text-xs font-bold rounded-lg border border-blue-500/30 uppercase tracking-wider">
-                          {sugg.civ_name}
-                        </span>
-                        <span className="text-sm text-gray-400 flex items-center gap-2">
-                          Sezione: <span className="text-white font-medium">{sugg.section}</span>
-                        </span>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="px-3 py-1 bg-blue-600/20 text-blue-400 text-xs font-bold rounded-lg border border-blue-500/30 uppercase tracking-wider">
+                            {sugg.civ_name}
+                          </span>
+                          <span className="text-sm text-gray-400 flex items-center gap-2">
+                            Sezione: <span className="text-white font-medium">{sugg.section}</span>
+                          </span>
+                        </div>
+                        {sugg.section === 'build_order' && (
+                          <button
+                            onClick={() => setExpandedSugg(expandedSugg === sugg.id ? null : sugg.id)}
+                            className="text-xs text-blue-400 hover:underline"
+                          >
+                            {expandedSugg === sugg.id ? 'Chiudi Editor' : 'Edita Passaggi'}
+                          </button>
+                        )}
                       </div>
 
                       <div className="bg-black/50 p-4 rounded-lg border border-gray-700/50 mb-4">
-                        <p className="text-gray-200 text-sm whitespace-pre-wrap leading-relaxed">{sugg.suggestion_text}</p>
+                        {sugg.section === 'build_order' ? (
+                          (() => {
+                            let boData: any;
+                            try {
+                              boData = JSON.parse(sugg.suggestion_text);
+                            } catch (e) {
+                              return <p className="text-gray-200 text-sm whitespace-pre-wrap">{sugg.suggestion_text}</p>;
+                            }
+
+                            const currentEdits = editingBOs[sugg.id] || boData;
+
+                            const updateBOField = (field: string, value: any) => {
+                              setEditingBOs(prev => ({
+                                ...prev,
+                                [sugg.id]: { ...(prev[sugg.id] || boData), [field]: value }
+                              }));
+                            };
+
+                            const updateBOStep = (idx: number, field: string, value: string) => {
+                              const newSteps = [...currentEdits.steps];
+                              newSteps[idx] = { ...newSteps[idx], [field]: value };
+                              updateBOField('steps', newSteps);
+                            };
+
+                            if (expandedSugg !== sugg.id) {
+                              return (
+                                <div className="space-y-3">
+                                  <p className="text-blue-400 font-bold text-xl">{currentEdits.title}</p>
+                                  <div className="space-y-3 mt-3">
+                                    {currentEdits.steps.map((s: any, i: number) => (
+                                      <p key={i} className="text-base text-gray-100">
+                                        <span className="text-yellow-500 font-mono mr-4 text-sm font-bold">{s.time}</span> {s.action}
+                                      </p>
+                                    ))}
+                                  </div>
+                                  {currentEdits.source && (
+                                    <div className="text-[10px] text-blue-400/60 truncate mt-2 font-mono italic">
+                                      Fonte: {currentEdits.source}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            }
+
+                            return (
+                              <div className="space-y-5 animate-in fade-in duration-300">
+                                <div>
+                                  <label className="text-xs text-gray-500 uppercase font-bold mb-1.5 block">Titolo</label>
+                                  <input
+                                    className="w-full bg-black/40 border border-gray-700 rounded-lg px-4 py-3 text-lg text-white focus:border-blue-500 outline-none"
+                                    value={currentEdits.title}
+                                    onChange={(e) => updateBOField('title', e.target.value)}
+                                  />
+                                </div>
+                                <div className="space-y-4">
+                                  <label className="text-xs text-gray-500 uppercase font-bold mb-1.5 block">Passaggi</label>
+                                  {currentEdits.steps.map((s: any, i: number) => (
+                                    <div key={i} className="grid grid-cols-12 gap-3 p-4 bg-white/5 rounded border border-white/5">
+                                      <input
+                                        className="col-span-2 bg-black/40 border border-transparent rounded px-2 py-2 text-base text-yellow-500 focus:border-blue-500 outline-none font-mono"
+                                        value={s.time}
+                                        onChange={(e) => updateBOStep(i, 'time', e.target.value)}
+                                      />
+                                      <input
+                                        className="col-span-10 bg-black/40 border border-transparent rounded px-2 py-2 text-lg text-white focus:border-blue-500 outline-none font-bold"
+                                        value={s.action}
+                                        onChange={(e) => updateBOStep(i, 'action', e.target.value)}
+                                      />
+                                      <textarea
+                                        className="col-span-12 bg-black/40 border border-transparent rounded px-2 py-2 text-base text-gray-300 focus:border-blue-500 outline-none resize-none h-20 italic"
+                                        value={s.note}
+                                        placeholder="Nota..."
+                                        onChange={(e) => updateBOStep(i, 'note', e.target.value)}
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                                <div>
+                                  <label className="text-[10px] text-gray-500 uppercase font-bold mb-1.5 block">Fonte / Link YouTube</label>
+                                  <input
+                                    className="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-yellow-400/80 focus:border-blue-500 outline-none"
+                                    value={currentEdits.source}
+                                    onChange={(e) => updateBOField('source', e.target.value)}
+                                  />
+                                  {currentEdits.source && getYoutubeId(currentEdits.source) && (
+                                    <div className="mt-3 relative aspect-video w-full max-w-[240px] rounded-lg overflow-hidden border border-white/10 group">
+                                      <img
+                                        src={`https://img.youtube.com/vi/${getYoutubeId(currentEdits.source)}/mqdefault.jpg`}
+                                        alt="Preview"
+                                        className="w-full h-full object-cover"
+                                      />
+                                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                        <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center shadow-lg">
+                                          <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white border-b-[6px] border-b-transparent ml-1" />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })()
+                        ) : (
+                          <p className="text-gray-200 text-sm whitespace-pre-wrap leading-relaxed">{sugg.suggestion_text}</p>
+                        )}
                       </div>
 
                       <div className="flex flex-wrap items-center gap-4 text-xs">
-                        {sugg.source && (
-                          <div className="flex items-center gap-1 text-yellow-400/80 bg-yellow-400/10 px-2 py-1 rounded">
-                            <span className="font-bold">Fonte:</span> {sugg.source}
-                          </div>
-                        )}
-                        <div className="text-gray-500">
-                          <strong>Autore:</strong> {sugg.user_name || 'Anonimo'}
+                        <div className="flex items-center gap-2 text-gray-400 bg-white/5 px-2 py-1 rounded border border-white/5">
+                          <span className="font-bold text-[10px] uppercase text-gray-500">Autore:</span>
+                          <span className="text-blue-400">{sugg.user_nickname || sugg.user_name || 'Anonimo'}</span>
+                          {sugg.user_rank && sugg.user_rank !== 'Unranked' && (
+                            <span className="bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded-md text-[10px] border border-blue-500/30">
+                              {sugg.user_rank}
+                            </span>
+                          )}
                         </div>
-                        <div className="text-gray-500 text-blue-400/80">
+                        <div className="text-gray-500">
                           <strong>Email:</strong> {sugg.user_email || 'Non fornita'}
                         </div>
                         <div className="text-gray-500">

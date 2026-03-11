@@ -1,20 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
-import { User } from 'lucide-react';
+import { Trash2, Plus, User, Info, Globe, ChevronDown } from 'lucide-react';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
-import { supabase } from '../lib/supabaseClient';
-import { Plus, Trash2, Clock, FileText } from 'lucide-react';
 
 interface SuggestionFormProps {
   civName: string;
 }
 
 export function EditSuggestionForm({ civName }: SuggestionFormProps) {
+  const [searchParams] = useSearchParams();
   const { isAuthenticated, user, openLoginModal } = useAuth();
-  const [section, setSection] = useState('');
-  const [suggestion, setSuggestion] = useState('');
-  const [source, setSource] = useState('');
+  const [section, setSection] = useState(searchParams.get('section') || '');
+  const [title, setTitle] = useState(''); // For build order title
+  const [description, setDescription] = useState(''); // For build order description
+  const [text, setText] = useState(''); // For general suggestion text
+  const [source, setSource] = useState(''); // For general source or build order source
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
     isVisible: false,
@@ -35,6 +38,13 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
     setBoSteps(newSteps);
   };
 
+  useEffect(() => {
+    const sectionFromUrl = searchParams.get('section');
+    if (sectionFromUrl) {
+      setSection(sectionFromUrl);
+    }
+  }, [searchParams]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
@@ -45,22 +55,33 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
     try {
       setIsSubmitting(true);
 
-      let finalSuggestion = suggestion;
+      let submissionText = '';
       if (section === 'build_order') {
-        finalSuggestion = "BUILD ORDER STRUTTURATO:\n\n" + boSteps
-          .filter(s => s.action.trim() !== '')
-          .map(s => `${s.time ? `[${s.time}] ` : ''}${s.action}${s.note ? `\n   Note: ${s.note}` : ''}`)
-          .join('\n\n');
+        const boData = {
+          title: title || 'Nuovo Build Order',
+          description: description,
+          steps: boSteps,
+          source: source
+        };
+        submissionText = JSON.stringify(boData);
+      } else {
+        submissionText = text;
       }
 
-      const { error } = await supabase.from('suggestions').insert({
-        civ_name: civName,
-        section,
-        suggestion_text: finalSuggestion,
-        source: source || null,
-        user_name: user?.name || null,
-        user_email: user?.email || null,
-      });
+      const { error } = await supabase
+        .from('suggestions')
+        .insert([
+          {
+            civ_name: civName,
+            section,
+            suggestion_text: submissionText,
+            user_name: user?.name || 'Anonimo',
+            user_email: user?.email || '',
+            user_rank: user?.rank || 'Unranked',
+            user_nickname: user?.nickname || '',
+            status: 'pending'
+          }
+        ]);
 
       if (error) throw error;
 
@@ -71,8 +92,11 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
       });
 
       setSection('');
-      setSuggestion('');
+      setText('');
+      setTitle('');
+      setDescription('');
       setSource('');
+      setBoSteps([{ time: '', action: '', note: '' }]); // Reset build order steps
     } catch (err: any) {
       console.error('Error submitting suggestion:', err);
       setToast({
@@ -116,14 +140,19 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
         Hai informazioni più accurate su questa civiltà? Proponi una modifica e il nostro team la esaminerà.
       </p>
 
-
-
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-1">Sezione da modificare</label>
           <select
             value={section}
-            onChange={(e) => setSection(e.target.value)}
+            onChange={(e) => {
+              setSection(e.target.value);
+              setText('');
+              setTitle('');
+              setDescription('');
+              setSource('');
+              setBoSteps([{ time: '', action: '', note: '' }]);
+            }}
             required
             className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors [&>option]:bg-[#1a1c23] [&>option]:text-white"
           >
@@ -137,111 +166,124 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
           </select>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">Descrizione (opzionale)</label>
-          <textarea
-            value={suggestion}
-            onChange={(e) => setSuggestion(e.target.value)}
-            rows={section === 'build_order' ? 2 : 5}
-            className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors resize-y"
-            placeholder={section === 'build_order' ? "Breve introduzione alla strategia..." : "Descrivi dettagliatamente la modifica che proponi..."}
-          />
-        </div>
+        {section !== 'build_order' && section !== '' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Descrizione</label>
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              rows={5}
+              className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors resize-y"
+              placeholder="Descrivi dettagliatamente la modifica che proponi..."
+              required
+            />
+          </div>
+        )}
 
         {section === 'build_order' && (
-          <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-            <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium text-blue-400">Passaggi Build Order</label>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Titolo Build Order</label>
+              <input
+                type="text"
+                placeholder="es. Fast Castle, 2-Town Center, ecc."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Breve Descrizione / Introduzione Strategia</label>
+              <textarea
+                placeholder="es. Questa build punta a massimizzare l'economia iniziale..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors resize-y h-24"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Passaggi</label>
+              {boSteps.map((step, index) => (
+                <div key={index} className="flex flex-col gap-2 p-4 bg-white/5 rounded-xl border border-white/10 group relative">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="0:00"
+                      value={step.time}
+                      onChange={(e) => updateStep(index, 'time', e.target.value)}
+                      className="w-28 bg-black/40 border border-white/10 rounded-lg px-3 py-3 text-base text-yellow-400 focus:outline-none focus:border-blue-500 transition-colors font-mono"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Azione (es. 6 a cibo)"
+                      value={step.action}
+                      onChange={(e) => updateStep(index, 'action', e.target.value)}
+                      className="flex-1 bg-black/40 border border-white/10 rounded-lg px-4 py-3.5 text-xl text-white focus:outline-none focus:border-blue-500 transition-colors font-bold"
+                      required
+                    />
+                    {boSteps.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeStep(index)}
+                        className="p-2 text-gray-500 hover:text-red-400 transition-colors"
+                      >
+                        <Trash2 size={24} />
+                      </button>
+                    )}
+                  </div>
+                  <textarea
+                    placeholder="Note aggiuntive"
+                    value={step.note}
+                    onChange={(e) => updateStep(index, 'note', e.target.value)}
+                    className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-base text-gray-200 focus:outline-none focus:border-blue-500 transition-colors resize-none h-24 italic"
+                  />
+                </div>
+              ))}
               <button
                 type="button"
                 onClick={addStep}
-                className="flex items-center gap-1 text-xs bg-blue-600/20 text-blue-400 px-3 py-1.5 rounded-lg border border-blue-500/30 hover:bg-blue-600/40 transition-all font-bold"
+                className="w-full py-3 border-2 border-dashed border-white/10 rounded-xl text-gray-400 hover:text-white hover:border-white/20 transition-all flex items-center justify-center gap-2 text-sm"
               >
-                <Plus size={14} /> Aggiungi Step
+                <Plus size={16} />
+                Aggiungi Passaggio
               </button>
-            </div>
-
-            <div className="space-y-3">
-              {boSteps.map((step, index) => (
-                <div key={index} className="glass p-4 rounded-xl border border-white/5 relative group">
-                  <div className="grid grid-cols-12 gap-3">
-                    <div className="col-span-3">
-                      <div className="relative">
-                        <Clock size={12} className="absolute left-3 top-3.5 text-gray-500" />
-                        <input
-                          type="text"
-                          placeholder="Min:Sec"
-                          value={step.time}
-                          onChange={(e) => updateStep(index, 'time', e.target.value)}
-                          className="w-full bg-black/40 border border-gray-700 rounded-lg pl-8 pr-2 py-2.5 text-xs text-white focus:border-blue-500 outline-none"
-                        />
-                      </div>
-                    </div>
-                    <div className="col-span-8">
-                      <input
-                        type="text"
-                        placeholder="Azione (es: manda 6 a cibo)"
-                        value={step.action}
-                        onChange={(e) => updateStep(index, 'action', e.target.value)}
-                        className="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2.5 text-xs text-white focus:border-blue-500 outline-none"
-                        required={index === 0}
-                      />
-                    </div>
-                    <div className="col-span-1 flex items-center justify-end">
-                      {boSteps.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeStep(index)}
-                          className="text-gray-500 hover:text-red-500 transition-colors p-1"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      )}
-                    </div>
-                    <div className="col-span-12">
-                      <div className="relative">
-                        <FileText size={12} className="absolute left-3 top-3.5 text-gray-500" />
-                        <input
-                          type="text"
-                          placeholder="Note extra o consigli..."
-                          value={step.note}
-                          onChange={(e) => updateStep(index, 'note', e.target.value)}
-                          className="w-full bg-black/40 border border-gray-700 rounded-lg pl-8 pr-3 py-2 text-[11px] text-gray-300 focus:border-blue-500 outline-none"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         )}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">Fonte (opzionale)</label>
-          <input
-            type="text"
-            value={source}
-            onChange={(e) => setSource(e.target.value)}
-            className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors"
-            placeholder="AoE4 World, Pro Player (es. Beastyqt), ecc."
-          />
-        </div>
+        {section !== '' && (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Fonte / Video (opzionale)</label>
+              <input
+                type="text"
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+                className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors"
+                placeholder={section === 'build_order' ? "Link YouTube o guida..." : "AoE4 World, Pro Player, ecc."}
+              />
+            </div>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full sm:w-auto sm:px-8 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium shadow-lg shadow-blue-500/20 transition-all mt-2 flex items-center justify-center gap-2"
-        >
-          {isSubmitting ? (
-            <>
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              Invio in corso...
-            </>
-          ) : (
-            'Invia Proposta'
-          )}
-        </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto sm:px-8 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium shadow-lg shadow-blue-500/20 transition-all mt-2 flex items-center justify-center gap-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Invio in corso...
+                </>
+              ) : (
+                'Invia Proposta'
+              )}
+            </button>
+          </>
+        )}
       </form>
 
       <Toast

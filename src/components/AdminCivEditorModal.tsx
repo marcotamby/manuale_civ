@@ -48,6 +48,12 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
     }
   }, [civ, isOpen]);
 
+  const getYoutubeId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+
   if (!isOpen) return null;
 
   const handleSave = async () => {
@@ -407,14 +413,60 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                         <input type="text" value={bo.title} onChange={e => updateArrayField('buildOrders', idx, 'title', e.target.value)} placeholder="Titolo" className="col-span-3 bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600" />
                       </div>
                       <div className="mb-2">
-                        <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Descrizione / Strategia (Legacy)</label>
+                        <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block text-blue-400">Descrizione / Strategia</label>
                         <textarea
                           value={bo.description || ''}
                           onChange={e => updateArrayField('buildOrders', idx, 'description', e.target.value)}
-                          placeholder="Descrizione testuale della strategia..."
+                          placeholder="Descrizione obbligatoria della strategia..."
                           rows={3}
-                          className="w-full bg-gray-900 border border-gray-700/50 rounded px-2 py-1 text-xs text-gray-300 focus:border-blue-500 outline-none"
+                          className="w-full bg-gray-900 border border-blue-500/20 rounded px-3 py-2 text-sm text-gray-200 focus:border-blue-500 outline-none h-24"
                         />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 mb-2">
+                        <div>
+                          <label className="text-[10px] text-gray-500 uppercase font-bold mb-2 block text-yellow-500">Fonte / Link YouTube (Anteprima Auto)</label>
+                          <input
+                            type="text"
+                            value={bo.source || ''}
+                            onChange={e => updateArrayField('buildOrders', idx, 'source', e.target.value)}
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            className="w-full bg-gray-800 text-yellow-400 text-sm rounded px-3 py-2 border border-gray-600 focus:border-yellow-500 outline-none"
+                          />
+                          {bo.source && getYoutubeId(bo.source) && (
+                            <div className="mt-2 relative aspect-video w-full max-w-xs rounded-lg overflow-hidden border border-white/10 group">
+                              <img
+                                src={`https://img.youtube.com/vi/${getYoutubeId(bo.source)}/mqdefault.jpg`}
+                                alt="Preview"
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                                <Play size={24} className="text-white fill-white shadow-lg shadow-black/50" />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Nickname Autore</label>
+                            <input
+                              type="text"
+                              value={bo.author_nickname || ''}
+                              onChange={e => updateArrayField('buildOrders', idx, 'author_nickname', e.target.value)}
+                              className="w-full bg-gray-800 text-blue-400 text-xs rounded px-2 py-1 border border-gray-600"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Rank Autore</label>
+                            <input
+                              type="text"
+                              value={bo.author_rank || ''}
+                              onChange={e => updateArrayField('buildOrders', idx, 'author_rank', e.target.value)}
+                              placeholder="Silver III"
+                              className="w-full bg-gray-800 text-white text-xs rounded px-2 py-1 border border-gray-600"
+                            />
+                          </div>
+                        </div>
                       </div>
                       {/* Steps (Structured handling) */}
                       <div className="mt-4 space-y-3">
@@ -448,7 +500,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                                       placeholder="Min:Sec"
                                       value={step.time || ''}
                                       onChange={(e) => updateArrayField('buildOrders', idx, 'updateStep', { stepIndex: sIdx, stepField: 'time', stepValue: e.target.value })}
-                                      className="w-full bg-gray-900 border border-gray-700/50 rounded pl-6 pr-1 py-1 text-[10px] text-yellow-300 focus:border-blue-500 outline-none"
+                                      className="w-full bg-gray-900 border border-gray-700/50 rounded pl-7 pr-1 py-2 text-base text-yellow-300 focus:border-blue-500 outline-none font-mono"
                                     />
                                   </div>
                                 </div>
@@ -458,18 +510,21 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                                     placeholder="Azione..."
                                     value={step.action || ''}
                                     onChange={(e) => updateArrayField('buildOrders', idx, 'updateStep', { stepIndex: sIdx, stepField: 'action', stepValue: e.target.value })}
-                                    className="w-full bg-gray-900 border border-gray-700/50 rounded px-2 py-1 text-[10px] text-white focus:border-blue-500 outline-none"
+                                    className="w-full bg-gray-900 border border-gray-700/50 rounded px-2 py-2 text-lg text-white focus:border-blue-500 outline-none font-bold"
                                   />
                                 </div>
                                 <div className="col-span-12">
                                   <div className="relative">
-                                    <FileText size={10} className="absolute left-2 top-2 text-gray-500" />
-                                    <input
-                                      type="text"
-                                      placeholder="Note o consigli extra..."
+                                    <FileText size={14} className="absolute left-2 top-3 text-gray-500" />
+                                    <textarea
                                       value={step.note || ''}
-                                      onChange={(e) => updateArrayField('buildOrders', idx, 'updateStep', { stepIndex: sIdx, stepField: 'note', stepValue: e.target.value })}
-                                      className="w-full bg-gray-900 border border-gray-700/50 rounded pl-6 pr-2 py-1 text-[9px] text-gray-400 focus:border-blue-500 outline-none italic"
+                                      onChange={e => {
+                                        const newSteps = [...bo.steps];
+                                        newSteps[sIdx].note = e.target.value;
+                                        updateArrayField('buildOrders', idx, 'steps', newSteps);
+                                      }}
+                                      placeholder="Note passaggi..."
+                                      className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-[11px] text-gray-400 italic h-16 resize-none"
                                     />
                                   </div>
                                 </div>

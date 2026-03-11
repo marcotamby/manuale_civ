@@ -50,6 +50,9 @@ export interface BuildOrder {
   description: string;
   difficulty: 'Easy' | 'Medium' | 'Advanced';
   steps: BuildOrderStep[];
+  source?: string;
+  author_nickname?: string;
+  author_rank?: string;
 }
 
 export interface Civilization {

@@ -11,6 +11,28 @@ import { useAuth } from './AuthContext';
 import type { Civilization } from '../data/aoe4Data';
 import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight, Clock } from 'lucide-react';
 import { ResourceText } from './ResourceText';
+import { ExternalLink } from 'lucide-react';
+
+const RANK_ICONS: Record<string, string> = {
+  'Bronze I': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_bronze_1-a193ea93b70b33ed636f2356854abe66585ef4d901dcef5a5248739970d03ccc.svg',
+  'Bronze II': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_bronze_2-a193ea93b70b33ed636f2356854abe66585ef4d901dcef5a5248739970d03ccc.svg',
+  'Bronze III': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_bronze_3-a193ea93b70b33ed636f2356854abe66585ef4d901dcef5a5248739970d03ccc.svg',
+  'Silver I': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_silver_1-af994caf7a9461b35d33d8263328b152ffb146ef8882118184c5e4e3964c9337.svg',
+  'Silver II': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_silver_2-af994caf7a9461b35d33d8263328b152ffb146ef8882118184c5e4e3964c9337.svg',
+  'Silver III': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_silver_3-af994caf7a9461b35d33d8263328b152ffb146ef8882118184c5e4e3964c9337.svg',
+  'Gold I': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_gold_1-a42fe36b5df89a42efaf489e6ef10d7c5546fd36a77c5977ce34dca3e822b420.svg',
+  'Gold II': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_gold_2-e1e4843093c7120ad707e9e6ff0f0674e1db471491ef8694b72271dc08478af8.svg',
+  'Gold III': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_gold_3-68164da46a35c3c0229a4d3e8dd065957198b8f81df268ac667aa3ce642ff4d5.svg',
+  'Platinum I': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_platinum_1-55fc3aa3a2a72c71fb3eee19f251d1db6bd66f8d6a39977a222ec2c74ac6bb77.svg',
+  'Diamond I': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_diamond_1-f298786d7d0c5af34efc552724d1e6962e143f05326f6092863a3542647987be.svg',
+  'Conqueror I': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_conqueror_1-77cc5eae2e96a4b63b00a46fdf16567a134a81c0b39fa88e4e33a8c95a8071c2.svg',
+};
+
+const getYoutubeId = (url: string) => {
+  if (!url) return null;
+  const match = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+  return match ? match[1] : null;
+};
 
 type Tab = 'caratteristiche' | 'units' | 'buildorders' | 'matchups' | 'video' | 'proponi' | 'admin-edit';
 
@@ -273,34 +295,102 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 {civ.buildOrders.map((bo) => {
                   const isExpanded = expandedBOs.has(bo.id);
                   return (
-                    <div key={bo.id} className={`glass p-6 rounded-2xl border border-white/5 transition-all group h-fit`}>
-                      <div className="flex justify-between items-start mb-4">
-                        <h3 className="text-xl font-bold text-white group-hover:text-yellow-400 transition-colors">{bo.title}</h3>
+                    <div
+                      key={bo.id}
+                      className={`glass p-6 md:p-8 rounded-2xl border border-white/5 transition-all group h-fit cursor-pointer hover:border-yellow-500/30 ${isExpanded ? 'bg-white/[0.02]' : ''}`}
+                      onClick={() => {
+                        const newExpanded = new Set(expandedBOs);
+                        if (isExpanded) newExpanded.delete(bo.id);
+                        else newExpanded.add(bo.id);
+                        setExpandedBOs(newExpanded);
+                      }}
+                    >
+                      <div className="flex justify-between items-start mb-6">
+                        <h3 className="text-2xl md:text-3xl font-bold text-white group-hover:text-yellow-400 transition-colors uppercase tracking-tight">{bo.title}</h3>
                       </div>
 
-                      <div className={`text-sm text-gray-400 mb-6 ${isExpanded ? '' : 'line-clamp-2'}`}>
+                      <div className={`text-xl text-gray-300 leading-relaxed max-w-3xl mb-8 ${isExpanded ? '' : 'line-clamp-2 opacity-60'}`}>
                         <ResourceText text={bo.description} />
                       </div>
 
                       {isExpanded && bo.steps && bo.steps.length > 0 && (
-                        <div className="space-y-4 mb-6 animate-in slide-in-from-top-2 duration-300">
+                        <div className="space-y-5 mb-8 animate-in slide-in-from-top-2 duration-300">
                           {bo.steps.map((step, sIdx) => (
-                            <div key={sIdx} className="flex flex-col gap-1">
-                              <div className="flex gap-3 text-[13px] leading-relaxed">
+                            <div key={sIdx} className="flex flex-col gap-1.5 relative pl-6 border-l border-white/5">
+                              {/* Bullet point indicator */}
+                              <div className="absolute left-[-5px] top-[10px] w-[10px] h-[10px] rounded-full bg-yellow-500/80 shadow-[0_0_8px_rgba(234,179,8,0.4)]" />
+
+                              <div className="flex gap-4 items-baseline">
                                 {step.time && (
-                                  <span className="text-yellow-500 font-mono w-10 shrink-0 font-bold flex items-center gap-1">
-                                    <Clock size={10} /> {step.time}
+                                  <span className="text-yellow-500 font-mono w-24 shrink-0 font-bold flex items-center gap-1 text-xl md:text-2xl">
+                                    <Clock size={20} /> {step.time}
                                   </span>
                                 )}
-                                <ResourceText text={step.action} className="text-gray-200 font-medium" />
+                                <ResourceText text={step.action} className="text-3xl md:text-5xl text-white font-extrabold tracking-tighter leading-none py-1" />
                               </div>
                               {step.note && (
-                                <div className="ml-13 pl-3 border-l border-white/10">
-                                  <ResourceText text={step.note} className="text-[11px] text-gray-500 italic" />
+                                <div className="pl-0 mt-3 mb-2">
+                                  <ResourceText text={step.note} className="text-xl md:text-2xl text-gray-300 italic leading-relaxed font-medium" />
                                 </div>
                               )}
                             </div>
                           ))}
+
+                          {/* Source / Video Preview */}
+                          {bo.source && (
+                            <div className="mt-8 pt-6 border-t border-white/5">
+                              <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 block">Fonte & Riferimenti</label>
+                              {getYoutubeId(bo.source) ? (
+                                <a
+                                  href={bo.source}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="group relative block aspect-video w-full rounded-2xl overflow-hidden border border-white/10 bg-black hover:border-red-500/50 transition-all shadow-2xl hover:shadow-red-500/10"
+                                >
+                                  <img
+                                    src={`https://img.youtube.com/vi/${getYoutubeId(bo.source)}/hqdefault.jpg`}
+                                    className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity"
+                                    alt="Video preview"
+                                  />
+                                  <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="w-12 h-9 bg-red-600 rounded-lg flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
+                                      <Play size={16} fill="white" />
+                                    </div>
+                                  </div>
+                                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black to-transparent text-[10px] text-white font-medium flex items-center gap-1">
+                                    <ExternalLink size={10} /> Guarda su YouTube
+                                  </div>
+                                </a>
+                              ) : (
+                                <a
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 px-4 py-3 rounded-xl border border-blue-500/20 shadow-lg"
+                                >
+                                  <ExternalLink size={14} />
+                                  {bo.source.length > 40 ? bo.source.slice(0, 40) + '...' : bo.source}
+                                </a>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Author Attribution */}
+                          {(bo.author_nickname || bo.author_rank) && (
+                            <div className="flex items-center justify-between mt-6 px-4 py-3 bg-white/5 rounded-xl border border-white/5">
+                              <div className="flex items-center gap-3">
+                                <div className="flex flex-col">
+                                  <span className="text-[9px] text-gray-500 uppercase font-bold tracking-tighter">Proposta da</span>
+                                  <span className="text-sm font-bold text-blue-400">{bo.author_nickname || 'Anonimo'}</span>
+                                </div>
+                              </div>
+                              {bo.author_rank && bo.author_rank !== 'Unranked' && RANK_ICONS[bo.author_rank] && (
+                                <div className="flex items-center gap-2 bg-black/30 px-2 py-1.5 rounded-lg border border-white/5">
+                                  <img src={RANK_ICONS[bo.author_rank]} alt={bo.author_rank} className="w-6 h-6 object-contain" />
+                                  <span className="text-[10px] font-bold text-gray-400 uppercase">{bo.author_rank}</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
 
@@ -335,8 +425,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 <h3 className="text-xl font-bold text-white mb-2">Build Orders in arrivo</h3>
                 <p className="text-sm text-gray-500 max-w-sm">I build order per questa civiltà saranno aggiunti presto dai contributori della community.</p>
                 <button
-                  onClick={() => handleTabChange('proponi')}
-                  className="mt-6 px-8 py-3 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/30 rounded-xl text-sm text-yellow-500 font-bold transition-all"
+                  onClick={() => navigate(`/civ/${civId}/proponi?section=build_order`)}
+                  className="mt-6 px-10 py-4 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/40 rounded-2xl text-base text-yellow-500 font-extrabold transition-all shadow-lg hover:scale-105 active:scale-95"
                 >
                   Proponi un Build Order →
                 </button>

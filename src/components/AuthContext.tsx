@@ -6,6 +6,7 @@ interface UserData {
   email?: string;
   picture?: string;
   rank?: string;
+  nickname?: string;
 }
 
 interface AuthContextType {
@@ -20,6 +21,7 @@ interface AuthContextType {
   logout: () => void;
   toggleFavorite: (civId: string) => void;
   updateRank: (rank: string) => void;
+  updateProfile: (data: { rank?: string; nickname?: string }) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -64,7 +66,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log('🛡️ Local development detected: Admin bypass active.');
       setIsAdmin(true);
       setIsAuthenticated(true);
-      setUser({ name: 'Local Admin (Dev)', email: 'admin@localhost', rank: localStorage.getItem('auth_user_rank') || 'Unranked' });
+      setUser({
+        name: 'Local Admin (Dev)',
+        email: 'admin@localhost',
+        rank: localStorage.getItem('auth_user_rank') || 'Unranked',
+        nickname: localStorage.getItem('auth_user_nickname') || ''
+      });
     }
   }, []);
 
@@ -75,7 +82,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = (userData: UserData) => {
     const savedRank = localStorage.getItem('auth_user_rank') || 'Unranked';
-    const enrichedUser = { ...userData, rank: savedRank };
+    const savedNickname = localStorage.getItem('auth_user_nickname') || '';
+    const enrichedUser = { ...userData, rank: savedRank, nickname: savedNickname };
 
     setIsAuthenticated(true);
     setUser(enrichedUser);
@@ -94,11 +102,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const updateRank = (rank: string) => {
+    updateProfile({ rank });
+  };
+
+  const updateProfile = (data: { rank?: string; nickname?: string }) => {
     if (user) {
-      const updatedUser = { ...user, rank };
+      const updatedUser = { ...user, ...data };
       setUser(updatedUser);
       localStorage.setItem('auth_user', JSON.stringify(updatedUser));
-      localStorage.setItem('auth_user_rank', rank);
+      if (data.rank) localStorage.setItem('auth_user_rank', data.rank);
+      if (data.nickname !== undefined) localStorage.setItem('auth_user_nickname', data.nickname);
     }
   };
 
@@ -125,7 +138,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       logout,
       toggleFavorite,
-      updateRank
+      updateRank,
+      updateProfile
     }}>
       {children}
     </AuthContext.Provider>
