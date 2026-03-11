@@ -319,16 +319,19 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                       </button>
                       <div className="grid grid-cols-2 gap-2 mb-2">
                         <input type="text" value={u.name} onChange={e => updateArrayField('uniqueUnits', idx, 'name', e.target.value)} placeholder="Nome Unità" className="bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600 w-full" />
-                        <select value={u.type} onChange={e => updateArrayField('uniqueUnits', idx, 'type', e.target.value)} className="bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600 w-full">
-                          <option value="Infantry">Infantry</option><option value="Cavalry">Cavalry</option><option value="Ranged">Ranged</option><option value="Siege">Siege</option>
-                        </select>
+                        <input type="text" value={u.imageId || ''} onChange={e => updateArrayField('uniqueUnits', idx, 'imageId', e.target.value)} placeholder="Image ID (es: archer-2)" className="bg-gray-800 text-blue-300 text-sm rounded px-2 py-1 border border-gray-600 w-full" />
                       </div>
-                      <div className="grid grid-cols-5 gap-1 mb-2">
-                        <input type="number" min="1" max="4" value={u.age} onChange={e => updateArrayField('uniqueUnits', idx, 'age', e.target.value)} title="Age" className="bg-gray-800 text-white text-xs rounded px-1 py-1 text-center border border-gray-600" />
-                        <input type="number" value={u.stats?.attack || 0} onChange={e => updateArrayField('uniqueUnits', idx, 'attack', e.target.value)} title="Attack" className="bg-gray-800 text-red-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
-                        <input type="number" value={u.stats?.armor || 0} onChange={e => updateArrayField('uniqueUnits', idx, 'armor', e.target.value)} title="Armor" className="bg-gray-800 text-gray-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
-                        <input type="number" value={u.stats?.health || 0} onChange={e => updateArrayField('uniqueUnits', idx, 'health', e.target.value)} title="Health" className="bg-gray-800 text-green-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
-                        <input type="number" step="0.1" value={u.stats?.speed || 0} onChange={e => updateArrayField('uniqueUnits', idx, 'speed', e.target.value)} title="Speed" className="bg-gray-800 text-blue-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                      <div className="grid grid-cols-2 gap-2 mb-2">
+                        <select value={u.type} onChange={e => updateArrayField('uniqueUnits', idx, 'type', e.target.value)} className="bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600 w-full">
+                          <option value="Infantry">Infantry</option><option value="Cavalry">Cavalry</option><option value="Ranged">Ranged</option><option value="Siege">Siege</option><option value="Religious">Religious</option>
+                        </select>
+                        <div className="grid grid-cols-5 gap-1">
+                          <input type="number" min="1" max="4" value={u.age} onChange={e => updateArrayField('uniqueUnits', idx, 'age', e.target.value)} title="Age" className="bg-gray-800 text-white text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                          <input type="number" value={u.stats?.attack || 0} onChange={e => updateArrayField('uniqueUnits', idx, 'attack', e.target.value)} title="Attack" className="bg-gray-800 text-red-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                          <input type="number" value={u.stats?.armor || 0} onChange={e => updateArrayField('uniqueUnits', idx, 'armor', e.target.value)} title="Armor" className="bg-gray-800 text-gray-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                          <input type="number" value={u.stats?.health || 0} onChange={e => updateArrayField('uniqueUnits', idx, 'health', e.target.value)} title="Health" className="bg-gray-800 text-green-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                          <input type="number" step="0.1" value={u.stats?.speed || 0} onChange={e => updateArrayField('uniqueUnits', idx, 'speed', e.target.value)} title="Speed" className="bg-gray-800 text-blue-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                        </div>
                       </div>
                       <textarea value={u.description} onChange={e => updateArrayField('uniqueUnits', idx, 'description', e.target.value)} placeholder="Descrizione" rows={2} className="bg-gray-800 text-white text-xs rounded px-2 py-1 border border-gray-600 w-full resize-none" />
                     </div>
@@ -353,11 +356,12 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                         <Trash2 size={16} />
                       </button>
                       <div className="grid grid-cols-12 gap-2 mb-2">
-                        <input type="text" value={l.name} onChange={e => updateArrayField('landmarks', idx, 'name', e.target.value)} placeholder="Nome Landmark" className="col-span-6 bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600" />
-                        <select value={l.type} onChange={e => updateArrayField('landmarks', idx, 'type', e.target.value)} className="col-span-4 bg-gray-800 text-white text-xs rounded px-1 py-1 border border-gray-600">
+                        <input type="text" value={l.name} onChange={e => updateArrayField('landmarks', idx, 'name', e.target.value)} placeholder="Nome Landmark" className="col-span-5 bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600" />
+                        <input type="text" value={l.imageId || ''} onChange={e => updateArrayField('landmarks', idx, 'imageId', e.target.value)} placeholder="Image ID" className="col-span-3 bg-gray-800 text-blue-300 text-xs rounded px-2 py-1 border border-gray-600" />
+                        <select value={l.type} onChange={e => updateArrayField('landmarks', idx, 'type', e.target.value)} className="col-span-3 bg-gray-800 text-white text-xs rounded px-1 py-1 border border-gray-600">
                           <option value="Military">Military</option><option value="Economic">Economic</option><option value="Defensive">Defensive</option><option value="Religious">Religious</option><option value="Technology">Technology</option>
                         </select>
-                        <input type="number" min="2" max="4" value={l.age} onChange={e => updateArrayField('landmarks', idx, 'age', e.target.value)} title="Age" className="col-span-2 bg-gray-800 text-white text-sm rounded px-1 py-1 text-center border border-gray-600" />
+                        <input type="number" min="2" max="4" value={l.age} onChange={e => updateArrayField('landmarks', idx, 'age', e.target.value)} title="Age" className="col-span-1 bg-gray-800 text-white text-sm rounded px-1 py-1 text-center border border-gray-600" />
                       </div>
                       <textarea value={l.description} onChange={e => updateArrayField('landmarks', idx, 'description', e.target.value)} placeholder="Descrizione" rows={2} className="bg-gray-800 text-white text-xs rounded px-2 py-1 border border-gray-600 w-full resize-none" />
                     </div>
