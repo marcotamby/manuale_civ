@@ -291,7 +291,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             </div>
 
             {civ.buildOrders && civ.buildOrders.length > 0 ? (
-              <div className="flex flex-col gap-8 max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
                 {civ.buildOrders.map((bo) => {
                   const isExpanded = expandedBOs.has(bo.id);
                   return (
@@ -305,11 +305,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         setExpandedBOs(newExpanded);
                       }}
                     >
-                      <div className="flex justify-between items-start mb-6">
-                        <h3 className="text-2xl md:text-3xl font-bold text-white group-hover:text-yellow-400 transition-colors uppercase tracking-tight">{bo.title}</h3>
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-yellow-400 transition-colors uppercase tracking-tight">{bo.title}</h3>
                       </div>
 
-                      <div className={`text-lg text-gray-300 leading-relaxed max-w-4xl mb-8 ${isExpanded ? '' : 'line-clamp-2 opacity-60'}`}>
+                      <div className={`text-base text-gray-300 leading-relaxed max-w-4xl mb-6 ${isExpanded ? '' : 'line-clamp-2 opacity-60'}`}>
                         <ResourceText text={bo.description} />
                       </div>
 
@@ -322,15 +322,15 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
                               <div className="flex gap-4 items-baseline">
                                 {step.time && (
-                                  <span className="text-yellow-500 font-mono w-24 shrink-0 font-bold flex items-center gap-1 text-lg md:text-xl">
-                                    <Clock size={18} /> {step.time}
+                                  <span className="text-yellow-500 font-mono w-24 shrink-0 font-bold flex items-center gap-1 text-base md:text-lg">
+                                    <Clock size={16} /> {step.time}
                                   </span>
                                 )}
-                                <ResourceText text={step.action} className="text-2xl md:text-4xl text-white font-extrabold tracking-tight leading-snug py-1" />
+                                <ResourceText text={step.action} className="text-xl md:text-2xl text-white font-extrabold tracking-tight leading-snug py-1" />
                               </div>
                               {step.note && (
-                                <div className="pl-0 mt-2 mb-2">
-                                  <ResourceText text={step.note} className="text-lg md:text-xl text-gray-300 italic leading-relaxed font-medium" />
+                                <div className="pl-0 mt-1 mb-1">
+                                  <ResourceText text={step.note} className="text-sm md:text-base text-gray-400 italic leading-relaxed" />
                                 </div>
                               )}
                             </div>
