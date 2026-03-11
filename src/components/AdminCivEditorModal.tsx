@@ -394,51 +394,6 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                         />
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 mb-2">
-                        <div>
-                          <label className="text-[10px] text-gray-500 uppercase font-bold mb-2 block text-yellow-500">Fonte / Link YouTube (Anteprima Auto)</label>
-                          <input
-                            type="text"
-                            value={bo.source || ''}
-                            onChange={e => updateArrayField('buildOrders', idx, 'source', e.target.value)}
-                            placeholder="https://www.youtube.com/watch?v=..."
-                            className="w-full bg-gray-800 text-yellow-400 text-sm rounded px-3 py-2 border border-gray-600 focus:border-yellow-500 outline-none"
-                          />
-                          {bo.source && getYoutubeId(bo.source) && (
-                            <div className="mt-2 relative aspect-video w-full max-w-xs rounded-lg overflow-hidden border border-white/10 group">
-                              <img
-                                src={`https://img.youtube.com/vi/${getYoutubeId(bo.source)}/mqdefault.jpg`}
-                                alt="Preview"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
-                                <Play size={24} className="text-white fill-white shadow-lg shadow-black/50" />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div>
-                            <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Nickname Autore</label>
-                            <input
-                              type="text"
-                              value={bo.author_nickname || ''}
-                              onChange={e => updateArrayField('buildOrders', idx, 'author_nickname', e.target.value)}
-                              className="w-full bg-gray-800 text-blue-400 text-xs rounded px-2 py-1 border border-gray-600"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Rank Autore</label>
-                            <input
-                              type="text"
-                              value={bo.author_rank || ''}
-                              onChange={e => updateArrayField('buildOrders', idx, 'author_rank', e.target.value)}
-                              placeholder="Silver III"
-                              className="w-full bg-gray-800 text-white text-xs rounded px-2 py-1 border border-gray-600"
-                            />
-                          </div>
-                        </div>
-                      </div>
                       {/* Steps (Structured handling) */}
                       <div className="mt-4 space-y-3">
                         <div className="flex items-center mb-1">
@@ -507,6 +462,53 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                         >
                           <Plus size={10} /> Aggiungi Step
                         </button>
+                      </div>
+
+                      <div className="mt-6 pt-4 border-t border-gray-700/50 space-y-4">
+                        <div>
+                          <label className="text-[10px] text-gray-500 uppercase font-bold mb-2 block text-yellow-500">Fonte / Link YouTube</label>
+                          <input
+                            type="text"
+                            value={bo.source || ''}
+                            onChange={e => updateArrayField('buildOrders', idx, 'source', e.target.value)}
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            className="w-full bg-gray-800 text-yellow-400 text-sm rounded px-3 py-2 border border-gray-600 focus:border-yellow-500 outline-none"
+                          />
+                          {bo.source && getYoutubeId(bo.source) && (
+                            <div className="mt-2 relative aspect-video w-48 rounded-lg overflow-hidden border border-white/10 group">
+                              <img
+                                src={`https://img.youtube.com/vi/${getYoutubeId(bo.source)}/mqdefault.jpg`}
+                                alt="Preview"
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                                <Play size={24} className="text-white fill-white shadow-lg shadow-black/50" />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block text-blue-400">Nickname Autore</label>
+                            <input
+                              type="text"
+                              value={bo.author_nickname || ''}
+                              onChange={e => updateArrayField('buildOrders', idx, 'author_nickname', e.target.value)}
+                              className="w-full bg-gray-800 text-white text-sm rounded px-3 py-2 border border-gray-600 focus:border-blue-500 outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block text-blue-400">Rank Autore</label>
+                            <input
+                              type="text"
+                              value={bo.author_rank || ''}
+                              onChange={e => updateArrayField('buildOrders', idx, 'author_rank', e.target.value)}
+                              placeholder="Silver III"
+                              className="w-full bg-gray-800 text-white text-sm rounded px-3 py-2 border border-gray-600 focus:border-blue-500 outline-none"
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))}
