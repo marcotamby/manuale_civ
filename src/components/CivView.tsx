@@ -309,7 +309,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         <h3 className="text-lg md:text-xl font-bold text-white group-hover:text-yellow-400 transition-colors uppercase tracking-tight">{bo.title}</h3>
                       </div>
 
-                      <div className={`text-sm text-gray-400 leading-relaxed max-w-4xl mb-6 ${isExpanded ? '' : 'line-clamp-2 opacity-60'}`}>
+                      <div className={`text-base text-gray-200 leading-relaxed max-w-4xl mb-6 ${isExpanded ? '' : 'line-clamp-2 opacity-60'}`}>
                         <ResourceText text={bo.description} />
                       </div>
 
@@ -330,7 +330,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                               </div>
                               {step.note && (
                                 <div className="pl-0 mt-1 mb-1">
-                                  <ResourceText text={step.note} className="text-[11px] md:text-xs text-gray-500 italic leading-relaxed" />
+                                  <ResourceText text={step.note} className="text-sm text-gray-300 italic leading-relaxed" />
                                 </div>
                               )}
                             </div>

@@ -217,14 +217,15 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                       onChange={(e) => updateStep(index, 'time', e.target.value)}
                       className="w-28 bg-black/40 border border-white/10 rounded-lg px-3 py-3 text-base text-yellow-400 focus:outline-none focus:border-blue-500 transition-colors font-mono"
                     />
-                    <input
-                      type="text"
-                      placeholder="Azione (es. 6 a cibo)"
-                      value={step.action}
-                      onChange={(e) => updateStep(index, 'action', e.target.value)}
-                      className="flex-1 bg-black/40 border border-white/10 rounded-lg px-4 py-3.5 text-xl text-white focus:outline-none focus:border-blue-500 transition-colors font-bold"
-                      required
-                    />
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        value={step.action}
+                        onChange={(e) => updateStep(index, 'action', e.target.value)}
+                        placeholder="Azione (es. 6 a cibo)"
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:border-yellow-500/50 outline-none transition-all font-bold text-sm"
+                      />
+                    </div>
                     {boSteps.length > 1 && (
                       <button
                         type="button"
@@ -239,7 +240,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                     placeholder="Note aggiuntive"
                     value={step.note}
                     onChange={(e) => updateStep(index, 'note', e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-base text-gray-200 focus:outline-none focus:border-blue-500 transition-colors resize-none h-24 italic"
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:border-yellow-500/50 outline-none transition-all italic text-xs h-20 resize-none"
                   />
                 </div>
               ))}
