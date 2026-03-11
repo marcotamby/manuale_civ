@@ -394,8 +394,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                   <label className="text-xs text-gray-500 uppercase font-bold mb-1.5 block">Titolo</label>
                                   <input
                                     className="w-full bg-black/40 border border-gray-700 rounded-lg px-4 py-3 text-lg text-white focus:border-blue-500 outline-none"
-                                    value={currentEdits.title}
+                                    value={currentEdits.title === 'Nuovo Build Order' ? '' : currentEdits.title}
                                     onChange={(e) => updateBOField('title', e.target.value)}
+                                    placeholder="Titolo"
                                   />
                                 </div>
                                 <div className="space-y-4">

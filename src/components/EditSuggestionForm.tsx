@@ -53,6 +53,15 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
       return;
     }
 
+    if (section === 'build_order' && (!title.trim() || !description.trim())) {
+      setToast({
+        isVisible: true,
+        message: 'Titolo e Descrizione sono obbligatori per i Build Order',
+        type: 'error'
+      });
+      return;
+    }
+
     if (section === 'build_order' && isSigned && !user?.nickname) {
       setToast({
         isVisible: true,
@@ -68,7 +77,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
       let submissionText = '';
       if (section === 'build_order') {
         const boData = {
-          title: title || '',
+          title: title.trim() || '',
           description: description,
           steps: boSteps,
           source: source

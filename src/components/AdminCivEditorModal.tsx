@@ -381,7 +381,13 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                         <Trash2 size={16} />
                       </button>
                       <div className="grid grid-cols-3 gap-2 mb-2 pr-6">
-                        <input type="text" value={bo.title} onChange={e => updateArrayField('buildOrders', idx, 'title', e.target.value)} placeholder="Titolo" className="col-span-3 bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600" />
+                        <input 
+                          type="text" 
+                          value={bo.title === 'Nuovo Build Order' ? '' : bo.title} 
+                          onChange={e => updateArrayField('buildOrders', idx, 'title', e.target.value)} 
+                          placeholder="Titolo" 
+                          className="col-span-3 bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600" 
+                        />
                       </div>
                       <div className="mb-2">
                         <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block text-blue-400">Descrizione / Strategia</label>
