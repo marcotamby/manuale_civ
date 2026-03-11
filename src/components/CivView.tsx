@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useCivData } from './CivContext';
 import type { Unit } from '../data/aoe4Data';
 import { UnitGrid } from './UnitGrid';
-import { TechTree } from './TechTree';
 import { MatchupsTable } from './MatchupsTable';
 import { EditSuggestionForm } from './EditSuggestionForm';
 import { AdminCivEditorModal } from './AdminCivEditorModal';
@@ -51,9 +50,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const [activeAge, setActiveAge] = useState<1 | 2 | 3 | 4>(() => {
     return (Number(sessionStorage.getItem('activeAge')) as 1 | 2 | 3 | 4) || 1;
   });
-  const [unitView, setUnitView] = useState<'units' | 'techtree'>(() => {
-    return (sessionStorage.getItem('unitView') as 'units' | 'techtree') || 'units';
-  });
 
   const handleTabChange = (newTab: Tab) => {
     navigate(`/civ/${civId}/${newTab}`);
@@ -62,11 +58,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const handleAgeChange = (age: number) => {
     setActiveAge(age as 1 | 2 | 3 | 4);
     sessionStorage.setItem('activeAge', age.toString());
-  };
-
-  const handleUnitViewChange = (view: 'units' | 'techtree') => {
-    setUnitView(view);
-    sessionStorage.setItem('unitView', view);
   };
 
   const [localCivs, setLocalCivs] = useState<Record<string, Civilization>>({});
@@ -210,9 +201,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                       {civ.uniqueUnits.length > 0 && (
                         <li>Accesso a unità uniche: <strong className="text-green-400">{civ.uniqueUnits.map(u => u.name).join(', ')}</strong></li>
                       )}
-                      {civ.technologies.length > 0 && (
-                        <li>Tecnologie esclusive: <strong className="text-green-400">{civ.technologies.map(t => t.name).join(', ')}</strong></li>
-                      )}
                       <li className="text-gray-400 italic">Vedi sezione Unità & Landmarks per i dettagli specifici.</li>
                     </>
                   )}
@@ -257,26 +245,15 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   </button>
                 ))}
               </div>
-              <div className="flex gap-2 glass rounded-2xl p-1.5">
+              <div className="flex gap-2 glass rounded-2xl p-1.5 shrink-0">
                 <button
-                  className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${unitView === 'units' ? 'bg-blue-600/50 text-white border border-blue-500/30' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-                  onClick={() => handleUnitViewChange('units')}
+                  className="px-6 py-2.5 rounded-xl text-sm font-bold bg-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.4)] text-white"
                 >
-                  Unità & Tecnologie
-                </button>
-                <button
-                  className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${unitView === 'techtree' ? 'bg-blue-600/50 text-white border border-blue-500/30' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-                  onClick={() => handleUnitViewChange('techtree')}
-                >
-                  Tech Tree
+                  Unità & Landmarks
                 </button>
               </div>
             </div>
-            {unitView === 'units' ? (
-              <UnitGrid civId={civId} age={activeAge} onSelectUnit={onSelectUnit} />
-            ) : (
-              <TechTree civId={civId} />
-            )}
+            <UnitGrid civId={civId} age={activeAge} onSelectUnit={onSelectUnit} />
           </div>
         )}
 
@@ -398,7 +375,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                       )}
 
                       <button
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           const newExpanded = new Set(expandedBOs);
                           if (isExpanded) newExpanded.delete(bo.id);
                           else newExpanded.add(bo.id);
@@ -419,6 +397,20 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                     </div>
                   );
                 })}
+
+                <div className="mt-12 pt-10 border-t border-white/5 text-center flex flex-col items-center">
+                  <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mb-4 border border-yellow-500/20">
+                    <Map size={32} className="text-yellow-500" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Proponi un nuovo Build Order</h3>
+                  <p className="text-sm text-gray-500 max-w-sm mb-6">Aiuta la community aggiungendo una nuova strategia o un'ottimizzazione per questa civiltà.</p>
+                  <button
+                    onClick={() => navigate(`/civ/${civId}/proponi?section=build_order`)}
+                    className="px-10 py-4 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/40 rounded-2xl text-base text-yellow-500 font-extrabold transition-all shadow-lg hover:scale-105 active:scale-95"
+                  >
+                    Invia la tua proposta →
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="glass p-10 rounded-3xl border border-yellow-500/20 text-center flex flex-col items-center">

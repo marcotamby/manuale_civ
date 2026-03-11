@@ -33,9 +33,6 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
         if (civ.uniqueUnits?.length > 0) {
           generated.push(`Accesso a unità uniche: ${civ.uniqueUnits.map(u => u.name).join(', ')}`);
         }
-        if (civ.technologies?.length > 0) {
-          generated.push(`Tecnologie esclusive: ${civ.technologies.map(t => t.name).join(', ')}`);
-        }
         if (generated.length > 0) {
           defaultStrengths = generated;
         }
@@ -70,7 +67,6 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
           videos: editedCiv.videos,
           build_orders: editedCiv.buildOrders,
           unique_units: editedCiv.uniqueUnits,
-          technologies: editedCiv.technologies,
           landmarks: editedCiv.landmarks,
           strengths: editedCiv.strengths?.filter(s => s.trim() !== '') || [],
           weaknesses: editedCiv.weaknesses?.filter(s => s.trim() !== '') || []
@@ -341,31 +337,6 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave }: AdminCivEd
                 </div>
               </div>
 
-              {/* Tecnologie */}
-              <div className="bg-black/30 border border-green-500/30 rounded-xl p-4">
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="font-bold text-green-400 flex items-center gap-2"><span className="text-xl">🧬</span> Tecnologie</h4>
-                  <button onClick={() => addToArray('technologies', { id: 'new-tech', name: 'Nuova Tech', age: 2, building: 'Blacksmith', description: '' })} className="text-xs bg-green-600 hover:bg-green-500 text-white px-2 py-1 rounded flex items-center gap-1">
-                    <Plus size={14} /> Aggiungi
-                  </button>
-                </div>
-                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                  {(editedCiv.technologies || []).map((t: any, idx: number) => (
-                    <div key={idx} className="bg-black/50 border border-gray-700 rounded-lg p-3 relative group">
-                      <button onClick={() => removeFromArray('technologies', idx)} className="absolute top-2 right-2 text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Trash2 size={16} />
-                      </button>
-                      <div className="grid grid-cols-12 gap-2 mb-2">
-                        <input type="text" value={t.name} onChange={e => updateArrayField('technologies', idx, 'name', e.target.value)} placeholder="Nome Tecnologia" className="col-span-6 bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600" />
-                        <input type="text" value={t.building} onChange={e => updateArrayField('technologies', idx, 'building', e.target.value)} placeholder="Edificio" className="col-span-4 bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600" />
-                        <input type="number" min="1" max="4" value={t.age} onChange={e => updateArrayField('technologies', idx, 'age', e.target.value)} title="Age" className="col-span-2 bg-gray-800 text-white text-sm rounded px-1 py-1 text-center border border-gray-600" />
-                      </div>
-                      <textarea value={t.description} onChange={e => updateArrayField('technologies', idx, 'description', e.target.value)} placeholder="Descrizione" rows={2} className="bg-gray-800 text-white text-xs rounded px-2 py-1 border border-gray-600 w-full resize-none" />
-                    </div>
-                  ))}
-                  {(!editedCiv.technologies || editedCiv.technologies.length === 0) && <p className="text-gray-500 text-sm italic text-center py-4">Nessuna tecnologia</p>}
-                </div>
-              </div>
 
               {/* Landmarks */}
               <div className="bg-black/30 border border-purple-500/30 rounded-xl p-4">
