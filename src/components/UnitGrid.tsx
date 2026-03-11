@@ -86,7 +86,7 @@ export function UnitGrid({ civId, age, onSelectUnit, onEditUnit, onEditLandmark 
                     {isAdmin && onEditLandmark && (
                       <button 
                         onClick={(e) => { e.stopPropagation(); onEditLandmark(landmark.id); }} 
-                        className="p-2 bg-yellow-600 hover:bg-yellow-500 text-black rounded-xl transition-all border border-yellow-400/50 ml-2 shadow-lg"
+                        className="p-2 bg-yellow-500 hover:bg-yellow-400 text-black rounded-xl transition-all border border-yellow-300 ml-2 shadow-[0_0_15px_rgba(234,179,8,0.4)] flex items-center justify-center"
                         title="Modifica Landmark"
                       >
                         <Edit size={14} fill="black" />
@@ -170,7 +170,7 @@ export function UnitGrid({ civId, age, onSelectUnit, onEditUnit, onEditLandmark 
                         const isGlobal = !civ?.uniqueUnits?.some(uu => uu.id === unit.id);
                         onEditUnit(unit.id, isGlobal); 
                       }} 
-                      className="absolute top-2 right-2 p-2 bg-yellow-600 hover:bg-yellow-500 text-black rounded-xl z-20 border border-yellow-400/50 transition-all shadow-xl flex items-center justify-center"
+                      className="absolute top-2 right-2 p-2 bg-yellow-500 hover:bg-yellow-400 text-black rounded-xl z-20 border border-yellow-300 transition-all shadow-[0_0_20px_rgba(234,179,8,0.4)] flex items-center justify-center transform active:scale-90"
                       title="Modifica Unità"
                     >
                       <Edit size={14} fill="black" />

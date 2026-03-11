@@ -1,5 +1,5 @@
 import type { Unit } from '../data/aoe4Data';
-import { X, Shield, Sword, Heart, FastForward, CheckCircle2, XCircle, Info, Edit } from 'lucide-react';
+import { X, Shield, Sword, Heart, FastForward, CheckCircle2, XCircle, Info, Settings } from 'lucide-react';
 import { useAuth } from './AuthContext';
 
 interface UnitDetailModalProps {
@@ -73,7 +73,7 @@ export function UnitDetailModal({ unit, onClose, onEdit }: UnitDetailModalProps)
               className="absolute top-4 right-16 p-2.5 bg-yellow-600 hover:bg-yellow-500 text-black rounded-full shadow-lg transition-all active:scale-95 flex items-center justify-center border border-yellow-400/50"
               title="Modifica Unità"
             >
-              <Edit size={20} fill="black" />
+              <Settings size={20} fill="black" />
             </button>
           )}
         </div>

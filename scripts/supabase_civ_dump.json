@@ -1,0 +1,251 @@
+[
+  {
+    "id": "goldenhorde",
+    "name": "Orda d'Oro",
+    "passive_bonuses": [
+      "Mobile buildings like the Mongols.",
+      "Increased early economic and military pressure."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "lancaster",
+    "name": "Lancaster",
+    "passive_bonuses": [
+      "Enhanced defensive networks.",
+      "Focus on ranged superiority and area denial."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "macedonian",
+    "name": "Macedoni",
+    "passive_bonuses": [
+      "Specialized infantry formations.",
+      "Unique mercenary contracts."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "rus",
+    "name": "Rusiani",
+    "passive_bonuses": [
+      "Gain Bounty from hunting animals, increasing global gather rates.",
+      "Produce strong early knights and wooden defensive structures."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "sengoku",
+    "name": "Sengoku Daimyo",
+    "passive_bonuses": [
+      "Aggressive early game melee bonuses.",
+      "Enhanced Daimyo mechanics for military production."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "tughlaq",
+    "name": "Dinastia di Tughlaq",
+    "passive_bonuses": [
+      "Earlier access to War Elephants.",
+      "Stronger defensive network integration."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "delhi",
+    "name": "Sultanato di Delhi",
+    "passive_bonuses": [
+      "All technologies are free but take longer to research.",
+      "Scholars speed up research times significantly."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "templar",
+    "name": "Knights Templar",
+    "passive_bonuses": [
+      "Powerful Templar Knights with charge bonuses.",
+      "Monasteries provide unique military upgrades."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "ottomans",
+    "name": "Ottomani",
+    "passive_bonuses": [
+      "Military Schools produce units slowly for free.",
+      "Gain Vizier Points to unlock powerful civilization-wide abilities."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "hre",
+    "name": "Sacro Romano Impero",
+    "passive_bonuses": [
+      "Prelates can inspire economy and military units.",
+      "Early Men-at-Arms access and powerful relic bonuses."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "mongols",
+    "name": "Mongoli",
+    "passive_bonuses": [
+      "All buildings can be packed up and moved to a new location.",
+      "Start with maximum population limit; no need to build houses.",
+      "Cavalry produce 50% faster, or can produce double with stone."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "jeannedarc",
+    "name": "Giovanna d'Arco",
+    "passive_bonuses": [
+      "Jeanne d'Arc gains experience from building, combat, and landmarks to unlock powerful abilities.",
+      "Highly aggressive and tempo-based."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "ayyubids",
+    "name": "Ayyubidi",
+    "passive_bonuses": [
+      "House of Wisdom wings grant unique, immediate bonuses when advancing."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "byzantines",
+    "name": "Bizantini",
+    "passive_bonuses": [
+      "Aqueducts increase production speed and gather rates.",
+      "Can hire foreign mercenaries using Olive Oil."
+    ],
+    "strengths": [
+      "Accesso a unità uniche: Limitanei, Varangian Guard, Cataphract, Cheirosiphon"
+    ],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "zhuxi",
+    "name": "Eredità di Zhu Xi",
+    "passive_bonuses": [
+      "Cheaper officials and streamlined access to powerful Shaolin Monks and Chu Ko Nu.",
+      "Earlier access to robust technologies."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "abbasid",
+    "name": "Abbasidi",
+    "passive_bonuses": [
+      "Constructing buildings near the House of Wisdom increases the Golden Age tier.",
+      "Berry bushes gather 30% faster but cannot hunt Boars."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "chinese",
+    "name": "Cinesi",
+    "passive_bonuses": [
+      "Inizia nella Dinastia Tang: +30% raggio visivo degli Esploratori e accesso al Villaggio.",
+      "Unità addestrate, tecnologie ricercate e risorse restituite generano Tasse (Oro) raccoglibili dagli Ufficiali Imperiali.",
+      "Costruisce entrambi i Landmark di un'Età per sbloccare una Dinastia con bonus unici (Song, Yuan, Ming).",
+      "I Villici costruiscono difese +50% più veloci e tutti gli altri edifici +100% più velocemente.",
+      "La tecnologia Chimica è gratuita in Età I: difese usano Feritoie a Cannone invece di quelle standard.",
+      "I Cantieri Navali lavorano il +10% più velocemente."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "english",
+    "name": "Inglesi",
+    "passive_bonuses": [
+      "Farms are 50% cheaper to construct.",
+      "Network of Castles: Town Centers, Outposts, Towers, and Keeps grant a +25% attack speed bonus.",
+      "Vanguard Men-at-Arms available in the Dark Age (I)."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "french",
+    "name": "Francesi",
+    "passive_bonuses": [
+      "Villagers and Scouts are produced 10/15/20% faster per Age.",
+      "Economic technology upgrades cost 30% less.",
+      "Traders can return any resource to Markets."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "japanese",
+    "name": "Giapponesi",
+    "passive_bonuses": [
+      "Town Centers can upgrade into Daimyo Manors to increase farm gather rates.",
+      "Forges offer unique melee upgrade paths."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "malians",
+    "name": "Maliani",
+    "passive_bonuses": [
+      "Pit Mines automatically generate Gold",
+      "Musofadi Warriors can utilize stealth."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  },
+  {
+    "id": "orderofthedragon",
+    "name": "Ordine del Drago",
+    "passive_bonuses": [
+      "Units are individually much stronger but cost double the resources and population space."
+    ],
+    "strengths": [],
+    "weaknesses": [],
+    "build_orders": []
+  }
+]

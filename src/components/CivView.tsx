@@ -141,9 +141,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   </div>
                   <button
                     onClick={() => openEditor()}
-                    className="ml-2 px-3 py-1.5 bg-yellow-600 hover:bg-yellow-500 text-black text-[10px] font-black rounded uppercase transition-all active:scale-95 flex items-center gap-1 shadow-lg"
+                    className="ml-2 px-3 py-1.5 bg-yellow-600 hover:bg-yellow-500 text-black text-[10px] font-black rounded uppercase transition-all active:scale-95 flex items-center gap-1 shadow-lg border border-yellow-400/50"
                   >
-                    <Edit size={12} fill="black" /> Modifica Globale
+                    <Edit size={12} fill="black" /> Modifica
                   </button>
                 </div>
               )}
@@ -191,11 +191,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 {isAdmin && (
                   <button 
                     onClick={() => openEditor('bonuses')} 
-                    className="p-1.5 bg-yellow-500/20 hover:bg-yellow-500/40 rounded-lg transition-all text-yellow-500 border border-yellow-500/30 flex items-center gap-1 shadow-sm group/btn"
+                    className="p-1.5 bg-yellow-500 hover:bg-yellow-400 rounded-lg transition-all text-black border border-yellow-400 flex items-center gap-1 shadow-[0_0_10px_rgba(234,179,8,0.3)] group/btn"
                     title="Modifica Bonus"
                   >
-                    <Edit size={12} className="group-hover/btn:scale-110 transition-transform" />
-                    <span className="text-[10px] font-bold uppercase pr-1">Edit</span>
+                    <Edit size={12} fill="black" className="group-hover/btn:scale-110 transition-transform" />
+                    <span className="text-[10px] font-bold uppercase pr-1">Modifica</span>
                   </button>
                 )}
               </h2>
@@ -216,11 +216,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 {isAdmin && (
                   <button 
                     onClick={() => openEditor('strengths')} 
-                    className="p-1.5 bg-yellow-500/20 hover:bg-yellow-500/40 rounded-lg transition-all text-yellow-500 border border-yellow-500/30 flex items-center gap-1 shadow-sm group/btn"
+                    className="p-1.5 bg-yellow-500 hover:bg-yellow-400 rounded-lg transition-all text-black border border-yellow-400 flex items-center gap-1 shadow-[0_0_10px_rgba(234,179,8,0.3)] group/btn"
                     title="Modifica Punti di Forza"
                   >
-                    <Edit size={12} className="group-hover/btn:scale-110 transition-transform" />
-                    <span className="text-[10px] font-bold uppercase pr-1">Edit</span>
+                    <Edit size={12} fill="black" className="group-hover/btn:scale-110 transition-transform" />
+                    <span className="text-[10px] font-bold uppercase pr-1">Modifica</span>
                   </button>
                 )}
               </h2>
@@ -249,11 +249,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 {isAdmin && (
                   <button 
                     onClick={() => openEditor('weaknesses')} 
-                    className="p-1.5 bg-yellow-500/20 hover:bg-yellow-500/40 rounded-lg transition-all text-yellow-500 border border-yellow-500/30 flex items-center gap-1 shadow-sm group/btn"
+                    className="p-1.5 bg-yellow-500 hover:bg-yellow-400 rounded-lg transition-all text-black border border-yellow-400 flex items-center gap-1 shadow-[0_0_10px_rgba(234,179,8,0.3)] group/btn"
                     title="Modifica Punti Deboli"
                   >
-                    <Edit size={12} className="group-hover/btn:scale-110 transition-transform" />
-                    <span className="text-[10px] font-bold uppercase pr-1">Edit</span>
+                    <Edit size={12} fill="black" className="group-hover/btn:scale-110 transition-transform" />
+                    <span className="text-[10px] font-bold uppercase pr-1">Modifica</span>
                   </button>
                 )}
               </h2>

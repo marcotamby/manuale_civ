@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, X, Loader2, Play, Map, Plus, Trash2, CheckCircle, Clock } from 'lucide-react';
+import { Save, X, Loader2, Play, Map, Plus, Trash2, CheckCircle, Clock, Zap, ChevronUp, ChevronDown, Info, Cog, Edit } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { YouTubePickerModal } from './YouTubePickerModal';
 import { Toast } from './Toast';
@@ -65,11 +65,11 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
         setTimeout(() => {
           const ref = (sectionRefs as any)[initialSection.toLowerCase()];
           if (ref?.current) {
-            ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
             // Highlight the section briefly
-            ref.current.classList.add('ring-2', 'ring-purple-500', 'bg-purple-500/10');
+            ref.current.classList.add('ring-2', 'ring-yellow-500', 'bg-yellow-500/10');
             setTimeout(() => {
-              ref.current?.classList.remove('ring-2', 'ring-purple-500', 'bg-purple-500/10');
+              ref.current?.classList.remove('ring-2', 'ring-yellow-500', 'bg-yellow-500/10');
             }, 2000);
           }
         }, 300);
@@ -100,8 +100,8 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
           build_orders: editedCiv.buildOrders,
           unique_units: editedCiv.uniqueUnits,
           landmarks: editedCiv.landmarks,
-          strengths: editedCiv.strengths?.filter(s => s.trim() !== '') || [],
-          weaknesses: editedCiv.weaknesses?.filter(s => s.trim() !== '') || []
+          strengths: editedCiv.strengths?.filter((s: string) => s.trim() !== '') || [],
+          weaknesses: editedCiv.weaknesses?.filter((s: string) => s.trim() !== '') || []
         })
         .eq('id', civ.id);
 
@@ -129,8 +129,8 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
 
       onSave({
         ...editedCiv,
-        strengths: editedCiv.strengths?.filter(s => s.trim() !== '') || [],
-        weaknesses: editedCiv.weaknesses?.filter(s => s.trim() !== '') || []
+        strengths: editedCiv.strengths?.filter((s: string) => s.trim() !== '') || [],
+        weaknesses: editedCiv.weaknesses?.filter((s: string) => s.trim() !== '') || []
       });
 
       setTimeout(() => {
@@ -216,7 +216,9 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
         <div className="p-6 border-b border-purple-500/20 flex justify-between items-center bg-purple-500/5">
           <div>
             <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-              <span className="text-purple-400">🛡️ Admin Editor:</span> {civ.name}
+              <span className="text-yellow-500">
+                {initialSection ? `Modifica ${initialSection === 'global' ? 'Unità' : initialSection.charAt(0).toUpperCase() + initialSection.slice(1)}:` : 'Admin Editor:'}
+              </span> {civ.name}
             </h2>
             <p className="text-xs text-gray-400 mt-1">Le modifiche apportate qui verranno salvate istantaneamente nel database (live per tutti).</p>
           </div>
@@ -226,82 +228,11 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
         </div>
 
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-bold text-gray-300 mb-1">Nome Civiltà</label>
-                <input
-                  type="text"
-                  value={editedCiv.name}
-                  onChange={e => setEditedCiv({ ...editedCiv, name: e.target.value })}
-                  className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-gray-300 mb-1">Difficoltà</label>
-                <select
-                  value={editedCiv.difficulty}
-                  onChange={e => setEditedCiv({ ...editedCiv, difficulty: e.target.value as any })}
-                  className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors [&>option]:bg-[#1a1c23] [&>option]:text-white"
-                >
-                  <option value="Facile">Facile</option>
-                  <option value="Medio">Medio</option>
-                  <option value="Difficile">Difficile</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-gray-300 mb-1">Descrizione Breve</label>
-                <textarea
-                  value={editedCiv.shortDescription}
-                  onChange={e => setEditedCiv({ ...editedCiv, shortDescription: e.target.value })}
-                  rows={4}
-                  className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors resize-y"
-                />
-              </div>
-
-
-
-              <div>
-                <div className="flex justify-between items-end mb-1">
-                  <label className="text-sm font-bold text-gray-300 flex items-center gap-2">
-                    <Play size={16} className="text-red-500" />
-                    Video YouTube (Link o ID)
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setIsYoutubePickerOpen(true)}
-                    className="text-[10px] bg-red-600 hover:bg-red-500 text-white px-2 py-1 rounded flex items-center gap-1 transition-all shadow-lg shadow-red-600/20 active:scale-95 z-10"
-                  >
-                    <Play size={10} fill="currentColor" /> Sfoglia Canale
-                  </button>
-                </div>
-                <textarea
-                  value={editedCiv.videos?.join(', ') || ''}
-                  onChange={e => {
-                    const rawValues = e.target.value.split(',').map(v => v.trim()).filter(Boolean);
-                    const parsedIds = rawValues.map(val => {
-                      // Extract ID from various YouTube URL formats
-                      if (val.includes('youtube.com/watch?v=')) {
-                        return val.split('v=')[1]?.split('&')[0] || val;
-                      } else if (val.includes('youtu.be/')) {
-                        return val.split('youtu.be/')[1]?.split('?')[0] || val;
-                      }
-                      return val;
-                    });
-                    setEditedCiv({ ...editedCiv, videos: parsedIds });
-                  }}
-                  placeholder="Incolla i link dei video separati da virgola..."
-                  rows={3}
-                  className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-sm text-white focus:border-purple-500 transition-colors"
-                />
-                <p className="text-[10px] text-gray-500 mt-1 italic">Puoi incollare i link completi (es. youtube.com/watch?v=...) e verranno convertiti in ID automaticamente.</p>
-              </div>
-            </div>
-
-            <div ref={sectionRefs.bonuses} className="space-y-4">
-              <label className="block text-sm font-bold text-gray-300 mb-1">Bonus</label>
+          {(!initialSection || initialSection === 'bonuses') && (
+            <div ref={sectionRefs.bonuses} className="bg-black/30 border border-yellow-500/20 rounded-xl p-5 space-y-4">
+              <label className="block text-sm font-bold text-yellow-500 uppercase tracking-widest mb-1 flex items-center gap-2">
+                <Zap size={16} /> Bonus
+              </label>
               <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                 {editedCiv.passiveBonuses.map((bonus: string, idx: number) => (
                   <div key={idx} className="flex gap-2">
@@ -309,7 +240,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                       value={bonus}
                       onChange={e => handleBonusChange(idx, e.target.value)}
                       rows={2}
-                      className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-1 text-sm text-white focus:border-purple-500 transition-colors"
+                      className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-yellow-500 transition-colors"
                     />
                     <button
                       onClick={() => {
@@ -317,56 +248,149 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                         nb.splice(idx, 1);
                         setEditedCiv({ ...editedCiv, passiveBonuses: nb });
                       }}
-                      className="p-2 h-fit bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/40"
+                      className="p-2 h-fit bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/40 transition-colors"
                     >
-                      <X size={14} />
+                      <Trash2 size={16} />
                     </button>
                   </div>
                 ))}
               </div>
               <button
                 onClick={() => setEditedCiv({ ...editedCiv, passiveBonuses: [...editedCiv.passiveBonuses, 'Nuovo Bonus...'] })}
-                className="w-full py-2 bg-white/5 border border-dashed border-gray-500 text-gray-400 rounded-lg hover:bg-white/10 hover:text-white transition-all text-sm font-bold mt-2"
+                className="w-full py-2 bg-yellow-500/10 border border-dashed border-yellow-500/30 text-yellow-500/70 rounded-lg hover:bg-yellow-500/20 hover:text-yellow-500 transition-all text-xs font-bold mt-2"
               >
                 + Aggiungi Bonus
               </button>
+            </div>
+          )}
 
-              <div className="pt-4 mt-6 border-t border-gray-600/30 space-y-4">
-                <div ref={sectionRefs.strengths}>
-                  <label className="block text-sm font-bold text-gray-300 mb-1">Punti di Forza</label>
-                  <textarea
-                    value={editedCiv.strengths?.join('\n') || ''}
-                    onChange={e => {
-                      const values = e.target.value.split('\n');
-                      setEditedCiv({ ...editedCiv, strengths: values });
-                    }}
-                    rows={4}
-                    placeholder="Inserisci un punto di forza per riga..."
-                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors resize-y"
+          {(!initialSection || initialSection === 'strengths') && (
+            <div ref={sectionRefs.strengths} className="bg-black/30 border border-green-500/20 rounded-xl p-5">
+              <label className="block text-sm font-bold text-green-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <ChevronUp size={16} /> Punti di Forza
+              </label>
+              <textarea
+                value={editedCiv.strengths?.join('\n') || ''}
+                onChange={e => {
+                  const values = e.target.value.split('\n');
+                  setEditedCiv({ ...editedCiv, strengths: values });
+                }}
+                rows={4}
+                placeholder="Inserisci un punto di forza per riga..."
+                className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-green-500 transition-colors resize-y text-sm"
+              />
+            </div>
+          )}
+
+          {(!initialSection || initialSection === 'weaknesses') && (
+            <div ref={sectionRefs.weaknesses} className="bg-black/30 border border-red-500/20 rounded-xl p-5">
+              <label className="block text-sm font-bold text-red-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <ChevronDown size={16} /> Punti Deboli
+              </label>
+              <textarea
+                value={editedCiv.weaknesses?.join('\n') || ''}
+                onChange={e => {
+                  const values = e.target.value.split('\n');
+                  setEditedCiv({ ...editedCiv, weaknesses: values });
+                }}
+                rows={4}
+                placeholder="Inserisci un punto debole per riga..."
+                className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-red-500 transition-colors resize-y text-sm"
+              />
+            </div>
+          )}
+
+          {!initialSection && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-white/5">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                    <Info size={12} /> Nome Civiltà
+                  </label>
+                  <input
+                    type="text"
+                    value={editedCiv.name}
+                    onChange={e => setEditedCiv({ ...editedCiv, name: e.target.value })}
+                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors"
                   />
                 </div>
 
-                <div ref={sectionRefs.weaknesses}>
-                  <label className="block text-sm font-bold text-gray-300 mb-1">Punti Deboli</label>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                    <Cog size={12} /> Difficoltà
+                  </label>
+                  <select
+                    value={editedCiv.difficulty}
+                    onChange={e => setEditedCiv({ ...editedCiv, difficulty: e.target.value as any })}
+                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors [&>option]:bg-[#1a1c23] [&>option]:text-white"
+                  >
+                    <option value="Facile">Facile</option>
+                    <option value="Medio">Medio</option>
+                    <option value="Difficile">Difficile</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                    <Info size={12} /> Descrizione Breve
+                  </label>
                   <textarea
-                    value={editedCiv.weaknesses?.join('\n') || ''}
-                    onChange={e => {
-                      const values = e.target.value.split('\n');
-                      setEditedCiv({ ...editedCiv, weaknesses: values });
-                    }}
+                    value={editedCiv.shortDescription}
+                    onChange={e => setEditedCiv({ ...editedCiv, shortDescription: e.target.value })}
                     rows={4}
-                    placeholder="Inserisci un punto debole per riga..."
-                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors resize-y"
+                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors resize-y text-sm"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-end mb-1.5">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                      <Play size={12} className="text-red-500" /> YouTube
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setIsYoutubePickerOpen(true)}
+                      className="text-[9px] bg-red-600/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded flex items-center gap-1 hover:bg-red-600/40 transition-all font-bold uppercase tracking-tighter"
+                    >
+                      Sfoglia Canale
+                    </button>
+                  </div>
+                  <textarea
+                    value={editedCiv.videos?.join(', ') || ''}
+                    onChange={e => {
+                      const rawValues = e.target.value.split(',').map(v => v.trim()).filter(Boolean);
+                      const parsedIds = rawValues.map(val => {
+                        if (val.includes('youtube.com/watch?v=')) {
+                          return val.split('v=')[1]?.split('&')[0] || val;
+                        } else if (val.includes('youtu.be/')) {
+                          return val.split('youtu.be/')[1]?.split('?')[0] || val;
+                        }
+                        return val;
+                      });
+                      setEditedCiv({ ...editedCiv, videos: parsedIds });
+                    }}
+                    placeholder="ID video separati da virgola..."
+                    rows={2}
+                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-xs text-white focus:border-red-500 transition-colors"
                   />
                 </div>
               </div>
+              <div className="bg-yellow-500/5 rounded-xl border border-yellow-500/10 p-5 flex flex-col items-center justify-center text-center">
+                 <Edit size={32} className="text-yellow-500/30 mb-3" />
+                 <p className="text-xs text-gray-400 max-w-[200px]">Utilizza i tasti di modifica sulle singole unità per un editing più preciso e focalizzato.</p>
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="pt-6 border-t border-purple-500/20">
-            <h3 className="text-xl font-bold text-white mb-4">Dati Strutturati (Visual Editor)</h3>
+          <div className="pt-6 border-t border-white/10">
+            {(!initialSection || ['units', 'landmarks', 'buildorders', 'global'].includes(initialSection.toLowerCase())) && (
+               <h3 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
+                 Editor Strutturato
+                 <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent"></div>
+               </h3>
+            )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className={`grid grid-cols-1 ${!initialSection ? 'lg:grid-cols-2' : ''} gap-8`}>
 
               {/* Unità Uniche */}
               <div ref={sectionRefs.units} className="bg-black/30 border border-blue-500/30 rounded-xl p-4">
@@ -597,10 +621,10 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
             </div>
 
             {/* Global Units section added at the end of Structured Data */}
-            <div ref={sectionRefs.global} className="mt-8 pt-6 border-t border-purple-500/20">
-              <h4 className="font-bold text-gray-400 flex items-center gap-2 mb-4"><span className="text-xl">🌍</span> Unità Globali (Comuni a tutte le Civ)</h4>
+            <div ref={sectionRefs.global} className="mt-8 pt-6 border-t border-yellow-500/20">
+              <h4 className="font-bold text-gray-400 flex items-center gap-2 mb-4"><span className="text-xl">🌍</span> Unità Comuni (Comuni a tutte le Civ)</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar p-1">
-                {editedGlobalUnits.map((gu, idx) => (
+                {editedGlobalUnits.map((gu: any, idx: number) => (
                   <div key={gu.id} className={`bg-black/40 border border-gray-700/50 rounded-xl p-4 transition-all duration-500 ${initialId === gu.id ? 'ring-2 ring-yellow-500 bg-yellow-500/10' : ''}`}>
                     <div className="flex justify-between items-center mb-3">
                       <span className="text-sm font-bold text-white">{gu.name}</span>
