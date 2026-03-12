@@ -95,6 +95,7 @@ export function FAQPage() {
   const navigate = useNavigate();
   const { isSuperAdmin } = useAuth();
   const [sections, setSections] = useState<FAQSection[]>([]);
+  const [intro, setIntro] = useState({ title: "Cos'è il Manuale delle Civiltà?", content: "Questo portale è nato per offrire alla community italiana di Age of Empires IV uno strumento completo, rapido e intuitivo per consultare ogni dettaglio del gioco." });
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
@@ -102,6 +103,19 @@ export function FAQPage() {
   const fetchFAQ = async () => {
     try {
       setLoading(true);
+      
+      // Fetch Intro
+      const { data: introData } = await supabase
+        .from('faq_settings')
+        .select('*')
+        .eq('id', 'intro')
+        .single();
+      
+      if (introData) {
+        setIntro({ title: introData.title, content: introData.content });
+      }
+
+      // Fetch Sections
       const { data: sectionData, error: sectionError } = await supabase
         .from('faq_sections')
         .select('*')
@@ -129,7 +143,7 @@ export function FAQPage() {
       setSections(combined);
     } catch (err) {
       console.error('Error fetching FAQ:', err);
-      setSections(STATIC_SECTIONS);
+      if (sections.length === 0) setSections(STATIC_SECTIONS);
     } finally {
       setLoading(false);
     }
@@ -173,8 +187,14 @@ export function FAQPage() {
     try {
       setSaveLoading(true);
       
-      // Clear existing to avoid complexity of nested upsert
-      // WARNING: In production, a more careful differential sync is better
+      // Save Intro
+      await supabase.from('faq_settings').upsert({
+        id: 'intro',
+        title: intro.title,
+        content: intro.content
+      });
+
+      // Clear existing sections/items to simplify sync
       await supabase.from('faq_items').delete().neq('id', '00000000-0000-0000-0000-000000000000');
       await supabase.from('faq_sections').delete().neq('id', '00000000-0000-0000-0000-000000000000');
 
@@ -280,13 +300,36 @@ export function FAQPage() {
           <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
             <Info size={120} />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
-            <Info className="text-yellow-500" />
-            Cos'è il Manuale delle Civiltà?
-          </h2>
-          <p className="text-lg leading-relaxed text-gray-300">
-            Questo portale è nato per offrire alla community italiana di <span className="text-yellow-500 font-bold">Age of Empires IV</span> uno strumento completo, rapido e intuitivo per consultare ogni dettaglio del gioco. Che tu sia un giocatore alle prime armi o un veterano in cerca di micro-ottimizzazioni, qui troverai tutto ciò che serve per dominare la scala competitiva.
-          </p>
+          
+          {isEditing ? (
+            <div className="space-y-4 relative z-10">
+              <div className="flex items-center gap-3">
+                <Info className="text-yellow-500" />
+                <input 
+                  value={intro.title}
+                  onChange={(e) => setIntro({ ...intro, title: e.target.value })}
+                  className="flex-1 bg-black/50 border border-yellow-500/30 rounded-lg px-4 py-2 text-2xl font-bold text-white"
+                  placeholder="Titolo Intro"
+                />
+              </div>
+              <textarea 
+                value={intro.content}
+                onChange={(e) => setIntro({ ...intro, content: e.target.value })}
+                className="w-full bg-black/50 border border-yellow-500/30 rounded-lg px-4 py-3 text-lg leading-relaxed text-gray-300 h-40 resize-none"
+                placeholder="Contenuto Intro"
+              />
+            </div>
+          ) : (
+            <>
+              <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                <Info className="text-yellow-500" />
+                {intro.title}
+              </h2>
+              <p className="text-lg leading-relaxed text-gray-300">
+                {intro.content}
+              </p>
+            </>
+          )}
         </section>
 
         <div className="space-y-12">
