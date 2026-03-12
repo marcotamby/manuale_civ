@@ -124,10 +124,10 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
 
       {/* Center Title Area */}
       <Link to="/" className="flex flex-col items-center justify-center text-center w-full md:w-1/3 group cursor-pointer hover:opacity-90 transition-opacity">
-        <h2 className="text-xs md:text-sm font-sackers font-bold text-yellow-500/90 tracking-[0.3em] uppercase mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+        <h2 className="text-xs md:text-sm font-sackers font-bold text-yellow-500/90 tracking-[0.15em] uppercase mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
           Age of Empires IV
         </h2>
-        <h1 className="text-3xl md:text-4xl font-sackers font-bold text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 via-yellow-400 to-amber-600 drop-shadow-[0_0_15px_rgba(212,175,55,0.3)] tracking-tight">
+        <h1 className="text-3xl md:text-4xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 via-yellow-400 to-amber-600 drop-shadow-[0_0_15px_rgba(212,175,55,0.3)] tracking-tight">
           Manuale delle Civiltà
         </h1>
         <div className="flex items-center gap-3 mt-3 mb-2">
