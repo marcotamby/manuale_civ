@@ -1,5 +1,60 @@
+import { useState, useEffect } from 'react';
 import { useCivData } from './CivContext';
-import { Shield, Sword, Zap, X, BarChart2, ChevronUp, ChevronDown } from 'lucide-react';
+import { Shield, Sword, Zap, X, BarChart2, ChevronUp, ChevronDown, Users } from 'lucide-react';
+import { CustomSelect } from './CustomSelect';
+
+// Maps app civ IDs to the exact IDs used by the AoE4World API
+const CIV_ID_TO_API_KEY: Record<string, string> = {
+  abbasid: 'abbasid_dynasty',
+  ayyubids: 'ayyubids',
+  byzantines: 'byzantines',
+  chinese: 'chinese',
+  delhi: 'delhi_sultanate',
+  english: 'english',
+  french: 'french',
+  goldenhorde: 'golden_horde',
+  hre: 'holy_roman_empire',
+  japanese: 'japanese',
+  jeannedarc: 'jeanne_darc',
+  lancaster: 'house_of_lancaster',
+  macedonian: 'macedonian_dynasty',
+  malians: 'malians',
+  mongols: 'mongols',
+  orderofthedragon: 'order_of_the_dragon',
+  ottomans: 'ottomans',
+  rus: 'rus',
+  sengoku: 'sengoku_daimyo',
+  templar: 'knights_templar',
+  tughlaq: 'tughlaq_dynasty',
+  zhuxi: 'zhu_xis_legacy',
+};
+
+type RankLevel = '' | 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond' | 'conqueror' | '≥gold' | '≥platinum' | '≥diamond';
+type RatingRange = '' | '<499' | '500-699' | '700-999' | '1000-1199' | '1200-1399' | '>1400' | '>1700';
+
+const RANK_LEVELS: { value: RankLevel; label: string }[] = [
+  { value: '', label: 'Tutti i Rank' },
+  { value: 'bronze', label: 'Bronze' },
+  { value: 'silver', label: 'Silver' },
+  { value: 'gold', label: 'Gold' },
+  { value: 'platinum', label: 'Platinum' },
+  { value: 'diamond', label: 'Diamond' },
+  { value: 'conqueror', label: 'Conqueror' },
+  { value: '≥gold', label: '≥ Gold' },
+  { value: '≥platinum', label: '≥ Platinum' },
+  { value: '≥diamond', label: '≥ Diamond' },
+];
+
+const RATING_RANGES: { value: RatingRange; label: string }[] = [
+  { value: '', label: 'Tutti i Rating' },
+  { value: '<499', label: '< 499' },
+  { value: '500-699', label: '500-699' },
+  { value: '700-999', label: '700-999' },
+  { value: '1000-1199', label: '1000-1199' },
+  { value: '1200-1399', label: '1200-1399' },
+  { value: '>1400', label: '> 1400' },
+  { value: '>1700', label: '> 1700' },
+];
 
 interface CompareViewProps {
   civIds: string[];
@@ -7,53 +62,153 @@ interface CompareViewProps {
 }
 
 export function CompareView({ civIds, onClose }: CompareViewProps) {
-  const { civilizations: civilizationsData } = useCivData();
-  const civs = civIds.map(id => civilizationsData.find(c => c.id === id)).filter(Boolean);
+  const { civilizations } = useCivData();
+  const [matchupWinRate, setMatchupWinRate] = useState<number | null>(null);
+  const [gamesCount, setGamesCount] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
+  const [rankLevel, setRankLevel] = useState<RankLevel>('');
+  const [ratingRange, setRatingRange] = useState<RatingRange>('');
 
-  if (civs.length < 2) return null;
+  const civ1 = civilizations.find(c => c.id === civIds[0]);
+  const civ2 = civilizations.find(c => c.id === civIds[1]);
 
-  const [civ1, civ2] = civs;
+  useEffect(() => {
+    if (!civ1 || !civ2) return;
+
+    const fetchMatchup = async () => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams();
+        if (rankLevel) params.set('rank_level', rankLevel);
+        if (ratingRange) params.set('rating', ratingRange);
+
+        const url = `https://aoe4world.com/api/v0/stats/rm_solo/matchups${params.toString() ? '?' + params.toString() : ''}`;
+        const response = await fetch(url);
+        const json = await response.json();
+        
+        const civ1Key = CIV_ID_TO_API_KEY[civ1.id] || civ1.id;
+        const civ2Key = CIV_ID_TO_API_KEY[civ2.id] || civ2.id;
+
+        const data = json.data || [];
+        const specificMatchup = data.find((m: any) => m.civilization === civ1Key && m.other_civilization === civ2Key);
+
+        if (specificMatchup) {
+          setMatchupWinRate(specificMatchup.win_rate);
+          setGamesCount(specificMatchup.games_count);
+        } else {
+          setMatchupWinRate(null);
+          setGamesCount(0);
+        }
+      } catch (err) {
+        console.error("Matchup fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMatchup();
+  }, [civ1, civ2, rankLevel, ratingRange]);
+
+  if (!civ1 || !civ2) return null;
 
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-[var(--color-brand-dark)] h-full">
-      <header className="mb-10 flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 mb-2 flex items-center gap-4">
-            <BarChart2 size={40} className="text-blue-500" />
-            Confronto Civiltà
-          </h1>
-          <p className="text-gray-400 italic text-sm md:text-base">Analisi fianco a fianco di {civ1!.name} e {civ2!.name}.</p>
-        </div>
+      {/* Header */}
+      <div className="flex flex-col items-center justify-center text-center p-6 md:p-8 bg-black/40 border-b border-white/5 relative">
         <button
           onClick={onClose}
-          className="p-3 glass rounded-full hover:bg-red-500/20 hover:text-red-400 transition-all border border-white/10"
+          className="absolute right-6 top-6 p-2 hover:bg-white/10 rounded-full transition-colors"
         >
-          <X size={24} />
+          <X size={24} className="text-gray-400" />
         </button>
-      </header>
+        <div className="flex items-center gap-3 mb-2">
+          <BarChart2 className="text-blue-500" size={32} />
+          <h1 className="text-3xl font-bold text-white">Confronto Civiltà</h1>
+        </div>
+        <p className="text-gray-400">
+          Analisi fianco a fianco di <span className="text-white font-medium">{civ1?.name}</span> e <span className="text-white font-medium">{civ2?.name}</span>.
+        </p>
+      </div>
 
-      <div className="max-w-7xl mx-auto pb-20 space-y-12">
-        {/* Row 1: Headers */}
+      <div className="p-4 md:p-8 space-y-8 max-w-7xl mx-auto w-full">
+        {/* Row 1: Flags & Names */}
         <div className="grid grid-cols-2 gap-3 md:gap-8">
-          {[civ1, civ2].map((civ, idx) => (
-            <div key={`header-${civ!.id}`} className="glass p-4 md:p-8 rounded-3xl border border-[#D4AF37]/20 relative overflow-hidden group animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${idx * 150}ms` }}>
-              <div className="absolute inset-0 opacity-10 transition-transform duration-700 group-hover:scale-110">
-                <img src={civ!.flag} alt="" className="w-full h-full object-cover blur-xl" />
-              </div>
-              <div className="relative flex flex-col md:flex-row items-center gap-3 md:gap-6 text-center md:text-left">
-                <img src={civ!.flag} alt={civ!.name} className="w-10 h-10 md:w-20 md:h-20 object-contain drop-shadow-2xl" />
-                <div>
-                  <h2 className="text-sm md:text-3xl font-bold text-white mb-1 md:mb-2">{civ!.name}</h2>
-                  <span className={`text-[8px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full border ${civ!.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/10' :
-                      civ!.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-500/40 bg-yellow-500/10' :
-                        'text-red-400 border-red-500/40 bg-red-500/10'
-                    }`}>
-                    {civ!.difficulty}
-                  </span>
-                </div>
+          {[civ1, civ2].map(civ => (
+            <div key={civ!.id} className="glass p-4 md:p-6 rounded-2xl flex items-center gap-4 md:gap-6 border border-white/5 hover:border-yellow-500/20 transition-all">
+              <img src={civ!.flag} alt={civ!.name} className="w-12 h-12 md:w-20 md:h-20 object-contain drop-shadow-lg" />
+              <div>
+                <h2 className="text-xl md:text-3xl font-bold text-white mb-1.5 md:mb-2">{civ!.name}</h2>
+                <span className={`text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 rounded-full border ${civ!.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/10' :
+                  civ!.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-500/40 bg-yellow-500/10' :
+                    'text-red-400 border-red-400/30 bg-red-500/10'
+                  }`}>
+                  {civ!.difficulty}
+                </span>
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Row 1.5: 1v1 Matchup Stats */}
+        <div className="glass p-6 md:p-8 rounded-3xl border border-blue-500/20 bg-blue-500/5">
+          <div className="flex flex-col items-center gap-6">
+            <h3 className="text-sm font-black text-blue-400 uppercase tracking-[0.2em] flex items-center gap-2">
+              <Users size={18} /> Statistiche 1v1 Live
+            </h3>
+
+            <div className="flex flex-wrap justify-center gap-4 w-full">
+              <CustomSelect
+                label="Grado (Rank)"
+                options={RANK_LEVELS}
+                value={rankLevel}
+                onChange={setRankLevel}
+              />
+              <CustomSelect
+                label="Punteggio ELO"
+                options={RATING_RANGES}
+                value={ratingRange}
+                onChange={setRatingRange}
+              />
+            </div>
+
+            <div className="flex flex-col items-center gap-2 w-full max-w-lg mt-4">
+              {loading ? (
+                <div className="text-blue-400/60 animate-pulse font-bold text-sm">SINCRONIZZAZIONE DATI...</div>
+              ) : matchupWinRate !== null ? (
+                <>
+                  <div className="flex justify-between w-full text-xs font-bold mb-1">
+                    <span className="text-gray-400">{civ1?.name}</span>
+                    <span className="text-gray-400">{civ2?.name}</span>
+                  </div>
+                  <div className="w-full h-4 md:h-6 bg-gray-800 rounded-full overflow-hidden flex shadow-inner border border-white/5 relative">
+                    <div 
+                      className="h-full bg-gradient-to-r from-blue-600 to-blue-500 transition-all duration-700 relative group" 
+                      style={{ width: `${matchupWinRate}%` }}
+                    >
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-[10px] md:text-xs font-black text-white drop-shadow-md">{matchupWinRate.toFixed(1)}%</span>
+                      </div>
+                    </div>
+                    <div 
+                      className="h-full bg-gradient-to-r from-red-500 to-red-600 transition-all duration-700 relative group" 
+                      style={{ width: `${100 - matchupWinRate}%` }}
+                    >
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-[10px] md:text-xs font-black text-white drop-shadow-md">{(100 - matchupWinRate).toFixed(1)}%</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-[10px] md:text-xs text-gray-500 mt-2 font-medium">
+                    Basato su <span className="text-blue-400/80">{gamesCount.toLocaleString('it-IT')}</span> partite analizzate
+                  </span>
+                </>
+              ) : (
+                <div className="text-gray-500 italic text-sm py-4">
+                  Dati insufficienti per questo matchup con i filtri selezionati.
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Row 2: Playstyle/Description */}
