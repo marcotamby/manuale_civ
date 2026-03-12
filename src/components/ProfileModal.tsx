@@ -37,6 +37,8 @@ const RANK_ICONS: Record<string, string> = {
     'Conqueror III': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_conqueror_3-7bfca5cbf4863241844cfc355340bcf5209c36d93bc747c5d96e33704349e65a.svg'
 };
 
+export { RANK_ICONS };
+
 const RANK_GROUPS = [
     { label: 'Bronze', ranks: ['Bronze I', 'Bronze II', 'Bronze III'] },
     { label: 'Silver', ranks: ['Silver I', 'Silver II', 'Silver III'] },
@@ -122,7 +124,7 @@ function RankDropdown({ value, onChange }: { value: string; onChange: (rank: str
 }
 
 export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps) {
-    const { user, favorites, updateProfile, logout } = useAuth();
+    const { user, favorites, updateProfile, logout, isAdmin, isSuperAdmin } = useAuth();
     const [mySuggestions, setMySuggestions] = useState<Suggestion[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -165,7 +167,14 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                             <User size={24} />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-white uppercase tracking-wider">Il Tuo Profilo</h2>
+                            <div className="flex items-center gap-2">
+                                <h2 className="text-xl font-bold text-white uppercase tracking-wider">Il Tuo Profilo</h2>
+                                {isAdmin && (
+                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-bold uppercase tracking-widest">
+                                        {isSuperAdmin ? 'Admin' : 'Editor'}
+                                    </span>
+                                )}
+                            </div>
                             <p className="text-xs text-gray-400">{user?.email}</p>
                         </div>
                     </div>

@@ -4,6 +4,7 @@ import { useCivData } from './CivContext';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Link } from 'react-router-dom';
+import { RANK_ICONS } from './ProfileModal';
 
 export type FilterType = 'Tutte' | 'Fanteria' | 'Cavalleria' | 'Arcieri' | 'Assedio';
 
@@ -126,8 +127,12 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
                 className="flex items-center gap-2 text-yellow-500 hover:opacity-80 transition-opacity group"
                 title="Il Tuo Profilo"
               >
-                <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30 group-hover:border-yellow-500/60 transition-colors">
-                  <User size={16} />
+                <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30 group-hover:border-yellow-500/60 transition-colors overflow-hidden">
+                  {user?.rank && user.rank !== 'Unranked' ? (
+                    <img src={RANK_ICONS[user.rank]} alt={user.rank} className="w-6 h-6 object-contain" />
+                  ) : (
+                    <User size={16} />
+                  )}
                 </div>
                 <div className="flex flex-col text-left">
                   <span className="font-medium hidden sm:block text-sm leading-none text-white/90">{user?.name}</span>
@@ -160,10 +165,16 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
                   (window as any).openProfileModal?.();
                   (window as any).clearNotifications?.();
                 }}
-                className="relative p-2 rounded-full bg-blue-600/10 border border-blue-500/30 text-blue-400 hover:bg-blue-600/20 hover:border-blue-500/50 transition-all group"
+                className="relative p-1 rounded-full bg-blue-600/10 border border-blue-500/30 text-blue-400 hover:bg-blue-600/20 hover:border-blue-500/50 transition-all group overflow-hidden"
                 title="Il Tuo Profilo"
               >
-                <User size={20} />
+                {user?.rank && user.rank !== 'Unranked' ? (
+                  <img src={RANK_ICONS[user.rank]} alt={user.rank} className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]" />
+                ) : (
+                  <div className="w-8 h-8 flex items-center justify-center">
+                    <User size={20} />
+                  </div>
+                )}
                 {notificationCount > 0 && (
                   <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[9px] font-bold text-white shadow-lg group-hover:scale-110 transition-transform ring-1 ring-[#0d1424]">
                     {notificationCount}
