@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCivData } from './CivContext';
+import { useAuth } from './AuthContext';
 import { usePresence } from './PresenceContext';
 import type { Unit } from '../data/aoe4Data';
 import { UnitGrid } from './UnitGrid';
 import { MatchupsTable } from './MatchupsTable';
 import { EditSuggestionForm } from './EditSuggestionForm';
 import { AdminCivEditorModal } from './AdminCivEditorModal';
-import { useAuth } from './AuthContext';
 import type { Civilization } from '../data/aoe4Data';
 import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight, Clock } from 'lucide-react';
 import { ResourceText } from './ResourceText';
@@ -43,6 +43,7 @@ interface CivViewProps {
 
 export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const { civilizations: civilizationsData, refreshCivs } = useCivData();
+  const { isAdmin, isSuperAdmin, user } = useAuth();
   const { updateActivity, activeAdmins } = usePresence();
   const { tab } = useParams<{ tab?: string }>();
   const navigate = useNavigate();
@@ -66,7 +67,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const [expandedBOs, setExpandedBOs] = useState<Set<string>>(new Set());
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editorTarget, setEditorTarget] = useState<{ section?: string; id?: string }>({});
-  const { isAdmin, isSuperAdmin, user } = useAuth();
 
   const openEditor = (section?: string, id?: string) => {
     setEditorTarget({ section, id });
