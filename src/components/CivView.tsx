@@ -159,7 +159,29 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               )}
             </div>
 
-            {/* Active presence indicators temporarily disabled */}
+            {/* Active presence indicators */}
+            {Object.values(_activeAdmins).some(a => a.user?.email !== user?.email && a.activity?.civId === civId) && (
+              <div className="flex -space-x-2 overflow-hidden mt-3 items-center">
+                {Object.values(_activeAdmins)
+                  .filter(admin => admin.user?.email !== user?.email && admin.activity?.civId === civId)
+                  .map((admin, idx) => (
+                    <div
+                      key={idx}
+                      className="inline-block h-6 w-6 rounded-full ring-2 ring-[var(--color-brand-dark)] bg-yellow-500/10 flex items-center justify-center overflow-hidden"
+                      title={`${admin.user.name} sta guardando questa civiltà`}
+                    >
+                      {admin.user.avatar ? (
+                        <img src={admin.user.avatar} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <span className="text-[10px] font-bold text-yellow-500">{admin.user.name?.charAt(0)}</span>
+                      )}
+                    </div>
+                  ))}
+                <span className="ml-4 text-[10px] text-gray-500 font-medium italic">
+                  Altri admin stanno consultando questa civiltà
+                </span>
+              </div>
+            )}
 
             <p className="text-gray-300 max-w-2xl leading-relaxed">{civ.shortDescription}</p>
           </div>

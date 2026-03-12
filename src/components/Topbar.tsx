@@ -146,11 +146,11 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
           isAdmin ? (
             <div className="flex items-center gap-4 font-sans">
               {/* Active presence indicators */}
-              {_activeAdmins.length > 0 && (
+              {Object.keys(_activeAdmins).length > 0 && (
                 <div className="flex items-center gap-1.5 px-2 py-1 bg-yellow-500/10 rounded-full border border-yellow-500/20 animate-pulse">
                   <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.6)]"></div>
                   <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-tighter">
-                    {_activeAdmins.length} {_activeAdmins.length === 1 ? 'Admin' : 'Admin'} Online
+                    {Object.keys(_activeAdmins).length} {Object.keys(_activeAdmins).length === 1 ? 'Admin' : 'Admin'} Online
                   </span>
                 </div>
               )}
