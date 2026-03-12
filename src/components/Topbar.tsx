@@ -118,15 +118,22 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
         {isAuthenticated ? (
           isAdmin ? (
             <div className="flex items-center gap-4 font-sans">
-              <div className="flex items-center gap-2 text-yellow-500">
-                <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30">
+              <button
+                onClick={() => {
+                  (window as any).openProfileModal?.();
+                  (window as any).clearNotifications?.();
+                }}
+                className="flex items-center gap-2 text-yellow-500 hover:opacity-80 transition-opacity group"
+                title="Il Tuo Profilo"
+              >
+                <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30 group-hover:border-yellow-500/60 transition-colors">
                   <User size={16} />
                 </div>
                 <div className="flex flex-col text-left">
                   <span className="font-medium hidden sm:block text-sm leading-none text-white/90">{user?.name}</span>
                   <span className="text-[10px] text-yellow-600 font-bold uppercase tracking-wider">{isSuperAdmin ? 'Admin' : 'Editor'}</span>
                 </div>
-              </div>
+              </button>
               {isSuperAdmin && (
                 <button
                   onClick={onOpenAdminDashboard}
