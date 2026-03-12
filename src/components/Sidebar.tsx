@@ -155,8 +155,8 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
           </nav>
         )}
 
-        {/* Community & Support Links - Bottom Section */}
-        <div className="mt-auto pt-4 flex flex-col gap-3 w-full px-3 md:px-6 mb-2 border-t border-white/5">
+        {/* Community & Support Links - Bottom Section (Mobile Only) */}
+        <div className="mt-auto pt-4 flex flex-col gap-3 w-full px-3 md:px-6 mb-2 border-t border-white/5 md:hidden">
           <a
             href="https://discord.gg/XmFhYzwC"
             target="_blank"
