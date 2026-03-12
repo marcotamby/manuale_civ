@@ -182,7 +182,7 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
                   </div>
                   <div className="w-full h-4 md:h-6 bg-gray-800 rounded-full overflow-hidden flex shadow-inner border border-white/5 relative">
                     <div 
-                      className="h-full bg-gradient-to-r from-blue-600 to-blue-500 transition-all duration-700 relative group" 
+                      className={`h-full transition-all duration-700 relative group ${matchupWinRate >= 50 ? 'bg-gradient-to-r from-green-600 to-green-500' : 'bg-gradient-to-r from-red-600 to-red-500'}`} 
                       style={{ width: `${matchupWinRate}%` }}
                     >
                       <div className="absolute inset-0 flex items-center justify-center">
@@ -190,7 +190,7 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
                       </div>
                     </div>
                     <div 
-                      className="h-full bg-gradient-to-r from-red-500 to-red-600 transition-all duration-700 relative group" 
+                      className={`h-full transition-all duration-700 relative group ${matchupWinRate < 50 ? 'bg-gradient-to-r from-green-500 to-green-600' : 'bg-gradient-to-r from-red-500 to-red-600'}`} 
                       style={{ width: `${100 - matchupWinRate}%` }}
                     >
                       <div className="absolute inset-0 flex items-center justify-center">
