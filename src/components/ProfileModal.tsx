@@ -267,43 +267,45 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                         )}
                     </section>
 
-                    {/* Proposte */}
-                    <section>
-                        <div className="flex items-center gap-2 mb-4 text-yellow-400 tracking-widest uppercase text-xs font-bold">
-                            <MessageSquare size={14} />
-                            <span>Le Tue Proposte</span>
-                        </div>
-                        {isLoading ? (
-                            <div className="flex items-center justify-center py-10">
-                                <Loader2 size={24} className="animate-spin text-blue-500" />
+                    {/* Proposte - Hidden for Admins/Editors as they have the Dashboard */}
+                    {!isAdmin && (
+                        <section>
+                            <div className="flex items-center gap-2 mb-4 text-yellow-400 tracking-widest uppercase text-xs font-bold">
+                                <MessageSquare size={14} />
+                                <span>Le Tue Proposte</span>
                             </div>
-                        ) : mySuggestions.length > 0 ? (
-                            <div className="space-y-3">
-                                {mySuggestions.map(sugg => (
-                                    <div key={sugg.id} className="bg-white/[0.03] p-4 rounded-xl border border-white/5 hover:border-white/10 transition-all">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <span className="text-xs font-bold text-blue-400 uppercase">{sugg.civ_name}</span>
-                                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
-                                                sugg.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' :
-                                                sugg.status === 'implemented' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
-                                                'bg-red-500/10 text-red-500 border border-red-500/20'
-                                            }`}>
-                                                {sugg.status}
-                                            </span>
+                            {isLoading ? (
+                                <div className="flex items-center justify-center py-10">
+                                    <Loader2 size={24} className="animate-spin text-blue-500" />
+                                </div>
+                            ) : mySuggestions.length > 0 ? (
+                                <div className="space-y-3">
+                                    {mySuggestions.map(sugg => (
+                                        <div key={sugg.id} className="bg-white/[0.03] p-4 rounded-xl border border-white/5 hover:border-white/10 transition-all">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className="text-xs font-bold text-blue-400 uppercase">{sugg.civ_name}</span>
+                                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                                                    sugg.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' :
+                                                    sugg.status === 'implemented' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
+                                                    'bg-red-500/10 text-red-500 border border-red-500/20'
+                                                }`}>
+                                                    {sugg.status}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm text-gray-300 line-clamp-2 italic">"{sugg.suggestion_text}"</p>
+                                            <p className="text-[10px] text-gray-500 mt-2">
+                                                Inviata il {new Date(sugg.created_at).toLocaleDateString('it-IT')}
+                                            </p>
                                         </div>
-                                        <p className="text-sm text-gray-300 line-clamp-2 italic">"{sugg.suggestion_text}"</p>
-                                        <p className="text-[10px] text-gray-500 mt-2">
-                                            Inviata il {new Date(sugg.created_at).toLocaleDateString('it-IT')}
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-6 bg-white/[0.02] rounded-xl border border-white/5">
-                                <p className="text-sm text-gray-500">Non hai ancora inviato nessuna proposta.</p>
-                            </div>
-                        )}
-                    </section>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-6 bg-white/[0.02] rounded-xl border border-white/5">
+                                    <p className="text-sm text-gray-500">Non hai ancora inviato nessuna proposta.</p>
+                                </div>
+                            )}
+                        </section>
+                    )}
                 </div>
 
                 {/* Footer */}
