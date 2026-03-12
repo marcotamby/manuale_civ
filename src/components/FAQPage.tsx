@@ -304,10 +304,6 @@ export function FAQPage() {
         </header>
 
         <section className="mb-12 glass p-8 rounded-3xl border border-white/5 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-            <Info size={120} />
-          </div>
-          
           {isEditing ? (
             <div className="space-y-4 relative z-10">
               <div className="flex items-center gap-3">
