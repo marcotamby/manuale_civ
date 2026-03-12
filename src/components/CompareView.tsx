@@ -134,11 +134,11 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
         {/* Row 1: Flags & Names */}
         <div className="grid grid-cols-2 gap-3 md:gap-8">
           {[civ1, civ2].map(civ => (
-            <div key={civ!.id} className="glass p-4 md:p-6 rounded-2xl flex items-center gap-4 md:gap-6 border border-white/5 hover:border-yellow-500/20 transition-all">
-              <img src={civ!.flag} alt={civ!.name} className="w-12 h-12 md:w-20 md:h-20 object-contain drop-shadow-lg" />
+            <div key={civ!.id} className="glass p-6 md:p-8 rounded-2xl flex flex-col items-center justify-center text-center gap-4 border border-white/5 hover:border-yellow-500/20 transition-all min-h-[160px] md:min-h-[200px]">
+              <img src={civ!.flag} alt={civ!.name} className="w-16 h-16 md:w-24 md:h-24 object-contain drop-shadow-lg" />
               <div>
-                <h2 className="text-xl md:text-3xl font-bold text-white mb-1.5 md:mb-2">{civ!.name}</h2>
-                <span className={`text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 rounded-full border ${civ!.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/10' :
+                <h2 className="text-xl md:text-3xl font-bold text-white mb-2 tracking-tight">{civ!.name}</h2>
+                <span className={`text-[10px] md:text-xs font-bold px-3 py-1 rounded-full border ${civ!.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/10' :
                   civ!.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-500/40 bg-yellow-500/10' :
                     'text-red-400 border-red-400/30 bg-red-500/10'
                   }`}>
