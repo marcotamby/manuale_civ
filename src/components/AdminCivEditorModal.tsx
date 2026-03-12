@@ -100,11 +100,11 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
     }
   }, [isOpen]);
 
-  const otherAdminsEditing = Object.values(activeAdmins).filter(
+  const otherAdminsEditing = activeAdmins ? Object.values(activeAdmins).filter(
     a => a?.user?.email && a.user.email !== user?.email && 
     a.activity?.type === 'editing' && 
     a.activity?.civId === civ.id
-  );
+  ) : [];
 
   const getYoutubeId = (url: string) => {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;

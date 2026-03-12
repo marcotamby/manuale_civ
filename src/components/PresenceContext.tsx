@@ -23,13 +23,15 @@ interface PresenceContextType {
 
 const PresenceContext = createContext<PresenceContextType | undefined>(undefined);
 
+const DISABLE_PRESENCE = true; // Temporary master switch to restore site
+
 export function PresenceProvider({ children }: { children: React.ReactNode }) {
   const { user, isAdmin } = useAuth();
   const [activeAdmins, setActiveAdmins] = useState<Record<string, PresenceState>>({});
   const [channel, setChannel] = useState<any>(null);
 
   useEffect(() => {
-    if (!isAdmin || !user || !user.email) {
+    if (DISABLE_PRESENCE || !isAdmin || !user || !user.email) {
       setActiveAdmins({});
       setChannel(null);
       return;

@@ -44,7 +44,7 @@ interface CivViewProps {
 export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const { civilizations: civilizationsData, refreshCivs } = useCivData();
   const { isAdmin, isSuperAdmin, user } = useAuth();
-  const { updateActivity, activeAdmins } = usePresence();
+  const { updateActivity, activeAdmins: _activeAdmins } = usePresence();
   const { tab } = useParams<{ tab?: string }>();
   const navigate = useNavigate();
 
