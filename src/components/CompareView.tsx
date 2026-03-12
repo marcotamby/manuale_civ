@@ -1,5 +1,5 @@
 import { useCivData } from './CivContext';
-import { Shield, Sword, Zap, X, BarChart2 } from 'lucide-react';
+import { Shield, Sword, Zap, X, BarChart2, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface CompareViewProps {
   civIds: string[];
@@ -83,6 +83,52 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
                     {bonus}
                   </div>
                 ))}
+              </div>
+            </section>
+          ))}
+        </div>
+
+        {/* Row 3.5: Strengths */}
+        <div className="grid grid-cols-2 gap-3 md:gap-8">
+          {[civ1, civ2].map(civ => (
+            <section key={`strengths-${civ!.id}`} className="space-y-4 h-full">
+              <h3 className="text-[10px] md:text-sm font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                <ChevronUp size={16} className="text-green-400" />
+                Punti di Forza
+              </h3>
+              <div className="glass p-4 rounded-xl border border-green-500/20 text-gray-300 text-[11px] md:text-sm leading-relaxed">
+                <ul className="space-y-2 list-disc list-inside">
+                  {civ!.strengths && civ!.strengths.length > 0 ? (
+                    civ!.strengths.map((str, idx) => (
+                      <li key={idx}><strong className="text-green-400">{str}</strong></li>
+                    ))
+                  ) : (
+                    <li className="text-gray-500 italic">Dati non disponibili.</li>
+                  )}
+                </ul>
+              </div>
+            </section>
+          ))}
+        </div>
+
+        {/* Row 3.6: Weaknesses */}
+        <div className="grid grid-cols-2 gap-3 md:gap-8">
+          {[civ1, civ2].map(civ => (
+            <section key={`weaknesses-${civ!.id}`} className="space-y-4 h-full">
+              <h3 className="text-[10px] md:text-sm font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                <ChevronDown size={16} className="text-red-400" />
+                Punti Deboli
+              </h3>
+              <div className="glass p-4 rounded-xl border border-red-500/20 text-gray-300 text-[11px] md:text-sm leading-relaxed">
+                {civ!.weaknesses && civ!.weaknesses.length > 0 ? (
+                  <ul className="space-y-2 list-disc list-inside">
+                    {civ!.weaknesses.map((wk, idx) => (
+                      <li key={idx}><strong className="text-red-400">{wk}</strong></li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500 italic px-2">Dati non disponibili.</p>
+                )}
               </div>
             </section>
           ))}
