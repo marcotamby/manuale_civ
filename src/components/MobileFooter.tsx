@@ -32,7 +32,7 @@ export function MobileFooter() {
         className="flex flex-col items-center gap-1 text-gray-400 hover:text-amber-500 transition-all font-sans"
       >
         <Coffee size={20} />
-        <span className="text-[10px] font-bold uppercase tracking-widest">Supporto</span>
+        <span className="text-[10px] font-bold uppercase tracking-widest">Sostieni</span>
       </a>
     </footer>
   );

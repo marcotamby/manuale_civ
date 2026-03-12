@@ -99,6 +99,13 @@ export function FAQPage() {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+
+  const toggleItem = (sIdx: number, iIdx: number) => {
+    if (window.innerWidth >= 768) return; // Don't toggle on desktop
+    const key = `${sIdx}-${iIdx}`;
+    setExpandedItems(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const fetchFAQ = async () => {
     try {
@@ -385,68 +392,85 @@ export function FAQPage() {
               )}
 
               <div className="grid md:grid-cols-2 gap-4">
-                {section.items.map((item, iIdx) => (
-                  <div key={iIdx} className="glass p-5 rounded-2xl border border-white/5 hover:border-yellow-500/30 transition-all hover:translate-y-[-2px] group relative">
-                    {isEditing && (
-                      <button 
-                        onClick={() => handleRemoveItem(sIdx, iIdx)}
-                        className="absolute -top-2 -right-2 p-1 bg-red-600 rounded-full text-white shadow-lg z-10 hover:scale-110 transition-transform"
-                      >
-                        <X size={12} />
-                      </button>
-                    )}
-                    
-                    {isEditing ? (
-                      <div className="space-y-3">
-                        <div className="flex gap-2">
-                          <select 
-                            value={item.icon_name}
+                {section.items.map((item, iIdx) => {
+                  const isExpanded = expandedItems[`${sIdx}-${iIdx}`];
+                  return (
+                    <div 
+                      key={iIdx} 
+                      onClick={() => !isEditing && toggleItem(sIdx, iIdx)}
+                      className={`glass p-5 rounded-2xl border border-white/5 hover:border-yellow-500/30 transition-all group relative ${!isEditing ? 'cursor-pointer md:cursor-default' : ''} ${!isEditing && isExpanded ? 'border-yellow-500/30' : ''}`}
+                    >
+                      {isEditing && (
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveItem(sIdx, iIdx);
+                          }}
+                          className="absolute -top-2 -right-2 p-1 bg-red-600 rounded-full text-white shadow-lg z-10 hover:scale-110 transition-transform"
+                        >
+                          <X size={12} />
+                        </button>
+                      )}
+                      
+                      {isEditing ? (
+                        <div className="space-y-3">
+                          <div className="flex gap-2">
+                            <select 
+                              value={item.icon_name}
+                              onChange={(e) => {
+                                const next = [...sections];
+                                next[sIdx].items[iIdx].icon_name = e.target.value;
+                                setSections(next);
+                              }}
+                              className="bg-black/50 border border-white/10 rounded-lg px-1 py-1 text-xs text-yellow-500"
+                            >
+                              {['Layers', 'Zap', 'Heart', 'GitPullRequest', 'Users', 'Shield', 'PlayCircle', 'BookOpen', 'Sword', 'Info', 'HelpCircle'].map(icon => (
+                                <option key={icon} value={icon}>{icon}</option>
+                              ))}
+                            </select>
+                            <input 
+                              value={item.label}
+                              onChange={(e) => {
+                                const next = [...sections];
+                                next[sIdx].items[iIdx].label = e.target.value;
+                                setSections(next);
+                              }}
+                              className="flex-1 bg-black/50 border border-white/10 rounded-lg px-3 py-1 text-sm font-bold text-white"
+                            />
+                          </div>
+                          <textarea 
+                            value={item.description}
                             onChange={(e) => {
                               const next = [...sections];
-                              next[sIdx].items[iIdx].icon_name = e.target.value;
+                              next[sIdx].items[iIdx].description = e.target.value;
                               setSections(next);
                             }}
-                            className="bg-black/50 border border-white/10 rounded-lg px-1 py-1 text-xs text-yellow-500"
-                          >
-                            {['Layers', 'Zap', 'Heart', 'GitPullRequest', 'Users', 'Shield', 'PlayCircle', 'BookOpen', 'Sword', 'Info', 'HelpCircle'].map(icon => (
-                              <option key={icon} value={icon}>{icon}</option>
-                            ))}
-                          </select>
-                          <input 
-                            value={item.label}
-                            onChange={(e) => {
-                              const next = [...sections];
-                              next[sIdx].items[iIdx].label = e.target.value;
-                              setSections(next);
-                            }}
-                            className="flex-1 bg-black/50 border border-white/10 rounded-lg px-3 py-1 text-sm font-bold text-white"
+                            className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-gray-400 h-24 resize-none"
                           />
                         </div>
-                        <textarea 
-                          value={item.description}
-                          onChange={(e) => {
-                            const next = [...sections];
-                            next[sIdx].items[iIdx].description = e.target.value;
-                            setSections(next);
-                          }}
-                          className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-gray-400 h-24 resize-none"
-                        />
-                      </div>
-                    ) : (
-                      <>
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="p-2 bg-white/5 rounded-lg group-hover:bg-yellow-500/10 transition-colors text-yellow-500">
-                             <IconComponent name={item.icon_name} />
+                      ) : (
+                        <>
+                          <div className="flex items-center justify-between gap-3 mb-3">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 bg-white/5 rounded-lg group-hover:bg-yellow-500/10 transition-colors text-yellow-500 shrink-0">
+                                 <IconComponent name={item.icon_name} />
+                              </div>
+                              <h3 className="font-bold text-white tracking-wide">{item.label}</h3>
+                            </div>
+                            <div className="md:hidden">
+                              {isExpanded ? <ChevronUp size={16} className="text-yellow-500" /> : <ChevronDown size={16} className="text-gray-500" />}
+                            </div>
                           </div>
-                          <h3 className="font-bold text-white tracking-wide">{item.label}</h3>
-                        </div>
-                        <p className="text-sm text-gray-400 leading-relaxed">
-                          {item.description}
-                        </p>
-                      </>
-                    )}
-                  </div>
-                ))}
+                          <div className={`overflow-hidden transition-all duration-300 md:block ${isExpanded ? 'max-h-96 opacity-100 mt-3' : 'max-h-0 opacity-0 md:max-h-96 md:opacity-100'}`}>
+                            <p className="text-sm text-gray-400 leading-relaxed border-t border-white/5 pt-3 md:border-0 md:pt-0">
+                              {item.description}
+                            </p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
 
                 {isEditing && (
                   <button 
