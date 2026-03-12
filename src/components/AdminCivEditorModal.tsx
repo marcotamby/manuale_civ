@@ -101,9 +101,9 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
   }, [isOpen]);
 
   const otherAdminsEditing = Object.values(activeAdmins).filter(
-    a => a.user.email !== user?.email && 
-    a.activity.type === 'editing' && 
-    a.activity.civId === civ.id
+    a => a?.user?.email && a.user.email !== user?.email && 
+    a.activity?.type === 'editing' && 
+    a.activity?.civId === civ.id
   );
 
   const getYoutubeId = (url: string) => {
@@ -263,15 +263,18 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
               <div>
                 <h4 className="text-red-400 font-bold text-sm">ATTENZIONE: Altri admin stanno modificando questa civiltà</h4>
                 <div className="mt-2 space-y-1">
-                  {otherAdminsEditing.map(a => (
-                    <div key={a.user.email} className="flex items-center gap-2 text-xs text-red-300">
-                      <div className="w-4 h-4 rounded-full bg-red-600 flex items-center justify-center text-[8px] font-bold text-white">
-                        {a.user.name.charAt(0)}
+                  {otherAdminsEditing.map(a => {
+                    if (!a?.user?.email || !a?.user?.name) return null;
+                    return (
+                      <div key={a.user.email} className="flex items-center gap-2 text-xs text-red-300">
+                        <div className="w-4 h-4 rounded-full bg-red-600 flex items-center justify-center text-[8px] font-bold text-white">
+                          {a.user.name.charAt(0)}
+                        </div>
+                        <span className="font-semibold">{a.user.name}</span>
+                        <span className="opacity-70">sta modificando la sezione: <b className="text-red-200">{a.activity?.section === 'all' ? 'Tutte' : a.activity?.section}</b></span>
                       </div>
-                      <span className="font-semibold">{a.user.name}</span>
-                      <span className="opacity-70">sta modificando la sezione: <b className="text-red-200">{a.activity.section === 'all' ? 'Tutte' : a.activity.section}</b></span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 <p className="text-[10px] text-red-400/80 mt-2 italic">Rischio di sovrascrittura dati: coordina le modifiche per evitare perdite di informazioni.</p>
               </div>

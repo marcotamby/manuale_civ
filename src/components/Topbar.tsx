@@ -148,19 +148,22 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
               {/* Active Admins List */}
               <div className="hidden lg:flex items-center gap-2 mr-2 border-r border-white/10 pr-4">
                 <div className="flex -space-x-2">
-                  {Object.values(activeAdmins).map(a => (
-                    <div 
-                      key={a.user.email} 
-                      className={`w-7 h-7 rounded-full border-2 border-[var(--color-brand-dark)] flex items-center justify-center overflow-hidden transition-all ${a.activity.type === 'editing' ? 'ring-2 ring-red-500 ring-offset-1 ring-offset-transparent shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'bg-blue-600'}`}
-                      title={`${a.user.name} - ${a.activity.type === 'editing' ? 'Sta modificando' : a.activity.type === 'viewing' ? 'Sta guardando' : 'Online'}`}
-                    >
-                      {a.user.avatar ? (
-                        <img src={a.user.avatar} alt={a.user.name} />
-                      ) : (
-                        <span className="text-[10px] font-bold text-white">{a.user.name.charAt(0)}</span>
-                      )}
-                    </div>
-                  ))}
+                  {Object.values(activeAdmins).map(a => {
+                    if (!a?.user?.email || !a?.user?.name) return null;
+                    return (
+                      <div 
+                        key={a.user.email} 
+                        className={`w-7 h-7 rounded-full border-2 border-[var(--color-brand-dark)] flex items-center justify-center overflow-hidden transition-all ${a.activity?.type === 'editing' ? 'ring-2 ring-red-500 ring-offset-1 ring-offset-transparent shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'bg-blue-600'}`}
+                        title={`${a.user.name} - ${a.activity?.type === 'editing' ? 'Sta modificando' : a.activity?.type === 'viewing' ? 'Sta guardando' : 'Online'}`}
+                      >
+                        {a.user.avatar ? (
+                          <img src={a.user.avatar} alt={a.user.name} />
+                        ) : (
+                          <span className="text-[10px] font-bold text-white">{a.user.name.charAt(0)}</span>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
                 {Object.keys(activeAdmins).length > 0 && (
                   <div className="flex flex-col">

@@ -49,14 +49,13 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
         const simplifiedState: Record<string, PresenceState> = {};
         
         Object.keys(newState).forEach((key) => {
-          // Presence state can have multiple entries for the same key (different tabs)
-          // We take the first one or we could merge them. Let's take the first one.
           const presenceEntry = newState[key][0] as any;
-          if (presenceEntry) {
+          // Only add to activeAdmins if the data is complete to avoid downstream crashes
+          if (presenceEntry && presenceEntry.user && presenceEntry.user.email && presenceEntry.activity) {
             simplifiedState[key] = {
               user: presenceEntry.user,
               activity: presenceEntry.activity,
-              onlineAt: presenceEntry.onlineAt
+              onlineAt: presenceEntry.onlineAt || new Date().toISOString()
             };
           }
         });
