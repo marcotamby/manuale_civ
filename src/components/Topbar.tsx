@@ -167,6 +167,7 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
                   <span className="text-[10px] text-yellow-600 font-bold uppercase tracking-wider">{isSuperAdmin ? 'Admin' : 'Editor'}</span>
                 </div>
               </button>
+
               {isSuperAdmin && (
                 <button
                   onClick={onOpenAdminDashboard}
@@ -179,7 +180,9 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
                     </span>
                   )}
                 </button>
-              )}              <button
+              )}
+
+              <button
                 onClick={logout}
                 className="text-xs text-gray-400 hover:text-white transition-colors border border-white/10 px-3 py-1.5 rounded hover:bg-white/5 font-sans tracking-wider uppercase"
               >
