@@ -159,7 +159,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               )}
             </div>
 
-            {/* Other Admins Viewing Indicator */}
+            {/* Temporary hide presence indicator to debug crash */}
+            {/* 
             {activeAdmins && Object.values(activeAdmins).filter(a => a?.user?.email && a.user.email !== user?.email && a.activity?.type === 'viewing' && a.activity?.civId === civId).length > 0 && (
               <div className="flex items-center gap-2 mt-2">
                 <div className="flex -space-x-2">
@@ -188,6 +189,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 </span>
               </div>
             )}
+            */}
 
             <p className="text-gray-300 max-w-2xl leading-relaxed">{civ.shortDescription}</p>
           </div>

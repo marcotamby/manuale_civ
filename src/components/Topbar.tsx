@@ -145,7 +145,8 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
         {isAuthenticated ? (
           isAdmin ? (
             <div className="flex items-center gap-4 font-sans">
-              {/* Active Admins List */}
+              {/* Active Admins List */              {/* Temporary hide presence indicator to debug crash */}
+              {/* 
               <div className="hidden lg:flex items-center gap-2 mr-2 border-r border-white/10 pr-4">
                 <div className="flex -space-x-2">
                   {Object.values(activeAdmins).map(a => {
@@ -176,6 +177,8 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
                   </div>
                 )}
               </div>
+              */}
+>
 
               <button
                 onClick={() => {
