@@ -15,6 +15,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
   const [difficultyFilter, setDifficultyFilter] = useState<'Tutte' | 'Facile' | 'Medio' | 'Difficile' | 'Preferiti'>('Tutte');
   const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
   const [isCompareMode, setIsCompareMode] = useState(false);
+  const isMaxReached = selectedForCompare.length >= 2;
 
   const filteredCivs = civilizationsData.filter(civ => {
     if (difficultyFilter === 'Preferiti') return favorites.includes(civ.id);
@@ -107,6 +108,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
         {filteredCivs.map(civ => {
           const isSelected = selectedForCompare.includes(civ.id);
           const isFavorite = favorites.includes(civ.id);
+          const isUnselectable = isCompareMode && isMaxReached && !isSelected;
 
           return (
             <div
@@ -114,7 +116,9 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
               onClick={() => handleCardClick(civ.id)}
               className={`group relative h-40 md:h-56 rounded-xl cursor-pointer overflow-hidden border transition-all duration-500 ${isSelected
                 ? 'border-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.4)] scale-[0.98]'
-                : 'border-[#D4AF37]/20 hover:border-yellow-400 hover:shadow-[0_0_30px_rgba(212,175,55,0.25)] hover:-translate-y-1'
+                : isUnselectable
+                  ? 'border-[#D4AF37]/5 opacity-40 grayscale-[0.3] cursor-not-allowed'
+                  : 'border-[#D4AF37]/20 hover:border-yellow-400 hover:shadow-[0_0_30px_rgba(212,175,55,0.25)] hover:-translate-y-1'
                 }`}
             >
               {/* Full Cover Flag Background */}
@@ -126,7 +130,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                   onLoad={(e) => {
                     (e.target as HTMLImageElement).classList.remove('opacity-0');
                   }}
-                  className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 opacity-0"
+                  className={`w-full h-full object-cover transition-all duration-1000 opacity-0 ${!isUnselectable ? 'group-hover:scale-110' : ''}`}
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>';
                     (e.target as HTMLImageElement).classList.remove('opacity-0');
@@ -138,7 +142,11 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
 
               {/* Selection Indicator */}
               {isCompareMode && (
-                <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${isSelected ? 'bg-blue-600/20' : 'bg-black/40 opacity-0 group-hover:opacity-100'}`}>
+                <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${isSelected 
+                  ? 'bg-blue-600/20' 
+                  : isUnselectable 
+                    ? 'hidden' 
+                    : 'bg-black/40 opacity-0 group-hover:opacity-100'}`}>
                   <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-blue-600 border-white scale-110' : 'border-white/50'}`}>
                     {isSelected && <BarChart2 size={16} className="text-white" />}
                   </div>
