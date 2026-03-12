@@ -17,7 +17,6 @@ import { ProfileModal } from './components/ProfileModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { PrivacyPage } from './components/PrivacyPage';
 import { FAQPage } from './components/FAQPage';
-import { MobileFooter } from './components/MobileFooter';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 
 function App() {
@@ -233,7 +232,7 @@ function App() {
         />
       )}
 
-      <MobileFooter />
+
       <CookieBanner />
       <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
       <ProfileModal
