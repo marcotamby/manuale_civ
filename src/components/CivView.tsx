@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCivData } from './CivContext';
+import { usePresence } from './PresenceContext';
 import type { Unit } from '../data/aoe4Data';
 import { UnitGrid } from './UnitGrid';
 import { MatchupsTable } from './MatchupsTable';
@@ -42,6 +43,7 @@ interface CivViewProps {
 
 export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const { civilizations: civilizationsData, refreshCivs } = useCivData();
+  const { updateActivity, activeAdmins } = usePresence();
   const { tab } = useParams<{ tab?: string }>();
   const navigate = useNavigate();
 
@@ -73,7 +75,15 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
   useEffect(() => {
     (window as any).openCivEditor = openEditor;
-    return () => { (window as any).openCivEditor = undefined; };
+    
+    // Update presence to viewing this civ
+    updateActivity({ type: 'viewing', civId });
+
+    return () => { 
+      (window as any).openCivEditor = undefined; 
+      // Reset activity to idle when leaving the view
+      updateActivity({ type: 'idle' });
+    };
   }, [civId]);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -148,6 +158,34 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 </div>
               )}
             </div>
+
+            {/* Other Admins Viewing Indicator */}
+            {Object.values(activeAdmins).filter(a => a.user.email !== user?.email && a.activity.type === 'viewing' && a.activity.civId === civId).length > 0 && (
+              <div className="flex items-center gap-2 mt-2">
+                <div className="flex -space-x-2">
+                  {Object.values(activeAdmins)
+                    .filter(a => a.user.email !== user?.email && a.activity.type === 'viewing' && a.activity.civId === civId)
+                    .map(a => (
+                      <div 
+                        key={a.user.email} 
+                        className="w-6 h-6 rounded-full border-2 border-[var(--color-brand-dark)] bg-blue-500 flex items-center justify-center overflow-hidden"
+                        title={`${a.user.name} sta guardando questa civiltà`}
+                      >
+                        {a.user.avatar ? (
+                          <img src={a.user.avatar} alt={a.user.name} />
+                        ) : (
+                          <span className="text-[10px] font-bold text-white">{a.user.name.charAt(0)}</span>
+                        )}
+                      </div>
+                    ))
+                  }
+                </div>
+                <span className="text-[10px] text-blue-400 font-medium animate-pulse uppercase tracking-wider">
+                  Altri admin stanno visualizzando questa civiltà
+                </span>
+              </div>
+            )}
+
             <p className="text-gray-300 max-w-2xl leading-relaxed">{civ.shortDescription}</p>
           </div>
         </div>

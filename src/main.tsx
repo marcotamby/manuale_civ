@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
 import { AuthProvider } from './components/AuthContext.tsx'
+import { PresenceProvider } from './components/PresenceContext.tsx'
 import { CivDataProvider } from './components/CivContext.tsx'
 
 import { GoogleOAuthProvider } from '@react-oauth/google'
@@ -16,9 +17,11 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
         <AuthProvider>
-          <CivDataProvider>
-            <App />
-          </CivDataProvider>
+          <PresenceProvider>
+            <CivDataProvider>
+              <App />
+            </CivDataProvider>
+          </PresenceProvider>
         </AuthProvider>
       </GoogleOAuthProvider>
     </BrowserRouter>

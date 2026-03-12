@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, X, Loader2, Play, Map, Plus, Trash2, CheckCircle, Clock, Zap, ChevronUp, ChevronDown, Info, Cog, Edit } from 'lucide-react';
+import { Save, X, Loader2, Play, Map, Plus, Trash2, CheckCircle, Clock, Zap, ChevronUp, ChevronDown, Info, Cog, Edit, AlertTriangle } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { YouTubePickerModal } from './YouTubePickerModal';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
 import { useCivData } from './CivContext';
+import { useAuth } from './AuthContext';
+import { usePresence } from './PresenceContext';
 import type { Civilization } from '../data/aoe4Data';
 
 interface AdminCivEditorModalProps {
@@ -18,6 +20,8 @@ interface AdminCivEditorModalProps {
 
 export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSection, initialId }: AdminCivEditorModalProps) {
   const { globalUnits } = useCivData();
+  const { user } = useAuth();
+  const { updateActivity, activeAdmins } = usePresence();
   const [editedCiv, setEditedCiv] = useState<Civilization>(civ);
   const [editedGlobalUnits, setEditedGlobalUnits] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -43,6 +47,12 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
   // Sync state with props when modal opens or civ changes
   useEffect(() => {
     if (isOpen) {
+      updateActivity({ 
+        type: 'editing', 
+        civId: civ.id, 
+        section: initialSection || 'all' 
+      });
+
       let defaultStrengths = civ.strengths || [];
       if (defaultStrengths.length === 0) {
         const generated = [];
@@ -74,8 +84,27 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
           }
         }, 300);
       }
+    } else {
+      // Small delay to avoid race conditions with CivView's viewing state
+      // When the modal closes, we want to go back to "viewing" (which is handled by CivView's effect if still on page)
+      // or "idle" if the view is gone.
     }
   }, [civ, isOpen, globalUnits, initialSection]);
+
+  // Handle closing Presence state
+  useEffect(() => {
+    if (!isOpen) {
+      // Explicitly reset to idle when modal closes
+      // The CivView's useEffect will catch up if we are still there
+      updateActivity({ type: 'idle' });
+    }
+  }, [isOpen]);
+
+  const otherAdminsEditing = Object.values(activeAdmins).filter(
+    a => a.user.email !== user?.email && 
+    a.activity.type === 'editing' && 
+    a.activity.civId === civ.id
+  );
 
   const getYoutubeId = (url: string) => {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -228,6 +257,27 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
         </div>
 
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
+          {otherAdminsEditing.length > 0 && (
+            <div className="bg-red-500/20 border border-red-500/50 p-4 rounded-xl flex items-start gap-4 animate-pulse">
+              <AlertTriangle className="text-red-500 shrink-0" size={24} />
+              <div>
+                <h4 className="text-red-400 font-bold text-sm">ATTENZIONE: Altri admin stanno modificando questa civiltà</h4>
+                <div className="mt-2 space-y-1">
+                  {otherAdminsEditing.map(a => (
+                    <div key={a.user.email} className="flex items-center gap-2 text-xs text-red-300">
+                      <div className="w-4 h-4 rounded-full bg-red-600 flex items-center justify-center text-[8px] font-bold text-white">
+                        {a.user.name.charAt(0)}
+                      </div>
+                      <span className="font-semibold">{a.user.name}</span>
+                      <span className="opacity-70">sta modificando la sezione: <b className="text-red-200">{a.activity.section === 'all' ? 'Tutte' : a.activity.section}</b></span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[10px] text-red-400/80 mt-2 italic">Rischio di sovrascrittura dati: coordina le modifiche per evitare perdite di informazioni.</p>
+              </div>
+            </div>
+          )}
+
           {(!initialSection || initialSection === 'bonuses') && (
             <div ref={sectionRefs.bonuses} className="bg-black/30 border border-yellow-500/20 rounded-xl p-5 space-y-4">
               <label className="block text-sm font-bold text-yellow-500 uppercase tracking-widest mb-1 flex items-center gap-2">

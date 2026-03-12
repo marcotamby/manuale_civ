@@ -5,7 +5,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Link } from 'react-router-dom';
 import { RANK_ICONS } from './ProfileModal';
-import { Coffee } from 'lucide-react';
+import { Coffee, Radio } from 'lucide-react';
+import { usePresence } from './PresenceContext';
 
 export type FilterType = 'Tutte' | 'Fanteria' | 'Cavalleria' | 'Arcieri' | 'Assedio';
 
@@ -20,6 +21,7 @@ interface TopbarProps {
 export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
   const { isAuthenticated, isAdmin, isSuperAdmin, user, logout, openLoginModal, favorites } = useAuth();
   const { civilizations } = useCivData();
+  const { activeAdmins } = usePresence();
   const [pendingCount, setPendingCount] = useState(0);
   const [notificationCount, setNotificationCount] = useState(0);
 
@@ -143,6 +145,35 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
         {isAuthenticated ? (
           isAdmin ? (
             <div className="flex items-center gap-4 font-sans">
+              {/* Active Admins List */}
+              <div className="hidden lg:flex items-center gap-2 mr-2 border-r border-white/10 pr-4">
+                <div className="flex -space-x-2">
+                  {Object.values(activeAdmins).map(a => (
+                    <div 
+                      key={a.user.email} 
+                      className={`w-7 h-7 rounded-full border-2 border-[var(--color-brand-dark)] flex items-center justify-center overflow-hidden transition-all ${a.activity.type === 'editing' ? 'ring-2 ring-red-500 ring-offset-1 ring-offset-transparent shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'bg-blue-600'}`}
+                      title={`${a.user.name} - ${a.activity.type === 'editing' ? 'Sta modificando' : a.activity.type === 'viewing' ? 'Sta guardando' : 'Online'}`}
+                    >
+                      {a.user.avatar ? (
+                        <img src={a.user.avatar} alt={a.user.name} />
+                      ) : (
+                        <span className="text-[10px] font-bold text-white">{a.user.name.charAt(0)}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {Object.keys(activeAdmins).length > 0 && (
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-blue-400 font-bold uppercase tracking-tighter flex items-center gap-1">
+                      <Radio size={8} className="animate-pulse" /> Live
+                    </span>
+                    <span className="text-[8px] text-gray-500 font-medium">
+                      {Object.keys(activeAdmins).length} Admin online
+                    </span>
+                  </div>
+                )}
+              </div>
+
               <button
                 onClick={() => {
                   (window as any).openProfileModal?.();
