@@ -1,16 +1,16 @@
 import { useRef } from 'react';
 import { useCivData } from './CivContext';
 import { useAuth } from './AuthContext';
-import { Home as HomeIcon, Heart, ChevronLeft, ChevronRight, Coffee } from 'lucide-react';
+import { Home as HomeIcon, Heart, ChevronLeft, ChevronRight, Coffee, HelpCircle } from 'lucide-react';
 
 interface SidebarProps {
   selectedCiv: string;
   onSelectCiv: (civId: string) => void;
-  onSelectPage: (page: 'home' | 'civ' | 'compare') => void;
+  onSelectPage: (page: 'home' | 'civ' | 'compare' | 'faq') => void;
   isOpen: boolean;
   onClose: () => void;
   onOpen?: () => void;
-  currentPage: 'home' | 'civ' | 'compare';
+  currentPage: 'home' | 'civ' | 'compare' | 'faq';
 }
 
 export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClose, onOpen, currentPage }: SidebarProps) {
@@ -177,6 +177,13 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
           >
             <Coffee size={20} className="group-hover:scale-110 transition-transform" />
           </a>
+          <button
+            onClick={() => onSelectPage('faq')}
+            title="Domande Frequenti"
+            className="w-full aspect-square rounded-lg glass flex items-center justify-center text-yellow-500 border border-yellow-500/20 hover:border-yellow-500/50 hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all group scale-90"
+          >
+            <HelpCircle size={20} className="group-hover:scale-110 transition-transform" />
+          </button>
         </div>
       </aside>
     </>

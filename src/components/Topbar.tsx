@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Link } from 'react-router-dom';
 import { RANK_ICONS } from './ProfileModal';
-import { Coffee, Radio as _Radio } from 'lucide-react';
+import { Coffee, Radio as _Radio, HelpCircle } from 'lucide-react';
 import { usePresence } from './PresenceContext';
 
 export type FilterType = 'Tutte' | 'Fanteria' | 'Cavalleria' | 'Arcieri' | 'Assedio';
@@ -110,6 +110,14 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
           </svg>
           Discord
         </a>
+        <Link
+          to="/faq"
+          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/20 hover:border-yellow-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
+          title="Domande Frequenti"
+        >
+          <HelpCircle size={14} className="group-hover:scale-110 transition-transform" />
+          FAQ
+        </Link>
         <a
           href="https://ko-fi.com/marcotamby"
           target="_blank"

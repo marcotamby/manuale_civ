@@ -16,6 +16,7 @@ import { LoginModal } from './components/LoginModal';
 import { ProfileModal } from './components/ProfileModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { PrivacyPage } from './components/PrivacyPage';
+import { FAQPage } from './components/FAQPage';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 
 function App() {
@@ -29,7 +30,9 @@ function App() {
   const selectedCivMatch = location.pathname.match(/^\/civ\/([^/]+)/);
   const selectedCiv = selectedCivMatch ? selectedCivMatch[1] : '';
 
-  const currentPage = isHome ? 'home' : isCompare ? 'compare' : isCiv ? 'civ' : 'home';
+  const isFaq = location.pathname === '/faq';
+
+  const currentPage = isHome ? 'home' : isCompare ? 'compare' : isCiv ? 'civ' : isFaq ? 'faq' : 'home';
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
@@ -125,6 +128,7 @@ function App() {
           onSelectPage={(page) => {
             if (page === 'home') navigate('/');
             else if (page === 'compare') navigate('/compare');
+            else if (page === 'faq') navigate('/faq');
             // civ navigation is handled by onSelectCiv calling navigate
           }}
           isOpen={isSidebarOpen}
@@ -209,6 +213,7 @@ function App() {
               <Route path="/civ/:civId/:tab" element={<CivView civId={selectedCiv} onSelectUnit={setSelectedUnit} />} />
               <Route path="/compare" element={<CompareView civIds={compareIds} onClose={() => navigate('/')} />} />
               <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/faq" element={<FAQPage />} />
             </Routes>
           </div>
         </div>
