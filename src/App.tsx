@@ -63,13 +63,16 @@ function App() {
     if (touchStartX.current === null) return;
     const touchEndX = e.changedTouches[0].clientX;
     const diffX = touchEndX - touchStartX.current;
+    
+    // Reset immediately to avoid multiple triggers
+    const startX = touchStartX.current;
+    touchStartX.current = null;
 
     // If swipe right and sidebar is closed, open it
     const canShowSidebar = currentPage !== 'home' || favorites.length > 0;
-    if (diffX > 50 && !isSidebarOpen && canShowSidebar) {
+    if (diffX > 60 && startX < 50 && !isSidebarOpen && canShowSidebar) {
       setIsSidebarOpen(true);
     }
-    touchStartX.current = null;
   };
   const { favorites, isLoginModalOpen, closeLoginModal, isAuthenticated, isAdmin } = useAuth();
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);

@@ -26,6 +26,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-image: radial-gradient(circle at top, #1a2542 0%, #121212 50%);
   background-attachment: fixed;
+  touch-action: pan-y;
 }
 
 /* Apply scrollbar globally */

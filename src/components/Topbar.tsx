@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { Link } from 'react-router-dom';
 
 export type FilterType = 'Tutte' | 'Fanteria' | 'Cavalleria' | 'Arcieri' | 'Assedio';
 
@@ -95,7 +96,7 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
       <div className="hidden md:flex w-1/3 items-center justify-start"></div>
 
       {/* Center Title Area */}
-      <div className="flex flex-col items-center justify-center text-center w-full md:w-1/3">
+      <Link to="/" className="flex flex-col items-center justify-center text-center w-full md:w-1/3 group cursor-pointer hover:opacity-90 transition-opacity">
         <h2 className="text-xs md:text-sm font-sackers font-bold text-yellow-500/90 tracking-[0.3em] uppercase mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
           Age of Empires IV
         </h2>
@@ -104,13 +105,13 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
         </h1>
         <div className="flex items-center gap-3 mt-3 mb-2">
           <div className="h-px w-12 bg-gradient-to-r from-transparent to-yellow-500/50"></div>
-          <div className="w-1.5 h-1.5 rotate-45 bg-yellow-500/60"></div>
+          <div className="w-1.5 h-1.5 rotate-45 bg-yellow-500/60 transition-transform group-hover:rotate-[135deg] duration-500"></div>
           <div className="h-px w-12 bg-gradient-to-l from-transparent to-yellow-500/50"></div>
         </div>
         <p className="text-xs text-gray-400/90 italic hidden sm:block font-serif tracking-wider">
           Scegli la tua civiltà e domina il campo di battaglia
         </p>
-      </div>
+      </Link>
 
       {/* Auth / Right side */}
       <div className="flex items-center justify-center md:justify-end w-full md:w-1/3 gap-4">
