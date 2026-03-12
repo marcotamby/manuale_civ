@@ -64,6 +64,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   };
 
   const [localCivs, setLocalCivs] = useState<Record<string, Civilization>>({});
+  
+  const baseCiv = civilizationsData.find(c => c.id === civId);
+  const civ = baseCiv ? (localCivs[civId] || baseCiv) : undefined;
   const [expandedBOs, setExpandedBOs] = useState<Set<string>>(new Set());
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editorTarget, setEditorTarget] = useState<{ section?: string; id?: string }>({});
@@ -79,12 +82,33 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     // Update presence to viewing this civ
     updateActivity({ type: 'viewing', civId });
 
+    // Mark as read for this specific civ if user is logged in
+    if (user?.email && civ) {
+      const lastSeenKey = `lastSeenCounts_${user.email}`;
+      const lastSeenData = JSON.parse(localStorage.getItem(lastSeenKey) || '{}');
+      
+      const currentBO = civ.buildOrders?.length || 0;
+      const currentVideo = civ.videos?.length || 0;
+
+      // Only update if counts have changed
+      if (!lastSeenData[civId] || 
+          lastSeenData[civId].bo !== currentBO || 
+          lastSeenData[civId].video !== currentVideo) {
+        
+        lastSeenData[civId] = { bo: currentBO, video: currentVideo };
+        localStorage.setItem(lastSeenKey, JSON.stringify(lastSeenData));
+        
+        // Refresh topbar count if needed
+        (window as any).refreshNotificationCount?.();
+      }
+    }
+
     return () => { 
       (window as any).openCivEditor = undefined; 
       // Reset activity to idle when leaving the view
       updateActivity({ type: 'idle' });
     };
-  }, [civId]);
+  }, [civId, user?.email, !!civ]);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -102,8 +126,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     return () => window.removeEventListener('resize', checkScroll);
   }, []);
 
-  const baseCiv = civilizationsData.find(c => c.id === civId);
-  const civ = baseCiv ? (localCivs[civId] || baseCiv) : undefined;
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: 'caratteristiche', label: 'Caratteristiche', icon: <Shield size={16} /> },

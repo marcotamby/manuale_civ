@@ -67,26 +67,31 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
       return;
     }
 
-    // Calculate total content items for current favorites
-    const favCivs = civilizations.filter(c => favorites.includes(c.id));
-    const currentTotalItems = favCivs.reduce((acc, civ) => {
-      return acc + (civ.buildOrders?.length || 0) + (civ.videos?.length || 0);
-    }, 0);
+    // Get granular counts from localStorage
+    const lastSeenKey = `lastSeenCounts_${user?.email}`;
+    const lastSeenData = JSON.parse(localStorage.getItem(lastSeenKey) || '{}');
+    
+    let totalUnread = 0;
 
-    // Get last seen total from localStorage
-    const lastSeenKey = `lastSeenTotal_${user?.email}`;
-    const lastSeenTotal = parseInt(localStorage.getItem(lastSeenKey) || '0');
+    // Only check favorited civilizations
+    favorites.forEach(favId => {
+      const civ = civilizations.find(c => c.id === favId);
+      if (civ) {
+        const stored = lastSeenData[favId] || { bo: 0, video: 0 };
+        const currentBO = civ.buildOrders?.length || 0;
+        const currentVideo = civ.videos?.length || 0;
 
-    if (currentTotalItems > lastSeenTotal) {
-      setNotificationCount(currentTotalItems - lastSeenTotal);
-    } else {
-      setNotificationCount(0);
-    }
+        if (currentBO > stored.bo) totalUnread += (currentBO - stored.bo);
+        if (currentVideo > stored.video) totalUnread += (currentVideo - stored.video);
+      }
+    });
 
-    // Function to clear notifications when profile is opened
-    (window as any).clearNotifications = () => {
-      localStorage.setItem(lastSeenKey, currentTotalItems.toString());
-      setNotificationCount(0);
+    setNotificationCount(totalUnread);
+
+    // This is now handled more precisely in ProfileModal or CivView
+    (window as any).refreshNotificationCount = () => {
+      fetchPendingCount(); // Keep existing admin count refresh
+      // Trigger a re-calculation if needed
     };
   }, [favorites, civilizations, isAuthenticated, user?.email]);
 

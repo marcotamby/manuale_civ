@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, User, Heart, MessageSquare, Trophy, ExternalLink, Loader2, ChevronDown } from 'lucide-react';
 import { useAuth } from './AuthContext';
+import { useCivData } from './CivContext';
 import { supabase } from '../lib/supabaseClient';
 import type { Suggestion } from './AdminDashboardModal';
 
@@ -125,8 +126,29 @@ function RankDropdown({ value, onChange }: { value: string; onChange: (rank: str
 
 export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps) {
     const { user, favorites, updateProfile, logout, isAdmin, isSuperAdmin } = useAuth();
+    const { civilizations } = useCivData();
     const [mySuggestions, setMySuggestions] = useState<Suggestion[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+
+    const lastSeenKey = `lastSeenCounts_${user?.email}`;
+    const lastSeenData = JSON.parse(localStorage.getItem(lastSeenKey) || '{}');
+
+    const markAllAsRead = () => {
+        const newData: Record<string, { bo: number, video: number }> = { ...lastSeenData };
+        favorites.forEach(favId => {
+            const civ = civilizations.find((c: any) => c.id === favId);
+            if (civ) {
+                newData[favId] = {
+                    bo: civ.buildOrders?.length || 0,
+                    video: civ.videos?.length || 0
+                };
+            }
+        });
+        localStorage.setItem(lastSeenKey, JSON.stringify(newData));
+        // Force refresh by closing/opening or other state trigger
+        onClose();
+        setTimeout(() => (window as any).openProfileModal?.(), 50);
+    };
 
     useEffect(() => {
         if (isOpen && user?.email) {
@@ -243,22 +265,58 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
 
                     {/* Favorites */}
                     <section>
-                        <div className="flex items-center gap-2 mb-4 text-red-400 tracking-widest uppercase text-xs font-bold">
-                            <Heart size={14} />
-                            <span>Civiltà Preferite ({favorites.length})</span>
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2 text-red-400 tracking-widest uppercase text-xs font-bold">
+                                <Heart size={14} />
+                                <span>Civiltà Preferite ({favorites.length})</span>
+                            </div>
+                            {favorites.length > 0 && (
+                                <button 
+                                    onClick={markAllAsRead}
+                                    className="text-[10px] text-gray-500 hover:text-white transition-colors uppercase font-bold tracking-tighter"
+                                >
+                                    Segna tutti come letti
+                                </button>
+                            )}
                         </div>
                         {favorites.length > 0 ? (
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                                {favorites.map(favId => (
-                                    <button
-                                        key={favId}
-                                        onClick={() => { onSelectCiv(favId); onClose(); }}
-                                        className="bg-white/[0.03] px-4 py-3 rounded-xl border border-white/5 text-gray-300 hover:text-white hover:border-blue-400/50 hover:bg-blue-400/5 transition-all flex items-center gap-2 group"
-                                    >
-                                        <span className="capitalize text-sm font-medium">{favId}</span>
-                                        <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity ml-auto" />
-                                    </button>
-                                ))}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {favorites.map(favId => {
+                                    const civ = civilizations.find((c: any) => c.id === favId);
+                                    const stored = lastSeenData[favId] || { bo: 0, video: 0 };
+                                    const hasNewBO = civ && (civ.buildOrders?.length || 0) > stored.bo;
+                                    const hasNewVideo = civ && (civ.videos?.length || 0) > stored.video;
+
+                                    return (
+                                        <button
+                                            key={favId}
+                                            onClick={() => { onSelectCiv(favId); onClose(); }}
+                                            className="bg-white/[0.03] px-4 py-3 rounded-xl border border-white/5 text-gray-300 hover:text-white hover:border-blue-400/50 hover:bg-blue-400/5 transition-all flex flex-col gap-1 group relative overflow-hidden"
+                                        >
+                                            <div className="flex items-center justify-between w-full">
+                                                <span className="capitalize text-sm font-bold tracking-wide">{favId}</span>
+                                                <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            </div>
+                                            
+                                            <div className="flex flex-wrap gap-1.5 mt-1">
+                                                {hasNewBO && (
+                                                    <span className="text-[9px] bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-1.5 py-0.5 rounded font-black uppercase tracking-tighter animate-in zoom-in">
+                                                        Nuovo Build Order!
+                                                    </span>
+                                                )}
+                                                {hasNewVideo && (
+                                                    <span className="text-[9px] bg-red-500/10 text-red-500 border border-red-500/20 px-1.5 py-0.5 rounded font-black uppercase tracking-tighter animate-in zoom-in">
+                                                        Nuovo Video!
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            {(hasNewBO || hasNewVideo) && (
+                                                <div className="absolute top-0 right-0 w-8 h-8 bg-red-500/10 blur-xl rounded-full -mr-4 -mt-4 animate-pulse"></div>
+                                            )}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         ) : (
                             <div className="text-center py-6 bg-white/[0.02] rounded-xl border border-white/5">
