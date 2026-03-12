@@ -16,6 +16,7 @@
 :root {
   background-color: var(--color-brand-dark);
   color: #f8f8f2;
+  overscroll-behavior-x: none;
 }
 
 body {
@@ -27,6 +28,7 @@ body {
   background-image: radial-gradient(circle at top, #1a2542 0%, #121212 50%);
   background-attachment: fixed;
   touch-action: pan-y;
+  overscroll-behavior-x: none;
 }
 
 /* Apply scrollbar globally */
