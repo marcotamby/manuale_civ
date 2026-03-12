@@ -23,7 +23,7 @@ interface PresenceContextType {
 
 const PresenceContext = createContext<PresenceContextType | undefined>(undefined);
 
-const DISABLE_PRESENCE = true; // Temporary master switch to restore site
+const DISABLE_PRESENCE = false; // Phase 1: background logic reactivated
 
 export function PresenceProvider({ children }: { children: React.ReactNode }) {
   const { user, isAdmin } = useAuth();
