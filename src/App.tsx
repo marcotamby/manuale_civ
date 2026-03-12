@@ -145,7 +145,7 @@ function App() {
 
         <div className="flex-1 overflow-hidden flex flex-col">
           {currentPage !== 'home' && (
-            <div className="flex items-center gap-3 px-4 md:px-6 py-2 shrink-0">
+            <div className="flex items-center gap-3 px-4 md:pl-6 md:pr-[73px] py-2 shrink-0">
               <button
                 onClick={() => navigate('/')}
                 title="Dashboard"
