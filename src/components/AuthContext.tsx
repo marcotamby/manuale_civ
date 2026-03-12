@@ -103,12 +103,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [user?.email]);
 
-  // Save favorites to localStorage when they change, using the current user's key
+  // Save favorites to localStorage when they change
   useEffect(() => {
     const userEmail = user?.email || 'guest';
     const favoritesKey = `aoe4_favorites_${userEmail}`;
     localStorage.setItem(favoritesKey, JSON.stringify(favorites));
-  }, [favorites, user?.email]);
+  }, [favorites]); // Removed user?.email to prevent saving stale favorites during user switch
 
   const login = (userData: UserData) => {
     const savedRank = localStorage.getItem('auth_user_rank') || 'Unranked';

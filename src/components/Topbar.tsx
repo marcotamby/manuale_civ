@@ -62,13 +62,13 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
   }, [isAuthenticated, isSuperAdmin]);
 
   useEffect(() => {
-    if (!isAuthenticated || favorites.length === 0) {
+    if (favorites.length === 0) {
       setNotificationCount(0);
       return;
     }
 
     // Get granular counts from localStorage
-    const lastSeenKey = `lastSeenCounts_${user?.email}`;
+    const lastSeenKey = `lastSeenCounts_${user?.email || 'guest'}`;
     const lastSeenData = JSON.parse(localStorage.getItem(lastSeenKey) || '{}');
     
     let totalUnread = 0;
@@ -176,7 +176,7 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
                   (window as any).openProfileModal?.();
                   (window as any).clearNotifications?.();
                 }}
-                className="flex items-center gap-2 text-yellow-500 hover:opacity-80 transition-opacity group shrink-0"
+                className="relative flex items-center gap-2 text-yellow-500 hover:opacity-80 transition-opacity group shrink-0"
                 title="Il Tuo Profilo"
               >
                 <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30 group-hover:border-yellow-500/60 transition-colors overflow-hidden">
@@ -186,6 +186,11 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
                     <User size={16} />
                   )}
                 </div>
+                {notificationCount > 0 && (
+                  <span className="absolute -top-1 -left-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[9px] font-bold text-white shadow-lg group-hover:scale-110 transition-transform ring-1 ring-[#0d1424]">
+                    {notificationCount}
+                  </span>
+                )}
                 <div className="flex flex-col text-left">
                   <span className="font-medium hidden sm:block text-sm leading-none text-white/90">{user?.name}</span>
                   <span className="text-[9px] text-yellow-600 font-bold uppercase tracking-widest">{isSuperAdmin ? 'Admin' : 'Editor'}</span>

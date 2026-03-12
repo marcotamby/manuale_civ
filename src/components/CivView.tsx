@@ -64,7 +64,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   };
 
   const [localCivs, setLocalCivs] = useState<Record<string, Civilization>>({});
-  
+
   const baseCiv = civilizationsData.find(c => c.id === civId);
   const civ = baseCiv ? (localCivs[civId] || baseCiv) : undefined;
   const [expandedBOs, setExpandedBOs] = useState<Set<string>>(new Set());
@@ -78,7 +78,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
   useEffect(() => {
     (window as any).openCivEditor = openEditor;
-    
+
     // Update presence to viewing this civ
     updateActivity({ type: 'viewing', civId });
 
@@ -86,25 +86,25 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     if (user?.email && civ) {
       const lastSeenKey = `lastSeenCounts_${user.email}`;
       const lastSeenData = JSON.parse(localStorage.getItem(lastSeenKey) || '{}');
-      
+
       const currentBO = civ.buildOrders?.length || 0;
       const currentVideo = civ.videos?.length || 0;
 
       // Only update if counts have changed
-      if (!lastSeenData[civId] || 
-          lastSeenData[civId].bo !== currentBO || 
-          lastSeenData[civId].video !== currentVideo) {
-        
+      if (!lastSeenData[civId] ||
+        lastSeenData[civId].bo !== currentBO ||
+        lastSeenData[civId].video !== currentVideo) {
+
         lastSeenData[civId] = { bo: currentBO, video: currentVideo };
         localStorage.setItem(lastSeenKey, JSON.stringify(lastSeenData));
-        
+
         // Refresh topbar count if needed
         (window as any).refreshNotificationCount?.();
       }
     }
 
-    return () => { 
-      (window as any).openCivEditor = undefined; 
+    return () => {
+      (window as any).openCivEditor = undefined;
       // Reset activity to idle when leaving the view
       updateActivity({ type: 'idle' });
     };
@@ -246,8 +246,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 <Zap className="text-yellow-500" size={20} />
                 Bonus
                 {isAdmin && (
-                  <button 
-                    onClick={() => openEditor('bonuses')} 
+                  <button
+                    onClick={() => openEditor('bonuses')}
                     className="p-1.5 bg-yellow-500 hover:bg-yellow-400 rounded-lg transition-all text-black border border-yellow-400 flex items-center gap-1 shadow-[0_0_10px_rgba(234,179,8,0.3)] group/btn"
                     title="Modifica Bonus"
                   >
@@ -271,8 +271,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 <ChevronUp className="text-green-400" size={20} />
                 Punti di Forza
                 {isAdmin && (
-                  <button 
-                    onClick={() => openEditor('strengths')} 
+                  <button
+                    onClick={() => openEditor('strengths')}
                     className="p-1.5 bg-yellow-500 hover:bg-yellow-400 rounded-lg transition-all text-black border border-yellow-400 flex items-center gap-1 shadow-[0_0_10px_rgba(234,179,8,0.3)] group/btn"
                     title="Modifica Punti di Forza"
                   >
@@ -304,8 +304,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 <ChevronDown className="text-red-400" size={20} />
                 Punti Deboli
                 {isAdmin && (
-                  <button 
-                    onClick={() => openEditor('weaknesses')} 
+                  <button
+                    onClick={() => openEditor('weaknesses')}
                     className="p-1.5 bg-yellow-500 hover:bg-yellow-400 rounded-lg transition-all text-black border border-yellow-400 flex items-center gap-1 shadow-[0_0_10px_rgba(234,179,8,0.3)] group/btn"
                     title="Modifica Punti Deboli"
                   >
@@ -354,10 +354,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 </button>
               </div>
             </div>
-            <UnitGrid 
-              civId={civId} 
-              age={activeAge} 
-              onSelectUnit={onSelectUnit} 
+            <UnitGrid
+              civId={civId}
+              age={activeAge}
+              onSelectUnit={onSelectUnit}
               onEditUnit={(id, isGlobal) => openEditor(isGlobal ? 'global' : 'units', id)}
               onEditLandmark={(id) => openEditor('landmarks', id)}
             />
@@ -371,8 +371,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 <Map className="text-yellow-500" size={24} />
                 Build Orders
                 {isAdmin && (
-                  <button 
-                    onClick={() => openEditor('buildorders')} 
+                  <button
+                    onClick={() => openEditor('buildorders')}
                     className="p-1.5 bg-yellow-500/20 hover:bg-yellow-500/40 rounded-lg transition-all text-yellow-500 border border-yellow-500/30 flex items-center gap-1 shadow-sm group/btn"
                     title="Modifica Build Orders"
                   >
