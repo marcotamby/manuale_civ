@@ -53,18 +53,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     console.log('🔐 Auth roles checked:', { email, name, isSA, isEd, isAdmin: !!isSA || !!isEd });
   };
 
-  // Load favorites and check for development admin bypass
+  // Load user from storage on mount
   useEffect(() => {
-    const saved = localStorage.getItem('aoe4_favorites');
-    if (saved) {
-      try {
-        setFavorites(JSON.parse(saved));
-      } catch (e) {
-        console.error('Failed to parse favorites', e);
-      }
-    }
-
-    // Persist login state
     const storedUser = localStorage.getItem('auth_user');
     if (storedUser) {
       try {
@@ -84,19 +74,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsAdmin(true);
       setIsSuperAdmin(true);
       setIsAuthenticated(true);
-      setUser({
+      const devUser = {
         name: 'Local Admin (Dev)',
         email: 'admin@localhost',
         rank: localStorage.getItem('auth_user_rank') || 'Unranked',
         nickname: localStorage.getItem('auth_user_nickname') || ''
-      });
+      };
+      setUser(devUser);
+      checkRoles(devUser);
     }
   }, []);
 
-  // Save favorites to localStorage when they change
+  // Sync favorites when user changes (login/logout/switch)
   useEffect(() => {
-    localStorage.setItem('aoe4_favorites', JSON.stringify(favorites));
-  }, [favorites]);
+    const userEmail = user?.email || 'guest';
+    const favoritesKey = `aoe4_favorites_${userEmail}`;
+    
+    const saved = localStorage.getItem(favoritesKey);
+    if (saved) {
+      try {
+        setFavorites(JSON.parse(saved));
+      } catch (e) {
+        console.error('Failed to parse favorites', e);
+        setFavorites([]);
+      }
+    } else {
+      setFavorites([]);
+    }
+  }, [user?.email]);
+
+  // Save favorites to localStorage when they change, using the current user's key
+  useEffect(() => {
+    const userEmail = user?.email || 'guest';
+    const favoritesKey = `aoe4_favorites_${userEmail}`;
+    localStorage.setItem(favoritesKey, JSON.stringify(favorites));
+  }, [favorites, user?.email]);
 
   const login = (userData: UserData) => {
     const savedRank = localStorage.getItem('auth_user_rank') || 'Unranked';
@@ -115,6 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsSuperAdmin(false);
     setIsEditor(false);
     setUser(null);
+    setFavorites([]); // Clear favorites state on logout
     localStorage.removeItem('auth_user');
   };
 
