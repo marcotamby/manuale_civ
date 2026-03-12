@@ -45,22 +45,28 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
 
     adminChannel
       .on('presence', { event: 'sync' }, () => {
-        const newState = adminChannel.presenceState();
-        const simplifiedState: Record<string, PresenceState> = {};
-        
-        Object.keys(newState).forEach((key) => {
-          const presenceEntry = newState[key][0] as any;
-          // Only add to activeAdmins if the data is complete to avoid downstream crashes
-          if (presenceEntry && presenceEntry.user && presenceEntry.user.email && presenceEntry.activity) {
-            simplifiedState[key] = {
-              user: presenceEntry.user,
-              activity: presenceEntry.activity,
-              onlineAt: presenceEntry.onlineAt || new Date().toISOString()
-            };
-          }
-        });
-        
-        setActiveAdmins(simplifiedState);
+        try {
+          const newState = adminChannel.presenceState();
+          if (!newState) return;
+
+          const simplifiedState: Record<string, PresenceState> = {};
+          
+          Object.keys(newState).forEach((key) => {
+            const presenceEntry = newState[key]?.[0] as any;
+            // Only add to activeAdmins if the data is complete to avoid downstream crashes
+            if (presenceEntry && presenceEntry.user && presenceEntry.user.email && presenceEntry.activity) {
+              simplifiedState[key] = {
+                user: presenceEntry.user,
+                activity: presenceEntry.activity,
+                onlineAt: presenceEntry.onlineAt || new Date().toISOString()
+              };
+            }
+          });
+          
+          setActiveAdmins(simplifiedState);
+        } catch (err) {
+          console.error('Error syncing presence:', err);
+        }
       })
       .on('presence', { event: 'join' }, ({ key, newPresences }) => {
         console.log('Admin joined:', key, newPresences);

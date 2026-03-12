@@ -160,7 +160,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             </div>
 
             {/* Other Admins Viewing Indicator */}
-            {Object.values(activeAdmins).filter(a => a?.user?.email && a.user.email !== user?.email && a.activity?.type === 'viewing' && a.activity?.civId === civId).length > 0 && (
+            {activeAdmins && Object.values(activeAdmins).filter(a => a?.user?.email && a.user.email !== user?.email && a.activity?.type === 'viewing' && a.activity?.civId === civId).length > 0 && (
               <div className="flex items-center gap-2 mt-2">
                 <div className="flex -space-x-2">
                   {Object.values(activeAdmins)
