@@ -137,107 +137,108 @@ function App() {
 
   return (
     <div
-      className="flex flex-row h-screen w-full bg-[#0a0a0b] text-white overflow-hidden selection:bg-yellow-500/30"
+      className="flex flex-col h-screen w-full bg-[#0a0a0b] text-white overflow-hidden selection:bg-yellow-500/30"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {((currentPage !== 'home' || favorites.length > 0) && (currentPage !== 'home' || isSidebarOpen)) && (
-        <Sidebar
-          selectedCiv={selectedCiv}
-          onSelectCiv={handleSelectCiv}
-          onSelectPage={(page) => {
-            if (page === 'home') navigate('/');
-            else if (page === 'compare') navigate('/compare');
-            else if (page === 'faq') navigate('/faq');
-            // civ navigation is handled by onSelectCiv calling navigate
-          }}
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-          onOpen={() => setIsSidebarOpen(true)}
-          currentPage={currentPage}
-        />
-      )}
+      <Topbar
+        searchQuery=""
+        setSearchQuery={() => { }}
+        activeFilter="Tutte"
+        setActiveFilter={() => { }}
+        onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
+      />
 
-      <main className="flex-1 flex flex-col relative overflow-hidden">
-        <Topbar
-          searchQuery=""
-          setSearchQuery={() => { }}
-          activeFilter="Tutte"
-          setActiveFilter={() => { }}
-          onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
-        />
+      <div className="flex-1 flex flex-row overflow-hidden relative">
+        {((currentPage !== 'home' || favorites.length > 0) && (currentPage !== 'home' || isSidebarOpen)) && (
+          <Sidebar
+            selectedCiv={selectedCiv}
+            onSelectCiv={handleSelectCiv}
+            onSelectPage={(page) => {
+              if (page === 'home') navigate('/');
+              else if (page === 'compare') navigate('/compare');
+              else if (page === 'faq') navigate('/faq');
+            }}
+            isOpen={isSidebarOpen}
+            onClose={() => setIsSidebarOpen(false)}
+            onOpen={() => setIsSidebarOpen(true)}
+            currentPage={currentPage}
+          />
+        )}
 
-        <div className="flex-1 overflow-hidden flex flex-col">
-          {currentPage !== 'home' && (
-            <div className="flex items-center gap-3 px-4 md:pl-6 md:pr-[73px] py-2 shrink-0">
-              <button
-                onClick={() => navigate('/')}
-                title="Dashboard"
-                className="md:hidden p-2 glass rounded-lg hover:bg-white/10 transition-colors text-yellow-500"
-              >
-                <HomeIcon size={20} />
-              </button>
+        <main className="flex-1 flex flex-col relative overflow-hidden">
+          <div className="flex-1 overflow-hidden flex flex-col">
+            {currentPage !== 'home' && (
+              <div className="flex items-center gap-3 px-4 md:pl-6 md:pr-[73px] py-2 shrink-0">
+                <button
+                  onClick={() => navigate('/')}
+                  title="Dashboard"
+                  className="md:hidden p-2 glass rounded-lg hover:bg-white/10 transition-colors text-yellow-500"
+                >
+                  <HomeIcon size={20} />
+                </button>
 
-              <button
-                onClick={() => setIsSidebarOpen(true)}
-                className="md:hidden p-2 glass rounded-lg hover:bg-white/10 transition-colors"
-                title="Apri Menu"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="3" y1="12" x2="21" y2="12"></line>
-                  <line x1="3" y1="6" x2="21" y2="6"></line>
-                  <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-              </button>
+                <button
+                  onClick={() => setIsSidebarOpen(true)}
+                  className="md:hidden p-2 glass rounded-lg hover:bg-white/10 transition-colors"
+                  title="Apri Menu"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                  </svg>
+                </button>
 
-              {currentPage === 'civ' && (
-                <div className="flex items-center gap-2 ml-auto">
-                  {prevCiv && (
-                    <button
-                      onClick={() => handleSelectCiv(prevCiv.id)}
-                      title={prevCiv.name}
-                      className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg hover:bg-white/10 transition-colors group text-sm"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="19" y1="12" x2="5" y2="12"></line>
-                        <polyline points="12 19 5 12 12 5"></polyline>
-                      </svg>
-                      <img src={prevCiv.flag} alt={prevCiv.name} className="w-5 h-5 object-contain opacity-70 group-hover:opacity-100 transition-opacity" />
-                      <span className="hidden md:inline text-gray-400 group-hover:text-white transition-colors">{prevCiv.name}</span>
-                    </button>
-                  )}
+                {currentPage === 'civ' && (
+                  <div className="flex items-center gap-2 ml-auto">
+                    {prevCiv && (
+                      <button
+                        onClick={() => handleSelectCiv(prevCiv.id)}
+                        title={prevCiv.name}
+                        className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg hover:bg-white/10 transition-colors group text-sm"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="19" y1="12" x2="5" y2="12"></line>
+                          <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                        <img src={prevCiv.flag} alt={prevCiv.name} className="w-5 h-5 object-contain opacity-70 group-hover:opacity-100 transition-opacity" />
+                        <span className="hidden md:inline text-gray-400 group-hover:text-white transition-colors">{prevCiv.name}</span>
+                      </button>
+                    )}
 
-                  {nextCiv && (
-                    <button
-                      onClick={() => handleSelectCiv(nextCiv.id)}
-                      title={nextCiv.name}
-                      className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg hover:bg-white/10 transition-colors group text-sm"
-                    >
-                      <span className="hidden md:inline text-gray-400 group-hover:text-white transition-colors">{nextCiv.name}</span>
-                      <img src={nextCiv.flag} alt={nextCiv.name} className="w-5 h-5 object-contain opacity-70 group-hover:opacity-100 transition-opacity" />
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              )}
+                    {nextCiv && (
+                      <button
+                        onClick={() => handleSelectCiv(nextCiv.id)}
+                        title={nextCiv.name}
+                        className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg hover:bg-white/10 transition-colors group text-sm"
+                      >
+                        <span className="hidden md:inline text-gray-400 group-hover:text-white transition-colors">{nextCiv.name}</span>
+                        <img src={nextCiv.flag} alt={nextCiv.name} className="w-5 h-5 object-contain opacity-70 group-hover:opacity-100 transition-opacity" />
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="5" y1="12" x2="19" y2="12"></line>
+                          <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="flex-1 overflow-y-auto overflow-x-hidden w-full main-content-area elegant-scrollbar md:md-content-padding pb-20 md:pb-0">
+              <Routes>
+                <Route path="/" element={<Home onSelectCiv={handleSelectCiv} onCompareCivs={handleCompare} />} />
+                <Route path="/civ/:civId" element={<CivView civId={selectedCiv} onSelectUnit={setSelectedUnit} />} />
+                <Route path="/civ/:civId/:tab" element={<CivView civId={selectedCiv} onSelectUnit={setSelectedUnit} />} />
+                <Route path="/compare" element={<CompareView civIds={compareIds} onClose={() => navigate('/')} />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="/faq" element={<FAQPage />} />
+              </Routes>
             </div>
-          )}
-
-          <div className="flex-1 overflow-y-auto overflow-x-hidden w-full main-content-area elegant-scrollbar md:md-content-padding pb-20 md:pb-0">
-            <Routes>
-              <Route path="/" element={<Home onSelectCiv={handleSelectCiv} onCompareCivs={handleCompare} />} />
-              <Route path="/civ/:civId" element={<CivView civId={selectedCiv} onSelectUnit={setSelectedUnit} />} />
-              <Route path="/civ/:civId/:tab" element={<CivView civId={selectedCiv} onSelectUnit={setSelectedUnit} />} />
-              <Route path="/compare" element={<CompareView civIds={compareIds} onClose={() => navigate('/')} />} />
-              <Route path="/privacy" element={<PrivacyPage />} />
-              <Route path="/faq" element={<FAQPage />} />
-            </Routes>
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
 
       {selectedUnit && (
         <UnitDetailModal
