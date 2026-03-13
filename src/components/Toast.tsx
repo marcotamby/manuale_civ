@@ -42,7 +42,7 @@ export function Toast({
 
   const positionClasses = {
     'top-right': 'top-6 right-6',
-    'top-center': 'top-6 left-1/2 -translate-x-1/2',
+    'top-center': 'top-24 left-1/2 -translate-x-1/2',
     'bottom-center': 'bottom-6 left-1/2 -translate-x-1/2'
   };
 
