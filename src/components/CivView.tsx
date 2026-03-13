@@ -8,7 +8,7 @@ import { UnitGrid } from './UnitGrid';
 import { MatchupsTable } from './MatchupsTable';
 import { AdminCivEditorModal } from './AdminCivEditorModal';
 import type { Civilization } from '../data/aoe4Data';
-import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight, Clock, MessageSquare, Send, UserCircle, CheckCircle, XCircle, X, Loader2, Trash2 } from 'lucide-react';
+import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight, Clock, MessageSquare, Send, UserCircle, CheckCircle, XCircle, X, Loader2, Trash2, AlertTriangle } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { ResourceText } from './ResourceText';
 import { ExternalLink } from 'lucide-react';
@@ -66,6 +66,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const [expandedBOs, setExpandedBOs] = useState<Set<string>>(new Set());
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editorTarget, setEditorTarget] = useState<{ section?: string; id?: string }>({});
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string, type: 'question' | 'answer' } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const openEditor = (section?: string, id?: string) => {
     setEditorTarget({ section, id });
@@ -173,8 +175,16 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     }
   };
 
-  const handleDeleteQA = async (id: string, type: 'question' | 'answer') => {
-    if (!isAdmin || !confirm(`Sei sicuro di voler eliminare questa ${type === 'question' ? 'domanda' : 'risposta'}?`)) return;
+  const handleDeleteQA = (id: string, type: 'question' | 'answer') => {
+    if (!isAdmin) return;
+    setDeleteConfirm({ id, type });
+  };
+
+  const executeDeleteQA = async () => {
+    if (!deleteConfirm || isDeleting) return;
+    
+    setIsDeleting(true);
+    const { id, type } = deleteConfirm;
 
     try {
       const { error } = await supabase
@@ -183,10 +193,13 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         .eq('id', id);
 
       if (error) throw error;
+      setDeleteConfirm(null);
       fetchQA();
     } catch (err) {
       console.error(`Error deleting ${type}:`, err);
       alert('Errore durante l\'eliminazione');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -1003,6 +1016,38 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           civName={civ.name} 
           onFollow={() => toggleFavorite(civId)} 
         />
+      )}
+
+      {/* Custom Deletion Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-[#1a1c23] border border-red-500/30 p-8 rounded-3xl max-w-sm w-full shadow-2xl animate-in zoom-in duration-300 text-center">
+            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
+              <AlertTriangle className="text-red-500" size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Conferma Eliminazione</h3>
+            <p className="text-sm text-gray-400 mb-8 leading-relaxed">
+              Sei sicuro di voler eliminare questa {deleteConfirm.type === 'question' ? 'domanda' : 'risposta'}? Questa azione non può essere annullata.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                disabled={isDeleting}
+                className="flex-1 px-4 py-2.5 border border-white/10 text-gray-400 rounded-xl hover:bg-white/5 transition-colors font-bold text-xs uppercase"
+              >
+                Annulla
+              </button>
+              <button
+                onClick={executeDeleteQA}
+                disabled={isDeleting}
+                className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl transition-all font-bold text-xs uppercase shadow-lg shadow-red-600/20 flex items-center justify-center gap-2"
+              >
+                {isDeleting ? <Loader2 size={14} className="animate-spin" /> : 'Elimina Ora'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
