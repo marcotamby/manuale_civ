@@ -185,7 +185,7 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
                 className="relative flex items-center gap-2 text-yellow-500 hover:opacity-80 transition-opacity group shrink-0"
                 title="Il Tuo Profilo"
               >
-                <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30 group-hover:border-yellow-500/60 transition-colors overflow-hidden">
+                <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30 group-hover:border-yellow-500/60 transition-colors overflow-hidden relative">
                   {user?.rank && user.rank !== 'Unranked' ? (
                     <img src={RANK_ICONS[user.rank]} alt={user.rank} className="w-6 h-6 object-contain" />
                   ) : (
@@ -193,13 +193,13 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
                   )}
                 </div>
                 {notificationCount > 0 && (
-                  <span className="absolute -top-1 -left-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[9px] font-bold text-white shadow-lg group-hover:scale-110 transition-transform ring-1 ring-[#0d1424]">
+                  <span className="absolute -top-1 -right-1 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[9px] font-black text-white shadow-[0_0_10px_rgba(220,38,38,0.5)] group-hover:scale-110 transition-transform ring-2 ring-[#0d1424]">
                     {notificationCount}
                   </span>
                 )}
                 <div className="flex flex-col text-left">
-                  <span className="font-medium hidden sm:block text-sm leading-none text-white/90">{user?.name}</span>
-                  <span className="text-[9px] text-yellow-600 font-bold uppercase tracking-widest">{isSuperAdmin ? 'Admin' : 'Editor'}</span>
+                  <span className="font-bold hidden md:block text-xs leading-none text-white/90 uppercase tracking-tight">Il Tuo Profilo</span>
+                  <span className="text-[9px] text-yellow-600 font-bold uppercase tracking-widest leading-none mt-1">{isSuperAdmin ? 'Admin' : 'Editor'}</span>
                 </div>
               </button>
 
@@ -231,21 +231,24 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
                   (window as any).openProfileModal?.();
                   (window as any).clearNotifications?.();
                 }}
-                className="relative p-1 rounded-full bg-blue-600/10 border border-blue-500/30 text-blue-400 hover:bg-blue-600/20 hover:border-blue-500/50 transition-all group overflow-hidden"
+                className="relative flex items-center gap-2.5 group transition-all"
                 title="Il Tuo Profilo"
               >
-                {user?.rank && user.rank !== 'Unranked' ? (
-                  <img src={RANK_ICONS[user.rank]} alt={user.rank} className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]" />
-                ) : (
-                  <div className="w-8 h-8 flex items-center justify-center">
-                    <User size={20} />
-                  </div>
-                )}
+                <div className="p-1 rounded-full bg-blue-600/10 border border-blue-500/30 text-blue-400 group-hover:bg-blue-600/20 group-hover:border-blue-500/50 transition-all">
+                  {user?.rank && user.rank !== 'Unranked' ? (
+                    <img src={RANK_ICONS[user.rank]} alt={user.rank} className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]" />
+                  ) : (
+                    <div className="w-8 h-8 flex items-center justify-center">
+                      <User size={20} />
+                    </div>
+                  )}
+                </div>
                 {notificationCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[9px] font-bold text-white shadow-lg group-hover:scale-110 transition-transform ring-1 ring-[#0d1424]">
+                  <span className="absolute -top-1 -left-1 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[9px] font-black text-white shadow-[0_0_10px_rgba(220,38,38,0.5)] group-hover:scale-110 transition-transform ring-2 ring-[#0d1424]">
                     {notificationCount}
                   </span>
                 )}
+                <span className="hidden md:block text-xs font-bold text-white/90 uppercase tracking-widest whitespace-nowrap">Il Tuo Profilo</span>
               </button>
               <button
                 onClick={logout}
