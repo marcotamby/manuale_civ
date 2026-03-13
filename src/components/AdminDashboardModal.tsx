@@ -640,7 +640,6 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                </div>
             </div>
           )}
-        </div>
 
         {/* Fixed Footer with Send Notifications Button */}
         {pendingNotifCount > 0 && (
