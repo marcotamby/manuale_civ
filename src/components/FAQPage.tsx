@@ -295,9 +295,9 @@ export function FAQPage() {
                   <button 
                     onClick={handleSave}
                     disabled={saveLoading || isSaveSuccess}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all text-xs font-bold uppercase tracking-wider shadow-lg disabled:opacity-50 ${
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 text-xs font-bold uppercase tracking-wider shadow-lg disabled:opacity-50 ${
                       isSaveSuccess 
-                        ? 'bg-emerald-400 text-white shadow-[0_0_20px_rgba(52,211,153,0.8)] scale-105 animate-pulse' 
+                        ? 'bg-[#00ff9f] text-[#0d1424] shadow-[0_0_25px_rgba(0,255,159,0.8)] scale-110 animate-[pulse_1s_infinite]' 
                         : 'bg-green-600 text-white hover:bg-green-500 shadow-green-600/20'
                     }`}
                   >
