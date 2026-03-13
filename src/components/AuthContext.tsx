@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
+import { supabase } from '../lib/supabaseClient';
 
 interface UserData {
   name: string | null;
@@ -111,7 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(favoritesKey, JSON.stringify(favorites));
   }, [favorites]); // Removed user?.email to prevent saving stale favorites during user switch
 
-  const login = (userData: UserData) => {
+  const login = async (userData: UserData) => {
     const email = userData.email?.toLowerCase() || 'guest';
     const savedRank = localStorage.getItem(`auth_user_rank_${email}`) || localStorage.getItem('auth_user_rank') || 'Unranked';
     const savedNickname = localStorage.getItem(`auth_user_nickname_${email}`) || localStorage.getItem('auth_user_nickname') || '';
@@ -126,6 +127,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Migration: save back to per-user keys if using old global keys
     localStorage.setItem(`auth_user_rank_${email}`, savedRank);
     localStorage.setItem(`auth_user_nickname_${email}`, savedNickname);
+
+    // Fetch favorites from Supabase
+    if (userData.email) {
+      const { data, error } = await supabase
+        .from('user_favorites')
+        .select('civ_id')
+        .eq('user_email', userData.email.toLowerCase());
+      
+      if (!error && data) {
+        const dbFavorites = data.map(f => f.civ_id);
+        const localEmail = userData.email.toLowerCase();
+        const favoritesKey = `aoe4_favorites_${localEmail}`;
+        const localFavorites = JSON.parse(localStorage.getItem(favoritesKey) || '[]');
+        
+        // Merge local and DB favorites
+        const merged = Array.from(new Set([...localFavorites, ...dbFavorites]));
+        setFavorites(merged);
+        localStorage.setItem(favoritesKey, JSON.stringify(merged));
+
+        // Sync local-only favorites back to DB
+        const localOnly = localFavorites.filter((f: string) => !dbFavorites.includes(f));
+        if (localOnly.length > 0) {
+          await supabase
+            .from('user_favorites')
+            .insert(localOnly.map((civId: string) => ({
+              user_email: localEmail,
+              civ_id: civId
+            })));
+        }
+      }
+    }
   };
 
   const logout = () => {
@@ -164,12 +196,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const toggleFavorite = (civId: string) => {
+  const toggleFavorite = async (civId: string) => {
+    const isAdding = !favorites.includes(civId);
+    
     setFavorites(prev =>
-      prev.includes(civId)
-        ? prev.filter(id => id !== civId)
-        : [...prev, civId]
+      isAdding
+        ? [...prev, civId]
+        : prev.filter(id => id !== civId)
     );
+
+    // Sync with Supabase if logged in
+    if (user?.email) {
+      const email = user.email.toLowerCase();
+      if (isAdding) {
+        await supabase
+          .from('user_favorites')
+          .insert({ user_email: email, civ_id: civId });
+      } else {
+        await supabase
+          .from('user_favorites')
+          .delete()
+          .eq('user_email', email)
+          .eq('civ_id', civId);
+      }
+    }
   };
 
   const openLoginModal = () => setIsLoginModalOpen(true);

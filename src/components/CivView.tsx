@@ -12,6 +12,7 @@ import type { Civilization } from '../data/aoe4Data';
 import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight, Clock } from 'lucide-react';
 import { ResourceText } from './ResourceText';
 import { ExternalLink } from 'lucide-react';
+import { SocialProofPopup } from './SocialProofPopup';
 
 const RANK_ICONS: Record<string, string> = {
   'Bronze I': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_bronze_1-a193ea93b70b33ed636f2356854abe66585ef4d901dcef5a5248739970d03ccc.svg',
@@ -43,7 +44,7 @@ interface CivViewProps {
 
 export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const { civilizations: civilizationsData, refreshCivs } = useCivData();
-  const { isAdmin, isSuperAdmin, user } = useAuth();
+  const { isAdmin, isSuperAdmin, user, toggleFavorite } = useAuth();
   const { updateActivity, activeAdmins: _activeAdmins } = usePresence();
   const { tab } = useParams<{ tab?: string }>();
   const navigate = useNavigate();
@@ -656,6 +657,14 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             setLocalCivs(prev => ({ ...prev, [civId]: updatedCiv }));
             refreshCivs();
           }}
+        />
+      )}
+
+      {civ && (
+        <SocialProofPopup 
+          civId={civId} 
+          civName={civ.name} 
+          onFollow={() => toggleFavorite(civId)} 
         />
       )}
     </div>
