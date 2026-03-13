@@ -39,7 +39,7 @@ const getRankIcon = (rank: string | undefined) => {
 
 export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const { civilizations: civilizationsData, refreshCivs } = useCivData();
-  const { isAdmin, isSuperAdmin, user, toggleFavorite } = useAuth();
+  const { isAdmin, isSuperAdmin, user, toggleFavorite, openLoginModal } = useAuth();
   const { updateActivity, activeAdmins: _activeAdmins } = usePresence();
   const { tab } = useParams<{ tab?: string }>();
   const navigate = useNavigate();
@@ -809,7 +809,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <div className="glass p-8 rounded-2xl border border-white/5 text-center">
                 <p className="text-gray-400 text-sm mb-4">Accedi per fare una domanda o rispondere alla community.</p>
                 <button 
-                  onClick={() => (window as any).openLoginModal?.()}
+                  onClick={openLoginModal}
                   className="px-8 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold uppercase transition-all"
                 >
                   Accedi Ora
