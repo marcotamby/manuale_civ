@@ -304,8 +304,8 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   if (!isOpen || (!isSuperAdmin && !isAdmin)) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm shadow-2xl">
-      <div className="bg-[#0f1423] border border-[#D4AF37]/30 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-[0_0_40px_rgba(0,0,0,0.8)] filter drop-shadow-2xl relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 md:p-4 bg-black/80 backdrop-blur-sm shadow-2xl">
+      <div className="bg-[#0f1423] border border-[#D4AF37]/30 rounded-xl md:rounded-2xl w-full max-w-4xl max-h-[95vh] md:max-h-[90vh] flex flex-col shadow-[0_0_40px_rgba(0,0,0,0.8)] filter drop-shadow-2xl relative overflow-hidden">
 
         {/* Rejection Modal Overlay */}
         {rejectionModalSugg && (
@@ -344,19 +344,23 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
           </div>
         )}
 
-        <div className="flex items-center justify-between p-6 border-b border-[#D4AF37]/20 bg-gradient-to-r from-[#0d1424] to-[#1a1c32] rounded-t-2xl shrink-0">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 md:p-6 border-b border-[#D4AF37]/20 bg-gradient-to-r from-[#0d1424] to-[#1a1c32] rounded-t-2xl shrink-0 gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20 text-blue-400">
-              <Inbox size={24} />
+              {activeTab === 'proposte' ? <Inbox size={24} /> : <MessageSquare size={24} />}
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white uppercase tracking-wider">Gestione Proposte</h2>
-              <p className="text-xs text-gray-400">Revisiona i suggerimenti della community</p>
+              <h2 className="text-lg md:text-xl font-bold text-white uppercase tracking-wider">
+                {activeTab === 'proposte' ? 'Gestione Proposte' : 'Gestione Q&A'}
+              </h2>
+              <p className="text-[10px] md:text-xs text-gray-400">
+                {activeTab === 'proposte' ? 'Revisiona i suggerimenti della community' : 'Modera le domande e risposte degli utenti'}
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 mr-4">
+          <div className="flex items-center justify-between md:justify-end w-full md:w-auto gap-4">
+            <div className="flex bg-black/40 p-1 rounded-xl border border-white/5">
                {isSuperAdmin && (
                  <button
                    onClick={() => setActiveTab('proposte')}
@@ -572,12 +576,12 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
             )
           ) : (
             /* Q&A Tab Content */
-            <div className="space-y-8 overflow-y-auto pr-2 max-h-[60vh]">
-               {/* Pending Questions */}
-               <div className="space-y-4">
-                  <h3 className="text-sm font-black text-yellow-500 uppercase tracking-widest flex items-center gap-2">
-                    <MessageSquare size={16} /> Domande da Approvare ({questions.length})
-                  </h3>
+          <div className="space-y-8 overflow-y-auto px-4 md:px-6 py-4 max-h-[70vh]">
+             {/* Pending Questions */}
+             <div className="space-y-4">
+                <h3 className="text-sm font-black text-yellow-500 uppercase tracking-widest flex items-center gap-3">
+                  <MessageSquare size={16} className="text-yellow-500 shrink-0" /> Domande da Approvare ({questions.length})
+                </h3>
                   {questions.length === 0 ? (
                     <p className="text-gray-500 text-sm italic py-4">Nessuna domanda in sospeso.</p>
                   ) : (
@@ -604,11 +608,11 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                   )}
                </div>
 
-               {/* Pending Answers */}
-               <div className="space-y-4">
-                  <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest flex items-center gap-2">
-                    <Send size={16} /> Risposte da Approvare ({answers.length})
-                  </h3>
+             {/* Pending Answers */}
+             <div className="space-y-4">
+                <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest flex items-center gap-3">
+                  <Send size={16} className="text-blue-400 shrink-0" /> Risposte da Approvare ({answers.length})
+                </h3>
                   {answers.length === 0 ? (
                     <p className="text-gray-500 text-sm italic py-4">Nessuna risposta in sospeso.</p>
                   ) : (
