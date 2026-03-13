@@ -67,12 +67,12 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
         
         <button 
           onClick={handleDismiss}
-          className="absolute top-1 right-1 p-1.5 text-gray-500 hover:text-white transition-colors z-10 sm:top-2 sm:right-2"
+          className="absolute top-1 right-1 p-1.5 text-gray-500 hover:text-white transition-colors z-10 sm:top-2 sm:right-3"
         >
           <X size={14} />
         </button>
 
-        <div className="flex items-center gap-2 sm:gap-6 pr-8 sm:pr-0">
+        <div className="flex items-center gap-2 sm:gap-6 pr-8 sm:pr-10">
           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center shrink-0">
             <Heart size={18} className="text-yellow-500 fill-yellow-500/20 group-hover:scale-110 transition-transform" />
           </div>
