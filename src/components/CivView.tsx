@@ -14,6 +14,7 @@ import { ResourceText } from './ResourceText';
 import { ExternalLink } from 'lucide-react';
 import { SocialProofPopup } from './SocialProofPopup';
 import { RANK_ICONS } from './ProfileModal';
+import { EditSuggestionForm } from './EditSuggestionForm';
 
 const getYoutubeId = (url: string) => {
   if (!url) return null;
@@ -1130,6 +1131,15 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 </div>
               )}
             </div>
+          </div>
+        )}
+        {activeTab === 'proponi' && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+              <Edit className="text-yellow-500" size={24} />
+              Proponi una modifica
+            </h2>
+            <EditSuggestionForm civName={civ.name} />
           </div>
         )}
       </div>
