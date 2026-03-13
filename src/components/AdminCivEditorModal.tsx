@@ -101,7 +101,8 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
   }, [isOpen]);
 
   const otherAdminsEditing = activeAdmins ? Object.values(activeAdmins).filter(
-    a => a?.user?.email && a.user.email !== user?.email && 
+    a => a?.user?.email && user?.email && 
+    a.user.email.toLowerCase() !== user.email.toLowerCase() && 
     a.activity?.type === 'editing' && 
     a.activity?.civId === civ.id
   ) : [];

@@ -40,7 +40,7 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
     const adminChannel = supabase.channel('admin-presence', {
       config: {
         presence: {
-          key: user.email,
+          key: user.email.toLowerCase(),
         },
       },
     });
@@ -54,13 +54,36 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
           const simplifiedState: Record<string, PresenceState> = {};
           
           Object.keys(newState).forEach((key) => {
-            const presenceEntry = newState[key]?.[0] as any;
+            const presences = newState[key] as any[];
+            if (!presences || presences.length === 0) return;
+
+            // Consolidate multiple presence entries for the same user (e.g., multiple tabs)
+            // Priority: editing > viewing > idle
+            let consolidatedEntry = presences[0];
+            
+            for (let i = 1; i < presences.length; i++) {
+              const current = presences[i];
+              if (!current?.activity) continue;
+
+              const currentPriority = 
+                current.activity.type === 'editing' ? 3 : 
+                current.activity.type === 'viewing' ? 2 : 1;
+              
+              const consolidatedPriority = 
+                consolidatedEntry.activity.type === 'editing' ? 3 : 
+                consolidatedEntry.activity.type === 'viewing' ? 2 : 1;
+
+              if (currentPriority > consolidatedPriority) {
+                consolidatedEntry = current;
+              }
+            }
+
             // Only add to activeAdmins if the data is complete to avoid downstream crashes
-            if (presenceEntry && presenceEntry.user && presenceEntry.user.email && presenceEntry.activity) {
+            if (consolidatedEntry && consolidatedEntry.user && consolidatedEntry.user.email && consolidatedEntry.activity) {
               simplifiedState[key] = {
-                user: presenceEntry.user,
-                activity: presenceEntry.activity,
-                onlineAt: presenceEntry.onlineAt || new Date().toISOString()
+                user: consolidatedEntry.user,
+                activity: consolidatedEntry.activity,
+                onlineAt: consolidatedEntry.onlineAt || new Date().toISOString()
               };
             }
           });
