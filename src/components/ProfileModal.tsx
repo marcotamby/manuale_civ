@@ -129,6 +129,31 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     const { civilizations } = useCivData();
     const [mySuggestions, setMySuggestions] = useState<Suggestion[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    
+    // Local state for pending changes
+    const [pendingNickname, setPendingNickname] = useState(user?.nickname || '');
+    const [pendingRank, setPendingRank] = useState(user?.rank || 'Unranked');
+    const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+
+    // Sync local state when user or modal state changes
+    useEffect(() => {
+        if (isOpen) {
+            setPendingNickname(user?.nickname || '');
+            setPendingRank(user?.rank || 'Unranked');
+            setShowSaveSuccess(false);
+        }
+    }, [isOpen, user?.nickname, user?.rank]);
+
+    const hasChanges = pendingNickname !== (user?.nickname || '') || pendingRank !== (user?.rank || 'Unranked');
+
+    const handleSaveProfile = () => {
+        updateProfile({
+            nickname: pendingNickname,
+            rank: pendingRank
+        });
+        setShowSaveSuccess(true);
+        setTimeout(() => setShowSaveSuccess(false), 3000);
+    };
 
     const lastSeenKey = user?.email ? `lastSeenCounts_${user.email}` : null;
     const lastSeenData = lastSeenKey ? JSON.parse(localStorage.getItem(lastSeenKey) || '{}') : {};
@@ -176,9 +201,6 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
 
     if (!isOpen) return null;
 
-    const currentRank = user?.rank || 'Unranked';
-    const rankIcon = currentRank !== 'Unranked' ? RANK_ICONS[currentRank] : null;
-
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
             <div className="bg-[#0f1423] border border-blue-500/30 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-[0_0_50px_rgba(37,99,235,0.2)] relative">
@@ -224,8 +246,8 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                 <input
                                     type="text"
                                     placeholder="Inserisci il tuo nickname..."
-                                    value={user?.nickname || ''}
-                                    onChange={(e) => updateProfile({ nickname: e.target.value })}
+                                    value={pendingNickname}
+                                    onChange={(e) => setPendingNickname(e.target.value)}
                                     className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors"
                                 />
                             </div>
@@ -236,24 +258,45 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                     Grado Attuale
                                 </label>
                                 <RankDropdown
-                                    value={currentRank}
-                                    onChange={(rank) => updateProfile({ rank })}
+                                    value={pendingRank}
+                                    onChange={(rank) => setPendingRank(rank)}
                                 />
                             </div>
 
+                            {/* Save Button */}
+                            <div className="pt-2">
+                                <button
+                                    onClick={handleSaveProfile}
+                                    disabled={!hasChanges}
+                                    className={`w-full py-2.5 rounded-lg text-sm font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
+                                        hasChanges 
+                                            ? 'bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_15px_rgba(37,99,235,0.3)]' 
+                                            : showSaveSuccess 
+                                                ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                                : 'bg-white/5 text-gray-500 cursor-not-allowed border border-white/5'
+                                    }`}
+                                >
+                                    {showSaveSuccess ? (
+                                        <>Salvato! ✅</>
+                                    ) : (
+                                        <>Salva Modifiche</>
+                                    )}
+                                </button>
+                            </div>
+
                             {/* Selected rank display — shown only when not Unranked */}
-                            {rankIcon && (
+                            {pendingRank !== 'Unranked' && RANK_ICONS[pendingRank] && (
                                 <div className="flex items-center gap-4 pt-3 border-t border-white/5">
                                     <img
-                                        src={rankIcon}
-                                        alt={currentRank}
+                                        src={RANK_ICONS[pendingRank]}
+                                        alt={pendingRank}
                                         width={56}
                                         height={56}
                                         className="object-contain drop-shadow-[0_0_14px_rgba(255,200,50,0.5)] shrink-0"
                                     />
                                     <div>
-                                        <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-0.5">Rank corrente</p>
-                                        <p className="text-lg font-bold text-yellow-400 leading-tight">{currentRank}</p>
+                                        <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-0.5">Rank selezionato</p>
+                                        <p className="text-lg font-bold text-yellow-400 leading-tight">{pendingRank}</p>
                                     </div>
                                 </div>
                             )}
