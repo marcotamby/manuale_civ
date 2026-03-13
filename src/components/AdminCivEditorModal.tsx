@@ -239,8 +239,8 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[1000] p-4 backdrop-blur-sm">
-      <div className="bg-[#1a1c23] border border-purple-500/50 rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.2)] flex flex-col animate-in fade-in zoom-in duration-200 mt-12 md:mt-0">
+    <div className="fixed inset-0 bg-black/80 flex justify-center z-[1000] backdrop-blur-sm overflow-y-auto p-2 md:p-4">
+      <div className="bg-[#1a1c23] border border-purple-500/50 rounded-2xl w-full max-w-5xl h-fit max-h-none md:max-h-[90vh] my-auto overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.2)] flex flex-col animate-in fade-in zoom-in duration-200">
 
         <div className="p-6 border-b border-purple-500/20 flex justify-between items-center bg-purple-500/5">
           <div>

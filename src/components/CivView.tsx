@@ -119,6 +119,30 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   };
 
   useEffect(() => {
+    fetchQA();
+
+    // Real-time subscription for questions and answers
+    const channel = supabase
+      .channel(`qa-${civId}`)
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'questions',
+        filter: `civ_id=eq.${civId}`
+      }, () => fetchQA())
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'answers'
+      }, () => fetchQA())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [civId]);
+
+  useEffect(() => {
     checkScroll();
     window.addEventListener('resize', checkScroll);
     return () => window.removeEventListener('resize', checkScroll);
@@ -139,7 +163,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const [questions, setQuestions] = useState<any[]>([]);
   const [qaLoading, setQaLoading] = useState(false);
   const [questionText, setQuestionText] = useState('');
-  const [activeAnswerId, setActiveAnswerId] = useState<string | null>(null);
+  const [replyTo, setReplyTo] = useState<{ questionId: string, parentId?: string } | null>(null);
   const [answerText, setAnswerText] = useState('');
   const [qaMessage, setQaMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
 
@@ -158,13 +182,27 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
       if (error) throw error;
 
-      // Filter approved answers inside approved questions
-      const filteredData = data.map(q => ({
-        ...q,
-        answers: (q.answers || [])
+      // Build threaded structure
+      const filteredData = data.map(q => {
+        const allAnswers = (q.answers || [])
           .filter((a: any) => a.status === 'approved')
-          .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-      }));
+          .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+
+        // Helper to find children
+        const getThread = (parentId: string | null): any[] => {
+          return allAnswers
+            .filter((a: any) => a.parent_id === parentId)
+            .map((a: any) => ({
+              ...a,
+              replies: getThread(a.id)
+            }));
+        };
+
+        return {
+          ...q,
+          answers: getThread(null)
+        };
+      });
 
       setQuestions(filteredData);
     } catch (err) {
@@ -210,11 +248,12 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     }
   }, [user]);
 
-  useEffect(() => {
-    if (activeTab === 'domande') {
-      fetchQA();
-    }
-  }, [activeTab, civId]);
+  // Removed the old useEffect for fetching Q&A, now handled by the subscription useEffect
+  // useEffect(() => {
+  //   if (activeTab === 'domande') {
+  //     fetchQA();
+  //   }
+  // }, [activeTab, civId]);
 
   const validateProfile = () => {
     if (!user?.nickname || !user?.rank || user.rank === 'Unranked') {
@@ -247,38 +286,170 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
       if (error) throw error;
       setQuestionText('');
-      setQaMessage({ text: 'La tua domanda è in fase di approvazione da parte degli amministratori', type: 'success' });
+      
+      const msg = isAdmin 
+        ? 'Domanda pubblicata!' 
+        : 'La tua domanda è in fase di approvazione da parte degli amministratori';
+      
+      setQaMessage({ text: msg, type: 'success' });
+      if (isAdmin) fetchQA();
     } catch (err) {
       console.error('Error submitting question:', err);
       setQaMessage({ text: 'Errore durante l\'invio della domanda.', type: 'error' });
     }
   };
 
-  const handleAnswerSubmit = async (questionId: string) => {
+  const handleAnswerSubmit = async (questionId: string, parentId?: string) => {
     if (!user) return;
     if (!validateProfile()) return;
     if (!answerText.trim()) return;
 
     try {
+      // Auto-approval logic:
+      // 1. If admin -> approved
+      // 2. If the user already has an approved message in this specific question thread -> approved
+      let targetStatus = 'pending';
+      
+      if (isAdmin) {
+        targetStatus = 'approved';
+      } else {
+        // Check if user has any approved activity in this question
+        const { data: existingApproved } = await supabase
+          .from('answers')
+          .select('id')
+          .eq('question_id', questionId)
+          .eq('user_id', user.email)
+          .eq('status', 'approved')
+          .limit(1);
+          
+        const { data: existingQApproved } = await supabase
+          .from('questions')
+          .select('id')
+          .eq('id', questionId)
+          .eq('user_id', user.email)
+          .eq('status', 'approved')
+          .limit(1);
+
+        if ((existingApproved && existingApproved.length > 0) || (existingQApproved && existingQApproved.length > 0)) {
+          targetStatus = 'approved';
+        }
+      }
+
       const { error } = await supabase
         .from('answers')
         .insert([{
           question_id: questionId,
+          parent_id: parentId || null,
           user_id: user.email,
           user_nickname: user.nickname,
           user_rank: user.rank,
           answer_text: answerText.trim(),
-          status: 'pending'
+          status: targetStatus
         }]);
 
       if (error) throw error;
       setAnswerText('');
-      setActiveAnswerId(null);
-      setQaMessage({ text: 'La tua risposta a questa domanda è in fase di approvazione da parte degli amministratori', type: 'success' });
+      setReplyTo(null);
+      
+      const msg = targetStatus === 'approved' 
+        ? 'Risposta pubblicata!' 
+        : 'La tua risposta è in fase di approvazione';
+        
+      setQaMessage({ text: msg, type: 'success' });
+      if (targetStatus === 'approved') fetchQA();
     } catch (err) {
       console.error('Error submitting answer:', err);
       setQaMessage({ text: 'Errore durante l\'invio della risposta.', type: 'error' });
     }
+  };
+
+  // Helper function to render answers recursively within the component scope
+  const renderAnswers = (answers: any[], questionId: string, depth = 0) => {
+    if (!answers || answers.length === 0) return null;
+
+    return answers.map((a: any) => (
+      <div key={a.id} className={`${depth > 0 ? 'ml-6 border-l border-white/5 pl-4' : ''} space-y-3`}>
+        <div className="glass p-4 rounded-xl border border-white/5 bg-white/[0.01] group/a">
+          <div className="flex items-start gap-3">
+            <div className="shrink-0">
+              <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                {a.user_rank && getRankIcon(a.user_rank) ? (
+                  <img src={getRankIcon(a.user_rank) || ''} alt={a.user_rank} className="w-5 h-5 object-contain" />
+                ) : (
+                  <UserCircle size={18} className="text-gray-600" />
+                )}
+              </div>
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs font-bold text-blue-400 uppercase tracking-tight select-text">{a.user_nickname}</span>
+                <span className="text-[9px] text-gray-500 font-bold px-1 py-0.5 bg-white/5 rounded border border-white/5 uppercase select-none">{a.user_rank}</span>
+                <span className="text-[9px] text-gray-600 select-none">{new Date(a.created_at).toLocaleDateString('it-IT')}</span>
+                {isAdmin && (
+                  <button 
+                    onClick={() => handleDeleteQA(a.id, 'answer')}
+                    className="ml-auto opacity-0 group-hover/a:opacity-100 p-1 text-red-500 hover:bg-red-500/10 rounded transition-all"
+                    title="Elimina risposta"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                )}
+              </div>
+              <p className="text-gray-300 text-sm leading-relaxed select-text">{a.answer_text}</p>
+              
+              <div className="flex justify-end pt-2">
+                 <button 
+                   onClick={() => {
+                     if (replyTo && replyTo.parentId === a.id) {
+                       setReplyTo(null);
+                     } else {
+                       setReplyTo({ questionId, parentId: a.id });
+                       setAnswerText('');
+                     }
+                   }}
+                   className={`flex items-center gap-1.5 px-3 py-1 rounded text-[10px] font-bold transition-all ${
+                     replyTo && replyTo.parentId === a.id 
+                       ? 'bg-white/10 text-white' 
+                       : 'text-gray-500 hover:text-white hover:bg-white/5'
+                   }`}
+                 >
+                   <MessageSquare size={12} />
+                   {replyTo && replyTo.parentId === a.id ? 'Annulla' : 'Rispondi'}
+                 </button>
+              </div>
+
+              {/* Nested Reply Input */}
+              {replyTo && replyTo.parentId === a.id && (
+                <div className="mt-3 pt-3 border-t border-white/5 space-y-2 animate-in fade-in slide-in-from-top-1 duration-200 outline-none select-none">
+                  <textarea
+                    value={answerText}
+                    onChange={(e) => setAnswerText(e.target.value)}
+                    placeholder="Scrivi una risposta..."
+                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white placeholder:text-gray-600 focus:border-blue-500/50 outline-none transition-all text-xs min-h-[60px] resize-none"
+                    autoFocus
+                  />
+                  <div className="flex justify-end">
+                    <button
+                      onClick={() => handleAnswerSubmit(questionId, a.id)}
+                      disabled={!answerText.trim()}
+                      className="flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-md text-[10px] font-bold uppercase transition-all"
+                    >
+                      <Send size={10} />
+                      Rispondi
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        {a.replies && a.replies.length > 0 && (
+          <div className="space-y-3">
+            {renderAnswers(a.replies, questionId, depth + 1)}
+          </div>
+        )}
+      </div>
+    ));
   };
 
   if (!civ) return <div className="text-gray-400 p-8">Civiltà non trovata.</div>;
@@ -896,37 +1067,37 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                               </div>
                               <p className="text-white text-base leading-relaxed select-text">{q.question_text}</p>
                            </div>
-                        </div>
-
-                        <div className="flex justify-end pt-2 border-t border-white/5">
+                         </div>
+                                  <div className="flex justify-end pt-2 border-t border-white/5">
                            <button 
-                             onClick={() => {
-                               if (activeAnswerId === q.id) {
-                                 setActiveAnswerId(null);
-                               } else {
-                                 setActiveAnswerId(q.id);
-                                 setAnswerText('');
-                               }
-                             }}
-                             className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                               activeAnswerId === q.id 
-                                ? 'bg-white/10 text-white' 
-                                : 'text-gray-400 hover:text-white hover:bg-white/5'
-                             }`}
-                           >
-                             <MessageSquare size={14} />
-                             {activeAnswerId === q.id ? 'Annulla' : 'Rispondi'}
-                           </button>
+                              onClick={() => {
+                                if (replyTo && replyTo.questionId === q.id && !replyTo.parentId) {
+                                  setReplyTo(null);
+                                } else {
+                                  setReplyTo({ questionId: q.id });
+                                  setAnswerText('');
+                                }
+                              }}
+                              className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                                replyTo && replyTo.questionId === q.id && !replyTo.parentId
+                                  ? 'bg-white/10 text-white' 
+                                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                              }`}
+                            >
+                              <MessageSquare size={14} />
+                              {replyTo && replyTo.questionId === q.id && !replyTo.parentId ? 'Annulla' : 'Rispondi'}
+                            </button>
                         </div>
 
-                        {/* Answer Input */}
-                        {activeAnswerId === q.id && (
+                        {/* Answer Input (Root) */}
+                        {replyTo && replyTo.questionId === q.id && !replyTo.parentId && (
                            <div className="mt-4 pt-4 border-t border-white/5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300 outline-none select-none">
                               <textarea
                                 value={answerText}
                                 onChange={(e) => setAnswerText(e.target.value)}
                                 placeholder="Scrivi la tua risposta..."
                                 className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:border-blue-500/50 outline-none transition-all text-sm min-h-[80px] resize-none"
+                                autoFocus
                               />
                               <div className="flex justify-end">
                                 <button
@@ -942,40 +1113,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         )}
                      </div>
 
-                     {/* Answers List */}
+                     {/* Answers List (Recursive Threading) */}
                      <div className="ml-6 md:ml-12 space-y-3">
-                        {q.answers && q.answers.map((a: any) => (
-                           <div key={a.id} className="glass p-4 rounded-xl border border-white/5 bg-white/[0.01] group/a">
-                              <div className="flex items-start gap-3">
-                                <div className="shrink-0">
-                                  <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                                    {a.user_rank && getRankIcon(a.user_rank) ? (
-                                      <img src={getRankIcon(a.user_rank) || ''} alt={a.user_rank} className="w-5 h-5 object-contain" />
-                                    ) : (
-                                      <UserCircle size={18} className="text-gray-600" />
-                                    )}
-                                  </div>
-                                </div>
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <span className="text-xs font-bold text-blue-400 uppercase tracking-tight select-text">{a.user_nickname}</span>
-                                    <span className="text-[9px] text-gray-500 font-bold px-1 py-0.5 bg-white/5 rounded border border-white/5 uppercase select-none">{a.user_rank}</span>
-                                    <span className="text-[9px] text-gray-600 select-none">{new Date(a.created_at).toLocaleDateString('it-IT')}</span>
-                                    {isAdmin && (
-                                      <button 
-                                        onClick={() => handleDeleteQA(a.id, 'answer')}
-                                        className="ml-auto opacity-0 group-hover/a:opacity-100 p-1 text-red-500 hover:bg-red-500/10 rounded transition-all"
-                                        title="Elimina risposta"
-                                      >
-                                        <Trash2 size={12} />
-                                      </button>
-                                    )}
-                                  </div>
-                                  <p className="text-gray-300 text-sm leading-relaxed select-text">{a.answer_text}</p>
-                                </div>
-                              </div>
-                           </div>
-                        ))}
+                        {renderAnswers(q.answers, q.id)}
                      </div>
                   </div>
                 ))

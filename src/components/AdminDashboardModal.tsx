@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, CheckCircle, XCircle, Loader2, Inbox, MessageSquare, Send } from 'lucide-react';
+import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { Toast } from './Toast';
@@ -28,6 +28,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const { isSuperAdmin } = useAuth();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; type: 'question' | 'answer'; item: any } | null>(null);
   const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
     isVisible: false,
     message: '',
@@ -115,11 +116,12 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   };
 
   useEffect(() => {
-    if (isOpen && (isSuperAdmin || !isSuperAdmin)) { // Admin can access QA
-      if (activeTab === 'proposte' && isSuperAdmin) fetchSuggestions();
-      if (activeTab === 'qa') fetchQA();
+    if (isOpen) {
+      if (isSuperAdmin) fetchSuggestions();
+      fetchQA();
+      fetchPendingNotifCount();
     }
-  }, [isOpen, activeTab, isSuperAdmin]);
+  }, [isOpen, isSuperAdmin]);
 
   const handleSendNotifications = async () => {
     if (pendingNotifCount === 0 || !isSuperAdmin) return;
@@ -273,19 +275,30 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     }
   };
 
-  const handleUpdateQAStatus = async (item: any, type: 'question' | 'answer', newStatus: 'approved' | 'rejected') => {
+  const handleUpdateQAStatus = async (item: any, type: 'question' | 'answer', newStatus: 'approved' | 'rejected' | 'deleted') => {
     try {
       const table = type === 'question' ? 'questions' : 'answers';
-      const { error } = await supabase
-        .from(table)
-        .update({ status: newStatus })
-        .eq('id', item.id);
+      
+      let error;
+      if (newStatus === 'deleted') {
+        const { error: delError } = await supabase
+          .from(table)
+          .delete()
+          .eq('id', item.id);
+        error = delError;
+      } else {
+        const { error: updError } = await supabase
+          .from(table)
+          .update({ status: newStatus })
+          .eq('id', item.id);
+        error = updError;
+      }
 
       if (error) throw error;
 
       setToast({
         isVisible: true,
-        message: newStatus === 'approved' ? 'Approvato con successo!' : 'Rifiutato',
+        message: newStatus === 'approved' ? 'Approvato con successo!' : newStatus === 'deleted' ? 'Eliminato definitivamente' : 'Rifiutato',
         type: 'success'
       });
 
@@ -296,7 +309,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       }
     } catch (err: any) {
       console.error(`Error updating ${type} status:`, err);
-      setToast({ isVisible: true, message: 'Errore nell\'aggiornamento', type: 'error' });
+      setToast({ isVisible: true, message: 'Errore nell\'operazione', type: 'error' });
     }
   };
 
@@ -608,11 +621,12 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                   <span className="text-[10px] text-gray-500">({q.user_rank})</span>
                                </div>
                                <p className="text-gray-200 text-sm">{q.question_text}</p>
-                            </div>
-                            <div className="flex gap-2">
-                               <button onClick={() => handleUpdateQAStatus(q, 'question', 'approved')} className="p-2 bg-green-500/10 text-green-500 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-all"><CheckCircle size={18} /></button>
-                               <button onClick={() => handleUpdateQAStatus(q, 'question', 'rejected')} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all"><XCircle size={18} /></button>
-                            </div>
+                                                        <div className="flex gap-2">
+                                <button onClick={() => handleUpdateQAStatus(q, 'question', 'approved')} className="p-2 bg-green-500/10 text-green-500 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-all" title="Approva"><CheckCircle size={18} /></button>
+                                <button onClick={() => handleUpdateQAStatus(q, 'question', 'rejected')} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all" title="Rifiuta"><XCircle size={18} /></button>
+                                <button onClick={() => setDeleteConfirm({ id: q.id, type: 'question', item: q })} className="p-2 bg-gray-500/10 text-gray-500 rounded-lg border border-gray-500/20 hover:bg-red-500/20 hover:text-red-500 transition-all" title="Elimina"><Inbox size={18} /></button>
+                             </div>
+        </div>
                           </div>
                         </div>
                       ))}
@@ -644,10 +658,11 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                </div>
                                <p className="text-gray-200 text-sm">{a.answer_text}</p>
                             </div>
-                            <div className="flex gap-2">
-                               <button onClick={() => handleUpdateQAStatus(a, 'answer', 'approved')} className="p-2 bg-green-500/10 text-green-500 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-all"><CheckCircle size={18} /></button>
-                               <button onClick={() => handleUpdateQAStatus(a, 'answer', 'rejected')} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all"><XCircle size={18} /></button>
-                            </div>
+                             <div className="flex gap-2">
+                                <button onClick={() => handleUpdateQAStatus(a, 'answer', 'approved')} className="p-2 bg-green-500/10 text-green-500 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-all" title="Approva"><CheckCircle size={18} /></button>
+                                <button onClick={() => handleUpdateQAStatus(a, 'answer', 'rejected')} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all" title="Rifiuta"><XCircle size={18} /></button>
+                                <button onClick={() => setDeleteConfirm({ id: a.id, type: 'answer', item: a })} className="p-2 bg-gray-500/10 text-gray-500 rounded-lg border border-gray-500/20 hover:bg-red-500/20 hover:text-red-500 transition-all" title="Elimina"><Inbox size={18} /></button>
+                             </div>
                           </div>
                         </div>
                       ))}
@@ -678,6 +693,41 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
           </div>
         )}
       </div>
+      {/* Custom Deletion Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-[#1a1c23] border border-red-500/30 p-8 rounded-3xl max-w-sm w-full shadow-2xl animate-in zoom-in duration-300 text-center">
+            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
+              <AlertTriangle className="text-red-500" size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Conferma Eliminazione</h3>
+            <p className="text-sm text-gray-400 mb-8 leading-relaxed">
+              Sei sicuro di voler eliminare definitivamente questa {deleteConfirm.type === 'question' ? 'domanda' : 'risposta'}?
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="flex-1 px-4 py-2.5 border border-white/10 text-gray-400 rounded-xl hover:bg-white/5 transition-colors font-bold text-xs uppercase"
+              >
+                Annulla
+              </button>
+              <button
+                onClick={async () => {
+                  const item = deleteConfirm.item;
+                  const type = deleteConfirm.type;
+                  setDeleteConfirm(null);
+                  handleUpdateQAStatus(item, type, 'deleted');
+                }}
+                className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl transition-all font-bold text-xs uppercase shadow-lg shadow-red-600/20"
+              >
+                Elimina Ora
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Toast
         isVisible={toast.isVisible}
         message={toast.message}
