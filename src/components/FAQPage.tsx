@@ -74,35 +74,16 @@ const STATIC_SECTIONS: FAQSection[] = [
         display_order: 1
       },
       {
+        label: "Q & A (Domande & Risposte)",
+        description: "In ogni scheda civiltà puoi fare domande specifiche o rispondere a dubbi. È lo strumento ideale per consigli tattici e chiarimenti.",
+        icon_name: "HelpCircle",
+        display_order: 2
+      },
+      {
         label: "Invia Proposte",
         description: "Se noti un errore o vuoi suggerire un contenuto, usa il tasto 'Proponi Modifica'. La community aiuta a tenere il manuale aggiornato!",
         icon_name: "GitPullRequest",
-        display_order: 2
-      }
-    ]
-  },
-  {
-    title: "Q & A (Domande & Risposte)",
-    icon_name: "HelpCircle",
-    display_order: 2,
-    items: [
-      {
-        label: "Come funziona la sezione Domande?",
-        description: "In ogni scheda civiltà puoi fare domande specifiche o rispondere a dubbi di altri giocatori. È il posto ideale per consigli tattici avanzati.",
-        icon_name: "MessageSquare",
-        display_order: 0
-      },
-      {
-        label: "Chi può rispondere?",
-        description: "Tutti i membri della community possono partecipare. Le risposte degli utenti esperti o admin sono spesso le più dettagliate!",
-        icon_name: "Users",
-        display_order: 1
-      },
-      {
-        label: "Moderazione",
-        description: "Le domande e risposte passano attraverso una fase di moderazione per garantire che i contenuti siano sempre utili e rispettosi.",
-        icon_name: "Shield",
-        display_order: 2
+        display_order: 3
       }
     ]
   }
