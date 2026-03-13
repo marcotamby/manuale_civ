@@ -293,6 +293,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                       value={bonus}
                       onChange={e => handleBonusChange(idx, e.target.value)}
                       rows={2}
+                      placeholder="Nuovo Bonus..."
                       className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-yellow-500 transition-colors"
                     />
                     <button
@@ -309,7 +310,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                 ))}
               </div>
               <button
-                onClick={() => setEditedCiv({ ...editedCiv, passiveBonuses: [...editedCiv.passiveBonuses, 'Nuovo Bonus...'] })}
+                onClick={() => setEditedCiv({ ...editedCiv, passiveBonuses: [...editedCiv.passiveBonuses, ''] })}
                 className="w-full py-2 bg-yellow-500/10 border border-dashed border-yellow-500/30 text-yellow-500/70 rounded-lg hover:bg-yellow-500/20 hover:text-yellow-500 transition-all text-xs font-bold mt-2"
               >
                 + Aggiungi Bonus
@@ -449,7 +450,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
               <div ref={sectionRefs.units} className="bg-black/30 border border-blue-500/30 rounded-xl p-4">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="font-bold text-blue-400 flex items-center gap-2"><span className="text-xl">⚔️</span> Unità Uniche</h4>
-                  <button onClick={() => addToArray('uniqueUnits', { id: 'new-unit', name: 'Nuova Unità', type: 'Infantry', age: 2, stats: { attack: 0, armor: 0, speed: 1, health: 100 }, strengths: [], weaknesses: [], description: '' })} className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded flex items-center gap-1">
+                  <button onClick={() => addToArray('uniqueUnits', { id: `unit-${Date.now()}`, name: '', type: 'Infantry', age: 2, stats: { attack: 0, armor: 0, speed: 1, health: 100 }, strengths: [], weaknesses: [], description: '' })} className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded flex items-center gap-1">
                     <Plus size={14} /> Aggiungi
                   </button>
                 </div>
@@ -460,7 +461,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                         <Trash2 size={16} />
                       </button>
                       <div className="grid grid-cols-2 gap-2 mb-2">
-                        <input type="text" value={u.name} onChange={e => updateArrayField('uniqueUnits', idx, 'name', e.target.value)} placeholder="Nome Unità" className="bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600 w-full" />
+                        <input type="text" value={u.name} onChange={e => updateArrayField('uniqueUnits', idx, 'name', e.target.value)} placeholder="Nuova Unità..." className="bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600 w-full" />
                         <input type="text" value={u.imageId || ''} onChange={e => updateArrayField('uniqueUnits', idx, 'imageId', e.target.value)} placeholder="Image URL o ID (es: archer-2)" className="bg-gray-800 text-blue-300 text-sm rounded px-2 py-1 border border-gray-600 w-full" />
                       </div>
                       <div className="grid grid-cols-2 gap-2 mb-2">
@@ -491,7 +492,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
               <div ref={sectionRefs.landmarks} className="bg-black/30 border border-purple-500/30 rounded-xl p-4">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="font-bold text-purple-400 flex items-center gap-2"><span className="text-xl">🏛️</span> Landmarks</h4>
-                  <button onClick={() => addToArray('landmarks', { id: 'new-landmark', name: 'Nuovo Landmark', age: 2, type: 'Economic', description: '' })} className="text-xs bg-purple-600 hover:bg-purple-500 text-white px-2 py-1 rounded flex items-center gap-1">
+                  <button onClick={() => addToArray('landmarks', { id: `landmark-${Date.now()}`, name: '', age: 2, type: 'Economic', description: '' })} className="text-xs bg-purple-600 hover:bg-purple-500 text-white px-2 py-1 rounded flex items-center gap-1">
                     <Plus size={14} /> Aggiungi
                   </button>
                 </div>
@@ -502,7 +503,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                         <Trash2 size={16} />
                       </button>
                       <div className="grid grid-cols-12 gap-2 mb-2">
-                        <input type="text" value={l.name} onChange={e => updateArrayField('landmarks', idx, 'name', e.target.value)} placeholder="Nome Landmark" className="col-span-5 bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600" />
+                        <input type="text" value={l.name} onChange={e => updateArrayField('landmarks', idx, 'name', e.target.value)} placeholder="Nuovo Landmark..." className="col-span-5 bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600" />
                         <input type="text" value={l.imageId || ''} onChange={e => updateArrayField('landmarks', idx, 'imageId', e.target.value)} placeholder="Image ID" className="col-span-3 bg-gray-800 text-blue-300 text-xs rounded px-2 py-1 border border-gray-600" />
                         <select value={l.type} onChange={e => updateArrayField('landmarks', idx, 'type', e.target.value)} className="col-span-3 bg-gray-800 text-white text-xs rounded px-1 py-1 border border-gray-600">
                           <option value="Military">Military</option><option value="Economic">Economic</option><option value="Defensive">Defensive</option><option value="Religious">Religious</option><option value="Technology">Technology</option>
