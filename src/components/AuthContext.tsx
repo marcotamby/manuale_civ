@@ -110,7 +110,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const userEmail = user?.email || 'guest';
     const favoritesKey = `aoe4_favorites_${userEmail}`;
     localStorage.setItem(favoritesKey, JSON.stringify(favorites));
-  }, [favorites]); // Removed user?.email to prevent saving stale favorites during user switch
+  }, [favorites]);
+
+  const syncFavoritesWithSupabase = async (userEmail: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_favorites')
+        .select('civ_id')
+        .eq('user_email', userEmail.toLowerCase());
+      
+      if (!error && data) {
+        const dbFavorites = data.map(f => f.civ_id);
+        const localEmail = userEmail.toLowerCase();
+        const favoritesKey = `aoe4_favorites_${localEmail}`;
+        const localFavorites = JSON.parse(localStorage.getItem(favoritesKey) || '[]');
+        
+        // Merge local and DB favorites
+        const merged = Array.from(new Set([...localFavorites, ...dbFavorites]));
+        
+        // Update state and local storage
+        setFavorites(merged);
+        localStorage.setItem(favoritesKey, JSON.stringify(merged));
+
+        // Sync local-only favorites back to DB
+        const localOnly = localFavorites.filter((f: string) => !dbFavorites.includes(f));
+        if (localOnly.length > 0) {
+          await supabase
+            .from('user_favorites')
+            .insert(localOnly.map((civId: string) => ({
+              user_email: localEmail,
+              civ_id: civId
+            })));
+        }
+      }
+    } catch (err) {
+      console.error('Error syncing favorites:', err);
+    }
+  };
+
+  // Sync favorites on mount if user is already logged in
+  useEffect(() => {
+    if (isAuthenticated && user?.email) {
+      syncFavoritesWithSupabase(user.email);
+    }
+  }, [isAuthenticated, !!user?.email]);
 
   const login = async (userData: UserData) => {
     const email = userData.email?.toLowerCase() || 'guest';
@@ -128,35 +171,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(`auth_user_rank_${email}`, savedRank);
     localStorage.setItem(`auth_user_nickname_${email}`, savedNickname);
 
-    // Fetch favorites from Supabase
+    // Sync favorites from Supabase
     if (userData.email) {
-      const { data, error } = await supabase
-        .from('user_favorites')
-        .select('civ_id')
-        .eq('user_email', userData.email.toLowerCase());
-      
-      if (!error && data) {
-        const dbFavorites = data.map(f => f.civ_id);
-        const localEmail = userData.email.toLowerCase();
-        const favoritesKey = `aoe4_favorites_${localEmail}`;
-        const localFavorites = JSON.parse(localStorage.getItem(favoritesKey) || '[]');
-        
-        // Merge local and DB favorites
-        const merged = Array.from(new Set([...localFavorites, ...dbFavorites]));
-        setFavorites(merged);
-        localStorage.setItem(favoritesKey, JSON.stringify(merged));
-
-        // Sync local-only favorites back to DB
-        const localOnly = localFavorites.filter((f: string) => !dbFavorites.includes(f));
-        if (localOnly.length > 0) {
-          await supabase
-            .from('user_favorites')
-            .insert(localOnly.map((civId: string) => ({
-              user_email: localEmail,
-              civ_id: civId
-            })));
-        }
-      }
+      await syncFavoritesWithSupabase(userData.email);
     }
   };
 
