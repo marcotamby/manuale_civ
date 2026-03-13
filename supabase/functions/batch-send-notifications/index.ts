@@ -69,6 +69,18 @@ serve(async (req) => {
       let itemsHtml = ''
       userSuggestions.forEach(s => {
         const isApp = s.status === 'implemented'
+        let suggestionDisplay = s.suggestion_text || '';
+        
+        // Handle Build Order JSON if applicable
+        if (s.section === 'build_order' && suggestionDisplay.startsWith('{')) {
+          try {
+            const boData = JSON.parse(suggestionDisplay);
+            suggestionDisplay = boData.title || suggestionDisplay;
+          } catch (e) {
+            // Fallback to raw text if parsing fails
+          }
+        }
+
         itemsHtml += `
           <div style="margin-bottom: 12px; padding: 12px; background-color: #f9fafb; border-radius: 8px; border-left: 4px solid ${isApp ? '#10b981' : '#ef4444'};">
             <div style="font-weight: bold; color: #111827; margin-bottom: 4px;">
@@ -76,6 +88,7 @@ serve(async (req) => {
             </div>
             <div style="font-size: 14px; color: #4b5563;">
               <strong>Sezione:</strong> ${s.section}<br/>
+              <strong>Testo:</strong> ${suggestionDisplay}<br/>
               ${!isApp && s.rejection_reason ? `<strong>Motivo:</strong> ${s.rejection_reason}` : ''}
             </div>
           </div>`
