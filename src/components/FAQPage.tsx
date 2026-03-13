@@ -532,6 +532,7 @@ export function FAQPage() {
         isVisible={toast.isVisible}
         message={toast.message}
         type={toast.type}
+        position="top-center"
         onClose={() => setToast({ ...toast, isVisible: false })}
       />
     </div>

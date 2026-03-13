@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { CheckCircle, XCircle, X } from 'lucide-react';
 
 export type ToastType = 'success' | 'error';
+export type ToastPosition = 'top-right' | 'top-center' | 'bottom-center';
 
 interface ToastProps {
   message: string;
@@ -9,9 +10,17 @@ interface ToastProps {
   isVisible: boolean;
   onClose: () => void;
   duration?: number;
+  position?: ToastPosition;
 }
 
-export function Toast({ message, type, isVisible, onClose, duration = 3000 }: ToastProps) {
+export function Toast({ 
+  message, 
+  type, 
+  isVisible, 
+  onClose, 
+  duration = 3000,
+  position = 'top-right' 
+}: ToastProps) {
   const [shouldRender, setShouldRender] = useState(isVisible);
 
   useEffect(() => {
@@ -31,8 +40,14 @@ export function Toast({ message, type, isVisible, onClose, duration = 3000 }: To
 
   if (!shouldRender) return null;
 
+  const positionClasses = {
+    'top-right': 'top-6 right-6',
+    'top-center': 'top-6 left-1/2 -translate-x-1/2',
+    'bottom-center': 'bottom-6 left-1/2 -translate-x-1/2'
+  };
+
   return (
-    <div className={`fixed top-6 right-6 z-[9999] transition-all duration-300 transform ${
+    <div className={`fixed z-[9999] transition-all duration-300 transform ${positionClasses[position]} ${
       isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-4 scale-95'
     }`}>
       <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border backdrop-blur-md ${
