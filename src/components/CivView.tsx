@@ -169,6 +169,13 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     }
   };
 
+  // Clear message when user logs out
+  useEffect(() => {
+    if (!user) {
+      setQaMessage(null);
+    }
+  }, [user]);
+
   useEffect(() => {
     if (activeTab === 'domande') {
       fetchQA();
