@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
-import { Trash2, Plus, User, CheckCircle } from 'lucide-react';
-import { Toast } from './Toast';
+import { Trash2, Plus, User, CheckCircle, XCircle, X } from 'lucide-react';
 import type { ToastType } from './Toast';
 
 interface SuggestionFormProps {
@@ -171,6 +170,21 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        {toast.isVisible && (
+          <div className={`p-4 rounded-xl border flex items-center justify-between animate-in zoom-in duration-300 ${
+            toast.type === 'success' 
+              ? 'bg-green-500/10 border-green-500/30 text-green-400' 
+              : 'bg-red-500/10 border-red-500/30 text-red-400'
+          }`}>
+            <div className="flex items-center gap-3">
+              {toast.type === 'success' ? <CheckCircle size={20} /> : <XCircle size={20} />}
+              <p className="text-sm font-medium">{toast.message}</p>
+            </div>
+            <button onClick={() => setToast({ ...toast, isVisible: false })} className="ml-4 opacity-50 hover:opacity-100">
+              <X size={16} />
+            </button>
+          </div>
+        )}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-1">Sezione da modificare</label>
           <select
@@ -346,12 +360,6 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
         )}
       </form>
 
-      <Toast
-        isVisible={toast.isVisible}
-        message={toast.message}
-        type={toast.type}
-        onClose={() => setToast({ ...toast, isVisible: false })}
-      />
     </div>
   );
 }
