@@ -199,12 +199,12 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
             <div className="flex items-center gap-3 md:gap-4 font-sans">
               {/* Active presence indicators - Only visible on Desktop */}
               {Object.keys(_activeAdmins).length > 0 && (
-                <div className="hidden md:flex items-center gap-2 px-2.5 py-1.5 bg-yellow-500/10 rounded-full border border-yellow-500/30 shadow-[0_0_15px_rgba(212,175,55,0.1)] shrink-0 whitespace-nowrap">
+                <div className="hidden md:flex items-center gap-2 px-3 py-2 bg-yellow-500/10 rounded-full border border-yellow-500/30 shadow-[0_0_15px_rgba(212,175,55,0.1)] shrink-0 whitespace-nowrap">
                   <div className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
                   </div>
-                  <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest leading-none">
+                  <span className="text-[11px] font-bold text-yellow-500 uppercase tracking-widest leading-none">
                     {Object.keys(_activeAdmins).length} {Object.keys(_activeAdmins).length === 1 ? 'Admin' : 'Admins'} LIVE
                   </span>
                 </div>
@@ -215,14 +215,14 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
                   (window as any).openProfileModal?.();
                   (window as any).clearNotifications?.();
                 }}
-                className="relative flex items-center gap-2 text-yellow-500 hover:opacity-80 transition-opacity group shrink-0"
+                className="relative flex items-center gap-3 text-yellow-500 hover:opacity-80 transition-opacity group shrink-0"
                 title="Il Tuo Profilo"
               >
-                <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30 group-hover:border-yellow-500/60 transition-colors overflow-hidden relative">
+                <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30 group-hover:border-yellow-500/60 transition-colors overflow-hidden relative">
                   {user?.rank && user.rank !== 'Unranked' ? (
-                    <img src={RANK_ICONS[user.rank]} alt={user.rank} className="w-6 h-6 object-contain" />
+                    <img src={RANK_ICONS[user.rank]} alt={user.rank} className="w-7 h-7 object-contain" />
                   ) : (
-                    <User size={16} />
+                    <User size={18} />
                   )}
                 </div>
                 {notificationCount > 0 && (
@@ -231,15 +231,15 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
                   </span>
                 )}
                 <div className="flex flex-col text-left">
-                  <span className="font-bold hidden md:block text-[10px] leading-none text-white/90 uppercase tracking-widest">Il Tuo Profilo</span>
-                  <span className="text-[9px] text-yellow-600 font-bold uppercase tracking-widest leading-none mt-1">{isSuperAdmin ? 'Admin' : 'Editor'}</span>
+                  <span className="font-bold hidden md:block text-xs leading-none text-white/90 uppercase tracking-widest">Il Tuo Profilo</span>
+                  <span className="text-[10px] text-yellow-600 font-bold uppercase tracking-widest leading-none mt-1">{isSuperAdmin ? 'Admin' : 'Editor'}</span>
                 </div>
               </button>
 
               {isAdmin && (
                 <button
                   onClick={onOpenAdminDashboard}
-                  className="relative text-[10px] text-yellow-500 hover:text-white transition-colors border border-yellow-500/20 px-2 py-1.5 rounded-lg hover:bg-yellow-500/10 font-bold tracking-widest uppercase flex items-center gap-1 shrink-0"
+                  className="relative text-[11px] md:text-xs text-yellow-500 hover:text-white transition-colors border border-yellow-500/20 px-3 py-2 rounded-lg hover:bg-yellow-500/10 font-bold tracking-widest uppercase flex items-center gap-1 shrink-0"
                 >
                   Pannello
                   {(pendingCount + pendingQaCount) > 0 && (
@@ -252,7 +252,7 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
 
               <button
                 onClick={logout}
-                className="text-[10px] text-gray-400 hover:text-white transition-colors border border-white/10 px-2 py-1.5 rounded-lg hover:bg-white/5 font-bold tracking-widest uppercase shrink-0"
+                className="text-[11px] md:text-xs text-gray-400 hover:text-white transition-colors border border-white/10 px-3 py-2 rounded-lg hover:bg-white/5 font-bold tracking-widest uppercase shrink-0"
               >
                 Esci
               </button>
