@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCivData } from './CivContext';
 import { CustomSelect } from './CustomSelect';
 import { Heart, BarChart2 } from 'lucide-react';
@@ -51,6 +51,17 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
       onCompareCivs(selectedForCompare);
     }
   };
+
+  useEffect(() => {
+    (window as any).resetHomeFilters = () => {
+      setDifficultyFilter('Tutte');
+      setIsCompareMode(false);
+      setSelectedForCompare([]);
+    };
+    return () => {
+      (window as any).resetHomeFilters = undefined;
+    };
+  }, []);
 
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full bg-[var(--color-brand-dark)]">

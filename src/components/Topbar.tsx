@@ -123,7 +123,10 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
         </a>
         <Link
           to="/faq"
-          onClick={() => (window as any).closeAllModals?.()}
+          onClick={() => {
+            (window as any).closeAllModals?.();
+            (window as any).resetHomeFilters?.();
+          }}
           className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/20 hover:border-yellow-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
           title="Domande Frequenti"
         >
@@ -145,7 +148,10 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
       {/* Center Title Area */}
       <Link 
         to="/" 
-        onClick={() => (window as any).closeAllModals?.()}
+        onClick={() => {
+          (window as any).closeAllModals?.();
+          (window as any).resetHomeFilters?.();
+        }}
         className="flex flex-col items-center justify-center text-center w-full md:w-1/3 group cursor-pointer hover:opacity-90 transition-opacity"
       >
         <h2 className="text-xs md:text-sm font-sackers font-bold text-yellow-500/90 tracking-[0.15em] uppercase mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
