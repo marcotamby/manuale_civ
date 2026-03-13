@@ -304,8 +304,8 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   if (!isOpen || (!isSuperAdmin && !isAdmin)) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 md:p-4 bg-black/80 backdrop-blur-sm shadow-2xl">
-      <div className="bg-[#0f1423] border border-[#D4AF37]/30 rounded-xl md:rounded-2xl w-full max-w-4xl max-h-[95vh] md:max-h-[90vh] flex flex-col shadow-[0_0_40px_rgba(0,0,0,0.8)] filter drop-shadow-2xl relative overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-start md:items-center justify-center p-2 md:p-4 bg-black/80 backdrop-blur-sm shadow-2xl overflow-y-auto pt-4 md:pt-0">
+      <div className="bg-[#0f1423] border border-[#D4AF37]/30 rounded-xl md:rounded-2xl w-full max-w-4xl min-h-0 max-h-none md:max-h-[90vh] flex flex-col shadow-[0_0_40px_rgba(0,0,0,0.8)] filter drop-shadow-2xl relative overflow-hidden mb-4 md:mb-0">
 
         {/* Rejection Modal Overlay */}
         {rejectionModalSugg && (
