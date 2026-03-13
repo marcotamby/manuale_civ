@@ -364,16 +364,26 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                {isSuperAdmin && (
                  <button
                    onClick={() => setActiveTab('proposte')}
-                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'proposte' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'proposte' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
                  >
                    Proposte
+                   {suggestions.length > 0 && (
+                     <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] rounded-full">
+                       {suggestions.length}
+                     </span>
+                   )}
                  </button>
                )}
                <button
                  onClick={() => setActiveTab('qa')}
-                 className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'qa' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                 className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'qa' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
                >
                  Q&A
+                 {(questions.length + answers.length) > 0 && (
+                   <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-yellow-500 text-black text-[10px] rounded-full font-black">
+                     {questions.length + answers.length}
+                   </span>
+                 )}
                </button>
             </div>
             <button
