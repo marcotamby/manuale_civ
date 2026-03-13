@@ -60,8 +60,8 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
   if (!isVisible || favoriteCount === null || favoriteCount < 1) return null;
 
   return (
-    <div className="fixed bottom-24 right-4 z-50 animate-in slide-in-from-right-10 fade-in duration-700 max-w-[280px] sm:max-w-xs">
-      <div className="glass-premium p-4 rounded-2xl border border-yellow-500/30 shadow-[0_10px_40px_rgba(0,0,0,0.4),0_0_20px_rgba(234,179,8,0.1)] relative overflow-hidden group">
+    <div className="fixed bottom-20 sm:bottom-24 right-4 z-50 animate-in slide-in-from-right-10 fade-in duration-700 max-w-[220px] sm:max-w-xs">
+      <div className="glass-premium p-3 sm:p-4 rounded-2xl border border-yellow-500/30 shadow-[0_10px_40px_rgba(0,0,0,0.4),0_0_20px_rgba(234,179,8,0.1)] relative overflow-hidden group">
         {/* Decorative background glow */}
         <div className="absolute top-0 right-0 w-16 h-16 bg-yellow-500/10 blur-2xl rounded-full -mr-8 -mt-8 animate-pulse"></div>
         
@@ -72,9 +72,9 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
           <X size={14} />
         </button>
 
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-full bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center shrink-0">
-            <Heart size={20} className="text-yellow-500 fill-yellow-500/20 group-hover:scale-110 transition-transform" />
+        <div className="flex items-start gap-2 sm:gap-3">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center shrink-0">
+            <Heart size={16} className="text-yellow-500 fill-yellow-500/20 group-hover:scale-110 transition-transform sm:w-[20px] sm:h-[20px]" />
           </div>
           
           <div className="flex-1">
@@ -84,11 +84,11 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
               <Users size={10} className="text-gray-500" />
             </div>
             
-            <p className="text-sm text-gray-200 leading-snug">
+            <p className="text-[11px] sm:text-sm text-gray-200 leading-snug">
               <span className="font-bold text-white">{favoriteCount} {favoriteCount === 1 ? 'utente ha' : 'utenti hanno'}</span> aggiunto i <span className="text-yellow-400 font-bold">{civName}</span> ai preferiti! 
             </p>
             
-            <p className="text-[11px] text-gray-400 mt-2 mb-3 leading-tight italic">
+            <p className="text-[9px] sm:text-[11px] text-gray-400 mt-1.5 sm:mt-2 mb-2 sm:mb-3 leading-tight italic">
               Seguila anche tu per non perdere i nuovi video e build order!
             </p>
 

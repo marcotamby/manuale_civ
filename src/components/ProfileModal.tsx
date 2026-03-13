@@ -173,7 +173,6 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
         localStorage.setItem(lastSeenKey, JSON.stringify(newData));
         // Refresh local count and topbar
         (window as any).refreshNotificationCount?.();
-        onClose();
     };
 
     useEffect(() => {
