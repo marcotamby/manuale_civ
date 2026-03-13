@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
+import { Toast } from './Toast';
+import type { ToastType } from './Toast';
 
 interface FAQItem {
   id?: string;
@@ -106,6 +108,11 @@ export function FAQPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+  const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
+    isVisible: false,
+    message: '',
+    type: 'success'
+  });
 
   const toggleItem = (sIdx: number, iIdx: number) => {
     if (window.innerWidth >= 768) return; // Don't toggle on desktop
@@ -236,9 +243,18 @@ export function FAQPage() {
 
       setIsEditing(false);
       fetchFAQ();
+      setToast({
+        isVisible: true,
+        message: 'FAQ salvate con successo!',
+        type: 'success'
+      });
     } catch (err) {
       console.error('Error saving FAQ:', err);
-      alert('Errore nel salvataggio. Controlla la console.');
+      setToast({
+        isVisible: true,
+        message: 'Errore nel salvataggio delle FAQ',
+        type: 'error'
+      });
     } finally {
       setSaveLoading(false);
     }
@@ -512,6 +528,12 @@ export function FAQPage() {
           </div>
         </footer>
       </div>
+      <Toast
+        isVisible={toast.isVisible}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ ...toast, isVisible: false })}
+      />
     </div>
   );
 }
