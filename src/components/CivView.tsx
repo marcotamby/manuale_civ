@@ -13,21 +13,7 @@ import { supabase } from '../lib/supabaseClient';
 import { ResourceText } from './ResourceText';
 import { ExternalLink } from 'lucide-react';
 import { SocialProofPopup } from './SocialProofPopup';
-
-const RANK_ICONS: Record<string, string> = {
-  'Bronze I': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_bronze_1-a193ea93b70b33ed636f2356854abe66585ef4d901dcef5a5248739970d03ccc.svg',
-  'Bronze II': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_bronze_2-a193ea93b70b33ed636f2356854abe66585ef4d901dcef5a5248739970d03ccc.svg',
-  'Bronze III': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_bronze_3-a193ea93b70b33ed636f2356854abe66585ef4d901dcef5a5248739970d03ccc.svg',
-  'Silver I': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_silver_1-af994caf7a9461b35d33d8263328b152ffb146ef8882118184c5e4e3964c9337.svg',
-  'Silver II': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_silver_2-af994caf7a9461b35d33d8263328b152ffb146ef8882118184c5e4e3964c9337.svg',
-  'Silver III': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_silver_3-af994caf7a9461b35d33d8263328b152ffb146ef8882118184c5e4e3964c9337.svg',
-  'Gold I': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_gold_1-a42fe36b5df89a42efaf489e6ef10d7c5546fd36a77c5977ce34dca3e822b420.svg',
-  'Gold II': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_gold_2-e1e4843093c7120ad707e9e6ff0f0674e1db471491ef8694b72271dc08478af8.svg',
-  'Gold III': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_gold_3-68164da46a35c3c0229a4d3e8dd065957198b8f81df268ac667aa3ce642ff4d5.svg',
-  'Platinum I': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_platinum_1-55fc3aa3a2a72c71fb3eee19f251d1db6bd66f8d6a39977a222ec2c74ac6bb77.svg',
-  'Diamond I': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_diamond_1-f298786d7d0c5af34efc552724d1e6962e143f05326f6092863a3542647987be.svg',
-  'Conqueror I': 'https://static.aoe4world.com/assets/rank_levels/season_3/solo_conqueror_1-77cc5eae2e96a4b63b00a46fdf16567a134a81c0b39fa88e4e33a8c95a8071c2.svg',
-};
+import { RANK_ICONS } from './ProfileModal';
 
 const getYoutubeId = (url: string) => {
   if (!url) return null;
