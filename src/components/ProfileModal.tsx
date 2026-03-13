@@ -267,12 +267,12 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                             <div className="pt-2">
                                 <button
                                     onClick={handleSaveProfile}
-                                    disabled={!hasChanges}
+                                    disabled={!hasChanges && !showSaveSuccess}
                                     className={`w-full py-2.5 rounded-lg text-sm font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
-                                        hasChanges 
-                                            ? 'bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_15px_rgba(37,99,235,0.3)]' 
-                                            : showSaveSuccess 
-                                                ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                        showSaveSuccess
+                                            ? 'bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]'
+                                            : hasChanges 
+                                                ? 'bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_15px_rgba(37,99,235,0.3)]' 
                                                 : 'bg-white/5 text-gray-500 cursor-not-allowed border border-white/5'
                                     }`}
                                 >

@@ -111,14 +111,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [favorites]); // Removed user?.email to prevent saving stale favorites during user switch
 
   const login = (userData: UserData) => {
-    const savedRank = localStorage.getItem('auth_user_rank') || 'Unranked';
-    const savedNickname = localStorage.getItem('auth_user_nickname') || '';
+    const email = userData.email?.toLowerCase() || 'guest';
+    const savedRank = localStorage.getItem(`auth_user_rank_${email}`) || localStorage.getItem('auth_user_rank') || 'Unranked';
+    const savedNickname = localStorage.getItem(`auth_user_nickname_${email}`) || localStorage.getItem('auth_user_nickname') || '';
+    
     const enrichedUser = { ...userData, rank: savedRank, nickname: savedNickname };
 
     setIsAuthenticated(true);
     setUser(enrichedUser);
     localStorage.setItem('auth_user', JSON.stringify(enrichedUser));
     checkRoles(enrichedUser);
+
+    // Migration: save back to per-user keys if using old global keys
+    localStorage.setItem(`auth_user_rank_${email}`, savedRank);
+    localStorage.setItem(`auth_user_nickname_${email}`, savedNickname);
   };
 
   const logout = () => {
@@ -129,6 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setFavorites([]); // Clear favorites state on logout
     localStorage.removeItem('auth_user');
+    // We don't remove rank/nickname keys as they are per-user in localStorage
   };
 
   const updateRank = (rank: string) => {
@@ -138,10 +145,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateProfile = (data: { rank?: string; nickname?: string }) => {
     if (user) {
       const updatedUser = { ...user, ...data };
+      const email = user.email?.toLowerCase() || 'guest';
+      
       setUser(updatedUser);
       localStorage.setItem('auth_user', JSON.stringify(updatedUser));
-      if (data.rank) localStorage.setItem('auth_user_rank', data.rank);
-      if (data.nickname !== undefined) localStorage.setItem('auth_user_nickname', data.nickname);
+      
+      if (data.rank) {
+        localStorage.setItem(`auth_user_rank_${email}`, data.rank);
+        // Clear legacy global key
+        localStorage.removeItem('auth_user_rank');
+      }
+      if (data.nickname !== undefined) {
+        localStorage.setItem(`auth_user_nickname_${email}`, data.nickname);
+        // Clear legacy global key
+        localStorage.removeItem('auth_user_nickname');
+      }
     }
   };
 

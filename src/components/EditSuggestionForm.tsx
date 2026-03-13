@@ -296,7 +296,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                 }`}>
                   {isSigned && <CheckCircle size={14} className="text-black" />}
                 </div>
-                <span className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors">Firmati</span>
+                <span className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors">Firma</span>
               </div>
               {!user?.nickname && (
                 <span className="text-[10px] text-gray-500 italic">Completa il profilo per firmare</span>
