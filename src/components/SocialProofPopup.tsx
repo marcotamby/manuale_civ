@@ -60,45 +60,43 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
   if (!isVisible || favoriteCount === null || favoriteCount < 1) return null;
 
   return (
-    <div className="fixed bottom-20 sm:bottom-24 right-4 z-50 animate-in slide-in-from-right-10 fade-in duration-700 max-w-[220px] sm:max-w-xs">
+    <div className="fixed bottom-20 sm:bottom-24 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-4 z-50 animate-in slide-in-from-bottom-10 sm:slide-in-from-right-10 fade-in duration-700 w-[calc(100%-32px)] sm:w-auto sm:max-w-xs">
       <div className="glass-premium p-3 sm:p-4 rounded-2xl border border-yellow-500/30 shadow-[0_10px_40px_rgba(0,0,0,0.4),0_0_20px_rgba(234,179,8,0.1)] relative overflow-hidden group">
         {/* Decorative background glow */}
         <div className="absolute top-0 right-0 w-16 h-16 bg-yellow-500/10 blur-2xl rounded-full -mr-8 -mt-8 animate-pulse"></div>
         
         <button 
           onClick={handleDismiss}
-          className="absolute top-2 right-2 p-1 text-gray-500 hover:text-white transition-colors"
+          className="absolute top-2 right-2 p-1 text-gray-500 hover:text-white transition-colors z-10"
         >
           <X size={14} />
         </button>
 
-        <div className="flex items-start gap-2 sm:gap-3">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center shrink-0">
-            <Heart size={16} className="text-yellow-500 fill-yellow-500/20 group-hover:scale-110 transition-transform sm:w-[20px] sm:h-[20px]" />
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center shrink-0">
+            <Heart size={20} className="text-yellow-500 fill-yellow-500/20 group-hover:scale-110 transition-transform" />
           </div>
           
-          <div className="flex-1">
-            <div className="flex items-center gap-1.5 mb-1">
-              <span className="text-xs font-black text-yellow-500 uppercase tracking-widest">Community</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <span className="text-[10px] font-black text-yellow-500 uppercase tracking-widest">Community</span>
               <div className="h-1 w-1 rounded-full bg-gray-600"></div>
               <Users size={10} className="text-gray-500" />
             </div>
             
-            <p className="text-[11px] sm:text-sm text-gray-200 leading-snug">
-              <span className="font-bold text-white">{favoriteCount} {favoriteCount === 1 ? 'utente ha' : 'utenti hanno'}</span> aggiunto i <span className="text-yellow-400 font-bold">{civName}</span> ai preferiti! 
+            <p className="text-xs sm:text-sm text-gray-200 leading-tight">
+              <span className="font-bold text-white">{favoriteCount} {favoriteCount === 1 ? 'utente' : 'utenti'}</span> hanno scelto i <span className="text-yellow-400 font-bold">{civName}</span>! 
+              <span className="hidden sm:inline text-[11px] text-gray-400 ml-2 italic">Seguila anche tu!</span>
             </p>
-            
-            <p className="text-[9px] sm:text-[11px] text-gray-400 mt-1.5 sm:mt-2 mb-2 sm:mb-3 leading-tight italic">
-              Seguila anche tu per non perdere i nuovi video e build order!
-            </p>
-
-            <button
-              onClick={handleFollow}
-              className="w-full py-2 bg-yellow-600/20 hover:bg-yellow-600/30 border border-yellow-500/40 rounded-xl text-xs font-black text-yellow-500 transition-all active:scale-95 flex items-center justify-center gap-2"
-            >
-              <Bell size={12} /> SEGUI QUESTA CIVILTÀ
-            </button>
           </div>
+
+          <button
+            onClick={handleFollow}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-600/20 hover:bg-yellow-600/30 border border-yellow-500/40 rounded-xl text-[10px] font-black text-yellow-500 transition-all active:scale-95 shrink-0"
+          >
+            <Bell size={12} className="shrink-0" />
+            <span className="hidden xs:inline">SEGUI</span>
+          </button>
         </div>
       </div>
 

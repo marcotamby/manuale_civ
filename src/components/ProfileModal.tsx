@@ -156,7 +156,15 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     };
 
     const lastSeenKey = user?.email ? `lastSeenCounts_${user.email}` : null;
-    const lastSeenData = lastSeenKey ? JSON.parse(localStorage.getItem(lastSeenKey) || '{}') : {};
+    const [lastSeenData, setLastSeenData] = useState<Record<string, { bo: number, video: number }>>(() => 
+        lastSeenKey ? JSON.parse(localStorage.getItem(lastSeenKey) || '{}') : {}
+    );
+
+    const hasUnread = lastSeenKey && favorites.some(favId => {
+        const civ = civilizations.find((c: any) => c.id === favId);
+        const stored = lastSeenData[favId] || { bo: 0, video: 0 };
+        return civ && ((civ.buildOrders?.length || 0) > stored.bo || (civ.videos?.length || 0) > stored.video);
+    });
 
     const markAllAsRead = () => {
         if (!lastSeenKey) return;
@@ -171,7 +179,8 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
             }
         });
         localStorage.setItem(lastSeenKey, JSON.stringify(newData));
-        // Refresh local count and topbar
+        setLastSeenData(newData);
+        // Refresh topbar
         (window as any).refreshNotificationCount?.();
     };
 
@@ -316,7 +325,11 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                             {favorites.length > 0 && (
                                 <button
                                     onClick={markAllAsRead}
-                                    className="text-[10px] text-gray-500 hover:text-white transition-colors uppercase font-bold tracking-tighter"
+                                    className={`text-[10px] uppercase font-bold tracking-tight transition-colors ${
+                                        hasUnread 
+                                            ? 'text-blue-400 hover:text-blue-300' 
+                                            : 'text-gray-600 cursor-default'
+                                    }`}
                                 >
                                     Segna tutti come letti
                                 </button>
