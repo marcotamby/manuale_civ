@@ -42,14 +42,28 @@ function App() {
     (window as any).openProfileModal = () => setIsProfileModalOpen(true);
   }, []);
 
+  const prevPathRef = useRef(location.pathname);
   useEffect(() => {
-    // Scroll to top on route change
-    const selectors = ['.main-content-area', '.civ-view-container'];
-    selectors.forEach(selector => {
-      const container = document.querySelector(selector);
-      if (container) container.scrollTop = 0;
-    });
-    window.scrollTo(0, 0);
+    const prevPath = prevPathRef.current;
+    const currentPath = location.pathname;
+
+    // Skip scroll to top if we are just switching tabs inside the same civ
+    const isCivPath = (path: string) => path.startsWith('/civ/');
+    const getCivId = (path: string) => path.split('/')[2];
+    
+    const isSameCiv = isCivPath(prevPath) && isCivPath(currentPath) && getCivId(prevPath) === getCivId(currentPath);
+
+    if (!isSameCiv) {
+      // Scroll to top on route change
+      const selectors = ['.main-content-area', '.civ-view-container'];
+      selectors.forEach(selector => {
+        const container = document.querySelector(selector);
+        if (container) container.scrollTop = 0;
+      });
+      window.scrollTo(0, 0);
+    }
+    
+    prevPathRef.current = currentPath;
   }, [location.pathname]);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

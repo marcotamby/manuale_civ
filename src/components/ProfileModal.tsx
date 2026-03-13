@@ -152,7 +152,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
             rank: pendingRank
         });
         setShowSaveSuccess(true);
-        setTimeout(() => setShowSaveSuccess(false), 3000);
+        setTimeout(() => setShowSaveSuccess(false), 1000);
     };
 
     const lastSeenKey = user?.email ? `lastSeenCounts_${user.email}` : null;
@@ -277,7 +277,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                     }`}
                                 >
                                     {showSaveSuccess ? (
-                                        <>Salvato! ✅</>
+                                        <>Salvato!</>
                                     ) : (
                                         <>Salva Modifiche</>
                                     )}
