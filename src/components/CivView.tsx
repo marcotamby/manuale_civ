@@ -426,7 +426,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                     value={answerText}
                     onChange={(e) => setAnswerText(e.target.value)}
                     placeholder="Scrivi una risposta..."
-                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white placeholder:text-gray-600 focus:border-blue-500/50 outline-none transition-all text-xs min-h-[60px] resize-none"
+                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white placeholder:text-gray-600 focus:border-blue-500/50 outline-none transition-all text-xs min-h-[60px] resize-y"
                     autoFocus
                   />
                   <div className="flex justify-end">
@@ -1004,7 +1004,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                       value={questionText}
                       onChange={(e) => setQuestionText(e.target.value)}
                       placeholder="Fai una domanda relativa a questa civiltà. Sii il più specifico possibile, così che i giocatori più esperti possano risponderti in maniera dettagliata e darti una mano!"
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:border-yellow-500/50 outline-none transition-all text-sm min-h-[100px] resize-none"
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:border-yellow-500/50 outline-none transition-all text-sm min-h-[100px] resize-y"
                     />
                     <div className="flex justify-end">
                       <button
@@ -1097,7 +1097,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                 value={answerText}
                                 onChange={(e) => setAnswerText(e.target.value)}
                                 placeholder="Scrivi la tua risposta..."
-                                className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:border-blue-500/50 outline-none transition-all text-sm min-h-[80px] resize-none"
+                                className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:border-blue-500/50 outline-none transition-all text-sm min-h-[80px] resize-y"
                                 autoFocus
                               />
                               <div className="flex justify-end">

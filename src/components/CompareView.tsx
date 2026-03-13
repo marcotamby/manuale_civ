@@ -121,7 +121,7 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
         >
           <X size={24} className="text-gray-400" />
         </button>
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex flex-col md:flex-row items-center gap-3 mb-2">
           <BarChart2 className="text-blue-500" size={32} />
           <h1 className="text-3xl font-bold text-white">Confronto Civiltà</h1>
         </div>
