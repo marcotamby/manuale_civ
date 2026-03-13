@@ -135,14 +135,14 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     const [pendingRank, setPendingRank] = useState(user?.rank || 'Unranked');
     const [showSaveSuccess, setShowSaveSuccess] = useState(false);
 
-    // Sync local state when user or modal state changes
+    // Sync local state ONLY when modal opens
     useEffect(() => {
         if (isOpen) {
             setPendingNickname(user?.nickname || '');
             setPendingRank(user?.rank || 'Unranked');
             setShowSaveSuccess(false);
         }
-    }, [isOpen, user?.nickname, user?.rank]);
+    }, [isOpen]); // Only sync on open, not when user context changes while open
 
     const hasChanges = pendingNickname !== (user?.nickname || '') || pendingRank !== (user?.rank || 'Unranked');
 

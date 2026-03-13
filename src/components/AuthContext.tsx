@@ -74,11 +74,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsAdmin(true);
       setIsSuperAdmin(true);
       setIsAuthenticated(true);
+      const email = 'admin@localhost';
       const devUser = {
         name: 'Local Admin (Dev)',
-        email: 'admin@localhost',
-        rank: localStorage.getItem('auth_user_rank') || 'Unranked',
-        nickname: localStorage.getItem('auth_user_nickname') || ''
+        email,
+        rank: localStorage.getItem(`auth_user_rank_${email}`) || localStorage.getItem('auth_user_rank') || 'Unranked',
+        nickname: localStorage.getItem(`auth_user_nickname_${email}`) || localStorage.getItem('auth_user_nickname') || ''
       };
       setUser(devUser);
       checkRoles(devUser);
