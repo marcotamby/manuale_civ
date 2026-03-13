@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   HelpCircle, Info, Layers, Zap, Heart, GitPullRequest, ArrowLeft, 
-  Users, Shield, PlayCircle, BookOpen, Sword, Edit3, Save, Plus, Trash2, X, ChevronUp, ChevronDown, Loader2
+  Users, Shield, PlayCircle, BookOpen, Sword, Edit3, Save, Plus, Trash2, X, ChevronUp, ChevronDown, Loader2, CheckCircle
 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
@@ -108,6 +108,7 @@ export function FAQPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+  const [isSaveSuccess, setIsSaveSuccess] = useState(false);
   const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
     isVisible: false,
     message: '',
@@ -240,14 +241,15 @@ export function FAQPage() {
           if (iErr) throw iErr;
         }
       }
-
-      setIsEditing(false);
+      
+      setIsSaveSuccess(true);
       fetchFAQ();
-      setToast({
-        isVisible: true,
-        message: 'FAQ salvate con successo!',
-        type: 'success'
-      });
+      
+      setTimeout(() => {
+        setIsEditing(false);
+        setIsSaveSuccess(false);
+      }, 1000);
+
     } catch (err) {
       console.error('Error saving FAQ:', err);
       setToast({
@@ -292,11 +294,15 @@ export function FAQPage() {
                   </button>
                   <button 
                     onClick={handleSave}
-                    disabled={saveLoading}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500 transition-all text-xs font-bold uppercase tracking-wider shadow-lg shadow-green-600/20 disabled:opacity-50"
+                    disabled={saveLoading || isSaveSuccess}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all text-xs font-bold uppercase tracking-wider shadow-lg disabled:opacity-50 ${
+                      isSaveSuccess 
+                        ? 'bg-green-500 text-white shadow-green-500/40 scale-105' 
+                        : 'bg-green-600 text-white hover:bg-green-500 shadow-green-600/20'
+                    }`}
                   >
-                    {saveLoading ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
-                    Salva
+                    {saveLoading ? <Loader2 className="animate-spin" size={16} /> : isSaveSuccess ? <CheckCircle size={16} className="animate-in zoom-in" /> : <Save size={16} />}
+                    {isSaveSuccess ? 'Salvato' : 'Salva'}
                   </button>
                 </>
               ) : (
