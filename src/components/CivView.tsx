@@ -8,7 +8,7 @@ import { UnitGrid } from './UnitGrid';
 import { MatchupsTable } from './MatchupsTable';
 import { AdminCivEditorModal } from './AdminCivEditorModal';
 import type { Civilization } from '../data/aoe4Data';
-import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight, Clock, MessageSquare, Send, UserCircle, CheckCircle, XCircle, X, Loader2 } from 'lucide-react';
+import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight, Clock, MessageSquare, Send, UserCircle, CheckCircle, XCircle, X, Loader2, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { ResourceText } from './ResourceText';
 import { ExternalLink } from 'lucide-react';
@@ -144,28 +144,49 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const fetchQA = async () => {
     try {
       setQaLoading(true);
-      const { data: qData, error: qError } = await supabase
+      const { data, error } = await supabase
         .from('questions')
-        .select('*, answers(*)')
+        .select(`
+          *,
+          answers:answers(*)
+        `)
         .eq('civ_id', civId)
         .eq('status', 'approved')
         .order('created_at', { ascending: false });
 
-      if (qError) throw qError;
-      
-      // Filter approved answers and sort them
-      const sortedData = (qData || []).map(q => ({
+      if (error) throw error;
+
+      // Filter approved answers inside approved questions
+      const filteredData = data.map(q => ({
         ...q,
         answers: (q.answers || [])
           .filter((a: any) => a.status === 'approved')
           .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
       }));
 
-      setQuestions(sortedData);
+      setQuestions(filteredData);
     } catch (err) {
       console.error('Error fetching Q&A:', err);
     } finally {
-      setQaLoading(false);
+      setQaLoading(true); // Small delay to prevent layout shift
+      setTimeout(() => setQaLoading(false), 200);
+    }
+  };
+
+  const handleDeleteQA = async (id: string, type: 'question' | 'answer') => {
+    if (!isAdmin || !confirm(`Sei sicuro di voler eliminare questa ${type === 'question' ? 'domanda' : 'risposta'}?`)) return;
+
+    try {
+      const { error } = await supabase
+        .from(type === 'question' ? 'questions' : 'answers')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      fetchQA();
+    } catch (err) {
+      console.error(`Error deleting ${type}:`, err);
+      alert('Errore durante l\'eliminazione');
     }
   };
 
@@ -833,12 +854,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               ) : questions.length > 0 ? (
                 questions.map((q) => (
                   <div key={q.id} className="space-y-4">
-                     {/* Question Card */}
-                     <div className="glass p-6 rounded-2xl border border-white/10 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                          <MessageSquare size={64} />
-                        </div>
-                        <div className="flex items-start gap-4 mb-4">
+                      {/* Question Card */}
+                      <div className="glass p-6 rounded-2xl border border-white/10 relative overflow-hidden group/q">
+                         <div className="flex items-start gap-4 mb-4">
                            <div className="shrink-0 flex flex-col items-center gap-1">
                               <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
                                 {q.user_rank && getRankIcon(q.user_rank) ? (
@@ -849,10 +867,19 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                               </div>
                            </div>
                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
+                               <div className="flex items-center gap-2 mb-1">
                                 <span className="text-sm font-black text-yellow-500 uppercase tracking-tight">{q.user_nickname}</span>
                                 <span className="text-[10px] text-gray-500 font-bold px-1.5 py-0.5 bg-white/5 rounded border border-white/5 uppercase">{q.user_rank}</span>
-                                <span className="text-[10px] text-gray-600 ml-auto">{new Date(q.created_at).toLocaleDateString('it-IT')}</span>
+                                <span className="text-[10px] text-gray-600">{new Date(q.created_at).toLocaleDateString('it-IT')}</span>
+                                {isAdmin && (
+                                  <button 
+                                    onClick={() => handleDeleteQA(q.id, 'question')}
+                                    className="ml-auto opacity-0 group-hover/q:opacity-100 p-1.5 text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                                    title="Elimina domanda"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                )}
                               </div>
                               <p className="text-white text-base leading-relaxed">{q.question_text}</p>
                            </div>
@@ -905,7 +932,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                      {/* Answers List */}
                      <div className="ml-6 md:ml-12 space-y-3">
                         {q.answers && q.answers.map((a: any) => (
-                           <div key={a.id} className="glass p-4 rounded-xl border border-white/5 bg-white/[0.01]">
+                           <div key={a.id} className="glass p-4 rounded-xl border border-white/5 bg-white/[0.01] group/a">
                               <div className="flex items-start gap-3">
                                 <div className="shrink-0">
                                   <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
@@ -920,7 +947,16 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                   <div className="flex items-center gap-2 mb-1">
                                     <span className="text-xs font-bold text-blue-400 uppercase tracking-tight">{a.user_nickname}</span>
                                     <span className="text-[9px] text-gray-500 font-bold px-1 py-0.5 bg-white/5 rounded border border-white/5 uppercase">{a.user_rank}</span>
-                                    <span className="text-[9px] text-gray-600 ml-auto">{new Date(a.created_at).toLocaleDateString('it-IT')}</span>
+                                    <span className="text-[9px] text-gray-600">{new Date(a.created_at).toLocaleDateString('it-IT')}</span>
+                                    {isAdmin && (
+                                      <button 
+                                        onClick={() => handleDeleteQA(a.id, 'answer')}
+                                        className="ml-auto opacity-0 group-hover/a:opacity-100 p-1 text-red-500 hover:bg-red-500/10 rounded transition-all"
+                                        title="Elimina risposta"
+                                      >
+                                        <Trash2 size={12} />
+                                      </button>
+                                    )}
                                   </div>
                                   <p className="text-gray-300 text-sm leading-relaxed">{a.answer_text}</p>
                                 </div>
