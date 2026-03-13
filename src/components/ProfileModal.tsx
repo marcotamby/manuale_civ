@@ -210,8 +210,8 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[80] flex items-start sm:items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300 overflow-y-auto pt-20 sm:pt-4">
-            <div className="bg-[#0f1423] border border-blue-500/30 rounded-2xl w-full max-w-2xl my-32 sm:my-8 flex flex-col shadow-[0_0_50px_rgba(37,99,235,0.2)] relative">
+        <div className="fixed inset-0 z-[80] flex items-start justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300 overflow-y-auto pt-[280px] sm:pt-[200px]">
+            <div className="bg-[#0f1423] border border-blue-500/30 rounded-2xl w-full max-w-2xl mb-20 flex flex-col shadow-[0_0_50px_rgba(37,99,235,0.2)] relative">
 
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-white/10 bg-gradient-to-r from-[#0d1424] to-[#1a1c32] rounded-t-2xl shrink-0">
