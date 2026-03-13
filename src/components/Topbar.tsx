@@ -189,7 +189,7 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
           <div className="h-px w-12 bg-gradient-to-l from-transparent to-yellow-500/50"></div>
         </div>
         <p className="text-xs text-gray-400/90 italic hidden sm:block font-serif tracking-wider">
-          Scegli la tua civiltà e domina il campo di battaglia
+          Benvenuto sul sito dedicato alle guide e strategie per ogni civiltà di AoE IV!
         </p>
       </Link>
 
