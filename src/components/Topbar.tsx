@@ -102,7 +102,7 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
   }, [favorites, civilizations, isAuthenticated, user?.email, refreshTrigger]);
 
   return (
-    <div className="w-full bg-gradient-to-r from-[#0d1424] via-[#1a1c32] to-[#0d1424] border-b border-yellow-500/20 flex flex-col md:flex-row items-center justify-between px-4 py-4 md:pl-14 md:pr-[73px] md:py-5 z-10 shrink-0 gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative overflow-hidden">
+    <div className="w-full bg-gradient-to-r from-[#0d1424] via-[#1a1c32] to-[#0d1424] border-b border-yellow-500/20 flex flex-col md:flex-row items-center justify-between px-4 py-4 md:pl-14 md:pr-[73px] md:py-5 z-[70] shrink-0 gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative overflow-hidden">
 
       {/* Decorative top border glow effect */}
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent"></div>
@@ -123,6 +123,7 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
         </a>
         <Link
           to="/faq"
+          onClick={() => (window as any).closeAllModals?.()}
           className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/20 hover:border-yellow-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
           title="Domande Frequenti"
         >
@@ -142,7 +143,11 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
       </div>
 
       {/* Center Title Area */}
-      <Link to="/" className="flex flex-col items-center justify-center text-center w-full md:w-1/3 group cursor-pointer hover:opacity-90 transition-opacity">
+      <Link 
+        to="/" 
+        onClick={() => (window as any).closeAllModals?.()}
+        className="flex flex-col items-center justify-center text-center w-full md:w-1/3 group cursor-pointer hover:opacity-90 transition-opacity"
+      >
         <h2 className="text-xs md:text-sm font-sackers font-bold text-yellow-500/90 tracking-[0.15em] uppercase mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
           Age of Empires IV
         </h2>

@@ -38,8 +38,13 @@ function App() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   useEffect(() => {
-    // Expose method to Topbar via window (quickest way without moving state up)
+    // Expose methods to Topbar via window (quickest way without moving state up)
     (window as any).openProfileModal = () => setIsProfileModalOpen(true);
+    (window as any).closeAllModals = () => {
+      setIsProfileModalOpen(false);
+      setIsAdminDashboardOpen(false);
+      setIsSidebarOpen(false);
+    };
   }, []);
 
   const prevPathRef = useRef(location.pathname);

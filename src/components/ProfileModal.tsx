@@ -325,12 +325,14 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                             {favorites.length > 0 && (
                                 <button
                                     onClick={markAllAsRead}
-                                    className={`text-[10px] uppercase font-bold tracking-tight transition-colors ${
+                                    disabled={!hasUnread}
+                                    className={`flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-tight transition-all py-1 px-2 rounded-md ${
                                         hasUnread 
-                                            ? 'text-blue-400 hover:text-blue-300' 
-                                            : 'text-gray-600 cursor-default'
+                                            ? 'text-blue-400 hover:text-white hover:bg-blue-500/20 underline underline-offset-4 decoration-blue-500/50' 
+                                            : 'text-gray-600 cursor-default opacity-50'
                                     }`}
                                 >
+                                    {hasUnread && <div className="w-1 h-1 rounded-full bg-blue-400 animate-pulse" />}
                                     Segna tutti come letti
                                 </button>
                             )}
