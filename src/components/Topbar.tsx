@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Link } from 'react-router-dom';
 import { RANK_ICONS } from './ProfileModal';
-import { Coffee, Radio as _Radio, HelpCircle } from 'lucide-react';
+import { Coffee, Radio as _Radio, HelpCircle, LogOut } from 'lucide-react';
 import { usePresence } from './PresenceContext';
 
 export type FilterType = 'Tutte' | 'Fanteria' | 'Cavalleria' | 'Arcieri' | 'Assedio';
@@ -25,6 +25,7 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
   const [pendingCount, setPendingCount] = useState(0);
   const [pendingQaCount, setPendingQaCount] = useState(0);
   const [notificationCount, setNotificationCount] = useState(0);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const fetchPendingCount = async () => {
     try {
@@ -251,7 +252,7 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
               )}
 
               <button
-                onClick={logout}
+                onClick={() => setShowLogoutConfirm(true)}
                 className="text-[11px] md:text-xs text-gray-400 hover:text-white transition-colors border border-white/10 px-3 py-2 rounded-lg hover:bg-white/5 font-bold tracking-widest uppercase shrink-0"
               >
                 Esci
@@ -284,7 +285,7 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
                 <span className="hidden md:block text-xs font-bold text-white/90 uppercase tracking-widest whitespace-nowrap">Il Tuo Profilo</span>
               </button>
               <button
-                onClick={logout}
+                onClick={() => setShowLogoutConfirm(true)}
                 className="text-xs text-gray-400 hover:text-white transition-colors border border-white/10 px-3 py-1.5 rounded hover:bg-white/5 font-sans tracking-wider uppercase"
               >
                 Esci
@@ -301,6 +302,39 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
           </button>
         )}
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-[#1a1c23] border border-red-500/30 p-8 rounded-3xl max-w-sm w-full shadow-2xl animate-in zoom-in duration-300 text-center">
+            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
+              <LogOut className="text-red-500" size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tight">Esci dall'Account</h3>
+            <p className="text-sm text-gray-400 mb-8 leading-relaxed">
+              Sei sicuro di voler uscire? Dovrai effettuare nuovamente l'accesso per interagire con la community.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className="flex-1 px-4 py-2.5 border border-white/10 text-gray-400 rounded-xl hover:bg-white/5 transition-colors font-bold text-xs uppercase"
+              >
+                Annulla
+              </button>
+              <button
+                onClick={() => {
+                  logout();
+                  setShowLogoutConfirm(false);
+                }}
+                className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl transition-all font-bold text-xs uppercase shadow-lg shadow-red-600/20 flex items-center justify-center gap-2"
+              >
+                Esci Ora
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

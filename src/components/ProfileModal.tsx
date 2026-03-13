@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, User, Heart, MessageSquare, Trophy, ExternalLink, Loader2, ChevronDown } from 'lucide-react';
+import { X, User, Heart, MessageSquare, Trophy, ExternalLink, Loader2, ChevronDown, LogOut } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
 import { supabase } from '../lib/supabaseClient';
@@ -134,6 +134,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     const [pendingNickname, setPendingNickname] = useState(user?.nickname || '');
     const [pendingRank, setPendingRank] = useState(user?.rank || 'Unranked');
     const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
     // Sync local state ONLY when modal opens
     useEffect(() => {
@@ -427,12 +428,46 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                 <div className="p-6 border-t border-white/5 bg-black/20 flex flex-col sm:flex-row gap-4 items-center justify-between rounded-b-2xl shrink-0">
                     <p className="text-[10px] text-gray-500 tracking-wide uppercase">Sincronizzato con il Cloud</p>
                     <button
-                        onClick={() => { logout(); onClose(); }}
+                        onClick={() => setShowLogoutConfirm(true)}
                         className="w-full sm:w-auto px-6 py-2 border border-red-500/30 text-red-500 hover:bg-red-500/10 rounded-lg text-sm font-bold transition-all uppercase tracking-widest"
                     >
                         Esci dall'Account
                     </button>
                 </div>
+
+                {/* Logout Confirmation Modal Overlay */}
+                {showLogoutConfirm && (
+                    <div className="absolute inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200 rounded-2xl">
+                        <div className="bg-[#1a1c23] border border-red-500/30 p-8 rounded-3xl max-w-sm w-full shadow-2xl animate-in zoom-in duration-300 text-center">
+                            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
+                                <LogOut className="text-red-500" size={32} />
+                            </div>
+                            <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tight">Esci dall'Account</h3>
+                            <p className="text-sm text-gray-400 mb-8 leading-relaxed">
+                                Sei sicuro di voler uscire? Dovrai effettuare nuovamente l'accesso per interagire con la community.
+                            </p>
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowLogoutConfirm(false)}
+                                    className="flex-1 px-4 py-2.5 border border-white/10 text-gray-400 rounded-xl hover:bg-white/5 transition-colors font-bold text-xs uppercase"
+                                >
+                                    Annulla
+                                </button>
+                                <button
+                                    onClick={() => { 
+                                        logout(); 
+                                        onClose();
+                                        setShowLogoutConfirm(false); 
+                                    }}
+                                    className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl transition-all font-bold text-xs uppercase shadow-lg shadow-red-600/20 flex items-center justify-center gap-2"
+                                >
+                                    Esci Ora
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
