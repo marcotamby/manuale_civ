@@ -6,10 +6,10 @@ import { usePresence } from './PresenceContext';
 import type { Unit } from '../data/aoe4Data';
 import { UnitGrid } from './UnitGrid';
 import { MatchupsTable } from './MatchupsTable';
-import { EditSuggestionForm } from './EditSuggestionForm';
 import { AdminCivEditorModal } from './AdminCivEditorModal';
 import type { Civilization } from '../data/aoe4Data';
-import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight, Clock } from 'lucide-react';
+import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight, Clock, MessageSquare, Send, UserCircle, CheckCircle, XCircle, X, Loader2 } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient';
 import { ResourceText } from './ResourceText';
 import { ExternalLink } from 'lucide-react';
 import { SocialProofPopup } from './SocialProofPopup';
@@ -35,7 +35,7 @@ const getYoutubeId = (url: string) => {
   return match ? match[1] : null;
 };
 
-type Tab = 'caratteristiche' | 'units' | 'buildorders' | 'matchups' | 'video' | 'proponi' | 'admin-edit';
+type Tab = 'caratteristiche' | 'units' | 'buildorders' | 'matchups' | 'video' | 'domande' | 'proponi' | 'admin-edit';
 
 interface CivViewProps {
   civId: string;
@@ -49,7 +49,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const { tab } = useParams<{ tab?: string }>();
   const navigate = useNavigate();
 
-  const validTabs: Tab[] = ['caratteristiche', 'units', 'buildorders', 'matchups', 'video', 'proponi', 'admin-edit'];
+  const validTabs: Tab[] = ['caratteristiche', 'units', 'buildorders', 'matchups', 'video', 'domande', 'proponi', 'admin-edit'];
   const activeTab: Tab = (validTabs.includes(tab as Tab)) ? (tab as Tab) : 'caratteristiche';
   const [activeAge, setActiveAge] = useState<1 | 2 | 3 | 4>(() => {
     return (Number(sessionStorage.getItem('activeAge')) as 1 | 2 | 3 | 4) || 1;
@@ -134,8 +134,116 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     { id: 'buildorders', label: 'Build Orders', icon: <Map size={16} /> },
     { id: 'matchups', label: 'Matchups', icon: <BarChart2 size={16} /> },
     { id: 'video', label: 'Video Guide', icon: <Play size={16} /> },
+    { id: 'domande', label: 'Domande', icon: <MessageSquare size={16} /> },
     { id: 'proponi', label: 'Proponi Modifica', icon: <Edit size={16} /> },
   ];
+
+  // Q&A State
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [qaLoading, setQaLoading] = useState(false);
+  const [questionText, setQuestionText] = useState('');
+  const [activeAnswerId, setActiveAnswerId] = useState<string | null>(null);
+  const [answerText, setAnswerText] = useState('');
+  const [qaMessage, setQaMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
+
+  const fetchQA = async () => {
+    try {
+      setQaLoading(true);
+      const { data: qData, error: qError } = await supabase
+        .from('questions')
+        .select('*, answers(*)')
+        .eq('civ_id', civId)
+        .eq('status', 'approved')
+        .order('created_at', { ascending: false });
+
+      if (qError) throw qError;
+      
+      // Filter approved answers and sort them
+      const sortedData = (qData || []).map(q => ({
+        ...q,
+        answers: (q.answers || [])
+          .filter((a: any) => a.status === 'approved')
+          .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+      }));
+
+      setQuestions(sortedData);
+    } catch (err) {
+      console.error('Error fetching Q&A:', err);
+    } finally {
+      setQaLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'domande') {
+      fetchQA();
+    }
+  }, [activeTab, civId]);
+
+  const validateProfile = () => {
+    if (!user?.nickname || !user?.rank || user.rank === 'Unranked') {
+      setQaMessage({ 
+        text: 'Per inviare domande o risposte occorre completare il profilo con username e rank.', 
+        type: 'error' 
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const handleQuestionSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    if (!validateProfile()) return;
+    if (!questionText.trim()) return;
+
+    try {
+      const { error } = await supabase
+        .from('questions')
+        .insert([{
+          civ_id: civId,
+          user_id: user.email,
+          user_nickname: user.nickname,
+          user_rank: user.rank,
+          question_text: questionText.trim(),
+          status: 'pending'
+        }]);
+
+      if (error) throw error;
+      setQuestionText('');
+      setQaMessage({ text: 'La tua domanda è in fase di approvazione da parte degli amministratori', type: 'success' });
+    } catch (err) {
+      console.error('Error submitting question:', err);
+      setQaMessage({ text: 'Errore durante l\'invio della domanda.', type: 'error' });
+    }
+  };
+
+  const handleAnswerSubmit = async (questionId: string) => {
+    if (!user) return;
+    if (!validateProfile()) return;
+    if (!answerText.trim()) return;
+
+    try {
+      const { error } = await supabase
+        .from('answers')
+        .insert([{
+          question_id: questionId,
+          user_id: user.email,
+          user_nickname: user.nickname,
+          user_rank: user.rank,
+          answer_text: answerText.trim(),
+          status: 'pending'
+        }]);
+
+      if (error) throw error;
+      setAnswerText('');
+      setActiveAnswerId(null);
+      setQaMessage({ text: 'La tua risposta a questa domanda è in fase di approvazione da parte degli amministratori', type: 'success' });
+    } catch (err) {
+      console.error('Error submitting answer:', err);
+      setQaMessage({ text: 'Errore durante l\'invio della risposta.', type: 'error' });
+    }
+  };
 
   if (!civ) return <div className="text-gray-400 p-8">Civiltà non trovata.</div>;
 
@@ -632,13 +740,204 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           </div>
         )}
 
-        {activeTab === 'proponi' && (
-          <div className="max-w-xl">
-            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-              <Edit className="text-blue-400" size={24} />
-              Proponi Modifiche
-            </h2>
-            <EditSuggestionForm civName={civ.name} />
+        {activeTab === 'domande' && (
+          <div className="max-w-4xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-1 flex items-center gap-2">
+                <MessageSquare className="text-yellow-500" size={24} />
+                Domande della Community
+              </h2>
+              <p className="text-sm text-gray-400">Chiedi consiglio ai giocatori più esperti o aiuta gli altri a migliorare.</p>
+            </div>
+
+            {/* Success/Error Message */}
+            {qaMessage && (
+              <div className={`p-4 rounded-xl border flex items-center justify-between animate-in zoom-in duration-300 ${
+                qaMessage.type === 'success' 
+                  ? 'bg-green-500/10 border-green-500/30 text-green-400' 
+                  : 'bg-red-500/10 border-red-500/30 text-red-400'
+              }`}>
+                <div className="flex items-center gap-3">
+                  {qaMessage.type === 'success' ? <CheckCircle size={20} /> : <XCircle size={20} />}
+                  <p className="text-sm font-medium">{qaMessage.text}</p>
+                </div>
+                {qaMessage.type === 'error' && (
+                  <button 
+                    onClick={() => (window as any).openProfileModal?.()}
+                    className="px-4 py-1.5 bg-red-500 hover:bg-red-400 text-white rounded-lg text-xs font-bold transition-all"
+                  >
+                    Vai al Profilo
+                  </button>
+                )}
+                <button onClick={() => setQaMessage(null)} className="ml-4 opacity-50 hover:opacity-100">
+                  <X size={16} />
+                </button>
+              </div>
+            )}
+
+            {/* Question Submission Box */}
+            {user ? (
+               <div className="glass p-6 rounded-2xl border border-white/5 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
+                      {user.rank && RANK_ICONS[user.rank] ? (
+                        <img src={RANK_ICONS[user.rank]} alt={user.rank} className="w-6 h-6 object-contain" />
+                      ) : (
+                        <UserCircle size={24} className="text-gray-500" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-white">{user.nickname || user.name || 'Il Tuo Profilo'}</p>
+                      <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest">{user.rank || 'Unranked'}</p>
+                    </div>
+                  </div>
+                  <form onSubmit={handleQuestionSubmit} className="space-y-4">
+                    <textarea
+                      value={questionText}
+                      onChange={(e) => setQuestionText(e.target.value)}
+                      placeholder="Fai una domanda relativa a questa civiltà. Sii il più specifico possibile, così che i giocatori più esperti possano risponderti in maniera dettagliata e darti una mano!"
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:border-yellow-500/50 outline-none transition-all text-sm min-h-[100px] resize-none"
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        disabled={!questionText.trim()}
+                        className="flex items-center gap-2 px-6 py-2.5 bg-yellow-600 hover:bg-yellow-500 text-black rounded-xl text-xs font-black uppercase transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-yellow-600/20"
+                      >
+                        <Send size={14} />
+                        Invia Domanda
+                      </button>
+                    </div>
+                  </form>
+               </div>
+            ) : (
+              <div className="glass p-8 rounded-2xl border border-white/5 text-center">
+                <p className="text-gray-400 text-sm mb-4">Accedi per fare una domanda o rispondere alla community.</p>
+                <button 
+                  onClick={() => (window as any).openLoginModal?.()}
+                  className="px-8 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold uppercase transition-all"
+                >
+                  Accedi Ora
+                </button>
+              </div>
+            )}
+
+            {/* Questions List */}
+            <div className="space-y-6">
+              {qaLoading ? (
+                <div className="flex py-12 justify-center">
+                  <Loader2 className="animate-spin text-yellow-500" size={32} />
+                </div>
+              ) : questions.length > 0 ? (
+                questions.map((q) => (
+                  <div key={q.id} className="space-y-4">
+                     {/* Question Card */}
+                     <div className="glass p-6 rounded-2xl border border-white/10 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                          <MessageSquare size={64} />
+                        </div>
+                        <div className="flex items-start gap-4 mb-4">
+                           <div className="shrink-0 flex flex-col items-center gap-1">
+                              <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
+                                {q.user_rank && RANK_ICONS[q.user_rank] ? (
+                                  <img src={RANK_ICONS[q.user_rank]} alt={q.user_rank} className="w-8 h-8 object-contain" />
+                                ) : (
+                                  <UserCircle size={28} className="text-gray-600" />
+                                )}
+                              </div>
+                           </div>
+                           <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-sm font-black text-yellow-500 uppercase tracking-tight">{q.user_nickname}</span>
+                                <span className="text-[10px] text-gray-500 font-bold px-1.5 py-0.5 bg-white/5 rounded border border-white/5 uppercase">{q.user_rank}</span>
+                                <span className="text-[10px] text-gray-600 ml-auto">{new Date(q.created_at).toLocaleDateString('it-IT')}</span>
+                              </div>
+                              <p className="text-white text-base leading-relaxed">{q.question_text}</p>
+                           </div>
+                        </div>
+
+                        <div className="flex justify-end pt-2 border-t border-white/5">
+                           <button 
+                             onClick={() => {
+                               if (activeAnswerId === q.id) {
+                                 setActiveAnswerId(null);
+                               } else {
+                                 setActiveAnswerId(q.id);
+                                 setAnswerText('');
+                               }
+                             }}
+                             className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                               activeAnswerId === q.id 
+                                ? 'bg-white/10 text-white' 
+                                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                             }`}
+                           >
+                             <MessageSquare size={14} />
+                             {activeAnswerId === q.id ? 'Annulla' : 'Rispondi'}
+                           </button>
+                        </div>
+
+                        {/* Answer Input */}
+                        {activeAnswerId === q.id && (
+                           <div className="mt-4 pt-4 border-t border-white/5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                              <textarea
+                                value={answerText}
+                                onChange={(e) => setAnswerText(e.target.value)}
+                                placeholder="Scrivi la tua risposta..."
+                                className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:border-blue-500/50 outline-none transition-all text-sm min-h-[80px] resize-none"
+                              />
+                              <div className="flex justify-end">
+                                <button
+                                  onClick={() => handleAnswerSubmit(q.id)}
+                                  disabled={!answerText.trim()}
+                                  className="flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold uppercase transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50"
+                                >
+                                  <Send size={12} />
+                                  Pubblica Risposta
+                                </button>
+                              </div>
+                           </div>
+                        )}
+                     </div>
+
+                     {/* Answers List */}
+                     <div className="ml-6 md:ml-12 space-y-3">
+                        {q.answers && q.answers.map((a: any) => (
+                           <div key={a.id} className="glass p-4 rounded-xl border border-white/5 bg-white/[0.01]">
+                              <div className="flex items-start gap-3">
+                                <div className="shrink-0">
+                                  <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                                    {a.user_rank && RANK_ICONS[a.user_rank] ? (
+                                      <img src={RANK_ICONS[a.user_rank]} alt={a.user_rank} className="w-5 h-5 object-contain" />
+                                    ) : (
+                                      <UserCircle size={18} className="text-gray-600" />
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <span className="text-xs font-bold text-blue-400 uppercase tracking-tight">{a.user_nickname}</span>
+                                    <span className="text-[9px] text-gray-500 font-bold px-1 py-0.5 bg-white/5 rounded border border-white/5 uppercase">{a.user_rank}</span>
+                                    <span className="text-[9px] text-gray-600 ml-auto">{new Date(a.created_at).toLocaleDateString('it-IT')}</span>
+                                  </div>
+                                  <p className="text-gray-300 text-sm leading-relaxed">{a.answer_text}</p>
+                                </div>
+                              </div>
+                           </div>
+                        ))}
+                     </div>
+                  </div>
+                ))
+              ) : (
+                <div className="glass p-12 rounded-3xl border border-white/5 text-center flex flex-col items-center">
+                  <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
+                    <MessageSquare size={32} className="text-gray-700" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-500 mb-2">Ancora nessuna domanda</h3>
+                  <p className="text-sm text-gray-600 max-w-sm">Sii il primo a rompere il ghiaccio! Fai una domanda su questa civiltà.</p>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

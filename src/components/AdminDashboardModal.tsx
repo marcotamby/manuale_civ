@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, CheckCircle, XCircle, Loader2, Inbox } from 'lucide-react';
+import { X, CheckCircle, XCircle, Loader2, Inbox, MessageSquare, Send } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { Toast } from './Toast';
@@ -40,6 +40,10 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [editingBOs, setEditingBOs] = useState<Record<string, any>>({});
   const [expandedSugg, setExpandedSugg] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'proposte' | 'qa'>('proposte');
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [answers, setAnswers] = useState<any[]>([]);
+  const [qaLoading, setQaLoading] = useState(false);
 
   const getYoutubeId = (url: string) => {
     if (!url) return null;
@@ -82,11 +86,40 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     }
   };
 
-  useEffect(() => {
-    if (isOpen && isSuperAdmin) {
-      fetchSuggestions();
+  const fetchQA = async () => {
+    try {
+      setQaLoading(true);
+      const { data: qData, error: qError } = await supabase
+        .from('questions')
+        .select('*')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
+
+      const { data: aData, error: aError } = await supabase
+        .from('answers')
+        .select('*, questions(question_text, civ_id)')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
+
+      if (qError) throw qError;
+      if (aError) throw aError;
+
+      setQuestions(qData || []);
+      setAnswers(aData || []);
+    } catch (err: any) {
+      console.error('Error fetching QA:', err);
+      setToast({ isVisible: true, message: 'Errore caricamento QA', type: 'error' });
+    } finally {
+      setQaLoading(false);
     }
-  }, [isOpen, isSuperAdmin]);
+  };
+
+  useEffect(() => {
+    if (isOpen && (isSuperAdmin || !isSuperAdmin)) { // Admin can access QA
+      if (activeTab === 'proposte' && isSuperAdmin) fetchSuggestions();
+      if (activeTab === 'qa') fetchQA();
+    }
+  }, [isOpen, activeTab, isSuperAdmin]);
 
   const handleSendNotifications = async () => {
     if (pendingNotifCount === 0 || !isSuperAdmin) return;
@@ -240,7 +273,35 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     }
   };
 
-  if (!isOpen || !isSuperAdmin) return null;
+  const handleUpdateQAStatus = async (item: any, type: 'question' | 'answer', newStatus: 'approved' | 'rejected') => {
+    try {
+      const table = type === 'question' ? 'questions' : 'answers';
+      const { error } = await supabase
+        .from(table)
+        .update({ status: newStatus })
+        .eq('id', item.id);
+
+      if (error) throw error;
+
+      setToast({
+        isVisible: true,
+        message: newStatus === 'approved' ? 'Approvato con successo!' : 'Rifiutato',
+        type: 'success'
+      });
+
+      if (type === 'question') {
+        setQuestions(prev => prev.filter(q => q.id !== item.id));
+      } else {
+        setAnswers(prev => prev.filter(a => a.id !== item.id));
+      }
+    } catch (err: any) {
+      console.error(`Error updating ${type} status:`, err);
+      setToast({ isVisible: true, message: 'Errore nell\'aggiornamento', type: 'error' });
+    }
+  };
+
+  const { isAdmin } = useAuth();
+  if (!isOpen || (!isSuperAdmin && !isAdmin)) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm shadow-2xl">
@@ -294,7 +355,23 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
+            <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 mr-4">
+               {isSuperAdmin && (
+                 <button
+                   onClick={() => setActiveTab('proposte')}
+                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'proposte' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                 >
+                   Proposte
+                 </button>
+               )}
+               <button
+                 onClick={() => setActiveTab('qa')}
+                 className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'qa' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+               >
+                 Q&A
+               </button>
+            </div>
             <button
               onClick={onClose}
               className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
@@ -304,193 +381,263 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
           </div>
         </div>
 
-        <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
-          {isLoading ? (
+          {isLoading || qaLoading ? (
             <div className="flex flex-col items-center justify-center h-40">
               <Loader2 size={32} className="animate-spin text-blue-500 mb-4" />
-              <p className="text-gray-400">Caricamento proposte...</p>
+              <p className="text-gray-400">Caricamento in corso...</p>
             </div>
-          ) : suggestions.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-60 text-center glass rounded-xl border border-white/5">
-              <Inbox size={48} className="text-gray-600 mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">Nessuna proposta in sospeso</h3>
-              <p className="text-gray-400 text-sm">Hai gestito tutti i suggerimenti della community!</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {suggestions.map((sugg) => (
-                <div key={sugg.id} className="bg-black/40 border border-[#D4AF37]/30 rounded-xl p-5 hover:border-blue-500/50 transition-colors relative overflow-hidden group">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/50 hidden group-hover:block blur-sm"></div>
+          ) : activeTab === 'proposte' ? (
+             suggestions.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-60 text-center glass rounded-xl border border-white/5">
+                <Inbox size={48} className="text-gray-600 mb-4" />
+                <h3 className="text-xl font-bold text-white mb-2">Nessuna proposta in sospeso</h3>
+                <p className="text-gray-400 text-sm">Hai gestito tutti i suggerimenti della community!</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {suggestions.map((sugg) => (
+                  <div key={sugg.id} className="bg-black/40 border border-[#D4AF37]/30 rounded-xl p-5 hover:border-blue-500/50 transition-colors relative overflow-hidden group">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/50 hidden group-hover:block blur-sm"></div>
 
-                  <div className="flex flex-col md:flex-row justify-between gap-6 relative z-10">
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <span className="px-3 py-1 bg-blue-600/20 text-blue-400 text-xs font-bold rounded-lg border border-blue-500/30 uppercase tracking-wider">
-                            {sugg.civ_name}
-                          </span>
-                          <span className="text-sm text-gray-400 flex items-center gap-2">
-                            Sezione: <span className="text-white font-medium">{sugg.section}</span>
-                          </span>
-                        </div>
-                        {sugg.section === 'build_order' && (
-                          <button
-                            onClick={() => setExpandedSugg(expandedSugg === sugg.id ? null : sugg.id)}
-                            className="text-xs text-blue-400 hover:underline"
-                          >
-                            {expandedSugg === sugg.id ? 'Chiudi Editor' : 'Edita Passaggi'}
-                          </button>
-                        )}
-                      </div>
-
-                      <div className="bg-black/50 p-4 rounded-lg border border-gray-700/50 mb-4">
-                        {sugg.section === 'build_order' ? (
-                          (() => {
-                            let boData: any;
-                            try {
-                              boData = JSON.parse(sugg.suggestion_text);
-                            } catch (e) {
-                              return <p className="text-gray-200 text-sm whitespace-pre-wrap">{sugg.suggestion_text}</p>;
-                            }
-
-                            const currentEdits = editingBOs[sugg.id] || boData;
-
-                            const updateBOField = (field: string, value: any) => {
-                              setEditingBOs(prev => ({
-                                ...prev,
-                                [sugg.id]: { ...(prev[sugg.id] || boData), [field]: value }
-                              }));
-                            };
-
-                            const updateBOStep = (idx: number, field: string, value: string) => {
-                              const newSteps = [...currentEdits.steps];
-                              newSteps[idx] = { ...newSteps[idx], [field]: value };
-                              updateBOField('steps', newSteps);
-                            };
-
-                            if (expandedSugg !== sugg.id) {
-                              return (
-                                <div className="space-y-3">
-                                  <p className="text-blue-400 font-bold text-xl">{currentEdits.title}</p>
-                                  <div className="space-y-3 mt-3">
-                                    {currentEdits.steps.map((s: any, i: number) => (
-                                      <p key={i} className="text-base text-gray-100">
-                                        <span className="text-yellow-500 font-mono mr-4 text-sm font-bold">{s.time}</span> {s.action}
-                                      </p>
-                                    ))}
-                                  </div>
-                                  {currentEdits.source && (
-                                    <div className="text-[10px] text-blue-400/60 truncate mt-2 font-mono italic">
-                                      Fonte: {currentEdits.source}
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            }
-
-                            return (
-                              <div className="space-y-5 animate-in fade-in duration-300">
-                                <div>
-                                  <label className="text-xs text-gray-500 uppercase font-bold mb-1.5 block">Titolo</label>
-                                  <input
-                                    className="w-full bg-black/40 border border-gray-700 rounded-lg px-4 py-3 text-lg text-white focus:border-blue-500 outline-none"
-                                    value={currentEdits.title === 'Nuovo Build Order' ? '' : currentEdits.title}
-                                    onChange={(e) => updateBOField('title', e.target.value)}
-                                    placeholder="Titolo"
-                                  />
-                                </div>
-                                <div className="space-y-4">
-                                  <label className="text-xs text-gray-500 uppercase font-bold mb-1.5 block">Passaggi</label>
-                                  {currentEdits.steps.map((s: any, i: number) => (
-                                    <div key={i} className="grid grid-cols-12 gap-3 p-4 bg-white/5 rounded border border-white/5">
-                                      <input
-                                        className="col-span-2 bg-black/40 border border-transparent rounded px-2 py-2 text-base text-yellow-500 focus:border-blue-500 outline-none font-mono"
-                                        value={s.time}
-                                        onChange={(e) => updateBOStep(i, 'time', e.target.value)}
-                                      />
-                                      <input
-                                        className="col-span-10 bg-black/40 border border-transparent rounded px-2 py-2 text-lg text-white focus:border-blue-500 outline-none font-bold"
-                                        value={s.action}
-                                        onChange={(e) => updateBOStep(i, 'action', e.target.value)}
-                                      />
-                                      <textarea
-                                        className="col-span-12 bg-black/40 border border-transparent rounded px-2 py-2 text-base text-gray-300 focus:border-blue-500 outline-none resize-none h-20 italic"
-                                        value={s.note}
-                                        placeholder="Nota..."
-                                        onChange={(e) => updateBOStep(i, 'note', e.target.value)}
-                                      />
-                                    </div>
-                                  ))}
-                                </div>
-                                <div>
-                                  <label className="text-[10px] text-gray-500 uppercase font-bold mb-1.5 block">Fonte / Link YouTube</label>
-                                  <input
-                                    className="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-yellow-400/80 focus:border-blue-500 outline-none"
-                                    value={currentEdits.source}
-                                    onChange={(e) => updateBOField('source', e.target.value)}
-                                  />
-                                  {currentEdits.source && getYoutubeId(currentEdits.source) && (
-                                    <div className="mt-3 relative aspect-video w-full max-w-[240px] rounded-lg overflow-hidden border border-white/10 group">
-                                      <img
-                                        src={`https://img.youtube.com/vi/${getYoutubeId(currentEdits.source)}/mqdefault.jpg`}
-                                        alt="Preview"
-                                        className="w-full h-full object-cover"
-                                      />
-                                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                                        <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center shadow-lg">
-                                          <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white border-b-[6px] border-b-transparent ml-1" />
-                                        </div>
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })()
-                        ) : (
-                          <p className="text-gray-200 text-sm whitespace-pre-wrap leading-relaxed">{sugg.suggestion_text}</p>
-                        )}
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-4 text-xs">
-                        <div className="flex items-center gap-2 text-gray-400 bg-white/5 px-2 py-1 rounded border border-white/5">
-                          <span className="font-bold text-[10px] uppercase text-gray-500">Autore:</span>
-                          <span className="text-blue-400">{sugg.user_nickname || sugg.user_name || 'Anonimo'}</span>
-                          {sugg.user_rank && sugg.user_rank !== 'Unranked' && (
-                            <span className="bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded-md text-[10px] border border-blue-500/30">
-                              {sugg.user_rank}
+                    <div className="flex flex-col md:flex-row justify-between gap-6 relative z-10">
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <span className="px-3 py-1 bg-blue-600/20 text-blue-400 text-xs font-bold rounded-lg border border-blue-500/30 uppercase tracking-wider">
+                              {sugg.civ_name}
                             </span>
+                            <span className="text-sm text-gray-400 flex items-center gap-2">
+                              Sezione: <span className="text-white font-medium">{sugg.section}</span>
+                            </span>
+                          </div>
+                          {sugg.section === 'build_order' && (
+                            <button
+                              onClick={() => setExpandedSugg(expandedSugg === sugg.id ? null : sugg.id)}
+                              className="text-xs text-blue-400 hover:underline"
+                            >
+                              {expandedSugg === sugg.id ? 'Chiudi Editor' : 'Edita Passaggi'}
+                            </button>
                           )}
                         </div>
-                        <div className="text-gray-500">
-                          <strong>Email:</strong> {sugg.user_email || 'Non fornita'}
+
+                        <div className="bg-black/50 p-4 rounded-lg border border-gray-700/50 mb-4">
+                          {sugg.section === 'build_order' ? (
+                            (() => {
+                              let boData: any;
+                              try {
+                                boData = JSON.parse(sugg.suggestion_text);
+                              } catch (e) {
+                                return <p className="text-gray-200 text-sm whitespace-pre-wrap">{sugg.suggestion_text}</p>;
+                              }
+
+                              const currentEdits = editingBOs[sugg.id] || boData;
+
+                              const updateBOField = (field: string, value: any) => {
+                                setEditingBOs(prev => ({
+                                  ...prev,
+                                  [sugg.id]: { ...(prev[sugg.id] || boData), [field]: value }
+                                }));
+                              };
+
+                              const updateBOStep = (idx: number, field: string, value: string) => {
+                                const newSteps = [...currentEdits.steps];
+                                newSteps[idx] = { ...newSteps[idx], [field]: value };
+                                updateBOField('steps', newSteps);
+                              };
+
+                              if (expandedSugg !== sugg.id) {
+                                return (
+                                  <div className="space-y-3">
+                                    <p className="text-blue-400 font-bold text-xl">{currentEdits.title}</p>
+                                    <div className="space-y-3 mt-3">
+                                      {currentEdits.steps.map((s: any, i: number) => (
+                                        <p key={i} className="text-base text-gray-100">
+                                          <span className="text-yellow-500 font-mono mr-4 text-sm font-bold">{s.time}</span> {s.action}
+                                        </p>
+                                      ))}
+                                    </div>
+                                    {currentEdits.source && (
+                                      <div className="text-[10px] text-blue-400/60 truncate mt-2 font-mono italic">
+                                        Fonte: {currentEdits.source}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              }
+
+                              return (
+                                <div className="space-y-5 animate-in fade-in duration-300">
+                                  <div>
+                                    <label className="text-xs text-gray-500 uppercase font-bold mb-1.5 block">Titolo</label>
+                                    <input
+                                      className="w-full bg-black/40 border border-gray-700 rounded-lg px-4 py-3 text-lg text-white focus:border-blue-500 outline-none"
+                                      value={currentEdits.title === 'Nuovo Build Order' ? '' : currentEdits.title}
+                                      onChange={(e) => updateBOField('title', e.target.value)}
+                                      placeholder="Titolo"
+                                    />
+                                  </div>
+                                  <div className="space-y-4">
+                                    <label className="text-xs text-gray-500 uppercase font-bold mb-1.5 block">Passaggi</label>
+                                    {currentEdits.steps.map((s: any, i: number) => (
+                                      <div key={i} className="grid grid-cols-12 gap-3 p-4 bg-white/5 rounded border border-white/5">
+                                        <input
+                                          className="col-span-2 bg-black/40 border border-transparent rounded px-2 py-2 text-base text-yellow-500 focus:border-blue-500 outline-none font-mono"
+                                          value={s.time}
+                                          onChange={(e) => updateBOStep(i, 'time', e.target.value)}
+                                        />
+                                        <input
+                                          className="col-span-10 bg-black/40 border border-transparent rounded px-2 py-2 text-lg text-white focus:border-blue-500 outline-none font-bold"
+                                          value={s.action}
+                                          onChange={(e) => updateBOStep(i, 'action', e.target.value)}
+                                        />
+                                        <textarea
+                                          className="col-span-12 bg-black/40 border border-transparent rounded px-2 py-2 text-base text-gray-300 focus:border-blue-500 outline-none resize-none h-20 italic"
+                                          value={s.note}
+                                          placeholder="Nota..."
+                                          onChange={(e) => updateBOStep(i, 'note', e.target.value)}
+                                        />
+                                      </div>
+                                    ))}
+                                  </div>
+                                  <div>
+                                    <label className="text-[10px] text-gray-500 uppercase font-bold mb-1.5 block">Fonte / Link YouTube</label>
+                                    <input
+                                      className="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-yellow-400/80 focus:border-blue-500 outline-none"
+                                      value={currentEdits.source}
+                                      onChange={(e) => updateBOField('source', e.target.value)}
+                                    />
+                                    {currentEdits.source && getYoutubeId(currentEdits.source) && (
+                                      <div className="mt-3 relative aspect-video w-full max-w-[240px] rounded-lg overflow-hidden border border-white/10 group">
+                                        <img
+                                          src={`https://img.youtube.com/vi/${getYoutubeId(currentEdits.source)}/mqdefault.jpg`}
+                                          alt="Preview"
+                                          className="w-full h-full object-cover"
+                                        />
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                          <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center shadow-lg">
+                                            <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white border-b-[6px] border-b-transparent ml-1" />
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })()
+                          ) : (
+                            <p className="text-gray-200 text-sm whitespace-pre-wrap leading-relaxed">{sugg.suggestion_text}</p>
+                          )}
                         </div>
-                        <div className="text-gray-500">
-                          <strong>Data:</strong> {new Date(sugg.created_at).toLocaleString('it-IT')}
+
+                        <div className="flex flex-wrap items-center gap-4 text-xs">
+                          <div className="flex items-center gap-2 text-gray-400 bg-white/5 px-2 py-1 rounded border border-white/5">
+                            <span className="font-bold text-[10px] uppercase text-gray-500">Autore:</span>
+                            <span className="text-blue-400">{sugg.user_nickname || sugg.user_name || 'Anonimo'}</span>
+                            {sugg.user_rank && sugg.user_rank !== 'Unranked' && (
+                              <span className="bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded-md text-[10px] border border-blue-500/30">
+                                {sugg.user_rank}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-gray-500">
+                            <strong>Email:</strong> {sugg.user_email || 'Non fornita'}
+                          </div>
+                          <div className="text-gray-500">
+                            <strong>Data:</strong> {new Date(sugg.created_at).toLocaleString('it-IT')}
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="flex md:flex-col gap-3 shrink-0 items-center md:items-end justify-center">
-                      <button
-                        onClick={() => handleUpdateStatus(sugg, 'implemented')}
-                        className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-green-600/20 hover:bg-green-600/40 text-green-400 rounded-lg border border-green-500/30 transition-colors font-medium text-sm"
-                        title="Segna come completata"
-                      >
-                        <CheckCircle size={18} /> Approva
-                      </button>
+                      <div className="flex md:flex-col gap-3 shrink-0 items-center md:items-end justify-center">
+                        <button
+                          onClick={() => handleUpdateStatus(sugg, 'implemented')}
+                          className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-green-600/20 hover:bg-green-600/40 text-green-400 rounded-lg border border-green-500/30 transition-colors font-medium text-sm"
+                          title="Segna come completata"
+                        >
+                          <CheckCircle size={18} /> Approva
+                        </button>
 
-                      <button
-                        onClick={() => setRejectionModalSugg(sugg)}
-                        className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/40 text-red-400 rounded-lg border border-red-500/30 transition-colors font-medium text-sm"
-                        title="Rifiuta proposta"
-                      >
-                        <XCircle size={18} /> Scarta
-                      </button>
+                        <button
+                          onClick={() => setRejectionModalSugg(sugg)}
+                          className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/40 text-red-400 rounded-lg border border-red-500/30 transition-colors font-medium text-sm"
+                          title="Rifiuta proposta"
+                        >
+                          <XCircle size={18} /> Scarta
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            )
+          ) : (
+            /* Q&A Tab Content */
+            <div className="space-y-8 overflow-y-auto pr-2 max-h-[60vh]">
+               {/* Pending Questions */}
+               <div className="space-y-4">
+                  <h3 className="text-sm font-black text-yellow-500 uppercase tracking-widest flex items-center gap-2">
+                    <MessageSquare size={16} /> Domande da Approvare ({questions.length})
+                  </h3>
+                  {questions.length === 0 ? (
+                    <p className="text-gray-500 text-sm italic py-4">Nessuna domanda in sospeso.</p>
+                  ) : (
+                    <div className="grid gap-4">
+                      {questions.map(q => (
+                        <div key={q.id} className="glass p-5 rounded-xl border border-white/5 space-y-4">
+                          <div className="flex justify-between items-start gap-4">
+                            <div className="flex-1">
+                               <div className="flex items-center gap-2 mb-2">
+                                  <span className="px-2 py-0.5 bg-yellow-500/10 text-yellow-500 text-[10px] font-black rounded border border-yellow-500/20 uppercase">{q.civ_id}</span>
+                                  <span className="text-xs font-bold text-white">{q.user_nickname}</span>
+                                  <span className="text-[10px] text-gray-500">({q.user_rank})</span>
+                               </div>
+                               <p className="text-gray-200 text-sm">{q.question_text}</p>
+                            </div>
+                            <div className="flex gap-2">
+                               <button onClick={() => handleUpdateQAStatus(q, 'question', 'approved')} className="p-2 bg-green-500/10 text-green-500 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-all"><CheckCircle size={18} /></button>
+                               <button onClick={() => handleUpdateQAStatus(q, 'question', 'rejected')} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all"><XCircle size={18} /></button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+               </div>
+
+               {/* Pending Answers */}
+               <div className="space-y-4">
+                  <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                    <Send size={16} /> Risposte da Approvare ({answers.length})
+                  </h3>
+                  {answers.length === 0 ? (
+                    <p className="text-gray-500 text-sm italic py-4">Nessuna risposta in sospeso.</p>
+                  ) : (
+                    <div className="grid gap-4">
+                      {answers.map(a => (
+                        <div key={a.id} className="glass p-5 rounded-xl border border-white/5 space-y-4">
+                          <div className="flex justify-between items-start gap-4">
+                            <div className="flex-1">
+                               <div className="bg-white/5 p-3 rounded-lg border border-white/5 mb-3">
+                                  <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">In risposta a:</p>
+                                  <p className="text-xs text-gray-400 italic line-clamp-1">"{a.questions?.question_text}"</p>
+                               </div>
+                               <div className="flex items-center gap-2 mb-2">
+                                  <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-[10px] font-black rounded border border-blue-500/20 uppercase">{a.questions?.civ_id}</span>
+                                  <span className="text-xs font-bold text-white">{a.user_nickname}</span>
+                                  <span className="text-[10px] text-gray-500">({a.user_rank})</span>
+                               </div>
+                               <p className="text-gray-200 text-sm">{a.answer_text}</p>
+                            </div>
+                            <div className="flex gap-2">
+                               <button onClick={() => handleUpdateQAStatus(a, 'answer', 'approved')} className="p-2 bg-green-500/10 text-green-500 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-all"><CheckCircle size={18} /></button>
+                               <button onClick={() => handleUpdateQAStatus(a, 'answer', 'rejected')} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all"><XCircle size={18} /></button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+               </div>
             </div>
           )}
         </div>

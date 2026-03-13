@@ -23,43 +23,65 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
   const { civilizations } = useCivData();
   const { activeAdmins: _activeAdmins } = usePresence();
   const [pendingCount, setPendingCount] = useState(0);
+  const [pendingQaCount, setPendingQaCount] = useState(0);
   const [notificationCount, setNotificationCount] = useState(0);
 
   const fetchPendingCount = async () => {
     try {
-      const { count, error } = await supabase
-        .from('suggestions')
+      // Fetch suggestions count (only if superadmin)
+      if (isSuperAdmin) {
+        const { count, error } = await supabase
+          .from('suggestions')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'pending');
+        if (!error) setPendingCount(count || 0);
+      }
+
+      // Fetch Q&A count (for all admins)
+      const { count: qCount, error: qError } = await supabase
+        .from('questions')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+      
+      const { count: aCount, error: aError } = await supabase
+        .from('answers')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'pending');
 
-      if (error) throw error;
-      setPendingCount(count || 0);
+      if (!qError && !aError) {
+        setPendingQaCount((qCount || 0) + (aCount || 0));
+      }
     } catch (err) {
-      console.error('Error fetching pending suggestions count:', err);
+      console.error('Error fetching pending counts:', err);
     }
   };
 
   useEffect(() => {
-    if (isAuthenticated && isSuperAdmin) {
+    if (isAuthenticated && isAdmin) {
       fetchPendingCount();
 
-      // Real-time subscription to suggestions table
-      const channel = supabase
-        .channel('suggestions-count')
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'suggestions'
-        }, () => {
-          fetchPendingCount();
-        })
+      // Real-time subscription to suggestions (superadmin only)
+      let suggestionChannel: any;
+      if (isSuperAdmin) {
+        suggestionChannel = supabase
+          .channel('suggestions-count')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'suggestions' }, () => fetchPendingCount())
+          .subscribe();
+      }
+
+      // Real-time subscription to Q&A (all admins)
+      const qaChannel = supabase
+        .channel('qa-count')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'questions' }, () => fetchPendingCount())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'answers' }, () => fetchPendingCount())
         .subscribe();
 
       return () => {
-        supabase.removeChannel(channel);
+        if (suggestionChannel) supabase.removeChannel(suggestionChannel);
+        supabase.removeChannel(qaChannel);
       };
     }
-  }, [isAuthenticated, isSuperAdmin]);
+  }, [isAuthenticated, isAdmin, isSuperAdmin]);
 
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -214,15 +236,15 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
                 </div>
               </button>
 
-              {isSuperAdmin && (
+              {isAdmin && (
                 <button
                   onClick={onOpenAdminDashboard}
                   className="relative text-[10px] text-yellow-500 hover:text-white transition-colors border border-yellow-500/20 px-2 py-1.5 rounded-lg hover:bg-yellow-500/10 font-bold tracking-widest uppercase flex items-center gap-1 shrink-0"
                 >
-                  Proposte
-                  {pendingCount > 0 && (
+                  Pannello
+                  {(pendingCount + pendingQaCount) > 0 && (
                     <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[9px] font-bold text-white shadow-lg animate-bounce ring-1 ring-[#0d1424]">
-                      {pendingCount}
+                      {pendingCount + pendingQaCount}
                     </span>
                   )}
                 </button>

@@ -1,8 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
 import { HelpCircle, Coffee, MessageSquare } from 'lucide-react';
+import { usePresence } from './PresenceContext';
+import { useAuth } from './AuthContext';
 
 export function MobileFooter() {
   const location = useLocation();
+  const { isAdmin } = useAuth();
+  const { activeAdmins } = usePresence();
   const isFaq = location.pathname === '/faq';
 
   return (
@@ -34,6 +38,19 @@ export function MobileFooter() {
         <Coffee size={20} />
         <span className="text-[10px] font-bold uppercase tracking-widest">Sostieni</span>
       </a>
+
+      {/* Admin Live indicator - Bottom Right (only for admins) */}
+      {isAdmin && Object.keys(activeAdmins).length > 0 && (
+        <div className="absolute -top-12 right-4 flex items-center gap-2 px-3 py-1.5 bg-[#0d1424]/90 backdrop-blur-md rounded-full border border-yellow-500/30 shadow-lg animate-in slide-in-from-right duration-500">
+          <div className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
+          </div>
+          <span className="text-[9px] font-black text-yellow-500 uppercase tracking-widest">
+            {Object.keys(activeAdmins).length} LIVE
+          </span>
+        </div>
+      )}
     </footer>
   );
 }
