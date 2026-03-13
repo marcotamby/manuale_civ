@@ -868,7 +868,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 questions.map((q) => (
                   <div key={q.id} className="space-y-4">
                       {/* Question Card */}
-                      <div className="glass p-6 rounded-2xl border border-white/10 relative overflow-hidden group/q">
+                      <div className="glass p-6 rounded-2xl border border-white/10 relative overflow-hidden group/q outline-none select-none">
                          <div className="flex items-start gap-4 mb-4">
                            <div className="shrink-0 flex flex-col items-center gap-1">
                               <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
@@ -881,9 +881,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                            </div>
                            <div className="flex-1">
                                <div className="flex items-center gap-2 mb-1">
-                                <span className="text-sm font-black text-yellow-500 uppercase tracking-tight">{q.user_nickname}</span>
-                                <span className="text-[10px] text-gray-500 font-bold px-1.5 py-0.5 bg-white/5 rounded border border-white/5 uppercase">{q.user_rank}</span>
-                                <span className="text-[10px] text-gray-600">{new Date(q.created_at).toLocaleDateString('it-IT')}</span>
+                                <span className="text-sm font-black text-yellow-500 uppercase tracking-tight select-text">{q.user_nickname}</span>
+                                <span className="text-[10px] text-gray-500 font-bold px-1.5 py-0.5 bg-white/5 rounded border border-white/5 uppercase select-none">{q.user_rank}</span>
+                                <span className="text-[10px] text-gray-600 select-none">{new Date(q.created_at).toLocaleDateString('it-IT')}</span>
                                 {isAdmin && (
                                   <button 
                                     onClick={() => handleDeleteQA(q.id, 'question')}
@@ -894,7 +894,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                   </button>
                                 )}
                               </div>
-                              <p className="text-white text-base leading-relaxed">{q.question_text}</p>
+                              <p className="text-white text-base leading-relaxed select-text">{q.question_text}</p>
                            </div>
                         </div>
 
@@ -921,7 +921,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
                         {/* Answer Input */}
                         {activeAnswerId === q.id && (
-                           <div className="mt-4 pt-4 border-t border-white/5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                           <div className="mt-4 pt-4 border-t border-white/5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300 outline-none select-none">
                               <textarea
                                 value={answerText}
                                 onChange={(e) => setAnswerText(e.target.value)}
@@ -958,9 +958,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                 </div>
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-1">
-                                    <span className="text-xs font-bold text-blue-400 uppercase tracking-tight">{a.user_nickname}</span>
-                                    <span className="text-[9px] text-gray-500 font-bold px-1 py-0.5 bg-white/5 rounded border border-white/5 uppercase">{a.user_rank}</span>
-                                    <span className="text-[9px] text-gray-600">{new Date(a.created_at).toLocaleDateString('it-IT')}</span>
+                                    <span className="text-xs font-bold text-blue-400 uppercase tracking-tight select-text">{a.user_nickname}</span>
+                                    <span className="text-[9px] text-gray-500 font-bold px-1 py-0.5 bg-white/5 rounded border border-white/5 uppercase select-none">{a.user_rank}</span>
+                                    <span className="text-[9px] text-gray-600 select-none">{new Date(a.created_at).toLocaleDateString('it-IT')}</span>
                                     {isAdmin && (
                                       <button 
                                         onClick={() => handleDeleteQA(a.id, 'answer')}
@@ -971,7 +971,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                       </button>
                                     )}
                                   </div>
-                                  <p className="text-gray-300 text-sm leading-relaxed">{a.answer_text}</p>
+                                  <p className="text-gray-300 text-sm leading-relaxed select-text">{a.answer_text}</p>
                                 </div>
                               </div>
                            </div>
