@@ -248,7 +248,7 @@ export function FAQPage() {
       setTimeout(() => {
         setIsEditing(false);
         setIsSaveSuccess(false);
-      }, 1000);
+      }, 1800);
 
     } catch (err) {
       console.error('Error saving FAQ:', err);
@@ -297,7 +297,7 @@ export function FAQPage() {
                     disabled={saveLoading || isSaveSuccess}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all text-xs font-bold uppercase tracking-wider shadow-lg disabled:opacity-50 ${
                       isSaveSuccess 
-                        ? 'bg-green-500 text-white shadow-green-500/40 scale-105' 
+                        ? 'bg-emerald-400 text-white shadow-[0_0_20px_rgba(52,211,153,0.8)] scale-105 animate-pulse' 
                         : 'bg-green-600 text-white hover:bg-green-500 shadow-green-600/20'
                     }`}
                   >
