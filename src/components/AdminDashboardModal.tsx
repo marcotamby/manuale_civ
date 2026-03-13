@@ -304,8 +304,8 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   if (!isOpen || (!isSuperAdmin && !isAdmin)) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start md:items-center justify-center p-2 md:p-4 bg-black/80 backdrop-blur-sm shadow-2xl overflow-y-auto pt-4 md:pt-0">
-      <div className="bg-[#0f1423] border border-[#D4AF37]/30 rounded-xl md:rounded-2xl w-full max-w-4xl min-h-0 max-h-none md:max-h-[90vh] flex flex-col shadow-[0_0_40px_rgba(0,0,0,0.8)] filter drop-shadow-2xl relative overflow-hidden mb-4 md:mb-0">
+    <div className="fixed inset-0 z-50 flex items-start md:items-center justify-center p-2 md:p-4 bg-black/80 backdrop-blur-md shadow-2xl overflow-y-auto">
+      <div className="bg-[#0f1423] border border-[#D4AF37]/30 rounded-xl md:rounded-2xl w-full max-w-4xl min-h-[60vh] md:min-h-0 h-auto md:h-auto max-h-[95vh] md:max-h-[90vh] flex flex-col shadow-[0_0_40px_rgba(0,0,0,0.8)] filter drop-shadow-2xl relative overflow-hidden mt-2 md:mt-0">
 
         {/* Rejection Modal Overlay */}
         {rejectionModalSugg && (
@@ -390,15 +390,15 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
               <Loader2 size={32} className="animate-spin text-blue-500 mb-4" />
               <p className="text-gray-400">Caricamento in corso...</p>
             </div>
-          ) : activeTab === 'proposte' ? (
-             suggestions.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-60 text-center glass rounded-xl border border-white/5">
-                <Inbox size={48} className="text-gray-600 mb-4" />
-                <h3 className="text-xl font-bold text-white mb-2">Nessuna proposta in sospeso</h3>
-                <p className="text-gray-400 text-sm">Hai gestito tutti i suggerimenti della community!</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 custom-scrollbar">
+              {suggestions.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-60 text-center glass rounded-xl border border-white/5">
+                  <Inbox size={48} className="text-gray-600 mb-4" />
+                  <h3 className="text-xl font-bold text-white mb-2">Nessuna proposta in sospeso</h3>
+                  <p className="text-gray-400 text-sm">Hai gestito tutti i suggerimenti della community!</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
                 {suggestions.map((sugg) => (
                   <div key={sugg.id} className="bg-black/40 border border-[#D4AF37]/30 rounded-xl p-5 hover:border-blue-500/50 transition-colors relative overflow-hidden group">
                     <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/50 hidden group-hover:block blur-sm"></div>
@@ -573,7 +573,8 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                   </div>
                 ))}
               </div>
-            )
+            )}
+            </div>
           ) : (
             /* Q&A Tab Content */
           <div className="space-y-8 overflow-y-auto px-4 md:px-6 py-4 max-h-[70vh]">
