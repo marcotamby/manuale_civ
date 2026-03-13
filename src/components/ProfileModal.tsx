@@ -130,10 +130,11 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     const [mySuggestions, setMySuggestions] = useState<Suggestion[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    const lastSeenKey = `lastSeenCounts_${user?.email}`;
-    const lastSeenData = JSON.parse(localStorage.getItem(lastSeenKey) || '{}');
+    const lastSeenKey = user?.email ? `lastSeenCounts_${user.email}` : null;
+    const lastSeenData = lastSeenKey ? JSON.parse(localStorage.getItem(lastSeenKey) || '{}') : {};
 
     const markAllAsRead = () => {
+        if (!lastSeenKey) return;
         const newData: Record<string, { bo: number, video: number }> = { ...lastSeenData };
         favorites.forEach(favId => {
             const civ = civilizations.find((c: any) => c.id === favId);
@@ -145,9 +146,9 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
             }
         });
         localStorage.setItem(lastSeenKey, JSON.stringify(newData));
-        // Force refresh by closing/opening or other state trigger
+        // Refresh local count and topbar
+        (window as any).refreshNotificationCount?.();
         onClose();
-        setTimeout(() => (window as any).openProfileModal?.(), 50);
     };
 
     useEffect(() => {
@@ -343,8 +344,8 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                             <div className="flex justify-between items-start mb-2">
                                                 <span className="text-xs font-bold text-blue-400 uppercase">{sugg.civ_name}</span>
                                                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${sugg.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' :
-                                                        sugg.status === 'implemented' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
-                                                            'bg-red-500/10 text-red-500 border border-red-500/20'
+                                                    sugg.status === 'implemented' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
+                                                        'bg-red-500/10 text-red-500 border border-red-500/20'
                                                     }`}>
                                                     {sugg.status}
                                                 </span>

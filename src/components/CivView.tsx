@@ -82,7 +82,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     // Update presence to viewing this civ
     updateActivity({ type: 'viewing', civId });
 
-    // Mark as read for this specific civ if user is logged in
+    // Mark as read for this specific civ (Logged in users only)
     if (user?.email && civ) {
       const lastSeenKey = `lastSeenCounts_${user.email}`;
       const lastSeenData = JSON.parse(localStorage.getItem(lastSeenKey) || '{}');
@@ -98,7 +98,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         lastSeenData[civId] = { bo: currentBO, video: currentVideo };
         localStorage.setItem(lastSeenKey, JSON.stringify(lastSeenData));
 
-        // Refresh topbar count if needed
+        // Refresh topbar count
         (window as any).refreshNotificationCount?.();
       }
     }

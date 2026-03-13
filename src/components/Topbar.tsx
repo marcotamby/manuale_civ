@@ -61,19 +61,18 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
     }
   }, [isAuthenticated, isSuperAdmin]);
 
-  useEffect(() => {
-    if (favorites.length === 0) {
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const calculateNotifications = () => {
+    if (!isAuthenticated || !user?.email || favorites.length === 0) {
       setNotificationCount(0);
       return;
     }
 
-    // Get granular counts from localStorage
-    const lastSeenKey = `lastSeenCounts_${user?.email || 'guest'}`;
+    const lastSeenKey = `lastSeenCounts_${user.email}`;
     const lastSeenData = JSON.parse(localStorage.getItem(lastSeenKey) || '{}');
     
     let totalUnread = 0;
-
-    // Only check favorited civilizations
     favorites.forEach(favId => {
       const civ = civilizations.find(c => c.id === favId);
       if (civ) {
@@ -87,13 +86,20 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
     });
 
     setNotificationCount(totalUnread);
+  };
 
-    // This is now handled more precisely in ProfileModal or CivView
+  useEffect(() => {
+    calculateNotifications();
+
     (window as any).refreshNotificationCount = () => {
-      fetchPendingCount(); // Keep existing admin count refresh
-      // Trigger a re-calculation if needed
+      fetchPendingCount();
+      setRefreshTrigger(prev => prev + 1);
     };
-  }, [favorites, civilizations, isAuthenticated, user?.email]);
+
+    return () => {
+      (window as any).refreshNotificationCount = undefined;
+    };
+  }, [favorites, civilizations, isAuthenticated, user?.email, refreshTrigger]);
 
   return (
     <div className="w-full bg-gradient-to-r from-[#0d1424] via-[#1a1c32] to-[#0d1424] border-b border-yellow-500/20 flex flex-col md:flex-row items-center justify-between px-4 py-4 md:pl-14 md:pr-[73px] md:py-5 z-10 shrink-0 gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative overflow-hidden">
