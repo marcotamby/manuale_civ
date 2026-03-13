@@ -58,3 +58,27 @@ CREATE POLICY "Admins can update answer status" ON answers FOR UPDATE USING (aut
 -- These will be populated from the user profile at submission time.
 CREATE TRIGGER update_questions_updated_at BEFORE UPDATE ON questions FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 CREATE TRIGGER update_answers_updated_at BEFORE UPDATE ON answers FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+-- Create table for Profiles (to sync across devices)
+CREATE TABLE IF NOT EXISTS profiles (
+    email TEXT PRIMARY KEY,
+    nickname TEXT,
+    rank TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable RLS for profiles
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public read profiles" ON profiles FOR SELECT USING (true);
+CREATE POLICY "Allow anyone to upsert profiles" ON profiles FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow anyone to update profiles" ON profiles FOR UPDATE USING (true);
+
+-- Update RLS for Questions & Answers to allow anon access (since we use custom Google Login)
+DROP POLICY IF EXISTS "Authenticated users can ask questions" ON questions;
+DROP POLICY IF EXISTS "Authenticated users can answer questions" ON answers;
+
+CREATE POLICY "Anyone can ask questions" ON questions FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can answer questions" ON answers FOR INSERT WITH CHECK (true);
+
+-- Trigger to update updated_at (Profiles)
+CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();

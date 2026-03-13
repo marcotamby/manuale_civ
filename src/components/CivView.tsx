@@ -28,6 +28,15 @@ interface CivViewProps {
   onSelectUnit: (unit: Unit) => void;
 }
 
+const getRankIcon = (rank: string | undefined) => {
+  if (!rank) return null;
+  if (RANK_ICONS[rank]) return RANK_ICONS[rank];
+  // Case-insensitive fallback
+  return Object.entries(RANK_ICONS).find(
+    ([key]) => key.toLowerCase() === rank.toLowerCase()
+  )?.[1];
+};
+
 export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const { civilizations: civilizationsData, refreshCivs } = useCivData();
   const { isAdmin, isSuperAdmin, user, toggleFavorite } = useAuth();
@@ -766,8 +775,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                <div className="glass p-6 rounded-2xl border border-white/5 space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
-                      {user.rank && RANK_ICONS[user.rank] ? (
-                        <img src={RANK_ICONS[user.rank]} alt={user.rank} className="w-6 h-6 object-contain" />
+                      {user.rank && getRankIcon(user.rank) ? (
+                        <img src={getRankIcon(user.rank) || ''} alt={user.rank} className="w-6 h-6 object-contain" />
                       ) : (
                         <UserCircle size={24} className="text-gray-500" />
                       )}
@@ -825,8 +834,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         <div className="flex items-start gap-4 mb-4">
                            <div className="shrink-0 flex flex-col items-center gap-1">
                               <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
-                                {q.user_rank && RANK_ICONS[q.user_rank] ? (
-                                  <img src={RANK_ICONS[q.user_rank]} alt={q.user_rank} className="w-8 h-8 object-contain" />
+                                {q.user_rank && getRankIcon(q.user_rank) ? (
+                                  <img src={getRankIcon(q.user_rank) || ''} alt={q.user_rank} className="w-8 h-8 object-contain" />
                                 ) : (
                                   <UserCircle size={28} className="text-gray-600" />
                                 )}
@@ -893,8 +902,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                               <div className="flex items-start gap-3">
                                 <div className="shrink-0">
                                   <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                                    {a.user_rank && RANK_ICONS[a.user_rank] ? (
-                                      <img src={RANK_ICONS[a.user_rank]} alt={a.user_rank} className="w-5 h-5 object-contain" />
+                                    {a.user_rank && getRankIcon(a.user_rank) ? (
+                                      <img src={getRankIcon(a.user_rank) || ''} alt={a.user_rank} className="w-5 h-5 object-contain" />
                                     ) : (
                                       <UserCircle size={18} className="text-gray-600" />
                                     )}

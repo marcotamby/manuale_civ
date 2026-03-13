@@ -112,6 +112,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(favoritesKey, JSON.stringify(favorites));
   }, [favorites]);
 
+  const syncProfileWithSupabase = async (userEmail: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('nickname, rank')
+        .eq('email', userEmail.toLowerCase())
+        .single();
+      
+      if (!error && data) {
+        const email = userEmail.toLowerCase();
+        
+        // Use DB values as truth if they exist, but allow local to override if DB is empty
+        const currentRank = data.rank || localStorage.getItem(`auth_user_rank_${email}`) || 'Unranked';
+        const currentNickname = data.nickname || localStorage.getItem(`auth_user_nickname_${email}`) || '';
+        
+        localStorage.setItem(`auth_user_rank_${email}`, currentRank);
+        localStorage.setItem(`auth_user_nickname_${email}`, currentNickname);
+        
+        // Update user state
+        setUser(prev => prev ? { ...prev, rank: currentRank, nickname: currentNickname } : null);
+        
+        // Update auth_user in localStorage
+        const storedUser = localStorage.getItem('auth_user');
+        if (storedUser) {
+           const parsed = JSON.parse(storedUser);
+           localStorage.setItem('auth_user', JSON.stringify({ ...parsed, rank: currentRank, nickname: currentNickname }));
+        }
+      } else if (error && error.code === 'PGRST116') {
+        // Profile doesn't exist yet, create it with local values
+        const email = userEmail.toLowerCase();
+        const rank = localStorage.getItem(`auth_user_rank_${email}`) || 'Unranked';
+        const nickname = localStorage.getItem(`auth_user_nickname_${email}`) || '';
+        
+        await supabase
+          .from('profiles')
+          .upsert({ email, nickname, rank });
+      }
+    } catch (err) {
+      console.error('Error syncing profile:', err);
+    }
+  };
+
   const syncFavoritesWithSupabase = async (userEmail: string) => {
     try {
       const { data, error } = await supabase
@@ -152,6 +194,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isAuthenticated && user?.email) {
       syncFavoritesWithSupabase(user.email);
+      syncProfileWithSupabase(user.email);
     }
   }, [isAuthenticated, !!user?.email]);
 
@@ -171,9 +214,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(`auth_user_rank_${email}`, savedRank);
     localStorage.setItem(`auth_user_nickname_${email}`, savedNickname);
 
-    // Sync favorites from Supabase
+    // Sync favorites and profile from Supabase
     if (userData.email) {
-      await syncFavoritesWithSupabase(userData.email);
+      await Promise.all([
+        syncFavoritesWithSupabase(userData.email),
+        syncProfileWithSupabase(userData.email)
+      ]);
     }
   };
 
@@ -202,13 +248,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       if (data.rank) {
         localStorage.setItem(`auth_user_rank_${email}`, data.rank);
-        // Clear legacy global key
         localStorage.removeItem('auth_user_rank');
       }
       if (data.nickname !== undefined) {
         localStorage.setItem(`auth_user_nickname_${email}`, data.nickname);
-        // Clear legacy global key
         localStorage.removeItem('auth_user_nickname');
+      }
+
+      // Sync to Supabase
+      if (user.email) {
+        supabase
+          .from('profiles')
+          .upsert({ 
+            email: email, 
+            nickname: updatedUser.nickname || '', 
+            rank: updatedUser.rank || 'Unranked',
+            updated_at: new Date().toISOString()
+          })
+          .then(({ error }) => {
+            if (error) console.error('Error syncing profile to DB:', error);
+          });
       }
     }
   };
