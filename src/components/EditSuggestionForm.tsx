@@ -46,6 +46,16 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
     }
   }, [searchParams]);
 
+  // Clear inputs when user changes
+  useEffect(() => {
+    setText('');
+    setTitle('');
+    setDescription('');
+    setSource('');
+    setBoSteps([{ time: '', action: '', note: '' }]);
+    setIsSigned(false);
+  }, [user?.email]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {

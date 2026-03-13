@@ -241,12 +241,13 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     }
   };
 
-  // Clear message when user logs out
+  // Clear inputs and messages when user changes (logout or switch)
   useEffect(() => {
-    if (!user) {
-      setQaMessage(null);
-    }
-  }, [user]);
+    setQuestionText('');
+    setAnswerText('');
+    setReplyTo(null);
+    setQaMessage(null);
+  }, [user?.email]);
 
   // Removed the old useEffect for fetching Q&A, now handled by the subscription useEffect
   // useEffect(() => {
