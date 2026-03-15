@@ -1,0 +1,3910 @@
+[
+  {
+    "id": "abbasid",
+    "name": "Abbasidi",
+    "flag": "/civs/Abbasid Dynasty.webp",
+    "difficulty": "Medio",
+    "short_description": "A flexible and adaptable civilization focused on the House of Wisdom.",
+    "passive_bonuses": [
+      "Constructing buildings near the House of Wisdom increases the Golden Age tier.",
+      "Berry bushes gather 30% faster but cannot hunt Boars."
+    ],
+    "unique_units": [
+      {
+        "id": "camel-archer",
+        "age": 2,
+        "name": "Camel Archer",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.62,
+          "attack": 11,
+          "health": 150
+        },
+        "imageId": "camel-archer-2",
+        "strengths": [
+          "Cavalry",
+          "Archers"
+        ],
+        "weaknesses": [
+          "Knights",
+          "Horsemen"
+        ],
+        "description": "Mobile ranged unit that debuffs nearby horse cavalry."
+      },
+      {
+        "id": "ghulam",
+        "age": 3,
+        "name": "Ghulam",
+        "type": "Infantry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.12,
+          "attack": 20,
+          "health": 195
+        },
+        "imageId": "ghulam-3",
+        "strengths": [
+          "Light Infantry",
+          "Archers"
+        ],
+        "weaknesses": [
+          "Knights",
+          "Crossbowmen"
+        ],
+        "description": "Tough infantry that delivers a rapid double-strike attack."
+      },
+      {
+        "id": "camel-rider",
+        "age": 3,
+        "name": "Camel Rider",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.62,
+          "attack": 14,
+          "health": 270
+        },
+        "imageId": "camel-rider-3",
+        "strengths": [
+          "Cavalry"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Crossbowmen"
+        ],
+        "description": "Anti-cavalry specialist that applies the Camels Unease debuff."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "house-of-wisdom",
+        "age": 1,
+        "name": "House of Wisdom (Costruita in Età I)",
+        "type": "Technology",
+        "description": "L'edificio centrale da cui si ricercano le Ali per avanzare d'età. Le ali sbloccano potenti tecnologie esclusive."
+      },
+      {
+        "id": "economic-wing-2",
+        "age": 2,
+        "name": "Ala Economica",
+        "type": "Economic",
+        "imageId": "economic-wing",
+        "description": "Sblocca tecnologie come Fresh Foodstuffs (-35% costo abitanti), Agriculture e Improved Processing. Può essere scelta in Età 2, 3 o 4."
+      },
+      {
+        "id": "military-wing-2",
+        "age": 2,
+        "name": "Ala Militare",
+        "type": "Military",
+        "imageId": "military-wing",
+        "description": "Sblocca tecnologie per potenziare la fanteria e i cammelli (Boot Camp, Camel Support, Camel Shields). Può essere scelta in Età 2, 3 o 4."
+      },
+      {
+        "id": "culture-wing-2",
+        "age": 2,
+        "name": "Ala Culturale",
+        "type": "Technology",
+        "imageId": "culture-wing",
+        "description": "Sblocca tecnologie chiave come Preservation of Knowledge (-30% costo ricerche) e cure mediche. Può essere scelta in Età 2, 3 o 4."
+      },
+      {
+        "id": "trade-wing-2",
+        "age": 2,
+        "name": "Ala Commerciale",
+        "type": "Economic",
+        "imageId": "trade-wing",
+        "description": "Migliora enormemente il commercio, fornendo bonus difensivi e risorse secondarie ai mercanti. Può essere scelta in Età 2, 3 o 4."
+      },
+      {
+        "id": "economic-wing-3",
+        "age": 3,
+        "name": "Ala Economica",
+        "type": "Economic",
+        "imageId": "economic-wing",
+        "description": "Sblocca tecnologie come Fresh Foodstuffs, Agriculture e Improved Processing."
+      },
+      {
+        "id": "military-wing-3",
+        "age": 3,
+        "name": "Ala Militare",
+        "type": "Military",
+        "imageId": "military-wing",
+        "description": "Sblocca tecnologie infanteria e cammelli. Fornisce inoltre truppe immediate se costruita."
+      },
+      {
+        "id": "culture-wing-3",
+        "age": 3,
+        "name": "Ala Culturale",
+        "type": "Technology",
+        "imageId": "culture-wing",
+        "description": "Sblocca Preservation of Knowledge e Medical Centers."
+      },
+      {
+        "id": "trade-wing-3",
+        "age": 3,
+        "name": "Ala Commerciale",
+        "type": "Economic",
+        "imageId": "trade-wing",
+        "description": "Migliora l'economia del mercato e dei commercianti."
+      },
+      {
+        "id": "economic-wing-4",
+        "age": 4,
+        "name": "Ala Economica",
+        "type": "Economic",
+        "imageId": "economic-wing",
+        "description": "Completa i potenziamenti agricoli e della raccolta."
+      },
+      {
+        "id": "military-wing-4",
+        "age": 4,
+        "name": "Ala Militare",
+        "type": "Military",
+        "imageId": "military-wing",
+        "description": "Completa i potenziamenti bellici per fanteria e cavalieri su cammello."
+      },
+      {
+        "id": "culture-wing-4",
+        "age": 4,
+        "name": "Ala Culturale",
+        "type": "Technology",
+        "imageId": "culture-wing",
+        "description": "Permette agli Imām di convertire le unità senza reliquia."
+      },
+      {
+        "id": "trade-wing-4",
+        "age": 4,
+        "name": "Ala Commerciale",
+        "type": "Economic",
+        "imageId": "trade-wing",
+        "description": "Permette ai commercianti di riportare risorse secondarie preziose."
+      }
+    ],
+    "strengths": [
+      "Migliore civiltà per il boom economico in team games (multi-TC)",
+      "Cammelli che debuffano cavalleria e supportano fanteria",
+      "Ghulam: fanteria pesante con doppio attacco"
+    ],
+    "weaknesses": [
+      "Inizio lento e vulnerabilità iniziale",
+      "Dipendenza dalla Casa della Sapienza",
+      "Transizione a farm critica dopo bacche"
+    ]
+  },
+  {
+    "id": "ayyubids",
+    "name": "Ayyubidi",
+    "flag": "/civs/Ayyubids.webp",
+    "difficulty": "Medio",
+    "short_description": "A versatile civilization leveraging Desert Raiders and House of Wisdom advancements.",
+    "passive_bonuses": [
+      "House of Wisdom wings grant unique, immediate bonuses when advancing."
+    ],
+    "unique_units": [
+      {
+        "id": "desert-raider",
+        "age": 2,
+        "name": "Desert Raider",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.62,
+          "attack": 10,
+          "health": 120
+        },
+        "imageId": "desert-raider-2",
+        "strengths": [
+          "Light Units"
+        ],
+        "weaknesses": [
+          "Knights"
+        ],
+        "description": "Versatile raider that can switch between melee and ranged."
+      },
+      {
+        "id": "camel-lancer",
+        "age": 3,
+        "name": "Camel Lancer",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.62,
+          "attack": 22,
+          "health": 210
+        },
+        "imageId": "camel-lancer-3",
+        "strengths": [
+          "Cavalry"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Strong heavy camel cavalry."
+      },
+      {
+        "id": "ghulam-ayyubid",
+        "age": 3,
+        "name": "Ghulam",
+        "type": "Infantry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.12,
+          "attack": 12,
+          "health": 195
+        },
+        "imageId": "ghulam-3",
+        "strengths": [
+          "Light Infantry"
+        ],
+        "weaknesses": [
+          "Knights"
+        ],
+        "description": "Tough infantry with a double-strike attack."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "house-of-wisdom-ay",
+        "age": 1,
+        "name": "House of Wisdom (Costruita in Età I)",
+        "type": "Technology",
+        "imageId": "house-of-wisdom",
+        "description": "Dalla House of Wisdom si scelgono le Ali per avanzare. A differenza degli Abbasidi, le ali forniscono bonus immediati unici tra due scelte per ala."
+      },
+      {
+        "id": "culture-wing-logistics-2",
+        "age": 2,
+        "name": "Ala Culturale (Curatori / Avanzamento)",
+        "type": "Religious",
+        "imageId": "culture-wing",
+        "description": "Scegli tra Dervisci gratuiti (Logistica) o avanzamenti d'età più veloci ed economici (Avanzamento). Disponibile in tutte le età."
+      },
+      {
+        "id": "economic-wing-growth-2",
+        "age": 2,
+        "name": "Ala Economica (Crescita / Industria)",
+        "type": "Economic",
+        "imageId": "economic-wing",
+        "description": "Scegli tra la creazione automatica di abitanti extra (Crescita) o grandi carichi di legno gratuiti (Industria). Disponibile in tutte le età."
+      },
+      {
+        "id": "military-wing-smith-2",
+        "age": 2,
+        "name": "Ala Militare (Fabbri / Rinforzi)",
+        "type": "Military",
+        "imageId": "military-wing",
+        "description": "Scegli tra potenziamenti da Fabbro automatici gratuiti (Maestri Fabbri) o un flusso costante di Desert Raiders gratuiti (Rinforzi). Disponibile in tutte le età."
+      },
+      {
+        "id": "trade-wing-bazaar-2",
+        "age": 2,
+        "name": "Ala Commerciale (Bazar / Consiglieri)",
+        "type": "Economic",
+        "imageId": "trade-wing",
+        "description": "Scegli tra mercanti neutrali che offrono scambi eccellenti (Bazar) o potenti Atabeg che supportano le guarnigioni (Consiglieri). Disponibile in tutte le età."
+      },
+      {
+        "id": "culture-wing-logistics-3",
+        "age": 3,
+        "name": "Ala Culturale (Curatori / Avanzamento)",
+        "type": "Religious",
+        "imageId": "culture-wing",
+        "description": "Ottieni Dervisci (Logistica) o sconti sull'avanzamento d'età (Avanzamento)."
+      },
+      {
+        "id": "economic-wing-growth-3",
+        "age": 3,
+        "name": "Ala Economica (Crescita / Industria)",
+        "type": "Economic",
+        "imageId": "economic-wing",
+        "description": "Abitanti gratuiti extra (Crescita) o legna immediata (Industria)."
+      },
+      {
+        "id": "military-wing-smith-3",
+        "age": 3,
+        "name": "Ala Militare (Fabbri / Rinforzi)",
+        "type": "Military",
+        "imageId": "military-wing",
+        "description": "Upgrades del fabbro gratuiti e istantanei (Maestri Fabbri) o spawn periodico di Desert Raiders d'élite (Rinforzi)."
+      },
+      {
+        "id": "trade-wing-bazaar-3",
+        "age": 3,
+        "name": "Ala Commerciale (Bazar / Consiglieri)",
+        "type": "Economic",
+        "imageId": "trade-wing",
+        "description": "Genera scambi speciali al Bazar (Bazar) o fornisce preziosi Atabeg per potenziare la salute dell'esercito (Consiglieri)."
+      },
+      {
+        "id": "culture-wing-logistics-4",
+        "age": 4,
+        "name": "Ala Culturale (Curatori / Avanzamento)",
+        "type": "Religious",
+        "imageId": "culture-wing",
+        "description": "Dervisci o avanzamento d'età finale."
+      },
+      {
+        "id": "economic-wing-growth-4",
+        "age": 4,
+        "name": "Ala Economica (Crescita / Industria)",
+        "type": "Economic",
+        "imageId": "economic-wing",
+        "description": "Enorme flusso di abitanti rapidi o massiccia iniezione di legno."
+      },
+      {
+        "id": "military-wing-smith-4",
+        "age": 4,
+        "name": "Ala Militare (Fabbri / Rinforzi)",
+        "type": "Military",
+        "imageId": "military-wing",
+        "description": "Garantisce gli ultimi potenziamenti fabbro o grandi spawn di incursori del deserto."
+      },
+      {
+        "id": "trade-wing-bazaar-4",
+        "age": 4,
+        "name": "Ala Commerciale (Bazar / Consiglieri)",
+        "type": "Economic",
+        "imageId": "trade-wing",
+        "description": "Ultimi scambi neutri iper-convenienti o Atabeg supremi."
+      }
+    ],
+    "strengths": [
+      "Fast castle fortissima",
+      "Grazie alle ali della Casa della Sapienza, possono decidere se ricevere un boost economico (abitanti extra), militare (unità subito pronte) o tecnologico, adattandosi alla strategia dell'avversario.",
+      "La fanteria può costruire arieti e altre macchine d'assedio senza dover ricercare la tecnologia specifica. Possiedono inoltre unità d'assedio uniche come il Manjaniq (una variante del mangano con attacco incendiario ad area) e la Torre del Sultano. Anche le unità a cammello possono costruire armi d'assedio dopo essere passati di era con l'ala militare.",
+      "Desert Raider: un'unità su cammello che può passare dalla modalità melee a quella a distanza (arco), eccellente per raidare.",
+      "Ghulam: fanteria pesante (man at arms) molto resistente ed efficace contro la fanteria leggera.",
+      "Derviscio: unità religiosa a cavallo capace di curare le truppe, molto veloce a spostarmi anche quando trasporta reliquie"
+    ],
+    "weaknesses": [
+      "Non possono cacciare cinghiali: l'incapacità di raccogliere cibo dai cinghiali limita le loro opzioni di raccolta di cibo ad alto rendimento sulla mappa",
+      "Dipendenza dalla Casa della Sapienza: se l'avversario riesce a mettere pressione o distruggere l'influenza della Casa della Sapienza, la civiltà perde gran parte dei bonus legati alle Età dell'Oro.",
+      "Unità costose: sebbene potenti, le unità a cammello sono spesso costose in termini di oro e cibo; perderle in scontri sbagliati può essere fatale."
+    ]
+  },
+  {
+    "id": "byzantines",
+    "name": "Bizantini",
+    "flag": "/civs/Byzantines.webp",
+    "difficulty": "Difficile",
+    "short_description": "A complex defensive civilization utilizing an aqueduct network and mercenaries.",
+    "passive_bonuses": [
+      "Aqueducts increase production speed and gather rates.",
+      "Can hire foreign mercenaries using Olive Oil."
+    ],
+    "unique_units": [
+      {
+        "id": "limitanei",
+        "age": 1,
+        "name": "Limitanei",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 9,
+          "health": 90
+        },
+        "imageId": "limitanei-1",
+        "strengths": [
+          "Cavalry"
+        ],
+        "weaknesses": [
+          "Archers"
+        ],
+        "description": "Spearman replacement with Shield Wall ability."
+      },
+      {
+        "id": "varangian-guard",
+        "age": 3,
+        "name": "Varangian Guard",
+        "type": "Infantry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.12,
+          "attack": 12,
+          "health": 160
+        },
+        "imageId": "varangian-guard-3",
+        "strengths": [
+          "Heavy Units"
+        ],
+        "weaknesses": [
+          "Crossbowmen"
+        ],
+        "description": "Elite infantry that can use Berserk mode."
+      },
+      {
+        "id": "cataphract",
+        "age": 3,
+        "name": "Cataphract",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.38,
+          "attack": 24,
+          "health": 280
+        },
+        "imageId": "cataphract-3",
+        "strengths": [
+          "All Ground Units"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Super heavy cavalry with a Trample charge."
+      },
+      {
+        "id": "cheirosiphon",
+        "age": 3,
+        "name": "Cheirosiphon",
+        "type": "Siege",
+        "stats": {
+          "armor": 0,
+          "speed": 0.88,
+          "attack": 0,
+          "health": 220
+        },
+        "imageId": "cheirosiphon-3",
+        "strengths": [
+          "Buildings"
+        ],
+        "weaknesses": [
+          "Melee"
+        ],
+        "description": "Greek Fire ram that deals area fire damage."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "grand-winery",
+        "age": 2,
+        "name": "Grand Winery",
+        "type": "Economic",
+        "description": "+60% Olive Oil from nearby farms; acts as a Monastery."
+      },
+      {
+        "id": "imperial-hippodrome",
+        "age": 2,
+        "name": "Imperial Hippodrome",
+        "type": "Military",
+        "description": "Unlocks Triumph ability for cavalry speed/heal."
+      },
+      {
+        "id": "cistern-first-hill",
+        "age": 3,
+        "name": "Cistern of the First Hill",
+        "type": "Defensive",
+        "imageId": "cistern-of-the-first-hill-2",
+        "description": "Acts as a large Cistern; provides healing flasks."
+      },
+      {
+        "id": "golden-horn-tower",
+        "age": 3,
+        "name": "Golden Horn Tower",
+        "type": "Military",
+        "description": "Periodically spawns free Mercenary units."
+      },
+      {
+        "id": "foreign-engineering",
+        "age": 4,
+        "name": "Foreign Engineering Company",
+        "type": "Military",
+        "imageId": "foreign-engineering-company-3",
+        "description": "Produces unique mercenary siege units."
+      },
+      {
+        "id": "palatine-school",
+        "age": 4,
+        "name": "Palatine School",
+        "type": "Technology",
+        "description": "Acts as a University; produces free elite mercenary units when researching technologies."
+      }
+    ],
+    "strengths": [
+      "Accesso a unità uniche: Limitanei, Varangian Guard, Catafratti, Cheirosiphon",
+      "Può reclutare truppe gratis grazie all'olio d'oliva ed il covo dei mercenari",
+      "Flessibilità grazie ai mercenari",
+      "Sistema di cisterne per boost produzione ed economia"
+    ],
+    "weaknesses": [
+      "Elevata complessità di gestione",
+      "Richiede pietra presto per cisterne",
+      "Dipendenza dalla rete idrica"
+    ]
+  },
+  {
+    "id": "chinese",
+    "name": "Cinesi",
+    "flag": "/civs/Chinese.webp",
+    "difficulty": "Difficile",
+    "short_description": "Civiltà flessibile che si evolve attraverso le Grandi Dinastie. Costruisce velocemente, tassa le risorse e padroneggia la polvere da sparo.",
+    "passive_bonuses": [
+      "Inizia nella Dinastia Tang: +30% raggio visivo degli Esploratori e accesso al Villaggio.",
+      "Unità addestrate, tecnologie ricercate e risorse restituite generano Tasse (Oro) raccoglibili dagli Ufficiali Imperiali.",
+      "Costruisce entrambi i Landmark di un'Età per sbloccare una Dinastia con bonus unici (Song, Yuan, Ming).",
+      "I Villici costruiscono difese +50% più veloci e tutti gli altri edifici +100% più velocemente.",
+      "La tecnologia Chimica è gratuita in Età I: difese usano Feritoie a Cannone invece di quelle standard.",
+      "I Cantieri Navali lavorano il +10% più velocemente."
+    ],
+    "unique_units": [
+      {
+        "id": "imperial-official",
+        "age": 1,
+        "name": "Ufficiale Imperiale",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 0,
+          "health": 75
+        },
+        "imageId": "imperial-official-1",
+        "strengths": [
+          "Supervisione Edifici",
+          "Raccolta Tasse"
+        ],
+        "weaknesses": [
+          "Tutto"
+        ],
+        "description": "Raccoglie Oro (Tasse) e usa 'Supervisiona' per aumentare del +150% la produzione degli edifici militari, o il +20% delle risorse dei Villici."
+      },
+      {
+        "id": "zhuge-nu",
+        "age": 2,
+        "name": "Zhuge Nu",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 12,
+          "health": 70
+        },
+        "imageId": "zhuge-nu-2",
+        "strengths": [
+          "Fanteria Leggera"
+        ],
+        "weaknesses": [
+          "Cavalieri",
+          "Cavalleggeri"
+        ],
+        "description": "Balestriere a fuoco rapido che spara 3 dardi per attacco. Sblocato con la Dinastia Song."
+      },
+      {
+        "id": "palace-guard",
+        "age": 3,
+        "name": "Guardia del Palazzo",
+        "type": "Infantry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.25,
+          "attack": 12,
+          "health": 155
+        },
+        "imageId": "palace-guard-3",
+        "strengths": [
+          "Fanteria Leggera",
+          "Arcieri"
+        ],
+        "weaknesses": [
+          "Cavalieri",
+          "Balestrieri"
+        ],
+        "description": "Rimpiazza l'Uomo d'Arme. Stessa forza ma con velocità superiore e meno armatura."
+      },
+      {
+        "id": "nest-of-bees",
+        "age": 3,
+        "name": "Nido delle Api",
+        "type": "Siege",
+        "stats": {
+          "armor": 0,
+          "speed": 0.75,
+          "attack": 8,
+          "health": 130
+        },
+        "imageId": "nest-of-bees-3",
+        "strengths": [
+          "Fanteria Ammassata",
+          "Unità Leggere"
+        ],
+        "weaknesses": [
+          "Cavalieri",
+          "Springalds"
+        ],
+        "description": "Rimpiazza il Mangonel. Lancia una raffica di razzi che causano danni ad area. Letale contro unità raggruppate."
+      },
+      {
+        "id": "fire-lancer",
+        "age": 3,
+        "name": "Lanciere di Fuoco",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.62,
+          "attack": 20,
+          "health": 130
+        },
+        "imageId": "fire-lancer-3",
+        "strengths": [
+          "Macchine da Assedio",
+          "Edifici"
+        ],
+        "weaknesses": [
+          "Lancieri",
+          "Balestrieri"
+        ],
+        "description": "Cavalleria leggera con attacco esplosivo in carica, ottima contro macchinari d'assedio ed edifici. Sblocato con la Dinastia Yuan."
+      },
+      {
+        "id": "grenadier",
+        "age": 4,
+        "name": "Granatiere",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 25,
+          "health": 100
+        },
+        "imageId": "grenadier-4",
+        "strengths": [
+          "Unità Raggruppate",
+          "Fanteria Pesante"
+        ],
+        "weaknesses": [
+          "Cavalleria",
+          "Arcieri"
+        ],
+        "description": "Fanteria a polvere da sparo che lancia granate con danno ad area. Sblocato con la Dinastia Ming."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "imperial-academy",
+        "age": 2,
+        "name": "Imperial Academy",
+        "type": "Economic",
+        "description": "Genera Oro dalle Tasse al +100% per gli edifici vicini."
+      },
+      {
+        "id": "barbican-of-the-sun",
+        "age": 2,
+        "name": "Barbican of the Sun",
+        "type": "Defensive",
+        "description": "Fortezza con potente cannone a lungo raggio."
+      },
+      {
+        "id": "astronomical-clocktower",
+        "age": 3,
+        "name": "Astronomical Clocktower",
+        "type": "Military",
+        "description": "Produce macchine d'assedio con +50% HP. Include Springald, Trebuchet, Bombarda e Nido delle Api esclusive."
+      },
+      {
+        "id": "imperial-palace",
+        "age": 3,
+        "name": "Imperial Palace",
+        "type": "Economic",
+        "description": "Ampio raggio visivo. Con 'Spie Imperiali' rivela la posizione dei Villici nemici."
+      },
+      {
+        "id": "great-wall-gatehouse",
+        "age": 4,
+        "name": "Great Wall Gatehouse",
+        "type": "Defensive",
+        "description": "Sblocca la Grande Muraglia. Aumenta la salute delle Mura di Pietra e Porte del +100%."
+      },
+      {
+        "id": "spirit-way",
+        "age": 4,
+        "name": "Spirit Way",
+        "type": "Military",
+        "description": "Riduce il costo delle unità della Dinastia del -30% nelle vicinanze."
+      }
+    ],
+    "strengths": [
+      "Dinastia Song (Velocità produzione abitanti +33%)"
+    ],
+    "weaknesses": [
+      "Civiltà complessa con gameplay da adattare in base ai matchup"
+    ]
+  },
+  {
+    "id": "tughlaq",
+    "name": "Dinastia di Tughlaq",
+    "flag": "/civs/Tughlaq Dynasty.png",
+    "difficulty": "Medio",
+    "short_description": "A variant of the Delhi Sultanate heavily utilizing elephants and defensive structures.",
+    "passive_bonuses": [
+      "Earlier access to War Elephants.",
+      "Stronger defensive network integration."
+    ],
+    "unique_units": [
+      {
+        "id": "worker-elephant",
+        "age": 1,
+        "name": "Worker Elephant",
+        "type": "Siege",
+        "stats": {
+          "armor": 2,
+          "speed": 1,
+          "attack": 0,
+          "health": 400
+        },
+        "imageId": "worker-elephant",
+        "strengths": [
+          "Resource gathering",
+          "Mobile drop-off"
+        ],
+        "weaknesses": [
+          "Vulnerable to attacks"
+        ],
+        "description": "Gathers all resources and acts as a mobile drop-off point. Moves and builds faster than villagers."
+      },
+      {
+        "id": "healer-elephant",
+        "age": 2,
+        "name": "Healer Elephant",
+        "type": "Religious",
+        "stats": {
+          "armor": 1,
+          "speed": 1.12,
+          "attack": 0,
+          "health": 250
+        },
+        "imageId": "healer-elephant",
+        "strengths": [
+          "Healing in combat",
+          "Garrison relics"
+        ],
+        "weaknesses": [
+          "Vulnerable to melee"
+        ],
+        "description": "Religious unit mounted on an elephant capable of healing units in combat."
+      },
+      {
+        "id": "raider-elephant",
+        "age": 2,
+        "name": "Raider Elephant",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 2,
+          "speed": 1.25,
+          "attack": 20,
+          "health": 600
+        },
+        "imageId": "tower-war-elephant",
+        "strengths": [
+          "Siege",
+          "Buildings"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Fast cavalry elephant effective against buildings and units."
+      },
+      {
+        "id": "ballista-elephant",
+        "age": 3,
+        "name": "Ballista Elephant",
+        "type": "Siege",
+        "stats": {
+          "armor": 3,
+          "speed": 1,
+          "attack": 40,
+          "health": 800
+        },
+        "imageId": "ballista-elephant",
+        "strengths": [
+          "Infantry",
+          "Units"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Springalds"
+        ],
+        "description": "Siege elephant effective against both units and structures."
+      },
+      {
+        "id": "war-elephant-tughlaq",
+        "age": 3,
+        "name": "War Elephant",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 0.88,
+          "attack": 30,
+          "health": 1200
+        },
+        "imageId": "war-elephant",
+        "strengths": [
+          "High health",
+          "Damage"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Handcannoneers"
+        ],
+        "description": "Heavy cavalry unit with very high health and damage."
+      },
+      {
+        "id": "amir-warrior",
+        "age": 2,
+        "name": "Amir Warrior",
+        "type": "Infantry",
+        "stats": {
+          "armor": 2,
+          "speed": 1.25,
+          "attack": 12,
+          "health": 150
+        },
+        "imageId": "amir-warrior",
+        "strengths": [
+          "Zero population cost",
+          "Powerful near forts"
+        ],
+        "weaknesses": [
+          "Weak far from forts"
+        ],
+        "description": "Powerful free heavy infantry with no population cost. Excels near Tughlaqabad Forts."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "dome-of-the-faith",
+        "age": 2,
+        "name": "Dome of the Faith",
+        "type": "Religious",
+        "imageId": "dome-of-the-faith-1",
+        "description": "Acts as a Mosque and provides early access to Healer Elephants. Produces Imams and Healer Elephants at a discount of 65 Gold."
+      },
+      {
+        "id": "tower-of-victory",
+        "age": 2,
+        "name": "Tower of Victory",
+        "type": "Technology",
+        "imageId": "tower-of-victory-1",
+        "description": "Increases the attack speed of Elephants by +20% when produced from buildings within influence."
+      },
+      {
+        "id": "compound-of-the-defender",
+        "age": 3,
+        "name": "Compound of the Defender",
+        "type": "Defensive",
+        "imageId": "compound-of-the-defender-3",
+        "description": "Reduces Stone cost of buildings by 20%. Unlocks an additional upgrade to each Tughlaqabad Fort which enhances health and Governor benefits."
+      },
+      {
+        "id": "house-of-learning",
+        "age": 3,
+        "name": "House of Learning",
+        "type": "Technology",
+        "imageId": "house-of-learning-3",
+        "description": "Advances to the next Age and contains many unique technologies."
+      },
+      {
+        "id": "hisar-academy",
+        "age": 4,
+        "name": "Hisar Academy",
+        "type": "Technology",
+        "imageId": "hisar-academy-4",
+        "description": "Acts as a Madrasa. Generates 70 Food and 70 Gold per minute for every active Governor."
+      },
+      {
+        "id": "palace-of-the-sultan",
+        "age": 4,
+        "name": "Palace of the Sultan",
+        "type": "Military",
+        "imageId": "palace-of-the-sultan-4",
+        "description": "Grants the fourth-tier benefactor bonus of an appointed Governor immediately."
+      }
+    ],
+    "strengths": [
+      "Elefanti guaritori",
+      "Può costruire fortezze a partire dall'età feudale"
+    ],
+    "weaknesses": [
+      "Gli upgrade sono molto più costosi",
+      "Non hanno unità di cavalleria leggera"
+    ]
+  },
+  {
+    "id": "zhuxi",
+    "name": "Eredità di Zhu Xi",
+    "flag": "/civs/Zhu Xis Legacy.png",
+    "difficulty": "Difficile",
+    "short_description": "A fast-paced Imperial variant of the Chinese emphasizing early Dynasties.",
+    "passive_bonuses": [
+      "Cheaper officials and streamlined access to powerful Shaolin Monks and Chu Ko Nu.",
+      "Earlier access to robust technologies."
+    ],
+    "unique_units": [
+      {
+        "id": "zhuge-nu-zhuxi",
+        "age": 2,
+        "name": "Zhuge Nu",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 12,
+          "health": 70
+        },
+        "imageId": "zhuge-nu-2",
+        "strengths": [
+          "Fanteria Leggera"
+        ],
+        "weaknesses": [
+          "Cavalieri",
+          "Cavalleggeri"
+        ],
+        "description": "Rapid-fire crossbowman."
+      },
+      {
+        "id": "shaolin-monk",
+        "age": 3,
+        "name": "Monaco Shaolin",
+        "type": "Religious",
+        "stats": {
+          "armor": 2,
+          "speed": 1.25,
+          "attack": 15,
+          "health": 190
+        },
+        "imageId": "shaolin-monk-3",
+        "strengths": [
+          "All Units"
+        ],
+        "weaknesses": [
+          "Massed Ranged"
+        ],
+        "description": "Powerful monk that can reflect ranged attacks."
+      },
+      {
+        "id": "yuan-raider",
+        "age": 4,
+        "name": "Predone Yuan",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 2,
+          "attack": 15,
+          "health": 200
+        },
+        "imageId": "fire-lancer-3",
+        "strengths": [
+          "Raiding"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Extremely fast light cavalry."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "jiangnan-tower",
+        "age": 2,
+        "name": "Torre Jiangnan",
+        "type": "Military",
+        "description": "Acts as tax drop-off; grants free units on building completion."
+      },
+      {
+        "id": "meditation-gardens",
+        "age": 2,
+        "name": "Giardini della Meditazione",
+        "type": "Economic",
+        "description": "Generates resources based on nearby deposits."
+      },
+      {
+        "id": "mount-lu",
+        "age": 3,
+        "name": "Accademia del Monte Lu",
+        "type": "Economic",
+        "imageId": "mount-lu-academy-1",
+        "description": "Improves tax collection and food gathering."
+      },
+      {
+        "id": "shaolin-monastery",
+        "age": 3,
+        "name": "Monastero Shaolin",
+        "type": "Religious",
+        "description": "Produces powerful Shaolin Monks."
+      },
+      {
+        "id": "temple-sun",
+        "age": 4,
+        "name": "Tempio del Sole",
+        "type": "Technology",
+        "imageId": "temple-of-the-sun-3",
+        "description": "Grants powerful global togglable buffs."
+      },
+      {
+        "id": "zhuxi-library",
+        "age": 4,
+        "name": "Biblioteca di Zhu Xi",
+        "type": "Technology",
+        "imageId": "zhu-xis-library-3",
+        "description": "Access to powerful unique upgrades."
+      }
+    ],
+    "strengths": [
+      "Fast Castle più veloce del gioco"
+    ],
+    "weaknesses": [
+      "Non hanno arcieri",
+      "Transizione a Farm lenta"
+    ]
+  },
+  {
+    "id": "french",
+    "name": "Francesi",
+    "flag": "/civs/French.webp",
+    "difficulty": "Facile",
+    "short_description": "A cavalry-focused civilization with a strong trading economy and powerful Royal Knights.",
+    "passive_bonuses": [
+      "Villagers and Scouts are produced 10/15/20% faster per Age.",
+      "Economic technology upgrades cost 30% less.",
+      "Traders can return any resource to Markets."
+    ],
+    "unique_units": [
+      {
+        "id": "royal-knight",
+        "age": 2,
+        "name": "Royal Knight",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.62,
+          "attack": 19,
+          "health": 190
+        },
+        "imageId": "knight-2",
+        "strengths": [
+          "Archers",
+          "Infantry"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Crossbowmen"
+        ],
+        "description": "Heavy cavalry unit that heals out of combat."
+      },
+      {
+        "id": "arbaletrier",
+        "age": 3,
+        "name": "Arbalétrier",
+        "type": "Ranged",
+        "stats": {
+          "armor": 1,
+          "speed": 1.12,
+          "attack": 12,
+          "health": 80
+        },
+        "imageId": "arbaletrier-3",
+        "strengths": [
+          "Heavy Infantry",
+          "Heavy Cavalry"
+        ],
+        "weaknesses": [
+          "Archers",
+          "Light Cavalry"
+        ],
+        "description": "Crossbowman with a deployable Pavise that grants +5 ranged armor."
+      },
+      {
+        "id": "royal-cannon",
+        "age": 4,
+        "name": "Royal Cannon",
+        "type": "Siege",
+        "stats": {
+          "armor": 0,
+          "speed": 0.75,
+          "attack": 75,
+          "health": 228
+        },
+        "imageId": "cannon-4",
+        "strengths": [
+          "Buildings"
+        ],
+        "weaknesses": [
+          "Melee Units"
+        ],
+        "description": "Improved version of the standard cannon with higher damage."
+      }
+    ],
+    "technologies": [
+      {
+        "id": "tech-chivalry",
+        "age": 2,
+        "name": "Chivalry",
+        "building": "School of Cavalry",
+        "description": "Royal Knights heal 1 HP every 1s when out of combat."
+      },
+      {
+        "id": "tech-enlistment-incentives",
+        "age": 4,
+        "name": "Enlistment Incentives",
+        "building": "Keep",
+        "description": "Improves French influence, reducing unit cost around Keeps by 10%."
+      }
+    ],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "chamber-of-commerce",
+        "age": 2,
+        "name": "Chamber of Commerce",
+        "type": "Economic",
+        "description": "Acts as a Market. All Traders return +30% more resources."
+      },
+      {
+        "id": "school-of-cavalry",
+        "age": 2,
+        "name": "School of Cavalry",
+        "type": "Military",
+        "description": "Acts as a Stable. All Stables produce units 20% faster."
+      },
+      {
+        "id": "guild-hall",
+        "age": 3,
+        "name": "Guild Hall",
+        "type": "Economic",
+        "description": "Stores resources over time; generation speed increases with accumulation."
+      },
+      {
+        "id": "royal-institute",
+        "age": 3,
+        "name": "Royal Institute",
+        "type": "Technology",
+        "description": "Houses unique French technologies at a 20% reduced cost."
+      },
+      {
+        "id": "college-of-artillery",
+        "age": 4,
+        "name": "College of Artillery",
+        "type": "Military",
+        "description": "Provides access to Royal Artillery units with +20% damage."
+      },
+      {
+        "id": "red-palace",
+        "age": 4,
+        "name": "Red Palace",
+        "type": "Defensive",
+        "description": "Acts as a powerful Keep with high-damage arbalest bolts."
+      }
+    ],
+    "strengths": [
+      "Hanno i balestrieri più forti del gioco",
+      "Cavalieri pesanti disponibili in età feudale"
+    ],
+    "weaknesses": [
+      "Soffrono molto le dark age con rush di picche"
+    ]
+  },
+  {
+    "id": "japanese",
+    "name": "Giapponesi",
+    "flag": "/civs/Japanese.webp",
+    "difficulty": "Medio",
+    "short_description": "An infantry and farming-centric civilization utilizing Samurai and Shinobi.",
+    "passive_bonuses": [
+      "Town Centers can upgrade into Daimyo Manors to increase farm gather rates.",
+      "Forges offer unique melee upgrade paths."
+    ],
+    "unique_units": [
+      {
+        "id": "samurai",
+        "age": 2,
+        "name": "Samurai",
+        "type": "Infantry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.12,
+          "attack": 10,
+          "health": 130
+        },
+        "imageId": "samurai-2",
+        "strengths": [
+          "Infantry"
+        ],
+        "weaknesses": [
+          "Crossbowmen"
+        ],
+        "description": "Heavy infantry with Deflective Armor that blocks strikes."
+      },
+      {
+        "id": "onna-bugeisha",
+        "age": 2,
+        "name": "Onna-Bugeisha",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.38,
+          "attack": 8,
+          "health": 80
+        },
+        "imageId": "onna-bugeisha-2",
+        "strengths": [
+          "Light Units"
+        ],
+        "weaknesses": [
+          "Archers"
+        ],
+        "description": "Fast light infantry with high attack range."
+      },
+      {
+        "id": "shinobi",
+        "age": 2,
+        "name": "Shinobi",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.25,
+          "attack": 8,
+          "health": 100
+        },
+        "imageId": "shinobi-2",
+        "strengths": [
+          "Sabotage"
+        ],
+        "weaknesses": [
+          "Detection"
+        ],
+        "description": "Stealth unit that can teleport and sabotage buildings."
+      },
+      {
+        "id": "ozutsu",
+        "age": 4,
+        "name": "Ozutsu",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 40,
+          "health": 140
+        },
+        "imageId": "ozutsu-4",
+        "strengths": [
+          "Buildings",
+          "Siege"
+        ],
+        "weaknesses": [
+          "Cavalry"
+        ],
+        "description": "Siege infantry armed with hand cannons."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "koka-township",
+        "age": 2,
+        "name": "Koka Township",
+        "type": "Military",
+        "description": "Produces Shinobi units."
+      },
+      {
+        "id": "kura-storehouse",
+        "age": 2,
+        "name": "Kura Storehouse",
+        "type": "Economic",
+        "description": "Acts as a Resource Drop-off; generates free Wood/Farms."
+      },
+      {
+        "id": "floating-gate",
+        "age": 3,
+        "name": "Floating Gate",
+        "type": "Religious",
+        "description": "Produces Shinto Priests and Yorishiro for building buffs."
+      },
+      {
+        "id": "temple-equality",
+        "age": 3,
+        "name": "Temple of Equality",
+        "type": "Religious",
+        "imageId": "temple-of-equality-2",
+        "description": "Produces Buddhist Monks to debuff enemy units."
+      },
+      {
+        "id": "tanegashima",
+        "age": 4,
+        "name": "Tanegashima Gunsmith",
+        "type": "Military",
+        "imageId": "tanegashima-gunsmith-3",
+        "description": "Produces Ozutsu and other gunpowder units."
+      },
+      {
+        "id": "castle-of-the-crow",
+        "age": 4,
+        "name": "Castle of the Crow",
+        "type": "Defensive",
+        "imageId": "castle-of-the-crow-3",
+        "description": "Acts as a powerful defensive structure that periodically spawns Treasure Caravans from neutral Trading Posts, providing large amounts of Food, Wood, Gold, and Stone."
+      }
+    ],
+    "strengths": [
+      "Gli alloggiamenti costano solo 75 legno"
+    ],
+    "weaknesses": [
+      "Non può costruire fortezze fino all'età Imperiale"
+    ]
+  },
+  {
+    "id": "jeannedarc",
+    "name": "Giovanna d'Arco",
+    "flag": "/civs/Jeanne d'Arc.webp",
+    "difficulty": "Difficile",
+    "short_description": "A hero-led civilization where Jeanne d'Arc levels up and leads her army to victory.",
+    "passive_bonuses": [
+      "Jeanne d'Arc gains experience from building, combat, and landmarks to unlock powerful abilities.",
+      "Highly aggressive and tempo-based."
+    ],
+    "unique_units": [
+      {
+        "id": "jeanne-hero",
+        "age": 1,
+        "name": "Giovanna d'Arco",
+        "type": "Infantry",
+        "stats": {
+          "armor": 2,
+          "speed": 1.12,
+          "attack": 10,
+          "health": 150
+        },
+        "imageId": "jeanne-hero-1",
+        "strengths": [
+          "Versatility"
+        ],
+        "weaknesses": [
+          "Death"
+        ],
+        "description": "Hero unit that evolves and gains powerful abilities."
+      },
+      {
+        "id": "jeannes-rider",
+        "age": 3,
+        "name": "Cavaliere di Giovanna",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.62,
+          "attack": 15,
+          "health": 155
+        },
+        "imageId": "jeannes-rider-3",
+        "strengths": [
+          "Support"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Agile light cavalry that supports Jeanne."
+      },
+      {
+        "id": "jeannes-champion",
+        "age": 3,
+        "name": "Campione di Giovanna",
+        "type": "Infantry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.12,
+          "attack": 12,
+          "health": 175
+        },
+        "imageId": "jeannes-champion-3",
+        "strengths": [
+          "Protective"
+        ],
+        "weaknesses": [
+          "Crossbowmen"
+        ],
+        "description": "Heavy infantry elite protector."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "chamber-commerce-jd",
+        "age": 2,
+        "name": "Chamber of Commerce",
+        "type": "Economic",
+        "imageId": "chamber-of-commerce",
+        "description": "Acts as a Market. All Traders return +30% more resources."
+      },
+      {
+        "id": "school-cavalry-jd",
+        "age": 2,
+        "name": "School of Cavalry",
+        "type": "Military",
+        "imageId": "school-of-cavalry",
+        "description": "Acts as a Stable. All Stables produce units 20% faster."
+      },
+      {
+        "id": "guild-hall-jd",
+        "age": 3,
+        "name": "Guild Hall",
+        "type": "Economic",
+        "imageId": "guild-hall",
+        "description": "Stores resources over time; generation speed increases with accumulation."
+      },
+      {
+        "id": "royal-institute-jd",
+        "age": 3,
+        "name": "Royal Institute",
+        "type": "Technology",
+        "imageId": "royal-institute",
+        "description": "Houses unique French technologies at a 20% reduced cost."
+      },
+      {
+        "id": "college-artillery-jd",
+        "age": 4,
+        "name": "College of Artillery",
+        "type": "Military",
+        "imageId": "college-of-artillery",
+        "description": "Provides access to Royal Artillery units with +20% damage."
+      },
+      {
+        "id": "red-palace-jd",
+        "age": 4,
+        "name": "Red Palace",
+        "type": "Defensive",
+        "imageId": "red-palace",
+        "description": "Acts as a powerful Keep with high-damage arbalest bolts."
+      }
+    ],
+    "strengths": [
+      "Ha come Eroe \"Giovanna D'Arco\" un'unità in grado di svilupparsi 4 volte"
+    ],
+    "weaknesses": [
+      "Economia scarsa"
+    ]
+  },
+  {
+    "id": "english",
+    "name": "Inglesi",
+    "flag": "/civs/English.webp",
+    "difficulty": "Facile",
+    "short_description": "A defensive civilization with a strong agricultural economy and the formidable Longbowman.",
+    "passive_bonuses": [
+      "Farms are 50% cheaper to construct.",
+      "Network of Castles: Town Centers, Outposts, Towers, and Keeps grant a +25% attack speed bonus.",
+      "Vanguard Men-at-Arms available in the Dark Age (I)."
+    ],
+    "unique_units": [
+      {
+        "id": "king-2",
+        "age": 2,
+        "name": "King",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 2,
+          "speed": 1.62,
+          "attack": 16,
+          "health": 220
+        },
+        "imageId": "king-2",
+        "strengths": [
+          "Raiding",
+          "Heal Support"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Crossbowmen"
+        ],
+        "description": "A powerful leader that heals nearby out-of-combat units by +2 HP/s."
+      },
+      {
+        "id": "longbowman-2",
+        "age": 2,
+        "name": "Longbowman",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 6,
+          "health": 70
+        },
+        "imageId": "longbowman-2",
+        "strengths": [
+          "Spearmen",
+          "Archers",
+          "Light Infantry"
+        ],
+        "weaknesses": [
+          "Knights",
+          "Horsemen"
+        ],
+        "description": "Long-ranged archer unit capable of deploying defensive palings against cavalry."
+      },
+      {
+        "id": "man-at-arms-1",
+        "age": 1,
+        "name": "Vanguard Man-at-Arms",
+        "type": "Infantry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.12,
+          "attack": 8,
+          "health": 100
+        },
+        "imageId": "man-at-arms-1",
+        "strengths": [
+          "Light Infantry",
+          "Archers"
+        ],
+        "weaknesses": [
+          "Crossbowmen",
+          "Heavy Cavalry"
+        ],
+        "description": "Tough early infantry available in the Dark Age with good damage and armor."
+      },
+      {
+        "id": "wynguard-ranger-4",
+        "age": 4,
+        "name": "Wynguard Ranger",
+        "type": "Ranged",
+        "stats": {
+          "armor": 3,
+          "speed": 1.12,
+          "attack": 12,
+          "health": 125
+        },
+        "imageId": "longbowman-4",
+        "strengths": [
+          "Standard Infantry"
+        ],
+        "weaknesses": [
+          "Siege",
+          "Heavy Cavalry"
+        ],
+        "description": "Elite variant of the Longbowman with significantly higher damage and health."
+      },
+      {
+        "id": "wynguard-footman-4",
+        "age": 4,
+        "name": "Wynguard Footman",
+        "type": "Infantry",
+        "stats": {
+          "armor": 6,
+          "speed": 1.12,
+          "attack": 20,
+          "health": 280
+        },
+        "imageId": "man-at-arms-4",
+        "strengths": [
+          "Frontline Tanking"
+        ],
+        "weaknesses": [
+          "Crossbowmen",
+          "Handcannoneers"
+        ],
+        "description": "A specialized Man-at-Arms with exceptionally high health and pierce armor."
+      }
+    ],
+    "technologies": [
+      {
+        "id": "tech-armor-clad",
+        "age": 3,
+        "name": "Armor Clad",
+        "building": "Barracks",
+        "description": "Grants Men-at-Arms +2 armor."
+      },
+      {
+        "id": "tech-shattering-projectiles",
+        "age": 4,
+        "name": "Shattering Projectiles",
+        "building": "Siege Workshop",
+        "description": "Trebuchets deal AoE damage."
+      }
+    ],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "abbey-of-kings",
+        "age": 2,
+        "name": "Abbey of Kings",
+        "type": "Religious",
+        "description": "Heals nearby friendly units out of combat (+6 HP/1s). Can produce Kings."
+      },
+      {
+        "id": "council-hall",
+        "age": 2,
+        "name": "Council Hall",
+        "type": "Military",
+        "description": "Archery Range that works 100% faster. Longbowmen are 5% cheaper."
+      },
+      {
+        "id": "kings-palace",
+        "age": 3,
+        "name": "King's Palace",
+        "type": "Economic",
+        "description": "Acts as a fully functional Town Center."
+      },
+      {
+        "id": "white-tower",
+        "age": 3,
+        "name": "The White Tower",
+        "type": "Defensive",
+        "imageId": "the-white-tower-2",
+        "description": "Acts as a Keep that works 75% faster and has all technologies."
+      },
+      {
+        "id": "berkshire-palace",
+        "age": 4,
+        "name": "Berkshire Palace",
+        "type": "Defensive",
+        "description": "Powerful Keep with +50% greater range and incendiary arrows."
+      },
+      {
+        "id": "wynguard-palace",
+        "age": 4,
+        "name": "Wynguard Palace",
+        "type": "Military",
+        "description": "Produces specialized battalions (Rangers, Footmen, etc.)."
+      }
+    ],
+    "strengths": [
+      "Accesso a unità uniche: King, Longbowman, Vanguard Man-at-Arms, Wynguard Ranger, Wynguard Footman",
+      "Miglior Civiltà difensiva"
+    ],
+    "weaknesses": [
+      "Lenta ad ingranare poichè ha bisogno di settare le farm",
+      "Ha poche strategie funzionanti"
+    ]
+  },
+  {
+    "id": "templar",
+    "name": "Knights Templar",
+    "flag": "/civs/Knights Templar.png",
+    "difficulty": "Medio",
+    "short_description": "A variant of the French with a fanatical cavalry focus and unique religious orders.",
+    "passive_bonuses": [
+      "Powerful Templar Knights with charge bonuses.",
+      "Monasteries provide unique military upgrades."
+    ],
+    "unique_units": [
+      {
+        "id": "serjeant",
+        "age": 2,
+        "name": "Serjeant",
+        "type": "Infantry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.25,
+          "attack": 10,
+          "health": 105
+        },
+        "imageId": "serjeant",
+        "strengths": [
+          "Melee Infantry"
+        ],
+        "weaknesses": [
+          "Ranged Units"
+        ],
+        "description": "Sturdy infantry that throws axes which deal melee damage from range."
+      },
+      {
+        "id": "hospitaller-knight",
+        "age": 2,
+        "name": "Hospitaller Knight",
+        "type": "Infantry",
+        "stats": {
+          "armor": 2,
+          "speed": 1.25,
+          "attack": 10,
+          "health": 145
+        },
+        "imageId": "hospitaller-knight",
+        "strengths": [
+          "High armor"
+        ],
+        "weaknesses": [
+          "Knights",
+          "Crossbowmen"
+        ],
+        "description": "Tough infantry with good damage, heals friendly units."
+      },
+      {
+        "id": "genoese-crossbowman",
+        "age": 3,
+        "name": "Genoese Crossbowman",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.06,
+          "attack": 21,
+          "health": 110
+        },
+        "imageId": "genoese-crossbowman",
+        "strengths": [
+          "Melee Infantry",
+          "Cavalry"
+        ],
+        "weaknesses": [
+          "Horsemen"
+        ],
+        "description": "High damage ranged unit effective against Melee Infantry and Cavalry."
+      },
+      {
+        "id": "heavy-spearman",
+        "age": 2,
+        "name": "Heavy Spearman",
+        "type": "Infantry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.13,
+          "attack": 11,
+          "health": 140
+        },
+        "imageId": "https://data.aoe4world.com/images/units/heavy-spearman-3.png",
+        "strengths": [
+          "Cavalry"
+        ],
+        "weaknesses": [
+          "Crossbowmen"
+        ],
+        "description": "Heavy Infantry excellent against mounted units, especially near Fortresses."
+      },
+      {
+        "id": "condottiero",
+        "age": 3,
+        "name": "Condottiero",
+        "type": "Infantry",
+        "stats": {
+          "armor": 2,
+          "speed": 1.44,
+          "attack": 16,
+          "health": 195
+        },
+        "imageId": "https://data.aoe4world.com/images/units/condottiero-4.png",
+        "strengths": [
+          "Gunpowder Units",
+          "Mobility"
+        ],
+        "weaknesses": [
+          "High Gold cost"
+        ],
+        "description": "Fast Heavy Infantry that deals more and takes less damage from Gunpowder units."
+      },
+      {
+        "id": "teutonic-knight",
+        "age": 4,
+        "name": "Teutonic Knight",
+        "type": "Infantry",
+        "stats": {
+          "armor": 6,
+          "speed": 0.98,
+          "attack": 24,
+          "health": 310
+        },
+        "imageId": "teutonic-knight",
+        "strengths": [
+          "Melee Combat"
+        ],
+        "weaknesses": [
+          "Crossbowmen"
+        ],
+        "description": "Powerful and expensive. Lowers armor of nearby enemies and grows stronger after kills."
+      },
+      {
+        "id": "chevalier-confrere",
+        "age": 2,
+        "name": "Chevalier Confrere",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 2,
+          "speed": 1.63,
+          "attack": 14,
+          "health": 160
+        },
+        "imageId": "chevalier-confrere",
+        "strengths": [
+          "Cheap",
+          "Melee Conflict"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Crossbowmen"
+        ],
+        "description": "Heavy cavalry with high damage. Gains health from nearby Heavy Cavalry."
+      },
+      {
+        "id": "templar-brother",
+        "age": 3,
+        "name": "Templar Brother",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.63,
+          "attack": 24,
+          "health": 275
+        },
+        "imageId": "templar-brother",
+        "strengths": [
+          "Heavy Armor",
+          "Melee Combat"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Crossbowmen"
+        ],
+        "description": "Expensive cavalry with high damage and melee armor. Effective against melee units."
+      },
+      {
+        "id": "venetian-trader",
+        "age": 4,
+        "name": "Venetian Trader",
+        "type": "Worker",
+        "stats": {
+          "armor": 3,
+          "speed": 1.88,
+          "attack": 0,
+          "health": 120
+        },
+        "imageId": "venetian-trader",
+        "strengths": [
+          "Gold Generation",
+          "Speed"
+        ],
+        "weaknesses": [
+          "Vulnerable"
+        ],
+        "description": "Expensive and fast Trader that generates Gold. Max 5."
+      },
+      {
+        "id": "venetian-galley",
+        "age": 3,
+        "name": "Venetian Galley",
+        "type": "Siege",
+        "stats": {
+          "armor": 0,
+          "speed": 1,
+          "attack": 450,
+          "health": 1008
+        },
+        "imageId": "https://data.aoe4world.com/images/units/venetian-galley-4.png",
+        "strengths": [
+          "Long Range",
+          "Buildings"
+        ],
+        "weaknesses": [
+          "Vulnerable to small ships"
+        ],
+        "description": "Large oared vessel with a long-range forward-mounted Trebuchet."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center-1",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "town-center-2",
+        "age": 2,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "fortress-2",
+        "age": 2,
+        "name": "Fortezza",
+        "type": "Defensive",
+        "imageId": "fortress-2",
+        "description": "Potente struttura difensiva che protegge il territorio."
+      },
+      {
+        "id": "town-center-3",
+        "age": 3,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "fortress-3",
+        "age": 3,
+        "name": "Fortezza",
+        "type": "Defensive",
+        "imageId": "fortress-2",
+        "description": "Potente struttura difensiva che protegge il territorio."
+      },
+      {
+        "id": "town-center-4",
+        "age": 4,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "fortress-4",
+        "age": 4,
+        "name": "Fortezza",
+        "type": "Defensive",
+        "imageId": "fortress-2",
+        "description": "Potente struttura difensiva che protegge il territorio."
+      }
+    ],
+    "strengths": [
+      "Grande quantità di unità uniche",
+      "Fortezze disponibili dall'età feudale"
+    ],
+    "weaknesses": []
+  },
+  {
+    "id": "lancaster",
+    "name": "Lancaster",
+    "flag": "/civs/House of Lancaster.webp",
+    "difficulty": "Facile",
+    "short_description": "A variant of the English with powerful longbowmen upgrades and defensive traits.",
+    "passive_bonuses": [
+      "Enhanced defensive networks.",
+      "Focus on ranged superiority and area denial."
+    ],
+    "unique_units": [
+      {
+        "id": "lord-of-lancaster",
+        "age": 1,
+        "name": "Lord of Lancaster",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 2,
+          "speed": 1.62,
+          "attack": 10,
+          "health": 250
+        },
+        "imageId": "https://data.aoe4world.com/images/units/lord-of-lancaster-2.png",
+        "strengths": [
+          "Raiding",
+          "Mobility"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "A powerful hero unit that inspires nearby troops and excels in early skirmishes."
+      },
+      {
+        "id": "demilancer",
+        "age": 2,
+        "name": "Demilancer",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.62,
+          "attack": 19,
+          "health": 190
+        },
+        "imageId": "https://data.aoe4world.com/images/units/demilancer-1.png",
+        "strengths": [
+          "Archers",
+          "Light Infantry"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Crossbowmen"
+        ],
+        "description": "Versatile heavy cavalry available in the Feudal Age."
+      },
+      {
+        "id": "earls-guard",
+        "age": 1,
+        "name": "Earl's Guard",
+        "type": "Infantry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.12,
+          "attack": 8,
+          "health": 120
+        },
+        "imageId": "https://data.aoe4world.com/images/units/earls-guard-1.png",
+        "strengths": [
+          "Light Infantry",
+          "Archers"
+        ],
+        "weaknesses": [
+          "Crossbowmen",
+          "Knights"
+        ],
+        "description": "Heavy infantry available early to protect key positions."
+      },
+      {
+        "id": "yeoman",
+        "age": 1,
+        "name": "Yeoman",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.25,
+          "attack": 5,
+          "health": 70
+        },
+        "imageId": "https://data.aoe4world.com/images/units/yeoman-2.png",
+        "strengths": [
+          "Spearmen",
+          "Unarmored Units"
+        ],
+        "weaknesses": [
+          "Cavalry",
+          "Man-at-Arms"
+        ],
+        "description": "Skilled longbowmen with exceptional range and volley fire."
+      },
+      {
+        "id": "hobelar",
+        "age": 1,
+        "name": "Hobelar",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.88,
+          "attack": 13,
+          "health": 125
+        },
+        "imageId": "https://data.aoe4world.com/images/units/hobelar-2.png",
+        "strengths": [
+          "Archers",
+          "Siege"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Knights"
+        ],
+        "description": "Swift light cavalry used for scouting and harassing enemy lines."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "abbey-of-kings-lan",
+        "age": 2,
+        "name": "Abbey of Kings",
+        "type": "Religious",
+        "imageId": "abbey-of-kings-1",
+        "description": "Heals nearby friendly units out of combat (+6 HP/1s). Can produce Kings."
+      },
+      {
+        "id": "lancaster-castle",
+        "age": 2,
+        "name": "Lancaster Castle",
+        "type": "Defensive",
+        "imageId": "https://data.aoe4world.com/images/buildings/lancaster-castle-1.png",
+        "description": "Acts as a Keep and Archery Range/Stable."
+      },
+      {
+        "id": "white-tower-lan",
+        "age": 3,
+        "name": "The White Tower",
+        "type": "Defensive",
+        "imageId": "the-white-tower-2",
+        "description": "Acts as a Keep that works 75% faster and has all technologies."
+      },
+      {
+        "id": "kings-college",
+        "age": 3,
+        "name": "King's College",
+        "type": "Technology",
+        "imageId": "kings-college-2",
+        "description": "Acts as a University and improves research speed."
+      },
+      {
+        "id": "wynguard-palace-lan",
+        "age": 4,
+        "name": "Wynguard Palace",
+        "type": "Military",
+        "imageId": "wynguard-palace-3",
+        "description": "Produces specialized battalions (Rangers, Footmen, etc.)."
+      },
+      {
+        "id": "berkshire-palace-lan",
+        "age": 4,
+        "name": "Berkshire Palace",
+        "type": "Defensive",
+        "imageId": "berkshire-palace-3",
+        "description": "Powerful Keep with +50% greater range and incendiary arrows."
+      }
+    ],
+    "strengths": [
+      "Se sfruttati correttamente i manieri garantistico un ottimo boom economico"
+    ],
+    "weaknesses": []
+  },
+  {
+    "id": "macedonian",
+    "name": "Macedoni",
+    "flag": "/civs/Macedonian Dynasty.webp",
+    "difficulty": "Facile",
+    "short_description": "A variant of the Byzantines featuring robust frontline units and unique mercenaries.",
+    "passive_bonuses": [
+      "Specialized infantry formations.",
+      "Unique mercenary contracts."
+    ],
+    "unique_units": [],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [
+      {
+        "steps": [
+          {
+            "action": "6 pecore, uno costruisce casa"
+          },
+          {
+            "action": "2 oro"
+          },
+          {
+            "action": "villi al cibo fino a feudale"
+          },
+          {
+            "action": "4 villi dal cibo costruiscono Ippodromo"
+          },
+          {
+            "action": "1 villo da cibo a legno costruisce falegnameria"
+          },
+          {
+            "action": "2 villi al legno"
+          },
+          {
+            "action": "tutti gli altri al cibo"
+          }
+        ],
+        "title": "BUILD ORDER FEUDALE",
+        "difficulty": "Easy",
+        "description": "Apertura standard con Ippodromo."
+      }
+    ],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "grand-winery-mac",
+        "age": 2,
+        "name": "Grand Winery",
+        "type": "Economic",
+        "imageId": "grand-winery-1",
+        "description": "+60% Olive Oil from nearby farms; acts as a Monastery."
+      },
+      {
+        "id": "imperial-hippodrome-mac",
+        "age": 2,
+        "name": "Imperial Hippodrome",
+        "type": "Military",
+        "imageId": "imperial-hippodrome-1",
+        "description": "Unlocks Triumph ability for cavalry speed/heal."
+      },
+      {
+        "id": "cistern-first-hill-mac",
+        "age": 3,
+        "name": "Cistern of the First Hill",
+        "type": "Defensive",
+        "imageId": "cistern-of-the-first-hill-2",
+        "description": "Acts as a large Cistern; provides healing flasks."
+      },
+      {
+        "id": "golden-horn-tower-mac",
+        "age": 3,
+        "name": "Golden Horn Tower",
+        "type": "Military",
+        "imageId": "golden-horn-tower-2",
+        "description": "Periodically spawns free Mercenary units."
+      },
+      {
+        "id": "foreign-engineering-mac",
+        "age": 4,
+        "name": "Foreign Engineering Company",
+        "type": "Military",
+        "imageId": "foreign-engineering-company-3",
+        "description": "Produces unique mercenary siege units."
+      },
+      {
+        "id": "palatine-school-mac",
+        "age": 4,
+        "name": "Palatine School",
+        "type": "Technology",
+        "imageId": "palatine-school-3",
+        "description": "Acts as a University; produces free elite mercenary units when researching technologies."
+      }
+    ],
+    "strengths": [
+      "Esercito leggermente più costoso ma mediamente più forte, sfrutta i campioni per ottenere vari bonus per l'esercito;",
+      "Le caserme, ovvero le Roccaforti, sono più costose ma possono essere migliorate con una tecnologie che le rende delle temibili basi capaci di difendersi da sole;",
+      "Sfruttano l'argento raccolto per migliorare il proprio esercito, potendo spendere le altre risorse in altro;",
+      "I luoghi storici sono molto utili e forti."
+    ],
+    "weaknesses": [
+      "Non posseggono bonus economici di alcun tipo, subire danni economici può rivelarsi letale.",
+      "Siccome l'arsenale, ovvero il fabbro della Dinastia Macedone, è molto verticale, dovendo spendere argento per migliorare una singola unità alla volta, cambiare composizione dell'esercito non è sempre immediato.",
+      "Non hanno accesso alla polvere da sparo se non per i cannoni reali (mercenari), quando la partita va per il lungo potrebbero soffrire."
+    ]
+  },
+  {
+    "id": "malians",
+    "name": "Maliani",
+    "flag": "/civs/Malians.webp",
+    "difficulty": "Difficile",
+    "short_description": "An economy-driven civilization focused on Gold, Cattle, and stealthy infantry.",
+    "passive_bonuses": [
+      "Pit Mines automatically generate Gold",
+      "Musofadi Warriors can utilize stealth."
+    ],
+    "unique_units": [
+      {
+        "id": "donso",
+        "age": 1,
+        "name": "Donso",
+        "type": "Infantry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.12,
+          "attack": 8,
+          "health": 80
+        },
+        "imageId": "donso-1",
+        "strengths": [
+          "Cavalry"
+        ],
+        "weaknesses": [
+          "Archers"
+        ],
+        "description": "Anti-cavalry infantry with a ranged spear throw."
+      },
+      {
+        "id": "javelin-thrower",
+        "age": 2,
+        "name": "Giavellottiere",
+        "type": "Ranged",
+        "stats": {
+          "armor": 3,
+          "speed": 1.12,
+          "attack": 8,
+          "health": 70
+        },
+        "imageId": "javelin-thrower-2",
+        "strengths": [
+          "Archers"
+        ],
+        "weaknesses": [
+          "Cavalry"
+        ],
+        "description": "Ranged unit that counters other ranged units."
+      },
+      {
+        "id": "musofadi-warrior",
+        "age": 2,
+        "name": "Guerriero Musofadi",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.25,
+          "attack": 10,
+          "health": 95
+        },
+        "imageId": "musofadi-warrior-2",
+        "strengths": [
+          "Heavy Units"
+        ],
+        "weaknesses": [
+          "Archers"
+        ],
+        "description": "Light infantry capable of entering stealth."
+      },
+      {
+        "id": "sofa",
+        "age": 2,
+        "name": "Sofa",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.62,
+          "attack": 12,
+          "health": 160
+        },
+        "imageId": "sofa-2",
+        "strengths": [
+          "Light Units"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Fast and relatively cheap heavy cavalry."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [
+      {
+        "steps": [
+          {
+            "note": "Shiftare i 5 al legno alle pecore dopo il primo albero.",
+            "time": "00:00",
+            "action": "5 su un albero vicino al tc ed 1 a costruire la Pitmine"
+          },
+          {
+            "note": "Presa la legna, spostare al cibo.",
+            "time": "00:20",
+            "action": "Mandare il primo villo su un secondo albero a prendere SOLO 25 di legna. Rally al cibo."
+          },
+          {
+            "note": "Fino a 7 case lasciando spazio per miniera.",
+            "time": "00:35",
+            "action": "Costruire case attorno alla pitmine"
+          },
+          {
+            "note": "Costruirla lontano dal cowboom.",
+            "time": "02:45",
+            "action": "Passare all'età feudale con 5 abitanti e 'CAVA DI MANSA'"
+          }
+        ],
+        "title": "BUILD ORDER STRUTTURATO",
+        "difficulty": "Medium",
+        "description": "Ottimizzazione Pitmine e Cowboom."
+      }
+    ],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "mansa-quarry",
+        "age": 2,
+        "name": "Cava di Mansa",
+        "type": "Economic",
+        "description": "Generates Gold or Stone passively (75/min)."
+      },
+      {
+        "id": "saharan-trade",
+        "age": 2,
+        "name": "Rete Commerciale Sahariana",
+        "type": "Defensive",
+        "imageId": "saharan-trade-network-1",
+        "description": "Toll Outpost that generates Food from trade."
+      },
+      {
+        "id": "farimba-garrison",
+        "age": 3,
+        "name": "Guarnigione di Farimba",
+        "type": "Military",
+        "description": "Trains specialized units in batches for Gold."
+      },
+      {
+        "id": "fulani-corral",
+        "age": 3,
+        "name": "Recinto dei Fulani",
+        "type": "Economic",
+        "imageId": "grand-fulani-corral-2",
+        "description": "Nearby cattle provide constant Food income."
+      },
+      {
+        "id": "fort-huntress",
+        "age": 4,
+        "name": "Forte della Cacciatrice",
+        "type": "Defensive",
+        "imageId": "fort-of-the-huntress-3",
+        "description": "Keep with poison arrows and stealth aura."
+      },
+      {
+        "id": "griot-bara",
+        "age": 4,
+        "name": "Griot Bara",
+        "type": "Technology",
+        "description": "Activates powerful civilization-wide festivals."
+      }
+    ],
+    "strengths": [
+      "Risorse passive grazie alle pitmines e le mucche nei recinti"
+    ],
+    "weaknesses": [
+      "Unità meno performanti in età imperiale",
+      "Indisponibilità di balestre"
+    ]
+  },
+  {
+    "id": "mongols",
+    "name": "Mongoli",
+    "flag": "/civs/Mongols.webp",
+    "difficulty": "Difficile",
+    "short_description": "A nomadic civilization capable of moving their bases, excelling in rapid cavalry strikes.",
+    "passive_bonuses": [
+      "All buildings can be packed up and moved to a new location.",
+      "Start with maximum population limit; no need to build houses.",
+      "Cavalry produce 50% faster, or can produce double with stone."
+    ],
+    "unique_units": [
+      {
+        "id": "khan",
+        "age": 1,
+        "name": "Khan",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.62,
+          "attack": 4,
+          "health": 140
+        },
+        "imageId": "khan-1",
+        "strengths": [
+          "Support Arrows",
+          "Scouting"
+        ],
+        "weaknesses": [
+          "Melee Units"
+        ],
+        "description": "Cavalry hero that uses Signal Arrows to buff nearby units."
+      },
+      {
+        "id": "mangudai",
+        "age": 2,
+        "name": "Mangudai",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.62,
+          "attack": 5,
+          "health": 70
+        },
+        "imageId": "mangudai-2",
+        "strengths": [
+          "Infantry",
+          "Villagers"
+        ],
+        "weaknesses": [
+          "Archers",
+          "Knights"
+        ],
+        "description": "Highly mobile horse archer capable of firing while moving."
+      },
+      {
+        "id": "keshik",
+        "age": 2,
+        "name": "Keshik",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.62,
+          "attack": 15,
+          "health": 145
+        },
+        "imageId": "keshik-2",
+        "strengths": [
+          "Early Raiding"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Heavy cavalry that heals when attacking."
+      }
+    ],
+    "technologies": [
+      {
+        "id": "tech-yam-network",
+        "age": 2,
+        "name": "Yam Network",
+        "building": "Outpost",
+        "description": "Outposts grant a speed boost to all nearby cavalry and traders."
+      },
+      {
+        "id": "tech-stone-commerce",
+        "age": 4,
+        "name": "Stone Commerce",
+        "building": "Market",
+        "description": "Traders also provide stone alongside gold."
+      }
+    ],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "deer-stones",
+        "age": 2,
+        "name": "Deer Stones",
+        "type": "Military",
+        "imageId": "deer-stones-1",
+        "description": "Grants access to the Khan's Hunter at the Archery Range and instantly researches the Yam Network technology."
+      },
+      {
+        "id": "yam-network",
+        "age": 2,
+        "name": "Yam Network",
+        "type": "Military",
+        "description": "Outposts grant a speed boost to all nearby cavalry and traders."
+      },
+      {
+        "id": "silver-tree",
+        "age": 2,
+        "name": "The Silver Tree",
+        "type": "Economic",
+        "imageId": "the-silver-tree-1",
+        "description": "Acts as a Market. Trader production +40% faster and -40% cheaper."
+      },
+      {
+        "id": "kurultai",
+        "age": 3,
+        "name": "Kurultai",
+        "type": "Military",
+        "description": "Heals nearby units and provides +20% damage bonus with Khan."
+      },
+      {
+        "id": "steppe-redoubt",
+        "age": 3,
+        "name": "Steppe Redoubt",
+        "type": "Economic",
+        "description": "Acts as a Ger. Gold income increased by +50%."
+      },
+      {
+        "id": "khaganate-palace",
+        "age": 4,
+        "name": "Khaganate Palace",
+        "type": "Military",
+        "description": "Automatically spawns diverse Mongol armies."
+      },
+      {
+        "id": "white-stupa",
+        "age": 4,
+        "name": "The White Stupa",
+        "type": "Economic",
+        "imageId": "the-white-stupa-3",
+        "description": "Generates 240 stone per minute without an Ovoo."
+      }
+    ],
+    "strengths": [
+      "Non ha bisogno di costruire case",
+      "Gli edifici si possono spostare",
+      "Possibilità di produrre due unità alla volta"
+    ],
+    "weaknesses": [
+      "Non possono costruire mura"
+    ]
+  },
+  {
+    "id": "goldenhorde",
+    "name": "Orda d'Oro",
+    "flag": "/civs/Golden Horde.webp",
+    "difficulty": "Medio",
+    "short_description": "An aggressive variant of the Mongols focusing on early cavalry and economy.",
+    "passive_bonuses": [
+      "Mobile buildings like the Mongols.",
+      "Increased early economic and military pressure."
+    ],
+    "unique_units": [
+      {
+        "id": "kharash",
+        "age": 1,
+        "name": "Kharash",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.13,
+          "attack": 6,
+          "health": 50
+        },
+        "strengths": [
+          "Supporto",
+          "Costo"
+        ],
+        "weaknesses": [
+          "Tutte le unità"
+        ],
+        "description": "Fanteria da mischia a basso costo che aumenta passivamente l'armatura delle unità vicine."
+      },
+      {
+        "id": "batu-khan",
+        "age": 1,
+        "name": "Batu Khan",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.63,
+          "attack": 10,
+          "health": 190
+        },
+        "strengths": [
+          "Supporto",
+          "Manovre"
+        ],
+        "weaknesses": [
+          "Lancieri"
+        ],
+        "description": "Unità eroe che potenzia l'esercito con manovre tattiche uniche."
+      },
+      {
+        "id": "torguud",
+        "age": 1,
+        "name": "Torguud",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.63,
+          "attack": 10,
+          "health": 220
+        },
+        "strengths": [
+          "Bodyguard",
+          "Alta Salute"
+        ],
+        "weaknesses": [
+          "Lancieri",
+          "Balestrieri"
+        ],
+        "description": "Cavalleria pesante che protegge il Khan deviando i danni su di sé."
+      },
+      {
+        "id": "keshik",
+        "age": 2,
+        "name": "Keshik",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.63,
+          "attack": 15,
+          "health": 150
+        },
+        "strengths": [
+          "Corpo a corpo",
+          "Sostenibilità"
+        ],
+        "weaknesses": [
+          "Lancieri",
+          "Balestrieri"
+        ],
+        "description": "Cavalleria pesante che si cura attaccando. Sostituisce il Cavaliere."
+      },
+      {
+        "id": "kipchak-archer",
+        "age": 2,
+        "name": "Kipchak Archer",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.63,
+          "attack": 10,
+          "health": 105
+        },
+        "strengths": [
+          "Mobilità",
+          "Hit-and-Run"
+        ],
+        "weaknesses": [
+          "Arcieri",
+          "Cavalleggeri"
+        ],
+        "description": "Arciere a cavallo capace di scoccare frecce in movimento."
+      },
+      {
+        "id": "rus-tribute",
+        "age": 3,
+        "name": "Rus Tribute",
+        "type": "Infantry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.13,
+          "attack": 12,
+          "health": 200
+        },
+        "strengths": [
+          "Anti-Cavalleria",
+          "Costo"
+        ],
+        "weaknesses": [
+          "Unità a distanza"
+        ],
+        "description": "Fanteria pesante evocata gratuitamente alla Tenda d'Oro con bonus vs cavalleria."
+      },
+      {
+        "id": "traction-trebuchet",
+        "age": 3,
+        "name": "Traction Trebuchet",
+        "type": "Siege",
+        "stats": {
+          "armor": 0,
+          "speed": 0.88,
+          "attack": 40,
+          "health": 125
+        },
+        "strengths": [
+          "Edifici",
+          "Mobilità"
+        ],
+        "weaknesses": [
+          "Unità da mischia"
+        ],
+        "description": "Trabucco ad alta mobilità per schieramenti rapidi e distruzione di edifici."
+      },
+      {
+        "id": "shaman",
+        "age": 3,
+        "name": "Shaman",
+        "type": "Religious",
+        "stats": {
+          "armor": 0,
+          "speed": 1.13,
+          "attack": 0,
+          "health": 130
+        },
+        "strengths": [
+          "Cura",
+          "Reliquie"
+        ],
+        "weaknesses": [
+          "Tutte le unità nemiche"
+        ],
+        "description": "Unità religiosa capace di curare e utilizzare le manovre del Khan."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center-1",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "town-center-2",
+        "age": 2,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "town-center-3",
+        "age": 3,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "town-center-4",
+        "age": 4,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "golden-tent",
+        "age": 2,
+        "name": "Tenda d'Oro",
+        "type": "Military",
+        "imageId": "golden-tent-1",
+        "description": "L'edificio centrale per il reclutamento del Khan e il comando dell'esercito. Consente di avanzare d'età e ricercare potenti editti."
+      },
+      {
+        "id": "golden-tent-3",
+        "age": 3,
+        "name": "Tenda d'Oro (Età III)",
+        "type": "Military",
+        "imageId": "golden-tent-1",
+        "description": "Potenziamento della Tenda d'Oro per l'Età dei Castelli."
+      },
+      {
+        "id": "golden-tent-4",
+        "age": 4,
+        "name": "Tenda d'Oro (Età IV)",
+        "type": "Military",
+        "imageId": "golden-tent-1",
+        "description": "Massimo potenziamento della Tenda d'Oro per l'Età Imperiale."
+      }
+    ],
+    "strengths": [
+      "Accesso a unità uniche: Torguud"
+    ],
+    "weaknesses": []
+  },
+  {
+    "id": "orderofthedragon",
+    "name": "Ordine del Drago",
+    "flag": "/civs/Order of the Dragon.webp",
+    "difficulty": "Facile",
+    "short_description": "An elite variant of the Holy Roman Empire, focusing on fewer, but incredibly powerful units.",
+    "passive_bonuses": [
+      "Units are individually much stronger but cost double the resources and population space."
+    ],
+    "unique_units": [
+      {
+        "id": "gilded-spearman",
+        "age": 1,
+        "name": "Gilded Spearman",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.25,
+          "attack": 14,
+          "health": 160
+        },
+        "imageId": "spearman-1",
+        "strengths": [
+          "Cavalry"
+        ],
+        "weaknesses": [
+          "Archers",
+          "Heavy Infantry"
+        ],
+        "description": "Elite variant of the Spearman with double health and damage."
+      },
+      {
+        "id": "gilded-archer",
+        "age": 2,
+        "name": "Gilded Archer",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.25,
+          "attack": 10,
+          "health": 140
+        },
+        "imageId": "archer-2",
+        "strengths": [
+          "Spearmen",
+          "Crossbowmen"
+        ],
+        "weaknesses": [
+          "Cavalry",
+          "Man-at-Arms"
+        ],
+        "description": "Elite variant of the Archer with double health and damage."
+      },
+      {
+        "id": "gilded-horseman",
+        "age": 2,
+        "name": "Gilded Horseman",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 2,
+          "speed": 1.88,
+          "attack": 18,
+          "health": 250
+        },
+        "imageId": "horseman-2",
+        "strengths": [
+          "Archers",
+          "Siege"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Knights"
+        ],
+        "description": "Elite variant of the Horseman with double health and damage."
+      },
+      {
+        "id": "gilded-knight",
+        "age": 3,
+        "name": "Gilded Knight",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 8,
+          "speed": 1.62,
+          "attack": 48,
+          "health": 460
+        },
+        "imageId": "knight-3",
+        "strengths": [
+          "Archers",
+          "Infantry"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Crossbowmen"
+        ],
+        "description": "Elite variant of the Knight with double health and damage."
+      },
+      {
+        "id": "gilded-landsknecht",
+        "age": 3,
+        "name": "Gilded Landsknecht",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 34,
+          "health": 170
+        },
+        "imageId": "landsknecht-3",
+        "strengths": [
+          "Massed Units",
+          "Light Infantry"
+        ],
+        "weaknesses": [
+          "Archers",
+          "Knights"
+        ],
+        "description": "Elite variant of the Landsknecht with double health and damage."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "aachen-chapel-od",
+        "age": 2,
+        "name": "Aachen Chapel",
+        "type": "Economic",
+        "imageId": "aachen-chapel",
+        "description": "Inspires all Villagers in a large radius and increases their gather rate by +15%. Acts as a drop-off point for all resource types."
+      },
+      {
+        "id": "meinwerk-palace-od",
+        "age": 2,
+        "name": "Meinwerk Palace",
+        "type": "Technology",
+        "imageId": "meinwerk-palace",
+        "description": "Blacksmith where technologies cost -50% and research 50% faster."
+      },
+      {
+        "id": "burgrave-palace-od",
+        "age": 3,
+        "name": "Burgrave Palace",
+        "type": "Military",
+        "imageId": "burgrave-palace",
+        "description": "Barracks that produces units 35% faster and 35% cheaper."
+      },
+      {
+        "id": "regnitz-cathedral-od",
+        "age": 3,
+        "name": "Regnitz Cathedral",
+        "type": "Economic",
+        "imageId": "regnitz-cathedral",
+        "description": "All Relics generate +100% gold while garrisoned. Acts as a Monastery."
+      },
+      {
+        "id": "palace-of-swabia-od",
+        "age": 4,
+        "name": "Palace of Swabia",
+        "type": "Economic",
+        "imageId": "palace-of-swabia",
+        "description": "Acts as a Town Center. Produces Villagers +200% faster and at -66% cost."
+      },
+      {
+        "id": "elzbach-palace-od",
+        "age": 4,
+        "name": "Elzbach Palace",
+        "type": "Defensive",
+        "imageId": "elzbach-palace",
+        "description": "Acts as a Keep with +50% health. Buildings within influence take -25% less damage."
+      }
+    ],
+    "strengths": [
+      "Unità più costose ma più forti"
+    ],
+    "weaknesses": []
+  },
+  {
+    "id": "ottomans",
+    "name": "Ottomani",
+    "flag": "/civs/Ottomans.webp",
+    "difficulty": "Medio",
+    "short_description": "A military powerhouse offering free troop production through Military Schools.",
+    "passive_bonuses": [
+      "Military Schools produce units slowly for free.",
+      "Gain Vizier Points to unlock powerful civilization-wide abilities."
+    ],
+    "unique_units": [
+      {
+        "id": "sipahi",
+        "age": 2,
+        "name": "Sipahi",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.62,
+          "attack": 11,
+          "health": 135
+        },
+        "imageId": "sipahi-2",
+        "strengths": [
+          "Archers"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Light cavalry that can activate Fortitude for more damage."
+      },
+      {
+        "id": "mehter",
+        "age": 2,
+        "name": "Mehter",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 1,
+          "speed": 1.62,
+          "attack": 0,
+          "health": 140
+        },
+        "imageId": "mehter-2",
+        "strengths": [
+          "Buffs"
+        ],
+        "weaknesses": [
+          "Combat Icons"
+        ],
+        "description": "War drummer that provides tactical auras to nearby units."
+      },
+      {
+        "id": "janissary",
+        "age": 3,
+        "name": "Janissary",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 16,
+          "health": 80
+        },
+        "imageId": "janissary-3",
+        "strengths": [
+          "Cavalry"
+        ],
+        "weaknesses": [
+          "Archers"
+        ],
+        "description": "Gunpowder unit strong vs cavalry; can repair siege."
+      },
+      {
+        "id": "great-bombard",
+        "age": 4,
+        "name": "Great Bombard",
+        "type": "Siege",
+        "stats": {
+          "armor": 0,
+          "speed": 0.62,
+          "attack": 150,
+          "health": 400
+        },
+        "imageId": "great-bombard-4",
+        "strengths": [
+          "Buildings",
+          "Masses"
+        ],
+        "weaknesses": [
+          "Melee Cavalry"
+        ],
+        "description": "The largest and most powerful siege cannon."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "sultanhani",
+        "age": 2,
+        "name": "Sultanhani Trade Network",
+        "type": "Economic",
+        "imageId": "sultanhani-trade-network-1",
+        "description": "Garrisons Traders to generate Gold over time."
+      },
+      {
+        "id": "twin-minaret",
+        "age": 2,
+        "name": "Twin Minaret Medrese",
+        "type": "Economic",
+        "imageId": "twin-minaret-medrese-1",
+        "description": "Acts as a Mill; spawns infinite Berry Bushes."
+      },
+      {
+        "id": "istanbul-palace",
+        "age": 3,
+        "name": "Istanbul Imperial Palace",
+        "type": "Technology",
+        "imageId": "istanbul-imperial-palace-2",
+        "description": "Increases Vizier Point generation speed."
+      },
+      {
+        "id": "mehmed-armory",
+        "age": 3,
+        "name": "Mehmed Imperial Armory",
+        "type": "Military",
+        "imageId": "mehmed-imperial-armory-2",
+        "description": "Automatically produces free Siege units."
+      },
+      {
+        "id": "sea-gate-castle",
+        "age": 4,
+        "name": "Sea Gate Castle",
+        "type": "Defensive",
+        "description": "Strengthens trade and acts as a powerful Keep."
+      },
+      {
+        "id": "istanbul-observatory",
+        "age": 4,
+        "name": "Istanbul Observatory",
+        "type": "Technology",
+        "imageId": "istanbul-observatory-3",
+        "description": "Functions as a University and significantly enhances the production speed influence provided by Blacksmiths and Universities."
+      }
+    ],
+    "strengths": [
+      "I sipahi sono la cavalleria leggera più forte del gioco.",
+      "I mehter sono unità a cavallo che non attaccano ma danno bonus unici alle unità circostanti",
+      "I giannizzeri sono fucilieri con bonus contro la cavalleria",
+      "Le scuole militari producono unità gratis col passare del tempo",
+      "La grande bombarda è un'arma d'assedio che infligge danni AOE alle unità e maggiori danni alle strutture"
+    ],
+    "weaknesses": [
+      "Non hanno bonus economici unici"
+    ]
+  },
+  {
+    "id": "rus",
+    "name": "Rusiani",
+    "flag": "/civs/Rus.webp",
+    "difficulty": "Medio",
+    "short_description": "A hunting and forestry civilization relying on Bounties and robust Wooden Fortresses.",
+    "passive_bonuses": [
+      "Gain Bounty from hunting animals, increasing global gather rates.",
+      "Produce strong early knights and wooden defensive structures."
+    ],
+    "unique_units": [
+      {
+        "id": "rus-knight",
+        "age": 2,
+        "name": "Knight (Rus)",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.62,
+          "attack": 19,
+          "health": 190
+        },
+        "imageId": "knight-2",
+        "strengths": [
+          "Archers",
+          "Standard Units"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Crossbowmen"
+        ],
+        "description": "Powerful heavy cavalry available an age earlier (Age II)."
+      },
+      {
+        "id": "warrior-monk",
+        "age": 3,
+        "name": "Warrior Monk",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.62,
+          "attack": 11,
+          "health": 190
+        },
+        "imageId": "warrior-monk-3",
+        "strengths": [
+          "Combat Buffs",
+          "Relics"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Religious cavalry unit that buffs nearby allies after combat."
+      },
+      {
+        "id": "streltsy",
+        "age": 4,
+        "name": "Streltsy",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 35,
+          "health": 150
+        },
+        "imageId": "streltsy-4",
+        "strengths": [
+          "All Ground Units"
+        ],
+        "weaknesses": [
+          "Mangonels",
+          "Horsemen"
+        ],
+        "description": "Gunpowder unit that gets stronger when standing still."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [
+      {
+        "steps": [
+          {
+            "note": "Appena cliccato age-up 5 al cibo, 4 alla porta d'oro e tutti gli altri alla legna finché non se ne hanno 8, poi di nuovo tutti al cibo.",
+            "time": "00:00",
+            "action": "Tutti al cibo dopo aver raccolto con 4 abitanti 2 giri di legna (3 capanni più casa)"
+          },
+          {
+            "note": "Se non contestano proscout, fortezza di legno sulla woodline subito.",
+            "time": "04:30",
+            "action": "Vendere 100 cibo alla porta d'oro e cliccare proscout. Aggiungere poi edificio militare."
+          },
+          {
+            "note": "Prepara le aree di tiro con l'arco o scuderia.",
+            "time": "09:XX",
+            "action": "Vendere la legna progressivamente per passare in terza epoca."
+          },
+          {
+            "note": "Iniziare transizione a farm. NON toccare oro.",
+            "time": "12:XX",
+            "action": "Addestrare HA da almeno 3 aree di tiro. Monastero, Fabbro."
+          },
+          {
+            "note": "Il vantaggio massimo è ORA.",
+            "time": "20:XX",
+            "action": "Mettere qualche bombarda nel mix per chiudere la partita."
+          }
+        ],
+        "title": "BUILD ORDER STRUTTURATO",
+        "difficulty": "Advanced",
+        "description": "Build order focalizzata sulla Porta d'Oro e ProScouts."
+      }
+    ],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "golden-gate",
+        "age": 2,
+        "name": "The Golden Gate",
+        "type": "Economic",
+        "imageId": "the-golden-gate-1",
+        "description": "Specialized Market with highly favorable exchange rates."
+      },
+      {
+        "id": "kremlin",
+        "age": 2,
+        "name": "The Kremlin",
+        "type": "Defensive",
+        "description": "Reinforced Wooden Fortress; can call temporary Militia."
+      },
+      {
+        "id": "high-trade-house",
+        "age": 3,
+        "name": "High Trade House",
+        "type": "Economic",
+        "description": "Generates gold from nearby trees and periodically spawns Deer."
+      },
+      {
+        "id": "abbey-trinity",
+        "age": 3,
+        "name": "Abbey of the Trinity",
+        "type": "Religious",
+        "imageId": "abbey-of-the-trinity-2",
+        "description": "Acts as a Monastery; trains Warrior Monks at lower cost."
+      },
+      {
+        "id": "high-armory",
+        "age": 4,
+        "name": "High Armory",
+        "type": "Military",
+        "description": "Reduces cost of Siege Workshops and provides unique upgrades."
+      },
+      {
+        "id": "spasskaya-tower",
+        "age": 4,
+        "name": "Spasskaya Tower",
+        "type": "Defensive",
+        "description": "High-health Keep with pre-unlocked weapon emplacements."
+      }
+    ],
+    "strengths": [
+      "Oro passivo grazie ai capanni di caccia e alla raccolta di carne cacciata",
+      "Arcieri a cavallo nell'età dei castelli",
+      "Boost alla raccolta della legna con una torre vicino alla falegnameria",
+      "Mura in legno più resistenti rispetto a quelle normali",
+      "Dispongono di cavalleria pesante già dall'età feudale",
+      "Raccolgono le reliquie più velocemente grazie ai \"Monaci guerrieri\" unità religiose a cavallo",
+      "Le torri sono più forti e possono riparare 8 abitanti"
+    ],
+    "weaknesses": [
+      "Non hanno mura in pietra senza la \"Spasskaya Tower\" (Landmark età IV)",
+      "L'economia dipende dalla carne cacciata che di base sono risorse esposte sulla mappa."
+    ]
+  },
+  {
+    "id": "hre",
+    "name": "Sacro Romano Impero",
+    "flag": "/civs/Holy Roman Empire.webp",
+    "difficulty": "Medio",
+    "short_description": "An infantry-heavy civilization buffed by religious Prelates.",
+    "passive_bonuses": [
+      "Prelates can inspire economy and military units.",
+      "Early Men-at-Arms access and powerful relic bonuses."
+    ],
+    "unique_units": [
+      {
+        "id": "prelate",
+        "age": 1,
+        "name": "Prelate",
+        "type": "Religious",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 0,
+          "health": 90
+        },
+        "imageId": "prelate-1",
+        "strengths": [
+          "Economic Buff",
+          "Healing"
+        ],
+        "weaknesses": [
+          "Everything"
+        ],
+        "description": "Support unit that inspires villagers to increase gather rates by 40."
+      },
+      {
+        "id": "landsknecht",
+        "age": 3,
+        "name": "Landsknecht",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 17,
+          "health": 85
+        },
+        "imageId": "landsknecht-3",
+        "strengths": [
+          "Massed Units",
+          "Light Infantry"
+        ],
+        "weaknesses": [
+          "Archers",
+          "Knights"
+        ],
+        "description": "Uses a large two-handed sword to deal significant area-of-effect damage."
+      },
+      {
+        "id": "hre-man-at-arms",
+        "age": 2,
+        "name": "Man-at-Arms",
+        "type": "Infantry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.12,
+          "attack": 10,
+          "health": 120
+        },
+        "imageId": "man-at-arms-2",
+        "strengths": [
+          "Light Infantry",
+          "Archers"
+        ],
+        "weaknesses": [
+          "Crossbowmen",
+          "Heavy Cavalry"
+        ],
+        "description": "Tough infantry with good damage and armor, available an age earlier for the Holy Roman Empire."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "aachen-chapel",
+        "age": 2,
+        "name": "Aachen Chapel",
+        "type": "Economic",
+        "description": "Inspires units in a large radius if a Prelate is garrisoned."
+      },
+      {
+        "id": "meinwerk-palace",
+        "age": 2,
+        "name": "Meinwerk Palace",
+        "type": "Technology",
+        "description": "Blacksmith where technologies cost -40% and research 40% faster."
+      },
+      {
+        "id": "burgrave-palace",
+        "age": 3,
+        "name": "Burgrave Palace",
+        "type": "Military",
+        "description": "Barracks that produces infantry 400% faster (in batches)."
+      },
+      {
+        "id": "regnitz-cathedral",
+        "age": 3,
+        "name": "Regnitz Cathedral",
+        "type": "Economic",
+        "description": "Relics garrisoned here generate +100% Gold. Acts as a Monastery."
+      },
+      {
+        "id": "palace-of-swabia",
+        "age": 4,
+        "name": "Palace of Swabia",
+        "type": "Economic",
+        "description": "Producs villagers 200% faster and at a 66% lower cost."
+      },
+      {
+        "id": "elzbach-palace",
+        "age": 4,
+        "name": "Elzbach Palace",
+        "type": "Defensive",
+        "description": "Keep with +50% HP. Reduces damage to nearby buildings by 33%."
+      }
+    ],
+    "strengths": [
+      "Man-At-Arms tra i più forti del gioco",
+      "La fanteria è del 10% più veloce",
+      "Economia molto forte con le reliquie ed il boost dei prelati"
+    ],
+    "weaknesses": [
+      "Lento nelle prime fasi"
+    ]
+  },
+  {
+    "id": "sengoku",
+    "name": "Sengoku Daimyo",
+    "flag": "/civs/Sengoku Daimyo.webp",
+    "difficulty": "Difficile",
+    "short_description": "A variant of the Japanese focusing intensely on Samurai warfare and rapid expansion.",
+    "passive_bonuses": [
+      "Aggressive early game melee bonuses.",
+      "Enhanced Daimyo mechanics for military production."
+    ],
+    "unique_units": [
+      {
+        "id": "samurai-sd",
+        "age": 2,
+        "name": "Samurai",
+        "type": "Infantry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.12,
+          "attack": 10,
+          "health": 130
+        },
+        "imageId": "samurai-2",
+        "strengths": [
+          "Infantry"
+        ],
+        "weaknesses": [
+          "Crossbowmen"
+        ],
+        "description": "Heavy infantry with Deflective Armor that blocks strikes."
+      },
+      {
+        "id": "onna-bugeisha-sd",
+        "age": 2,
+        "name": "Onna-Bugeisha",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.38,
+          "attack": 8,
+          "health": 80
+        },
+        "imageId": "onna-bugeisha-2",
+        "strengths": [
+          "Light Units"
+        ],
+        "weaknesses": [
+          "Archers"
+        ],
+        "description": "Fast light infantry with high attack range."
+      },
+      {
+        "id": "shinobi-sd",
+        "age": 2,
+        "name": "Shinobi",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.25,
+          "attack": 8,
+          "health": 100
+        },
+        "imageId": "shinobi-2",
+        "strengths": [
+          "Sabotage"
+        ],
+        "weaknesses": [
+          "Detection"
+        ],
+        "description": "Stealth unit that can teleport and sabotage buildings."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "koka-township",
+        "age": 2,
+        "name": "Koka Township",
+        "type": "Military",
+        "imageId": "koka-township-1",
+        "description": "Allows the production of Shinobi units and grants specialized sabotage abilities."
+      },
+      {
+        "id": "ryokan",
+        "age": 2,
+        "name": "Ryokan",
+        "type": "Economic",
+        "imageId": "ryokan-1",
+        "description": "Provides 10/15/20 population and heals nearby friendly units out of combat."
+      },
+      {
+        "id": "temple-equality-sd",
+        "age": 3,
+        "name": "Temple of Equality",
+        "type": "Religious",
+        "imageId": "temple-of-equality-2",
+        "description": "Produces Buddhist Monks to debuff enemy units."
+      },
+      {
+        "id": "sake-brewery",
+        "age": 3,
+        "name": "Sake Brewery",
+        "type": "Economic",
+        "imageId": "sake-brewery-2",
+        "description": "Generates significant gold and provides Matsuri buffs to nearby villagers."
+      },
+      {
+        "id": "sword-hunt-statue",
+        "age": 4,
+        "name": "Sword Hunt Statue",
+        "type": "Military",
+        "imageId": "sword-hunt-statue-3",
+        "description": "Decreases Daimyo cost and increases their aura attack speed bonus."
+      },
+      {
+        "id": "castle-of-the-crow-sd",
+        "age": 4,
+        "name": "Castle of the Crow",
+        "type": "Defensive",
+        "imageId": "castle-of-the-crow-3",
+        "description": "Acts as a powerful defensive structure that periodically spawns Treasure Caravans."
+      }
+    ],
+    "strengths": [
+      "Accesso a unità uniche: Samurai, Onna-Bugeisha, Shinobi"
+    ],
+    "weaknesses": []
+  },
+  {
+    "id": "delhi",
+    "name": "Sultanato di Delhi",
+    "flag": "/civs/Delhi Sultanate.webp",
+    "difficulty": "Difficile",
+    "short_description": "A research-focused civilization with free technologies and War Elephants.",
+    "passive_bonuses": [
+      "All technologies are free but take longer to research.",
+      "Scholars speed up research times significantly."
+    ],
+    "unique_units": [
+      {
+        "id": "scholar",
+        "age": 1,
+        "name": "Scholar",
+        "type": "Religious",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 0,
+          "health": 90
+        },
+        "imageId": "scholar-1",
+        "strengths": [
+          "Research Boost"
+        ],
+        "weaknesses": [
+          "Everything"
+        ],
+        "description": "Speeds up research and heals units."
+      },
+      {
+        "id": "ghazi-raider",
+        "age": 2,
+        "name": "Ghazi Raider",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.62,
+          "attack": 13,
+          "health": 125
+        },
+        "imageId": "ghazi-raider-2",
+        "strengths": [
+          "Heavy Cavalry"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Strong light cavalry effective vs heavy armor."
+      },
+      {
+        "id": "war-elephant",
+        "age": 3,
+        "name": "War Elephant",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 1,
+          "attack": 30,
+          "health": 700
+        },
+        "imageId": "war-elephant-3",
+        "strengths": [
+          "Buildings",
+          "Infantry"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Crossbowmen"
+        ],
+        "description": "Massive high-health melee unit."
+      }
+    ],
+    "technologies": [],
+    "videos": [],
+    "build_orders": [],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "dome-faith",
+        "age": 2,
+        "name": "Dome of the Faith",
+        "type": "Religious",
+        "imageId": "dome-of-the-faith-1",
+        "description": "Produces Scholars at -50% cost."
+      },
+      {
+        "id": "tower-victory",
+        "age": 2,
+        "name": "Tower of Victory",
+        "type": "Military",
+        "imageId": "tower-of-victory-1",
+        "description": "Infantry near tower gain +15% attack speed permanently."
+      },
+      {
+        "id": "compound-defender",
+        "age": 3,
+        "name": "Compound of the Defender",
+        "type": "Defensive",
+        "imageId": "compound-of-the-defender-2",
+        "description": "Infantry can build stone walls; reduces stone cost."
+      },
+      {
+        "id": "house-learning",
+        "age": 3,
+        "name": "House of Learning",
+        "type": "Technology",
+        "imageId": "house-of-learning-2",
+        "description": "Unlocks diverse unique technologies."
+      },
+      {
+        "id": "palace-sultan",
+        "age": 4,
+        "name": "Palace of the Sultan",
+        "type": "Religious",
+        "imageId": "palace-of-the-sultan-3",
+        "description": "Periodically produces free Tower Elephants."
+      },
+      {
+        "id": "hisar-academy",
+        "age": 4,
+        "name": "Hisar Academy",
+        "type": "Technology",
+        "imageId": "hisar-academy-3",
+        "description": "Functions as a Madrasa and generates Food per minute based on the total number of technologies researched."
+      }
+    ],
+    "strengths": [
+      "Accesso a unità uniche: Scholar, Ghazi Raider, War Elephant"
+    ],
+    "weaknesses": []
+  }
+]

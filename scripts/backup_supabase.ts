@@ -50,6 +50,19 @@ async function backupDatabase() {
     console.log(`✅ Salvati ${suggestions.length} suggerimenti in ${suggPath}`);
   }
 
+  // Backup FAQ
+  console.log('📡 Scaricamento tabella faq...');
+  const { data: faq, error: faqError } = await supabase.from('faq').select('*');
+  if (faqError) {
+    console.error('❌ Errore scaricamento FAQ:', faqError);
+  } else {
+    const faqPath = path.join(backupDir, `faq_backup_${timestamp}.json`);
+    const faqLatestPath = path.join(backupDir, `faq_latest.json`);
+    fs.writeFileSync(faqPath, JSON.stringify(faq, null, 2));
+    fs.writeFileSync(faqLatestPath, JSON.stringify(faq, null, 2)); // Sovrascrive il latest
+    console.log(`✅ Salvate ${faq.length} FAQ in ${faqPath}`);
+  }
+
   console.log('\n🎉 Backup completato con successo! Tutti i dati sono al sicuro sul tuo PC.');
 }
 

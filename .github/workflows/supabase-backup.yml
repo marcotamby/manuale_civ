@@ -43,6 +43,7 @@ jobs:
           # Aggiungiamo solo i file "latest" per non far esplodere la repo con i timestamp
           git add backups/civilizations_latest.json --force
           git add backups/suggestions_latest.json --force
+          git add backups/faq_latest.json --force
           
           # Se non ci sono modifiche nei dati, github eviterà di fare un commit vuoto
           if git diff --staged --quiet; then

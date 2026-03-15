@@ -36,18 +36,22 @@ async function restoreCivilizations(filePath: string) {
 
   console.log(`📡 Ripristino di ${civilizations.length} civiltà su Supabase...`);
 
-  // Eseguiamo l'upsert per ogni record
-  // Nota bene: usiamo l'id per capire se aggiornare o inserire
-  const { data, error } = await supabase
-    .from('civilizations')
-    .upsert(civilizations, { onConflict: 'id' });
+  for (const civ of civilizations) {
+    console.log(`📡 Aggiornamento ${civ.id}...`);
+    // Usiamo update invece di upsert per evitare di dover passare tutti i campi obbligatori come 'name'
+    const { error } = await supabase
+      .from('civilizations')
+      .update(civ)
+      .eq('id', civ.id);
 
-  if (error) {
-    console.error(`❌ Errore durante il ripristino: ${error.message}`);
-    process.exit(1);
+    if (error) {
+      console.error(`❌ Errore durante il ripristino di ${civ.id}: ${error.message}`);
+    } else {
+      console.log(`✅ ${civ.id} ripristinata.`);
+    }
   }
 
-  console.log('✅ Ripristino completato con successo!');
+  console.log('✅ Operazione di ripristino completata!');
 }
 
 const arg = process.argv[2];

@@ -10,7 +10,9 @@
     "user_email": "marco.tamborrino.94@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "e76ca776-c4a0-4355-84d9-5aa72962be95",
@@ -23,7 +25,9 @@
     "user_email": "alessio.bella97@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "7dbabaf4-23c5-49b7-a4ac-1819ab8989c1",
@@ -36,7 +40,9 @@
     "user_email": "alessio.bella97@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "392a1b2e-3881-4626-a72e-1cba9f988ccd",
@@ -49,7 +55,9 @@
     "user_email": "alessio.bella97@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "5b6e96e8-be8b-4012-b608-00397be11abb",
@@ -62,7 +70,9 @@
     "user_email": "alessio.bella97@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "c56a6e6c-28ee-43cb-805b-23680604a204",
@@ -75,7 +85,9 @@
     "user_email": "viaggiascrittori@gmail.com",
     "status": "rejected",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "5d341c44-1ae7-4661-a452-c20f95229b3d",
@@ -88,7 +100,9 @@
     "user_email": "viaggiascrittori@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "93825826-bb74-4d10-a2cb-800fd68602be",
@@ -101,7 +115,9 @@
     "user_email": "viaggiascrittori@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "4bc44c0b-09df-409d-ba07-7c552fd1603c",
@@ -114,7 +130,9 @@
     "user_email": "mattiaminuti03@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "181467c7-26b9-4fea-b571-98ce65be044a",
@@ -127,7 +145,9 @@
     "user_email": "viaggiascrittori@gmail.com",
     "status": "rejected",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "061e2c23-707b-494f-b770-6018946e0cc4",
@@ -140,7 +160,9 @@
     "user_email": "mattiaminuti03@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "95b0ec62-69df-4585-a31d-54a8f4715fde",
@@ -153,7 +175,9 @@
     "user_email": "contattodisparta@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "7ec82006-0da3-4337-971e-412fd70a3a3c",
@@ -166,7 +190,9 @@
     "user_email": "alessio.bella97@gmail.com",
     "status": "rejected",
     "rejection_reason": "Errata",
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "3dc68f2e-d3a0-4a74-9a66-fcb93f71c772",
@@ -179,7 +205,9 @@
     "user_email": "alessio.bella97@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "3647e053-31e7-4410-8303-5f12cb5b79fe",
@@ -192,7 +220,9 @@
     "user_email": "alessio.bella97@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "367066b8-debe-43cf-a43f-9c4363b9d4b8",
@@ -205,7 +235,9 @@
     "user_email": "alessio.bella97@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "29418d2e-aa34-4fac-8e46-f0c00f520b49",
@@ -218,7 +250,9 @@
     "user_email": "alessio.bella97@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "3fa3c106-2f08-4e13-9fe8-b82466ae49e3",
@@ -231,7 +265,9 @@
     "user_email": "alessio.bella97@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "cfd468c9-6509-408f-9eff-f6999dca43a0",
@@ -244,7 +280,9 @@
     "user_email": "marco.tamborrino.94@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "15c97bd5-c62a-424c-bc9b-7f7a8cf88630",
@@ -257,7 +295,9 @@
     "user_email": "marco.tamborrino.94@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "db23928d-010a-4b98-b8fe-8a1decc73297",
@@ -270,7 +310,9 @@
     "user_email": "marco.tamborrino.94@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "4f805a8b-e1aa-491d-b15c-36b8096d2027",
@@ -283,7 +325,9 @@
     "user_email": "viaggiascrittori@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "33a468ca-3ae5-4b95-988e-1fcc5c637e05",
@@ -296,7 +340,9 @@
     "user_email": "marco.tamborrino.94@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "4fe0e47f-4ba2-46a8-9247-9052471af650",
@@ -309,7 +355,9 @@
     "user_email": "marco.tamborrino.94@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "cc552969-974a-4fc0-9ca6-53f692e53166",
@@ -322,7 +370,9 @@
     "user_email": "marco.tamborrino.94@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "2d67a665-454d-44ef-b2aa-934fdda43adb",
@@ -335,7 +385,9 @@
     "user_email": "enrico.staffilano@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "72df0db7-b6bd-4397-9896-91e31bc7e88d",
@@ -348,7 +400,9 @@
     "user_email": "marco.tamborrino.94@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "0bc577b1-608a-4351-9932-9a3c685d4c0f",
@@ -361,7 +415,9 @@
     "user_email": "marco.tamborrino.94@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "76212eba-8ab1-4ce4-bc26-209adb9d616b",
@@ -374,7 +430,9 @@
     "user_email": "alessio.bella97@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "cefbd0d9-f42e-47e1-a6af-ebbc228b7a82",
@@ -387,7 +445,9 @@
     "user_email": "marco.tamborrino.94@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "de127d10-8484-4da5-97d7-e9e01d3be3ea",
@@ -400,7 +460,9 @@
     "user_email": "viaggiascrittori@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "3bbafa85-de74-4c7d-a652-fa7b61f13a25",
@@ -413,7 +475,9 @@
     "user_email": "alessio.bella97@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
   },
   {
     "id": "ee8c53bb-7d75-43d9-a7b5-d9d9dbe2d80e",
@@ -426,6 +490,128 @@
     "user_email": "alessio.bella97@gmail.com",
     "status": "implemented",
     "rejection_reason": null,
-    "notified": true
+    "notified": true,
+    "user_nickname": null,
+    "user_rank": null
+  },
+  {
+    "id": "af62f217-ef32-457a-9d70-df3eb11ac501",
+    "created_at": "2026-03-13T17:21:28.953322+00:00",
+    "civ_name": "Francesi",
+    "section": "build_order",
+    "suggestion_text": "{\"title\":\"Francia vs Francia\",\"description\":\"Potrà capitare durante le nostre partite classificate di incontrare un altro giocatore che seleziona i francesi. \\n\\nA differenza della build dei cervi, giocheremo più difensivi per garantirci però più velocemente la produzione di cavalli e quindi il controllo mappa.\",\"steps\":[{\"time\":\"\",\"action\":\"Mandiamo subito 6 abitanti alle pecore.\",\"note\":\"\"}],\"source\":\"\"}",
+    "source": null,
+    "user_name": "Diego Lai",
+    "user_email": "contattodisparta@gmail.com",
+    "status": "rejected",
+    "rejection_reason": "Hai sbagliato, bot",
+    "notified": true,
+    "user_nickname": "",
+    "user_rank": ""
+  },
+  {
+    "id": "bb11f7fc-4e3b-403c-b5f2-2cfed15b633b",
+    "created_at": "2026-03-12T18:03:53.904133+00:00",
+    "civ_name": "Sengoku Daimyo",
+    "section": "build_order",
+    "suggestion_text": "{\"title\":\"Sengoku\",\"description\":\"Massimizza l'economia con 3 Yatai e poi crea qualche cavalleria Yari prima di passare ai castelli\",\"steps\":[{\"time\":\"\",\"action\":\"1 villo costruisce Matsuri vicino alla legna\",\"note\":\"se possibile anche vicino all'oro\"},{\"time\":\"\",\"action\":\"5 villi iniziano a raccogliere la legna vicino al Matsuri\",\"note\":\"\"},{\"time\":\"0:20\",\"action\":\"1 villo a costruire casa vicino le bacche\",\"note\":\"prossimi 3 villi alle bacche\"},{\"time\":\"0:45\",\"action\":\"Ricerca Tawara dalla casa\",\"note\":\"\"},{\"time\":\"1:08\",\"action\":\"Crea primo Yatai dal matsuri\",\"note\":\"mandalo sul cinghiale\"},{\"time\":\"1:30\",\"action\":\"manda i prossimi villi sulle pecore\",\"note\":\"\"},{\"time\":\"1:55\",\"action\":\"crea secondo Yatai dal matsuri\",\"note\":\"mandalo sui cervi\"},{\"time\":\"2:25\",\"action\":\"crea terzo Yatai dal matsuri\",\"note\":\"mandalo tra le bacche e le pecore\"},{\"time\":\"2:50\",\"action\":\"costruisci la forgia sull'oro con i 6 villi della legna\",\"note\":\"assicurati di avere 100 di legna prima di spostare i villi\"},{\"time\":\"3:00\",\"action\":\"costruisci una seconda casa sulle bacche\",\"note\":\"usa un villo delle bacche\"},{\"time\":\"3:20\",\"action\":\"Manda i prossimi villi sulla legna\",\"note\":\"dovresti avere 5 villi alle pecore\"},{\"time\":\"3:48\",\"action\":\"Costruisci il Ryokan (o il Koka Township) con i 5 ville alle pecore\",\"note\":\"forza i villi a conservare l'oro che hanno raccolto\\nRyokan al lato opposto del Matsuri, rispetto al centro città\"},{\"time\":\"5:10\",\"action\":\"Compra 100 legna dal Matsuri\",\"note\":\"\"},{\"time\":\"5:15\",\"action\":\"Sei passato in età feudale\",\"note\":\"Manda 4 villi del Ryokan alle pecore\\nUn villo del Ryokan costruisce una scuderia vicino al Ryokan\"},{\"time\":\"5:30\",\"action\":\"Costruisci una scuderia accanto al Ryokan con un villo delle pecore\",\"note\":\"Forza i villi a conservare la legna che hanno raccolto\\nrecluta Yari quando le scuderie sono complete\"},{\"time\":\"5:40\",\"action\":\" Compra legna dal Matsuri\",\"note\":\"\"},{\"time\":\"6:10\",\"action\":\"Costruisci Takeda Clan Daimyo vicino alle scuderie\",\"note\":\"con i 2 villi che hanno costruito le scuderie\"},{\"time\":\"6:20\",\"action\":\"Costruisci casa sulle bacche\",\"note\":\"\"},{\"time\":\"6:25\",\"action\":\"Ricerca Takezaiku da una casa\",\"note\":\"\"},{\"time\":\"6:35\",\"action\":\"Ricerca Tatara dalla forgia\",\"note\":\"\"},{\"time\":\"6:55\",\"action\":\"Ricerca Horse Training dal Takeda Clan Daimyo\",\"note\":\"\"},{\"time\":\"\",\"action\":\"Continua...\",\"note\":\"Ricerca altri upgrade dalle forge\\nSe serve puoi fare arcierie e Yumi\\nPrendi i boar con i villi difendendoli con il tuo esercito\\nSe hai costruito Koka Township crea shinobi usando la sua abilità\\nvai in età dei castelli\"}],\"source\":\"https://www.youtube.com/watch?v=s2LUxq_E7pE\"}",
+    "source": null,
+    "user_name": "Vincenzo Cani",
+    "user_email": "cani.vincenzo@gmail.com",
+    "status": "implemented",
+    "rejection_reason": null,
+    "notified": true,
+    "user_nickname": "Kani | AoeItalia.com",
+    "user_rank": "Unranked"
+  },
+  {
+    "id": "e9b0e760-dd28-4a5a-a650-9831f22b6079",
+    "created_at": "2026-03-12T21:40:40.794513+00:00",
+    "civ_name": "Knights Templar",
+    "section": "build_order",
+    "suggestion_text": "{\"title\":\"test\",\"description\":\"test\",\"steps\":[{\"time\":\"00:00\",\"action\":\"test\",\"note\":\"test\"}],\"source\":\"\"}",
+    "source": null,
+    "user_name": "Marco Tamborrino",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "status": "implemented",
+    "rejection_reason": null,
+    "notified": true,
+    "user_nickname": "",
+    "user_rank": ""
+  },
+  {
+    "id": "1df2c158-5fd1-4d4b-89a3-06f7185f170b",
+    "created_at": "2026-03-13T16:19:56.336134+00:00",
+    "civ_name": "Francesi",
+    "section": "punti_di_debolezza",
+    "suggestion_text": "sfsf",
+    "source": null,
+    "user_name": "Marco Tamborrino",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "status": "rejected",
+    "rejection_reason": "è un test",
+    "notified": true,
+    "user_nickname": "",
+    "user_rank": ""
+  },
+  {
+    "id": "92126538-6187-471d-a1e7-f7c8167632b4",
+    "created_at": "2026-03-14T23:45:24.972184+00:00",
+    "civ_name": "Lancaster",
+    "section": "build_order",
+    "suggestion_text": "{\"title\":\"3tc + WT\",\"description\":\"Se 2tc + WT degli inglesi non ti basta, questa è la build perfetta per te. Il maniero, se posizionato correttamente, ti garantisce il terzo TC \\\"gratis\\\". Ti piace abbuffarti di pecore e legno? ti piace boommare come gli abbassidi ma con più stile? non ti rimane che provare.\",\"steps\":[{\"time\":\"\",\"action\":\"6 al cibo e mettere il rally sull'oro.\",\"note\":\"\"},{\"time\":\"0:20\",\"action\":\"Rally sull'oro fino a 3 abitanti, il primo abitante che esce costruisce la casa e la miniera. Poi rally sulle pecore fino all'age up \",\"note\":\"in questa fase è bene verificare dove posizionare il maniero. se posizionata correttamente ti può garantire un income passivo enorme. dare priorità al cibo e all'oro.\"},{\"time\":\"2:00\",\"action\":\"attorno ai 2 minuti riesci a cliccare l'age up. per salire usa i 3 abitanti dell'oro e il consiglio è salire con il castello dei lancaster cercando di coprire più risorse possibili. dare priorità a oro-pietra-legno in quest'ordine. spostare 5 villi dal cibo alla pietra e il resto al legno, lasciandone 3 sulle pecore.  mettere rally sul legno e lasciare fino a quando non si hanno le risorse per il terzo TC.\",\"note\":\"nota bene: se il maniero non dovessimo riuscire a posizionarlo tra cibo oro e legna, i villi che raccolgono al legno dovrebbero choppare la woodline lasciano intoccati i 3 alberelli attorno al TC che al 99% delle volte sono nell'area di influenza del maniero. se hai fortuna, e il maniero include anche la woodline, beh allora incomincia a volare.\"},{\"time\":\"4:05\",\"action\":\"complimenti, sei appena salito in seconda. i 3 villi dell'age up costruiscono il maniero e poi si spostano alla legna. i 5 villi alla pietra rimangono li fino a quando non ne hai raccolta abbastanza per il terzo tc. i 3 villi alle pecore ti bastano. Ora il tuo compito è molto semplice: raccogli legna e cerca di lasciare tutti gli abitanti nel raggio di influenza del maniero. il rally del tc sempre alla legna fino a quando non hai le risorse per il terzo tc. \",\"note\":\"se sei fortunato con lo spawn, hai circa 100-120 risorse passive dal maniero.\"},{\"time\":\"5:35\",\"action\":\"ottimo, hai le risorse per mettere giu il primo TC! fallo con 8 villi e piazzalo vicino all'oro. questi 8 villi andranno poi a raccogliere oro fino all'age up di terza. rally sempre alla legna. fino a quando hai raccolto i 400 che ti servono per il terzo tc. il maniero a questo punto ti dovrebbe dare circa 180 risorse al minuto.  \",\"note\":\"ricordati, 5 villi alla pietra fino a quando hai raccolto 350, poi spostali al cibo. la disposizione dei villi è\\n3 cibo, 5 pietra, 8 oro, resto legno.\"},{\"time\":\"6:45\",\"action\":\"dovresti avere le risorse per mettere giu il terzo tc. il consiglio è metterlo in una posizione abbastanza difensiva, esempio ti può coprire la woodline. appena il terzo tc è costruito, metti tutti i villi al cibo e lasciane 8 all'oro. rally sul cibo. I 2 tc aggiuntivi ti danno anche 8 pecore.\",\"note\":\"\"},{\"time\":\"8:50\",\"action\":\"la missione è praticamente compiuta, se non hai le risorse per passare in terza poco ci manca. il maniero con 40 villi equivale a 230 risorse al minuto. quanti villi all'age up dipende se ti stanno pushando. 8 - 10  - 12 - 16, a te la scelta.\",\"note\":\"\"},{\"time\":\"12:00\",\"action\":\"al minuto 12 dovresti avere 65-70 villi con il maniero che ti genera fino a 330 risorse passive. scegli tu come distruggere l'avversario: pioggia d'archi? balestrieri? un tsunami di hobelar? se senti di non aver fatto pena abbastanza, passa in quarta!!\",\"note\":\"\"}],\"source\":\"SWAGGY\"}",
+    "source": null,
+    "user_name": "Michael Alberti",
+    "user_email": "michael.alberti18@gmail.com",
+    "status": "implemented",
+    "rejection_reason": null,
+    "notified": true,
+    "user_nickname": "",
+    "user_rank": ""
+  },
+  {
+    "id": "80835707-b7f1-4b1b-a5b7-65459212b77b",
+    "created_at": "2026-03-13T16:23:00.863667+00:00",
+    "civ_name": "Francesi",
+    "section": "caratteristiche",
+    "suggestion_text": "test",
+    "source": null,
+    "user_name": "Marco Tamborrino",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "status": "rejected",
+    "rejection_reason": "test",
+    "notified": true,
+    "user_nickname": "",
+    "user_rank": ""
+  },
+  {
+    "id": "8cc947d6-926f-4273-b557-589c7f7c5f8d",
+    "created_at": "2026-03-13T16:23:54.612621+00:00",
+    "civ_name": "Francesi",
+    "section": "punti_di_forza",
+    "suggestion_text": "test",
+    "source": null,
+    "user_name": "Marco Tamborrino",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "status": "rejected",
+    "rejection_reason": "test",
+    "notified": true,
+    "user_nickname": "",
+    "user_rank": ""
+  },
+  {
+    "id": "d5fcd615-87e2-49e4-94f2-88527356d4a6",
+    "created_at": "2026-03-13T16:30:46.228237+00:00",
+    "civ_name": "Francesi",
+    "section": "bonus",
+    "suggestion_text": "test2",
+    "source": null,
+    "user_name": "Marco Tamborrino",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "status": "implemented",
+    "rejection_reason": null,
+    "notified": true,
+    "user_nickname": "",
+    "user_rank": ""
   }
 ]

@@ -92,29 +92,31 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
         )}
 
         {/* Favorites List - Stacked & Faded */}
-        <div className="flex flex-col w-full mb-4">
-          {favoriteCivs.map((civ) => (
-            <button
-              key={`fav-${civ.id}`}
-              onClick={() => {
-                onSelectCiv(civ.id);
-                onSelectPage('civ');
-              }}
-              title={civ.name}
-              className="w-full aspect-square shrink-0 relative overflow-hidden transition-all duration-300 hover:z-10 group mb-2 last:mb-0 rounded-md border border-transparent hover:border-yellow-500/50 hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] hover-pulse"
-            >
-              <img 
-                src={civ.flag} 
-                alt={civ.name} 
-                className="w-full h-full object-cover brightness-110 group-hover:brightness-125 transition-all duration-500" 
-              />
-              {/* Left edge fade - deep & soft */}
-              <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-[var(--color-brand-dark)] via-[var(--color-brand-dark)]/50 to-transparent pointer-events-none z-10" />
-              <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-[var(--color-brand-dark)] to-transparent pointer-events-none opacity-60" />
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-t from-yellow-400/10 to-transparent transition-opacity" />
-            </button>
-          ))}
-        </div>
+        {favoriteCivs.length > 0 && (
+          <div className="flex flex-col w-full mb-4">
+            {favoriteCivs.map((civ) => (
+              <button
+                key={`fav-${civ.id}`}
+                onClick={() => {
+                  onSelectCiv(civ.id);
+                  onSelectPage('civ');
+                }}
+                title={civ.name}
+                className="w-full aspect-square shrink-0 relative overflow-hidden transition-all duration-300 hover:z-10 group mb-2 last:mb-0 rounded-md border border-transparent hover:border-yellow-500/50 hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] hover-pulse"
+              >
+                <img 
+                  src={civ.flag} 
+                  alt={civ.name} 
+                  className="w-full h-full object-cover brightness-110 group-hover:brightness-125 transition-all duration-500" 
+                />
+                {/* Left edge fade - deep & soft */}
+                <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-[var(--color-brand-dark)] via-[var(--color-brand-dark)]/50 to-transparent pointer-events-none z-10" />
+                <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-[var(--color-brand-dark)] to-transparent pointer-events-none opacity-60" />
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-t from-yellow-400/10 to-transparent transition-opacity" />
+              </button>
+            ))}
+          </div>
+        )}
 
         {currentPage !== 'home' && <div className="w-10 h-[1px] bg-[#D4AF37]/20 mb-4 shrink-0" />}
 

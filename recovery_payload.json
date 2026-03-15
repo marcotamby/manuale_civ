@@ -1,0 +1,380 @@
+[
+  {
+    "id": "chinese",
+    "passive_bonuses": [
+      "Inizia nella Dinastia Tang: +30% raggio visivo degli Esploratori e accesso al Villaggio.",
+      "Unità addestrate, tecnologie ricercate e risorse restituite generano Tasse (Oro) raccoglibili dagli Ufficiali Imperiali.",
+      "Costruisce entrambi i Landmark di un'Età per sbloccare una Dinastia con bonus unici (Song, Yuan, Ming).",
+      "I Villici costruiscono difese +50% più veloci e tutti gli altri edifici +100% più velocemente.",
+      "La tecnologia Chimica è gratuita in Età I: difese usano Feritoie a Cannone invece di quelle standard.",
+      "I Cantieri Navali lavorano il +10% più velocemente."
+    ],
+    "strengths": [
+      "Dinastia Song (Velocità produzione abitanti +33%)"
+    ],
+    "weaknesses": [
+      "Civiltà complessa con gameplay da adattare in base ai matchup"
+    ]
+  },
+  {
+    "id": "rus",
+    "build_orders": [
+      {
+        "title": "BUILD ORDER STRUTTURATO",
+        "description": "Build order focalizzata sulla Porta d'Oro e ProScouts.",
+        "difficulty": "Advanced",
+        "steps": [
+          {
+            "time": "00:00",
+            "action": "Tutti al cibo dopo aver raccolto con 4 abitanti 2 giri di legna (3 capanni più casa)",
+            "note": "Appena cliccato age-up 5 al cibo, 4 alla porta d'oro e tutti gli altri alla legna finché non se ne hanno 8, poi di nuovo tutti al cibo."
+          },
+          {
+            "time": "04:30",
+            "action": "Vendere 100 cibo alla porta d'oro e cliccare proscout. Aggiungere poi edificio militare.",
+            "note": "Se non contestano proscout, fortezza di legno sulla woodline subito."
+          },
+          {
+            "time": "09:XX",
+            "action": "Vendere la legna progressivamente per passare in terza epoca.",
+            "note": "Prepara le aree di tiro con l'arco o scuderia."
+          },
+          {
+            "time": "12:XX",
+            "action": "Addestrare HA da almeno 3 aree di tiro. Monastero, Fabbro.",
+            "note": "Iniziare transizione a farm. NON toccare oro."
+          },
+          {
+            "time": "20:XX",
+            "action": "Mettere qualche bombarda nel mix per chiudere la partita.",
+            "note": "Il vantaggio massimo è ORA."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "malians",
+    "build_orders": [
+      {
+        "title": "BUILD ORDER STRUTTURATO",
+        "description": "Ottimizzazione Pitmine e Cowboom.",
+        "difficulty": "Medium",
+        "steps": [
+          {
+            "time": "00:00",
+            "action": "5 su un albero vicino al tc ed 1 a costruire la Pitmine",
+            "note": "Shiftare i 5 al legno alle pecore dopo il primo albero."
+          },
+          {
+            "time": "00:20",
+            "action": "Mandare il primo villo su un secondo albero a prendere SOLO 25 di legna. Rally al cibo.",
+            "note": "Presa la legna, spostare al cibo."
+          },
+          {
+            "time": "00:35",
+            "action": "Costruire case attorno alla pitmine",
+            "note": "Fino a 7 case lasciando spazio per miniera."
+          },
+          {
+            "time": "02:45",
+            "action": "Passare all'età feudale con 5 abitanti e 'CAVA DI MANSA'",
+            "note": "Costruirla lontano dal cowboom."
+          }
+        ]
+      }
+    ],
+    "strengths": [
+      "Risorse passive grazie alle pitmines e le mucche nei recinti"
+    ],
+    "weaknesses": [
+      "Unità meno performanti in età imperiale",
+      "Indisponibilità di balestre"
+    ]
+  },
+  {
+    "id": "abbasid",
+    "strengths": [
+      "Migliore civiltà per il boom economico in team games (multi-TC)",
+      "Cammelli che debuffano cavalleria e supportano fanteria",
+      "Ghulam: fanteria pesante con doppio attacco"
+    ],
+    "weaknesses": [
+      "Inizio lento e vulnerabilità iniziale",
+      "Dipendenza dalla Casa della Sapienza",
+      "Transizione a farm critica dopo bacche"
+    ]
+  },
+  {
+    "id": "byzantines",
+    "strengths": [
+      "Accesso a unità uniche: Limitanei, Varangian Guard, Catafratti, Cheirosiphon",
+      "Può reclutare truppe gratis grazie all'olio d'oliva ed il covo dei mercenari",
+      "Flessibilità grazie ai mercenari",
+      "Sistema di cisterne per boost produzione ed economia"
+    ],
+    "weaknesses": [
+      "Elevata complessità di gestione",
+      "Richiede pietra presto per cisterne",
+      "Dipendenza dalla rete idrica"
+    ]
+  },
+  {
+    "id": "zhuxi",
+    "strengths": [
+      "Fast Castle più veloce del gioco"
+    ],
+    "weaknesses": [
+      "Non hanno arcieri",
+      "Transizione a Farm lenta"
+    ]
+  },
+  {
+    "id": "french",
+    "strengths": [
+      "Hanno i balestrieri più forti del gioco",
+      "Cavalieri pesanti disponibili in età feudale"
+    ],
+    "weaknesses": [
+      "Soffrono molto le dark age con rush di picche"
+    ]
+  },
+  {
+    "id": "templar",
+    "strengths": [
+      "Grande quantità di unità uniche",
+      "Fortezze disponibili dall'età feudale"
+    ]
+  },
+  {
+    "id": "tughlaq",
+    "strengths": [
+      "Elefanti guaritori",
+      "Può costruire fortezze a partire dall'età feudale"
+    ]
+  },
+  {
+    "id": "macedonian",
+    "build_orders": [
+      {
+        "title": "BUILD ORDER FEUDALE",
+        "description": "Apertura standard con Ippodromo.",
+        "difficulty": "Easy",
+        "steps": [
+          {
+            "action": "6 pecore, uno costruisce casa"
+          },
+          {
+            "action": "2 oro"
+          },
+          {
+            "action": "villi al cibo fino a feudale"
+          },
+          {
+            "action": "4 villi dal cibo costruiscono Ippodromo"
+          },
+          {
+            "action": "1 villo da cibo a legno costruisce falegnameria"
+          },
+          {
+            "action": "2 villi al legno"
+          },
+          {
+            "action": "tutti gli altri al cibo"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "japanese",
+    "strengths": [
+      "Gli alloggiamenti costano solo 75 legno"
+    ],
+    "weaknesses": [
+      "Non può costruire fortezze fino all'età Imperiale"
+    ]
+  },
+  {
+    "id": "lancaster",
+    "build_orders": [
+      {
+        "id": "bo-1773663600000-lanc",
+        "title": "3tc + WT",
+        "description": "Se 2tc + WT degli inglesi non ti basta, questa è la build perfetta per te. Il maniero, se posizionato correttamente, ti garantisce il terzo TC \"gratis\". Ti piace abbuffarti di pecore e legno? ti piace boommare come gli abbassidi ma con più stile? non ti rimane che provare.",
+        "steps": [
+          {
+            "time": "",
+            "action": "6 al cibo e mettere il rally sull'oro.",
+            "note": ""
+          },
+          {
+            "time": "0:20",
+            "action": "Rally sull'oro fino a 3 abitanti, il primo abitante che esce costruisce la casa e la miniera. Poi rally sulle pecore fino all'age up ",
+            "note": "in questa fase è bene verificare dove posizionare il maniero. se posizionata correttamente ti può garantire un income passivo enorme. dare priorità al cibo e all'oro."
+          },
+          {
+            "time": "2:00",
+            "action": "attorno ai 2 minuti riesci a cliccare l'age up. per salire usa i 3 abitanti dell'oro e il consiglio è salire con il castello dei lancaster cercando di coprire più risorse possibili. dare priorità a oro-pietra-legno in quest'ordine. spostare 5 villi dal cibo alla pietra e il resto al legno, lasciandone 3 sulle pecore.  mettere rally sul legno e lasciare fino a quando non si hanno le risorse per il terzo TC.",
+            "note": "nota bene: se il maniero non dovessimo riuscire a posizionarlo tra cibo oro e legna, i villi che raccolgono al legno dovrebbero choppare la woodline lasciano intoccati i 3 alberelli attorno al TC che al 99% delle volte sono nell'area di influenza del maniero. se hai fortuna, e il maniero include anche la woodline, beh allora incomincia a volare."
+          },
+          {
+            "time": "4:05",
+            "action": "complimenti, sei appena salito in seconda. i 3 villi dell'age up costruiscono il maniero e poi si spostano alla legna. i 5 villi alla pietra rimangono li fino a quando non ne hai raccolta abbastanza per il terzo tc. i 3 villi alle pecore ti bastano. Ora il tuo compito è molto semplice: raccogli legna e cerca di lasciare tutti gli abitanti nel raggio di influenza del maniero. il rally del tc sempre alla legna fino a quando non hai le risorse per il terzo tc. ",
+            "note": "se sei fortunato con lo spawn, hai circa 100-120 risorse passive dal maniero."
+          },
+          {
+            "time": "5:35",
+            "action": "ottimo, hai le risorse per mettere giu il primo TC! fallo con 8 villi e piazzalo vicino all'oro. questi 8 villi andranno poi a raccogliere oro fino all'age up di terza. rally sempre alla legna. fino a quando hai raccolto i 400 che ti servono per il terzo tc. il maniero a questo punto ti dovrebbe dare circa 180 risorse al minuto.  ",
+            "note": "ricordati, 5 villi alla pietra fino a quando hai raccolto 350, poi spostali al cibo. la disposizione dei villi è\n3 cibo, 5 pietra, 8 oro, resto legno."
+          },
+          {
+            "time": "6:45",
+            "action": "dovresti avere le risorse per mettere giu il terzo tc. il consiglio è metterlo in una posizione abbastanza difensiva, esempio ti può coprire la woodline. appena il terzo tc è costruito, metti tutti i villi al cibo e lasciane 8 all'oro. rally sul cibo. I 2 tc aggiuntivi ti danno anche 8 pecore.",
+            "note": ""
+          },
+          {
+            "time": "8:50",
+            "action": "la missione è praticamente compiuta, se non hai le risorse per passare in terza poco ci manca. il maniero con 40 villi equivale a 230 risorse al minuto. quanti villi all'age up dipende se ti stanno pushando. 8 - 10  - 12 - 16, a te la scelta.",
+            "note": ""
+          },
+          {
+            "time": "12:00",
+            "action": "al minuto 12 dovresti avere 65-70 villi con il maniero che ti genera fino a 330 risorse passive. scegli tu come distruggere l'avversario: pioggia d'archi? balestrieri? un tsunami di hobelar? se senti di non aver fatto pena abbastanza, passa in quarta!!",
+            "note": ""
+          }
+        ],
+        "source": "SWAGGY",
+        "difficulty": "Medium",
+        "author_nickname": "Michael Alberti",
+        "author_rank": "Unranked"
+      }
+    ]
+  },
+  {
+    "id": "sengoku",
+    "build_orders": [
+      {
+        "id": "bo-1773663600001-sen",
+        "title": "Sengoku",
+        "description": "Massimizza l'economia con 3 Yatai e poi crea qualche cavalleria Yari prima di passare ai castelli",
+        "steps": [
+          {
+            "time": "",
+            "action": "1 villo costruisce Matsuri vicino alla legna",
+            "note": "se possibile anche vicino all'oro"
+          },
+          {
+            "time": "",
+            "action": "5 villi iniziano a raccogliere la legna vicino al Matsuri",
+            "note": ""
+          },
+          {
+            "time": "0:20",
+            "action": "1 villo a costruire casa vicino le bacche",
+            "note": "prossimi 3 villi alle bacche"
+          },
+          {
+            "time": "0:45",
+            "action": "Ricerca Tawara dalla casa",
+            "note": ""
+          },
+          {
+            "time": "1:08",
+            "action": "Crea primo Yatai dal matsuri",
+            "note": "mandalo sul cinghiale"
+          },
+          {
+            "time": "1:30",
+            "action": "manda i prossimi villi sulle pecore",
+            "note": ""
+          },
+          {
+            "time": "1:55",
+            "action": "crea secondo Yatai dal matsuri",
+            "note": "mandalo sui cervi"
+          },
+          {
+            "time": "2:25",
+            "action": "crea terzo Yatai dal matsuri",
+            "note": "mandalo tra le bacche e le pecore"
+          },
+          {
+            "time": "2:50",
+            "action": "costruisci la forgia sull'oro con i 6 villi della legna",
+            "note": "assicurati di avere 100 di legna prima di spostare i villi"
+          },
+          {
+            "time": "3:00",
+            "action": "costruisci una seconda casa sulle bacche",
+            "note": "usa un villo delle bacche"
+          },
+          {
+            "time": "3:20",
+            "action": "Manda i prossimi villi sulla legna",
+            "note": "dovresti avere 5 villi alle pecore"
+          },
+          {
+            "time": "3:48",
+            "action": "Costruisci il Ryokan (o il Koka Township) con i 5 ville alle pecore",
+            "note": "forza i villi a conservare l'oro che hanno raccolto\nRyokan al lato opposto del Matsuri, rispetto al centro città"
+          },
+          {
+            "time": "5:10",
+            "action": "Compra 100 legna dal Matsuri",
+            "note": ""
+          },
+          {
+            "time": "5:15",
+            "action": "Sei passato in età feudale",
+            "note": "Manda 4 villi del Ryokan alle pecore\nUn villo del Ryokan costruisce una scuderia vicino al Ryokan"
+          },
+          {
+            "time": "5:30",
+            "action": "Costruisci una scuderia accanto al Ryokan con un villo delle pecore",
+            "note": "Forza i villi a conservare la legna che hanno raccolto\nrecluta Yari quando le scuderie sono complete"
+          },
+          {
+            "time": "5:40",
+            "action": " Compra legna dal Matsuri",
+            "note": ""
+          },
+          {
+            "time": "6:10",
+            "action": "Costruisci Takeda Clan Daimyo vicino alle scuderie",
+            "note": "con i 2 villi che hanno costruito le scuderie"
+          },
+          {
+            "time": "6:20",
+            "action": "Costruisci casa sulle bacche",
+            "note": ""
+          },
+          {
+            "time": "6:25",
+            "action": "Ricerca Takezaiku da una casa",
+            "note": ""
+          },
+          {
+            "time": "6:35",
+            "action": "Ricerca Tatara dalla forgia",
+            "note": ""
+          },
+          {
+            "time": "6:55",
+            "action": "Ricerca Horse Training dal Takeda Clan Daimyo",
+            "note": ""
+          },
+          {
+            "time": "",
+            "action": "Continua...",
+            "note": "Ricerca altri upgrade dalle forge\nSe serve puoi fare arcierie e Yumi\nPrendi i boar con i villi difendendoli con il tuo esercito\nSe hai costruito Koka Township crea shinobi usando la sua abilità\nvai in età dei castelli"
+          }
+        ],
+        "source": "https://www.youtube.com/watch?v=s2LUxq_E7pE",
+        "difficulty": "Medium",
+        "author_nickname": "Kani | AoeItalia.com",
+        "author_rank": "Unranked"
+      }
+    ]
+  }
+]
