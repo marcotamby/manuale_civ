@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Backups and local JSON states
+scripts/*.json
+backups/*_backup_*.json
+!backups/*_latest.json

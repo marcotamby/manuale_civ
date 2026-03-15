@@ -1,0 +1,50 @@
+name: Daily Supabase Backup
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # Esegue tutti i giorni alle 03:00 UTC
+  workflow_dispatch: # Permette l'avvio manuale dal sito GitHub se necessario
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Necessario per fare push sulla repository
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Backup Script
+        env:
+          # Assicurati di aggiungere questi Secrets nelle impostazioni della repo su GitHub:
+          # Settings -> Secrets and variables -> Actions -> New repository secret
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.VITE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: npm run backup
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "GitHub Action Backup Bot"
+          git config --global user.email "action@github.com"
+          
+          # Aggiungiamo solo i file "latest" per non far esplodere la repo con i timestamp
+          git add backups/civilizations_latest.json
+          git add backups/suggestions_latest.json
+          
+          # Se non ci sono modifiche nei dati, github eviterà di fare un commit vuoto
+          if git diff --staged --quiet; then
+            echo "Nessun nuovo dato nel backup di oggi. Commit skippato."
+          else
+            git commit -m "📦 Salvataggio automatico database Supabase"
+            git push
+          fi
