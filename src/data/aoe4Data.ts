@@ -159,7 +159,7 @@ export const unitsList: Unit[] = [
     strengths: ["Light Infantry", "Archers"],
     weaknesses: ["Crossbowmen", "Heavy Cavalry"],
     description: "Tough infantry with good damage.\n+ High armor\n- Slow movement\n- Countered by Knights, Lancers, and Crossbowmen",
-    excludedCivs: ['abbasid', 'ayyubids', 'byzantines', 'chinese', 'japanese', 'lancaster', 'macedonian', 'malians', 'orderofthedragon', 'sengoku', 'zhuxi']
+    excludedCivs: ['abbasid', 'ayyubids', 'byzantines', 'chinese', 'hre', 'japanese', 'lancaster', 'macedonian', 'malians', 'orderofthedragon', 'sengoku', 'zhuxi']
   },
   {
     id: "knight",
@@ -681,6 +681,17 @@ export const civilizationsData: Civilization[] = [
         strengths: ["Massed Units", "Light Infantry"],
         weaknesses: ["Archers", "Knights"],
         description: "Uses a large two-handed sword to deal significant area-of-effect damage."
+      },
+      {
+        id: "hre-man-at-arms",
+        imageId: "man-at-arms-2",
+        name: "Man-at-Arms",
+        type: "Infantry",
+        age: 2,
+        stats: { attack: 10, armor: 3, speed: 1.12, health: 120 },
+        strengths: ["Light Infantry", "Archers"],
+        weaknesses: ["Crossbowmen", "Heavy Cavalry"],
+        description: "Tough infantry with good damage and armor, available an age earlier for the Holy Roman Empire."
       }
     ],
     technologies: [],
