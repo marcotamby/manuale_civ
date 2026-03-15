@@ -1,5 +1,8 @@
 name: Daily Supabase Backup
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   schedule:
     - cron: '0 3 * * *' # Esegue tutti i giorni alle 03:00 UTC
@@ -8,8 +11,6 @@ on:
 jobs:
   backup:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     permissions:
       contents: write # Necessario per fare push sulla repository
 
