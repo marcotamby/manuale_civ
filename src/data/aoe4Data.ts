@@ -1173,6 +1173,17 @@ export const civilizationsData: Civilization[] = [
         strengths: ["Long Range", "Buildings"],
         weaknesses: ["Vulnerable to small ships"],
         description: "Large oared vessel with a long-range forward-mounted Trebuchet."
+      },
+      {
+        id: "genitour",
+        imageId: "genitour",
+        name: "Genitour",
+        type: "Cavalry",
+        age: 2,
+        stats: { attack: 6, armor: 4, speed: 1.63, health: 105 },
+        strengths: ["Archers", "High Mobility"],
+        weaknesses: ["Melee Units"],
+        description: "Extremely mobile ranged cavalry that attacks by throwing javelins."
       }
     ],
     technologies: [],
