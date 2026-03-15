@@ -15,6 +15,7 @@ import { useAuth } from './components/AuthContext';
 import { LoginModal } from './components/LoginModal';
 import { ProfileModal } from './components/ProfileModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
+import { AdminCivEditorModal } from './components/AdminCivEditorModal';
 import { PrivacyPage } from './components/PrivacyPage';
 import { FAQPage } from './components/FAQPage';
 import { MobileFooter } from './components/MobileFooter';
@@ -36,13 +37,20 @@ function App() {
   const currentPage = isHome ? 'home' : isCompare ? 'compare' : isCiv ? 'civ' : isFaq ? 'faq' : 'home';
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isCivEditorOpen, setIsCivEditorOpen] = useState(false);
+  const [civEditorTarget, setCivEditorTarget] = useState<{ section?: string; id?: string }>({});
 
   useEffect(() => {
-    // Expose methods to Topbar via window (quickest way without moving state up)
+    // Expose methods via window
     (window as any).openProfileModal = () => setIsProfileModalOpen(true);
+    (window as any).openCivEditor = (section?: string, id?: string) => {
+      setCivEditorTarget({ section, id });
+      setIsCivEditorOpen(true);
+    };
     (window as any).closeAllModals = () => {
       setIsProfileModalOpen(false);
       setIsAdminDashboardOpen(false);
+      setIsCivEditorOpen(false);
       setIsSidebarOpen(false);
     };
   }, []);
@@ -100,7 +108,7 @@ function App() {
   const { favorites, isLoginModalOpen, closeLoginModal, isAuthenticated, isAdmin } = useAuth();
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
-  const { civilizations: civilizationsData, loading, error } = useCivData();
+  const { civilizations: civilizationsData, loading, error, refreshCivs } = useCivData();
 
   const handleSelectCiv = (civId: string) => {
     navigate(`/civ/${civId}`);
@@ -265,6 +273,22 @@ function App() {
         <AdminDashboardModal
           isOpen={isAdminDashboardOpen}
           onClose={() => setIsAdminDashboardOpen(false)}
+        />
+      )}
+
+      {isAdmin && civilizationsData.length > 0 && (
+        <AdminCivEditorModal
+          civ={civilizationsData.find(c => c.id === selectedCiv) || civilizationsData[0]}
+          isOpen={isCivEditorOpen}
+          onClose={() => {
+            setIsCivEditorOpen(false);
+            setCivEditorTarget({});
+          }}
+          initialSection={civEditorTarget.section}
+          initialId={civEditorTarget.id}
+          onSave={() => {
+            refreshCivs();
+          }}
         />
       )}
     </div>

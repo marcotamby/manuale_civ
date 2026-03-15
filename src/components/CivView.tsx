@@ -6,7 +6,6 @@ import { usePresence } from './PresenceContext';
 import type { Unit } from '../data/aoe4Data';
 import { UnitGrid } from './UnitGrid';
 import { MatchupsTable } from './MatchupsTable';
-import { AdminCivEditorModal } from './AdminCivEditorModal';
 import type { Civilization } from '../data/aoe4Data';
 import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight, Clock, MessageSquare, Send, UserCircle, CheckCircle, XCircle, X, Loader2, Trash2, AlertTriangle } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
@@ -39,7 +38,7 @@ const getRankIcon = (rank: string | undefined) => {
 };
 
 export function CivView({ civId, onSelectUnit }: CivViewProps) {
-  const { civilizations: civilizationsData, refreshCivs } = useCivData();
+  const { civilizations } = useCivData();
   const { isAdmin, isSuperAdmin, user, toggleFavorite, openLoginModal } = useAuth();
   const { updateActivity, activeAdmins: _activeAdmins } = usePresence();
   const { tab } = useParams<{ tab?: string }>();
@@ -60,19 +59,15 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     sessionStorage.setItem('activeAge', age.toString());
   };
 
-  const [localCivs, setLocalCivs] = useState<Record<string, Civilization>>({});
-
-  const baseCiv = civilizationsData.find(c => c.id === civId);
-  const civ = baseCiv ? (localCivs[civId] || baseCiv) : undefined;
+  const civ = civilizations.find(c => c.id === civId);
   const [expandedBOs, setExpandedBOs] = useState<Set<string>>(new Set());
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
-  const [editorTarget, setEditorTarget] = useState<{ section?: string; id?: string }>({});
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string, type: 'question' | 'answer' } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const openEditor = (section?: string, id?: string) => {
-    setEditorTarget({ section, id });
-    setIsEditorOpen(true);
+    if ((window as any).openCivEditor) {
+      (window as any).openCivEditor(section, id);
+    }
   };
 
   useEffect(() => {
@@ -1144,28 +1139,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         )}
       </div>
 
-      {civ && isAdmin && (
-        <AdminCivEditorModal
-          civ={civ}
-          isOpen={isEditorOpen}
-          onClose={() => {
-            setIsEditorOpen(false);
-            setEditorTarget({});
-          }}
-          initialSection={editorTarget.section}
-          initialId={editorTarget.id}
-          onSave={(updatedCiv) => {
-            setLocalCivs(prev => ({ ...prev, [civId]: updatedCiv }));
-            refreshCivs();
-          }}
-        />
-      )}
-
       {civ && (
-        <SocialProofPopup 
-          civId={civId} 
-          civName={civ.name} 
-          onFollow={() => toggleFavorite(civId)} 
+        <SocialProofPopup
+          civId={civId}
+          civName={civ.name}
+          onFollow={() => toggleFavorite(civId)}
         />
       )}
 

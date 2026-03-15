@@ -559,7 +559,88 @@ export const civilizationsData: Civilization[] = [
     difficulty: "Medio",
     shortDescription: "An aggressive variant of the Mongols focusing on early cavalry and economy.",
     passiveBonuses: ["Mobile buildings like the Mongols.", "Increased early economic and military pressure."],
-    uniqueUnits: [],
+    uniqueUnits: [
+      {
+        id: "kharash",
+        name: "Kharash",
+        type: "Infantry",
+        age: 1,
+        stats: { attack: 6, armor: 0, speed: 1.13, health: 50 },
+        strengths: ["Supporto", "Costo"],
+        weaknesses: ["Tutte le unità"],
+        description: "Fanteria da mischia a basso costo che aumenta passivamente l'armatura delle unità vicine."
+      },
+      {
+        id: "batu-khan",
+        name: "Batu Khan",
+        type: "Cavalry",
+        age: 1,
+        stats: { attack: 10, armor: 3, speed: 1.63, health: 190 },
+        strengths: ["Supporto", "Manovre"],
+        weaknesses: ["Lancieri"],
+        description: "Unità eroe che potenzia l'esercito con manovre tattiche uniche."
+      },
+      {
+        id: "torguud",
+        name: "Torguud",
+        type: "Cavalry",
+        age: 1,
+        stats: { attack: 10, armor: 3, speed: 1.63, health: 220 },
+        strengths: ["Bodyguard", "Alta Salute"],
+        weaknesses: ["Lancieri", "Balestrieri"],
+        description: "Cavalleria pesante che protegge il Khan deviando i danni su di sé."
+      },
+      {
+        id: "keshik",
+        name: "Keshik",
+        type: "Cavalry",
+        age: 2,
+        stats: { attack: 15, armor: 3, speed: 1.63, health: 150 },
+        strengths: ["Corpo a corpo", "Sostenibilità"],
+        weaknesses: ["Lancieri", "Balestrieri"],
+        description: "Cavalleria pesante che si cura attaccando. Sostituisce il Cavaliere."
+      },
+      {
+        id: "kipchak-archer",
+        name: "Kipchak Archer",
+        type: "Ranged",
+        age: 2,
+        stats: { attack: 10, armor: 0, speed: 1.63, health: 105 },
+        strengths: ["Mobilità", "Hit-and-Run"],
+        weaknesses: ["Arcieri", "Cavalleggeri"],
+        description: "Arciere a cavallo capace di scoccare frecce in movimento."
+      },
+      {
+        id: "rus-tribute",
+        name: "Rus Tribute",
+        type: "Infantry",
+        age: 3,
+        stats: { attack: 12, armor: 3, speed: 1.13, health: 200 },
+        strengths: ["Anti-Cavalleria", "Costo"],
+        weaknesses: ["Unità a distanza"],
+        description: "Fanteria pesante evocata gratuitamente alla Tenda d'Oro con bonus vs cavalleria."
+      },
+      {
+        id: "traction-trebuchet",
+        name: "Traction Trebuchet",
+        type: "Siege",
+        age: 3,
+        stats: { attack: 40, armor: 0, speed: 0.88, health: 125 },
+        strengths: ["Edifici", "Mobilità"],
+        weaknesses: ["Unità da mischia"],
+        description: "Trabucco ad alta mobilità per schieramenti rapidi e distruzione di edifici."
+      },
+      {
+        id: "shaman",
+        name: "Shaman",
+        type: "Religious",
+        age: 3,
+        stats: { attack: 0, armor: 0, speed: 1.13, health: 130 },
+        strengths: ["Cura", "Reliquie"],
+        weaknesses: ["Tutte le unità nemiche"],
+        description: "Unità religiosa capace di curare e utilizzare le manovre del Khan."
+      }
+    ],
     technologies: [],
     landmarks: [
       { id: "town-center-1", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
