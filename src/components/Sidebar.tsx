@@ -72,7 +72,7 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
         </button>
         {/* Main Navigation - Hide on Home */}
         {currentPage !== 'home' && (
-          <div className="flex flex-col gap-4 mb-8 shrink-0 w-full px-2 md:px-4">
+          <div className="flex flex-col gap-4 mb-4 shrink-0 w-full px-2 md:px-4">
             <button
               onClick={() => onSelectPage('home')}
               title="Torna alla Home"
@@ -92,7 +92,7 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
         )}
 
         {/* Favorites List - Stacked & Faded */}
-        <div className="flex flex-col w-full mb-6">
+        <div className="flex flex-col w-full mb-4">
           {favoriteCivs.map((civ) => (
             <button
               key={`fav-${civ.id}`}
@@ -116,7 +116,7 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
           ))}
         </div>
 
-        {currentPage !== 'home' && <div className="w-10 h-[1px] bg-[#D4AF37]/20 mb-6 shrink-0" />}
+        {currentPage !== 'home' && <div className="w-10 h-[1px] bg-[#D4AF37]/20 mb-4 shrink-0" />}
 
         {/* Main List - Hide on Home */}
         {currentPage !== 'home' && (
