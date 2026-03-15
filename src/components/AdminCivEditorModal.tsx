@@ -467,7 +467,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                       </div>
                       <div className="grid grid-cols-2 gap-2 mb-2">
                         <select value={u.type} onChange={e => updateArrayField('uniqueUnits', idx, 'type', e.target.value)} className="bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600 w-full">
-                          <option value="Infantry">Infantry</option><option value="Cavalry">Cavalry</option><option value="Ranged">Ranged</option><option value="Siege">Siege</option><option value="Religious">Religious</option>
+                          <option value="Infantry">Infantry</option><option value="Cavalry">Cavalry</option><option value="Ranged">Ranged</option><option value="Siege">Siege</option><option value="Religious">Religious</option><option value="Worker">Worker</option>
                         </select>
                         <div className="grid grid-cols-5 gap-1">
                           <input type="number" min="1" max="4" value={u.age} onChange={e => updateArrayField('uniqueUnits', idx, 'age', e.target.value)} title="Age" className="bg-gray-800 text-white text-xs rounded px-1 py-1 text-center border border-gray-600" />

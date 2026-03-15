@@ -40,8 +40,8 @@ function App() {
   const [isCivEditorOpen, setIsCivEditorOpen] = useState(false);
   const [civEditorTarget, setCivEditorTarget] = useState<{ section?: string; id?: string }>({});
 
+  // Expose methods via window on every render to ensure they are always present and up to date
   useEffect(() => {
-    // Expose methods via window
     (window as any).openProfileModal = () => setIsProfileModalOpen(true);
     (window as any).openCivEditor = (section?: string, id?: string) => {
       setCivEditorTarget({ section, id });
@@ -53,7 +53,16 @@ function App() {
       setIsCivEditorOpen(false);
       setIsSidebarOpen(false);
     };
-  }, []);
+  }, []); // Keep in empty dependency to avoid unnecessary re-assignments, 
+          // but the state setters are stable so it's fine.
+
+  // Re-assign explicitly to window to handle potential losses during navigations or hot-reloads
+  if (typeof window !== 'undefined') {
+    (window as any).openCivEditor = (section?: string, id?: string) => {
+      setCivEditorTarget({ section, id });
+      setIsCivEditorOpen(true);
+    };
+  }
 
   const prevPathRef = useRef(location.pathname);
   useEffect(() => {
@@ -276,7 +285,7 @@ function App() {
         />
       )}
 
-      {isAdmin && civilizationsData.length > 0 && (
+      {civilizationsData.length > 0 && isCivEditorOpen && (
         <AdminCivEditorModal
           civ={civilizationsData.find(c => c.id === selectedCiv) || civilizationsData[0]}
           isOpen={isCivEditorOpen}

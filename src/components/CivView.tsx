@@ -63,14 +63,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string, type: 'question' | 'answer' } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const openEditor = (section?: string, id?: string) => {
-    if ((window as any).openCivEditor) {
-      (window as any).openCivEditor(section, id);
-    }
-  };
 
   useEffect(() => {
-    (window as any).openCivEditor = openEditor;
 
     // Update presence to viewing this civ
     updateActivity({ type: 'viewing', civId });
@@ -97,7 +91,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     }
 
     return () => {
-      (window as any).openCivEditor = undefined;
       // Reset activity to idle when leaving the view
       updateActivity({ type: 'idle' });
     };
@@ -484,7 +477,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                     <span className="text-[8px] text-yellow-500/60 font-medium leading-none">{user?.email}</span>
                   </div>
                   <button
-                    onClick={() => openEditor()}
+                    onClick={() => (window as any).openCivEditor?.()}
                     className="ml-2 px-3 py-1.5 bg-yellow-600 hover:bg-yellow-500 text-black text-[10px] font-black rounded uppercase transition-all active:scale-95 flex items-center gap-1 shadow-lg border border-yellow-400/50"
                   >
                     <Edit size={12} fill="black" /> Modifica
@@ -559,7 +552,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 Bonus
                 {isAdmin && (
                   <button
-                    onClick={() => openEditor('bonuses')}
+                    onClick={() => (window as any).openCivEditor?.('bonuses')}
                     className="p-1.5 bg-yellow-500 hover:bg-yellow-400 rounded-lg transition-all text-black border border-yellow-400 flex items-center gap-1 shadow-[0_0_10px_rgba(234,179,8,0.3)] group/btn"
                     title="Modifica Bonus"
                   >
@@ -584,7 +577,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 Punti di Forza
                 {isAdmin && (
                   <button
-                    onClick={() => openEditor('strengths')}
+                    onClick={() => (window as any).openCivEditor?.('strengths')}
                     className="p-1.5 bg-yellow-500 hover:bg-yellow-400 rounded-lg transition-all text-black border border-yellow-400 flex items-center gap-1 shadow-[0_0_10px_rgba(234,179,8,0.3)] group/btn"
                     title="Modifica Punti di Forza"
                   >
@@ -617,7 +610,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 Punti Deboli
                 {isAdmin && (
                   <button
-                    onClick={() => openEditor('weaknesses')}
+                    onClick={() => (window as any).openCivEditor?.('weaknesses')}
                     className="p-1.5 bg-yellow-500 hover:bg-yellow-400 rounded-lg transition-all text-black border border-yellow-400 flex items-center gap-1 shadow-[0_0_10px_rgba(234,179,8,0.3)] group/btn"
                     title="Modifica Punti Deboli"
                   >
@@ -670,8 +663,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               civId={civId}
               age={activeAge}
               onSelectUnit={onSelectUnit}
-              onEditUnit={(id, isGlobal) => openEditor(isGlobal ? 'global' : 'units', id)}
-              onEditLandmark={(id) => openEditor('landmarks', id)}
+              onEditUnit={(id, isGlobal) => (window as any).openCivEditor?.(isGlobal ? 'global' : 'units', id)}
+              onEditLandmark={(id) => (window as any).openCivEditor?.('landmarks', id)}
             />
           </div>
         )}
@@ -684,7 +677,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 Build Orders
                 {isAdmin && (
                   <button
-                    onClick={() => openEditor('buildorders')}
+                    onClick={() => (window as any).openCivEditor?.('buildorders')}
                     className="p-1.5 bg-yellow-500/20 hover:bg-yellow-500/40 rounded-lg transition-all text-yellow-500 border border-yellow-500/30 flex items-center gap-1 shadow-sm group/btn"
                     title="Modifica Build Orders"
                   >

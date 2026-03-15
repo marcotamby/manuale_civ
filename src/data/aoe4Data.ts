@@ -1,4 +1,4 @@
-export type UnitType = 'Infantry' | 'Cavalry' | 'Siege' | 'Ranged' | 'Religious';
+export type UnitType = 'Infantry' | 'Cavalry' | 'Siege' | 'Ranged' | 'Religious' | 'Worker';
 export type Age = 1 | 2 | 3 | 4;
 
 export interface UnitStats {
@@ -759,7 +759,63 @@ export const civilizationsData: Civilization[] = [
     difficulty: "Facile",
     shortDescription: "A variant of the English with powerful longbowmen upgrades and defensive traits.",
     passiveBonuses: ["Enhanced defensive networks.", "Focus on ranged superiority and area denial."],
-    uniqueUnits: [],
+    uniqueUnits: [
+      {
+        id: "lord-of-lancaster",
+        imageId: "lord-of-lancaster-1",
+        name: "Lord of Lancaster",
+        type: "Cavalry",
+        age: 1,
+        stats: { attack: 10, armor: 2, speed: 1.62, health: 250 },
+        strengths: ["Raiding", "Mobility"],
+        weaknesses: ["Spearmen"],
+        description: "A powerful hero unit that inspires nearby troops and excels in early skirmishes."
+      },
+      {
+        id: "demilancer",
+        imageId: "demilancer-2",
+        name: "Demilancer",
+        type: "Cavalry",
+        age: 2,
+        stats: { attack: 19, armor: 3, speed: 1.62, health: 190 },
+        strengths: ["Archers", "Light Infantry"],
+        weaknesses: ["Spearmen", "Crossbowmen"],
+        description: "Versatile heavy cavalry available in the Feudal Age."
+      },
+      {
+        id: "earls-guard",
+        imageId: "earls-guard-1",
+        name: "Earl's Guard",
+        type: "Infantry",
+        age: 1,
+        stats: { attack: 8, armor: 3, speed: 1.12, health: 120 },
+        strengths: ["Light Infantry", "Archers"],
+        weaknesses: ["Crossbowmen", "Knights"],
+        description: "Heavy infantry available early to protect key positions."
+      },
+      {
+        id: "yeoman",
+        imageId: "yeoman-1",
+        name: "Yeoman",
+        type: "Ranged",
+        age: 1,
+        stats: { attack: 5, armor: 0, speed: 1.25, health: 70 },
+        strengths: ["Spearmen", "Unarmored Units"],
+        weaknesses: ["Cavalry", "Man-at-Arms"],
+        description: "Skilled longbowmen with exceptional range and volley fire."
+      },
+      {
+        id: "hobelar",
+        imageId: "hobelar-1",
+        name: "Hobelar",
+        type: "Cavalry",
+        age: 1,
+        stats: { attack: 13, armor: 0, speed: 1.88, health: 125 },
+        strengths: ["Archers", "Siege"],
+        weaknesses: ["Spearmen", "Knights"],
+        description: "Swift light cavalry used for scouting and harassing enemy lines."
+      }
+    ],
     technologies: [],
     landmarks: [
       { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
@@ -1007,7 +1063,118 @@ export const civilizationsData: Civilization[] = [
     difficulty: "Medio",
     shortDescription: "A variant of the French with a fanatical cavalry focus and unique religious orders.",
     passiveBonuses: ["Powerful Templar Knights with charge bonuses.", "Monasteries provide unique military upgrades."],
-    uniqueUnits: [],
+    uniqueUnits: [
+      {
+        id: "serjeant",
+        imageId: "serjeant",
+        name: "Serjeant",
+        type: "Infantry",
+        age: 2,
+        stats: { attack: 10, armor: 4, speed: 1.25, health: 105 },
+        strengths: ["Melee Infantry"],
+        weaknesses: ["Ranged Units"],
+        description: "Sturdy infantry that throws axes which deal melee damage from range."
+      },
+      {
+        id: "hospitaller-knight",
+        imageId: "hospitaller-knight",
+        name: "Hospitaller Knight",
+        type: "Infantry",
+        age: 2,
+        stats: { attack: 10, armor: 2, speed: 1.25, health: 145 },
+        strengths: ["High armor"],
+        weaknesses: ["Knights", "Crossbowmen"],
+        description: "Tough infantry with good damage, heals friendly units."
+      },
+      {
+        id: "genoese-crossbowman",
+        imageId: "genoese-crossbowman",
+        name: "Genoese Crossbowman",
+        type: "Ranged",
+        age: 3,
+        stats: { attack: 21, armor: 0, speed: 1.06, health: 110 },
+        strengths: ["Melee Infantry", "Cavalry"],
+        weaknesses: ["Horsemen"],
+        description: "High damage ranged unit effective against Melee Infantry and Cavalry."
+      },
+      {
+        id: "heavy-spearman",
+        imageId: "heavy-spearman",
+        name: "Heavy Spearman",
+        type: "Infantry",
+        age: 2,
+        stats: { attack: 11, armor: 4, speed: 1.13, health: 140 },
+        strengths: ["Cavalry"],
+        weaknesses: ["Crossbowmen"],
+        description: "Heavy Infantry excellent against mounted units, especially near Fortresses."
+      },
+      {
+        id: "condottiero",
+        imageId: "condottiero",
+        name: "Condottiero",
+        type: "Infantry",
+        age: 3,
+        stats: { attack: 16, armor: 2, speed: 1.44, health: 195 },
+        strengths: ["Gunpowder Units", "Mobility"],
+        weaknesses: ["High Gold cost"],
+        description: "Fast Heavy Infantry that deals more and takes less damage from Gunpowder units."
+      },
+      {
+        id: "teutonic-knight",
+        imageId: "teutonic-knight",
+        name: "Teutonic Knight",
+        type: "Infantry",
+        age: 4,
+        stats: { attack: 24, armor: 6, speed: 0.98, health: 310 },
+        strengths: ["Melee Combat"],
+        weaknesses: ["Crossbowmen"],
+        description: "Powerful and expensive. Lowers armor of nearby enemies and grows stronger after kills."
+      },
+      {
+        id: "chevalier-confrere",
+        imageId: "chevalier-confrere",
+        name: "Chevalier Confrere",
+        type: "Cavalry",
+        age: 2,
+        stats: { attack: 14, armor: 2, speed: 1.63, health: 160 },
+        strengths: ["Cheap", "Melee Conflict"],
+        weaknesses: ["Spearmen", "Crossbowmen"],
+        description: "Heavy cavalry with high damage. Gains health from nearby Heavy Cavalry."
+      },
+      {
+        id: "templar-brother",
+        imageId: "templar-brother",
+        name: "Templar Brother",
+        type: "Cavalry",
+        age: 3,
+        stats: { attack: 24, armor: 4, speed: 1.63, health: 275 },
+        strengths: ["Heavy Armor", "Melee Combat"],
+        weaknesses: ["Spearmen", "Crossbowmen"],
+        description: "Expensive cavalry with high damage and melee armor. Effective against melee units."
+      },
+      {
+        id: "venetian-trader",
+        imageId: "venetian-trader",
+        name: "Venetian Trader",
+        type: "Worker",
+        age: 4,
+        stats: { attack: 0, armor: 3, speed: 1.88, health: 120 },
+        strengths: ["Gold Generation", "Speed"],
+        weaknesses: ["Vulnerable"],
+        description: "Expensive and fast Trader that generates Gold. Max 5."
+      },
+      {
+        id: "venetian-galley",
+        imageId: "venetian-galley",
+        name: "Venetian Galley",
+        type: "Siege",
+        age: 3,
+        stats: { attack: 450, armor: 0, speed: 1, health: 1008 },
+        strengths: ["Long Range", "Buildings"],
+        weaknesses: ["Vulnerable to small ships"],
+        description: "Large oared vessel with a long-range forward-mounted Trebuchet."
+      }
+    ],
     technologies: [],
     landmarks: [
       { id: "town-center-1", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
