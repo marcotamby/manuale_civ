@@ -108,6 +108,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       setQuestions(qData || []);
       setAnswers(aData || []);
     } catch (err: any) {
+      setQaLoading(false);
       console.error('Error fetching QA:', err);
       setToast({ isVisible: true, message: 'Errore caricamento QA', type: 'error' });
     } finally {
@@ -120,6 +121,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       if (isSuperAdmin) fetchSuggestions();
       fetchQA();
       fetchPendingNotifCount();
+      if(!isSuperAdmin) {
+        setActiveTab('qa');
+      }
     }
   }, [isOpen, isSuperAdmin]);
 
