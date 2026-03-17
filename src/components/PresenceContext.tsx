@@ -93,12 +93,12 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
           console.error('Error syncing presence:', err);
         }
       })
-      .on('presence', { event: 'join' }, ({ key, newPresences }) => {
-        console.log('Admin joined:', key, newPresences);
-      })
-      .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-        console.log('Admin left:', key, leftPresences);
-      })
+      // .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+      //   console.log('Admin joined:', key, newPresences);
+      // })
+      // .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+      //   console.log('Admin left:', key, leftPresences);
+      // })
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
           await adminChannel.track({
