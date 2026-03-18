@@ -118,14 +118,15 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
   useEffect(() => {
     if (isOpen) {
-      if (isSuperAdmin) fetchSuggestions();
+      // if (isSuperAdmin) fetchSuggestions();
+      fetchSuggestions();
       fetchQA();
       fetchPendingNotifCount();
-      if(!isSuperAdmin) {
-        setActiveTab('qa');
-      }
+      // if(!isSuperAdmin) {
+      //   setActiveTab('qa');
+      // }
     }
-  }, [isOpen, isSuperAdmin]);
+  }, [isOpen]);
 
   const handleSendNotifications = async () => {
     if (pendingNotifCount === 0 || !isSuperAdmin) return;
