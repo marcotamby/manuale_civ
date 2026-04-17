@@ -11,16 +11,39 @@ interface TournamentBracketProps {
 export function TournamentBracket({ phase }: TournamentBracketProps) {
   const [sets, setSets] = useState<StartGGSet[]>([]);
   const [loading, setLoading] = useState(true);
+  const [debugInfo, setDebugInfo] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function loadSets() {
       setLoading(true);
-      // Fetch nodes from all phase groups in this phase
-      const allSets = await Promise.all(
-        phase.phaseGroups.nodes.map(pg => fetchPhaseGroupSets(pg.id))
-      );
-      setSets(allSets.flat());
+      setDebugInfo(null);
+      try {
+        const groups = phase.phaseGroups?.nodes || [];
+        if (groups.length === 0) {
+          setDebugInfo("Nessun gruppo (pool) trovato in questa fase.");
+          setSets([]);
+        } else {
+          // Fetch nodes from all phase groups in this phase
+          const allSets = await Promise.all(
+            groups.map(async pg => {
+              try {
+                return await fetchPhaseGroupSets(pg.id);
+              } catch (e) {
+                console.error(`Error fetching sets for group ${pg.id}:`, e);
+                return [];
+              }
+            })
+          );
+          const flatSets = allSets.flat();
+          setSets(flatSets);
+          if (flatSets.length === 0) {
+            setDebugInfo(`Trovati ${groups.length} gruppi, ma nessun match (sets) presente.`);
+          }
+        }
+      } catch (err: any) {
+        setDebugInfo(`Errore critico: ${err.message}`);
+      }
       setLoading(false);
     }
     loadSets();
@@ -53,6 +76,17 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
       if (a < 0 && b < 0) return b - a; // -1, -2, -3...
       return b - a; // Winners first
     });
+
+  if (debugInfo && sets.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+        <p className="text-gray-400 font-serif italic mb-4">{debugInfo}</p>
+        <div className="text-[10px] text-gray-600 font-mono p-3 bg-black/20 rounded border border-white/5 max-w-md">
+          Phase ID: {phase.id} | Groups: {groupsLength}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full relative py-8 md:py-12">
