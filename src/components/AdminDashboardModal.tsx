@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
+import { useCivData } from './CivContext';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
 
@@ -26,6 +27,7 @@ interface AdminDashboardModalProps {
 
 export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProps) {
   const { isSuperAdmin } = useAuth();
+  const { refreshCivs } = useCivData();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; type: 'question' | 'answer'; item: any } | null>(null);
@@ -270,6 +272,10 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       setRejectionModalSugg(null);
       setRejectionReason('');
       fetchPendingNotifCount();
+      
+      if (newStatus === 'implemented') {
+        refreshCivs();
+      }
     } catch (err: any) {
       console.error('Error updating suggestion:', err);
       setToast({
