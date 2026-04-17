@@ -77,6 +77,8 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
       return b - a; // Winners first
     });
 
+  const groupsLength = phase.phaseGroups?.nodes?.length || 0;
+
   if (debugInfo && sets.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center px-4">
