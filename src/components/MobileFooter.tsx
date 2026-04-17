@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { HelpCircle, Coffee, MessageSquare } from 'lucide-react';
+import { HelpCircle, Coffee, MessageSquare, Trophy } from 'lucide-react';
 import { usePresence } from './PresenceContext';
 import { useAuth } from './AuthContext';
 
@@ -29,15 +29,16 @@ export function MobileFooter() {
         <span className="text-[10px] font-bold uppercase tracking-widest">Discord</span>
       </a>
 
-      <a
-        href="https://ko-fi.com/marcotamby"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex flex-col items-center gap-1 text-gray-400 hover:text-amber-500 transition-all font-sans"
-      >
-        <Coffee size={20} />
         <span className="text-[10px] font-bold uppercase tracking-widest">Sostieni</span>
       </a>
+
+      <Link
+        to="/tornei"
+        className={`flex flex-col items-center gap-1 transition-all ${location.pathname.startsWith('/tornei') ? 'text-yellow-500' : 'text-gray-400 hover:text-yellow-500'}`}
+      >
+        <Trophy size={20} className={location.pathname.startsWith('/tornei') ? 'scale-110' : ''} />
+        <span className="text-[10px] font-bold uppercase tracking-widest">Tornei</span>
+      </Link>
 
       {/* Admin Live indicator - Bottom Right (only for admins) */}
       {isAdmin && Object.keys(activeAdmins).length > 0 && (

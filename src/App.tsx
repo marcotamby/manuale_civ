@@ -16,9 +16,9 @@ import { LoginModal } from './components/LoginModal';
 import { ProfileModal } from './components/ProfileModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { AdminCivEditorModal } from './components/AdminCivEditorModal';
-import { PrivacyPage } from './components/PrivacyPage';
-import { FAQPage } from './components/FAQPage';
 import { MobileFooter } from './components/MobileFooter';
+import { TournamentsPage } from './components/TournamentsPage';
+import { TournamentDetail } from './components/TournamentDetail';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 
 function App() {
@@ -251,6 +251,8 @@ function App() {
                 <Route path="/compare" element={<CompareView civIds={compareIds} onClose={() => navigate('/')} />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/faq" element={<FAQPage />} />
+                <Route path="/tornei" element={<TournamentsPage />} />
+                <Route path="/tornei/:slug" element={<TournamentDetail />} />
               </Routes>
             </div>
           </div>

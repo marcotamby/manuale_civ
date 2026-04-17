@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Link } from 'react-router-dom';
 import { RANK_ICONS } from './ProfileModal';
-import { Coffee, Radio as _Radio, HelpCircle, LogOut } from 'lucide-react';
+import { Coffee, Radio as _Radio, HelpCircle, LogOut, Trophy } from 'lucide-react';
 import { usePresence } from './PresenceContext';
 
 export type FilterType = 'Tutte' | 'Fanteria' | 'Cavalleria' | 'Arcieri' | 'Assedio';
@@ -93,7 +93,8 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
     }
 
     const lastSeenKey = `lastSeenCounts_${user.email}`;
-    const lastSeenData = JSON.parse(localStorage.getItem(lastSeenKey) || '{}');
+    const rawData = localStorage.getItem(lastSeenKey);
+    const lastSeenData = rawData ? JSON.parse(rawData) : {};
     
     let totalUnread = 0;
     favorites.forEach(favId => {
@@ -103,8 +104,12 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
         const currentBO = civ.buildOrders?.length || 0;
         const currentVideo = civ.videos?.length || 0;
 
-        if (currentBO > stored.bo) totalUnread += (currentBO - stored.bo);
-        if (currentVideo > stored.video) totalUnread += (currentVideo - stored.video);
+        // Ensure we compare with numbers and handle potential missing properties in 'stored'
+        const storedBO = typeof stored.bo === 'number' ? stored.bo : 0;
+        const storedVideo = typeof stored.video === 'number' ? stored.video : 0;
+
+        if (currentBO > storedBO) totalUnread += (currentBO - storedBO);
+        if (currentVideo > storedVideo) totalUnread += (currentVideo - storedVideo);
       }
     });
 
@@ -156,16 +161,21 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
           <HelpCircle size={14} className="group-hover:scale-110 transition-transform" />
           FAQ
         </Link>
-        <a
-          href="https://ko-fi.com/marcotamby"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-amber-500/30 text-amber-500 hover:bg-amber-500/20 hover:border-amber-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
-          title="Sostieni il progetto su Ko-fi"
-        >
           <Coffee size={14} className="group-hover:scale-110 transition-transform" />
           Sostieni
         </a>
+        <Link
+          to="/tornei"
+          onClick={() => {
+            (window as any).closeAllModals?.();
+            (window as any).resetHomeFilters?.();
+          }}
+          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/20 hover:border-yellow-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
+          title="Tornei Ufficiali"
+        >
+          <Trophy size={14} className="group-hover:scale-110 transition-transform" />
+          Tornei
+        </Link>
       </div>
 
       {/* Center Title Area */}
