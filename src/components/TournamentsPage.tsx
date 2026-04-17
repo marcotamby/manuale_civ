@@ -43,8 +43,6 @@ export function TournamentsPage() {
     );
   }
 
-  const hasError = tournaments.length === 0 && FEATURED_SLUGS.length > 0;
-
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col mb-12">
