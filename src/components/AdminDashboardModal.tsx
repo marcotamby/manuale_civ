@@ -108,6 +108,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       setQuestions(qData || []);
       setAnswers(aData || []);
     } catch (err: any) {
+      setQaLoading(false);
       console.error('Error fetching QA:', err);
       setToast({ isVisible: true, message: 'Errore caricamento QA', type: 'error' });
     } finally {
@@ -117,11 +118,15 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
   useEffect(() => {
     if (isOpen) {
-      if (isSuperAdmin) fetchSuggestions();
+      // if (isSuperAdmin) fetchSuggestions();
+      fetchSuggestions();
       fetchQA();
       fetchPendingNotifCount();
+      // if(!isSuperAdmin) {
+      //   setActiveTab('qa');
+      // }
     }
-  }, [isOpen, isSuperAdmin]);
+  }, [isOpen]);
 
   const handleSendNotifications = async () => {
     if (pendingNotifCount === 0 || !isSuperAdmin) return;
@@ -374,7 +379,6 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
           <div className="flex items-center justify-between md:justify-end w-full md:w-auto gap-4">
             <div className="flex bg-black/40 p-1 rounded-xl border border-white/5">
-               {isSuperAdmin && (
                  <button
                    onClick={() => setActiveTab('proposte')}
                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'proposte' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
@@ -386,7 +390,6 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                      </span>
                    )}
                  </button>
-               )}
                <button
                  onClick={() => setActiveTab('qa')}
                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'qa' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
