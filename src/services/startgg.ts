@@ -71,10 +71,8 @@ export interface StartGGTournament {
 }
 
 const getHeaders = () => {
-  const token = import.meta.env.VITE_STARTGG_TOKEN;
   return {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
   };
 };
 
