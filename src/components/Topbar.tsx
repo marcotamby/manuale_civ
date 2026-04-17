@@ -161,6 +161,13 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
           <HelpCircle size={14} className="group-hover:scale-110 transition-transform" />
           FAQ
         </Link>
+        <a
+          href="https://ko-fi.com/marcotamby"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-amber-500/30 text-amber-500 hover:bg-amber-500/20 hover:border-amber-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
+          title="Sostieni il progetto su Ko-fi"
+        >
           <Coffee size={14} className="group-hover:scale-110 transition-transform" />
           Sostieni
         </a>
