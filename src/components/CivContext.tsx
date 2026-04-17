@@ -10,12 +10,14 @@ interface CivDataContextType {
   loading: boolean;
   error: string | null;
   refreshCivs: () => void;
+  updateCivLocally: (civ: Civilization) => void;
+  updateGlobalUnitLocally: (gu: Unit) => void;
 }
 
 const CivDataContext = createContext<CivDataContextType | undefined>(undefined);
 
 export function CivDataProvider({ children }: { children: ReactNode }) {
-  const { civs, globalUnits, loading, error, refreshCivs } = useCivilizations();
+  const { civs, globalUnits, loading, error, refreshCivs, updateCivLocally, updateGlobalUnitLocally } = useCivilizations();
 
   return (
     <CivDataContext.Provider value={{
@@ -23,7 +25,9 @@ export function CivDataProvider({ children }: { children: ReactNode }) {
       globalUnits: globalUnits.length > 0 ? globalUnits : unitsList,
       loading,
       error,
-      refreshCivs
+      refreshCivs,
+      updateCivLocally,
+      updateGlobalUnitLocally
     }}>
       {children}
     </CivDataContext.Provider>

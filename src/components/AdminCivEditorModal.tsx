@@ -13,7 +13,7 @@ interface AdminCivEditorModalProps {
   civ: Civilization;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (updatedCiv: Civilization) => void;
+  onSave: (updatedCiv: Civilization, updatedGlobalUnits: any[]) => void;
   initialSection?: string;
   initialId?: string;
 }
@@ -161,7 +161,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
         ...editedCiv,
         strengths: editedCiv.strengths?.filter((s: string) => s.trim() !== '') || [],
         weaknesses: editedCiv.weaknesses?.filter((s: string) => s.trim() !== '') || []
-      });
+      }, editedGlobalUnits);
 
       setTimeout(() => {
         setIsSaveSuccess(false);

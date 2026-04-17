@@ -79,5 +79,13 @@ export function useCivilizations() {
     fetchCivs(true);
   }, []);
 
-  return { civs, globalUnits, loading, error, refreshCivs: () => fetchCivs(false) };
+  const updateCivLocally = (updatedCiv: Civilization) => {
+    setCivs(prev => prev.map(c => c.id === updatedCiv.id ? updatedCiv : c));
+  };
+
+  const updateGlobalUnitLocally = (updatedGu: Unit) => {
+    setGlobalUnits(prev => prev.map(gu => gu.id === updatedGu.id ? updatedGu : gu));
+  };
+
+  return { civs, globalUnits, loading, error, refreshCivs: () => fetchCivs(false), updateCivLocally, updateGlobalUnitLocally };
 }

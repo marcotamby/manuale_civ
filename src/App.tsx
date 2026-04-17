@@ -117,7 +117,7 @@ function App() {
   const { favorites, isLoginModalOpen, closeLoginModal, isAuthenticated, isAdmin } = useAuth();
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
-  const { civilizations: civilizationsData, loading, error, refreshCivs } = useCivData();
+  const { civilizations: civilizationsData, loading, error, refreshCivs, updateCivLocally, updateGlobalUnitLocally } = useCivData();
 
   const handleSelectCiv = (civId: string) => {
     navigate(`/civ/${civId}`);
@@ -295,7 +295,11 @@ function App() {
           }}
           initialSection={civEditorTarget.section}
           initialId={civEditorTarget.id}
-          onSave={() => {
+          onSave={(updatedCiv, updatedGlobalUnits) => {
+            if (updateCivLocally) updateCivLocally(updatedCiv);
+            if (updateGlobalUnitLocally && updatedGlobalUnits) {
+              updatedGlobalUnits.forEach(gu => updateGlobalUnitLocally(gu));
+            }
             refreshCivs();
           }}
         />
