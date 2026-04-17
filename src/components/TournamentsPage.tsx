@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchTournament, StartGGTournament } from '../services/startgg';
+import { fetchTournament } from '../services/startgg';
+import type { StartGGTournament } from '../services/startgg';
 import { Trophy, Calendar, Users, ArrowRight, Loader2 } from 'lucide-react';
 
 const FEATURED_SLUGS = ['torneo-1v1-2026'];

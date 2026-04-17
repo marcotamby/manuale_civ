@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { StartGGPhase, StartGGSet, fetchPhaseGroupSets } from '../services/startgg';
+import { fetchPhaseGroupSets } from '../services/startgg';
+import type { StartGGPhase, StartGGSet } from '../services/startgg';
 import { Loader2 } from 'lucide-react';
 import { clsx } from 'clsx';
 

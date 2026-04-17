@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchTournament, StartGGTournament, StartGGPhase } from '../services/startgg';
+import { fetchTournament } from '../services/startgg';
+import type { StartGGTournament, StartGGPhase } from '../services/startgg';
 import { Loader2, ArrowLeft, Trophy, Users, Shield } from 'lucide-react';
 import { TournamentBracket } from './TournamentBracket';
 
