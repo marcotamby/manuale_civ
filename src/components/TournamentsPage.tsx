@@ -29,6 +29,8 @@ export function TournamentsPage() {
     );
   }
 
+  const hasError = tournaments.length === 0 && FEATURED_SLUGS.length > 0;
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col mb-12">
@@ -40,6 +42,13 @@ export function TournamentsPage() {
         </p>
         <div className="h-1 w-24 bg-gradient-to-r from-yellow-500/50 to-transparent mt-6"></div>
       </div>
+
+      {hasError && (
+        <div className="glass p-8 rounded-2xl border border-red-500/20 mb-8 text-center">
+          <p className="text-red-400 mb-2">Impossibile caricare i dati dei tornei.</p>
+          <p className="text-gray-500 text-xs italic">Verifica la connessione o la configurazione della chiave API (VITE_STARTGG_TOKEN).</p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {tournaments.map((tournament) => {
