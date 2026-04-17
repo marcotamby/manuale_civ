@@ -70,7 +70,7 @@ export function TournamentDetail() {
                 <Trophy size={18} />
                 <span className="text-xs font-black uppercase tracking-[0.2em]">Competizione Ufficiale</span>
               </div>
-              <h1 className="text-4xl md:text-6xl font-cinzel font-bold text-white uppercase tracking-tighter leading-none mb-4">
+              <h1 className="text-4xl md:text-6xl font-sackers font-black text-white uppercase tracking-tighter leading-none mb-4">
                 {tournament.name}
               </h1>
               <div className="flex flex-wrap gap-6 text-gray-400 text-sm font-medium">

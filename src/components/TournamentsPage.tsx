@@ -9,13 +9,26 @@ const FEATURED_SLUGS = ['torneo-1v1-2026'];
 export function TournamentsPage() {
   const [tournaments, setTournaments] = useState<StartGGTournament[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     async function loadTournaments() {
       setLoading(true);
-      const results = await Promise.all(FEATURED_SLUGS.map(slug => fetchTournament(slug)));
-      setTournaments(results.filter((t): t is StartGGTournament => t !== null));
+      setErrorDetails(null);
+      try {
+        const results = await Promise.all(FEATURED_SLUGS.map(async slug => {
+          const res = await fetchTournament(slug);
+          return res;
+        }));
+        const filtered = results.filter((t): t is StartGGTournament => t !== null);
+        setTournaments(filtered);
+        if (filtered.length === 0 && FEATURED_SLUGS.length > 0) {
+          setErrorDetails("Nessun dato ricevuto dalle API. Controlla i log del server o la chiave API.");
+        }
+      } catch (err: any) {
+        setErrorDetails(err.message || "Errore sconosciuto durante il caricamento.");
+      }
       setLoading(false);
     }
     loadTournaments();
@@ -35,8 +48,8 @@ export function TournamentsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col mb-12">
-        <h1 className="text-4xl md:text-5xl font-cinzel font-bold text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-amber-600 mb-4 uppercase tracking-tighter">
-          Tornei Arena
+        <h1 className="text-4xl md:text-5xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-amber-600 mb-4 uppercase tracking-tighter">
+          Tornei
         </h1>
         <p className="text-gray-400 font-serif italic text-lg max-w-2xl">
           Segui le competizioni ufficiali del Manuale Civ, dai gironi iniziali fino alle gloriose finali.
@@ -44,10 +57,13 @@ export function TournamentsPage() {
         <div className="h-1 w-24 bg-gradient-to-r from-yellow-500/50 to-transparent mt-6"></div>
       </div>
 
-      {hasError && (
-        <div className="glass p-8 rounded-2xl border border-red-500/20 mb-8 text-center">
-          <p className="text-red-400 mb-2">Impossibile caricare i dati dei tornei.</p>
-          <p className="text-gray-500 text-xs italic">Verifica la connessione o la configurazione della chiave API (VITE_STARTGG_TOKEN).</p>
+      {errorDetails && (
+        <div className="glass p-8 rounded-2xl border border-red-500/20 mb-8 text-center animate-in zoom-in duration-300">
+          <p className="text-red-400 mb-2 font-bold uppercase tracking-widest text-xs">Errore di Caricamento</p>
+          <p className="text-gray-300 text-sm mb-4">{errorDetails}</p>
+          <div className="text-[10px] text-gray-500 font-mono p-3 bg-black/30 rounded border border-white/5">
+            LOG: ensure VITE_STARTGG_TOKEN is set in Vercel Settings
+          </div>
         </div>
       )}
 
