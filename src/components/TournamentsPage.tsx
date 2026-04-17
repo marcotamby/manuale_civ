@@ -18,16 +18,22 @@ export function TournamentsPage() {
       setErrorDetails(null);
       try {
         const results = await Promise.all(FEATURED_SLUGS.map(async slug => {
-          const res = await fetchTournament(slug);
-          return res;
+          try {
+            const res = await fetchTournament(slug);
+            return res;
+          } catch (e: any) {
+            console.error(`Error fetching tournament ${slug}:`, e);
+            throw e;
+          }
         }));
         const filtered = results.filter((t): t is StartGGTournament => t !== null);
         setTournaments(filtered);
         if (filtered.length === 0 && FEATURED_SLUGS.length > 0) {
-          setErrorDetails("Nessun dato ricevuto dalle API. Controlla i log del server o la chiave API.");
+          setErrorDetails("Le API hanno risposto con successo ma non hanno restituito alcun torneo. Verifica lo slug 'torneo-1v1-2026' o i permessi del token.");
         }
       } catch (err: any) {
-        setErrorDetails(err.message || "Errore sconosciuto durante il caricamento.");
+        console.error("General loading error:", err);
+        setErrorDetails(`Dettaglio Errore: ${err.message || 'Errore di rete o di risposta del server.'}`);
       }
       setLoading(false);
     }
