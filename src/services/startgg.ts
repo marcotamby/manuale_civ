@@ -1,4 +1,4 @@
-const STARTGG_API_URL = 'https://api.start.gg/gql/alpha';
+const STARTGG_API_URL = '/api/startgg';
 
 export interface StartGGImage {
   url: string;
