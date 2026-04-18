@@ -1,15 +1,33 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import type { StartGGTournament } from '../services/startgg';
-import { Trophy, Calendar, Users, ArrowRight, Loader2 } from 'lucide-react';
+import { Trophy, Calendar, Users, ArrowRight, Loader2, Terminal } from 'lucide-react';
 
 const FEATURED_SLUGS = ['torneo-1v1-2026'];
 
 export function TournamentsPage() {
+  const location = useLocation();
   const [tournaments, setTournaments] = useState<StartGGTournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
+  const [debugLogs, setDebugLogs] = useState<string[]>([]);
+  const isDebugMode = new URLSearchParams(location.search).get('debug') === 'true';
+
+  const addDebugLog = (msg: string) => {
+    setDebugLogs(prev => [...prev, `${new Date().toLocaleTimeString()} - ${msg}`]);
+  };
+
+  const runDebugAPI = async () => {
+    addDebugLog('Avvio test manuale...');
+    try {
+      const data = await fetchTournament('torneo-1v1-2026');
+      if (data) addDebugLog(`SUCCESSO: Trovato ${data.name}`);
+      else addDebugLog('ERRORE: Risposta NULL dal server.');
+    } catch (err: any) {
+      addDebugLog(`ERRORE CRITICO: ${err.message}`);
+    }
+  };
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -148,6 +166,29 @@ export function TournamentsPage() {
           <h4 className="text-gray-400 font-bold uppercase tracking-widest text-sm mb-2">Nuovo Torneo?</h4>
           <p className="text-gray-600 text-xs italic">Presto nuovi eventi ufficiali!</p>
         </div>
+        {/* Debug Panel (Solo se ?debug=true nell'URL) */}
+        {isDebugMode && (
+          <div className="mt-20 p-6 glass border border-yellow-500/30 rounded-3xl animate-in fade-in slide-in-from-bottom-5 duration-500">
+            <div className="flex items-center gap-3 mb-6 text-yellow-500">
+              <Terminal size={24} />
+              <h2 className="text-xl font-cinzel font-bold uppercase tracking-widest">Dashboard di Diagnostica</h2>
+            </div>
+            
+            <button 
+              onClick={runDebugAPI}
+              className="mb-6 px-6 py-2 bg-yellow-500 text-black font-black uppercase text-[10px] tracking-widest rounded-xl hover:bg-yellow-400 transition-all"
+            >
+              Test Connessione Start.gg
+            </button>
+
+            <div className="bg-black/60 p-4 rounded-xl border border-white/5 font-mono text-[10px] space-y-1 max-h-60 overflow-y-auto elegant-scrollbar">
+              {debugLogs.map((log, i) => (
+                <p key={i} className={log.includes('ERRORE') ? 'text-red-400' : 'text-gray-400'}>{log}</p>
+              ))}
+              {debugLogs.length === 0 && <p className="text-gray-600 italic">Pronto per il test. Clicca il tasto sopra.</p>}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
