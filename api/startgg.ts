@@ -5,19 +5,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Proviamo a leggere sia con che senza prefisso VITE_ per sicurezza
+  // Proviamo a leggere con vari nomi possibili
   const token = process.env.VITE_STARTGG_TOKEN || process.env.STARTGG_TOKEN;
 
   if (!token) {
-    console.error('SERVER ERROR: Start.gg token is missing in process.env');
-    return res.status(500).json({ 
-      error: 'API Token non configurato sul server',
-      details: 'La variabile VITE_STARTGG_TOKEN non è stata trovata nelle impostazioni di Vercel.' 
+    return res.status(401).json({ 
+      error: 'API Token assente', 
+      details: 'Il server non trova la chiave VITE_STARTGG_TOKEN. Verifica le Environment Variables su Vercel.' 
     });
   }
 
   try {
-    const response = await fetch('https://api.start.gg/gql/alpha', {
+    const startggUrl = 'https://api.start.gg/gql/alpha';
+    console.log(`Proxying to start.gg... Body present: ${!!req.body}`);
+    
+    const response = await fetch(startggUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
