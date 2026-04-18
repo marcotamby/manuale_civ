@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
+import { fetchChallongeTournament } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
 import { Trophy, Calendar, Users, ArrowRight, Loader2, Terminal } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -49,16 +50,20 @@ export function TournamentsPage() {
             if (config.source === 'startgg') {
               const res = await fetchTournament(config.slug);
               return res ? { ...res, config } : null;
+            } else if (config.source === 'challonge') {
+              const res = await fetchChallongeTournament(config.slug);
+              if (res) {
+                return {
+                  id: res.id,
+                  name: res.attributes.name,
+                  slug: config.slug,
+                  images: [],
+                  events: [],
+                  config
+                } as any;
+              }
             }
-            // Mock per Challonge (verrà popolato dal servizio vero nel prossimo task)
-            return {
-              id: config.slug,
-              name: 'Caricamento Torneo Challonge...',
-              slug: config.slug,
-              images: [],
-              events: [],
-              config
-            } as any;
+            return null;
           } catch (e: any) {
             console.error(`Error fetching tournament ${config.slug}:`, e);
             return null;
