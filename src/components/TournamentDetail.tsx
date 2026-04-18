@@ -11,15 +11,22 @@ export function TournamentDetail() {
   const [tournament, setTournament] = useState<StartGGTournament | null>(null);
   const [selectedPhase, setSelectedPhase] = useState<StartGGPhase | null>(null);
   const [loading, setLoading] = useState(true);
+  const [detailError, setDetailError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadTournament() {
       if (!slug) return;
       setLoading(true);
-      const data = await fetchTournament(slug);
-      setTournament(data);
-      if (data && data.events[0]?.phases.length > 0) {
-        setSelectedPhase(data.events[0].phases[0]);
+      setDetailError(null);
+      try {
+        const data = await fetchTournament(slug);
+        setTournament(data);
+        if (data && data.events[0]?.phases.length > 0) {
+          setSelectedPhase(data.events[0].phases[0]);
+        }
+      } catch (err: any) {
+        console.error("Detail load error:", err);
+        setDetailError(err.message || "Impossibile caricare i dettagli del torneo.");
       }
       setLoading(false);
     }
@@ -30,6 +37,23 @@ export function TournamentDetail() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <Loader2 className="w-12 h-12 text-yellow-500 animate-spin" />
+      </div>
+    );
+  }
+
+  if (detailError) {
+    return (
+      <div className="text-center py-20 px-4">
+        <div className="glass p-8 rounded-2xl border border-red-500/20 max-w-xl mx-auto">
+          <h2 className="text-2xl font-cinzel text-red-400 mb-4">Errore Tecnico</h2>
+          <p className="text-gray-400 mb-6 italic">{detailError}</p>
+          <button 
+            onClick={() => navigate('/tornei')} 
+            className="px-6 py-2 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/30 rounded-xl text-yellow-500 font-bold uppercase text-xs tracking-widest transition-all"
+          >
+            Torna ai tornei
+          </button>
+        </div>
       </div>
     );
   }
