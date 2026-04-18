@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { fetchPhaseGroupSets } from '../services/startgg';
 import type { StartGGPhase, StartGGSet } from '../services/startgg';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Shield } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface TournamentBracketProps {
