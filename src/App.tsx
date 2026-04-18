@@ -35,7 +35,7 @@ function App() {
   const selectedCiv = selectedCivMatch ? selectedCivMatch[1] : '';
 
   const isFaq = location.pathname === '/faq';
-  const isTournaments = location.pathname.startsWith('/tornei');
+  const isTournaments = location.pathname.includes('/tornei');
   
   const currentPage = isHome ? 'home' : isCompare ? 'compare' : isCiv ? 'civ' : isFaq ? 'faq' : isTournaments ? 'tornei' : 'home';
 
@@ -256,6 +256,7 @@ function App() {
                 <Route path="/faq" element={<FAQPage />} />
                 <Route path="/tornei" element={<TournamentsPage />} />
                 <Route path="/tornei/:slug" element={<TournamentDetail />} />
+                <Route path="/tornei/tournament/:slug" element={<TournamentDetail />} />
               </Routes>
             </div>
           </div>
