@@ -21,6 +21,7 @@ import { FAQPage } from './components/FAQPage';
 import { MobileFooter } from './components/MobileFooter';
 import { TournamentsPage } from './components/TournamentsPage';
 import { TournamentDetail } from './components/TournamentDetail';
+import { DebugPage } from './components/DebugPage';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 
 function App() {
@@ -255,6 +256,7 @@ function App() {
                 <Route path="/faq" element={<FAQPage />} />
                 <Route path="/tornei" element={<TournamentsPage />} />
                 <Route path="/tornei/:slug" element={<TournamentDetail />} />
+                <Route path="/debug-api" element={<DebugPage />} />
               </Routes>
             </div>
           </div>
