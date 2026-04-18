@@ -138,7 +138,7 @@ export async function fetchPhaseGroupSets(phaseGroupId: string): Promise<StartGG
     query PhaseGroupSets($id: ID!) {
       phaseGroup(id: $id) {
         id
-        sets(page: 1, perPage: 100) {
+        sets(page: 1, perPage: 100, sortType: STANDARD) {
           nodes {
             id
             fullRoundText
