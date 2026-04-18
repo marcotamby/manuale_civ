@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import type { StartGGTournament } from '../services/startgg';
 import { Trophy, Calendar, Users, ArrowRight, Loader2, Terminal } from 'lucide-react';
+import { clsx } from 'clsx';
 
 const FEATURED_SLUGS = ['torneo-1v1-2026'];
 
@@ -147,6 +148,32 @@ export function TournamentsPage() {
                       <span>{tournament.events?.[0]?.videogame?.name || 'Age of Empires IV'}</span>
                     </div>
                   </div>
+
+                  {/* Podium Section */}
+                  {tournament.events?.[0]?.standings?.nodes && tournament.events[0].standings.nodes.length > 0 && (
+                    <div className="mb-6 p-4 rounded-xl bg-white/[0.02] border border-white/5 animate-in slide-in-from-top-2 duration-500">
+                      <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3 border-b border-white/5 pb-2">Risultati Finali</p>
+                      <div className="space-y-2">
+                        {tournament.events[0].standings.nodes.map((standing, idx) => {
+                          const medals = ['🥇', '🥈', '🥉'];
+                          return (
+                            <div key={idx} className="flex items-center justify-between group/standing">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm leading-none">{medals[idx]}</span>
+                                <span className={clsx(
+                                  "text-xs font-bold transition-colors",
+                                  idx === 0 ? "text-yellow-100" : "text-gray-400"
+                                )}>
+                                  {standing.entrant.name}
+                                </span>
+                              </div>
+                              <span className="text-[10px] font-black text-white/20 group-hover/standing:text-white/40 transition-colors uppercase italic">{idx === 0 ? 'Winner' : `${idx + 1}nd`}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                   <button className="w-full py-3 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/30 rounded-xl text-yellow-500 font-bold uppercase text-xs tracking-widest transition-all flex items-center justify-center gap-2 group/btn">
                     Dettagli e Tabellone

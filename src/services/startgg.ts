@@ -52,6 +52,14 @@ export interface StartGGPhase {
   } | StartGGPhaseGroup[];
 }
 
+export interface StartGGStanding {
+  placement: number;
+  entrant: {
+    id: string;
+    name: string;
+  };
+}
+
 export interface StartGGEvent {
   id: string;
   name: string;
@@ -60,6 +68,9 @@ export interface StartGGEvent {
     name: string;
   };
   phases: StartGGPhase[];
+  standings?: {
+    nodes: StartGGStanding[];
+  };
 }
 
 export interface StartGGTournament {
@@ -93,6 +104,15 @@ export async function fetchTournament(slug: string): Promise<StartGGTournament |
           videogame {
             id
             name
+          }
+          standings(query: { perPage: 3, page: 1 }) {
+            nodes {
+              placement
+              entrant {
+                id
+                name
+              }
+            }
           }
           phases {
             id
