@@ -114,20 +114,29 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
       return Math.abs(a.sets[0].round) - Math.abs(b.sets[0].round);
     });
 
+    const isRoundRobin = phase.bracketType === 'ROUND_ROBIN';
+
     return (
-      <div className="flex gap-4 md:gap-12 overflow-x-auto pb-12 elegant-scrollbar pt-4 px-2 min-h-[700px]">
+      <div className={clsx(
+        "flex gap-4 md:gap-12 overflow-x-auto pb-12 elegant-scrollbar pt-4 px-2",
+        !isRoundRobin ? "min-h-[700px]" : "min-h-0"
+      )}>
         {sortedRounds.map((round, idx) => (
           <div key={idx} className="min-w-[280px] flex flex-col">
             <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-8 pl-2 border-l-2 border-yellow-500/30">
               {round.title}
             </h3>
-            <div className="flex-1 flex flex-col justify-around py-4">
+            <div className={clsx(
+              "flex-1 flex flex-col py-4",
+              isRoundRobin ? "justify-start gap-4" : "justify-around"
+            )}>
               {round.sets.map(set => (
                 <BracketSet 
                   key={set.id} 
                   set={set} 
                   isFirstRound={idx === 0}
                   isLastRound={idx === sortedRounds.length - 1}
+                  hideConnectors={isRoundRobin}
                 />
               ))}
             </div>
@@ -186,18 +195,18 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
   );
 }
 
-function BracketSet({ set, isFirstRound, isLastRound }: { set: StartGGSet, isFirstRound?: boolean, isLastRound?: boolean }) {
+function BracketSet({ set, isFirstRound, isLastRound, hideConnectors }: { set: StartGGSet, isFirstRound?: boolean, isLastRound?: boolean, hideConnectors?: boolean }) {
   return (
     <div className="relative py-4 w-full group/set">
-      {/* Connector lines (Golden) */}
-      {!isFirstRound && (
-        <div className="absolute left-[-24px] top-1/2 -translate-y-px w-6 h-px bg-gradient-to-r from-transparent to-yellow-500/30"></div>
+      {/* Connector lines (Golden) - Potenziate */}
+      {!isFirstRound && !hideConnectors && (
+        <div className="absolute left-[-24px] top-1/2 -translate-y-[1px] w-6 h-[2px] bg-gradient-to-r from-transparent to-yellow-500/60 transition-all duration-300 group-hover/set:to-yellow-400"></div>
       )}
-      {!isLastRound && (
-        <div className="absolute right-[-24px] top-1/2 -translate-y-px w-6 h-px bg-gradient-to-r from-yellow-500/30 to-transparent"></div>
+      {!isLastRound && !hideConnectors && (
+        <div className="absolute right-[-24px] top-1/2 -translate-y-[1px] w-6 h-[2px] bg-gradient-to-r from-yellow-500/60 to-transparent transition-all duration-300 group-hover/set:from-yellow-400"></div>
       )}
 
-      <div className="glass rounded-xl border border-white/5 hover:border-yellow-500/30 transition-all duration-300 w-full overflow-hidden shadow-lg relative z-10">
+      <div className="glass rounded-xl border border-white/5 hover:border-yellow-500/40 transition-all duration-300 w-full overflow-hidden shadow-lg relative z-10">
         <div className="flex flex-col">
         {set.slots.map((slot, idx) => {
           const isWinner = slot.standing?.stats.score.value !== null && 

@@ -39,7 +39,7 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
   return (
     <>
       {/* Mobile Backdrop Overlay */}
-      {isOpen && (
+      {isOpen && !window.location.pathname.includes('/tornei') && !window.location.pathname.includes('/tournament/') && (
         <div 
           className="md:hidden fixed inset-0 bg-black/50 z-20 transition-opacity"
           onClick={onClose}
@@ -47,7 +47,7 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
       )}
 
       {/* Mobile Open Toggle Button (when closed) */}
-      {!isOpen && currentPage !== 'home' && (
+      {!isOpen && !window.location.pathname.includes('/tornei') && !window.location.pathname.includes('/tournament/') && currentPage !== 'home' && (
         <button 
           onClick={onOpen}
           className="md:hidden fixed left-0 top-1/2 -translate-y-1/2 bg-black/80 border border-yellow-500/50 border-l-0 text-white p-1 rounded-r-lg z-20 shadow-[0_0_15px_rgba(212,175,55,0.4)]"
@@ -64,12 +64,14 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
         {/* Mobile Toggle Button (only when open to close it, or we rely on App.tsx topbar to open it) */}
-        <button 
-          onClick={onClose}
-          className="md:hidden absolute -right-4 top-1/2 bg-black/80 border border-yellow-500/50 text-white p-1 rounded-full z-50 shadow-[0_0_15px_rgba(212,175,55,0.4)]"
-        >
-          <ChevronLeft size={20} />
-        </button>
+        {!window.location.pathname.includes('/tornei') && !window.location.pathname.includes('/tournament/') && (
+          <button 
+            onClick={onClose}
+            className="md:hidden absolute -right-4 top-1/2 bg-black/80 border border-yellow-500/50 text-white p-1 rounded-full z-50 shadow-[0_0_15px_rgba(212,175,55,0.4)]"
+          >
+            <ChevronLeft size={20} />
+          </button>
+        )}
         {/* Main Navigation - Hide on Home */}
         {currentPage !== 'home' && (
           <div className="flex flex-col gap-4 mb-4 shrink-0 w-full px-2 md:px-4">

@@ -50,6 +50,7 @@ export interface StartGGPhase {
   phaseGroups?: {
     nodes?: StartGGPhaseGroup[];
   } | StartGGPhaseGroup[];
+  bracketType: string;
 }
 
 export interface StartGGStanding {
@@ -117,6 +118,7 @@ export async function fetchTournament(slug: string): Promise<StartGGTournament |
           phases {
             id
             name
+            bracketType
             phaseGroups {
               nodes {
                 id
