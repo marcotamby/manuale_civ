@@ -119,10 +119,17 @@ export async function fetchTournament(slug: string): Promise<StartGGTournament |
       }),
     });
     const result = await response.json();
+    
+    if (result.errors) {
+      console.error('Start.gg GraphQL Errors:', result.errors);
+      // Lanciamo l'errore per farlo catturare dalla UI
+      throw new Error(result.errors[0]?.message || 'Errore GraphQL ignoto');
+    }
+    
     return result.data?.tournament || null;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching tournament:', error);
-    return null;
+    throw error; // Rilanciamo l'errore alla UI
   }
 }
 
@@ -174,6 +181,12 @@ export async function fetchPhaseGroupSets(phaseGroupId: string): Promise<StartGG
       }),
     });
     const result = await response.json();
+
+    if (result.errors) {
+      console.error('Start.gg Sets GraphQL Errors:', result.errors);
+      return [];
+    }
+
     return result.data?.phaseGroup?.sets?.nodes || [];
   } catch (error) {
     console.error('Error fetching sets:', error);
