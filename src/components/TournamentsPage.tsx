@@ -73,7 +73,9 @@ export function TournamentsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {tournaments.map((tournament) => {
-          const banner = tournament.images.find(img => img.type === 'banner')?.url || tournament.images[0]?.url;
+          const banner = tournament.images?.find(img => img.type === 'banner')?.url || 
+                         tournament.images?.[0]?.url || 
+                         'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop';
           
           return (
             <div 
@@ -85,11 +87,14 @@ export function TournamentsPage() {
               <div className="glass rounded-2xl overflow-hidden border border-yellow-500/20 hover:border-yellow-500/50 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.15)] group-hover:-translate-y-2">
                 
                 {/* Image Section */}
-                <div className="h-48 relative overflow-hidden">
+                <div className="h-48 relative overflow-hidden bg-gray-900">
                   <img 
                     src={banner} 
-                    alt={tournament.name} 
+                    alt={tournament.name || 'Torneo'} 
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop';
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0d1424] to-transparent"></div>
                   
@@ -99,7 +104,7 @@ export function TournamentsPage() {
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
                     </span>
-                    Live / Concluso
+                    Informazioni Disponibili
                   </div>
                 </div>
 
@@ -110,23 +115,23 @@ export function TournamentsPage() {
                     <span className="text-[10px] font-bold uppercase tracking-widest">Organizzato da Manuale Civ</span>
                   </div>
                   
-                  <h3 className="text-xl font-cinzel font-bold text-white mb-4 group-hover:text-yellow-400 transition-colors">
-                    {tournament.name}
+                  <h3 className="text-xl font-cinzel font-bold text-white mb-4 group-hover:text-yellow-400 transition-colors truncate">
+                    {tournament.name || 'Torneo AoE4'}
                   </h3>
 
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center gap-3 text-gray-400 text-sm font-medium">
                       <Calendar size={16} className="text-yellow-500/40" />
-                      <span>Season 2026</span>
+                      <span>{tournament.events?.[0]?.name || 'Evento AoE4'}</span>
                     </div>
                     <div className="flex items-center gap-3 text-gray-400 text-sm font-medium">
                       <Users size={16} className="text-yellow-500/40" />
-                      <span>{tournament.events[0]?.name || '1v1 Open'}</span>
+                      <span>{tournament.events?.[0]?.videogame?.name || 'Age of Empires IV'}</span>
                     </div>
                   </div>
 
                   <button className="w-full py-3 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/30 rounded-xl text-yellow-500 font-bold uppercase text-xs tracking-widest transition-all flex items-center justify-center gap-2 group/btn">
-                    Vedi Tabellone
+                    Dettagli e Tabellone
                     <ArrowRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
                   </button>
                 </div>
