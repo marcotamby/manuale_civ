@@ -70,11 +70,11 @@ export function TournamentsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col mb-12">
-        <h1 className="text-4xl md:text-5xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-amber-600 mb-4 uppercase tracking-tighter">
-          Tornei
+        <h1 className="text-3xl md:text-5xl font-inter font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-amber-600 mb-4 uppercase tracking-tighter">
+          Tornei di Aoeitalia
         </h1>
-        <p className="text-gray-400 font-serif italic text-lg max-w-2xl">
-          Segui le competizioni ufficiali del Manuale Civ, dai gironi iniziali fino alle gloriose finali.
+        <p className="text-gray-400 font-serif italic text-base md:text-lg max-w-2xl">
+          Segui le competizioni ufficiali di Aoeitalia, dai gironi iniziali fino alle gloriose finali.
         </p>
         <div className="h-1 w-24 bg-gradient-to-r from-yellow-500/50 to-transparent mt-6"></div>
       </div>
@@ -105,7 +105,7 @@ export function TournamentsPage() {
               <div className="glass rounded-2xl overflow-hidden border border-yellow-500/20 hover:border-yellow-500/50 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.15)] group-hover:-translate-y-2">
                 
                 {/* Image Section */}
-                <div className="h-48 relative overflow-hidden bg-gray-900">
+                <div className="h-40 md:h-48 relative overflow-hidden bg-gray-900">
                   <img 
                     src={banner} 
                     alt={tournament.name || 'Torneo'} 
@@ -130,7 +130,7 @@ export function TournamentsPage() {
                 <div className="p-6">
                   <div className="flex items-center gap-2 text-yellow-500/60 mb-2">
                     <Trophy size={14} />
-                    <span className="text-[10px] font-bold uppercase tracking-widest">Organizzato da Manuale Civ</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#D4AF37]">organizzato da marcotamby</span>
                   </div>
                   
                   <h3 className="text-xl font-cinzel font-bold text-white mb-4 group-hover:text-yellow-400 transition-colors truncate">

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { fetchPhaseGroupSets, fetchPhaseGroups } from '../services/startgg';
 import type { StartGGPhase, StartGGSet, StartGGPhaseGroup } from '../services/startgg';
 import { Loader2, Trophy } from 'lucide-react';
@@ -10,8 +10,9 @@ interface TournamentBracketProps {
 
 export function TournamentBracket({ phase }: TournamentBracketProps) {
   const [sets, setSets] = useState<StartGGSet[]>([]);
+  const [pools, setPools] = useState<StartGGPhaseGroup[]>([]);
+  const [activePoolId, setActivePoolId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function loadSets() {
@@ -26,46 +27,39 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
           groups = rawGroups.nodes;
         }
         
-        // RECUPERO DI EMERGENZA: Prova automatica via Phase ID
         if (groups.length === 0) {
           groups = await fetchPhaseGroups(phase.id);
         }
 
-        // FALLBACK DI FORZA BRUTA: Se ancora vuoto (es. per il torneo 2026), proviamo gli ID noti
-        if (groups.length === 0) {
-           const fallbackMap: Record<string, string> = {
-             "Gironi": "2165052",
-             "Eliminazione": "2165053",
-             "Top 8": "2165053"
-           };
-           const fallbackId = fallbackMap[phase.name] || (phase.name.includes("Gironi") ? "2165052" : "2165053");
-           console.log("Brute force fallback triggered for phase:", phase.name, "with ID:", fallbackId);
-           groups = await fetchPhaseGroups(fallbackId);
+        // SALVATAGGIO POOL PER I TAB
+        setPools(groups);
+        if (groups.length > 0 && !activePoolId) {
+          setActivePoolId(groups[0].id);
         }
 
-        if (groups.length === 0) {
-          // Se ancora vuoti, non possiamo caricare nulla
-          setSets([]);
-        } else {
-          const results = await Promise.allSettled(
-            groups.map(pg => fetchPhaseGroupSets(pg.id))
-          );
-          
-          const flatSets = results
-            .filter((res): res is PromiseFulfilledResult<StartGGSet[]> => res.status === 'fulfilled')
-            .map(res => res.value)
-            .flat();
+        const results = await Promise.allSettled(
+          groups.map(async pg => {
+            const poolSets = await fetchPhaseGroupSets(pg.id);
+            // Marciamo ogni set con l'id della pool di appartenenza
+            return poolSets.map(s => ({ ...s, poolId: pg.id }));
+          })
+        );
 
-          // Filter out sets that don't have participants yet (optional) and sort by round
-          setSets(flatSets);
-        }
-      } catch (err: any) {
-        console.error("Error loading bracket:", err);
+        const allSets = (results.filter(r => r.status === 'fulfilled') as PromiseFulfilledResult<any[]>[]).flatMap(r => r.value);
+        setSets(allSets);
+      } catch (err) {
+        console.error("Error in loadSets:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     loadSets();
-  }, [phase]);
+  }, [phase, activePoolId]);
+
+  // Filtraggio set per pool attiva (se ci sono pool multiple, come nei gironi)
+  const filteredSets = pools.length > 1 && activePoolId 
+    ? sets.filter((s: any) => s.poolId === activePoolId)
+    : sets;
 
   if (loading) {
     return (
@@ -97,44 +91,93 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
     );
   }
 
-  // Group sets by round
-  const roundsMap: { [key: number]: { title: string; sets: StartGGSet[] } } = {};
-  sets.forEach(set => {
-    if (!roundsMap[set.round]) {
-      roundsMap[set.round] = { title: set.fullRoundText, sets: [] };
-    }
-    roundsMap[set.round].sets.push(set);
-  });
+  // Identificazione dei bracket (Winners vs Losers)
+  const winnersSets = filteredSets.filter(s => !s.fullRoundText.toLowerCase().includes('losers'));
+  const losersSets = filteredSets.filter(s => s.fullRoundText.toLowerCase().includes('losers'));
 
-  // Sort rounds: Winners (positives) then Losers (negatives)
-  const sortedRoundKeys = Object.keys(roundsMap)
-    .map(Number)
-    .sort((a, b) => {
-      if (a > 0 && b > 0) return a - b;
-      if (a < 0 && b < 0) return b - a;
-      return b - a;
+  const renderRounds = (targetSets: StartGGSet[]) => {
+    if (targetSets.length === 0) return null;
+    
+    const roundsMap: { [key: number]: { title: string; sets: StartGGSet[] } } = {};
+    targetSets.forEach(set => {
+      // Usiamo una chiave assoluta per assicurare l'ordine cronologico (i round di startgg possono essere negativi per i losers)
+      const roundKey = set.round;
+      if (!roundsMap[roundKey]) {
+        roundsMap[roundKey] = { title: set.fullRoundText, sets: [] };
+      }
+      roundsMap[roundKey].sets.push(set);
     });
 
-  return (
-    <div className="w-full relative py-8 md:py-12">
-      <div 
-        ref={scrollContainerRef}
-        className="flex gap-12 px-4 md:px-12 overflow-x-auto elegant-scrollbar pb-12 select-none active:cursor-grabbing scroll-smooth"
-      >
-        {sortedRoundKeys.map((roundKey) => (
-          <div key={roundKey} className="flex flex-col gap-6 min-w-[280px]">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-yellow-500/50 mb-4 border-l-2 border-yellow-500/30 pl-3">
-              {roundsMap[roundKey].title}
+    const sortedRounds = Object.values(roundsMap).sort((a, b) => {
+      const aVal = a.sets[0].round;
+      const bVal = b.sets[0].round;
+      // Per i winners (positivi) ordiniamo crescente, per i losers (negativi) startgg usa logiche diverse ma noi vogliamo l'ordine di gioco
+      return aVal - bVal;
+    });
+
+    return (
+      <div className="flex gap-8 overflow-x-auto pb-8 elegant-scrollbar pt-4 px-2">
+        {sortedRounds.map((round, idx) => (
+          <div key={idx} className="min-w-[280px] space-y-4">
+            <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-6 pl-2 border-l-2 border-yellow-500/30">
+              {round.title}
             </h3>
-            
             <div className="flex flex-col gap-4">
-              {roundsMap[roundKey].sets.map((set) => (
+              {round.sets.map(set => (
                 <BracketSet key={set.id} set={set} />
               ))}
             </div>
           </div>
         ))}
       </div>
+    );
+  };
+
+  return (
+    <div className="p-4 md:p-8 animate-in fade-in duration-500">
+      {/* Pool Selector (Tabs) per i Gironi */}
+      {pools.length > 1 && (
+        <div className="flex flex-wrap gap-2 mb-10 border-b border-white/5 pb-8 overflow-x-auto elegant-scrollbar">
+          {pools.map(pool => (
+            <button
+              key={pool.id}
+              onClick={() => setActivePoolId(pool.id)}
+              className={clsx(
+                "px-5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap",
+                activePoolId === pool.id
+                  ? "bg-yellow-500 text-black shadow-[0_0_20px_rgba(234,179,8,0.3)]"
+                  : "bg-white/5 text-gray-500 hover:bg-white/10 hover:text-gray-300 border border-white/5"
+              )}
+            >
+              {pool.displayIdentifier || 'Girone'}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Winners Bracket */}
+      <div className="mb-16">
+        {losersSets.length > 0 && winnersSets.length > 0 && (
+          <div className="flex items-center gap-3 mb-8 px-2">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-yellow-500/20 to-transparent"></div>
+            <h2 className="text-[11px] font-black text-yellow-500 uppercase tracking-[0.5em] whitespace-nowrap px-4">Upper Bracket</h2>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-yellow-500/20 to-transparent"></div>
+          </div>
+        )}
+        {renderRounds(winnersSets)}
+      </div>
+
+      {/* Losers Bracket (Stacked Below) */}
+      {losersSets.length > 0 && (
+        <div className="mt-20">
+          <div className="flex items-center gap-3 mb-8 px-2">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-red-500/20 to-transparent"></div>
+            <h2 className="text-[11px] font-black text-red-500/60 uppercase tracking-[0.5em] whitespace-nowrap px-4">Lower Bracket</h2>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-red-500/20 to-transparent"></div>
+          </div>
+          {renderRounds(losersSets)}
+        </div>
+      )}
     </div>
   );
 }
