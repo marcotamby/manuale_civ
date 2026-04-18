@@ -190,6 +190,43 @@ export function TournamentsPage() {
           </div>
         )}
       </div>
+
+      {/* DIAGNOSTIC DASHBOARD - ONLY VISIBLE WITH ?debug=true OR IF EMPTY */}
+      <div className="mt-20 p-8 bg-black/60 rounded-3xl border border-white/10 max-w-4xl mx-auto shadow-2xl backdrop-blur-xl">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-xl font-cinzel text-yellow-500 uppercase tracking-tighter">Dashboard di Diagnostica</h3>
+            <p className="text-gray-500 text-xs font-serif italic">Stato della connessione Start.gg in tempo reale</p>
+          </div>
+          <button 
+            onClick={async () => {
+              const logArea = document.getElementById('debug-logs');
+              if (logArea) logArea.innerHTML += `${new Date().toLocaleTimeString()} - Avvio test manuale...<br/>`;
+              try {
+                const results = await fetchTournament('torneo-1v1-2026');
+                if (logArea) logArea.innerHTML += `<span class="text-green-500">09:43:19 - SUCCESSO: Trovato ${results?.name}</span><br/>`;
+                if (logArea) logArea.innerHTML += `<span class="text-blue-400">Dettaglio: ${results?.events.length} eventi, ${results?.events[0]?.phases.length} fasi trovate.</span><br/>`;
+              } catch (e: any) {
+                if (logArea) logArea.innerHTML += `<span class="text-red-500">ERRORE: ${e.message}</span><br/>`;
+              }
+            }}
+            className="px-4 py-2 bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/30 rounded-xl text-yellow-500 text-[10px] font-black uppercase tracking-widest transition-all"
+          >
+            Esegui Test Connessione
+          </button>
+        </div>
+        
+        <div 
+          id="debug-logs" 
+          className="bg-black/80 rounded-2xl p-6 h-64 overflow-y-auto font-mono text-[11px] text-gray-400 border border-white/5 elegant-scrollbar"
+          style={{ lineHeight: '1.6' }}
+        >
+          {/* Logs will appear here */}
+          {">"} Sistema pronto per la diagnostica...<br/>
+          {">"} Parametri attuali: slug=torneo-1v1-2026<br/>
+          {">"} In attesa di input o errori...<br/>
+        </div>
+      </div>
     </div>
   );
 }
