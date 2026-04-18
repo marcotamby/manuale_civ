@@ -115,15 +115,20 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
     });
 
     return (
-      <div className="flex gap-8 overflow-x-auto pb-8 elegant-scrollbar pt-4 px-2">
+      <div className="flex gap-4 md:gap-12 overflow-x-auto pb-12 elegant-scrollbar pt-4 px-2 min-h-[700px]">
         {sortedRounds.map((round, idx) => (
-          <div key={idx} className="min-w-[280px] space-y-4">
-            <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-6 pl-2 border-l-2 border-yellow-500/30">
+          <div key={idx} className="min-w-[280px] flex flex-col">
+            <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-8 pl-2 border-l-2 border-yellow-500/30">
               {round.title}
             </h3>
-            <div className="flex flex-col gap-4">
+            <div className="flex-1 flex flex-col justify-around py-4">
               {round.sets.map(set => (
-                <BracketSet key={set.id} set={set} />
+                <BracketSet 
+                  key={set.id} 
+                  set={set} 
+                  isFirstRound={idx === 0}
+                  isLastRound={idx === sortedRounds.length - 1}
+                />
               ))}
             </div>
           </div>
@@ -181,10 +186,19 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
   );
 }
 
-function BracketSet({ set }: { set: StartGGSet }) {
+function BracketSet({ set, isFirstRound, isLastRound }: { set: StartGGSet, isFirstRound?: boolean, isLastRound?: boolean }) {
   return (
-    <div className="glass rounded-xl border border-white/5 hover:border-yellow-500/30 transition-all duration-300 w-full overflow-hidden shadow-lg group/set">
-      <div className="flex flex-col">
+    <div className="relative py-4 w-full group/set">
+      {/* Connector lines (Golden) */}
+      {!isFirstRound && (
+        <div className="absolute left-[-24px] top-1/2 -translate-y-px w-6 h-px bg-gradient-to-r from-transparent to-yellow-500/30"></div>
+      )}
+      {!isLastRound && (
+        <div className="absolute right-[-24px] top-1/2 -translate-y-px w-6 h-px bg-gradient-to-r from-yellow-500/30 to-transparent"></div>
+      )}
+
+      <div className="glass rounded-xl border border-white/5 hover:border-yellow-500/30 transition-all duration-300 w-full overflow-hidden shadow-lg relative z-10">
+        <div className="flex flex-col">
         {set.slots.map((slot, idx) => {
           const isWinner = slot.standing?.stats.score.value !== null && 
                           set.slots.every(s => s === slot || (s.standing?.stats.score.value || 0) < (slot.standing?.stats.score.value || 0));
@@ -240,6 +254,7 @@ function BracketSet({ set }: { set: StartGGSet }) {
             </div>
           );
         })}
+        </div>
       </div>
     </div>
   );
