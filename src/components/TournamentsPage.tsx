@@ -4,12 +4,20 @@ import { fetchTournament } from '../services/startgg';
 import type { StartGGTournament } from '../services/startgg';
 import { Trophy, Calendar, Users, ArrowRight, Loader2, Terminal } from 'lucide-react';
 import { clsx } from 'clsx';
+interface TournamentConfig {
+  slug: string;
+  source: 'startgg' | 'challonge';
+  organizer: string;
+}
 
-const FEATURED_SLUGS = ['torneo-1v1-2026'];
+const TOURNAMENTS: TournamentConfig[] = [
+  { slug: 'torneo-1v1-2026', source: 'startgg', organizer: 'marcotamby' },
+  { slug: 'gyunrhoc', source: 'challonge', organizer: 'Kani' }
+];
 
 export function TournamentsPage() {
   const location = useLocation();
-  const [tournaments, setTournaments] = useState<StartGGTournament[]>([]);
+  const [tournaments, setTournaments] = useState<(StartGGTournament & { config: TournamentConfig })[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [debugLogs, setDebugLogs] = useState<string[]>([]);
@@ -36,20 +44,28 @@ export function TournamentsPage() {
       setLoading(true);
       setErrorDetails(null);
       try {
-        const results = await Promise.all(FEATURED_SLUGS.map(async slug => {
+        const results = await Promise.all(TOURNAMENTS.map(async config => {
           try {
-            const res = await fetchTournament(slug);
-            return res;
+            if (config.source === 'startgg') {
+              const res = await fetchTournament(config.slug);
+              return res ? { ...res, config } : null;
+            }
+            // Mock per Challonge (verrà popolato dal servizio vero nel prossimo task)
+            return {
+              id: config.slug,
+              name: 'Caricamento Torneo Challonge...',
+              slug: config.slug,
+              images: [],
+              events: [],
+              config
+            } as any;
           } catch (e: any) {
-            console.error(`Error fetching tournament ${slug}:`, e);
-            throw e;
+            console.error(`Error fetching tournament ${config.slug}:`, e);
+            return null;
           }
         }));
-        const filtered = results.filter((t): t is StartGGTournament => t !== null);
+        const filtered = results.filter((t): t is (StartGGTournament & { config: TournamentConfig }) => t !== null);
         setTournaments(filtered);
-        if (filtered.length === 0 && FEATURED_SLUGS.length > 0) {
-          setErrorDetails("Le API hanno risposto con successo ma non hanno restituito alcun torneo. Verifica lo slug 'torneo-1v1-2026' o i permessi del token.");
-        }
       } catch (err: any) {
         console.error("General loading error:", err);
         setErrorDetails(`Dettaglio Errore: ${err.message || 'Errore di rete o di risposta del server.'}`);
@@ -131,7 +147,7 @@ export function TournamentsPage() {
                 <div className="p-6">
                   <div className="flex items-center gap-2 text-yellow-500/60 mb-2">
                     <Trophy size={14} />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#D4AF37]">organizzato da marcotamby</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#D4AF37]">organizzato da {tournament.config.organizer}</span>
                   </div>
                   
                   <h3 className="text-xl font-cinzel font-bold text-white mb-4 group-hover:text-yellow-400 transition-colors truncate">
@@ -175,7 +191,10 @@ export function TournamentsPage() {
                     </div>
                   )}
 
-                  <button className="w-full py-3 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/30 rounded-xl text-yellow-500 font-bold uppercase text-xs tracking-widest transition-all flex items-center justify-center gap-2 group/btn">
+                  <button 
+                    onClick={() => navigate(`/tornei/${tournament.slug}?source=${tournament.config.source}&organizer=${tournament.config.organizer}`)}
+                    className="w-full py-3 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/30 rounded-xl text-yellow-500 font-bold uppercase text-xs tracking-widest transition-all flex items-center justify-center gap-2 group/btn"
+                  >
                     Dettagli e Tabellone
                     <ArrowRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
                   </button>

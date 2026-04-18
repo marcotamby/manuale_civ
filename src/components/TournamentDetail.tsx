@@ -1,15 +1,20 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
-import type { StartGGTournament, StartGGPhase } from '../services/startgg';
+import { fetchChallongeTournament, fetchChallongeData, mapChallongeToUnified } from '../services/challonge';
+// I tipi vengono gestiti internamente come any per compatibilità Start.gg/Challonge
 import { Loader2, ArrowLeft, Trophy, Users, Shield } from 'lucide-react';
 import { TournamentBracket } from './TournamentBracket';
 
 export function TournamentDetail() {
   const { slug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
+  const source = searchParams.get('source') || 'startgg';
+  const organizer = searchParams.get('organizer') || 'marcotamby';
+  
   const navigate = useNavigate();
-  const [tournament, setTournament] = useState<StartGGTournament | null>(null);
-  const [selectedPhase, setSelectedPhase] = useState<StartGGPhase | null>(null);
+  const [tournament, setTournament] = useState<any>(null);
+  const [selectedPhase, setSelectedPhase] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [detailError, setDetailError] = useState<string | null>(null);
 
@@ -19,13 +24,30 @@ export function TournamentDetail() {
       setLoading(true);
       setDetailError(null);
       try {
-        const data = await fetchTournament(slug);
-        setTournament(data);
-        if (data && data.events.length > 0) {
-          // Cerchiamo l'evento '1v1' o quello con più fasi
-          const event1v1 = data.events.find(e => e.name.toLowerCase().includes('1v1')) || data.events[0];
-          if (event1v1.phases.length > 0) {
-            setSelectedPhase(event1v1.phases[0]);
+        if (source === 'challonge') {
+          const [tData, dData] = await Promise.all([
+            fetchChallongeTournament(slug),
+            fetchChallongeData(slug)
+          ]);
+          
+          if (tData && dData) {
+            const unifiedPhase = {
+              id: 'challonge-main',
+              name: 'Tabellone',
+              bracketType: tData.attributes.tournament_type === 'round robin' ? 'ROUND_ROBIN' : 'DOUBLE_ELIMINATION',
+              rounds: mapChallongeToUnified(dData.matches, dData.participants)
+            };
+            setTournament(tData);
+            setSelectedPhase(unifiedPhase);
+          }
+        } else {
+          const data = await fetchTournament(slug);
+          setTournament(data);
+          if (data && data.events.length > 0) {
+            const event1v1 = data.events.find(e => e.name.toLowerCase().includes('1v1')) || data.events[0];
+            if (event1v1.phases.length > 0) {
+              setSelectedPhase(event1v1.phases[0]);
+            }
           }
         }
       } catch (err: any) {
@@ -71,7 +93,9 @@ export function TournamentDetail() {
     );
   }
 
-  const banner = tournament.images.find(img => img.type === 'banner')?.url || tournament.images[0]?.url;
+  const banner = source === 'challonge' 
+    ? 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop'
+    : (tournament.images.find((img: any) => img.type === 'banner')?.url || tournament.images[0]?.url);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#0a0a0b]">
@@ -91,15 +115,15 @@ export function TournamentDetail() {
           
           <div className="flex items-end gap-6">
             <div className="hidden md:block w-32 h-32 rounded-2xl glass border border-yellow-500/30 overflow-hidden shrink-0 shadow-2xl">
-              <img src={tournament.images.find(i => i.type === 'profile')?.url || banner} className="w-full h-full object-cover" />
+              <img src={source === 'challonge' ? banner : (tournament.images.find((i: any) => i.type === 'profile')?.url || banner)} className="w-full h-full object-cover" />
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-3 text-yellow-500 mb-2">
                 <Trophy size={18} />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">organizzato da marcotamby</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]">organizzato da {organizer}</span>
               </div>
               <h1 className="text-4xl md:text-6xl font-sackers font-black text-white uppercase tracking-tighter leading-none mb-4">
-                {tournament.name}
+                {source === 'challonge' ? tournament.attributes.name : tournament.name}
               </h1>
               <div className="flex flex-wrap gap-6 text-gray-400 text-sm font-medium">
                 <div className="flex items-center gap-2">
@@ -108,11 +132,11 @@ export function TournamentDetail() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Users size={16} />
-                  {tournament.events?.[0]?.videogame?.name || 'Age of Empires IV'}
+                  {source === 'challonge' ? 'Challonge Tournament' : (tournament.events?.[0]?.videogame?.name || 'Age of Empires IV')}
                 </div>
                 <div className="flex items-center gap-2">
                   <Shield size={16} />
-                  {tournament.events?.find(e => e.phases?.some(p => p.id === selectedPhase?.id))?.name || tournament.events?.[0]?.name || 'Evento'}
+                  {source === 'challonge' ? 'Tabellone' : (tournament.events?.find((e: any) => e.phases?.some((p: any) => p.id === selectedPhase?.id))?.name || tournament.events?.[0]?.name || 'Evento')}
                 </div>
               </div>
             </div>
@@ -121,25 +145,27 @@ export function TournamentDetail() {
       </div>
 
       {/* Tabs / Phases Navigation */}
-      <div className="sticky top-0 z-30 bg-[#0a0a0b]/80 backdrop-blur-xl border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-8 overflow-x-auto elegant-scrollbar pb-px">
-             {tournament.events?.flatMap(e => e.phases || []).map((phase) => (
-              <button
-                key={phase.id}
-                onClick={() => setSelectedPhase(phase)}
-                className={`py-4 text-xs font-black uppercase tracking-[0.2em] whitespace-nowrap transition-all border-b-2 ${
-                  selectedPhase?.id === phase.id 
-                    ? 'border-yellow-500 text-yellow-500' 
-                    : 'border-transparent text-gray-500 hover:text-gray-300'
-                }`}
-              >
-                {phase.name}
-              </button>
-            ))}
+      {source !== 'challonge' && (
+        <div className="sticky top-0 z-30 bg-[#0a0a0b]/80 backdrop-blur-xl border-b border-white/5">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex items-center gap-8 overflow-x-auto elegant-scrollbar pb-px">
+               {tournament.events?.flatMap((e: any) => e.phases || []).map((phase: any) => (
+                <button
+                  key={phase.id}
+                  onClick={() => setSelectedPhase(phase)}
+                  className={`py-4 text-xs font-black uppercase tracking-[0.2em] whitespace-nowrap transition-all border-b-2 ${
+                    selectedPhase?.id === phase.id 
+                      ? 'border-yellow-500 text-yellow-500' 
+                      : 'border-transparent text-gray-500 hover:text-gray-300'
+                  }`}
+                >
+                  {phase.name}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-full overflow-hidden">
