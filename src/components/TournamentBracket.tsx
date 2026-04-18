@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { fetchPhaseGroupSets } from '../services/startgg';
 import type { StartGGPhase, StartGGSet } from '../services/startgg';
-import { Loader2, Shield } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface TournamentBracketProps {
@@ -11,38 +11,30 @@ interface TournamentBracketProps {
 export function TournamentBracket({ phase }: TournamentBracketProps) {
   const [sets, setSets] = useState<StartGGSet[]>([]);
   const [loading, setLoading] = useState(true);
-  const [debugInfo, setDebugInfo] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function loadSets() {
       setLoading(true);
-      setDebugInfo(null);
       try {
         const groups = phase.phaseGroups?.nodes || [];
         if (groups.length === 0) {
-          setDebugInfo("Nessun gruppo (pool) trovato in questa fase.");
           setSets([]);
         } else {
-          // Fetch nodes from all phase groups in this phase
-          const allSets = await Promise.all(
-            groups.map(async pg => {
-              try {
-                return await fetchPhaseGroupSets(pg.id);
-              } catch (e) {
-                console.error(`Error fetching sets for group ${pg.id}:`, e);
-                return [];
-              }
-            })
+          const results = await Promise.allSettled(
+            groups.map(pg => fetchPhaseGroupSets(pg.id))
           );
-          const flatSets = allSets.flat();
+          
+          const flatSets = results
+            .filter((res): res is PromiseFulfilledResult<StartGGSet[]> => res.status === 'fulfilled')
+            .map(res => res.value)
+            .flat();
+
+          // Filter out sets that don't have participants yet (optional) and sort by round
           setSets(flatSets);
-          if (flatSets.length === 0) {
-            setDebugInfo(`Trovati ${groups.length} gruppi, ma nessun match (sets) presente.`);
-          }
         }
       } catch (err: any) {
-        setDebugInfo(`Errore critico: ${err.message}`);
+        console.error("Error loading bracket:", err);
       }
       setLoading(false);
     }
@@ -66,60 +58,17 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
     roundsMap[set.round].sets.push(set);
   });
 
-  // Sort rounds: Winners (positives) then Losers (negatives, descending?) or just sorted by round index
+  // Sort rounds: Winners (positives) then Losers (negatives)
   const sortedRoundKeys = Object.keys(roundsMap)
     .map(Number)
     .sort((a, b) => {
-      // Logic: Winners Round 1, 2, 3... then Losers Round 1, 2, 3...
-      // On start.gg, Losers rounds are negative (e.g., -1, -2, -3)
       if (a > 0 && b > 0) return a - b;
-      if (a < 0 && b < 0) return b - a; // -1, -2, -3...
-      return b - a; // Winners first
+      if (a < 0 && b < 0) return b - a;
+      return b - a;
     });
-
-  const groupsLength = phase.phaseGroups?.nodes?.length || 0;
-
-  if ((debugInfo && sets.length === 0) || (groupsLength === 0 && !loading)) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center px-4 animate-in zoom-in duration-300">
-        <div className="bg-red-500/10 border border-red-500/50 p-8 rounded-3xl max-w-2xl shadow-[0_0_50px_rgba(239,68,68,0.1)]">
-          <Shield size={48} className="text-red-500 mx-auto mb-6 animate-pulse" />
-          <h2 className="text-2xl font-cinzel text-red-500 mb-4 uppercase tracking-tighter">Errore di Sincronizzazione</h2>
-          <p className="text-gray-300 font-serif italic mb-6 text-lg">{debugInfo || "Nessun dato trovato per questa fase del torneo."}</p>
-          
-          <div className="grid grid-cols-2 gap-4 text-left mb-8">
-            <div className="bg-black/40 p-3 rounded-xl border border-white/5">
-              <p className="text-[10px] text-gray-500 uppercase font-black mb-1">Phase ID</p>
-              <p className="text-xs font-mono text-yellow-500">{phase.id}</p>
-            </div>
-            <div className="bg-black/40 p-3 rounded-xl border border-white/5">
-              <p className="text-[10px] text-gray-500 uppercase font-black mb-1">Pools Trovate</p>
-              <p className="text-xs font-mono text-yellow-500">{groupsLength}</p>
-            </div>
-          </div>
-
-          <div className="text-[10px] text-gray-500 font-mono p-4 bg-black/60 rounded-xl border border-red-500/20 text-left overflow-auto max-h-32 mb-6">
-            <p className="text-red-400 mb-1 font-bold tracking-widest uppercase text-[8px]">Console Log d'Emergenza:</p>
-            • Verificando VITE_STARTGG_TOKEN su Vercel...<br/>
-            • Chiamata a /api/startgg in corso...<br/>
-            • Risultato: {debugInfo ? "Errore Ricevuto" : "Silenzio dal server"}<br/>
-            • Tip: Controlla che lo slug '{phase.id}' appartenga all'evento giusto.
-          </div>
-
-          <button 
-            onClick={() => window.location.reload()}
-            className="w-full py-4 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-2xl text-red-500 font-black uppercase text-xs tracking-[0.2em] transition-all"
-          >
-            Forza Ricaricamento Pagina
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="w-full relative py-8 md:py-12">
-      {/* Scrollable Area */}
       <div 
         ref={scrollContainerRef}
         className="flex gap-12 px-4 md:px-12 overflow-x-auto elegant-scrollbar pb-12 select-none active:cursor-grabbing scroll-smooth"
