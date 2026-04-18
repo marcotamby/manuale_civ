@@ -35,8 +35,9 @@ function App() {
   const selectedCiv = selectedCivMatch ? selectedCivMatch[1] : '';
 
   const isFaq = location.pathname === '/faq';
-
-  const currentPage = isHome ? 'home' : isCompare ? 'compare' : isCiv ? 'civ' : isFaq ? 'faq' : 'home';
+  const isTournaments = location.pathname.startsWith('/tornei');
+  
+  const currentPage = isHome ? 'home' : isCompare ? 'compare' : isCiv ? 'civ' : isFaq ? 'faq' : isTournaments ? 'tornei' : 'home';
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isCivEditorOpen, setIsCivEditorOpen] = useState(false);

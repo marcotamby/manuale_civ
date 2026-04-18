@@ -108,11 +108,11 @@ export function TournamentDetail() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Users size={16} />
-                  {tournament.events[0]?.videogame.name}
+                  {tournament.events?.[0]?.videogame?.name || 'Age of Empires IV'}
                 </div>
                 <div className="flex items-center gap-2">
                   <Shield size={16} />
-                  {tournament.events.find(e => e.phases.some(p => p.id === selectedPhase?.id))?.name || tournament.name}
+                  {tournament.events?.find(e => e.phases?.some(p => p.id === selectedPhase?.id))?.name || tournament.events?.[0]?.name || 'Evento'}
                 </div>
               </div>
             </div>
@@ -124,7 +124,7 @@ export function TournamentDetail() {
       <div className="sticky top-0 z-30 bg-[#0a0a0b]/80 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-8 overflow-x-auto elegant-scrollbar pb-px">
-             {tournament.events.flatMap(e => e.phases).map((phase) => (
+             {tournament.events?.flatMap(e => e.phases || []).map((phase) => (
               <button
                 key={phase.id}
                 onClick={() => setSelectedPhase(phase)}

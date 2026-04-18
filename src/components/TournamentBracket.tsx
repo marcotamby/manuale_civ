@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { fetchPhaseGroupSets, fetchPhaseGroups } from '../services/startgg';
 import type { StartGGPhase, StartGGSet, StartGGPhaseGroup } from '../services/startgg';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Trophy } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface TournamentBracketProps {
@@ -71,6 +71,28 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
     return (
       <div className="flex justify-center py-20">
         <Loader2 className="w-8 h-8 text-yellow-500 animate-spin" />
+      </div>
+    );
+  }
+
+  if (sets.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+        <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-6">
+          <Trophy className="w-8 h-8 text-gray-600" />
+        </div>
+        <h3 className="text-xl font-cinzel text-gray-400 mb-2 uppercase tracking-widest">Tabellone in Sincronizzazione</h3>
+        <p className="text-gray-500 font-serif italic max-w-md mx-auto mb-8">
+          I dati del torneo non sono ancora disponibili tramite connessione remota o il tabellone è in fase di generazione.
+        </p>
+        <a 
+          href="https://www.start.gg/tournament/torneo-1v1-2026/event/1v1/brackets" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="px-6 py-2 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/30 rounded-xl text-yellow-500 text-[10px] font-black uppercase tracking-widest transition-all"
+        >
+          Apri Tabellone Originale
+        </a>
       </div>
     );
   }
