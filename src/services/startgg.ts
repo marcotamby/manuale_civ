@@ -194,3 +194,36 @@ export async function fetchPhaseGroupSets(phaseGroupId: string): Promise<StartGG
     return [];
   }
 }
+
+export async function fetchPhaseGroups(phaseId: string): Promise<StartGGPhaseGroup[]> {
+  const query = `
+    query PhaseGroups($id: ID!) {
+      phase(id: $id) {
+        id
+        name
+        phaseGroups {
+          nodes {
+            id
+            displayIdentifier
+          }
+        }
+      }
+    }
+  `;
+
+  try {
+    const response = await fetch(STARTGG_API_URL, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({
+        query,
+        variables: { id: phaseId },
+      }),
+    });
+    const result = await response.json();
+    return result.data?.phase?.phaseGroups?.nodes || [];
+  } catch (error) {
+    console.error(`Error fetching groups for phase ${phaseId}:`, error);
+    return [];
+  }
+}

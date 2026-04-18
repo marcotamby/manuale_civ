@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { fetchPhaseGroupSets } from '../services/startgg';
+import { fetchPhaseGroupSets, fetchPhaseGroups } from '../services/startgg';
 import type { StartGGPhase, StartGGSet } from '../services/startgg';
 import { Loader2 } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -17,8 +17,16 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
     async function loadSets() {
       setLoading(true);
       try {
-        const groups = phase.phaseGroups?.nodes || [];
+        let groups = phase.phaseGroups?.nodes || [];
+        
+        // RECUPERO DI EMERGENZA: Se i gruppi sono vuoti, li cerchiamo direttamente via Phase ID
         if (groups.length === 0) {
+          console.log(`Phase groups empty, attempting direct fetch for phase ${phase.id}`);
+          groups = await fetchPhaseGroups(phase.id);
+        }
+
+        if (groups.length === 0) {
+          // Se ancora vuoti, non possiamo caricare nulla
           setSets([]);
         } else {
           const results = await Promise.allSettled(
