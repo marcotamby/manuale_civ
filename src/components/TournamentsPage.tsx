@@ -74,7 +74,7 @@ export function TournamentsPage() {
           Tornei di Aoeitalia
         </h1>
         <p className="text-gray-400 font-serif italic text-base md:text-lg max-w-2xl">
-          Segui le competizioni ufficiali di Aoeitalia, dai gironi iniziali fino alle gloriose finali.
+          Segui le competizioni ufficiali di Aoeitalia.
         </p>
         <div className="h-1 w-24 bg-gradient-to-r from-yellow-500/50 to-transparent mt-6"></div>
       </div>
