@@ -54,7 +54,7 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
       }
     }
     loadSets();
-  }, [phase, activePoolId]);
+  }, [phase]);
 
   // Filtraggio set per pool attiva (se ci sono pool multiple, come nei gironi)
   const filteredSets = pools.length > 1 && activePoolId 
@@ -109,10 +109,9 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
     });
 
     const sortedRounds = Object.values(roundsMap).sort((a, b) => {
-      const aVal = a.sets[0].round;
-      const bVal = b.sets[0].round;
-      // Per i winners (positivi) ordiniamo crescente, per i losers (negativi) startgg usa logiche diverse ma noi vogliamo l'ordine di gioco
-      return aVal - bVal;
+      // Usiamo il valore assoluto per assicurarci che sia i Winners (1, 2, 3) 
+      // che i Losers (-1, -2, -3) scorrano da sinistra a destra nel tempo.
+      return Math.abs(a.sets[0].round) - Math.abs(b.sets[0].round);
     });
 
     return (
@@ -137,19 +136,19 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
     <div className="p-4 md:p-8 animate-in fade-in duration-500">
       {/* Pool Selector (Tabs) per i Gironi */}
       {pools.length > 1 && (
-        <div className="flex flex-wrap gap-2 mb-10 border-b border-white/5 pb-8 overflow-x-auto elegant-scrollbar">
-          {pools.map(pool => (
+        <div className="flex flex-wrap gap-3 mb-10 border-b border-white/5 pb-8 overflow-x-auto elegant-scrollbar">
+          {pools.map((pool, idx) => (
             <button
               key={pool.id}
               onClick={() => setActivePoolId(pool.id)}
               className={clsx(
-                "px-5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap",
+                "px-6 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all whitespace-nowrap border",
                 activePoolId === pool.id
-                  ? "bg-yellow-500 text-black shadow-[0_0_20px_rgba(234,179,8,0.3)]"
-                  : "bg-white/5 text-gray-500 hover:bg-white/10 hover:text-gray-300 border border-white/5"
+                  ? "bg-yellow-500 text-black border-yellow-400 shadow-[0_0_25px_rgba(234,179,8,0.4)] scale-105"
+                  : "bg-white/5 text-gray-500 hover:bg-white/10 hover:text-gray-300 border-white/5"
               )}
             >
-              {pool.displayIdentifier || 'Girone'}
+              {`Gruppo ${pool.displayIdentifier || idx + 1}`}
             </button>
           ))}
         </div>
