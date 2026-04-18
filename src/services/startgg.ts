@@ -149,12 +149,7 @@ export async function fetchPhaseGroupSets(phaseGroupId: string): Promise<StartGG
                 id
                 name
                 participants {
-                  id
                   gamerTag
-                  player {
-                    id
-                    gamerTag
-                  }
                 }
               }
               standing {
@@ -180,16 +175,22 @@ export async function fetchPhaseGroupSets(phaseGroupId: string): Promise<StartGG
         variables: { id: phaseGroupId },
       }),
     });
+    
+    if (!response.ok) {
+        console.error(`Status Error for group ${phaseGroupId}: ${response.status}`);
+        return [];
+    }
+
     const result = await response.json();
 
     if (result.errors) {
-      console.error('Start.gg Sets GraphQL Errors:', result.errors);
+      console.error(`GraphQL Errors for group ${phaseGroupId}:`, result.errors);
       return [];
     }
 
     return result.data?.phaseGroup?.sets?.nodes || [];
   } catch (error) {
-    console.error('Error fetching sets:', error);
+    console.error(`Network Error for group ${phaseGroupId}:`, error);
     return [];
   }
 }

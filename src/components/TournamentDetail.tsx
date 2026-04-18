@@ -21,8 +21,12 @@ export function TournamentDetail() {
       try {
         const data = await fetchTournament(slug);
         setTournament(data);
-        if (data && data.events[0]?.phases.length > 0) {
-          setSelectedPhase(data.events[0].phases[0]);
+        if (data && data.events.length > 0) {
+          // Cerchiamo l'evento '1v1' o quello con più fasi
+          const event1v1 = data.events.find(e => e.name.toLowerCase().includes('1v1')) || data.events[0];
+          if (event1v1.phases.length > 0) {
+            setSelectedPhase(event1v1.phases[0]);
+          }
         }
       } catch (err: any) {
         console.error("Detail load error:", err);
@@ -108,7 +112,7 @@ export function TournamentDetail() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Shield size={16} />
-                  {tournament.events[0]?.name}
+                  {tournament.events.find(e => e.phases.some(p => p.id === selectedPhase?.id))?.name || tournament.name}
                 </div>
               </div>
             </div>
@@ -120,7 +124,7 @@ export function TournamentDetail() {
       <div className="sticky top-0 z-30 bg-[#0a0a0b]/80 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-8 overflow-x-auto elegant-scrollbar pb-px">
-            {tournament.events[0]?.phases.map((phase) => (
+             {tournament.events.flatMap(e => e.phases).map((phase) => (
               <button
                 key={phase.id}
                 onClick={() => setSelectedPhase(phase)}
