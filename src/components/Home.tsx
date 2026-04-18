@@ -212,16 +212,6 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
           );
         })}
       </div>
-
-      {/* EMERGENCY DEBUG BUTTON - REMOVE AFTER RESOLUTION */}
-      <div className="mt-20 pb-10 flex justify-center">
-        <button 
-          onClick={() => (window.location.href = '/tornei?debug=true')}
-          className="px-8 py-4 bg-yellow-500 text-black font-black uppercase tracking-[0.2em] rounded-2xl shadow-[0_0_30px_rgba(234,179,8,0.3)] hover:scale-105 transition-all animate-bounce"
-        >
-          ⚠️ DEBUG TORNEI ⚠️
-        </button>
-      </div>
     </div>
   );
 }
