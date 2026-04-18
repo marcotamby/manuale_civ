@@ -17,11 +17,17 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
     async function loadSets() {
       setLoading(true);
       try {
-        let groups = phase.phaseGroups?.nodes || [];
+        let groups: StartGGPhaseGroup[] = [];
+        const rawGroups = phase.phaseGroups as any;
         
-        // RECUPERO DI EMERGENZA: Se i gruppi sono vuoti, li cerchiamo direttamente via Phase ID
+        if (Array.isArray(rawGroups)) {
+          groups = rawGroups;
+        } else if (rawGroups?.nodes) {
+          groups = rawGroups.nodes;
+        }
+        
+        // RECUPERO DI EMERGENZA: Se i gruppi sono ancora vuoti, li cerchiamo direttamente
         if (groups.length === 0) {
-          console.log(`Phase groups empty, attempting direct fetch for phase ${phase.id}`);
           groups = await fetchPhaseGroups(phase.id);
         }
 

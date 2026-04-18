@@ -47,9 +47,9 @@ export interface StartGGPhaseGroup {
 export interface StartGGPhase {
   id: string;
   name: string;
-  phaseGroups: {
-    nodes: StartGGPhaseGroup[];
-  };
+  phaseGroups?: {
+    nodes?: StartGGPhaseGroup[];
+  } | StartGGPhaseGroup[];
 }
 
 export interface StartGGEvent {
