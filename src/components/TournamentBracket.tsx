@@ -79,12 +79,39 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
 
   const groupsLength = phase.phaseGroups?.nodes?.length || 0;
 
-  if (debugInfo && sets.length === 0) {
+  if ((debugInfo && sets.length === 0) || (groupsLength === 0 && !loading)) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-        <p className="text-gray-400 font-serif italic mb-4">{debugInfo}</p>
-        <div className="text-[10px] text-gray-600 font-mono p-3 bg-black/20 rounded border border-white/5 max-w-md">
-          Phase ID: {phase.id} | Groups: {groupsLength}
+      <div className="flex flex-col items-center justify-center py-20 text-center px-4 animate-in zoom-in duration-300">
+        <div className="bg-red-500/10 border border-red-500/50 p-8 rounded-3xl max-w-2xl shadow-[0_0_50px_rgba(239,68,68,0.1)]">
+          <Shield size={48} className="text-red-500 mx-auto mb-6 animate-pulse" />
+          <h2 className="text-2xl font-cinzel text-red-500 mb-4 uppercase tracking-tighter">Errore di Sincronizzazione</h2>
+          <p className="text-gray-300 font-serif italic mb-6 text-lg">{debugInfo || "Nessun dato trovato per questa fase del torneo."}</p>
+          
+          <div className="grid grid-cols-2 gap-4 text-left mb-8">
+            <div className="bg-black/40 p-3 rounded-xl border border-white/5">
+              <p className="text-[10px] text-gray-500 uppercase font-black mb-1">Phase ID</p>
+              <p className="text-xs font-mono text-yellow-500">{phase.id}</p>
+            </div>
+            <div className="bg-black/40 p-3 rounded-xl border border-white/5">
+              <p className="text-[10px] text-gray-500 uppercase font-black mb-1">Pools Trovate</p>
+              <p className="text-xs font-mono text-yellow-500">{groupsLength}</p>
+            </div>
+          </div>
+
+          <div className="text-[10px] text-gray-500 font-mono p-4 bg-black/60 rounded-xl border border-red-500/20 text-left overflow-auto max-h-32 mb-6">
+            <p className="text-red-400 mb-1 font-bold tracking-widest uppercase text-[8px]">Console Log d'Emergenza:</p>
+            • Verificando VITE_STARTGG_TOKEN su Vercel...<br/>
+            • Chiamata a /api/startgg in corso...<br/>
+            • Risultato: {debugInfo ? "Errore Ricevuto" : "Silenzio dal server"}<br/>
+            • Tip: Controlla che lo slug '{phase.id}' appartenga all'evento giusto.
+          </div>
+
+          <button 
+            onClick={() => window.location.reload()}
+            className="w-full py-4 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-2xl text-red-500 font-black uppercase text-xs tracking-[0.2em] transition-all"
+          >
+            Forza Ricaricamento Pagina
+          </button>
         </div>
       </div>
     );
