@@ -79,6 +79,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const response = await fetch(url.toString(), {
       headers: {
         'Authorization': `Bearer ${token}`,
+        'Authorization-Type': 'v2',
         'Content-Type': 'application/vnd.api+json',
         'Accept': 'application/vnd.api+json'
       },
