@@ -38,21 +38,41 @@ export interface ChallongeTournament {
 
 export async function fetchChallongeTournament(slug: string) {
   try {
-    const response = await fetch(`/api/challonge?path=tournaments/${slug}`);
-    if (!response.ok) throw new Error('Challonge tournament not found');
-    const data = await response.json();
-    return data.data as ChallongeTournament;
+    // Challonge v2.1 vuole l'ID numerico. Cerchiamo il torneo nella lista per trovarlo.
+    const listResponse = await fetch(`/api/challonge?path=tournaments`);
+    if (!listResponse.ok) throw new Error('Failed to fetch tournaments list');
+    
+    const listData = await listResponse.json();
+    const tournament = listData.data.find((t: any) => t.attributes.url === slug || t.id === slug);
+    
+    if (!tournament) {
+      // Se non lo troviamo nella lista principale, proviamo a interrogarlo direttamente
+      // nel caso lo slug sia in realtà un ID
+      const directRes = await fetch(`/api/challonge?path=tournaments/${slug}`);
+      if (directRes.ok) return (await directRes.json()).data as ChallongeTournament;
+      throw new Error('Tournament not found in Challonge');
+    }
+    
+    return tournament as ChallongeTournament;
   } catch (error) {
     console.error('Error fetching Challonge tournament:', error);
     return null;
   }
 }
 
-export async function fetchChallongeData(slug: string) {
+export async function fetchChallongeData(slugOrId: string) {
   try {
+    // Prima assicuriamoci di avere l'ID numerico
+    let id = slugOrId;
+    if (isNaN(Number(slugOrId))) {
+      const tournament = await fetchChallongeTournament(slugOrId);
+      if (!tournament) throw new Error('Could not resolve slug to ID');
+      id = tournament.id;
+    }
+
     const [matchesRes, participantsRes] = await Promise.all([
-      fetch(`/api/challonge?path=tournaments/${slug}/matches&page=1&per_page=100`),
-      fetch(`/api/challonge?path=tournaments/${slug}/participants&page=1&per_page=100`)
+      fetch(`/api/challonge?path=tournaments/${id}/matches&page=1&per_page=100`),
+      fetch(`/api/challonge?path=tournaments/${id}/participants&page=1&per_page=100`)
     ]);
 
     if (!matchesRes.ok || !participantsRes.ok) throw new Error('Failed to fetch Challonge details');
