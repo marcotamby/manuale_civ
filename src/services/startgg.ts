@@ -144,6 +144,7 @@ export async function fetchPhaseGroupSets(phaseGroupId: string): Promise<StartGG
             fullRoundText
             round
             displayScore
+            state
             slots {
               entrant {
                 id

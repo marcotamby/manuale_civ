@@ -26,9 +26,21 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
           groups = rawGroups.nodes;
         }
         
-        // RECUPERO DI EMERGENZA: Se i gruppi sono ancora vuoti, li cerchiamo direttamente
+        // RECUPERO DI EMERGENZA: Prova automatica via Phase ID
         if (groups.length === 0) {
           groups = await fetchPhaseGroups(phase.id);
+        }
+
+        // FALLBACK DI FORZA BRUTA: Se ancora vuoto (es. per il torneo 2026), proviamo gli ID noti
+        if (groups.length === 0) {
+           const fallbackMap: Record<string, string> = {
+             "Gironi": "2165052",
+             "Eliminazione": "2165053",
+             "Top 8": "2165053"
+           };
+           const fallbackId = fallbackMap[phase.name] || (phase.name.includes("Gironi") ? "2165052" : "2165053");
+           console.log("Brute force fallback triggered for phase:", phase.name, "with ID:", fallbackId);
+           groups = await fetchPhaseGroups(fallbackId);
         }
 
         if (groups.length === 0) {
