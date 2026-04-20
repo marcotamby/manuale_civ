@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, ExternalLink, Copy, Check, Clock, Monitor, ShieldCheck, Info } from 'lucide-react';
+import { X, ExternalLink, Copy, Clock, Monitor, ShieldCheck, Info } from 'lucide-react';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
 
