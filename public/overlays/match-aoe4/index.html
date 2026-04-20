@@ -10,7 +10,7 @@
         
         body { 
             width: 1920px; height: 1080px; color: white; overflow: hidden;
-            background: transparent url('background.jpg') no-repeat center center/cover;
+            background: transparent url('../background/background.png') no-repeat center center/cover;
             margin: 0; padding: 0;
         }
 
@@ -62,6 +62,15 @@
         .webcam-frame { width: 380px; height: 214px; border: 2px solid var(--gold); background: rgba(0,0,0,0.3); border-radius: 4px; }
         .caster-name { background: var(--gold); color: black; font-weight: 800; padding: 8px 30px; font-size: 22px; border-radius: 4px; text-transform: uppercase; min-width: 240px; text-align: center; }
 
+        /* TIMER */
+        #timer-container {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.85); border: 2px solid var(--gold); border-radius: 8px;
+            padding: 10px 40px; display: none; align-items: center; justify-content: center;
+            min-width: 200px; box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+        #timer-display { font-size: 42px; font-weight: 900; color: var(--gold); letter-spacing: 2px; font-variant-numeric: tabular-nums; }
+
         #central-divider {
             position: absolute; top: 0; left: 50%; transform: translateX(-50%);
             width: 4px; height: 100%; background: linear-gradient(to bottom, transparent, rgba(255,204,0,0.5), transparent);
@@ -98,52 +107,87 @@
         </div>
     </div>
 
+    <div id="timer-container">
+        <div id="timer-display">00:00:00</div>
+    </div>
+
     <script>
-        // Supabase Hardcoded Credentials
         const SUB_URL = "https://laliiuqjpxanhwhxajlm.supabase.co";
         const SUB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhbGlpdXFqcHhhbmh3aHhhamxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjQ5MjEsImV4cCI6MjA4ODU0MDkyMX0.1xIE1MXy1JxgGzpP0Hitotz8o3aMwASV8NUr06bQjkA";
         
         const civMap = {
-            'abbasid': '/civs/Abbasid Dynasty.webp',
-            'ayyubids': '/civs/Ayyubids.webp',
-            'byzantines': '/civs/Byzantines.webp',
-            'chinese': '/civs/Chinese.webp',
-            'delhi': '/civs/Delhi Sultanate.webp',
-            'english': '/civs/English.webp',
-            'french': '/civs/French.webp',
-            'goldenhorde': '/civs/Golden Horde.webp',
-            'hre': '/civs/Holy Roman Empire.webp',
-            'japanese': '/civs/Japanese.webp',
-            'jeannedarc': "/civs/Jeanne d'Arc.webp",
-            'lancaster': "/civs/House of Lancaster.webp",
-            'malians': '/civs/Malians.webp',
-            'mongols': '/civs/Mongols.webp',
-            'orderofthedragon': "/civs/Order of the Dragon.webp",
-            'ottomans': '/civs/Ottomans.webp',
-            'rus': '/civs/Rus.webp',
-            'templar': "/civs/Knights Templar.webp",
-            'zhuxi': "/civs/Zhu Xis Legacy.webp"
+            'abbasid': 'Abbasid Dynasty.webp',
+            'ayyubids': 'Ayyubids.webp',
+            'byzantines': 'Byzantines.webp',
+            'chinese': 'Chinese.webp',
+            'delhi': 'Delhi Sultanate.webp',
+            'english': 'English.webp',
+            'french': 'French.webp',
+            'goldenhorde': 'Golden Horde.webp',
+            'hre': 'Holy Roman Empire.webp',
+            'japanese': 'Japanese.webp',
+            'jeannedarc': "Jeanne d'Arc.webp",
+            'lancaster': "House of Lancaster.webp",
+            'malians': 'Malians.webp',
+            'mongols': 'Mongols.webp',
+            'orderofthedragon': "Order of the Dragon.webp",
+            'ottomans': 'Ottomans.webp',
+            'rus': 'Rus.webp',
+            'templar': "Knights Templar.webp",
+            'zhuxi': "Zhu Xis Legacy.webp",
+            'tughlaq': 'Tughlaq Dynasty.webp',
+            'sengoku': 'Sengoku Daimyo.webp',
+            'macedonian': 'Macedonian Dynasty.webp'
         };
 
         const { createClient } = window.supabase;
         const client = createClient(SUB_URL, SUB_KEY);
-        console.log("Supabase Client Initialized (v1.6)");
+        let lastState = null;
+        let timerInterval = null;
+
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
+            return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
+        }
+
+        function updateTimer() {
+            if (!lastState || !lastState.timer || !lastState.timer.active) {
+                document.getElementById('timer-container').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('timer-container').style.display = 'flex';
+            
+            const startTimestamp = lastState.timer.timestamp || Date.now();
+            const configSeconds = ((lastState.timer.min || 0) * 60) + (lastState.timer.sec || 0);
+            const elapsed = Math.floor((Date.now() - startTimestamp) / 1000);
+            const totalSeconds = configSeconds + elapsed;
+            
+            document.getElementById('timer-display').innerText = formatTime(totalSeconds);
+        }
+
+        function getCivUrl(id) {
+            if (!id) return '';
+            const filename = civMap[id] || id + '.webp';
+            return `/civs/${filename}`;
+        }
 
         function getMapUrl(name) {
             if (!name) return '/maps/default.png';
-            const cleanName = name.replace(/ /g, '_');
-            return `/maps/${cleanName}.png`;
+            return `/maps/${name.replace(/ /g, '_')}.png`;
         }
 
         function render(state) {
-            console.log("Rendering update:", state);
             if (!state) return;
+            lastState = state;
+            console.log("Rendering state:", state);
 
-            // Teams & Score
+            // Teams
             document.getElementById('t1-name').innerText = state.t1?.name || '--';
             document.getElementById('t1-players').innerText = (state.t1?.players || []).filter(p=>p).join(' • ') || '--';
             document.getElementById('t1-score').innerText = state.t1?.score ?? 0;
-
             document.getElementById('t2-name').innerText = state.t2?.name || '--';
             document.getElementById('t2-players').innerText = (state.t2?.players || []).filter(p=>p).join(' • ') || '--';
             document.getElementById('t2-score').innerText = state.t2?.score ?? 0;
@@ -172,48 +216,34 @@
                     </div>
                     <div class="civ-icons left">
                         ${m.winner == 1 ? '<div class="crown">👑</div>' : ''}
-                        ${(m.t1civs || []).map(c=>`<div class="civ-unit"><div class="civ-dot" style="background-image:url('${civMap[c] || '/civs/'+c+'.webp'}')"></div></div>`).join('')}
+                        ${(m.t1civs || []).map(c=>`<div class="civ-unit"><div class="civ-dot" style="background-image:url('${getCivUrl(c)}')"></div></div>`).join('')}
                     </div>
                     <div class="civ-icons right">
                         ${m.winner == 2 ? '<div class="crown">👑</div>' : ''}
-                        ${(m.t2civs || []).map(c=>`<div class="civ-unit"><div class="civ-dot" style="background-image:url('${civMap[c] || '/civs/'+c+'.webp'}')"></div></div>`).join('')}
+                        ${(m.t2civs || []).map(c=>`<div class="civ-unit"><div class="civ-dot" style="background-image:url('${getCivUrl(c)}')"></div></div>`).join('')}
                     </div>
                 </div>
             `).join('');
             
             document.getElementById('central-divider').style.display = (state.maps?.length >= 2) ? 'block' : 'none';
+            updateTimer();
         }
 
         async function init() {
-            try {
-                console.log("Initing overlay...");
-                const { data, error } = await client.from('stream_overlays').select('state').eq('id', 'aoe4-match').single();
-                if (error) {
-                    console.error("Initial fetch error:", error);
-                } else if (data && data.state) {
-                    render(data.state);
-                }
+            const { data } = await client.from('stream_overlays').select('state').eq('id', 'aoe4-match').single();
+            if (data?.state) render(data.state);
 
-                // Realtime subscription
-                client
-                    .channel('public:stream_overlays')
-                    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stream_overlays', filter: 'id=eq.aoe4-match' }, payload => {
-                        console.log("Update received!", payload.new.state);
-                        render(payload.new.state);
-                    })
-                    .subscribe((status) => {
-                        console.log("Realtime status:", status);
-                    });
+            client.channel('public:stream_overlays')
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stream_overlays', filter: 'id=eq.aoe4-match' }, payload => render(payload.new.state))
+                .subscribe();
 
-                // Polling fallback every 5s
-                setInterval(async () => {
-                    const { data } = await client.from('stream_overlays').select('state').eq('id', 'aoe4-match').single();
-                    if (data && data.state) render(data.state);
-                }, 5000);
+            setInterval(async () => {
+                const { data } = await client.from('stream_overlays').select('state').eq('id', 'aoe4-match').single();
+                if (data?.state) render(data.state);
+            }, 5000);
 
-            } catch (err) {
-                console.error("Critical init error:", err);
-            }
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
         }
 
         init();

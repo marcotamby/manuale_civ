@@ -30,8 +30,21 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
     console.log('Loading initial overlay state...');
     overlayService.getOverlayState('aoe4-match').then(savedState => {
       if (savedState) {
-        console.log('State loaded from DB:', savedState);
-        setState(savedState);
+        // Normalizzazione dati: assicura che t1civs e t2civs siano array
+        const normalizedMaps = (savedState.maps || []).map(m => ({
+          ...m,
+          t1civs: Array.isArray(m.t1civs) ? m.t1civs : [],
+          t2civs: Array.isArray(m.t2civs) ? m.t2civs : []
+        }));
+        
+        const normalizedState = {
+          ...DEFAULT_STATE,
+          ...savedState,
+          maps: normalizedMaps
+        };
+        
+        console.log('State normalized:', normalizedState);
+        setState(normalizedState);
       } else {
         console.warn('No state found in DB, using default.');
         setState(DEFAULT_STATE);
