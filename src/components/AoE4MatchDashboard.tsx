@@ -66,9 +66,17 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
     });
   }, []);
 
-  const resetMatch = () => {
-    setState(DEFAULT_STATE);
-    setIsConfirmingReset(false);
+  const resetMatch = async () => {
+    setIsSaving(true);
+    try {
+      await overlayService.updateOverlayState('aoe4-match', DEFAULT_STATE);
+      setState(DEFAULT_STATE);
+      setIsConfirmingReset(false);
+    } catch (error: any) {
+      onError(`Errore durante il reset: ${error.message || 'Errore generico'}`);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
     const [showSuccess, setShowSuccess] = useState(false);
