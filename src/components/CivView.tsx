@@ -723,7 +723,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         <div className="absolute inset-0 bg-black/10" />
                         <div className="absolute bottom-4 left-5 flex gap-1.5 drop-shadow-2xl">
                           {Array.from({ length: 3 }).map((_, i) => (
-                            <span key={i} className={`text-lg filter ${i < bo.difficulty ? 'text-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.8)]' : 'text-white/10'}`}>⭐</span>
+                            <span key={i} className={`text-lg filter ${i < bo.difficulty ? 'text-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.8)]' : 'text-white/30'}`}>⭐</span>
                           ))}
                         </div>
                       </div>
@@ -850,11 +850,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                     </div>
 
                     <div className="absolute bottom-6 left-8 right-8">
-                       <div className="flex items-center gap-2 mb-2">
+                       <div className="flex items-center gap-1.5 drop-shadow-lg scale-110 origin-left">
                           {Array.from({ length: 3 }).map((_, i) => (
-                            <span key={i} className={`text-sm ${i < selectedBO.difficulty ? 'text-yellow-500' : 'text-white/10'}`}>⭐</span>
+                            <span key={i} className={`text-lg filter ${i < selectedBO.difficulty ? 'text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]' : 'text-white/30'}`}>⭐</span>
                           ))}
-                          <span className="text-[10px] font-black text-yellow-500/80 uppercase tracking-[0.2em] ml-2">
+                          <span className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.2em] ml-3 bg-yellow-500/10 px-2 py-0.5 rounded border border-yellow-500/20">
                              {selectedBO.difficulty === 1 ? 'Facile' : selectedBO.difficulty === 2 ? 'Media' : 'Difficile'}
                           </span>
                        </div>
