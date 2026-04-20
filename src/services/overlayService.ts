@@ -27,7 +27,7 @@ export const overlayService = {
   async updateOverlayState(id: string = 'aoe4-match', state: OverlayState) {
     try {
       // 1. Prova prima l'aggiornamento
-      const { data, error, count } = await supabase
+      const { data, error } = await supabase
         .from('stream_overlays')
         .update({ 
           state,
