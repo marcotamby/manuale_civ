@@ -15,8 +15,14 @@ export function AoE4MatchDashboard({ onSuccess, onError }: AoE4MatchDashboardPro
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    overlayService.getOverlayState('aoe4-match').then(data => {
-      if (data) setState(data);
+    console.log('Loading initial overlay state...');
+    overlayService.getOverlayState('aoe4-match').then(savedState => {
+      if (savedState) {
+        console.log('State loaded from DB:', savedState);
+        setState(savedState);
+      } else {
+        console.warn('No state found in DB, using default.');
+      }
     });
   }, []);
 
