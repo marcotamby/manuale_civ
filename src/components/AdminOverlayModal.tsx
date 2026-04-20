@@ -151,28 +151,28 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                   <div className="flex gap-3">
                     <button
                       onClick={() => setActiveTab(activeTab === 'preview' ? 'dashboard' : 'preview')}
-                      className={`flex items-center gap-2 px-4 py-2 font-bold rounded-xl transition-all text-xs uppercase border ${
+                      className={`flex items-center gap-2 px-3 py-1.5 font-black rounded-lg transition-all text-[10px] uppercase border shadow-lg ${
                         activeTab === 'dashboard'
-                          ? 'bg-yellow-500 text-black border-yellow-500'
-                          : 'bg-white/5 text-yellow-500 border-yellow-500/30 hover:bg-yellow-500/10'
+                          ? 'bg-indigo-600 text-white border-indigo-400 shadow-indigo-500/20'
+                          : 'bg-white/5 text-indigo-400 border-indigo-500/30 hover:bg-indigo-500/10'
                       }`}
                     >
-                      {activeTab === 'preview' ? <Settings size={16} /> : <ChevronLeft size={16} />}
-                      {activeTab === 'preview' ? 'Configura Overlay' : 'Torna all\'Anteprima'}
+                      {activeTab === 'preview' ? <Settings size={14} /> : <ChevronLeft size={14} />}
+                      {activeTab === 'preview' ? 'Configura' : 'Indietro'}
                     </button>
                     <button
                       onClick={() => copyToClipboard(selectedOverlay.path)}
-                      className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-black font-bold rounded-xl hover:bg-yellow-400 transition-all text-xs uppercase"
+                      className="flex items-center gap-2 px-3 py-1.5 bg-emerald-600 text-white font-black rounded-lg hover:bg-emerald-500 transition-all text-[10px] uppercase shadow-lg shadow-emerald-900/20 border border-emerald-400/30"
                     >
-                      <Copy size={16} /> Copia URL per OBS
+                      <Copy size={14} /> Copia URL
                     </button>
                     <a
                       href={selectedOverlay.path}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-4 py-2 bg-white/10 text-white font-bold rounded-xl hover:bg-white/20 transition-all text-xs uppercase border border-white/10"
+                      className="flex items-center gap-2 px-3 py-1.5 bg-sky-600 text-white font-black rounded-lg hover:bg-sky-500 transition-all text-[10px] uppercase border border-sky-400/30 shadow-lg shadow-sky-900/20"
                     >
-                      <ExternalLink size={16} /> Apri in un'altra scheda
+                      <ExternalLink size={14} /> Apri Overlay
                     </a>
                   </div>
                 </div>

@@ -171,6 +171,22 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
 
   return (
     <div className="space-y-8 pb-12">
+      {/* Universal Reset & Sync Quick Actions */}
+      <div className="flex justify-between items-center bg-white/5 border border-white/10 rounded-2xl p-4 mb-4">
+        <div className="flex items-center gap-4">
+          <h2 className="text-sm font-black text-white uppercase tracking-widest">Configurazione Match</h2>
+          <button
+            onClick={resetMatch}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white rounded-lg text-[10px] font-black uppercase hover:bg-red-500 transition-all shadow-lg shadow-red-900/20"
+          >
+            <Trash2 size={14} /> Reset
+          </button>
+        </div>
+        <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+          Sincronizza per rendere le modifiche live
+        </div>
+      </div>
+
       {/* Teams Section */}
       <div className="grid grid-cols-2 gap-6">
         {['t1', 't2'].map((t) => {
@@ -239,12 +255,6 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
           </label>
           <div className="flex gap-2">
             <button
-              onClick={resetMatch}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 border border-red-500/30 text-red-500 rounded-lg text-[10px] font-bold uppercase hover:bg-red-500/20 transition-all"
-            >
-              <Trash2 size={14} /> Svuota Tutto
-            </button>
-            <button
               onClick={addMap}
               className="flex items-center gap-2 px-3 py-1.5 bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 rounded-lg text-[10px] font-bold uppercase hover:bg-yellow-500/20 transition-all"
             >
@@ -304,7 +314,7 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
                             : 'bg-white/5 text-gray-500 border border-white/5 hover:bg-white/10'
                         }`}
                       >
-                        {w === 0 ? 'Nessuno' : w === 1 ? 'Left' : 'Right'}
+                        {w === 0 ? 'Nessuno' : w === 1 ? 'Sinistra' : 'Destra'}
                       </button>
                     ))}
                   </div>
@@ -448,11 +458,13 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
           className={`flex items-center gap-3 px-12 py-5 rounded-2xl font-black text-xl uppercase tracking-wider shadow-2xl transition-all transform hover:scale-105 active:scale-95 ${
             isSaving 
               ? 'bg-gray-700 text-gray-400 cursor-not-allowed' 
-              : 'bg-yellow-500 text-black hover:bg-yellow-400 shadow-yellow-500/30'
+              : showSuccess
+                ? 'bg-green-600 text-white shadow-green-500/30'
+                : 'bg-yellow-500 text-black hover:bg-yellow-400 shadow-yellow-500/30'
           }`}
         >
-          <Save size={24} />
-          {isSaving ? 'Sincronizzazione...' : showSuccess ? 'Sincronizzato! ✅' : 'Sincronizza Overlay'}
+          <Save size={24} className={isSaving ? 'animate-spin' : ''} />
+          {isSaving ? 'Sincronizzazione...' : showSuccess ? 'Overlay Sincronizzato' : 'Sincronizza Overlay'}
         </button>
       </div>
     </div>
