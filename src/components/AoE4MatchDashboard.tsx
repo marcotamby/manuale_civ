@@ -264,27 +264,37 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
                 <div className="col-span-2 grid grid-cols-2 gap-4">
                   {['t1', 't2'].map((team) => {
                     const tKey = team as 't1' | 't2';
-                    const selectedCivs = map[tKey === 't1' ? 't1civs' : 't2civs'] || [];
+                    const currentMapState = state.maps[mIdx];
+                    const selectedCivs = currentMapState[tKey === 't1' ? 't1civs' : 't2civs'] || [];
+                    
                     return (
                       <div key={team}>
                         <label className="text-[10px] text-gray-500 uppercase mb-2 block">
                           Civ {tKey === 't1' ? 'Team Sinistra' : 'Team Destra'} ({selectedCivs.length}/3)
                         </label>
                         <div className="grid grid-cols-6 gap-2 bg-black/40 p-3 rounded-xl border border-white/5">
-                          {civilizationsData.map((civ) => (
-                            <button
-                              key={civ.id}
-                              onClick={() => toggleCiv(mIdx, tKey, civ.id)}
-                              title={civ.name}
-                              className={`w-full aspect-square rounded-full border-2 transition-all overflow-hidden ${
-                                selectedCivs.includes(civ.id)
-                                  ? 'border-yellow-500 scale-110 shadow-[0_0_20px_rgba(212,175,55,0.6)] z-10'
-                                  : 'border-white/5 opacity-60 grayscale-[40%] hover:opacity-100 hover:grayscale-0 hover:border-white/20'
-                              }`}
-                            >
-                              <img src={civ.flag} alt={civ.name} className="w-full h-full object-cover" />
-                            </button>
-                          ))}
+                          {civilizationsData.map((civ) => {
+                            const isSelected = selectedCivs.some((id: string) => id === civ.id);
+                            return (
+                              <button
+                                key={civ.id}
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  toggleCiv(mIdx, tKey, civ.id);
+                                }}
+                                title={civ.name}
+                                className={`w-full aspect-square rounded-full border-2 transition-all overflow-hidden cursor-pointer relative z-20 ${
+                                  isSelected
+                                    ? 'border-yellow-500 scale-110 shadow-[0_0_20px_rgba(212,175,55,0.6)] z-30'
+                                    : 'border-white/5 opacity-60 grayscale-[40%] hover:opacity-100 hover:grayscale-0 hover:border-white/20'
+                                }`}
+                              >
+                                <img src={civ.flag} alt={civ.name} className="w-full h-full object-cover pointer-events-none" />
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
                     );
