@@ -69,7 +69,7 @@ export function TournamentsPage() {
                     id: 'gyunrhoc',
                     name: "Torneo degli scudi d'oro",
                     slug: config.slug,
-                    images: [{ url: '/vetro_oro.jpg' }], // L'utente dovrà mettere un'immagine chiamata 'vetro_oro.jpg' nella cartella 'public'
+                    images: [{ url: '/vetro_oro.png' }], // Immagine custom Inserita dall'utente
                     events: [{ 
                       name: 'Torneo 3v3', 
                       videogame: { name: 'Age of Empires IV' },
