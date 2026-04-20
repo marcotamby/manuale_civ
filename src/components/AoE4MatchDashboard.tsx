@@ -22,7 +22,7 @@ const DEFAULT_STATE: OverlayState = {
   ]
 };
 
-export function AoE4MatchDashboard({ onError }: { onError: (msg: string) => void }) {
+export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
   const [state, setState] = useState<OverlayState | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
