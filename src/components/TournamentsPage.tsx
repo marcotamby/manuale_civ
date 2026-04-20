@@ -192,7 +192,7 @@ export function TournamentsPage() {
                     <span className="text-[10px] font-bold uppercase tracking-widest text-[#D4AF37]">organizzato da {tournament.config.organizer}</span>
                   </div>
                   
-                  <h3 className="text-xl font-cinzel font-bold text-white mb-4 group-hover:text-yellow-400 transition-colors truncate">
+                  <h3 className="text-xl font-bold text-white mb-4 group-hover:text-yellow-400 transition-colors truncate">
                     {tournament.name || 'Torneo AoE4'}
                   </h3>
 
