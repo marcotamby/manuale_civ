@@ -136,6 +136,19 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
       {/* Decorative top border glow effect */}
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent"></div>
 
+      {/* Decorative medieval skyline background */}
+      <div className="absolute bottom-0 left-0 right-0 h-12 pointer-events-none opacity-10 select-none z-0 flex items-end overflow-hidden">
+        <svg width="100%" height="32" viewBox="0 0 1200 32" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
+          <path 
+            d="M0,32 L0,25 L15,25 L15,18 L35,18 L35,25 L55,25 L55,18 L75,18 L75,25 L95,25 L95,10 L125,10 L125,25 L145,25 L145,18 L165,18 L165,25 L185,25 L185,18 L205,18 L205,25 L225,25 L225,5 L265,5 L265,25 L285,25 L285,18 L305,18 L305,25 L325,25 L325,18 L345,18 L345,25 L365,25 L365,18 L385,18 L385,25 L405,25 L405,8 L445,8 L445,25 L465,25 L465,18 L485,18 L485,25 L505,25 L505,18 L525,18 L525,25 L545,25 L545,5 L585,5 L585,25 L605,25 L605,18 L625,18 L625,25 L645,25 L645,18 L665,18 L665,25 L685,25 L685,12 L725,12 L725,25 L745,25 L745,18 L765,18 L765,25 L785,25 L785,18 L805,18 L805,25 L825,25 L825,5 L865,5 L865,25 L885,25 L885,18 L905,18 L905,25 L925,25 L925,18 L945,18 L945,25 L965,25 L965,8 L1005,8 L1005,25 L1025,25 L1025,18 L1045,18 L1045,25 L1065,25 L1065,18 L1085,18 L1085,25 L1105,25 L1105,5 L1145,5 L1145,25 L1165,25 L1165,18 L1185,18 L1185,25 L1200,25 L1200,32 Z" 
+            fill="none" 
+            stroke="white" 
+            strokeWidth="0.5" 
+          />
+          <path d="M50,18 L50,12 M200,18 L200,8 M400,18 L400,10 M650,18 L650,12 M850,18 L850,8 M1100,18 L1100,10" stroke="white" strokeWidth="0.5" />
+        </svg>
+      </div>
+
       {/* Left container for social links on desktop */}
       <div className="hidden md:flex w-1/3 items-center justify-start gap-3">
         <a
