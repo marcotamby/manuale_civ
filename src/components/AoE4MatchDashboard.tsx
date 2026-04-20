@@ -99,13 +99,19 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
     const maps = [...state.maps];
     const teamKey = team === 't1' ? 't1civs' : 't2civs';
     const currentCivs = maps[mapIndex][teamKey] || [];
-    const civs = [...currentCivs];
+    let newCivs = [...currentCivs];
     
-    if (civs.includes(civId)) {
-      maps[mapIndex][teamKey] = civs.filter(id => id !== civId);
-    } else if (civs.length < 3) {
-      maps[mapIndex][teamKey] = [...civs, civId];
+    if (newCivs.includes(civId)) {
+      newCivs = newCivs.filter(id => id !== civId);
+    } else if (newCivs.length < 3) {
+      newCivs = [...newCivs, civId];
     }
+
+    maps[mapIndex] = { 
+      ...maps[mapIndex], 
+      [teamKey]: newCivs 
+    };
+    
     setState({ ...state, maps });
   };
 
@@ -212,18 +218,18 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
                   </div>
                   
                   <label className="text-[10px] text-gray-500 uppercase mb-1 block">Mappa</label>
-                  <div className="relative">
+                  <div className="relative mb-4">
                     <MapIcon size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
                     <select
                       value={map.name}
                       onChange={(e) => updateMap(mIdx, 'name', e.target.value)}
-                      className="w-full bg-[#0f1423] border border-white/10 rounded-lg pl-8 pr-10 py-2 text-sm text-white outline-none mb-4 focus:border-yellow-500/50 cursor-pointer hover:bg-[#1a2035] transition-all appearance-none shadow-inner"
+                      className="w-full bg-[#0f1423] border border-white/10 rounded-lg pl-8 pr-10 py-2 text-sm text-white outline-none focus:border-yellow-500/50 cursor-pointer hover:bg-[#1a2035] transition-all appearance-none shadow-inner"
                     >
                       {AOE4_MAPS.map(mapName => (
                         <option key={mapName} value={mapName} className="bg-[#0f1423] text-gray-200">{mapName}</option>
                       ))}
                     </select>
-                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-[calc(50%+8px)] text-gray-500 pointer-events-none" />
+                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
                   </div>
 
                   <label className="text-[10px] text-gray-500 uppercase mb-2 block">Vincitore</label>
