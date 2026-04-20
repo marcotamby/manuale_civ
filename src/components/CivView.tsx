@@ -6,7 +6,7 @@ import { usePresence } from './PresenceContext';
 import type { Unit } from '../data/aoe4Data';
 import { UnitGrid } from './UnitGrid';
 import { MatchupsTable } from './MatchupsTable';
-import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight, MessageSquare, Send, UserCircle, CheckCircle, XCircle, X, Loader2, Trash2, AlertTriangle, Plus, ExternalLink } from 'lucide-react';
+import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight, MessageSquare, Send, UserCircle, CheckCircle, XCircle, X, Loader2, Trash2, AlertTriangle, Plus, ExternalLink, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { ResourceText } from './ResourceText';
 import { SocialProofPopup } from './SocialProofPopup';
@@ -161,6 +161,80 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const [replyTo, setReplyTo] = useState<{ questionId: string, parentId?: string } | null>(null);
   const [answerText, setAnswerText] = useState('');
   const [qaMessage, setQaMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
+  const [boVotes, setBoVotes] = useState<Record<string, { up: number, down: number, userVote: number | null }>>({});
+
+  const fetchVotes = async () => {
+    if (!civ?.buildOrders || civ.buildOrders.length === 0) return;
+    const boIds = civ.buildOrders.map(bo => bo.id);
+    
+    const { data, error } = await supabase
+      .from('build_order_votes')
+      .select('*')
+      .in('build_order_id', boIds);
+    
+    if (error) return;
+
+    const counts: Record<string, { up: number, down: number, userVote: number | null }> = {};
+    data.forEach(v => {
+      if (!counts[v.build_order_id]) counts[v.build_order_id] = { up: 0, down: 0, userVote: null };
+      if (v.vote === 1) counts[v.build_order_id].up++;
+      else counts[v.build_order_id].down++;
+      
+      if (user && v.user_id === user.id) {
+        counts[v.build_order_id].userVote = v.vote;
+      }
+    });
+    setBoVotes(counts);
+  };
+
+  const handleVote = async (boId: string, value: number) => {
+    if (!user) {
+      openLoginModal();
+      return;
+    }
+
+    const currentVote = boVotes[boId]?.userVote;
+    const isRemoving = currentVote === value;
+    
+    // Optimistic update
+    setBoVotes(prev => {
+      const next = { ...prev };
+      if (!next[boId]) next[boId] = { up: 0, down: 0, userVote: null };
+      
+      // Remove previous vote influence
+      if (currentVote === 1) next[boId].up--;
+      if (currentVote === -1) next[boId].down--;
+      
+      if (isRemoving) {
+        next[boId].userVote = null;
+      } else {
+        if (value === 1) next[boId].up++;
+        else next[boId].down++;
+        next[boId].userVote = value;
+      }
+      return next;
+    });
+
+    try {
+      if (isRemoving) {
+        await supabase
+          .from('build_order_votes')
+          .delete()
+          .match({ user_id: user.id, build_order_id: boId });
+      } else {
+        await supabase
+          .from('build_order_votes')
+          .upsert({ user_id: user.id, build_order_id: boId, vote: value });
+      }
+    } catch (e) {
+      console.error(e);
+      fetchVotes(); // Rollback
+    }
+  };
+
+  useEffect(() => {
+    if (civ?.buildOrders) fetchVotes();
+  }, [civ?.buildOrders, user?.id]);
 
   const fetchQA = async () => {
     try {
@@ -756,17 +830,37 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         </div>
 
                         <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
-                           <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                                {bo.author_rank && getRankIcon(bo.author_rank) ? (
-                                  <img src={getRankIcon(bo.author_rank) || ''} alt={bo.author_rank} className="w-4 h-4 object-contain" />
-                                ) : (
-                                  <UserCircle size={14} className="text-gray-600" />
-                                )}
+                           <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                 <div className="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                                   {bo.author_rank && getRankIcon(bo.author_rank) ? (
+                                     <img src={getRankIcon(bo.author_rank) || ''} alt={bo.author_rank} className="w-4 h-4 object-contain" />
+                                   ) : (
+                                     <UserCircle size={14} className="text-gray-600" />
+                                   )}
+                                 </div>
+                                 <span className="text-[11px] font-bold text-blue-400 uppercase tracking-tighter truncate max-w-[80px]">
+                                   {bo.author_nickname || 'Anonimo'}
+                                 </span>
                               </div>
-                              <span className="text-[11px] font-bold text-blue-400 uppercase tracking-tighter truncate max-w-[80px]">
-                                {bo.author_nickname || 'Anonimo'}
-                              </span>
+                              
+                              {/* Voting */}
+                              <div className="flex items-center gap-3">
+                                <button 
+                                  onClick={(e) => { e.stopPropagation(); handleVote(bo.id, 1); }}
+                                  className={`flex items-center gap-1 transition-colors ${boVotes[bo.id]?.userVote === 1 ? 'text-green-500' : 'text-gray-500 hover:text-green-400'}`}
+                                >
+                                  <ThumbsUp size={14} />
+                                  <span className="text-[10px] font-bold">{boVotes[bo.id]?.up || 0}</span>
+                                </button>
+                                <button 
+                                  onClick={(e) => { e.stopPropagation(); handleVote(bo.id, -1); }}
+                                  className={`flex items-center gap-1 transition-colors ${boVotes[bo.id]?.userVote === -1 ? 'text-red-500' : 'text-gray-500 hover:text-red-400'}`}
+                                >
+                                  <ThumbsDown size={14} />
+                                  <span className="text-[10px] font-bold">{boVotes[bo.id]?.down || 0}</span>
+                                </button>
+                              </div>
                            </div>
                            <span className="text-[10px] font-black text-yellow-500 uppercase tracking-widest bg-yellow-500/10 px-2 py-1 rounded">Vedi Strategia</span>
                         </div>
@@ -857,6 +951,24 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                           <span className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.2em] ml-3 bg-yellow-500/10 px-2 py-0.5 rounded border border-yellow-500/20">
                              {selectedBO.difficulty === 1 ? 'Facile' : selectedBO.difficulty === 2 ? 'Media' : 'Difficile'}
                           </span>
+
+                          <div className="ml-auto flex items-center gap-4 bg-black/40 px-4 py-1.5 rounded-full border border-white/5">
+                            <button 
+                              onClick={() => handleVote(selectedBO.id, 1)}
+                              className={`flex items-center gap-2 transition-all hover:scale-110 ${boVotes[selectedBO.id]?.userVote === 1 ? 'text-green-500' : 'text-gray-400 hover:text-green-400'}`}
+                            >
+                              <ThumbsUp size={18} />
+                              <span className="text-sm font-black">{boVotes[selectedBO.id]?.up || 0}</span>
+                            </button>
+                            <div className="w-px h-4 bg-white/10" />
+                            <button 
+                              onClick={() => handleVote(selectedBO.id, -1)}
+                              className={`flex items-center gap-2 transition-all hover:scale-110 ${boVotes[selectedBO.id]?.userVote === -1 ? 'text-red-500' : 'text-gray-400 hover:text-red-400'}`}
+                            >
+                              <ThumbsDown size={18} />
+                              <span className="text-sm font-black">{boVotes[selectedBO.id]?.down || 0}</span>
+                            </button>
+                          </div>
                        </div>
                        <h2 className="text-2xl md:text-4xl font-black text-white uppercase tracking-tighter drop-shadow-lg leading-tight">
                          {selectedBO.title}
