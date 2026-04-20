@@ -61,6 +61,19 @@ export function TournamentsPage() {
                   events: [],
                   config
                 } as any;
+              } else {
+                // Fallback robusto: se l'API blocca l'accesso ai tornei dei collaboratori (limite OAuth v2),
+                // forziamo la sua comparsa manuale nella UI per non far sparire l'evento.
+                if (config.slug === 'gyunrhoc' || config.slug === '17624499') {
+                  return {
+                    id: 'gyunrhoc',
+                    name: 'Vetro e Oro (Challonge)',
+                    slug: config.slug,
+                    images: [{ url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop' }],
+                    events: [{ name: 'Torneo Singolo', videogame: { name: 'Age of Empires IV' } }],
+                    config: { ...config, directLink: 'https://challonge.com/it/gyunrhoc' }
+                  } as any;
+                }
               }
             }
             return null;
@@ -119,7 +132,13 @@ export function TournamentsPage() {
           return (
             <div 
               key={tournament.id}
-              onClick={() => navigate(`/tornei/${tournament.slug}`)}
+              onClick={() => {
+                if ((tournament.config as any).directLink) {
+                  window.open((tournament.config as any).directLink, '_blank');
+                } else {
+                  navigate(`/tornei/${tournament.slug}`);
+                }
+              }}
               className="group relative cursor-pointer"
             >
               {/* Card Container */}
@@ -196,7 +215,14 @@ export function TournamentsPage() {
                   )}
 
                   <button 
-                    onClick={() => navigate(`/tornei/${tournament.slug}?source=${tournament.config.source}&organizer=${tournament.config.organizer}`)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if ((tournament.config as any).directLink) {
+                        window.open((tournament.config as any).directLink, '_blank');
+                      } else {
+                        navigate(`/tornei/${tournament.slug}?source=${tournament.config.source}&organizer=${tournament.config.organizer}`);
+                      }
+                    }}
                     className="w-full py-3 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/30 rounded-xl text-yellow-500 font-bold uppercase text-xs tracking-widest transition-all flex items-center justify-center gap-2 group/btn"
                   >
                     Dettagli e Tabellone
