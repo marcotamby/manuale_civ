@@ -69,8 +69,18 @@ export function TournamentsPage() {
                     id: 'gyunrhoc',
                     name: 'Vetro e Oro (Challonge)',
                     slug: config.slug,
-                    images: [{ url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop' }],
-                    events: [{ name: 'Torneo Singolo', videogame: { name: 'Age of Empires IV' } }],
+                    images: [{ url: '/vetro_oro.jpg' }], // L'utente dovrà mettere un'immagine chiamata 'vetro_oro.jpg' nella cartella 'public'
+                    events: [{ 
+                      name: 'Torneo 3v3', 
+                      videogame: { name: 'Age of Empires IV' },
+                      standings: {
+                        nodes: [
+                          { entrant: { name: 'Team Primo Posto' } },
+                          { entrant: { name: 'Team Secondo Posto' } },
+                          { entrant: { name: 'Team Terzo Posto' } }
+                        ]
+                      }
+                    }],
                     config: { ...config, directLink: 'https://challonge.com/it/gyunrhoc' }
                   } as any;
                 }
