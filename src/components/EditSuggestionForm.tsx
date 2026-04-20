@@ -20,7 +20,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
   const [isSigned, setIsSigned] = useState(false);
   const [difficulty, setDifficulty] = useState<number>(2);
   const [bannerUrl, setBannerUrl] = useState('');
-  const [bannerPosition, setBannerPosition] = useState<'top' | 'center' | 'bottom'>('center');
+  const [bannerPosition, setBannerPosition] = useState<number>(50);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
     isVisible: false,
@@ -58,7 +58,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
     setBoSteps([{ time: '', action: '', note: '' }]);
     setDifficulty(2);
     setBannerUrl('');
-    setBannerPosition('center');
+    setBannerPosition(50);
     setIsSigned(false);
   }, [user?.email]);
 
