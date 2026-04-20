@@ -9,11 +9,13 @@ interface TournamentConfig {
   slug: string;
   source: 'startgg' | 'challonge';
   organizer: string;
+  directLink?: string;
+  period?: string;
 }
 
 const TOURNAMENTS: TournamentConfig[] = [
-  { slug: 'torneo-1v1-2026', source: 'startgg', organizer: 'marcotamby' },
-  { slug: 'gyunrhoc', source: 'challonge', organizer: 'Kani' }
+  { slug: 'torneo-1v1-2026', source: 'startgg', organizer: 'marcotamby', period: 'Gennaio - Febbraio 2026' },
+  { slug: 'gyunrhoc', source: 'challonge', organizer: 'Kani', period: 'Marzo 2026' }
 ];
 
 export function TournamentsPage() {
@@ -167,17 +169,24 @@ export function TournamentsPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0d1424] to-transparent"></div>
                   
                   {/* Status Badge */}
-                  <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 text-yellow-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
-                    </span>
-                    Informazioni Disponibili
+                  <div className="absolute top-4 right-4 flex flex-col items-end gap-2 z-20">
+                    <div className="px-3 py-1 rounded-full bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 text-yellow-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
+                      </span>
+                      Informazioni Disponibili
+                    </div>
+                    <div className="px-3 py-1 rounded-full bg-red-500/10 backdrop-blur-md border border-red-500/20 text-red-500/80 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-lg">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500/80"></span>
+                      Concluso
+                    </div>
                   </div>
                 </div>
 
                 {/* Content Section */}
-                <div className="p-6">
+                {/* Aggiunto bg-[#121620] z-10 flex-grow e -mt-[1px] per coprire il gap di 1px causato dal subpixel rendering in fase di scaling immagine */}
+                <div className="p-6 relative z-10 bg-[#121620] -mt-[1px] flex flex-col flex-grow">
                   <div className="flex items-center gap-2 text-yellow-500/60 mb-2">
                     <Trophy size={14} />
                     <span className="text-[10px] font-bold uppercase tracking-widest text-[#D4AF37]">organizzato da {tournament.config.organizer}</span>
@@ -190,7 +199,7 @@ export function TournamentsPage() {
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center gap-3 text-gray-400 text-sm font-medium">
                       <Calendar size={16} className="text-yellow-500/40" />
-                      <span>{tournament.events?.[0]?.name || 'Evento AoE4'}</span>
+                      <span>{tournament.config.period || tournament.events?.[0]?.name || 'Evento AoE4'}</span>
                     </div>
                     <div className="flex items-center gap-3 text-gray-400 text-sm font-medium">
                       <Users size={16} className="text-yellow-500/40" />
