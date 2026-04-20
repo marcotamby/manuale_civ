@@ -155,6 +155,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
   // Q&A State
   const [questions, setQuestions] = useState<any[]>([]);
+  const [qaLoading, setQaLoading] = useState(false);
+  const [questionText, setQuestionText] = useState('');
   const [isSignOpen, setIsSignOpen] = useState(false);
   const [expandedBOs, setExpandedBOs] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState<'bonuses' | 'army' | 'landmarks' | 'buildorders'>('bonuses');
