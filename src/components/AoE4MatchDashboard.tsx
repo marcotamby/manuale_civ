@@ -25,6 +25,7 @@ const DEFAULT_STATE: OverlayState = {
 export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
   const [state, setState] = useState<OverlayState | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isConfirmingReset, setIsConfirmingReset] = useState(false);
 
   useEffect(() => {
     console.log('Loading initial overlay state...');
@@ -66,9 +67,8 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
   }, []);
 
   const resetMatch = () => {
-    if (confirm('Sei sicuro di voler svuotare tutti i campi? Questa operazione non può essere annullata.')) {
-      setState(DEFAULT_STATE);
-    }
+    setState(DEFAULT_STATE);
+    setIsConfirmingReset(false);
   };
 
     const [showSuccess, setShowSuccess] = useState(false);
@@ -174,15 +174,34 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
       {/* Universal Reset & Sync Quick Actions */}
       <div className="flex justify-between items-center bg-white/5 border border-white/10 rounded-2xl p-4 mb-4">
         <div className="flex items-center gap-4">
-          <h2 className="text-sm font-black text-white uppercase tracking-widest">Configurazione Match</h2>
-          <button
-            onClick={resetMatch}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white rounded-lg text-[10px] font-black uppercase hover:bg-red-500 transition-all shadow-lg shadow-red-900/20"
-          >
-            <Trash2 size={14} /> Reset
-          </button>
+          <h2 className="text-sm font-black text-white uppercase tracking-widest hidden sm:block">Configurazione Match</h2>
+          
+          {!isConfirmingReset ? (
+            <button
+              onClick={() => setIsConfirmingReset(true)}
+              className="flex items-center gap-1.5 px-4 py-2 bg-red-600/20 border border-red-500/30 text-red-500 rounded-lg text-[10px] font-black uppercase hover:bg-red-500 hover:text-white transition-all whitespace-nowrap"
+            >
+              <Trash2 size={14} /> Reset Campi
+            </button>
+          ) : (
+            <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2 duration-300">
+              <span className="text-[10px] font-bold text-red-400 uppercase mr-2">Sei sicuro?</span>
+              <button
+                onClick={resetMatch}
+                className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-[10px] font-black uppercase hover:bg-red-500 transition-all border border-red-400"
+              >
+                Sì, Resetta
+              </button>
+              <button
+                onClick={() => setIsConfirmingReset(false)}
+                className="px-3 py-1.5 bg-white/10 text-gray-300 rounded-lg text-[10px] font-black uppercase hover:bg-white/20 transition-all border border-white/10"
+              >
+                Annulla
+              </button>
+            </div>
+          )}
         </div>
-        <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+        <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest text-right">
           Sincronizza per rendere le modifiche live
         </div>
       </div>

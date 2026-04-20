@@ -151,10 +151,10 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                   <div className="flex gap-3">
                     <button
                       onClick={() => setActiveTab(activeTab === 'preview' ? 'dashboard' : 'preview')}
-                      className={`flex items-center gap-2 px-3 py-1.5 font-black rounded-lg transition-all text-[10px] uppercase border shadow-lg ${
+                      className={`flex items-center gap-2 px-3 py-1.5 font-black rounded-lg transition-all text-[10px] uppercase border shadow-lg whitespace-nowrap lg:px-4 ${
                         activeTab === 'dashboard'
                           ? 'bg-indigo-600 text-white border-indigo-400 shadow-indigo-500/20'
-                          : 'bg-white/5 text-indigo-400 border-indigo-500/30 hover:bg-indigo-500/10'
+                          : 'bg-indigo-500/10 text-indigo-300 border-indigo-500/50 hover:bg-indigo-500/20'
                       }`}
                     >
                       {activeTab === 'preview' ? <Settings size={14} /> : <ChevronLeft size={14} />}
@@ -162,7 +162,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                     </button>
                     <button
                       onClick={() => copyToClipboard(selectedOverlay.path)}
-                      className="flex items-center gap-2 px-3 py-1.5 bg-emerald-600 text-white font-black rounded-lg hover:bg-emerald-500 transition-all text-[10px] uppercase shadow-lg shadow-emerald-900/20 border border-emerald-400/30"
+                      className="flex items-center gap-2 px-3 py-1.5 bg-emerald-600 text-white font-black rounded-lg hover:bg-emerald-500 transition-all text-[10px] uppercase shadow-lg shadow-emerald-900/20 border border-emerald-400/30 whitespace-nowrap lg:px-4"
                     >
                       <Copy size={14} /> Copia URL
                     </button>
@@ -170,7 +170,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                       href={selectedOverlay.path}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-1.5 bg-sky-600 text-white font-black rounded-lg hover:bg-sky-500 transition-all text-[10px] uppercase border border-sky-400/30 shadow-lg shadow-sky-900/20"
+                      className="flex items-center gap-2 px-3 py-1.5 bg-sky-600 text-white font-black rounded-lg hover:bg-sky-500 transition-all text-[10px] uppercase border border-sky-400/30 shadow-lg shadow-sky-900/20 whitespace-nowrap lg:px-4"
                     >
                       <ExternalLink size={14} /> Apri Overlay
                     </a>
