@@ -26,12 +26,12 @@ const PresenceContext = createContext<PresenceContextType | undefined>(undefined
 const DISABLE_PRESENCE = false; // Phase 1: background logic reactivated
 
 export function PresenceProvider({ children }: { children: React.ReactNode }) {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isStreamer } = useAuth();
   const [activeAdmins, setActiveAdmins] = useState<Record<string, PresenceState>>({});
   const [channel, setChannel] = useState<any>(null);
 
   useEffect(() => {
-    if (DISABLE_PRESENCE || !isAdmin || !user || !user.email) {
+    if (DISABLE_PRESENCE || (!isAdmin && !isStreamer) || !user || !user.email) {
       setActiveAdmins({});
       setChannel(null);
       return;
@@ -118,7 +118,7 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
     return () => {
       adminChannel.unsubscribe();
     };
-  }, [isAdmin, user?.email]);
+  }, [isAdmin, isStreamer, user?.email]);
 
   const updateActivity = async (activity: PresenceState['activity']) => {
     if (channel && user && user.email) {

@@ -20,7 +20,7 @@ interface TopbarProps {
 }
 
 export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps) {
-  const { isAuthenticated, isAdmin, isSuperAdmin, user, logout, openLoginModal, favorites } = useAuth();
+  const { isAuthenticated, isAdmin, isSuperAdmin, isStreamer, user, logout, openLoginModal, favorites } = useAuth();
   const { civilizations } = useCivData();
   const { activeAdmins: _activeAdmins } = usePresence();
   const [pendingCount, setPendingCount] = useState(0);
@@ -184,7 +184,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
           <Trophy size={14} className="group-hover:scale-110 transition-transform" />
           Tornei
         </Link>
-        {isAdmin && window.innerWidth >= 1024 && (
+        {(isAdmin || isStreamer) && user?.email !== 'alessio.bella97@gmail.com' && window.innerWidth >= 1024 && (
           <button
             onClick={onOpenAdminOverlay}
             className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-fuchsia-500/30 text-fuchsia-400 hover:bg-fuchsia-500/20 hover:border-fuchsia-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
@@ -224,7 +224,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
       {/* Auth / Right side */}
       <div className="flex items-center justify-center md:justify-end w-full md:w-1/3 gap-4">
         {isAuthenticated ? (
-          isAdmin ? (
+          (isAdmin || isStreamer) ? (
             <div className="flex items-center gap-3 md:gap-4 font-sans">
               {/* Active presence indicators - Only visible on Desktop */}
               {Object.keys(_activeAdmins).length > 0 && (
@@ -261,7 +261,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
                 )}
                 <div className="flex flex-col text-left">
                   <span className="font-bold hidden md:block text-xs leading-none text-white/90 uppercase tracking-widest">Il Tuo Profilo</span>
-                  <span className="text-[10px] text-yellow-600 font-bold uppercase tracking-widest leading-none mt-1">{isSuperAdmin ? 'Admin' : 'Editor'}</span>
+                  <span className="text-[10px] text-yellow-600 font-bold uppercase tracking-widest leading-none mt-1">{isStreamer ? 'Streamer' : 'Admin'}</span>
                 </div>
               </button>
 

@@ -15,6 +15,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isSuperAdmin: boolean;
   isEditor: boolean;
+  isStreamer: boolean;
   user: UserData | null;
   favorites: string[];
   isLoginModalOpen: boolean;
@@ -34,12 +35,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [isEditor, setIsEditor] = useState(false);
+  const [isStreamer, setIsStreamer] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const SUPER_ADMIN_EMAILS = ['marcotamby@gmail.com', 'marco.tamborrino.94@gmail.com'];
   const EDITOR_EMAILS = ['alessio.bella97@gmail.com', 'contattodisparta@gmail.com'];
+  const STREAMER_EMAILS = ['cani.vincenzo@gmail.com'];
 
   const checkRoles = (userData: UserData) => {
     const email = userData.email?.toLowerCase();
@@ -47,11 +50,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     const isSA = (email && SUPER_ADMIN_EMAILS.includes(email)) || name === 'admin' || name?.includes('marcotamby');
     const isEd = email && EDITOR_EMAILS.includes(email);
+    const isStr = email && STREAMER_EMAILS.includes(email);
     
     setIsSuperAdmin(!!isSA);
     setIsEditor(!!isEd);
+    setIsStreamer(!!isStr);
     setIsAdmin(!!isSA || !!isEd);
-    console.log('🔐 Auth roles checked:', { email, name, isSA, isEd, isAdmin: !!isSA || !!isEd });
+    console.log('🔐 Auth roles checked:', { email, name, isSA, isEd, isStr, isAdmin: !!isSA || !!isEd });
   };
 
   // Load user from storage on mount
@@ -228,6 +233,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAdmin(false);
     setIsSuperAdmin(false);
     setIsEditor(false);
+    setIsStreamer(false);
     setUser(null);
     setFavorites([]); // Clear favorites state on logout
     localStorage.removeItem('auth_user');
@@ -307,6 +313,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAdmin,
       isSuperAdmin,
       isEditor,
+      isStreamer,
       user,
       favorites,
       isLoginModalOpen,
