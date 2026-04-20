@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1adbe069-d4d6-446e-bddc-59693fec8917",
+    "title": "Cosa trovo nelle sezioni?",
+    "icon_name": "Layers",
+    "display_order": 0,
+    "created_at": "2026-03-13T20:44:16.356043+00:00",
+    "updated_at": "2026-03-13T20:44:16.356043+00:00"
+  },
+  {
+    "id": "b4196621-9821-4d98-9500-d5f873fdd3f2",
+    "title": "Funzioni Importanti",
+    "icon_name": "Zap",
+    "display_order": 1,
+    "created_at": "2026-03-13T20:44:16.54019+00:00",
+    "updated_at": "2026-03-13T20:44:16.54019+00:00"
+  }
+]
