@@ -144,7 +144,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
             {selectedOverlay ? (
               <>
                 <div className="flex items-start justify-between mb-6">
-                  <div className="max-w-[400px]">
+                  <div className="max-w-[280px]">
                     <h3 className="text-2xl font-bold text-white mb-1">{selectedOverlay.name}</h3>
                     <p className="text-sm text-gray-400 leading-snug">{selectedOverlay.description}</p>
                   </div>
