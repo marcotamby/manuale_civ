@@ -67,7 +67,7 @@ export function TournamentsPage() {
                 if (config.slug === 'gyunrhoc' || config.slug === '17624499') {
                   return {
                     id: 'gyunrhoc',
-                    name: 'Vetro e Oro (Challonge)',
+                    name: "Torneo degli scudi d'oro",
                     slug: config.slug,
                     images: [{ url: '/vetro_oro.jpg' }], // L'utente dovrà mettere un'immagine chiamata 'vetro_oro.jpg' nella cartella 'public'
                     events: [{ 
@@ -75,9 +75,9 @@ export function TournamentsPage() {
                       videogame: { name: 'Age of Empires IV' },
                       standings: {
                         nodes: [
-                          { entrant: { name: 'Team Primo Posto' } },
-                          { entrant: { name: 'Team Secondo Posto' } },
-                          { entrant: { name: 'Team Terzo Posto' } }
+                          { entrant: { name: 'Va bene tutto' } },
+                          { entrant: { name: 'Scarsicomelammerda' } },
+                          { entrant: { name: 'Cerbero' } }
                         ]
                       }
                     }],
