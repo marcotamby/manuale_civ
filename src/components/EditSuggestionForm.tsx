@@ -313,62 +313,70 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
             </div>
 
             <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Immagine Banner (JPG/PNG)</label>
               <div className="flex gap-2">
-                <div className="flex-1">
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Immagine Banner (JPG/PNG)</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Inserisci link immagine o carica file..."
-                      value={bannerUrl}
-                      onChange={(e) => setBannerUrl(e.target.value)}
-                      className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-blue-300 focus:outline-none focus:border-blue-500 transition-colors"
-                    />
-                    <label className={`cursor-pointer flex items-center justify-center p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors w-12 h-full shrink-0 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
-                       <input 
-                         type="file" 
-                         className="hidden" 
-                         accept="image/*"
-                         onChange={handleFileUpload}
-                       />
-                       {isUploading ? (
-                         <Loader2 size={20} className="text-yellow-500 animate-spin" />
-                       ) : (
-                         <Upload size={20} className="text-gray-400" />
-                       )}
-                    </label>
-                  </div>
-                </div>
-                <div className="w-24">
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Allinea</label>
-                  <select
-                    value={bannerPosition}
-                    onChange={(e) => setBannerPosition(e.target.value as any)}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-[11px] text-white text-xs focus:outline-none focus:border-blue-500"
-                  >
-                    <option value="top">Sopra</option>
-                    <option value="center">Centro</option>
-                    <option value="bottom">Sotto</option>
-                  </select>
-                </div>
+                <input
+                  type="text"
+                  placeholder="Inserisci link immagine o carica file..."
+                  value={bannerUrl}
+                  onChange={(e) => setBannerUrl(e.target.value)}
+                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-blue-300 focus:outline-none focus:border-blue-500 transition-colors"
+                />
+                <label className={`cursor-pointer flex items-center justify-center p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors w-12 h-full shrink-0 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                   <input 
+                     type="file" 
+                     className="hidden" 
+                     accept="image/*"
+                     onChange={handleFileUpload}
+                   />
+                   {isUploading ? (
+                     <Loader2 size={20} className="text-yellow-500 animate-spin" />
+                   ) : (
+                     <Upload size={20} className="text-gray-400" />
+                   )}
+                </label>
               </div>
+              
               {bannerUrl && (
-                <div className="mt-2 relative h-32 w-full rounded-xl overflow-hidden border border-white/10 group/preview">
-                  <img 
-                    src={bannerUrl} 
-                    alt="Anteprima" 
-                    className="w-full h-full object-cover" 
-                    style={{ objectPosition: bannerPosition }}
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex items-center justify-center">
-                     <button 
-                       type="button"
-                       onClick={() => setBannerUrl('')}
-                       className="p-1 px-3 bg-red-600 text-xs font-bold text-white rounded-lg uppercase flex items-center gap-1 shadow-lg"
-                     >
-                       <Trash2 size={12} /> Rimuovi
-                     </button>
+                <div className="space-y-3 mt-4">
+                  <div className="bg-black/40 border border-white/10 rounded-xl p-3">
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Inquadratura Verticale</label>
+                      <span className="text-[10px] font-mono text-yellow-500">{bannerPosition}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={bannerPosition}
+                      onChange={(e) => setBannerPosition(Number(e.target.value))}
+                      className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-yellow-500"
+                    />
                   </div>
+
+                  <div className="relative h-40 w-full rounded-xl overflow-hidden border border-white/10 group/preview">
+                    <img 
+                      src={bannerUrl} 
+                      alt="Anteprima" 
+                      className="w-full h-full object-cover transition-all duration-300" 
+                      style={{ objectPosition: `50% ${bannerPosition}%` }}
+                    />
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/preview:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                       <div className="bg-yellow-500/10 border border-yellow-500/50 px-3 py-1 rounded text-[10px] text-yellow-500 uppercase font-black">
+                         Anteprima Taglio
+                       </div>
+                       <button 
+                         type="button"
+                         onClick={() => setBannerUrl('')}
+                         className="p-1 px-4 bg-red-600 text-xs font-bold text-white rounded-lg uppercase flex items-center gap-1 shadow-2xl"
+                       >
+                         <Trash2 size={12} /> Rimuovi Immagine
+                       </button>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-gray-500 italic text-center">
+                    Trascina lo slider per centrare il soggetto dell'immagine (es. il volto o l'unità principale).
+                  </p>
                 </div>
               )}
             </div>

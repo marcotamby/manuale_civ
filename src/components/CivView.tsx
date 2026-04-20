@@ -707,7 +707,12 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                       {/* Banner */}
                       <div className="relative h-40 w-full overflow-hidden bg-black/40">
                         {bo.banner_url ? (
-                          <img src={bo.banner_url} alt={bo.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                          <img 
+                            src={bo.banner_url} 
+                            alt={bo.title} 
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                            style={{ objectPosition: (bo.banner_position !== undefined) ? `50% ${bo.banner_position}%` : 'center center' }}
+                          />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <Map size={48} className="text-white/10" />
@@ -789,7 +794,12 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   {/* Header / Banner */}
                   <div className="relative h-48 md:h-64 shrink-0 overflow-hidden">
                     {selectedBO.banner_url ? (
-                      <img src={selectedBO.banner_url} alt="" className="w-full h-full object-cover" />
+                      <img 
+                        src={selectedBO.banner_url} 
+                        alt="" 
+                        className="w-full h-full object-cover" 
+                        style={{ objectPosition: (selectedBO.banner_position !== undefined) ? `50% ${selectedBO.banner_position}%` : 'center center' }}
+                      />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-[#1a1c23] to-black flex items-center justify-center">
                         <Map size={64} className="text-white/5" />
@@ -1014,6 +1024,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                           src={`https://img.youtube.com/vi/${finalId}/maxresdefault.jpg`}
                           alt="Video Thumbnail"
                           className="w-full h-full object-cover opacity-100 md:opacity-80 md:group-hover:opacity-100 transition-opacity"
+                          style={{ objectPosition: 'center center' }}
                           onLoad={(e) => {
                             const target = e.target as HTMLImageElement;
                             if (target.naturalWidth === 120 && target.naturalHeight === 90) {

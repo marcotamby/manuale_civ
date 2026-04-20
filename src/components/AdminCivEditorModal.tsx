@@ -575,7 +575,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
               <div ref={sectionRefs.buildorders} className="bg-black/30 border border-yellow-500/30 rounded-xl p-4">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="font-bold text-yellow-400 flex items-center gap-2"><Map size={18} /> Build Orders</h4>
-                  <button onClick={() => addToArray('buildOrders', { id: `bo-${Date.now()}`, title: '', difficulty: 2, description: '', steps: [], banner_url: '' })} className="text-xs bg-yellow-600 hover:bg-yellow-500 text-white px-2 py-1 rounded flex items-center gap-1">
+                  <button onClick={() => addToArray('buildOrders', { id: `bo-${Date.now()}`, title: '', difficulty: 2, description: '', steps: [], banner_url: '', banner_position: 50 })} className="text-xs bg-yellow-600 hover:bg-yellow-500 text-white px-2 py-1 rounded flex items-center gap-1">
                     <Plus size={14} /> Aggiungi
                   </button>
                 </div>
@@ -628,15 +628,41 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                           </label>
                         </div>
                         {bo.banner_url && (
-                          <div className="mt-1 relative h-24 w-full rounded-lg overflow-hidden border border-white/10 group/preview">
-                            <img src={bo.banner_url} alt="Preview" className="w-full h-full object-cover" />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex items-center justify-center">
-                               <button 
-                                 onClick={() => updateArrayField('buildOrders', idx, 'banner_url', '')}
-                                 className="p-1 px-2 bg-red-600 text-[10px] font-bold text-white rounded uppercase flex items-center gap-1"
-                               >
-                                 <Trash2 size={10} /> Rimuovi
-                               </button>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center bg-black/30 p-2 rounded-lg border border-gray-700/50">
+                              <div className="flex-1">
+                                <div className="flex justify-between items-center mb-1 pr-2">
+                                  <label className="text-[10px] text-gray-500 uppercase font-bold">Inquadratura Verticale</label>
+                                  <span className="text-[10px] text-yellow-500 font-mono">{bo.banner_position ?? 50}%</span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="100"
+                                  value={bo.banner_position ?? 50}
+                                  onChange={e => updateArrayField('buildOrders', idx, 'banner_position', Number(e.target.value))}
+                                  className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-yellow-500"
+                                />
+                              </div>
+                            </div>
+                            <div className="mt-1 relative h-32 w-full rounded-lg overflow-hidden border border-white/10 group/preview">
+                              <img 
+                                src={bo.banner_url} 
+                                alt="Preview" 
+                                className="w-full h-full object-cover transition-all duration-300" 
+                                style={{ objectPosition: `50% ${bo.banner_position ?? 50}%` }}
+                              />
+                              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/preview:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                                <div className="bg-yellow-500/10 border border-yellow-500/50 px-2 py-1 rounded text-[10px] text-yellow-500 uppercase font-black">
+                                  Anteprima Taglio
+                                </div>
+                                <button 
+                                  onClick={() => updateArrayField('buildOrders', idx, 'banner_url', '')}
+                                  className="p-1 px-3 bg-red-600 text-[10px] font-bold text-white rounded uppercase flex items-center gap-1 shadow-xl"
+                                >
+                                  <Trash2 size={10} /> Rimuovi Immagine
+                                </button>
+                              </div>
                             </div>
                           </div>
                         )}
@@ -746,13 +772,18 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block text-blue-400">Nickname Autore</label>
+                          <div className="w-32">
+                            <div className="flex justify-between items-center mb-1">
+                              <label className="text-[10px] text-gray-500 uppercase font-bold">Posizione Y</label>
+                              <span className="text-[10px] text-yellow-500 font-mono">{bo.banner_position ?? 50}%</span>
+                            </div>
                             <input
-                              type="text"
-                              value={bo.author_nickname || ''}
-                              onChange={e => updateArrayField('buildOrders', idx, 'author_nickname', e.target.value)}
-                              className="w-full bg-gray-800 text-white text-sm rounded px-3 py-2 border border-gray-600 focus:border-blue-500 outline-none"
+                              type="range"
+                              min="0"
+                              max="100"
+                              value={bo.banner_position ?? 50}
+                              onChange={e => updateArrayField('buildOrders', idx, 'banner_position', Number(e.target.value))}
+                              className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-yellow-500"
                             />
                           </div>
                           <div>

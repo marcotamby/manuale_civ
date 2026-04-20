@@ -55,7 +55,7 @@ export interface BuildOrder {
   author_nickname?: string;
   author_rank?: string;
   banner_url?: string;
-  banner_position?: 'top' | 'center' | 'bottom';
+  banner_position?: number;
 }
 
 export interface Civilization {
