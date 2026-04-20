@@ -141,7 +141,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
       {/* Left container for social links on desktop */}
       <div className="hidden md:flex w-1/3 items-center justify-start gap-3">
         <a
-          href="https://discord.gg/XmFhYzwC"
+          href="https://discord.gg/8Tx2YdXrEu"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/20 hover:border-indigo-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
