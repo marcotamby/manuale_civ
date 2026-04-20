@@ -121,7 +121,7 @@ function App() {
       setIsSidebarOpen(true);
     }
   };
-  const { favorites, isLoginModalOpen, closeLoginModal, isAuthenticated, isAdmin } = useAuth();
+  const { favorites, isLoginModalOpen, closeLoginModal, isAuthenticated, isAdmin, isStreamer } = useAuth();
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const { civilizations: civilizationsData, loading, error, refreshCivs, updateCivLocally, updateGlobalUnitLocally } = useCivData();
@@ -298,7 +298,7 @@ function App() {
         />
       )}
 
-      {isAuthenticated && isAdmin && (
+      {isAuthenticated && (isAdmin || isStreamer) && (
         <AdminOverlayModal
           isOpen={isAdminOverlayOpen}
           onClose={() => setIsAdminOverlayOpen(false)}
