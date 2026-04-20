@@ -180,7 +180,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       if (v.vote === 1) counts[v.build_order_id].up++;
       else counts[v.build_order_id].down++;
       
-      if (user && v.user_id === user.id) {
+      if (user && v.user_email === user.email) {
         counts[v.build_order_id].userVote = v.vote;
       }
     });
@@ -220,11 +220,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         await supabase
           .from('build_order_votes')
           .delete()
-          .match({ user_id: user.id, build_order_id: boId });
+          .match({ user_email: user.email, build_order_id: boId });
       } else {
         await supabase
           .from('build_order_votes')
-          .upsert({ user_id: user.id, build_order_id: boId, vote: value });
+          .upsert({ user_email: user.email, build_order_id: boId, vote: value });
       }
     } catch (e) {
       console.error(e);
@@ -234,7 +234,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
   useEffect(() => {
     if (civ?.buildOrders) fetchVotes();
-  }, [civ?.buildOrders, user?.id]);
+  }, [civ?.buildOrders, user?.email]);
 
   const fetchQA = async () => {
     try {
