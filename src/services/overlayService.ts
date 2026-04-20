@@ -1,4 +1,6 @@
 import { supabase } from '../lib/supabaseClient';
+// Real-time overlay service for AoE4 match data sync
+
 
 export interface OverlayState {
   t1: { name: string; score: number; players: string[] };
