@@ -744,7 +744,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "jeannedarc",
     name: "Giovanna d'Arco",
-    flag: "/civs/Jeanne d'Arc.webp",
+    flag: "/civs/jeannedarc.webp",
     difficulty: "Difficile",
     shortDescription: "A hero-led civilization where Jeanne d'Arc levels up and leads her army to victory.",
     passiveBonuses: ["Jeanne d'Arc gains experience from building, combat, and landmarks to unlock powerful abilities.", "Highly aggressive and tempo-based."],
