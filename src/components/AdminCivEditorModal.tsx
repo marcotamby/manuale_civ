@@ -663,27 +663,18 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
 
                         {bo.banner_url && (
                           <div className="space-y-2 mt-2">
-                            <div className="flex justify-between items-center bg-black/30 p-2 rounded-lg border border-gray-700/50">
-                              <div className="flex-1">
-                                <div className="flex justify-between items-center mb-1 pr-2">
-                                  <label className="text-[10px] text-gray-500 uppercase font-bold flex items-center gap-1">
-                                    <MoveVertical size={10} /> Inquadratura Verticale 
-                                    <span className="text-[8px] normal-case font-medium ml-1">(Trascina l'anteprima sotto)</span>
-                                  </label>
-                                  <span className="text-[10px] text-yellow-500 font-mono">{bo.banner_position ?? 50}%</span>
-                                </div>
-                                <input
-                                  type="range"
-                                  min="0"
-                                  max="100"
-                                  value={bo.banner_position ?? 50}
-                                  onChange={e => updateArrayField('buildOrders', idx, 'banner_position', Number(e.target.value))}
-                                  className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-yellow-500"
-                                />
+                            <div className="flex justify-between items-center bg-black/30 px-3 py-1.5 rounded-t-lg border-t border-x border-gray-700/50">
+                              <label className="text-[9px] text-gray-500 uppercase font-black flex items-center gap-1.5">
+                                <MoveVertical size={12} className="text-yellow-500" /> 
+                                Inquadratura Build Order 
+                                <span className="text-[8px] normal-case font-medium text-gray-600 ml-1">(Trascina l'immagine)</span>
+                              </label>
+                              <div className="flex items-center gap-2">
+                                <span className="text-[9px] text-yellow-500/50 font-mono">{bo.banner_position ?? 50}%</span>
                               </div>
                             </div>
                             <div 
-                              className={`mt-1 relative h-32 w-full rounded-lg overflow-hidden border-2 transition-all duration-300 group/preview cursor-move ${dragState ? 'border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.2)]' : 'border-white/10'}`}
+                              className={`relative w-full aspect-[4/1] rounded-b-lg overflow-hidden border-2 transition-all duration-300 group/preview cursor-move ${dragState ? 'border-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.3)]' : 'border-gray-700/50'}`}
                               onMouseDown={(e) => startDrag(e, idx, bo.banner_position ?? 50)}
                             >
                               <img 

@@ -376,26 +376,17 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
               
               {bannerUrl && (
                 <div className="space-y-3 mt-4">
-                  <div className="bg-black/40 border border-white/10 rounded-xl p-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                        <MoveVertical size={12} /> Inquadratura Verticale
-                        <span className="text-[8px] normal-case font-medium ml-1 text-gray-500">(Trascina l'anteprima sotto)</span>
-                      </label>
-                      <span className="text-[10px] font-mono text-yellow-500">{bannerPosition}%</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={bannerPosition}
-                      onChange={(e) => setBannerPosition(Number(e.target.value))}
-                      className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-yellow-500"
-                    />
+                  <div className="bg-black/60 border-t border-x border-white/10 rounded-t-2xl px-4 py-2 flex justify-between items-center">
+                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                      <MoveVertical size={14} className="text-yellow-500" />
+                      Inquadratura Finale Build Order
+                      <span className="text-[8px] normal-case font-medium text-gray-600 block md:inline ml-1">(Trascina l'anteprima sotto)</span>
+                    </label>
+                    <span className="text-[10px] font-mono text-yellow-500/50">{bannerPosition}%</span>
                   </div>
 
                   <div 
-                    className={`relative h-48 w-full rounded-2xl overflow-hidden border-2 transition-all duration-300 group/preview cursor-move ${dragState ? 'border-yellow-500 shadow-[0_0_30px_rgba(234,179,8,0.3)]' : 'border-white/10 hover:border-white/20'}`}
+                    className={`relative w-full aspect-[4/1] rounded-b-2xl overflow-hidden border-2 transition-all duration-300 group/preview cursor-move ${dragState ? 'border-yellow-500 shadow-[0_0_40px_rgba(234,179,8,0.3)]' : 'border-white/10 hover:border-white/20'}`}
                     onMouseDown={(e) => startDrag(e, bannerPosition)}
                   >
                     <img 
