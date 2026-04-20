@@ -156,7 +156,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
             (window as any).closeAllModals?.();
             (window as any).resetHomeFilters?.();
           }}
-          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/20 hover:border-yellow-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
+          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-sky-500/30 text-sky-400 hover:bg-sky-500/20 hover:border-sky-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
           title="Domande Frequenti"
         >
           <HelpCircle size={14} className="group-hover:scale-110 transition-transform" />
@@ -166,7 +166,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
           href="https://ko-fi.com/marcotamby"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-amber-500/30 text-amber-500 hover:bg-amber-500/20 hover:border-amber-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
+          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 hover:border-rose-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
           title="Sostieni il progetto su Ko-fi"
         >
           <Coffee size={14} className="group-hover:scale-110 transition-transform" />
@@ -178,7 +178,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
             (window as any).closeAllModals?.();
             (window as any).resetHomeFilters?.();
           }}
-          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/20 hover:border-yellow-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
+          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
           title="Tornei Ufficiali"
         >
           <Trophy size={14} className="group-hover:scale-110 transition-transform" />
@@ -187,7 +187,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
         {isAdmin && window.innerWidth >= 1024 && (
           <button
             onClick={onOpenAdminOverlay}
-            className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/20 hover:border-yellow-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
+            className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-fuchsia-500/30 text-fuchsia-400 hover:bg-fuchsia-500/20 hover:border-fuchsia-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
             title="Gestione Overlay Stream"
           >
             <Monitor size={14} className="group-hover:scale-110 transition-transform" />
