@@ -55,6 +55,14 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
         const normalizedState = {
           ...DEFAULT_STATE,
           ...savedState,
+          t1: {
+            ...(savedState.t1 || DEFAULT_STATE.t1),
+            name: (savedState.t1?.name === 'Team A' || !savedState.t1?.name) ? '' : savedState.t1.name
+          },
+          t2: {
+            ...(savedState.t2 || DEFAULT_STATE.t2),
+            name: (savedState.t2?.name === 'Team B' || !savedState.t2?.name) ? '' : savedState.t2.name
+          },
           maps: normalizedMaps
         };
         
