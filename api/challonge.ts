@@ -76,13 +76,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     });
 
+    const fetchHeaders: Record<string, string> = {
+      'Authorization': `Bearer ${token}`,
+      'Authorization-Type': 'v2',
+      'Accept': 'application/json'
+    };
+    
+    // Only add API-specific Accept and Content-Type for specific methods, or handle Challonge's strict requirement for v2.1
+    // Actually Challonge strictly requires Accept: application/json for some endpoints or vnd.api+json for v2
+    fetchHeaders['Accept'] = 'application/vnd.api+json';
+    if (req.method !== 'GET') {
+      fetchHeaders['Content-Type'] = 'application/vnd.api+json';
+    }
+
     const response = await fetch(url.toString(), {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Authorization-Type': 'v2',
-        'Content-Type': 'application/vnd.api+json',
-        'Accept': 'application/vnd.api+json'
-      },
+      method: req.method || 'GET',
+      headers: fetchHeaders,
     });
 
     if (!response.ok) {

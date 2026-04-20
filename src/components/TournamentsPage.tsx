@@ -13,7 +13,7 @@ interface TournamentConfig {
 
 const TOURNAMENTS: TournamentConfig[] = [
   { slug: 'torneo-1v1-2026', source: 'startgg', organizer: 'marcotamby' },
-  { slug: '17624499', source: 'challonge', organizer: 'Kani' }
+  { slug: 'gyunrhoc', source: 'challonge', organizer: 'Kani' }
 ];
 
 export function TournamentsPage() {
