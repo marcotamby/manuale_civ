@@ -26,9 +26,9 @@ export function AoE4MatchDashboard({ onSuccess, onError }: AoE4MatchDashboardPro
     try {
       await overlayService.updateOverlayState('aoe4-match', state);
       onSuccess('Overlay sincronizzato con successo! 🚀');
-    } catch (error) {
-      console.error(error);
-      onError('Errore durante la sincronizzazione.');
+    } catch (error: any) {
+      console.error('Errore Supabase completo:', error);
+      onError(`Errore durante la sincronizzazione: ${error.message || 'Errore generico'}`);
     } finally {
       setIsSaving(false);
     }
