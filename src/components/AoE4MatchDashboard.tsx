@@ -20,19 +20,23 @@ export function AoE4MatchDashboard({ onSuccess, onError }: AoE4MatchDashboardPro
     });
   }, []);
 
-  const handleSave = async () => {
-    if (!state) return;
-    setIsSaving(true);
-    try {
-      await overlayService.updateOverlayState('aoe4-match', state);
-      onSuccess('Overlay sincronizzato con successo! 🚀');
-    } catch (error: any) {
-      console.error('Errore Supabase completo:', error);
-      onError(`Errore durante la sincronizzazione: ${error.message || 'Errore generico'}`);
-    } finally {
-      setIsSaving(false);
-    }
-  };
+    const [showSuccess, setShowSuccess] = useState(false);
+
+    const handleSave = async () => {
+      if (!state) return;
+      setIsSaving(true);
+      try {
+        await overlayService.updateOverlayState('aoe4-match', state);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+        onSuccess('Overlay sincronizzato con successo! 🚀');
+      } catch (error: any) {
+        console.error('Errore Supabase completo:', error);
+        onError(`Errore durante la sincronizzazione: ${error.message || 'Errore generico'}`);
+      } finally {
+        setIsSaving(false);
+      }
+    };
 
   const updateTeam = (team: 't1' | 't2', field: string, value: any) => {
     if (!state) return;
@@ -339,7 +343,7 @@ export function AoE4MatchDashboard({ onSuccess, onError }: AoE4MatchDashboardPro
           }`}
         >
           <Save size={24} />
-          {isSaving ? 'Sincronizzazione...' : 'Sincronizza Overlay'}
+          {isSaving ? 'Sincronizzazione...' : showSuccess ? 'Sincronizzato! ✅' : 'Sincronizza Overlay'}
         </button>
       </div>
     </div>
