@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --gold: #d4af37; --gold-bright: #ffed4a; --red: #8b0000; }
+        * { font-family: 'Inter', sans-serif !important; margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            width: 1920px; height: 1080px; color: white; overflow: hidden;
+            background: transparent; /* Per OBS */
+        }
+
+        /* Header */
+        #header { position: absolute; top: 0; width: 100%; height: 125px; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.85); border-bottom: 2px solid var(--gold); }
+        .team-box { width: 580px; text-align: center; }
+        .players-display { color: #ddd; font-size: 25px; font-weight: 400; margin-top: 2px; letter-spacing: 0.5px; }
+        .score-box { font-size: 55px; font-weight: 900; background: var(--red); min-width: 85px; text-align: center; border: 2px solid var(--gold); border-radius: 8px; margin: 0 20px; padding: 2px 14px; }
+
+        #central-divider { position: absolute; top: 200px; bottom: 400px; left: 50%; width: 2px; background: var(--gold); transform: translateX(-50%); display: none; }
+        #maps-container { position: absolute; top: 255px; width: 100%; display: flex; justify-content: center; gap: 320px; }
+        
+        @keyframes master-pulse { 0% { transform: scale(1); } 100% { transform: scale(1.04); } }
+        .map-wrapper { position: relative; width: 400px; height: 250px; }
+        .map-wrapper.active { animation: master-pulse 2s infinite alternate ease-in-out; }
+
+        .map-card { width: 100%; height: 100%; background: #000; position: relative; border: 2px solid var(--gold); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; z-index: 2; }
+        .map-card img { width: 100%; height: 200px; object-fit: cover; }
+        .map-name { height: 50px; text-align: center; line-height: 50px; font-weight: 700; color: var(--gold); text-transform: uppercase; font-size: 18px; background: #000; border-top: 1px solid var(--gold); }
+
+        .label { 
+            position: absolute; 
+            top: -55px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: var(--gold-bright); 
+            color: black; 
+            padding: 6px 30px; 
+            font-weight: 900; 
+            border-radius: 4px; 
+            z-index: 10; 
+            text-transform: uppercase; 
+            font-size: 18px; 
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+            white-space: nowrap;
+        }
+
+        .civ-icons { position: absolute; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 20; }
+        .civ-icons.left { left: -95px; } .civ-icons.right { right: -95px; }
+        .civ-unit { width: 75px; height: 75px; position: relative; }
+        .civ-dot { width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; background-position: center; background-color: #000; }
+
+        .crown { position: absolute; top: -55px; left: 50%; transform: translateX(-50%); font-size: 45px; z-index: 100; filter: drop-shadow(0 0 8px gold); }
+
+        /* Timer */
+        #timer-wrap { position: absolute; bottom: 180px; left: 50%; transform: translateX(-50%); text-align: center; display: none; }
+        #timer-label { color: var(--gold); font-weight: 700; margin-bottom: 4px; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; }
+        #timer-box { font-size: 40px; font-weight: 900; background: rgba(0,0,0,0.85); padding: 8px 40px; border: 2px solid var(--gold); border-radius: 10px; min-width: 160px; }
+        .timer-finish { font-size: 24px !important; color: white; font-weight: 700 !important; }
+
+        /* CASTERS */
+        #casters-container { position: absolute; bottom: 100px; width: 100%; display: flex; justify-content: space-between; padding: 0 80px; box-sizing: border-box; pointer-events: none; }
+        .caster-box { display: flex; flex-direction: column; align-items: center; gap: 10px; visibility: hidden; }
+        .webcam-frame { width: 380px; height: 214px; border: 2px solid var(--gold); background: rgba(0,0,0,0.3); border-radius: 4px; }
+        .caster-name { background: var(--gold); color: black; font-weight: 800; padding: 8px 30px; font-size: 22px; border-radius: 4px; text-transform: uppercase; min-width: 240px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div id="central-divider"></div>
+    <div id="header">
+        <div class="team-box">
+            <div id="t1-n" style="font-size:36px; font-weight:900; color:var(--gold); text-transform:uppercase;">--</div>
+            <div id="t1-p" class="players-display">--</div>
+        </div>
+        <div class="score-box" id="t1-s">0</div>
+        <div class="score-box" id="t2-s">0</div>
+        <div class="team-box">
+            <div id="t2-n" style="font-size:36px; font-weight:900; color:var(--gold); text-transform:uppercase;">--</div>
+            <div id="t2-p" class="players-display">--</div>
+        </div>
+    </div>
+    
+    <div id="maps-container"></div>
+
+    <div id="casters-container">
+        <div id="cb-1" class="caster-box">
+            <div class="webcam-frame"></div>
+            <div id="c-1-name" class="caster-name"></div>
+        </div>
+        <div id="cb-2" class="caster-box">
+            <div class="webcam-frame"></div>
+            <div id="c-2-name" class="caster-name"></div>
+        </div>
+    </div>
+
+    <div id="timer-wrap">
+        <div id="timer-label">Il game inizia tra</div>
+        <div id="timer-box">00:00</div>
+    </div>
+
+    <script>
+        // Corretto caricamento Supabase
+        const { createClient } = window['@supabase/supabase-js'];
+        const client = createClient(SUB_URL, SUB_KEY);
+
+        let curMin = 0, curSec = 0, lastTs = 0, lastMaps = "";
+
+        const civMap = {
+            "Abbasid Dynasty": "/civs/Abbasid Dynasty.webp",
+            "Ayyubids": "/civs/Ayyubids.webp",
+            "Byzantines": "/civs/Byzantines.webp",
+            "Chinese": "/civs/Chinese.webp",
+            "Delhi Sultanate": "/civs/Delhi Sultanate.webp",
+            "English": "/civs/English.webp",
+            "French": "/civs/French.webp",
+            "Golden Horde": "/civs/Golden Horde.webp",
+            "Holy Roman Empire": "/civs/Holy Roman Empire.webp",
+            "House of Lancaster": "/civs/House of Lancaster.webp",
+            "Japanese": "/civs/Japanese.webp",
+            "Jeanne d Arc": "/civs/Jeanne d'Arc.webp",
+            "Knights Templar": "/civs/Knights Templar.webp",
+            "Macedonian Dynasty": "/civs/Macedonian Dynasty.webp",
+            "Malians": "/civs/Malians.webp",
+            "Mongols": "/civs/Mongols.webp",
+            "Order of the Dragon": "/civs/Order of the Dragon.webp",
+            "Ottomans": "/civs/Ottomans.webp",
+            "Rus": "/civs/Rus.webp",
+            "Sengoku Daimyo": "/civs/Sengoku Daimyo.webp",
+            "Tughlaq Dynasty": "/civs/Tughlaq Dynasty.webp",
+            "Zhu Xis Legacy": "/civs/Zhu Xis Legacy.webp"
+        };
+
+        // Helper per gestire estensioni multiple delle mappe
+        function getMapUrl(name) {
+            if (!name) return '/maps/default.png';
+            // Se il nome contiene già un'estensione, usala
+            if (name.match(/\.(png|jpg|jpeg|webp)$/i)) return `/maps/${name}`;
+            return `/maps/${name}.png`;
+        }
+        
+        function handleImageError(img) {
+            const src = img.src;
+            if (src.endsWith('.png')) {
+                img.src = src.replace('.png', '.jpg');
+            } else if (src.endsWith('.jpg')) {
+                img.src = src.replace('.jpg', '.jpeg');
+            } else {
+                img.src = '/maps/default.png';
+            }
+        }
+
+        function render(d) {
+            document.getElementById('t1-n').innerText = d.t1.name;
+            document.getElementById('t1-p').innerText = d.t1.players.filter(p=>p).join(' • ');
+            document.getElementById('t1-s').innerText = d.t1.score;
+            document.getElementById('t2-n').innerText = d.t2.name;
+            document.getElementById('t2-p').innerText = d.t2.players.filter(p=>p).join(' • ');
+            document.getElementById('t2-s').innerText = d.t2.score;
+
+            document.getElementById('central-divider').style.display = (d.maps.length >= 2) ? 'block' : 'none';
+
+            if(JSON.stringify(d.maps) !== lastMaps) {
+                document.getElementById('maps-container').innerHTML = d.maps.map(m => `
+                    <div class="map-wrapper ${m.status === 'active' ? 'active' : ''}">
+                        ${m.status === 'active' ? '<div class="label">Prossimo Game</div>' : ''}
+                        <div class="map-card">
+                            <img src="${getMapUrl(m.name)}" onerror="handleImageError(this)">
+                            <div class="map-name">${m.name}</div>
+                        </div>
+                        <div class="civ-icons left">
+                            ${m.winner == 1 ? '<div class="crown">👑</div>' : ''}
+                            ${m.t1civs.map(c=>`<div class="civ-unit"><div class="civ-dot" style="background-image:url('${civMap[c] || c}')"></div></div>`).join('')}
+                        </div>
+                        <div class="civ-icons right">
+                            ${m.winner == 2 ? '<div class="crown">👑</div>' : ''}
+                            ${m.t2civs.map(c=>`<div class="civ-unit"><div class="civ-dot" style="background-image:url('${civMap[c] || c}')"></div></div>`).join('')}
+                        </div>
+                    </div>`).join('');
+                lastMaps = JSON.stringify(d.maps);
+            }
+
+            d.casters.forEach((c, i) => {
+                const box = document.getElementById(`cb-${i+1}`);
+                const name = document.getElementById(`c-${i+1}-name`);
+                if(c.active && c.name) { name.innerText = c.name; box.style.visibility = 'visible'; } 
+                else { box.style.visibility = 'hidden'; }
+            });
+
+            if(d.timer.active) {
+                document.getElementById('timer-wrap').style.display = 'block';
+                if(d.timer.timestamp !== lastTs) {
+                    curMin = parseInt(d.timer.min); curSec = parseInt(d.timer.sec); lastTs = d.timer.timestamp;
+                }
+            } else { document.getElementById('timer-wrap').style.display = 'none'; lastTs = 0; }
+        }
+
+        async function init() {
+            const { data } = await client.from('stream_overlays').select('state').eq('id', 'aoe4-match').single();
+            if (data) render(data.state);
+
+            client.channel('overlay-aoe4-match')
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stream_overlays', filter: 'id=eq.aoe4-match' }, 
+                payload => render(payload.new.state))
+                .subscribe();
+        }
+
+        setInterval(() => {
+            if (lastTs === 0) return;
+            const label = document.getElementById('timer-label');
+            const box = document.getElementById('timer-box');
+
+            if(curMin > 0 || curSec > 0) {
+                if(curSec === 0) { curMin--; curSec = 59; } else curSec--;
+                label.style.display = "block";
+                box.classList.remove('timer-finish');
+                box.innerText = `${String(curMin).padStart(2,'0')}:${String(curSec).padStart(2,'0')}`;
+            } else {
+                label.style.display = "none";
+                box.classList.add('timer-finish');
+                box.innerText = "Il game sta per iniziare";
+            }
+        }, 1000);
+
+        init();
+    </script>
+</body>
+</html>

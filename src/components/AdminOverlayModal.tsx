@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { X, ExternalLink, Copy, Clock, Monitor, ShieldCheck, Info } from 'lucide-react';
+import { X, ExternalLink, Copy, Clock, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft } from 'lucide-react';
+import { AoE4MatchDashboard } from './AoE4MatchDashboard';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
 
@@ -18,6 +19,7 @@ interface AdminOverlayModalProps {
 
 export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
   const [selectedOverlay, setSelectedOverlay] = useState<OverlayItem | null>(null);
+  const [activeTab, setActiveTab] = useState<'preview' | 'dashboard'>('preview');
   const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
     isVisible: false,
     message: '',
@@ -31,8 +33,14 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
       description: 'Un elegante orologio con indicatore LIVE per le tue stream.',
       path: '/overlays/clock/index.html',
       icon: Clock
+    },
+    {
+      id: 'aoe4-match',
+      name: 'AoE4 Match 3V3',
+      description: 'Overlay professionale per Match 3V3 con mappe, casters e timer.',
+      path: '/overlays/match-aoe4/index.html',
+      icon: Trophy
     }
-    // Nuovi overlay possono essere aggiunti qui
   ];
 
   useEffect(() => {
@@ -40,6 +48,10 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
       setSelectedOverlay(overlays[0]);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    setActiveTab('preview');
+  }, [selectedOverlay]);
 
   const copyToClipboard = (path: string) => {
     const fullUrl = `${window.location.origin}${path}`;
@@ -126,6 +138,17 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                   </div>
                   <div className="flex gap-3">
                     <button
+                      onClick={() => setActiveTab(activeTab === 'preview' ? 'dashboard' : 'preview')}
+                      className={`flex items-center gap-2 px-4 py-2 font-bold rounded-xl transition-all text-xs uppercase border ${
+                        activeTab === 'dashboard'
+                          ? 'bg-yellow-500 text-black border-yellow-500'
+                          : 'bg-white/5 text-yellow-500 border-yellow-500/30 hover:bg-yellow-500/10'
+                      }`}
+                    >
+                      {activeTab === 'preview' ? <Settings size={16} /> : <ChevronLeft size={16} />}
+                      {activeTab === 'preview' ? 'Configura Overlay' : 'Torna all\'Anteprima'}
+                    </button>
+                    <button
                       onClick={() => copyToClipboard(selectedOverlay.path)}
                       className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-black font-bold rounded-xl hover:bg-yellow-400 transition-all text-xs uppercase"
                     >
@@ -142,22 +165,41 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                   </div>
                 </div>
 
-                <div className="flex-1 bg-[#1a1c32] rounded-3xl border border-white/5 overflow-hidden shadow-inner relative group">
-                  <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full border border-white/10 text-[10px] font-bold text-gray-400 flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    ANTEPRIMA LIVE
-                  </div>
-                  <iframe
-                    src={selectedOverlay.path}
-                    className="w-full h-full border-none pointer-events-none"
-                    title="Overlay Preview"
-                  />
-                  <div className="absolute inset-0 bg-transparent group-hover:bg-black/5 transition-colors"></div>
-                </div>
+                <div className="flex-1 overflow-y-auto custom-scrollbar">
+                  {activeTab === 'preview' ? (
+                    <div className="h-full flex flex-col">
+                      <div className="flex-1 bg-[#1a1c32] rounded-3xl border border-white/5 overflow-hidden shadow-inner relative group min-h-[400px]">
+                        <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full border border-white/10 text-[10px] font-bold text-gray-400 flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                          ANTEPRIMA LIVE
+                        </div>
+                        <iframe
+                          src={selectedOverlay.path}
+                          className="w-full h-full border-none pointer-events-none"
+                          title="Overlay Preview"
+                        />
+                        <div className="absolute inset-0 bg-transparent group-hover:bg-black/5 transition-colors"></div>
+                      </div>
 
-                <div className="mt-4 flex items-center gap-2 text-[10px] text-gray-500 font-mono italic">
-                  <span>URL sorgente:</span>
-                  <span className="text-yellow-500/70">{window.location.origin}{selectedOverlay.path}</span>
+                      <div className="mt-4 flex items-center gap-2 text-[10px] text-gray-500 font-mono italic">
+                        <span>URL sorgente:</span>
+                        <span className="text-yellow-500/70">{window.location.origin}{selectedOverlay.path}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="animate-in slide-in-from-bottom-4 fade-in duration-500">
+                      {selectedOverlay.id === 'aoe4-match' ? (
+                        <AoE4MatchDashboard 
+                          onSuccess={(msg) => setToast({ isVisible: true, message: msg, type: 'success' })}
+                          onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })}
+                        />
+                      ) : (
+                        <div className="p-12 text-center text-gray-500 bg-white/5 rounded-3xl border border-dashed border-white/10">
+                          Configurazione rapida non ancora disponibile per questo overlay.
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </>
             ) : (
