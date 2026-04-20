@@ -27,11 +27,11 @@ export const overlayService = {
   async updateOverlayState(id: string = 'aoe4-match', state: OverlayState) {
     const { error } = await supabase
       .from('stream_overlays')
-      .update({ 
+      .upsert({ 
+        id,
         state,
         updated_at: new Date().toISOString()
-      })
-      .eq('id', id);
+      }, { onConflict: 'id' });
 
     if (error) {
       throw error;

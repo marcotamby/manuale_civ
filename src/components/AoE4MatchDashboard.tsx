@@ -176,35 +176,28 @@ export function AoE4MatchDashboard({ onSuccess, onError }: AoE4MatchDashboardPro
                 {/* Map Info */}
                 <div className="col-span-1">
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-lg bg-yellow-500/20 flex items-center justify-center text-yellow-500 font-bold text-xs">
-                      #{mIdx + 1}
-                    </div>
                     <select
                       value={map.status}
                       onChange={(e) => updateMap(mIdx, 'status', e.target.value)}
-                      className="bg-black/40 border border-white/10 rounded-lg px-2 py-1 text-[10px] font-bold text-white uppercase outline-none"
+                      className="bg-[#0f1423] border border-yellow-500/30 rounded-lg px-2 py-1 text-[10px] font-bold text-yellow-500 uppercase outline-none focus:border-yellow-500/60 cursor-pointer hover:bg-[#1a1c32] transition-all shadow-inner"
                     >
-                      <option value="active">PROSSIMO GAME</option>
-                      <option value="played">GIOCATA</option>
+                      <option value="active" className="bg-[#0f1423]">PROSSIMO GAME</option>
+                      <option value="played" className="bg-[#0f1423]">GIOCATA</option>
                     </select>
                   </div>
                   
                   <label className="text-[10px] text-gray-500 uppercase mb-1 block">Mappa</label>
                   <div className="relative">
-                    <MapIcon size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                    <input
-                      type="text"
-                      list="aoe4-maps-list"
+                    <MapIcon size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                    <select
                       value={map.name}
                       onChange={(e) => updateMap(mIdx, 'name', e.target.value)}
-                      className="w-full bg-black/40 border border-white/10 rounded-lg pl-8 pr-3 py-2 text-sm text-white outline-none mb-4 focus:border-yellow-500/50 transition-colors"
-                      placeholder="Cerca mappa..."
-                    />
-                    <datalist id="aoe4-maps-list">
+                      className="w-full bg-[#0f1423] border border-white/10 rounded-lg pl-8 pr-3 py-2 text-sm text-white outline-none mb-4 focus:border-yellow-500/50 cursor-pointer hover:bg-[#1a2035] transition-all appearance-none shadow-inner"
+                    >
                       {AOE4_MAPS.map(mapName => (
-                        <option key={mapName} value={mapName} />
+                        <option key={mapName} value={mapName} className="bg-[#0f1423] text-gray-200">{mapName}</option>
                       ))}
-                    </datalist>
+                    </select>
                   </div>
 
                   <label className="text-[10px] text-gray-500 uppercase mb-2 block">Vincitore</label>
@@ -243,8 +236,8 @@ export function AoE4MatchDashboard({ onSuccess, onError }: AoE4MatchDashboardPro
                               title={civ.name}
                               className={`w-full aspect-square rounded-full border-2 transition-all overflow-hidden ${
                                 selectedCivs.includes(civ.name)
-                                  ? 'border-yellow-500 scale-110 shadow-lg shadow-yellow-500/20'
-                                  : 'border-transparent opacity-30 grayscale hover:opacity-60'
+                                  ? 'border-yellow-500 scale-110 shadow-[0_0_20px_rgba(212,175,55,0.6)] z-10'
+                                  : 'border-white/5 opacity-60 grayscale-[40%] hover:opacity-100 hover:grayscale-0 hover:border-white/20'
                               }`}
                             >
                               <img src={civ.flag} alt={civ.name} className="w-full h-full object-cover" />

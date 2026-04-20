@@ -197,13 +197,39 @@
         }
 
         async function init() {
-            const { data } = await client.from('stream_overlays').select('state').eq('id', 'aoe4-match').single();
-            if (data) render(data.state);
+            try {
+                console.log("Inizializzazione overlay...");
+                const { data, error } = await client
+                    .from('stream_overlays')
+                    .select('state')
+                    .eq('id', 'aoe4-match')
+                    .single();
+                
+                if (error) {
+                    console.warn("Nessuno stato trovato, in attesa di aggiornamenti...", error);
+                } else if (data && data.state) {
+                    console.log("Stato caricato:", data.state);
+                    render(data.state);
+                }
 
-            client.channel('overlay-aoe4-match')
-                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stream_overlays', filter: 'id=eq.aoe4-match' }, 
-                payload => render(payload.new.state))
-                .subscribe();
+                client.channel('overlay-aoe4-match')
+                    .on('postgres_changes', { 
+                        event: '*', 
+                        schema: 'public', 
+                        table: 'stream_overlays', 
+                        filter: 'id=eq.aoe4-match' 
+                    }, payload => {
+                        console.log("Update ricevuto via Realtime:", payload);
+                        if (payload.new && payload.new.state) {
+                            render(payload.new.state);
+                        }
+                    })
+                    .subscribe((status) => {
+                        console.log("Stato sottoscrizione Realtime:", status);
+                    });
+            } catch (err) {
+                console.error("Errore durante l'inizializzazione:", err);
+            }
         }
 
         setInterval(() => {
