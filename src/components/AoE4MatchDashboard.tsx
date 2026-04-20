@@ -327,18 +327,18 @@ export function AoE4MatchDashboard({ onSuccess, onError }: AoE4MatchDashboardPro
         </div>
       </div>
 
-      {/* Global Save Button */}
-      <div className="fixed bottom-8 right-12 z-50">
+      {/* Global Save Button - In-line at the bottom */}
+      <div className="flex justify-center pt-8 border-t border-white/5">
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-black text-lg uppercase tracking-wider shadow-2xl transition-all transform hover:scale-105 active:scale-95 ${
+          className={`flex items-center gap-3 px-12 py-5 rounded-2xl font-black text-xl uppercase tracking-wider shadow-2xl transition-all transform hover:scale-105 active:scale-95 ${
             isSaving 
               ? 'bg-gray-700 text-gray-400 cursor-not-allowed' 
-              : 'bg-yellow-500 text-black hover:bg-yellow-400 shadow-yellow-500/20'
+              : 'bg-yellow-500 text-black hover:bg-yellow-400 shadow-yellow-500/30'
           }`}
         >
-          <Save size={20} />
+          <Save size={24} />
           {isSaving ? 'Sincronizzazione...' : 'Sincronizza Overlay'}
         </button>
       </div>
