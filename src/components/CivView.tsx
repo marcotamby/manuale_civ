@@ -6,10 +6,9 @@ import { usePresence } from './PresenceContext';
 import type { Unit } from '../data/aoe4Data';
 import { UnitGrid } from './UnitGrid';
 import { MatchupsTable } from './MatchupsTable';
-import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight, Clock, MessageSquare, Send, UserCircle, CheckCircle, XCircle, X, Loader2, Trash2, AlertTriangle } from 'lucide-react';
+import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight, MessageSquare, Send, UserCircle, CheckCircle, XCircle, X, Loader2, Trash2, AlertTriangle, Plus, ExternalLink } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { ResourceText } from './ResourceText';
-import { ExternalLink } from 'lucide-react';
 import { SocialProofPopup } from './SocialProofPopup';
 import { RANK_ICONS } from './ProfileModal';
 import { EditSuggestionForm } from './EditSuggestionForm';
@@ -62,7 +61,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   };
 
   const civ = civilizations.find(c => c.id === civId);
-  const [expandedBOs, setExpandedBOs] = useState<Set<string>>(new Set());
   
   // Find selected BO for overlay
   const selectedBO = civ?.buildOrders?.find(bo => bo.id === selectedBOId);
@@ -943,8 +941,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 </div>
               </div>
             )}
-          </div>
-        )}
           </div>
         )}
 
