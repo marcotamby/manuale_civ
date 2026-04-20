@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, X, Loader2, Play, Map, Plus, Trash2, CheckCircle, Clock, Zap, ChevronUp, ChevronDown, Info, Cog, Edit, AlertTriangle, Upload } from 'lucide-react';
+import { Save, X, Loader2, Play, Map, Plus, Trash2, CheckCircle, Clock, Zap, ChevronUp, ChevronDown, Info, Cog, Edit, AlertTriangle, Upload, MousePointer2, MoveVertical } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { YouTubePickerModal } from './YouTubePickerModal';
 import { Toast } from './Toast';
@@ -33,6 +33,33 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
     type: 'success'
   });
   const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
+  const [dragState, setDragState] = useState<{ idx: number; startY: number; startPos: number } | null>(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!dragState) return;
+      const deltaY = e.clientY - dragState.startY;
+      const containerHeight = 120; // Approx height of preview
+      const deltaPercent = (deltaY / containerHeight) * 100;
+      let newPos = Math.max(0, Math.min(100, dragState.startPos - (deltaPercent * 0.5))); // 0.5 sensitivity
+      updateArrayField('buildOrders', dragState.idx, 'banner_position', Math.round(newPos));
+    };
+
+    const handleMouseUp = () => setDragState(null);
+
+    if (dragState) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [dragState]);
+
+  const startDrag = (e: React.MouseEvent, idx: number, currentPos: number) => {
+    setDragState({ idx, startY: e.clientY, startPos: currentPos });
+  };
 
   // Refs for scrolling
   const sectionRefs = {
@@ -452,7 +479,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
 
                 <div>
                   <div className="flex justify-between items-end mb-1.5">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
                       <Play size={12} className="text-red-500" /> YouTube
                     </label>
                     <button
@@ -605,7 +632,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                       </div>
                       <div className="mb-2">
                         <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block text-yellow-500">Immagine Banner (JPG/PNG)</label>
-                        <div className="flex gap-2 mb-2">
+                        <div className="flex gap-2">
                           <input 
                             type="text" 
                             value={bo.banner_url || ''} 
@@ -627,12 +654,22 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                              )}
                           </label>
                         </div>
+                        {uploadingIdx === idx && (
+                          <div className="mt-2 bg-yellow-500/10 border border-dashed border-yellow-500/30 rounded-lg p-3 flex flex-col items-center gap-2 animate-pulse">
+                            <Loader2 size={24} className="text-yellow-500 animate-spin" />
+                            <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest">Caricamento in corso...</span>
+                          </div>
+                        )}
+
                         {bo.banner_url && (
-                          <div className="space-y-2">
+                          <div className="space-y-2 mt-2">
                             <div className="flex justify-between items-center bg-black/30 p-2 rounded-lg border border-gray-700/50">
                               <div className="flex-1">
                                 <div className="flex justify-between items-center mb-1 pr-2">
-                                  <label className="text-[10px] text-gray-500 uppercase font-bold">Inquadratura Verticale</label>
+                                  <label className="text-[10px] text-gray-500 uppercase font-bold flex items-center gap-1">
+                                    <MoveVertical size={10} /> Inquadratura Verticale 
+                                    <span className="text-[8px] normal-case font-medium ml-1">(Trascina l'anteprima sotto)</span>
+                                  </label>
                                   <span className="text-[10px] text-yellow-500 font-mono">{bo.banner_position ?? 50}%</span>
                                 </div>
                                 <input
@@ -645,24 +682,35 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                                 />
                               </div>
                             </div>
-                            <div className="mt-1 relative h-32 w-full rounded-lg overflow-hidden border border-white/10 group/preview">
+                            <div 
+                              className={`mt-1 relative h-32 w-full rounded-lg overflow-hidden border-2 transition-all duration-300 group/preview cursor-move ${dragState ? 'border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.2)]' : 'border-white/10'}`}
+                              onMouseDown={(e) => startDrag(e, idx, bo.banner_position ?? 50)}
+                            >
                               <img 
                                 src={bo.banner_url} 
                                 alt="Preview" 
-                                className="w-full h-full object-cover transition-all duration-300" 
+                                className="w-full h-full object-cover transition-all duration-300 pointer-events-none select-none" 
                                 style={{ objectPosition: `50% ${bo.banner_position ?? 50}%` }}
                               />
-                              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/preview:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
-                                <div className="bg-yellow-500/10 border border-yellow-500/50 px-2 py-1 rounded text-[10px] text-yellow-500 uppercase font-black">
-                                  Anteprima Taglio
+                              
+                              {/* Overlay Indicators */}
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 pointer-events-none">
+                                <div className="bg-yellow-500/90 text-black px-2 py-1 rounded text-[10px] font-black uppercase flex items-center gap-1">
+                                  <MousePointer2 size={10} /> Trascina per inquadrare
                                 </div>
+                              </div>
+
+                              <div className="absolute top-2 right-2 flex gap-1">
                                 <button 
-                                  onClick={() => updateArrayField('buildOrders', idx, 'banner_url', '')}
-                                  className="p-1 px-3 bg-red-600 text-[10px] font-bold text-white rounded uppercase flex items-center gap-1 shadow-xl"
+                                  onClick={(e) => { e.stopPropagation(); updateArrayField('buildOrders', idx, 'banner_url', ''); }}
+                                  className="p-1 px-2 bg-red-600 text-[10px] font-bold text-white rounded uppercase flex items-center gap-1 shadow-xl pointer-events-auto hover:bg-red-500 transition-colors"
                                 >
-                                  <Trash2 size={10} /> Rimuovi Immagine
+                                  <Trash2 size={10} />
                                 </button>
                               </div>
+
+                              {/* Highlight Area visualization */}
+                              <div className="absolute inset-x-0 h-[100%] border-y-2 border-dashed border-white/20 pointer-events-none" />
                             </div>
                           </div>
                         )}

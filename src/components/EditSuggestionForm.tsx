@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
-import { Trash2, Plus, User, CheckCircle, XCircle, X, Upload, Loader2 } from 'lucide-react';
+import { Trash2, Plus, User, CheckCircle, XCircle, X, Upload, Loader2, MousePointer2, MoveVertical } from 'lucide-react';
 import type { ToastType } from './Toast';
 
 interface SuggestionFormProps {
@@ -28,6 +28,33 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
     type: 'success'
   });
   const [isUploading, setIsUploading] = useState(false);
+  const [dragState, setDragState] = useState<{ startY: number; startPos: number } | null>(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!dragState) return;
+      const deltaY = e.clientY - dragState.startY;
+      const containerHeight = 160; 
+      const deltaPercent = (deltaY / containerHeight) * 100;
+      let newPos = Math.max(0, Math.min(100, dragState.startPos - (deltaPercent * 0.5)));
+      setBannerPosition(Math.round(newPos));
+    };
+
+    const handleMouseUp = () => setDragState(null);
+
+    if (dragState) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [dragState]);
+
+  const startDrag = (e: React.MouseEvent, currentPos: number) => {
+    setDragState({ startY: e.clientY, startPos: currentPos });
+  };
 
   // Build Order structured state
   const [boSteps, setBoSteps] = useState<{ time: string; action: string; note: string }[]>([
@@ -336,12 +363,25 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                    )}
                 </label>
               </div>
+
+              {isUploading && (
+                <div className="mt-3 bg-yellow-500/10 border border-dashed border-yellow-500/30 rounded-xl p-6 flex flex-col items-center gap-3 animate-pulse">
+                  <Loader2 size={32} className="text-yellow-500 animate-spin" />
+                  <div className="text-center">
+                    <p className="text-xs font-black text-yellow-500 uppercase tracking-[0.2em] mb-1">Caricamento in corso...</p>
+                    <p className="text-[10px] text-yellow-500/60 uppercase">Ottimizzazione immagine per il web</p>
+                  </div>
+                </div>
+              )}
               
               {bannerUrl && (
                 <div className="space-y-3 mt-4">
-                  <div className="bg-black/40 border border-white/10 rounded-xl p-3">
+                  <div className="bg-black/40 border border-white/10 rounded-xl p-4">
                     <div className="flex justify-between items-center mb-2">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Inquadratura Verticale</label>
+                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                        <MoveVertical size={12} /> Inquadratura Verticale
+                        <span className="text-[8px] normal-case font-medium ml-1 text-gray-500">(Trascina l'anteprima sotto)</span>
+                      </label>
                       <span className="text-[10px] font-mono text-yellow-500">{bannerPosition}%</span>
                     </div>
                     <input
@@ -354,28 +394,39 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                     />
                   </div>
 
-                  <div className="relative h-40 w-full rounded-xl overflow-hidden border border-white/10 group/preview">
+                  <div 
+                    className={`relative h-48 w-full rounded-2xl overflow-hidden border-2 transition-all duration-300 group/preview cursor-move ${dragState ? 'border-yellow-500 shadow-[0_0_30px_rgba(234,179,8,0.3)]' : 'border-white/10 hover:border-white/20'}`}
+                    onMouseDown={(e) => startDrag(e, bannerPosition)}
+                  >
                     <img 
                       src={bannerUrl} 
                       alt="Anteprima" 
-                      className="w-full h-full object-cover transition-all duration-300" 
+                      className="w-full h-full object-cover transition-all duration-300 pointer-events-none select-none" 
                       style={{ objectPosition: `50% ${bannerPosition}%` }}
                     />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/preview:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
-                       <div className="bg-yellow-500/10 border border-yellow-500/50 px-3 py-1 rounded text-[10px] text-yellow-500 uppercase font-black">
-                         Anteprima Taglio
+                    
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3 pointer-events-none">
+                       <div className="bg-yellow-500/90 text-black px-3 py-1.5 rounded-lg text-[10px] font-black uppercase flex items-center gap-2">
+                         <MousePointer2 size={12} /> Trascina per posizionare
                        </div>
+                    </div>
+
+                    <div className="absolute top-3 right-3 flex gap-2">
                        <button 
                          type="button"
-                         onClick={() => setBannerUrl('')}
-                         className="p-1 px-4 bg-red-600 text-xs font-bold text-white rounded-lg uppercase flex items-center gap-1 shadow-2xl"
+                         onClick={(e) => { e.stopPropagation(); setBannerUrl(''); }}
+                         className="p-2 bg-red-600 text-white rounded-lg shadow-2xl pointer-events-auto hover:bg-red-500 transition-colors"
+                         title="Rimuovi Immagine"
                        >
-                         <Trash2 size={12} /> Rimuovi Immagine
+                         <Trash2 size={16} />
                        </button>
                     </div>
+
+                    {/* Focus Area Guide */}
+                    <div className="absolute inset-x-0 h-full border-y-2 border-dashed border-white/20 pointer-events-none" />
                   </div>
-                  <p className="text-[10px] text-gray-500 italic text-center">
-                    Trascina lo slider per centrare il soggetto dell'immagine (es. il volto o l'unità principale).
+                  <p className="text-[10px] text-gray-500 italic text-center px-4">
+                    Tieni premuto e trascina l'immagine verso l'alto o il basso per scegliere l'inquadratura perfetta.
                   </p>
                 </div>
               )}
