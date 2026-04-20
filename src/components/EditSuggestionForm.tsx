@@ -376,13 +376,12 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
               
               {bannerUrl && (
                 <div className="space-y-3 mt-4">
-                  <div className="bg-black/60 border-t border-x border-white/10 rounded-t-2xl px-4 py-2 flex justify-between items-center">
+                  <div className="bg-black/60 border-t border-x border-white/10 rounded-t-2xl px-4 py-2">
                     <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
                       <MoveVertical size={14} className="text-yellow-500" />
                       Inquadratura Finale Build Order
                       <span className="text-[8px] normal-case font-medium text-gray-600 block md:inline ml-1">(Trascina l'anteprima sotto)</span>
                     </label>
-                    <span className="text-[10px] font-mono text-yellow-500/50">{bannerPosition}%</span>
                   </div>
 
                   <div 

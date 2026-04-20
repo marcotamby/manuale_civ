@@ -718,7 +718,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                             <Map size={48} className="text-white/10" />
                           </div>
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+                        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#1a1c23] to-transparent" />
+                        <div className="absolute inset-0 bg-black/20" />
                         <div className="absolute bottom-3 left-4 flex gap-0.5">
                           {Array.from({ length: 3 }).map((_, i) => (
                             <span key={i} className={`text-xs ${i < bo.difficulty ? 'text-yellow-500' : 'text-white/20'}`}>⭐</span>

@@ -663,16 +663,11 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
 
                         {bo.banner_url && (
                           <div className="space-y-2 mt-2">
-                            <div className="flex justify-between items-center bg-black/30 px-3 py-1.5 rounded-t-lg border-t border-x border-gray-700/50">
                               <label className="text-[9px] text-gray-500 uppercase font-black flex items-center gap-1.5">
                                 <MoveVertical size={12} className="text-yellow-500" /> 
                                 Inquadratura Build Order 
                                 <span className="text-[8px] normal-case font-medium text-gray-600 ml-1">(Trascina l'immagine)</span>
                               </label>
-                              <div className="flex items-center gap-2">
-                                <span className="text-[9px] text-yellow-500/50 font-mono">{bo.banner_position ?? 50}%</span>
-                              </div>
-                            </div>
                             <div 
                               className={`relative w-full aspect-[4/1] rounded-b-lg overflow-hidden border-2 transition-all duration-300 group/preview cursor-move ${dragState ? 'border-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.3)]' : 'border-gray-700/50'}`}
                               onMouseDown={(e) => startDrag(e, idx, bo.banner_position ?? 50)}
