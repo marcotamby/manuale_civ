@@ -829,40 +829,44 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                           )}
                         </div>
 
-                        <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
-                           <div className="flex items-center gap-4">
-                              <div className="flex items-center gap-2">
-                                 <div className="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                                   {bo.author_rank && getRankIcon(bo.author_rank) ? (
-                                     <img src={getRankIcon(bo.author_rank) || ''} alt={bo.author_rank} className="w-4 h-4 object-contain" />
-                                   ) : (
-                                     <UserCircle size={14} className="text-gray-600" />
-                                   )}
-                                 </div>
-                                 <span className="text-[11px] font-bold text-blue-400 uppercase tracking-tighter truncate max-w-[80px]">
-                                   {bo.author_nickname || 'Anonimo'}
-                                 </span>
+                        <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5 gap-4">
+                           {/* Left: Author */}
+                           <div className="flex items-center gap-2 shrink-0">
+                              <div className="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                                {bo.author_rank && getRankIcon(bo.author_rank) ? (
+                                  <img src={getRankIcon(bo.author_rank) || ''} alt={bo.author_rank} className="w-4 h-4 object-contain" />
+                                ) : (
+                                  <UserCircle size={14} className="text-gray-600" />
+                                )}
                               </div>
+                              <span className="text-[11px] font-bold text-blue-400 uppercase tracking-tighter truncate max-w-[100px]">
+                                {bo.author_nickname || 'Anonimo'}
+                              </span>
+                           </div>
+                           
+                           {/* Right: Button & Voting */}
+                           <div className="flex flex-col items-end gap-2 shrink-0">
+                              <span className="text-[10px] font-black text-yellow-500 uppercase tracking-widest bg-yellow-500/10 px-3 py-1.5 rounded-lg border border-yellow-500/20 group-hover:bg-yellow-500 group-hover:text-black transition-all">
+                                Leggi Strategia
+                              </span>
                               
-                              {/* Voting */}
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-4 px-1">
                                 <button 
                                   onClick={(e) => { e.stopPropagation(); handleVote(bo.id, 1); }}
-                                  className={`flex items-center gap-1 transition-colors ${boVotes[bo.id]?.userVote === 1 ? 'text-green-500' : 'text-gray-500 hover:text-green-400'}`}
+                                  className={`flex items-center gap-1.5 transition-all hover:scale-110 ${boVotes[bo.id]?.userVote === 1 ? 'text-green-500' : 'text-gray-500 hover:text-green-400'}`}
                                 >
-                                  <ThumbsUp size={14} />
-                                  <span className="text-[10px] font-bold">{boVotes[bo.id]?.up || 0}</span>
+                                  <ThumbsUp size={16} />
+                                  <span className="text-[11px] font-black">{boVotes[bo.id]?.up || 0}</span>
                                 </button>
                                 <button 
                                   onClick={(e) => { e.stopPropagation(); handleVote(bo.id, -1); }}
-                                  className={`flex items-center gap-1 transition-colors ${boVotes[bo.id]?.userVote === -1 ? 'text-red-500' : 'text-gray-500 hover:text-red-400'}`}
+                                  className={`flex items-center gap-1.5 transition-all hover:scale-110 ${boVotes[bo.id]?.userVote === -1 ? 'text-red-500' : 'text-gray-500 hover:text-red-400'}`}
                                 >
-                                  <ThumbsDown size={14} />
-                                  <span className="text-[10px] font-bold">{boVotes[bo.id]?.down || 0}</span>
+                                  <ThumbsDown size={16} />
+                                  <span className="text-[11px] font-black">{boVotes[bo.id]?.down || 0}</span>
                                 </button>
                               </div>
                            </div>
-                           <span className="text-[10px] font-black text-yellow-500 uppercase tracking-widest bg-yellow-500/10 px-2 py-1 rounded">Vedi Strategia</span>
                         </div>
                       </div>
                     </div>
