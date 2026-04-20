@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, Plus, Minus, Trash2, User, Mic, Timer as TimerIcon, Map as MapIcon, ChevronDown } from 'lucide-react';
+import { Save, Plus, Minus, Trash2, User, Mic, Timer as TimerIcon, Map as MapIcon, ChevronDown, ShieldCheck } from 'lucide-react';
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
 import { overlayService } from '../services/overlayService';
@@ -10,8 +10,8 @@ interface AoE4MatchDashboardProps {
 }
 
 const DEFAULT_STATE: OverlayState = {
-  t1: { name: 'Team A', score: 0, players: ['', '', ''], active: false },
-  t2: { name: 'Team B', score: 0, players: ['', '', ''], active: true },
+  t1: { name: '', score: 0, players: ['', '', ''], active: false },
+  t2: { name: '', score: 0, players: ['', '', ''], active: true },
   maps: [
     { name: 'Dry Arabia', status: 'active', winner: 0, t1civs: [], t2civs: [] }
   ],
@@ -26,6 +26,7 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
   const [state, setState] = useState<OverlayState | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isConfirmingReset, setIsConfirmingReset] = useState(false);
+  const [showResetSuccess, setShowResetSuccess] = useState(false);
 
   useEffect(() => {
     console.log('Loading initial overlay state...');
@@ -72,6 +73,8 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
       await overlayService.updateOverlayState('aoe4-match', DEFAULT_STATE);
       setState(DEFAULT_STATE);
       setIsConfirmingReset(false);
+      setShowResetSuccess(true);
+      setTimeout(() => setShowResetSuccess(false), 3000);
     } catch (error: any) {
       onError(`Errore durante il reset: ${error.message || 'Errore generico'}`);
     } finally {
@@ -184,25 +187,30 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
         <div className="flex items-center gap-4">
           <h2 className="text-sm font-black text-white uppercase tracking-widest hidden sm:block">Configurazione Match</h2>
           
-          {!isConfirmingReset ? (
+          {!isConfirmingReset && !showResetSuccess ? (
             <button
               onClick={() => setIsConfirmingReset(true)}
               className="flex items-center gap-1.5 px-4 py-2 bg-red-600/20 border border-red-500/30 text-red-500 rounded-lg text-[10px] font-black uppercase hover:bg-red-500 hover:text-white transition-all whitespace-nowrap"
             >
               <Trash2 size={14} /> Reset Campi
             </button>
+          ) : showResetSuccess ? (
+            <div className="flex items-center gap-2 text-green-500 animate-in fade-in zoom-in duration-300">
+              <ShieldCheck size={14} />
+              <span className="text-[10px] font-black uppercase tracking-widest text-green-400">Reset Completato!</span>
+            </div>
           ) : (
-            <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2 duration-300">
-              <span className="text-[10px] font-bold text-red-400 uppercase mr-2">Sei sicuro?</span>
+            <div className="flex items-center gap-3 animate-in fade-in slide-in-from-left-2 duration-300 whitespace-nowrap">
+              <span className="text-[10px] font-black text-red-400 uppercase tracking-widest">Sei sicuro?</span>
               <button
                 onClick={resetMatch}
-                className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-[10px] font-black uppercase hover:bg-red-500 transition-all border border-red-400"
+                className="px-4 py-1.5 bg-red-600 text-white rounded-lg text-[10px] font-black uppercase hover:bg-red-500 transition-all border border-red-400 shadow-lg shadow-red-900/40"
               >
-                Sì, Resetta
+                Sì
               </button>
               <button
                 onClick={() => setIsConfirmingReset(false)}
-                className="px-3 py-1.5 bg-white/10 text-gray-300 rounded-lg text-[10px] font-black uppercase hover:bg-white/20 transition-all border border-white/10"
+                className="px-4 py-1.5 bg-white/5 text-gray-400 rounded-lg text-[10px] font-black uppercase hover:bg-white/10 transition-all border border-white/10"
               >
                 Annulla
               </button>
@@ -229,8 +237,9 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
                   <input
                     type="text"
                     value={state[teamKey].name}
+                    placeholder={teamKey === 't1' ? 'Team A' : 'Team B'}
                     onChange={(e) => updateTeam(teamKey, 'name', e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-yellow-500/50 outline-none transition-colors"
+                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-yellow-500/50 outline-none transition-colors placeholder:text-gray-600"
                   />
                 </div>
                 <div className="w-24">

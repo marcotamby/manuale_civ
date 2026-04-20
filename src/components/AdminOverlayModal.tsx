@@ -143,12 +143,12 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
           <div className="flex-1 flex flex-col bg-black/40 p-6 overflow-hidden">
             {selectedOverlay ? (
               <>
-                <div className="flex items-center justify-between mb-6">
-                  <div>
+                <div className="flex items-start justify-between mb-6">
+                  <div className="max-w-[60%]">
                     <h3 className="text-2xl font-bold text-white mb-1">{selectedOverlay.name}</h3>
-                    <p className="text-sm text-gray-400">{selectedOverlay.description}</p>
+                    <p className="text-sm text-gray-400 leading-snug">{selectedOverlay.description}</p>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2 shrink-0 pt-1">
                     <button
                       onClick={() => setActiveTab(activeTab === 'preview' ? 'dashboard' : 'preview')}
                       className={`flex items-center gap-2 px-3 py-1.5 font-black rounded-lg transition-all text-[10px] uppercase border shadow-lg whitespace-nowrap lg:px-4 ${
