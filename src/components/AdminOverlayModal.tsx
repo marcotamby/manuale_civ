@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, ExternalLink, Copy, Clock, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft } from 'lucide-react';
 import { AoE4MatchDashboard } from './AoE4MatchDashboard';
 import { Toast } from './Toast';
@@ -20,6 +20,8 @@ interface AdminOverlayModalProps {
 export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
   const [selectedOverlay, setSelectedOverlay] = useState<OverlayItem | null>(null);
   const [activeTab, setActiveTab] = useState<'preview' | 'dashboard'>('preview');
+  const [previewScale, setPreviewScale] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
     isVisible: false,
     message: '',
@@ -42,6 +44,23 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
       icon: Trophy
     }
   ];
+
+  useEffect(() => {
+    if (activeTab !== 'preview') return;
+    
+    const updateScale = () => {
+      const container = containerRef.current;
+      if (container) {
+        const { width, height } = container.getBoundingClientRect();
+        const scale = Math.min(width / 1920, height / 1080);
+        setPreviewScale(scale);
+      }
+    };
+
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, [activeTab, isOpen, selectedOverlay]);
 
   useEffect(() => {
     if (isOpen && overlays.length > 0 && !selectedOverlay) {
@@ -176,14 +195,14 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                         
                         {/* Scaling Iframe Container */}
                         <div className="absolute inset-0 flex items-center justify-center p-4">
-                          <div className="w-full h-full relative" id="preview-frame-container">
+                          <div className="w-full h-full relative" ref={containerRef}>
                             <iframe
                               src={selectedOverlay.path}
                               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border-none pointer-events-none"
                               style={{
                                 width: '1920px',
                                 height: '1080px',
-                                transform: `scale(calc(min(100% / 1920, 100% / 1080)))`,
+                                transform: `scale(${previewScale})`,
                                 transformOrigin: 'center center'
                               }}
                               title="Overlay Preview"

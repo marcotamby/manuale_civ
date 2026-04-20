@@ -10,16 +10,17 @@
         
         body { 
             width: 1920px; height: 1080px; color: white; overflow: hidden;
-            background: url('background.jpg') no-repeat center center/cover;
+            background: transparent url('background.jpg') no-repeat center center/cover;
+            margin: 0; padding: 0;
         }
 
         /* Header */
         #header { position: absolute; top: 0; width: 100%; height: 125px; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.85); border-bottom: 2px solid var(--gold); }
         .team-box { width: 580px; text-align: center; }
+        .team-name { font-size:36px; font-weight:900; color:var(--gold); text-transform:uppercase; letter-spacing: 1px; }
         .players-display { color: #ddd; font-size: 25px; font-weight: 400; margin-top: 2px; letter-spacing: 0.5px; }
         .score-box { font-size: 55px; font-weight: 900; background: var(--red); min-width: 85px; text-align: center; border: 2px solid var(--gold); border-radius: 8px; margin: 0 20px; padding: 2px 14px; }
 
-        #central-divider { position: absolute; top: 200px; bottom: 400px; left: 50%; width: 2px; background: var(--gold); transform: translateX(-50%); display: none; }
         #maps-container { position: absolute; top: 255px; width: 100%; display: flex; justify-content: center; gap: 320px; }
         
         @keyframes master-pulse { 0% { transform: scale(1); } 100% { transform: scale(1.04); } }
@@ -27,8 +28,8 @@
         .map-wrapper.active { animation: master-pulse 2s infinite alternate ease-in-out; }
 
         .map-card { width: 100%; height: 100%; background: #000; position: relative; border: 2px solid var(--gold); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; z-index: 2; }
-        .map-card img { width: 100%; height: 230px; object-fit: cover; }
-        .map-name { height: 50px; text-align: center; line-height: 50px; font-weight: 700; color: var(--gold); text-transform: uppercase; font-size: 18px; background: #000; border-top: 1px solid var(--gold); }
+        .map-card img { width: 100%; height: 200px; object-fit: cover; }
+        .map-name { height: 80px; text-align: center; line-height: 80px; font-weight: 700; color: var(--gold); text-transform: uppercase; font-size: 18px; background: #000; border-top: 1px solid var(--gold); }
 
         .label { 
             position: absolute; 
@@ -57,22 +58,30 @@
         /* CASTERS */
         #casters-container { position: absolute; bottom: 80px; width: 100%; display: flex; justify-content: space-between; padding: 0 80px; box-sizing: border-box; pointer-events: none; }
         .caster-box { display: flex; flex-direction: column; align-items: center; gap: 10px; visibility: hidden; }
+        .caster-box.active { visibility: visible; }
         .webcam-frame { width: 380px; height: 214px; border: 2px solid var(--gold); background: rgba(0,0,0,0.3); border-radius: 4px; }
         .caster-name { background: var(--gold); color: black; font-weight: 800; padding: 8px 30px; font-size: 22px; border-radius: 4px; text-transform: uppercase; min-width: 240px; text-align: center; }
+
+        #central-divider {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 4px; height: 100%; background: linear-gradient(to bottom, transparent, rgba(255,204,0,0.5), transparent);
+            box-shadow: 0 0 15px rgba(255,204,0,0.3);
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div id="central-divider"></div>
     <div id="header">
         <div class="team-box">
-            <div id="t1-n" style="font-size:36px; font-weight:900; color:var(--gold); text-transform:uppercase;">--</div>
-            <div id="t1-p" class="players-display">--</div>
+            <div id="t1-name" class="team-name">--</div>
+            <div id="t1-players" class="players-display">--</div>
         </div>
-        <div class="score-box" id="t1-s">0</div>
-        <div class="score-box" id="t2-s">0</div>
+        <div class="score-box" id="t1-score">0</div>
+        <div class="score-box" id="t2-score">0</div>
         <div class="team-box">
-            <div id="t2-n" style="font-size:36px; font-weight:900; color:var(--gold); text-transform:uppercase;">--</div>
-            <div id="t2-p" class="players-display">--</div>
+            <div id="t2-name" class="team-name">--</div>
+            <div id="t2-players" class="players-display">--</div>
         </div>
     </div>
     
@@ -90,118 +99,121 @@
     </div>
 
     <script>
-        // Credenziali Supabase (Hardcoded per OBS overlay)
-        const SUB_URL = 'https://laliiuqjpxanhwhxajlm.supabase.co';
-        const SUB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhbGlpdXFqcHhhbmh3aHhhamxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjQ5MjEsImV4cCI6MjA4ODU0MDkyMX0.1xIE1MXy1JxgGzpP0Hitotz8o3aMwASV8NUr06bQjkA';
+        // Supabase Hardcoded Credentials
+        const SUB_URL = "https://laliiuqjpxanhwhxajlm.supabase.co";
+        const SUB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhbGlpdXFqcHhhbmh3aHhhamxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjQ5MjEsImV4cCI6MjA4ODU0MDkyMX0.1xIE1MXy1JxgGzpP0Hitotz8o3aMwASV8NUr06bQjkA";
+        
+        const civMap = {
+            'abbasid': '/civs/Abbasid Dynasty.webp',
+            'ayyubids': '/civs/Ayyubids.webp',
+            'byzantines': '/civs/Byzantines.webp',
+            'chinese': '/civs/Chinese.webp',
+            'delhi': '/civs/Delhi Sultanate.webp',
+            'english': '/civs/English.webp',
+            'french': '/civs/French.webp',
+            'goldenhorde': '/civs/Golden Horde.webp',
+            'hre': '/civs/Holy Roman Empire.webp',
+            'japanese': '/civs/Japanese.webp',
+            'jeannedarc': "/civs/Jeanne d'Arc.webp",
+            'lancaster': "/civs/House of Lancaster.webp",
+            'malians': '/civs/Malians.webp',
+            'mongols': '/civs/Mongols.webp',
+            'orderofthedragon': "/civs/Order of the Dragon.webp",
+            'ottomans': '/civs/Ottomans.webp',
+            'rus': '/civs/Rus.webp',
+            'templar': "/civs/Knights Templar.webp",
+            'zhuxi': "/civs/Zhu Xis Legacy.webp"
+        };
 
         const { createClient } = window.supabase;
         const client = createClient(SUB_URL, SUB_KEY);
-        
-        console.log("Supabase Client Inizializzato (v1.4)");
-        
-        let lastMaps = "";
+        console.log("Supabase Client Initialized (v1.6)");
 
-        const civMap = {
-            "abbasid": "/civs/Abbasid Dynasty.webp",
-            "ayyubids": "/civs/Ayyubids.webp",
-            "byzantines": "/civs/Byzantines.webp",
-            "chinese": "/civs/Chinese.webp",
-            "delhi": "/civs/Delhi Sultanate.webp",
-            "english": "/civs/English.webp",
-            "french": "/civs/French.webp",
-            "goldenhorde": "/civs/Golden Horde.webp",
-            "hre": "/civs/Holy Roman Empire.webp",
-            "japanese": "/civs/Japanese.webp",
-            "jeannedarc": "/civs/Jeanne d'Arc.webp",
-            "macedonian": "/civs/Macedonian Dynasty.webp",
-            "malians": "/civs/Malians.webp",
-            "mongols": "/civs/Mongols.webp",
-            "ottomans": "/civs/Ottomans.webp",
-            "orderofthedragon": "/civs/Order of the Dragon.webp",
-            "rus": "/civs/Rus.webp",
-            "sengoku": "/civs/Sengoku Daimyo.webp",
-            "templar": "/civs/Knights Templar.webp",
-            "tughlaq": "/civs/Tughlaq Dynasty.webp",
-            "zhuxi": "/civs/Zhu Xis Legacy.webp",
-            "lancaster": "/civs/House of Lancaster.webp"
-        };
-
-        // Helper per gestire estensioni multiple delle mappe
         function getMapUrl(name) {
             if (!name) return '/maps/default.png';
-            if (name.match(/\.(png|jpg|jpeg|webp)$/i)) return `/maps/${name}`;
-            return `/maps/${name}.png`;
-        }
-        
-        function handleImageError(img) {
-            const src = img.src;
-            if (src.endsWith('.png')) { img.src = src.replace('.png', '.jpg'); } 
-            else if (src.endsWith('.jpg')) { img.src = src.replace('.jpg', '.jpeg'); } 
-            else { img.src = '/maps/default.png'; }
+            const cleanName = name.replace(/ /g, '_');
+            return `/maps/${cleanName}.png`;
         }
 
-        function render(d) {
-            if (!d || !d.t1 || !d.t2) return;
-            console.log("Rendering update...", d);
-            
-            document.getElementById('t1-n').innerText = d.t1.name || '--';
-            document.getElementById('t1-p').innerText = d.t1.players.filter(p=>p).join(' • ');
-            document.getElementById('t1-s').innerText = d.t1.score;
-            document.getElementById('t2-n').innerText = d.t2.name || '--';
-            document.getElementById('t2-p').innerText = d.t2.players.filter(p=>p).join(' • ');
-            document.getElementById('t2-s').innerText = d.t2.score;
+        function render(state) {
+            console.log("Rendering update:", state);
+            if (!state) return;
 
-            document.getElementById('central-divider').style.display = (d.maps.length >= 2) ? 'block' : 'none';
+            // Teams & Score
+            document.getElementById('t1-name').innerText = state.t1?.name || '--';
+            document.getElementById('t1-players').innerText = (state.t1?.players || []).filter(p=>p).join(' • ') || '--';
+            document.getElementById('t1-score').innerText = state.t1?.score ?? 0;
 
-            if(JSON.stringify(d.maps) !== lastMaps) {
-                document.getElementById('maps-container').innerHTML = d.maps.map(m => `
-                    <div class="map-wrapper ${m.status === 'active' ? 'active' : ''}">
-                        ${m.status === 'active' ? '<div class="label">Prossimo Game</div>' : ''}
-                        <div class="map-card">
-                            <img src="${getMapUrl(m.name)}" onerror="handleImageError(this)">
-                            <div class="map-name">${m.name}</div>
-                        </div>
-                        <div class="civ-icons left">
-                            ${m.winner == 1 ? '<div class="crown">👑</div>' : ''}
-                            ${(m.t1civs || []).map(c=>`<div class="civ-unit"><div class="civ-dot" style="background-image:url('${civMap[c] || c}')"></div></div>`).join('')}
-                        </div>
-                        <div class="civ-icons right">
-                            ${m.winner == 2 ? '<div class="crown">👑</div>' : ''}
-                            ${(m.t2civs || []).map(c=>`<div class="civ-unit"><div class="civ-dot" style="background-image:url('${civMap[c] || c}')"></div></div>`).join('')}
-                        </div>
-                    </div>`).join('');
-                lastMaps = JSON.stringify(d.maps);
-            }
+            document.getElementById('t2-name').innerText = state.t2?.name || '--';
+            document.getElementById('t2-players').innerText = (state.t2?.players || []).filter(p=>p).join(' • ') || '--';
+            document.getElementById('t2-score').innerText = state.t2?.score ?? 0;
 
-            d.casters.forEach((c, i) => {
+            // Casters
+            (state.casters || []).forEach((c, i) => {
                 const box = document.getElementById(`cb-${i+1}`);
                 const name = document.getElementById(`c-${i+1}-name`);
-                if(box && name) {
-                    if(c.active && c.name) { 
-                        name.innerText = c.name; 
-                        box.style.visibility = 'visible'; 
-                    } else { 
-                        box.style.visibility = 'hidden'; 
+                if (box && name) {
+                    if (c.active && c.name) {
+                        name.innerText = c.name;
+                        box.classList.add('active');
+                    } else {
+                        box.classList.remove('active');
                     }
                 }
             });
+
+            // Maps
+            document.getElementById('maps-container').innerHTML = (state.maps || []).map(m => `
+                <div class="map-wrapper ${m.status === 'active' ? 'active' : ''}">
+                    ${m.status === 'active' ? '<div class="label">Prossimo Game</div>' : ''}
+                    <div class="map-card">
+                        <img src="${getMapUrl(m.name)}" onerror="this.src='/maps/default.png'">
+                        <div class="map-name">${m.name || 'Mappa'}</div>
+                    </div>
+                    <div class="civ-icons left">
+                        ${m.winner == 1 ? '<div class="crown">👑</div>' : ''}
+                        ${(m.t1civs || []).map(c=>`<div class="civ-unit"><div class="civ-dot" style="background-image:url('${civMap[c] || '/civs/'+c+'.webp'}')"></div></div>`).join('')}
+                    </div>
+                    <div class="civ-icons right">
+                        ${m.winner == 2 ? '<div class="crown">👑</div>' : ''}
+                        ${(m.t2civs || []).map(c=>`<div class="civ-unit"><div class="civ-dot" style="background-image:url('${civMap[c] || '/civs/'+c+'.webp'}')"></div></div>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('central-divider').style.display = (state.maps?.length >= 2) ? 'block' : 'none';
         }
 
         async function init() {
             try {
-                // Fetch iniziale
-                const fetchState = async () => {
-                    const { data, error } = await client.from('stream_overlays').select('state').eq('id', 'aoe4-match').single();
-                    if (!error && data && data.state) render(data.state);
-                };
-                await fetchState();
+                console.log("Initing overlay...");
+                const { data, error } = await client.from('stream_overlays').select('state').eq('id', 'aoe4-match').single();
+                if (error) {
+                    console.error("Initial fetch error:", error);
+                } else if (data && data.state) {
+                    render(data.state);
+                }
 
-                // Sottoscrizione Realtime
-                client.channel('overlay-sync')
-                    .on('postgres_changes', { event: '*', schema: 'public', table: 'stream_overlays', filter: 'id=eq.aoe4-match' }, 
-                    payload => { if (payload.new && payload.new.state) render(payload.new.state); })
-                    .subscribe();
-            } catch (err) { console.error("Errore critico init:", err); }
+                // Realtime subscription
+                client
+                    .channel('public:stream_overlays')
+                    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stream_overlays', filter: 'id=eq.aoe4-match' }, payload => {
+                        console.log("Update received!", payload.new.state);
+                        render(payload.new.state);
+                    })
+                    .subscribe((status) => {
+                        console.log("Realtime status:", status);
+                    });
+
+                // Polling fallback every 5s
+                setInterval(async () => {
+                    const { data } = await client.from('stream_overlays').select('state').eq('id', 'aoe4-match').single();
+                    if (data && data.state) render(data.state);
+                }, 5000);
+
+            } catch (err) {
+                console.error("Critical init error:", err);
+            }
         }
 
         init();

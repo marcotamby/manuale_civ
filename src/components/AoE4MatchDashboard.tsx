@@ -10,16 +10,16 @@ interface AoE4MatchDashboardProps {
 }
 
 const DEFAULT_STATE: OverlayState = {
-  t1: { name: 'Team A', score: 0, players: ['', '', ''] },
-  t2: { name: 'Team B', score: 0, players: ['', '', ''] },
+  t1: { name: 'Team A', score: 0, players: ['', '', ''], active: false },
+  t2: { name: 'Team B', score: 0, players: ['', '', ''], active: true },
   maps: [
     { name: 'Dry Arabia', status: 'active', winner: 0, t1civs: [], t2civs: [] }
   ],
-  timer: { active: false, min: 0, sec: 0, timestamp: 0 },
   casters: [
-    { active: false, name: '' },
-    { active: false, name: '' }
-  ]
+    { name: 'Caster 1', active: false },
+    { name: 'Caster 2', active: true }
+  ],
+  timer: { active: true, startTime: null }
 };
 
 export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
@@ -97,12 +97,14 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
   const toggleCiv = (mapIndex: number, team: 't1' | 't2', civId: string) => {
     if (!state) return;
     const maps = [...state.maps];
-    const civs = [...maps[mapIndex][team === 't1' ? 't1civs' : 't2civs']];
+    const teamKey = team === 't1' ? 't1civs' : 't2civs';
+    const currentCivs = maps[mapIndex][teamKey] || [];
+    const civs = [...currentCivs];
     
     if (civs.includes(civId)) {
-      maps[mapIndex][team === 't1' ? 't1civs' : 't2civs'] = civs.filter(id => id !== civId);
+      maps[mapIndex][teamKey] = civs.filter(id => id !== civId);
     } else if (civs.length < 3) {
-      maps[mapIndex][team === 't1' ? 't1civs' : 't2civs'] = [...civs, civId];
+      maps[mapIndex][teamKey] = [...civs, civId];
     }
     setState({ ...state, maps });
   };
