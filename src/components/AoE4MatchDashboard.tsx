@@ -16,10 +16,10 @@ const DEFAULT_STATE: OverlayState = {
     { name: 'Dry Arabia', status: 'active', winner: 0, t1civs: [], t2civs: [] }
   ],
   casters: [
-    { name: 'Caster 1', active: false },
-    { name: 'Caster 2', active: true }
+    { name: '', active: false },
+    { name: '', active: false }
   ],
-  timer: { active: true, startTime: null }
+  timer: { active: false, startTime: null }
 };
 
 export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
