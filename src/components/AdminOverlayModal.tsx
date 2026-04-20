@@ -30,13 +30,6 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
 
   const overlays: OverlayItem[] = [
     {
-      id: 'clock',
-      name: 'Clock & Status',
-      description: 'Un elegante orologio con indicatore LIVE per le tue stream.',
-      path: '/overlays/clock/index.html',
-      icon: Clock
-    },
-    {
       id: 'aoe4-match',
       name: 'AoE4 Match 3V3',
       description: 'Overlay professionale per Match 3V3 con mappe, casters e timer.',

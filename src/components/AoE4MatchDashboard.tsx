@@ -58,61 +58,71 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
     };
 
   const updateTeam = (team: 't1' | 't2', field: string, value: any) => {
-    if (!state) return;
-    setState({
-      ...state,
-      [team]: { ...state[team], [field]: value }
+    setState(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        [team]: { ...prev[team], [field]: value }
+      };
     });
   };
 
   const updatePlayer = (team: 't1' | 't2', index: number, value: string) => {
-    if (!state) return;
-    const players = [...state[team].players];
-    players[index] = value;
-    setState({
-      ...state,
-      [team]: { ...state[team], players }
+    setState(prev => {
+      if (!prev) return prev;
+      const players = [...prev[team].players];
+      players[index] = value;
+      return {
+        ...prev,
+        [team]: { ...prev[team], players }
+      };
     });
   };
 
   const addMap = () => {
-    if (!state) return;
-    const newMap = {
-      name: 'Dry Arabia',
-      status: 'active',
-      winner: 0,
-      t1civs: [],
-      t2civs: []
-    };
-    setState({ ...state, maps: [...state.maps, newMap] });
+    setState(prev => {
+      if (!prev) return prev;
+      const newMap = {
+        name: 'Dry Arabia',
+        status: 'active',
+        winner: 0,
+        t1civs: [],
+        t2civs: []
+      };
+      return { ...prev, maps: [...prev.maps, newMap] };
+    });
   };
 
   const updateMap = (index: number, field: string, value: any) => {
-    if (!state) return;
-    const maps = [...state.maps];
-    maps[index] = { ...maps[index], [field]: value };
-    setState({ ...state, maps });
+    setState(prev => {
+      if (!prev) return prev;
+      const maps = [...prev.maps];
+      maps[index] = { ...maps[index], [field]: value };
+      return { ...prev, maps };
+    });
   };
 
   const toggleCiv = (mapIndex: number, team: 't1' | 't2', civId: string) => {
-    if (!state) return;
-    const maps = [...state.maps];
-    const teamKey = team === 't1' ? 't1civs' : 't2civs';
-    const currentCivs = maps[mapIndex][teamKey] || [];
-    let newCivs = [...currentCivs];
-    
-    if (newCivs.includes(civId)) {
-      newCivs = newCivs.filter(id => id !== civId);
-    } else if (newCivs.length < 3) {
-      newCivs = [...newCivs, civId];
-    }
+    setState(prev => {
+      if (!prev) return prev;
+      const maps = [...prev.maps];
+      const teamKey = team === 't1' ? 't1civs' : 't2civs';
+      const currentCivs = maps[mapIndex][teamKey] || [];
+      let newCivs = [...currentCivs];
+      
+      if (newCivs.includes(civId)) {
+        newCivs = newCivs.filter(id => id !== civId);
+      } else if (newCivs.length < 3) {
+        newCivs = [...newCivs, civId];
+      }
 
-    maps[mapIndex] = { 
-      ...maps[mapIndex], 
-      [teamKey]: newCivs 
-    };
-    
-    setState({ ...state, maps });
+      maps[mapIndex] = { 
+        ...maps[mapIndex], 
+        [teamKey]: newCivs 
+      };
+      
+      return { ...prev, maps };
+    });
   };
 
   if (!state) return <div className="p-8 text-center text-gray-500">Caricamento configurazione...</div>;
@@ -197,7 +207,7 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
           {state.maps.map((map, mIdx) => (
             <div key={mIdx} className="bg-black/20 border border-white/5 rounded-2xl p-6 relative group/map">
               <button
-                onClick={() => setState({ ...state, maps: state.maps.filter((_, i) => i !== mIdx) })}
+                onClick={() => setState(prev => prev ? ({ ...prev, maps: prev.maps.filter((_, i) => i !== mIdx) }) : prev)}
                 className="absolute top-4 right-4 p-2 text-gray-600 hover:text-red-500 transition-colors opacity-0 group-hover/map:opacity-100"
               >
                 <Trash2 size={16} />
@@ -299,9 +309,12 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
                   type="checkbox"
                   checked={caster.active}
                   onChange={(e) => {
-                    const casters = [...state.casters];
-                    casters[cIdx].active = e.target.checked;
-                    setState({ ...state, casters });
+                    setState(prev => {
+                      if (!prev) return prev;
+                      const casters = [...prev.casters];
+                      casters[cIdx] = { ...casters[cIdx], active: e.target.checked };
+                      return { ...prev, casters };
+                    });
                   }}
                   className="w-4 h-4 rounded border-white/10 bg-black/40 text-yellow-500 focus:ring-yellow-500"
                 />
@@ -311,9 +324,12 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
                     type="text"
                     value={caster.name}
                     onChange={(e) => {
-                      const casters = [...state.casters];
-                      casters[cIdx].name = e.target.value;
-                      setState({ ...state, casters });
+                      setState(prev => {
+                        if (!prev) return prev;
+                        const casters = [...prev.casters];
+                        casters[cIdx] = { ...casters[cIdx], name: e.target.value };
+                        return { ...prev, casters };
+                      });
                     }}
                     placeholder={`Caster ${cIdx + 1}`}
                     className="w-full bg-black/40 border border-white/10 rounded-lg pl-8 pr-3 py-2 text-sm text-white outline-none"
@@ -333,7 +349,7 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
               <input
                 type="checkbox"
                 checked={state.timer.active}
-                onChange={(e) => setState({ ...state, timer: { ...state.timer, active: e.target.checked, timestamp: Date.now() } })}
+                onChange={(e) => setState(prev => prev ? ({ ...prev, timer: { ...prev.timer, active: e.target.checked, timestamp: Date.now() } }) : prev)}
                 className="w-4 h-4 rounded border-white/10 bg-black/40 text-yellow-500 focus:ring-yellow-500"
               />
               <span className="text-sm text-gray-300 font-bold uppercase">Attiva Timer</span>
@@ -342,14 +358,14 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
               <input
                 type="number"
                 value={state.timer.min}
-                onChange={(e) => setState({ ...state, timer: { ...state.timer, min: parseInt(e.target.value) || 0, timestamp: Date.now() } })}
+                onChange={(e) => setState(prev => prev ? ({ ...prev, timer: { ...prev.timer, min: parseInt(e.target.value) || 0, timestamp: Date.now() } }) : prev)}
                 className="w-16 bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-center text-sm text-white font-bold outline-none"
               />
               <span className="text-gray-500 font-bold">m</span>
               <input
                 type="number"
                 value={state.timer.sec}
-                onChange={(e) => setState({ ...state, timer: { ...state.timer, sec: parseInt(e.target.value) || 0, timestamp: Date.now() } })}
+                onChange={(e) => setState(prev => prev ? ({ ...prev, timer: { ...prev.timer, sec: parseInt(e.target.value) || 0, timestamp: Date.now() } }) : prev)}
                 className="w-16 bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-center text-sm text-white font-bold outline-none"
               />
               <span className="text-gray-500 font-bold">s</span>
