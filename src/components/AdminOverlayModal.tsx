@@ -167,18 +167,30 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
 
                 <div className="flex-1 overflow-y-auto custom-scrollbar">
                   {activeTab === 'preview' ? (
-                    <div className="h-full flex flex-col">
-                      <div className="flex-1 bg-[#1a1c32] rounded-3xl border border-white/5 overflow-hidden shadow-inner relative group min-h-[400px]">
+                    <div className="h-full flex flex-col p-4">
+                      <div className="flex-1 bg-black rounded-3xl border border-white/5 overflow-hidden shadow-2xl relative group min-h-[400px]">
                         <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full border border-white/10 text-[10px] font-bold text-gray-400 flex items-center gap-2">
                           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                          ANTEPRIMA LIVE
+                          ANTEPRIMA LIVE (1920x1080)
                         </div>
-                        <iframe
-                          src={selectedOverlay.path}
-                          className="w-full h-full border-none pointer-events-none"
-                          title="Overlay Preview"
-                        />
-                        <div className="absolute inset-0 bg-transparent group-hover:bg-black/5 transition-colors"></div>
+                        
+                        {/* Scaling Iframe Container */}
+                        <div className="absolute inset-0 flex items-center justify-center p-4">
+                          <div className="w-full h-full relative" id="preview-frame-container">
+                            <iframe
+                              src={selectedOverlay.path}
+                              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border-none pointer-events-none"
+                              style={{
+                                width: '1920px',
+                                height: '1080px',
+                                transform: `scale(calc(min(100% / 1920, 100% / 1080)))`,
+                                transformOrigin: 'center center'
+                              }}
+                              title="Overlay Preview"
+                            />
+                          </div>
+                        </div>
+                        <div className="absolute inset-0 bg-transparent group-hover:bg-black/5 transition-colors pointer-events-none"></div>
                       </div>
 
                       <div className="mt-4 flex items-center gap-2 text-[10px] text-gray-500 font-mono italic">

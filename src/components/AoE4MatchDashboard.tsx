@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, Plus, Minus, Trash2, User, Mic, Timer as TimerIcon, Map as MapIcon } from 'lucide-react';
+import { Save, Plus, Minus, Trash2, User, Mic, Timer as TimerIcon, Map as MapIcon, ChevronDown } from 'lucide-react';
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
 import { overlayService } from '../services/overlayService';
@@ -9,6 +9,19 @@ interface AoE4MatchDashboardProps {
   onSuccess: (msg: string) => void;
   onError: (msg: string) => void;
 }
+
+const DEFAULT_STATE: OverlayState = {
+  t1: { name: 'Team A', score: 0, players: ['', '', ''] },
+  t2: { name: 'Team B', score: 0, players: ['', '', ''] },
+  maps: [
+    { name: 'Dry Arabia', status: 'active', winner: 0, t1civs: [], t2civs: [] }
+  ],
+  timer: { active: false, min: 0, sec: 0, timestamp: 0 },
+  casters: [
+    { active: false, name: '' },
+    { active: false, name: '' }
+  ]
+};
 
 export function AoE4MatchDashboard({ onSuccess, onError }: AoE4MatchDashboardProps) {
   const [state, setState] = useState<OverlayState | null>(null);
@@ -22,6 +35,7 @@ export function AoE4MatchDashboard({ onSuccess, onError }: AoE4MatchDashboardPro
         setState(savedState);
       } else {
         console.warn('No state found in DB, using default.');
+        setState(DEFAULT_STATE);
       }
     });
   }, []);
@@ -35,7 +49,7 @@ export function AoE4MatchDashboard({ onSuccess, onError }: AoE4MatchDashboardPro
         await overlayService.updateOverlayState('aoe4-match', state);
         setShowSuccess(true);
         setTimeout(() => setShowSuccess(false), 3000);
-        onSuccess('Overlay sincronizzato con successo! 🚀');
+        // onSuccess rimosso come richiesto (basta il feedback del pulsante)
       } catch (error: any) {
         console.error('Errore Supabase completo:', error);
         onError(`Errore durante la sincronizzazione: ${error.message || 'Errore generico'}`);
@@ -202,12 +216,13 @@ export function AoE4MatchDashboard({ onSuccess, onError }: AoE4MatchDashboardPro
                     <select
                       value={map.name}
                       onChange={(e) => updateMap(mIdx, 'name', e.target.value)}
-                      className="w-full bg-[#0f1423] border border-white/10 rounded-lg pl-8 pr-3 py-2 text-sm text-white outline-none mb-4 focus:border-yellow-500/50 cursor-pointer hover:bg-[#1a2035] transition-all appearance-none shadow-inner"
+                      className="w-full bg-[#0f1423] border border-white/10 rounded-lg pl-8 pr-10 py-2 text-sm text-white outline-none mb-4 focus:border-yellow-500/50 cursor-pointer hover:bg-[#1a2035] transition-all appearance-none shadow-inner"
                     >
                       {AOE4_MAPS.map(mapName => (
                         <option key={mapName} value={mapName} className="bg-[#0f1423] text-gray-200">{mapName}</option>
                       ))}
                     </select>
+                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-[calc(50%+8px)] text-gray-500 pointer-events-none" />
                   </div>
 
                   <label className="text-[10px] text-gray-500 uppercase mb-2 block">Vincitore</label>
@@ -242,10 +257,10 @@ export function AoE4MatchDashboard({ onSuccess, onError }: AoE4MatchDashboardPro
                           {civilizationsData.map((civ) => (
                             <button
                               key={civ.id}
-                              onClick={() => toggleCiv(mIdx, tKey, civ.name)}
+                              onClick={() => toggleCiv(mIdx, tKey, civ.id)}
                               title={civ.name}
                               className={`w-full aspect-square rounded-full border-2 transition-all overflow-hidden ${
-                                selectedCivs.includes(civ.name)
+                                selectedCivs.includes(civ.id)
                                   ? 'border-yellow-500 scale-110 shadow-[0_0_20px_rgba(212,175,55,0.6)] z-10'
                                   : 'border-white/5 opacity-60 grayscale-[40%] hover:opacity-100 hover:grayscale-0 hover:border-white/20'
                               }`}

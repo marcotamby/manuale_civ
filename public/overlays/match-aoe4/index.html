@@ -10,7 +10,7 @@
         
         body { 
             width: 1920px; height: 1080px; color: white; overflow: hidden;
-            background: transparent; /* Per OBS */
+            background: url('background.jpg') no-repeat center center/cover;
         }
 
         /* Header */
@@ -23,11 +23,11 @@
         #maps-container { position: absolute; top: 255px; width: 100%; display: flex; justify-content: center; gap: 320px; }
         
         @keyframes master-pulse { 0% { transform: scale(1); } 100% { transform: scale(1.04); } }
-        .map-wrapper { position: relative; width: 400px; height: 250px; }
+        .map-wrapper { position: relative; width: 500px; height: 280px; }
         .map-wrapper.active { animation: master-pulse 2s infinite alternate ease-in-out; }
 
         .map-card { width: 100%; height: 100%; background: #000; position: relative; border: 2px solid var(--gold); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; z-index: 2; }
-        .map-card img { width: 100%; height: 200px; object-fit: cover; }
+        .map-card img { width: 100%; height: 230px; object-fit: cover; }
         .map-name { height: 50px; text-align: center; line-height: 50px; font-weight: 700; color: var(--gold); text-transform: uppercase; font-size: 18px; background: #000; border-top: 1px solid var(--gold); }
 
         .label { 
@@ -49,19 +49,13 @@
 
         .civ-icons { position: absolute; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 20; }
         .civ-icons.left { left: -95px; } .civ-icons.right { right: -95px; }
-        .civ-unit { width: 75px; height: 75px; position: relative; }
+        .civ-unit { width: 85px; height: 85px; position: relative; }
         .civ-dot { width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; background-position: center; background-color: #000; }
 
         .crown { position: absolute; top: -55px; left: 50%; transform: translateX(-50%); font-size: 45px; z-index: 100; filter: drop-shadow(0 0 8px gold); }
 
-        /* Timer */
-        #timer-wrap { position: absolute; bottom: 180px; left: 50%; transform: translateX(-50%); text-align: center; display: none; }
-        #timer-label { color: var(--gold); font-weight: 700; margin-bottom: 4px; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; }
-        #timer-box { font-size: 40px; font-weight: 900; background: rgba(0,0,0,0.85); padding: 8px 40px; border: 2px solid var(--gold); border-radius: 10px; min-width: 160px; }
-        .timer-finish { font-size: 24px !important; color: white; font-weight: 700 !important; }
-
         /* CASTERS */
-        #casters-container { position: absolute; bottom: 100px; width: 100%; display: flex; justify-content: space-between; padding: 0 80px; box-sizing: border-box; pointer-events: none; }
+        #casters-container { position: absolute; bottom: 80px; width: 100%; display: flex; justify-content: space-between; padding: 0 80px; box-sizing: border-box; pointer-events: none; }
         .caster-box { display: flex; flex-direction: column; align-items: center; gap: 10px; visibility: hidden; }
         .webcam-frame { width: 380px; height: 214px; border: 2px solid var(--gold); background: rgba(0,0,0,0.3); border-radius: 4px; }
         .caster-name { background: var(--gold); color: black; font-weight: 800; padding: 8px 30px; font-size: 22px; border-radius: 4px; text-transform: uppercase; min-width: 240px; text-align: center; }
@@ -95,11 +89,6 @@
         </div>
     </div>
 
-    <div id="timer-wrap">
-        <div id="timer-label">Il game inizia tra</div>
-        <div id="timer-box">00:00</div>
-    </div>
-
     <script>
         // Credenziali Supabase (Hardcoded per OBS overlay)
         const SUB_URL = 'https://laliiuqjpxanhwhxajlm.supabase.co';
@@ -108,65 +97,57 @@
         const { createClient } = window.supabase;
         const client = createClient(SUB_URL, SUB_KEY);
         
-        console.log("Supabase Client Inizializzato (v1.3)");
+        console.log("Supabase Client Inizializzato (v1.4)");
         
-        let curMin = 0, curSec = 0, lastTs = 0, lastMaps = "";
+        let lastMaps = "";
 
         const civMap = {
-            "Abbasid Dynasty": "/civs/Abbasid Dynasty.webp",
-            "Ayyubids": "/civs/Ayyubids.webp",
-            "Byzantines": "/civs/Byzantines.webp",
-            "Chinese": "/civs/Chinese.webp",
-            "Delhi Sultanate": "/civs/Delhi Sultanate.webp",
-            "English": "/civs/English.webp",
-            "French": "/civs/French.webp",
-            "Golden Horde": "/civs/Golden Horde.webp",
-            "Holy Roman Empire": "/civs/Holy Roman Empire.webp",
-            "House of Lancaster": "/civs/House of Lancaster.webp",
-            "Japanese": "/civs/Japanese.webp",
-            "Jeanne d Arc": "/civs/Jeanne d'Arc.webp",
-            "Knights Templar": "/civs/Knights Templar.webp",
-            "Macedonian Dynasty": "/civs/Macedonian Dynasty.webp",
-            "Malians": "/civs/Malians.webp",
-            "Mongols": "/civs/Mongols.webp",
-            "Order of the Dragon": "/civs/Order of the Dragon.webp",
-            "Ottomans": "/civs/Ottomans.webp",
-            "Rus": "/civs/Rus.webp",
-            "Sengoku Daimyo": "/civs/Sengoku Daimyo.webp",
-            "Tughlaq Dynasty": "/civs/Tughlaq Dynasty.webp",
-            "Zhu Xis Legacy": "/civs/Zhu Xis Legacy.webp"
+            "abbasid": "/civs/Abbasid Dynasty.webp",
+            "ayyubids": "/civs/Ayyubids.webp",
+            "byzantines": "/civs/Byzantines.webp",
+            "chinese": "/civs/Chinese.webp",
+            "delhi": "/civs/Delhi Sultanate.webp",
+            "english": "/civs/English.webp",
+            "french": "/civs/French.webp",
+            "goldenhorde": "/civs/Golden Horde.webp",
+            "hre": "/civs/Holy Roman Empire.webp",
+            "japanese": "/civs/Japanese.webp",
+            "jeannedarc": "/civs/Jeanne d'Arc.webp",
+            "macedonian": "/civs/Macedonian Dynasty.webp",
+            "malians": "/civs/Malians.webp",
+            "mongols": "/civs/Mongols.webp",
+            "ottomans": "/civs/Ottomans.webp",
+            "orderofthedragon": "/civs/Order of the Dragon.webp",
+            "rus": "/civs/Rus.webp",
+            "sengoku": "/civs/Sengoku Daimyo.webp",
+            "templar": "/civs/Knights Templar.webp",
+            "tughlaq": "/civs/Tughlaq Dynasty.webp",
+            "zhuxi": "/civs/Zhu Xis Legacy.webp",
+            "lancaster": "/civs/House of Lancaster.webp"
         };
 
         // Helper per gestire estensioni multiple delle mappe
         function getMapUrl(name) {
             if (!name) return '/maps/default.png';
-            // Se il nome contiene già un'estensione, usala
             if (name.match(/\.(png|jpg|jpeg|webp)$/i)) return `/maps/${name}`;
             return `/maps/${name}.png`;
         }
         
         function handleImageError(img) {
             const src = img.src;
-            if (src.endsWith('.png')) {
-                img.src = src.replace('.png', '.jpg');
-            } else if (src.endsWith('.jpg')) {
-                img.src = src.replace('.jpg', '.jpeg');
-            } else {
-                img.src = '/maps/default.png';
-            }
+            if (src.endsWith('.png')) { img.src = src.replace('.png', '.jpg'); } 
+            else if (src.endsWith('.jpg')) { img.src = src.replace('.jpg', '.jpeg'); } 
+            else { img.src = '/maps/default.png'; }
         }
 
         function render(d) {
-            if (!d || !d.t1 || !d.t2) {
-                console.warn("Dati incompleti o mancanti in render:", d);
-                return;
-            }
+            if (!d || !d.t1 || !d.t2) return;
             console.log("Rendering update...", d);
             
             document.getElementById('t1-n').innerText = d.t1.name || '--';
             document.getElementById('t1-p').innerText = d.t1.players.filter(p=>p).join(' • ');
             document.getElementById('t1-s').innerText = d.t1.score;
-            document.getElementById('t2-n').innerText = d.t2.name;
+            document.getElementById('t2-n').innerText = d.t2.name || '--';
             document.getElementById('t2-p').innerText = d.t2.players.filter(p=>p).join(' • ');
             document.getElementById('t2-s').innerText = d.t2.score;
 
@@ -182,11 +163,11 @@
                         </div>
                         <div class="civ-icons left">
                             ${m.winner == 1 ? '<div class="crown">👑</div>' : ''}
-                            ${m.t1civs.map(c=>`<div class="civ-unit"><div class="civ-dot" style="background-image:url('${civMap[c] || c}')"></div></div>`).join('')}
+                            ${(m.t1civs || []).map(c=>`<div class="civ-unit"><div class="civ-dot" style="background-image:url('${civMap[c] || c}')"></div></div>`).join('')}
                         </div>
                         <div class="civ-icons right">
                             ${m.winner == 2 ? '<div class="crown">👑</div>' : ''}
-                            ${m.t2civs.map(c=>`<div class="civ-unit"><div class="civ-dot" style="background-image:url('${civMap[c] || c}')"></div></div>`).join('')}
+                            ${(m.t2civs || []).map(c=>`<div class="civ-unit"><div class="civ-dot" style="background-image:url('${civMap[c] || c}')"></div></div>`).join('')}
                         </div>
                     </div>`).join('');
                 lastMaps = JSON.stringify(d.maps);
@@ -195,88 +176,33 @@
             d.casters.forEach((c, i) => {
                 const box = document.getElementById(`cb-${i+1}`);
                 const name = document.getElementById(`c-${i+1}-name`);
-                if(c.active && c.name) { name.innerText = c.name; box.style.visibility = 'visible'; } 
-                else { box.style.visibility = 'hidden'; }
-            });
-
-            if(d.timer.active) {
-                document.getElementById('timer-wrap').style.display = 'block';
-                if(d.timer.timestamp !== lastTs) {
-                    curMin = parseInt(d.timer.min); curSec = parseInt(d.timer.sec); lastTs = d.timer.timestamp;
+                if(box && name) {
+                    if(c.active && c.name) { 
+                        name.innerText = c.name; 
+                        box.style.visibility = 'visible'; 
+                    } else { 
+                        box.style.visibility = 'hidden'; 
+                    }
                 }
-            } else { document.getElementById('timer-wrap').style.display = 'none'; lastTs = 0; }
+            });
         }
 
         async function init() {
             try {
-                const version = "v1.2 (Polling Fallback)";
-                console.log(`Inizializzazione overlay ${version}...`);
-                
                 // Fetch iniziale
                 const fetchState = async () => {
-                    const { data, error } = await client
-                        .from('stream_overlays')
-                        .select('state')
-                        .eq('id', 'aoe4-match')
-                        .single();
-                    
-                    if (error) {
-                        console.warn("Errore fetch iniziale:", error);
-                    } else if (data && data.state) {
-                        console.log("Dati recuperati con successo");
-                        render(data.state);
-                    }
+                    const { data, error } = await client.from('stream_overlays').select('state').eq('id', 'aoe4-match').single();
+                    if (!error && data && data.state) render(data.state);
                 };
-
                 await fetchState();
 
                 // Sottoscrizione Realtime
-                const channel = client.channel('overlay-sync')
-                    .on('postgres_changes', { 
-                        event: '*', 
-                        schema: 'public', 
-                        table: 'stream_overlays', 
-                        filter: 'id=eq.aoe4-match' 
-                    }, payload => {
-                        console.log("Update Realtime ricevuto!");
-                        if (payload.new && payload.new.state) {
-                            render(payload.new.state);
-                        }
-                    })
-                    .subscribe((status) => {
-                        console.log("Stato Realtime:", status);
-                        // Se dopo 5 secondi non siamo SUBSCRIBED, attiviamo il polling come fallback
-                        if (status !== 'SUBSCRIBED') {
-                            setTimeout(() => {
-                                if (channel.state !== 'joined') {
-                                    console.warn("Realtime non disponibile, attivo polling di emergenza...");
-                                    setInterval(fetchState, 5000);
-                                }
-                            }, 5000);
-                        }
-                    });
-
-            } catch (err) {
-                console.error("Errore critico init:", err);
-            }
+                client.channel('overlay-sync')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'stream_overlays', filter: 'id=eq.aoe4-match' }, 
+                    payload => { if (payload.new && payload.new.state) render(payload.new.state); })
+                    .subscribe();
+            } catch (err) { console.error("Errore critico init:", err); }
         }
-
-        setInterval(() => {
-            if (lastTs === 0) return;
-            const label = document.getElementById('timer-label');
-            const box = document.getElementById('timer-box');
-
-            if(curMin > 0 || curSec > 0) {
-                if(curSec === 0) { curMin--; curSec = 59; } else curSec--;
-                label.style.display = "block";
-                box.classList.remove('timer-finish');
-                box.innerText = `${String(curMin).padStart(2,'0')}:${String(curSec).padStart(2,'0')}`;
-            } else {
-                label.style.display = "none";
-                box.classList.add('timer-finish');
-                box.innerText = "Il game sta per iniziare";
-            }
-        }, 1000);
 
         init();
     </script>
