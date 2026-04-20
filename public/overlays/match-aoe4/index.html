@@ -163,7 +163,10 @@
             const startTimestamp = lastState.timer.timestamp || Date.now();
             const configSeconds = ((lastState.timer.min || 0) * 60) + (lastState.timer.sec || 0);
             const elapsed = Math.floor((Date.now() - startTimestamp) / 1000);
-            const totalSeconds = configSeconds + elapsed;
+            
+            // Countdown logic
+            let totalSeconds = configSeconds - elapsed;
+            if (totalSeconds < 0) totalSeconds = 0;
             
             document.getElementById('timer-display').innerText = formatTime(totalSeconds);
         }
