@@ -101,7 +101,10 @@
     </div>
 
     <script>
-        // Corretto caricamento Supabase
+        // Credenziali Supabase (Hardcoded per OBS overlay)
+        const SUB_URL = 'https://laliiuqjpxanhwhxajlm.supabase.co';
+        const SUB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhbGlpdXFqcHhhbmh3aHhhamxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjQ5MjEsImV4cCI6MjA4ODU0MDkyMX0.1xIE1MXy1JxgGzpP0Hitotz8o3aMwASV8NUr06bQjkA';
+
         const { createClient } = window['@supabase/supabase-js'];
         const client = createClient(SUB_URL, SUB_KEY);
 
@@ -152,7 +155,13 @@
         }
 
         function render(d) {
-            document.getElementById('t1-n').innerText = d.t1.name;
+            if (!d || !d.t1 || !d.t2) {
+                console.warn("Dati incompleti o mancanti in render:", d);
+                return;
+            }
+            console.log("Rendering update...", d);
+            
+            document.getElementById('t1-n').innerText = d.t1.name || '--';
             document.getElementById('t1-p').innerText = d.t1.players.filter(p=>p).join(' • ');
             document.getElementById('t1-s').innerText = d.t1.score;
             document.getElementById('t2-n').innerText = d.t2.name;
