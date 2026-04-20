@@ -157,9 +157,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const [questions, setQuestions] = useState<any[]>([]);
   const [qaLoading, setQaLoading] = useState(false);
   const [questionText, setQuestionText] = useState('');
-  const [isSignOpen, setIsSignOpen] = useState(false);
   const [expandedBOs, setExpandedBOs] = useState<Set<string>>(new Set());
-  const [activeTab, setActiveTab] = useState<'bonuses' | 'army' | 'landmarks' | 'buildorders'>('bonuses');
   const [replyTo, setReplyTo] = useState<{ questionId: string, parentId?: string } | null>(null);
   const [answerText, setAnswerText] = useState('');
   const [qaMessage, setQaMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
