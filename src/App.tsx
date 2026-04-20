@@ -145,7 +145,6 @@ function App() {
       <div className="flex h-screen items-center justify-center bg-[var(--color-brand-dark)] text-white">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-gray-400 font-medium">Caricamento truppe...</p>
         </div>
       </div>
     );

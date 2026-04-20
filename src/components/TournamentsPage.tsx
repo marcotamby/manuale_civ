@@ -84,7 +84,6 @@ export function TournamentsPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <Loader2 className="w-12 h-12 text-yellow-500 animate-spin" />
-        <p className="text-gray-400 font-cinzel tracking-widest uppercase text-sm">Caricamento tornei...</p>
       </div>
     );
   }
