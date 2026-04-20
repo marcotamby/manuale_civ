@@ -136,55 +136,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
       {/* Decorative top border glow effect */}
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent"></div>
 
-      {/* Professional Medieval Skyline Background Decoration */}
-      <div 
-        className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none opacity-40 select-none z-0 flex items-end overflow-hidden"
-        style={{ 
-          maskImage: 'linear-gradient(to top, white, transparent)',
-          WebkitMaskImage: 'linear-gradient(to top, white, transparent)' 
-        }}
-      >
-        <svg width="100%" height="48" viewBox="0 0 1200 48" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
-          <g fill="none" stroke="white" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round">
-            {/* Castle Left (Keep & Wall) */}
-            <path d="M20,48 L20,28 L25,28 L25,22 L35,22 L35,12 L65,12 L65,22 L75,22 L75,28 L80,28 L80,48" />
-            <path d="M35,12 L50,2 L65,12" /> {/* Pointed Roof */}
-            <path d="M80,38 L160,38 M95,38 L95,32 L105,32 L105,38 M125,38 L125,32 L135,32 L135,38" /> {/* Wall with Battlements */}
-            
-            {/* Watchtower with Flag */}
-            <path d="M210,48 L210,18 L205,18 L205,12 L245,12 L245,18 L240,18 L240,48" />
-            <path d="M225,12 L225,2 M225,2 L235,5 L225,8" /> {/* Flag */}
-            
-            {/* Group of Soldiers (Spearmen) */}
-            <g transform="translate(320, 38)">
-              <circle cx="0" cy="-6" r="2" /> <line x1="0" y1="-4" x2="0" y2="6" /> <line x1="1" y1="-2" x2="7" y2="-12" />
-              <circle cx="12" cy="-6" r="2" /> <line x1="12" y1="-4" x2="12" y2="6" /> <line x1="13" y1="-2" x2="19" y2="-12" />
-              <circle cx="24" cy="-6" r="2" /> <line x1="24" y1="-4" x2="24" y2="6" /> <line x1="25" y1="-2" x2="31" y2="-12" />
-            </g>
 
-            {/* Central Grand Cathedral/Keep */}
-            <path d="M540,48 L540,25 L530,25 L530,18 L555,18 L555,8 L645,8 L645,18 L670,18 L670,25 L660,25 L660,48" />
-            <path d="M575,8 L575,0 L625,0 L625,8" />
-            <path d="M600,0 L600,-6 M600,-6 L612,-2 L600,2" /> {/* Royal Flag */}
-            <path d="M585,15 L585,30 M615,15 L615,30" /> {/* Arch details */}
-
-            {/* High Watchtower Right */}
-            <path d="M850,48 L850,15 L840,15 L840,8 L890,8 L890,15 L880,15 L880,48" />
-            <path d="M865,8 L865,-2 M865,-2 L875,2 L865,6" />
-
-            {/* Far Right Settlement */}
-            <path d="M1020,48 L1020,35 L1010,35 L1035,22 L1060,35 L1050,35 L1050,48" /> {/* Peaked House */}
-            <path d="M1080,48 L1080,28 L1120,28 L1120,48" />
-            <path d="M1080,28 L1100,18 L1120,28" />
-            
-            {/* More Soldiers */}
-            <g transform="translate(1150, 42)">
-              <circle cx="0" cy="-6" r="2" /> <line x1="0" y1="-4" x2="0" y2="6" /> <line x1="1" y1="-2" x2="7" y2="-12" />
-              <circle cx="10" cy="-6" r="2" /> <line x1="10" y1="-4" x2="10" y2="6" /> <line x1="11" y1="-2" x2="17" y2="-12" />
-            </g>
-          </g>
-        </svg>
-      </div>
 
       {/* Left container for social links on desktop */}
       <div className="hidden md:flex w-1/3 items-center justify-start gap-3">
