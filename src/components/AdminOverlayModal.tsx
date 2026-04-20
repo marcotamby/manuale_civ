@@ -171,7 +171,9 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                   <overlay.icon size={20} />
                 </div>
                 <div className="text-left">
-                  <div className={`font-bold text-sm ${selectedOverlay?.id === overlay.id ? 'text-white' : 'text-gray-300'}`}>{overlay.name}</div>
+                  <div className={`font-bold text-sm ${selectedOverlay?.id === overlay.id ? 'text-white' : 'text-gray-300'}`}>
+                    {selectedOverlay?.id === overlay.id ? overlayDisplayName : overlay.name}
+                  </div>
                   <div className="text-[10px] text-gray-500 line-clamp-1 mt-1">{overlay.description}</div>
                 </div>
               </button>
