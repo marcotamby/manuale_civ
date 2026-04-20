@@ -522,7 +522,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
               <div ref={sectionRefs.buildorders} className="bg-black/30 border border-yellow-500/30 rounded-xl p-4">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="font-bold text-yellow-400 flex items-center gap-2"><Map size={18} /> Build Orders</h4>
-                  <button onClick={() => addToArray('buildOrders', { id: `bo-${Date.now()}`, title: '', difficulty: 'Medium', description: '', steps: [] })} className="text-xs bg-yellow-600 hover:bg-yellow-500 text-white px-2 py-1 rounded flex items-center gap-1">
+                  <button onClick={() => addToArray('buildOrders', { id: `bo-${Date.now()}`, title: '', difficulty: 2, description: '', steps: [], banner_url: '' })} className="text-xs bg-yellow-600 hover:bg-yellow-500 text-white px-2 py-1 rounded flex items-center gap-1">
                     <Plus size={14} /> Aggiungi
                   </button>
                 </div>
@@ -532,7 +532,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                       <button onClick={() => removeFromArray('buildOrders', idx)} className="absolute top-2 right-2 text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                         <Trash2 size={16} />
                       </button>
-                      <div className="grid grid-cols-3 gap-2 mb-2 pr-6">
+                      <div className="grid grid-cols-4 gap-2 mb-2 pr-6">
                         <input 
                           type="text" 
                           value={bo.title === 'Nuovo Build Order' ? '' : bo.title} 
@@ -540,6 +540,30 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                           placeholder="Titolo" 
                           className="col-span-3 bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600" 
                         />
+                        <select
+                          value={bo.difficulty || 2}
+                          onChange={e => updateArrayField('buildOrders', idx, 'difficulty', Number(e.target.value))}
+                          className="bg-gray-800 text-white text-xs rounded px-1 py-1 border border-gray-600 focus:border-yellow-500 outline-none"
+                        >
+                          <option value={1}>⭐ (Easy)</option>
+                          <option value={2}>⭐⭐ (Medium)</option>
+                          <option value={3}>⭐⭐⭐ (Hard)</option>
+                        </select>
+                      </div>
+                      <div className="mb-2">
+                        <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block text-yellow-500">Banner Image URL (JPG/PNG)</label>
+                        <input 
+                          type="text" 
+                          value={bo.banner_url || ''} 
+                          onChange={e => updateArrayField('buildOrders', idx, 'banner_url', e.target.value)} 
+                          placeholder="https://... (PNG/JPG)" 
+                          className="w-full bg-gray-800 text-blue-300 text-[10px] rounded px-2 py-1 border border-gray-600 focus:border-yellow-500 outline-none" 
+                        />
+                        {bo.banner_url && (
+                          <div className="mt-1 relative h-20 w-full rounded overflow-hidden border border-white/10">
+                            <img src={bo.banner_url} alt="Preview" className="w-full h-full object-cover" />
+                          </div>
+                        )}
                       </div>
                       <div className="mb-2">
                         <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block text-blue-400">Descrizione / Strategia</label>

@@ -49,11 +49,12 @@ export interface BuildOrder {
   id: string;
   title: string;
   description: string;
-  difficulty: 'Easy' | 'Medium' | 'Advanced';
+  difficulty: 1 | 2 | 3; // 1: Easy, 2: Medium, 3: Advanced
   steps: BuildOrderStep[];
   source?: string;
   author_nickname?: string;
   author_rank?: string;
+  banner_url?: string;
 }
 
 export interface Civilization {

@@ -18,6 +18,8 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
   const [text, setText] = useState(''); // For general suggestion text
   const [source, setSource] = useState(''); // For general source or build order source
   const [isSigned, setIsSigned] = useState(false);
+  const [difficulty, setDifficulty] = useState<number>(2);
+  const [bannerUrl, setBannerUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
     isVisible: false,
@@ -52,6 +54,8 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
     setDescription('');
     setSource('');
     setBoSteps([{ time: '', action: '', note: '' }]);
+    setDifficulty(2);
+    setBannerUrl('');
     setIsSigned(false);
   }, [user?.email]);
 
@@ -88,6 +92,8 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
         const boData = {
           title: title.trim() || '',
           description: description,
+          difficulty: difficulty,
+          banner_url: bannerUrl,
           steps: boSteps,
           source: source
         };
@@ -125,6 +131,8 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
       setDescription('');
       setSource('');
       setBoSteps([{ time: '', action: '', note: '' }]); // Reset build order steps
+      setDifficulty(2);
+      setBannerUrl('');
       setIsSigned(false);
     } catch (err: any) {
       console.error('Error submitting suggestion:', err);
@@ -236,6 +244,50 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
                 required
               />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Difficoltà Strategia</label>
+              <div className="flex gap-4">
+                {[1, 2, 3].map((num) => (
+                  <button
+                    key={num}
+                    type="button"
+                    onClick={() => setDifficulty(num)}
+                    className={`flex-1 py-3 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${
+                      difficulty === num 
+                        ? 'bg-yellow-500/10 border-yellow-500 text-yellow-500' 
+                        : 'bg-black/40 border-white/10 text-gray-500 hover:border-white/20'
+                    }`}
+                  >
+                    <div className="flex gap-0.5">
+                      {Array.from({ length: num }).map((_, i) => (
+                        <span key={i} className="text-xs">⭐</span>
+                      ))}
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-tighter">
+                      {num === 1 ? 'Facile' : num === 2 ? 'Media' : 'Difficile'}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Immagine Banner (URL JPG/PNG)</label>
+              <input
+                type="text"
+                placeholder="https://imgur.com/... (opzionale)"
+                value={bannerUrl}
+                onChange={(e) => setBannerUrl(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                title="Inserisci l'URL di un'immagine da mostrare come anteprima"
+              />
+              {bannerUrl && (
+                <div className="mt-2 relative h-32 w-full rounded-xl overflow-hidden border border-white/10">
+                  <img src={bannerUrl} alt="Anteprima" className="w-full h-full object-cover" />
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">

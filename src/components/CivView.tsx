@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCivData } from './CivContext';
 import { useAuth } from './AuthContext';
 import { usePresence } from './PresenceContext';
@@ -45,6 +45,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
   const validTabs: Tab[] = ['caratteristiche', 'units', 'buildorders', 'matchups', 'video', 'domande', 'proponi', 'admin-edit'];
   const activeTab: Tab = (validTabs.includes(tab as Tab)) ? (tab as Tab) : 'caratteristiche';
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedBOId = searchParams.get('bo');
+  
   const [activeAge, setActiveAge] = useState<1 | 2 | 3 | 4>(() => {
     return (Number(sessionStorage.getItem('activeAge')) as 1 | 2 | 3 | 4) || 1;
   });
@@ -60,6 +63,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
   const civ = civilizations.find(c => c.id === civId);
   const [expandedBOs, setExpandedBOs] = useState<Set<string>>(new Set());
+  
+  // Find selected BO for overlay
+  const selectedBO = civ?.buildOrders?.find(bo => bo.id === selectedBOId);
+
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string, type: 'question' | 'answer' } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -691,149 +698,69 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             </div>
 
             {civ.buildOrders && civ.buildOrders.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 w-full max-w-7xl mx-auto px-4 md:px-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl mx-auto">
                 {civ.buildOrders.map((bo) => {
-                  const isExpanded = expandedBOs.has(bo.id);
                   return (
                     <div
                       key={bo.id}
-                      className={`glass p-6 md:p-8 rounded-2xl border border-white/5 transition-all group h-fit hover:border-yellow-500/30 ${isExpanded ? 'bg-white/[0.02]' : 'cursor-pointer'}`}
-                      onClick={() => {
-                        if (!isExpanded) {
-                          const newExpanded = new Set(expandedBOs);
-                          newExpanded.add(bo.id);
-                          setExpandedBOs(newExpanded);
-                        }
-                      }}
+                      className="glass flex flex-col rounded-2xl border border-white/5 overflow-hidden transition-all group hover:border-yellow-500/30 hover:shadow-[0_0_30px_rgba(234,179,8,0.1)] cursor-pointer"
+                      onClick={() => setSearchParams({ bo: bo.id }, { replace: true })}
                     >
-                      <div className="flex justify-between items-start mb-3">
-                        <h3 className="text-lg md:text-xl font-bold text-white group-hover:text-yellow-400 transition-colors uppercase tracking-tight">{bo.title}</h3>
-                      </div>
-
-                      <div className={`text-base text-gray-200 leading-relaxed max-w-4xl mb-6 ${isExpanded ? '' : 'line-clamp-2 opacity-60'}`}>
-                        <ResourceText text={bo.description} />
-                      </div>
-
-                      {isExpanded && bo.steps && bo.steps.length > 0 && (
-                        <div className="space-y-4 mb-8 animate-in slide-in-from-top-2 duration-300">
-                          {bo.steps.map((step, sIdx) => (
-                            <div key={sIdx} className="flex flex-col gap-1.5 relative pl-6 border-l border-white/5">
-                              {/* Bullet point indicator */}
-                              <div className="absolute left-[-5px] top-[10px] w-[10px] h-[10px] rounded-full bg-yellow-500/80 shadow-[0_0_8px_rgba(234,179,8,0.4)]" />
-
-                              <div className="flex gap-2 items-baseline">
-                                {step.time && (
-                                  <span className="text-yellow-500 font-mono w-14 shrink-0 font-bold flex items-center gap-1 text-[10px] md:text-xs">
-                                    <Clock size={12} /> {step.time}
-                                  </span>
-                                )}
-                                <ResourceText text={step.action} className="text-sm md:text-base text-white font-semibold tracking-tight leading-snug py-0.5" />
-                              </div>
-                              {step.note && (
-                                <div className="pl-0 mt-1 mb-1">
-                                  <ResourceText text={step.note} className="text-sm text-gray-300 italic leading-relaxed" />
-                                </div>
-                              )}
-                            </div>
-                          ))}
-
-                          {/* Source / Video Preview */}
-                          {bo.source && (
-                            <div className="mt-8 pt-6 border-t border-white/5 space-y-4">
-                              <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">Fonte & Riferimenti</label>
-                              {getYoutubeId(bo.source) ? (
-                                <a
-                                  href={bo.source}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="group relative block aspect-video w-full max-w-xs rounded-xl overflow-hidden border border-white/10 bg-black hover:border-red-500/50 transition-all shadow-xl hover:shadow-red-500/10"
-                                >
-                                  <img
-                                    src={`https://img.youtube.com/vi/${getYoutubeId(bo.source)}/hqdefault.jpg`}
-                                    className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity"
-                                    alt="Video preview"
-                                  />
-                                  <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="w-12 h-9 bg-red-600 rounded-lg flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
-                                      <Play size={16} fill="white" />
-                                    </div>
-                                  </div>
-                                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black to-transparent text-[10px] text-white font-medium flex items-center gap-1">
-                                    <ExternalLink size={10} /> Guarda su YouTube
-                                  </div>
-                                </a>
-                              ) : (
-                                <a
-                                  href={bo.source}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 px-4 py-3 rounded-xl border border-blue-500/20 shadow-lg"
-                                >
-                                  <ExternalLink size={14} />
-                                  {bo.source.length > 30 ? bo.source.slice(0, 30) + '...' : bo.source}
-                                </a>
-                              )}
-                            </div>
-                          )}
-
-                          {/* Author Attribution */}
-                          {(bo.author_nickname || bo.author_rank) && (
-                            <div className="flex items-center justify-between mt-6 px-4 py-3 bg-white/5 rounded-xl border border-white/5">
-                              <div className="flex items-center gap-3">
-                                <div className="flex flex-col">
-                                  <span className="text-[9px] text-gray-500 uppercase font-bold tracking-tighter">Proposta da</span>
-                                  <span className="text-sm font-bold text-blue-400">{bo.author_nickname || 'Anonimo'}</span>
-                                </div>
-                              </div>
-                              {bo.author_rank && bo.author_rank !== 'Unranked' && RANK_ICONS[bo.author_rank] && (
-                                <div className="flex items-center gap-2 bg-black/30 px-2 py-1.5 rounded-lg border border-white/5">
-                                  <img src={RANK_ICONS[bo.author_rank]} alt={bo.author_rank} className="w-6 h-6 object-contain" />
-                                  <span className="text-[10px] font-bold text-gray-400 uppercase">{bo.author_rank}</span>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const newExpanded = new Set(expandedBOs);
-                          if (isExpanded) newExpanded.delete(bo.id);
-                          else newExpanded.add(bo.id);
-                          setExpandedBOs(newExpanded);
-                        }}
-                        className="flex items-center gap-2 text-xs font-bold text-yellow-500/80 hover:text-yellow-400 transition-colors"
-                      >
-                        {isExpanded ? (
-                          <>
-                            <ChevronUp size={14} /> Chiudi dettagli
-                          </>
+                      {/* Banner */}
+                      <div className="relative h-40 w-full overflow-hidden bg-black/40">
+                        {bo.banner_url ? (
+                          <img src={bo.banner_url} alt={bo.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                         ) : (
-                          <>
-                            <ChevronDown size={14} /> Mostra dettagli strategia
-                          </>
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Map size={48} className="text-white/10" />
+                          </div>
                         )}
-                      </button>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+                        <div className="absolute bottom-3 left-4 flex gap-0.5">
+                          {Array.from({ length: 3 }).map((_, i) => (
+                            <span key={i} className={`text-xs ${i < bo.difficulty ? 'text-yellow-500' : 'text-white/20'}`}>⭐</span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <div className="p-5 flex-1 flex flex-col bg-[#1a1c23]/50">
+                        <h3 className="text-lg font-black text-white group-hover:text-yellow-400 transition-colors uppercase tracking-tight mb-2 line-clamp-1">{bo.title}</h3>
+                        
+                        <p className="text-sm text-gray-400 line-clamp-2 mb-6 leading-relaxed flex-1">
+                           {bo.description}
+                        </p>
+
+                        <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
+                           <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                                {bo.author_rank && getRankIcon(bo.author_rank) ? (
+                                  <img src={getRankIcon(bo.author_rank) || ''} alt={bo.author_rank} className="w-4 h-4 object-contain" />
+                                ) : (
+                                  <UserCircle size={14} className="text-gray-600" />
+                                )}
+                              </div>
+                              <span className="text-[11px] font-bold text-blue-400 uppercase tracking-tighter truncate max-w-[80px]">
+                                {bo.author_nickname || 'Anonimo'}
+                              </span>
+                           </div>
+                           <span className="text-[10px] font-black text-yellow-500 uppercase tracking-widest bg-yellow-500/10 px-2 py-1 rounded">Vedi Strategia</span>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
 
-                <div className="mt-12 pt-10 border-t border-white/5 text-center flex flex-col items-center">
-                  <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mb-4 border border-yellow-500/20">
-                    <Map size={32} className="text-yellow-500" />
+                {/* Proposal card */}
+                <div 
+                  onClick={() => navigate(`/civ/${civId}/proponi?section=build_order`)}
+                  className="glass flex flex-col items-center justify-center p-8 rounded-2xl border border-dashed border-white/10 hover:border-yellow-500/40 hover:bg-yellow-500/5 transition-all group cursor-pointer text-center h-full min-h-[250px]"
+                >
+                  <div className="w-12 h-12 bg-yellow-500/10 rounded-full flex items-center justify-center mb-4 border border-yellow-500/20 group-hover:scale-110 transition-transform">
+                    <Plus size={24} className="text-yellow-500" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Proponi un nuovo Build Order</h3>
-                  <p className="text-sm text-gray-500 max-w-sm mb-6">Aiuta la community aggiungendo una nuova strategia o un'ottimizzazione per questa civiltà.</p>
-                  <button
-                    onClick={() => navigate(`/civ/${civId}/proponi?section=build_order`)}
-                    className="px-10 py-4 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/40 rounded-2xl text-base text-yellow-500 font-extrabold transition-all shadow-lg hover:scale-105 active:scale-95"
-                  >
-                    Invia la tua proposta →
-                  </button>
+                  <h3 className="text-base font-bold text-white mb-2">Proponi Build Order</h3>
+                  <p className="text-xs text-gray-500 px-4">Aiuta la community con una nuova strategia.</p>
                 </div>
               </div>
             ) : (
@@ -851,6 +778,173 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 </button>
               </div>
             )}
+
+            {/* FULL BUILD ORDER OVERLAY */}
+            {selectedBO && (
+              <div className="fixed inset-0 z-[3000] flex items-center justify-center p-2 md:p-6 bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
+                <div 
+                   className="absolute inset-0" 
+                   onClick={() => setSearchParams({}, { replace: true })}
+                />
+                <div className="relative bg-[#0f1115] border border-yellow-500/30 rounded-3xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_100px_rgba(234,179,8,0.15)] animate-in zoom-in slide-in-from-bottom-5 duration-300">
+                  
+                  {/* Header / Banner */}
+                  <div className="relative h-48 md:h-64 shrink-0 overflow-hidden">
+                    {selectedBO.banner_url ? (
+                      <img src={selectedBO.banner_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-[#1a1c23] to-black flex items-center justify-center">
+                        <Map size={64} className="text-white/5" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0f1115] via-[#0f1115]/40 to-transparent" />
+                    
+                    <button 
+                      onClick={() => setSearchParams({}, { replace: true })}
+                      className="absolute top-4 right-4 p-2 bg-black/60 hover:bg-black/80 text-white rounded-full backdrop-blur-md border border-white/10 transition-all z-10"
+                    >
+                      <X size={24} />
+                    </button>
+
+                    <div className="absolute bottom-6 left-8 right-8">
+                       <div className="flex items-center gap-2 mb-2">
+                          {Array.from({ length: 3 }).map((_, i) => (
+                            <span key={i} className={`text-sm ${i < selectedBO.difficulty ? 'text-yellow-500' : 'text-white/10'}`}>⭐</span>
+                          ))}
+                          <span className="text-[10px] font-black text-yellow-500/80 uppercase tracking-[0.2em] ml-2">
+                             {selectedBO.difficulty === 1 ? 'Facile' : selectedBO.difficulty === 2 ? 'Media' : 'Difficile'}
+                          </span>
+                       </div>
+                       <h2 className="text-2xl md:text-4xl font-black text-white uppercase tracking-tighter drop-shadow-lg leading-tight">
+                         {selectedBO.title}
+                       </h2>
+                    </div>
+                  </div>
+
+                  {/* Body Content */}
+                  <div className="flex-1 overflow-y-auto p-6 md:p-10 space-y-10 custom-scrollbar">
+                    
+                    {/* Intro / Description */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                      <div className="lg:col-span-2 space-y-6">
+                        <div className="space-y-4">
+                           <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-white/5 pb-2">Introduzione & Strategia</h4>
+                           <div className="text-gray-300 leading-relaxed text-sm md:text-base">
+                             <ResourceText text={selectedBO.description} />
+                           </div>
+                        </div>
+
+                        {/* Steps List */}
+                        <div className="space-y-6 pt-4">
+                           <h4 className="text-[10px] font-black text-yellow-500 uppercase tracking-widest flex items-center gap-2">
+                             <Map size={14} /> Passaggi della Build
+                           </h4>
+                           <div className="space-y-0">
+                             {selectedBO.steps.map((step, sIdx) => (
+                               <div key={sIdx} className="group relative pl-10 pb-8 last:pb-0 border-l border-white/5 last:border-transparent">
+                                 {/* Connector dot */}
+                                 <div className="absolute left-[-5px] top-1.5 w-[10px] h-[10px] rounded-full bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)] group-hover:scale-125 transition-transform" />
+                                 
+                                 <div className="space-y-2">
+                                   <div className="flex items-center gap-3">
+                                      {step.time && (
+                                        <span className="px-2 py-0.5 bg-yellow-500/10 text-yellow-500 rounded font-mono text-xs font-bold border border-yellow-500/20">
+                                          {step.time}
+                                        </span>
+                                      )}
+                                      <h5 className="text-white font-bold leading-tight md:text-lg">
+                                        <ResourceText text={step.action} />
+                                      </h5>
+                                   </div>
+                                   {step.note && (
+                                     <div className="bg-white/[0.02] border border-white/5 p-4 rounded-2xl text-sm text-gray-400 italic leading-relaxed">
+                                       <ResourceText text={step.note} />
+                                     </div>
+                                   )}
+                                 </div>
+                               </div>
+                             ))}
+                           </div>
+                        </div>
+                      </div>
+
+                      {/* Sidebar */}
+                      <div className="space-y-8">
+                        {/* Author Info */}
+                        <div className="bg-white/5 rounded-3xl border border-white/5 p-6 space-y-4">
+                           <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Informazioni Autore</h4>
+                           <div className="flex items-center gap-4">
+                              <div className="w-16 h-16 rounded-2xl bg-[#0f1115] border border-blue-500/20 flex items-center justify-center p-2">
+                                 {selectedBO.author_rank && getRankIcon(selectedBO.author_rank) ? (
+                                   <img src={getRankIcon(selectedBO.author_rank) || ''} alt={selectedBO.author_rank} className="w-full h-full object-contain" />
+                                 ) : (
+                                   <UserCircle size={40} className="text-gray-800" />
+                                 )}
+                              </div>
+                              <div className="flex flex-col">
+                                 <span className="text-lg font-black text-blue-400 truncate uppercase tracking-tighter">
+                                   {selectedBO.author_nickname || 'Contributore'}
+                                 </span>
+                                 <span className="text-[10px] font-bold text-gray-500 uppercase bg-black/40 px-2 py-0.5 rounded w-fit">
+                                   {selectedBO.author_rank || 'Unranked'}
+                                 </span>
+                              </div>
+                           </div>
+                           <p className="text-[10px] text-gray-600 italic leading-snug">
+                             Questo build order è stato proposto dalla community e verificato dai nostri esperti.
+                           </p>
+                        </div>
+
+                        {/* Video / Source */}
+                        {selectedBO.source && (
+                          <div className="bg-white/5 rounded-3xl border border-white/5 p-6 space-y-4">
+                             <h4 className="text-[10px] font-black text-red-500 uppercase tracking-widest">Video Tutorial</h4>
+                             {getYoutubeId(selectedBO.source) ? (
+                                <a 
+                                  href={`https://www.youtube.com/watch?v=${getYoutubeId(selectedBO.source)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="group relative block aspect-video rounded-2xl overflow-hidden border border-white/10 bg-black"
+                                >
+                                   <img 
+                                     src={`https://img.youtube.com/vi/${getYoutubeId(selectedBO.source)}/hqdefault.jpg`}
+                                     className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all duration-500"
+                                     alt="YouTube Preview"
+                                   />
+                                   <div className="absolute inset-0 flex items-center justify-center">
+                                      <div className="w-12 h-9 bg-red-600 rounded-xl flex items-center justify-center text-white shadow-xl shadow-red-600/20 translate-y-0 group-hover:-translate-y-1 transition-all">
+                                         <Play size={18} fill="white" />
+                                      </div>
+                                   </div>
+                                </a>
+                             ) : (
+                                <a 
+                                  href={selectedBO.source}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-3 p-4 bg-black/40 rounded-2xl border border-white/10 text-sm text-blue-400 hover:text-white transition-all group"
+                                >
+                                   <ExternalLink size={16} className="group-hover:scale-110 transition-transform" />
+                                   <span className="truncate">Visualizza fonte esterna</span>
+                                </a>
+                             )}
+                          </div>
+                        )}
+
+                        <button 
+                          onClick={() => setSearchParams({}, { replace: true })}
+                          className="w-full py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-xs font-black text-gray-400 hover:text-white uppercase tracking-widest transition-all"
+                        >
+                          Chiudi Strategia
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
           </div>
         )}
 
