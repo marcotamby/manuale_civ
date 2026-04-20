@@ -78,10 +78,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       const currentVideo = civ.videos?.length || 0;
 
       // Only update if counts have changed
-      if (!lastSeenData[civId] ||
-        lastSeenData[civId].bo !== currentBO ||
-        lastSeenData[civId].video !== currentVideo) {
+      const stored = lastSeenData[civId] || { bo: 0, video: 0 };
+      const storedBO = typeof stored.bo === 'number' ? stored.bo : 0;
+      const storedVideo = typeof stored.video === 'number' ? stored.video : 0;
 
+      if (storedBO !== currentBO || storedVideo !== currentVideo) {
         lastSeenData[civId] = { bo: currentBO, video: currentVideo };
         localStorage.setItem(lastSeenKey, JSON.stringify(lastSeenData));
 

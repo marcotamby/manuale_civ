@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
+import { execSync } from 'child_process';
 
 dotenv.config();
 
@@ -21,20 +22,24 @@ const TABLES_TO_BACKUP = [
   'faq_settings',
   'faq_sections',
   'faq_items',
-  'profiles'
+  'profiles',
+  'build_orders'
 ];
 
-async function backupDatabase() {
-  console.log('🚀 Inizio backup del database Supabase...');
+async function createSnapshot() {
+  const comment = process.argv[2] || 'manual_snapshot';
+  const cleanComment = comment.toLowerCase().replace(/[^a-z0-9]/g, '_');
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const backupDir = path.join(process.cwd(), 'backups');
+  
+  console.log(`🚀 Creazione snapshot: ${comment}...`);
+  const backupDir = path.join(process.cwd(), 'backups', 'snapshots');
 
   if (!fs.existsSync(backupDir)) {
     fs.mkdirSync(backupDir, { recursive: true });
   }
 
-  const sessionBackupDir = path.join(backupDir, `backup_${timestamp}`);
-  fs.mkdirSync(sessionBackupDir, { recursive: true });
+  const snapshotDir = path.join(backupDir, `${timestamp}_${cleanComment}`);
+  fs.mkdirSync(snapshotDir, { recursive: true });
 
   for (const table of TABLES_TO_BACKUP) {
     console.log(`📡 Scaricamento tabella ${table}...`);
@@ -46,26 +51,22 @@ async function backupDatabase() {
     }
 
     if (data) {
-      const tablePath = path.join(sessionBackupDir, `${table}.json`);
-      const latestPath = path.join(backupDir, `${table}_latest.json`);
-      
+      const tablePath = path.join(snapshotDir, `${table}.json`);
       fs.writeFileSync(tablePath, JSON.stringify(data, null, 2));
-      fs.writeFileSync(latestPath, JSON.stringify(data, null, 2));
       console.log(`✅ Table '${table}' salvata (${data.length} righe)`);
     }
   }
 
   console.log('\n📦 Automatizzazione Git...');
   try {
-    const { execSync } = await import('child_process');
     execSync('git add backups/', { stdio: 'inherit' });
-    execSync(`git commit -m "Automated database backup: ${timestamp}"`, { stdio: 'inherit' });
+    execSync(`git commit -m "Database snapshot: ${comment} (${timestamp})"`, { stdio: 'inherit' });
     console.log('✅ Commit Git eseguito con successo.');
-  } catch (gitError) {
-    console.warn('⚠️ Impossibile eseguire il commit Git (forse non ci sono modifiche o Git non è configurato):', (gitError as any).message);
+  } catch (gitError: any) {
+    console.warn('⚠️ Impossibile eseguire il commit Git:', gitError.message);
   }
 
-  console.log('\n🎉 Backup completato con successo! Tutti i dati sono al sicuro sul tuo PC e su Git.');
+  console.log(`\n🎉 Snapshot completato in: ${snapshotDir}`);
 }
 
-backupDatabase();
+createSnapshot();

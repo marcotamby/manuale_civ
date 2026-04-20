@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Link } from 'react-router-dom';
 import { RANK_ICONS } from './ProfileModal';
-import { Coffee, Radio as _Radio, HelpCircle, LogOut, Trophy } from 'lucide-react';
+import { Coffee, Radio as _Radio, HelpCircle, LogOut, Trophy, Monitor } from 'lucide-react';
 import { usePresence } from './PresenceContext';
 
 export type FilterType = 'Tutte' | 'Fanteria' | 'Cavalleria' | 'Arcieri' | 'Assedio';
@@ -16,9 +16,10 @@ interface TopbarProps {
   activeFilter: string;
   setActiveFilter: (f: FilterType) => void;
   onOpenAdminDashboard?: () => void;
+  onOpenAdminOverlay?: () => void;
 }
 
-export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
+export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps) {
   const { isAuthenticated, isAdmin, isSuperAdmin, user, logout, openLoginModal, favorites } = useAuth();
   const { civilizations } = useCivData();
   const { activeAdmins: _activeAdmins } = usePresence();
@@ -183,6 +184,16 @@ export function Topbar({ onOpenAdminDashboard }: TopbarProps) {
           <Trophy size={14} className="group-hover:scale-110 transition-transform" />
           Tornei
         </Link>
+        {isAdmin && window.innerWidth >= 1024 && (
+          <button
+            onClick={onOpenAdminOverlay}
+            className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/20 hover:border-yellow-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
+            title="Gestione Overlay Stream"
+          >
+            <Monitor size={14} className="group-hover:scale-110 transition-transform" />
+            Stream
+          </button>
+        )}
       </div>
 
       {/* Center Title Area */}

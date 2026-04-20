@@ -16,6 +16,7 @@ import { LoginModal } from './components/LoginModal';
 import { ProfileModal } from './components/ProfileModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { AdminCivEditorModal } from './components/AdminCivEditorModal';
+import { AdminOverlayModal } from './components/AdminOverlayModal';
 import { PrivacyPage } from './components/PrivacyPage';
 import { FAQPage } from './components/FAQPage';
 import { MobileFooter } from './components/MobileFooter';
@@ -40,6 +41,7 @@ function App() {
   const currentPage = isHome ? 'home' : isCompare ? 'compare' : isCiv ? 'civ' : isFaq ? 'faq' : isTournaments ? 'tornei' : 'home';
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isAdminOverlayOpen, setIsAdminOverlayOpen] = useState(false);
   const [isCivEditorOpen, setIsCivEditorOpen] = useState(false);
   const [civEditorTarget, setCivEditorTarget] = useState<{ section?: string; id?: string }>({});
 
@@ -50,9 +52,11 @@ function App() {
       setCivEditorTarget({ section, id });
       setIsCivEditorOpen(true);
     };
+    (window as any).openAdminOverlay = () => setIsAdminOverlayOpen(true);
     (window as any).closeAllModals = () => {
       setIsProfileModalOpen(false);
       setIsAdminDashboardOpen(false);
+      setIsAdminOverlayOpen(false);
       setIsCivEditorOpen(false);
       setIsSidebarOpen(false);
     };
@@ -167,6 +171,7 @@ function App() {
         activeFilter="Tutte"
         setActiveFilter={() => { }}
         onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
+        onOpenAdminOverlay={() => setIsAdminOverlayOpen(true)}
       />
 
       <div className="flex-1 flex flex-row overflow-hidden relative">
@@ -290,6 +295,13 @@ function App() {
         <AdminDashboardModal
           isOpen={isAdminDashboardOpen}
           onClose={() => setIsAdminDashboardOpen(false)}
+        />
+      )}
+
+      {isAuthenticated && isAdmin && (
+        <AdminOverlayModal
+          isOpen={isAdminOverlayOpen}
+          onClose={() => setIsAdminOverlayOpen(false)}
         />
       )}
 

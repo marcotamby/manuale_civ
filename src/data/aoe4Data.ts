@@ -206,17 +206,8 @@ export const civilizationsData: Civilization[] = [
         weaknesses: ["Knights", "Crossbowmen"],
         description: "Tough infantry that delivers a rapid double-strike attack."
       },
-      {
-        id: "camel-rider",
-        imageId: "camel-rider-3",
-        name: "Camel Rider",
-        type: "Cavalry",
-        age: 3,
-        stats: { attack: 14, armor: 0, speed: 1.62, health: 270 },
-        strengths: ["Cavalry"],
-        weaknesses: ["Spearmen", "Crossbowmen"],
-        description: "Anti-cavalry specialist that applies the Camels Unease debuff."
-      }
+      { id: "camel-rider", imageId: "camel-rider-3", name: "Camel Rider", type: "Cavalry", age: 3, stats: { attack: 14, armor: 0, speed: 1.62, health: 270 }, strengths: ["Cavalry"], weaknesses: ["Spearmen", "Crossbowmen"], description: "Anti-cavalry specialist that applies the Camels Unease debuff." },
+      { id: "lancer-abb", name: "Lancer", type: "Cavalry", age: 3, stats: { attack: 24, armor: 4, speed: 1.63, health: 230 }, strengths: ["Heavy combat"], weaknesses: ["Spearmen"], description: "Standard heavy cavalry for the Abbasid Dynasty." }
     ],
     technologies: [],
     landmarks: [
@@ -248,7 +239,10 @@ export const civilizationsData: Civilization[] = [
     uniqueUnits: [
       { id: "desert-raider", imageId: "desert-raider-2", name: "Desert Raider", type: "Cavalry", age: 2, stats: { attack: 10, armor: 0, speed: 1.62, health: 120 }, strengths: ["Light Units"], weaknesses: ["Knights"], description: "Versatile raider that can switch between melee and ranged." },
       { id: "camel-lancer", imageId: "camel-lancer-3", name: "Camel Lancer", type: "Cavalry", age: 3, stats: { attack: 22, armor: 3, speed: 1.62, health: 210 }, strengths: ["Cavalry"], weaknesses: ["Spearmen"], description: "Strong heavy camel cavalry." },
-      { id: "ghulam-ayyubid", imageId: "ghulam-3", name: "Ghulam", type: "Infantry", age: 3, stats: { attack: 12, armor: 4, speed: 1.12, health: 195 }, strengths: ["Light Infantry"], weaknesses: ["Knights"], description: "Tough infantry with a double-strike attack." }
+      { id: "ghulam-ayyubid", imageId: "ghulam-3", name: "Ghulam", type: "Infantry", age: 3, stats: { attack: 12, armor: 4, speed: 1.12, health: 195 }, strengths: ["Light Infantry"], weaknesses: ["Knights"], description: "Tough infantry with a double-strike attack." },
+      { id: "manjaniq-ayy", imageId: "mangonel-3", name: "Manjaniq", type: "Siege", age: 3, stats: { attack: 40, armor: 0, speed: 0.75, health: 130 }, strengths: ["Massed units"], weaknesses: ["Springalds"], description: "Improved mangonel variant with unique projectiles." },
+      { id: "atabeg-ayy", imageId: "monk-1", name: "Atabeg", type: "Religious", age: 2, stats: { attack: 0, armor: 0, speed: 1.00, health: 90 }, strengths: ["Buffing"], weaknesses: ["Combat units"], description: "Support unit that increases the health of trained units." },
+      { id: "tower-sultan-ayy", imageId: "ram-3", name: "Tower of the Sultan", type: "Siege", age: 3, stats: { attack: 600, armor: 0, speed: 0.50, health: 800 }, strengths: ["Buildings", "Tanking"], weaknesses: ["Melee"], description: "Massive siege tower that transports infantry." }
     ],
     technologies: [],
     landmarks: [
@@ -280,7 +274,10 @@ export const civilizationsData: Civilization[] = [
     uniqueUnits: [
       { id: "scholar", imageId: "scholar-1", name: "Scholar", type: "Religious", age: 1, stats: { attack: 0, armor: 0, speed: 1.12, health: 90 }, strengths: ["Research Boost"], weaknesses: ["Everything"], description: "Speeds up research and heals units." },
       { id: "ghazi-raider", imageId: "ghazi-raider-2", name: "Ghazi Raider", type: "Cavalry", age: 2, stats: { attack: 13, armor: 0, speed: 1.62, health: 125 }, strengths: ["Heavy Cavalry"], weaknesses: ["Spearmen"], description: "Strong light cavalry effective vs heavy armor." },
-      { id: "war-elephant", imageId: "war-elephant-3", name: "War Elephant", type: "Cavalry", age: 3, stats: { attack: 30, armor: 4, speed: 1.00, health: 700 }, strengths: ["Buildings", "Infantry"], weaknesses: ["Spearmen", "Crossbowmen"], description: "Massive high-health melee unit." }
+      { id: "tower-elephant", imageId: "tower-war-elephant", name: "Tower Elephant", type: "Cavalry", age: 3, stats: { attack: 15, armor: 7, speed: 0.88, health: 600 }, strengths: ["Ranged Resistance", "Siege"], weaknesses: ["Spearmen"], description: "Large elephant carrying two archers. Excellent for tanking and sieging." },
+      { id: "war-elephant", imageId: "war-elephant-3", name: "War Elephant", type: "Cavalry", age: 3, stats: { attack: 30, armor: 4, speed: 1.00, health: 700 }, strengths: ["Buildings", "Infantry"], weaknesses: ["Spearmen", "Crossbowmen"], description: "Massive high-health melee unit." },
+      { id: "sultan-elite-elephant", imageId: "tower-war-elephant", name: "Sultan's Elite Tower Elephant", type: "Cavalry", age: 3, stats: { attack: 76, armor: 7, speed: 0.88, health: 600 }, strengths: ["High Ranged Damage", "Tanky"], weaknesses: ["Spearmen", "Springalds"], description: "Produced by the Sultan's Palace. Features handcannoneer riders instead of archers." },
+      { id: "lancer-del", name: "Lancer", type: "Cavalry", age: 3, stats: { attack: 24, armor: 4, speed: 1.63, health: 230 }, strengths: ["Heavy combat"], weaknesses: ["Spearmen"], description: "Standard heavy cavalry for the Delhi Sultanate." }
     ],
     technologies: [],
     landmarks: [
@@ -692,7 +689,13 @@ export const civilizationsData: Civilization[] = [
         strengths: ["Light Infantry", "Archers"],
         weaknesses: ["Crossbowmen", "Heavy Cavalry"],
         description: "Tough infantry with good damage and armor, available an age earlier for the Holy Roman Empire."
-      }
+      },
+      { id: "spearman-hre", imageId: "spearman-1", name: "Spearman", type: "Infantry", age: 1, stats: { attack: 7, armor: 0, speed: 1.25, health: 80 }, strengths: ["Cavalry"], weaknesses: ["Archers"], description: "Standard anti-cavalry infantry." },
+      { id: "archer-hre", imageId: "archer-2", name: "Archer", type: "Ranged", age: 2, stats: { attack: 5, armor: 0, speed: 1.25, health: 70 }, strengths: ["Spearmen"], weaknesses: ["Cavalry"], description: "Standard ranged infantry." },
+      { id: "horseman-hre", imageId: "horseman-2", name: "Horseman", type: "Cavalry", age: 2, stats: { attack: 9, armor: 0, speed: 1.88, health: 125 }, strengths: ["Archers"], weaknesses: ["Spearmen"], description: "Standard light cavalry." },
+      { id: "knight-hre", imageId: "knight-3", name: "Knight", type: "Cavalry", age: 3, stats: { attack: 24, armor: 4, speed: 1.63, health: 230 }, strengths: ["Archers"], weaknesses: ["Spearmen"], description: "Standard heavy cavalry." },
+      { id: "crossbowman-hre", imageId: "crossbowman-3", name: "Crossbowman", type: "Ranged", age: 3, stats: { attack: 11, armor: 0, speed: 1.13, health: 80 }, strengths: ["Heavy Units"], weaknesses: ["Horsemen"], description: "Standard anti-heavy ranged unit." },
+      { id: "handcannoneer-hre", imageId: "handcannoneer-4", name: "Handcannoneer", type: "Ranged", age: 4, stats: { attack: 38, armor: 0, speed: 1.13, health: 130 }, strengths: ["High Damage"], weaknesses: ["Horsemen"], description: "Standard gunpowder unit." }
     ],
     technologies: [],
     landmarks: [
@@ -714,8 +717,17 @@ export const civilizationsData: Civilization[] = [
     passiveBonuses: ["Town Centers can upgrade into Daimyo Manors to increase farm gather rates.", "Forges offer unique melee upgrade paths."],
     uniqueUnits: [
       { id: "samurai", imageId: "samurai-2", name: "Samurai", type: "Infantry", age: 2, stats: { attack: 10, armor: 3, speed: 1.12, health: 130 }, strengths: ["Infantry"], weaknesses: ["Crossbowmen"], description: "Heavy infantry with Deflective Armor that blocks strikes." },
+      { id: "yumi-ashigaru", imageId: "archer-2", name: "Yumi Ashigaru", type: "Ranged", age: 2, stats: { attack: 5, armor: 0, speed: 1.38, health: 65 }, strengths: ["Unarmored Units"], weaknesses: ["Cavalry"], description: "Quick and cheap ranged infantry effective against unarmored targets." },
       { id: "onna-bugeisha", imageId: "onna-bugeisha-2", name: "Onna-Bugeisha", type: "Infantry", age: 2, stats: { attack: 8, armor: 0, speed: 1.38, health: 80 }, strengths: ["Light Units"], weaknesses: ["Archers"], description: "Fast light infantry with high attack range." },
       { id: "shinobi", imageId: "shinobi-2", name: "Shinobi", type: "Infantry", age: 2, stats: { attack: 8, armor: 0, speed: 1.25, health: 100 }, strengths: ["Sabotage"], weaknesses: ["Detection"], description: "Stealth unit that can teleport and sabotage buildings." },
+      { id: "buddhist-monk", imageId: "monk-3", name: "Buddhist Monk", type: "Religious", age: 3, stats: { attack: 0, armor: 0, speed: 1.25, health: 90 }, strengths: ["Debuff"], weaknesses: ["Combat Units"], description: "Support unit with the 'Sohei's Favor' ability to decrease nearby enemy attack damage." },
+      { id: "shinto-priest", imageId: "monk-2", name: "Shinto Priest", type: "Religious", age: 3, stats: { attack: 0, armor: 0, speed: 1.12, health: 90 }, strengths: ["Buff"], weaknesses: ["Combat Units"], description: "Support unit that can deposit Yorishiro into buildings to provide economic or military buffs." },
+      { id: "yumi-bannerman", imageId: "samurai-archer-2", name: "Yumi Bannerman", type: "Ranged", age: 2, stats: { attack: 5, armor: 1, speed: 1.38, health: 140 }, strengths: ["Aura", "Ranged Infantry"], weaknesses: ["Horsemen"], description: "Samurai archer that provides a damage-boosting aura. Features Deflective Armor." },
+      { id: "katana-bannerman", imageId: "samurai-2", name: "Katana Bannerman", type: "Infantry", age: 2, stats: { attack: 8, armor: 3, speed: 1.38, health: 155 }, strengths: ["Aura", "Melee Infantry"], weaknesses: ["Crossbowmen"], description: "Samurai infantry with a damage-boosting aura and Deflective Armor." },
+      { id: "uma-bannerman", imageId: "horseman-2", name: "Uma Bannerman", type: "Cavalry", age: 2, stats: { attack: 16, armor: 3, speed: 1.62, health: 230 }, strengths: ["Aura", "Cavalry"], weaknesses: ["Spearmen"], description: "Mounted Samurai with a damage-boosting aura and Deflective Armor." },
+      { id: "onna-musha", imageId: "onna-bugeisha-2", name: "Onna-Musha", type: "Cavalry", age: 3, stats: { attack: 10, armor: 0, speed: 1.62, health: 80 }, strengths: ["Kiting", "Heavy Units"], weaknesses: ["Archers"], description: "Mounted unit with a short-range bow, specialized in hit-and-run tactics." },
+      { id: "mounted-samurai", imageId: "knight-3", name: "Mounted Samurai", type: "Cavalry", age: 3, stats: { attack: 24, armor: 4, speed: 1.62, health: 230 }, strengths: ["Deflective Armor"], weaknesses: ["Spearmen"], description: "Standard heavy cavalry with unique Japanese defensive capabilities." },
+      { id: "handcannon-ashigaru", imageId: "handcannoneer-4", name: "Handcannon Ashigaru", type: "Ranged", age: 4, stats: { attack: 38, armor: 0, speed: 1.12, health: 130 }, strengths: ["High Damage"], weaknesses: ["Horsemen"], description: "Powerful gunpowder unit that synergizes with Yumi Bannerman auras." },
       { id: "ozutsu", imageId: "ozutsu-4", name: "Ozutsu", type: "Infantry", age: 4, stats: { attack: 40, armor: 0, speed: 1.12, health: 140 }, strengths: ["Buildings", "Siege"], weaknesses: ["Cavalry"], description: "Siege infantry armed with hand cannons." }
     ],
     technologies: [],
@@ -739,7 +751,9 @@ export const civilizationsData: Civilization[] = [
     uniqueUnits: [
       { id: "jeanne-hero", imageId: "jeanne-hero-1", name: "Giovanna d'Arco", type: "Infantry", age: 1, stats: { attack: 10, armor: 2, speed: 1.12, health: 150 }, strengths: ["Versatility"], weaknesses: ["Death"], description: "Hero unit that evolves and gains powerful abilities." },
       { id: "jeannes-rider", imageId: "jeannes-rider-3", name: "Cavaliere di Giovanna", type: "Cavalry", age: 3, stats: { attack: 15, armor: 0, speed: 1.62, health: 155 }, strengths: ["Support"], weaknesses: ["Spearmen"], description: "Agile light cavalry that supports Jeanne." },
-      { id: "jeannes-champion", imageId: "jeannes-champion-3", name: "Campione di Giovanna", type: "Infantry", age: 3, stats: { attack: 12, armor: 4, speed: 1.12, health: 175 }, strengths: ["Protective"], weaknesses: ["Crossbowmen"], description: "Heavy infantry elite protector." }
+      { id: "jeannes-champion", imageId: "jeannes-champion-3", name: "Campione di Giovanna", type: "Infantry", age: 3, stats: { attack: 12, armor: 4, speed: 1.12, health: 175 }, strengths: ["Protective"], weaknesses: ["Crossbowmen"], description: "Heavy infantry elite protector." },
+      { id: "royal-knight-jd", imageId: "knight-2", name: "Royal Knight", type: "Cavalry", age: 2, stats: { attack: 19, armor: 3, speed: 1.63, health: 190 }, strengths: ["Archers", "Infantry"], weaknesses: ["Spearmen"], description: "Heavy cavalry that heals out of combat." },
+      { id: "arbaletrier-jd", imageId: "arbaletrier-3", name: "Arbalétrier", type: "Ranged", age: 3, stats: { attack: 11, armor: 1, speed: 1.13, health: 80 }, strengths: ["Heavy Units"], weaknesses: ["Archers"], description: "Elite crossbowman with a Pavise shield." }
     ],
     technologies: [],
     landmarks: [
@@ -834,7 +848,18 @@ export const civilizationsData: Civilization[] = [
     difficulty: "Facile",
     shortDescription: "A variant of the Byzantines featuring robust frontline units and unique mercenaries.",
     passiveBonuses: ["Specialized infantry formations.", "Unique mercenary contracts."],
-    uniqueUnits: [],
+    uniqueUnits: [
+      { id: "atgeirmadr", imageId: "spearman-1", name: "Atgeirmaðr", type: "Infantry", age: 1, stats: { attack: 7, armor: 0, speed: 1.25, health: 90 }, strengths: ["Cavalry", "Speed"], weaknesses: ["Archers"], description: "Replaces Spearmen. Attacks faster when near Varangian Guards." },
+      { id: "bogmadr", imageId: "archer-1", name: "Bogmaðr", type: "Ranged", age: 1, stats: { attack: 5, armor: 0, speed: 1.25, health: 80 }, strengths: ["Rate of Fire"], weaknesses: ["Cavalry"], description: "Unique archer variant with high dps output." },
+      { id: "varangian-guard-mac", imageId: "varangian-guard-3", name: "Varangian Guard", type: "Infantry", age: 1, stats: { attack: 11, armor: 4, speed: 1.12, health: 125 }, strengths: ["Berserking", "Heavy Infantry"], weaknesses: ["Crossbowmen"], description: "Elite frontline infantry that can switch between defensive and offensive modes." },
+      { id: "hippodrome-horseman", imageId: "horseman-1", name: "Hippodrome Horseman", type: "Cavalry", age: 1, stats: { attack: 13, armor: 2, speed: 1.88, health: 220 }, strengths: ["Regeneration", "Speed"], weaknesses: ["Spearmen"], description: "Variant horseman produced from the Hippodrome." },
+      { id: "cataphract-mac", imageId: "cataphract-3", name: "Cataphract", type: "Cavalry", age: 3, stats: { attack: 32, armor: 5, speed: 1.63, health: 405 }, strengths: ["Heavy Charge", "Tanky"], weaknesses: ["Spearmen"], description: "Heavy armored shock cavalry." },
+      { id: "cheirosiphon-mac", imageId: "ram-3", name: "Cheirosiphon", type: "Siege", age: 3, stats: { attack: 280, armor: 0, speed: 0.86, health: 310 }, strengths: ["Area Fire", "Buildings"], weaknesses: ["Melee"], description: "Durable ram variant equipped with a flamethrower." },
+      { id: "royal-cannon-mac", imageId: "bombard-4", name: "Royal Cannon", type: "Siege", age: 4, stats: { attack: 500, armor: 0, speed: 0.88, health: 190 }, strengths: ["Buildings"], weaknesses: ["Melee Units"], description: "Massive cannon produced at the Foreign Engineering Company." },
+      { id: "riddari", imageId: "knight-3", name: "Riddari", type: "Cavalry", age: 3, stats: { attack: 24, armor: 4, speed: 1.70, health: 240 }, strengths: ["Heavy Cavalry"], weaknesses: ["Spearmen"], description: "Standard heavy cavalry variant." },
+      { id: "hippodrome-scout", imageId: "scout-1", name: "Hippodrome Scout", type: "Cavalry", age: 1, stats: { attack: 3, armor: 0, speed: 1.63, health: 220 }, strengths: ["Scouting"], weaknesses: ["Combat Units"], description: "High-health scout produced from the Hippodrome." },
+      { id: "hippodrome-riddari", imageId: "knight-2", name: "Hippodrome Riddari", type: "Cavalry", age: 1, stats: { attack: 29, armor: 4, speed: 1.70, health: 280 }, strengths: ["Early Pressure"], weaknesses: ["Spearmen"], description: "Heavy cavalry available remarkably early from the Hippodrome." }
+    ],
     technologies: [],
     landmarks: [
       { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
@@ -857,7 +882,12 @@ export const civilizationsData: Civilization[] = [
       { id: "donso", imageId: "donso-1", name: "Donso", type: "Infantry", age: 1, stats: { attack: 8, armor: 3, speed: 1.12, health: 80 }, strengths: ["Cavalry"], weaknesses: ["Archers"], description: "Anti-cavalry infantry with a ranged spear throw." },
       { id: "javelin-thrower", imageId: "javelin-thrower-2", name: "Giavellottiere", type: "Ranged", age: 2, stats: { attack: 8, armor: 3, speed: 1.12, health: 70 }, strengths: ["Archers"], weaknesses: ["Cavalry"], description: "Ranged unit that counters other ranged units." },
       { id: "musofadi-warrior", imageId: "musofadi-warrior-2", name: "Guerriero Musofadi", type: "Infantry", age: 2, stats: { attack: 10, armor: 0, speed: 1.25, health: 95 }, strengths: ["Heavy Units"], weaknesses: ["Archers"], description: "Light infantry capable of entering stealth." },
-      { id: "sofa", imageId: "sofa-2", name: "Sofa", type: "Cavalry", age: 2, stats: { attack: 12, armor: 3, speed: 1.62, health: 160 }, strengths: ["Light Units"], weaknesses: ["Spearmen"], description: "Fast and relatively cheap heavy cavalry." }
+      { id: "sofa", imageId: "sofa-2", name: "Sofa", type: "Cavalry", age: 2, stats: { attack: 12, armor: 3, speed: 1.62, health: 160 }, strengths: ["Light Units"], weaknesses: ["Spearmen"], description: "Fast and relatively cheap heavy cavalry." },
+      { id: "musofadi-gunner-mal", imageId: "handcannoneer-4", name: "Musofadi Gunner", type: "Ranged", age: 4, stats: { attack: 41, armor: 0, speed: 1.25, health: 130 }, strengths: ["High Damage"], weaknesses: ["Horsemen"], description: "Elite gunpowder unit." },
+      { id: "warrior-scout-mal", imageId: "scout-1", name: "Warrior Scout", type: "Cavalry", age: 1, stats: { attack: 7, armor: 0, speed: 1.75, health: 110 }, strengths: ["Scouting"], weaknesses: ["Spearmen"], description: "Fast scout variant capable of combat." },
+      { id: "mansa-javelineer", imageId: "javelin-thrower-1", name: "Mansa Javelineer", type: "Ranged", age: 2, stats: { attack: 8, armor: 3, speed: 1.31, health: 70 }, strengths: ["Archers"], weaknesses: ["Cavalry"], description: "Unique ranged unit produced by the Mansa Quarry." },
+      { id: "freeborn-warrior", imageId: "musofadi-warrior-2", name: "Freeborn Warrior", type: "Infantry", age: 3, stats: { attack: 9, armor: 5, speed: 1.38, health: 175 }, strengths: ["Infantry"], weaknesses: ["Crossbowmen"], description: "Elite infantry unit produced at the Farimba Garrison." },
+      { id: "mansa-musofadi-warrior", imageId: "musofadi-warrior-1", name: "Mansa Musofadi Warrior", type: "Infantry", age: 2, stats: { attack: 9, armor: 0, speed: 1.25, health: 80 }, strengths: ["Stealth"], weaknesses: ["Archers"], description: "Unique stealth infantry produced by the Mansa Quarry." }
     ],
     technologies: [],
     landmarks: [
@@ -904,17 +934,8 @@ export const civilizationsData: Civilization[] = [
         weaknesses: ["Archers", "Knights"],
         description: "Highly mobile horse archer capable of firing while moving."
       },
-      {
-        id: "keshik",
-        imageId: "keshik-2",
-        name: "Keshik",
-        type: "Cavalry",
-        age: 2,
-        stats: { attack: 15, armor: 3, speed: 1.62, health: 145 },
-        strengths: ["Early Raiding"],
-        weaknesses: ["Spearmen"],
-        description: "Heavy cavalry that heals when attacking."
-      }
+      { id: "keshik", imageId: "keshik-2", name: "Keshik", type: "Cavalry", age: 2, stats: { attack: 15, armor: 3, speed: 1.62, health: 145 }, strengths: ["Early Raiding"], weaknesses: ["Spearmen"], description: "Heavy cavalry that heals when attacking." },
+      { id: "early-horseman-mon", imageId: "horseman-1", name: "Early Horseman", type: "Cavalry", age: 2, stats: { attack: 8, armor: 0, speed: 1.88, health: 115 }, strengths: ["Archers"], weaknesses: ["Spearmen"], description: "Early light cavalry variant." }
     ],
     technologies: [
       { id: "tech-yam-network", name: "Yam Network", age: 2, building: "Outpost", description: "Outposts grant a speed boost to all nearby cavalry and traders." },
@@ -943,7 +964,10 @@ export const civilizationsData: Civilization[] = [
       { id: "gilded-archer", imageId: "archer-2", name: "Gilded Archer", type: "Ranged", age: 2, stats: { attack: 10, armor: 0, speed: 1.25, health: 140 }, strengths: ["Spearmen", "Crossbowmen"], weaknesses: ["Cavalry", "Man-at-Arms"], description: "Elite variant of the Archer with double health and damage." },
       { id: "gilded-horseman", imageId: "horseman-2", name: "Gilded Horseman", type: "Cavalry", age: 2, stats: { attack: 18, armor: 2, speed: 1.88, health: 250 }, strengths: ["Archers", "Siege"], weaknesses: ["Spearmen", "Knights"], description: "Elite variant of the Horseman with double health and damage." },
       { id: "gilded-knight", imageId: "knight-3", name: "Gilded Knight", type: "Cavalry", age: 3, stats: { attack: 48, armor: 8, speed: 1.62, health: 460 }, strengths: ["Archers", "Infantry"], weaknesses: ["Spearmen", "Crossbowmen"], description: "Elite variant of the Knight with double health and damage." },
-      { id: "gilded-landsknecht", imageId: "landsknecht-3", name: "Gilded Landsknecht", type: "Infantry", age: 3, stats: { attack: 34, armor: 0, speed: 1.12, health: 170 }, strengths: ["Massed Units", "Light Infantry"], weaknesses: ["Archers", "Knights"], description: "Elite variant of the Landsknecht with double health and damage." }
+      { id: "gilded-landsknecht", imageId: "landsknecht-3", name: "Gilded Landsknecht", type: "Infantry", age: 3, stats: { attack: 34, armor: 0, speed: 1.12, health: 170 }, strengths: ["Massed Units", "Light Infantry"], weaknesses: ["Archers", "Knights"], description: "Elite variant of the Landsknecht with double health and damage." },
+      { id: "gilded-man-at-arms", imageId: "man-at-arms-2", name: "Gilded Man-at-Arms", type: "Infantry", age: 2, stats: { attack: 14, armor: 3, speed: 1.13, health: 230 }, strengths: ["Heavy Infantry"], weaknesses: ["Crossbowmen"], description: "Elite variant of the Man-at-Arms." },
+      { id: "gilded-crossbowman", imageId: "crossbowman-3", name: "Gilded Crossbowman", type: "Ranged", age: 3, stats: { attack: 15, armor: 0, speed: 1.13, health: 140 }, strengths: ["Heavy Units"], weaknesses: ["Archers"], description: "Elite variant of the Crossbowman." },
+      { id: "gilded-handcannoneer", imageId: "handcannoneer-4", name: "Gilded Handcannoneer", type: "Ranged", age: 4, stats: { attack: 41, armor: 0, speed: 1.13, health: 250 }, strengths: ["High Damage"], weaknesses: ["Horsemen"], description: "Elite variant of the Handcannoneer." }
     ],
     technologies: [],
     landmarks: [
@@ -967,7 +991,8 @@ export const civilizationsData: Civilization[] = [
       { id: "sipahi", imageId: "sipahi-2", name: "Sipahi", type: "Cavalry", age: 2, stats: { attack: 11, armor: 0, speed: 1.62, health: 135 }, strengths: ["Archers"], weaknesses: ["Spearmen"], description: "Light cavalry that can activate Fortitude for more damage." },
       { id: "mehter", imageId: "mehter-2", name: "Mehter", type: "Cavalry", age: 2, stats: { attack: 0, armor: 1, speed: 1.62, health: 140 }, strengths: ["Buffs"], weaknesses: ["Combat Icons"], description: "War drummer that provides tactical auras to nearby units." },
       { id: "janissary", imageId: "janissary-3", name: "Janissary", type: "Ranged", age: 3, stats: { attack: 16, armor: 0, speed: 1.12, health: 80 }, strengths: ["Cavalry"], weaknesses: ["Archers"], description: "Gunpowder unit strong vs cavalry; can repair siege." },
-      { id: "great-bombard", imageId: "great-bombard-4", name: "Great Bombard", type: "Siege", age: 4, stats: { attack: 150, armor: 0, speed: 0.62, health: 400 }, strengths: ["Buildings", "Masses"], weaknesses: ["Melee Cavalry"], description: "The largest and most powerful siege cannon." }
+      { id: "great-bombard", imageId: "great-bombard-4", name: "Great Bombard", type: "Siege", age: 4, stats: { attack: 150, armor: 0, speed: 0.62, health: 400 }, strengths: ["Buildings", "Masses"], weaknesses: ["Melee Cavalry"], description: "The largest and most powerful siege cannon." },
+      { id: "lancer-ott", name: "Lancer", type: "Cavalry", age: 3, stats: { attack: 24, armor: 4, speed: 1.63, health: 230 }, strengths: ["Heavy combat"], weaknesses: ["Spearmen"], description: "Standard heavy cavalry for the Ottoman Empire." }
     ],
     technologies: [],
     landmarks: [
@@ -1043,7 +1068,18 @@ export const civilizationsData: Civilization[] = [
     uniqueUnits: [
       { id: "samurai-sd", imageId: "samurai-2", name: "Samurai", type: "Infantry", age: 2, stats: { attack: 10, armor: 3, speed: 1.12, health: 130 }, strengths: ["Infantry"], weaknesses: ["Crossbowmen"], description: "Heavy infantry with Deflective Armor that blocks strikes." },
       { id: "onna-bugeisha-sd", imageId: "onna-bugeisha-2", name: "Onna-Bugeisha", type: "Infantry", age: 2, stats: { attack: 8, armor: 0, speed: 1.38, health: 80 }, strengths: ["Light Units"], weaknesses: ["Archers"], description: "Fast light infantry with high attack range." },
-      { id: "shinobi-sd", imageId: "shinobi-2", name: "Shinobi", type: "Infantry", age: 2, stats: { attack: 8, armor: 0, speed: 1.25, health: 100 }, strengths: ["Sabotage"], weaknesses: ["Detection"], description: "Stealth unit that can teleport and sabotage buildings." }
+      { id: "shinobi-sd", imageId: "shinobi-2", name: "Shinobi", type: "Infantry", age: 2, stats: { attack: 8, armor: 0, speed: 1.25, health: 100 }, strengths: ["Sabotage"], weaknesses: ["Detection"], description: "Stealth unit that can teleport and sabotage buildings." },
+      { id: "yatai", imageId: "villager-1", name: "Yatai", type: "Worker", age: 1, stats: { attack: 0, armor: 0, speed: 0.88, health: 370 }, strengths: ["Mobile Drop-off"], weaknesses: ["Vulnerable"], description: "Mobile food stall that acts as a mobile drop-off point." },
+      { id: "naginata-samurai", imageId: "samurai-1", name: "Naginata Samurai", type: "Infantry", age: 1, stats: { attack: 8, armor: 2, speed: 1.12, health: 100 }, strengths: ["Armor", "Heavy Infantry"], weaknesses: ["Crossbowmen"], description: "Versatile heavy infantry with high armor." },
+      { id: "kanabo-samurai", imageId: "samurai-3", name: "Kanabo Samurai", type: "Infantry", age: 3, stats: { attack: 3, armor: 1, speed: 1.12, health: 185 }, strengths: ["Anti-Heavy"], weaknesses: ["Crossbowmen"], description: "Club-wielding infantry that deals percentage-based damage to high-health targets." },
+      { id: "tanegashima-ashigaru", imageId: "handcannoneer-3", name: "Tanegashima Ashigaru", type: "Ranged", age: 3, stats: { attack: 15, armor: 0, speed: 1.12, health: 95 }, strengths: ["Burst Damage"], weaknesses: ["Cavalry"], description: "Specialized matchlock unit with high burst damage." },
+      { id: "yari-cavalry", imageId: "horseman-2", name: "Yari Cavalry", type: "Cavalry", age: 2, stats: { attack: 9, armor: 0, speed: 1.88, health: 135 }, strengths: ["Charge", "Archers"], weaknesses: ["Spearmen"], description: "Spear-wielding light cavalry specialized in charging and counter-ranged tactics." },
+      { id: "ikko-ikki-monk", imageId: "monk-3", name: "Ikko-ikki Monk", type: "Religious", age: 3, stats: { attack: 13, armor: 0, speed: 1.12, health: 160 }, strengths: ["Combat Religious"], weaknesses: ["Archers"], description: "Unique support unit with powerful field abilities and religious influence." },
+      { id: "daimyo", imageId: "knight-2", name: "Daimyo", type: "Cavalry", age: 2, stats: { attack: 18, armor: 2, speed: 1.62, health: 240 }, strengths: ["Aura", "Hero"], weaknesses: ["Spearmen"], description: "Heroic leader unit with high stats and powerful military auras." },
+      { id: "yumi-ashigaru-sd", imageId: "archer-2", name: "Yumi Ashigaru", type: "Ranged", age: 2, stats: { attack: 4, armor: 0, speed: 1.38, health: 65 }, strengths: ["Unarmored Units"], weaknesses: ["Cavalry"], description: "Quick and cheap ranged infantry." },
+      { id: "ozutsu-sd", imageId: "ozutsu-4", name: "Ozutsu", type: "Infantry", age: 4, stats: { attack: 35, armor: 3, speed: 1.00, health: 160 }, strengths: ["Buildings"], weaknesses: ["Cavalry"], description: "Siege infantry armed with hand cannons." },
+      { id: "mounted-samurai-sd", imageId: "knight-3", name: "Mounted Samurai", type: "Cavalry", age: 3, stats: { attack: 24, armor: 4, speed: 1.63, health: 230 }, strengths: ["Heavy Armor"], weaknesses: ["Spearmen"], description: "Standard heavy cavalry with unique Japanese defensive capabilities." },
+      { id: "atakebune-sd", imageId: "warship-4", name: "Atakebune", type: "Siege", age: 4, stats: { attack: 40, armor: 0, speed: 1.25, health: 650 }, strengths: ["Buildings", "Ships"], weaknesses: ["Small Ships"], description: "Large heavy warship." }
     ],
     technologies: [],
     landmarks: [
@@ -1233,7 +1269,18 @@ export const civilizationsData: Civilization[] = [
     uniqueUnits: [
       { id: "zhuge-nu-zhuxi", imageId: "zhuge-nu-2", name: "Zhuge Nu", type: "Ranged", age: 2, stats: { attack: 12, armor: 0, speed: 1.12, health: 70 }, strengths: ["Fanteria Leggera"], weaknesses: ["Cavalieri", "Cavalleggeri"], description: "Rapid-fire crossbowman." },
       { id: "shaolin-monk", imageId: "shaolin-monk-3", name: "Monaco Shaolin", type: "Religious", age: 3, stats: { attack: 15, armor: 2, speed: 1.25, health: 190 }, strengths: ["All Units"], weaknesses: ["Massed Ranged"], description: "Powerful monk that can reflect ranged attacks." },
-      { id: "yuan-raider", imageId: "fire-lancer-3", name: "Predone Yuan", type: "Cavalry", age: 4, stats: { attack: 15, armor: 4, speed: 2.00, health: 200 }, strengths: ["Raiding"], weaknesses: ["Spearmen"], description: "Extremely fast light cavalry." }
+      { id: "yuan-raider", imageId: "fire-lancer-3", name: "Predone Yuan", type: "Cavalry", age: 4, stats: { attack: 15, armor: 4, speed: 2.00, health: 200 }, strengths: ["Raiding"], weaknesses: ["Spearmen"], description: "Extremely fast light cavalry." },
+      {
+        id: "imperial-guard",
+        imageId: "imperial-guard",
+        name: "Imperial Guard",
+        type: "Cavalry",
+        age: 4,
+        stats: { attack: 28, armor: 10, speed: 1.63, health: 340 },
+        strengths: ["Heavy armor", "Strong in melee combat"],
+        weaknesses: ["Spearmen", "Crossbowmen"],
+        description: "Expensive cavalry with high damage and melee armor. Effective against melee units. Requires Dynastic Protectors researched at Zhu Xi's Library."
+      }
     ],
     technologies: [],
     landmarks: [

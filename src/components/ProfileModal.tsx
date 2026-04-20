@@ -142,8 +142,14 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
             setPendingNickname(user?.nickname || '');
             setPendingRank(user?.rank || 'Unranked');
             setShowSaveSuccess(false);
+
+            // REFRESH Notification Data from localStorage whenever modal opens
+            if (user?.email) {
+                const refreshedData = JSON.parse(localStorage.getItem(`lastSeenCounts_${user.email}`) || '{}');
+                setLastSeenData(refreshedData);
+            }
         }
-    }, [isOpen]); // Only sync on open, not when user context changes while open
+    }, [isOpen, user?.email]); // Only sync on open, or if user changes while open
 
     const hasChanges = pendingNickname !== (user?.nickname || '') || pendingRank !== (user?.rank || 'Unranked');
 
@@ -164,7 +170,9 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     const hasUnread = lastSeenKey && favorites.some(favId => {
         const civ = civilizations.find((c: any) => c.id === favId);
         const stored = lastSeenData[favId] || { bo: 0, video: 0 };
-        return civ && ((civ.buildOrders?.length || 0) > stored.bo || (civ.videos?.length || 0) > stored.video);
+        const storedBO = typeof stored.bo === 'number' ? stored.bo : 0;
+        const storedVideo = typeof stored.video === 'number' ? stored.video : 0;
+        return civ && ((civ.buildOrders?.length || 0) > storedBO || (civ.videos?.length || 0) > storedVideo);
     });
 
     const markAllAsRead = () => {
@@ -343,8 +351,10 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                 {favorites.map(favId => {
                                     const civ = civilizations.find((c: any) => c.id === favId);
                                     const stored = lastSeenData[favId] || { bo: 0, video: 0 };
-                                    const hasNewBO = civ && (civ.buildOrders?.length || 0) > stored.bo;
-                                    const hasNewVideo = civ && (civ.videos?.length || 0) > stored.video;
+                                    const storedBO = typeof stored.bo === 'number' ? stored.bo : 0;
+                                    const storedVideo = typeof stored.video === 'number' ? stored.video : 0;
+                                    const hasNewBO = civ && (civ.buildOrders?.length || 0) > storedBO;
+                                    const hasNewVideo = civ && (civ.videos?.length || 0) > storedVideo;
 
                                     return (
                                         <button
