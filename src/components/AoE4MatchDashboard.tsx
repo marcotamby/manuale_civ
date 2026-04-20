@@ -30,12 +30,25 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
     console.log('Loading initial overlay state...');
     overlayService.getOverlayState('aoe4-match').then(savedState => {
       if (savedState) {
-        // Normalizzazione dati: assicura che t1civs e t2civs siano array
-        const normalizedMaps = (savedState.maps || []).map(m => ({
-          ...m,
-          t1civs: Array.isArray(m.t1civs) ? m.t1civs : [],
-          t2civs: Array.isArray(m.t2civs) ? m.t2civs : []
-        }));
+        // Normalizzazione dati aggressiva: assicura array di stringhe valide
+        const normalizedMaps = (savedState.maps || []).map(m => {
+          const cleanCivs = (list: any) => 
+            (Array.isArray(list) ? list : [])
+            .map(item => String(item).trim())
+            .filter(item => {
+              // Mantieni solo se corrisponde a un ID o Nome di una civiltà valida
+              return civilizationsData.some(c => 
+                c.id.toLowerCase() === item.toLowerCase() || 
+                c.name.toLowerCase() === item.toLowerCase()
+              );
+            });
+
+          return {
+            ...m,
+            t1civs: cleanCivs(m.t1civs),
+            t2civs: cleanCivs(m.t2civs)
+          };
+        });
         
         const normalizedState = {
           ...DEFAULT_STATE,
@@ -43,7 +56,7 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
           maps: normalizedMaps
         };
         
-        console.log('State normalized:', normalizedState);
+        console.log('State normalized and cleaned:', normalizedState);
         setState(normalizedState);
       } else {
         console.warn('No state found in DB, using default.');
@@ -51,6 +64,12 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
       }
     });
   }, []);
+
+  const resetMatch = () => {
+    if (confirm('Sei sicuro di voler svuotare tutti i campi? Questa operazione non può essere annullata.')) {
+      setState(DEFAULT_STATE);
+    }
+  };
 
     const [showSuccess, setShowSuccess] = useState(false);
 
@@ -115,7 +134,7 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
     });
   };
 
-  const toggleCiv = (mapIndex: number, team: 't1' | 't2', civId: string) => {
+  const toggleCiv = (mapIndex: number, team: 't1' | 't2', civId: string, civName: string) => {
     setState(prev => {
       if (!prev) return prev;
       const maps = [...prev.maps];
@@ -123,8 +142,18 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
       const currentCivs = maps[mapIndex][teamKey] || [];
       let newCivs = [...currentCivs];
       
-      if (newCivs.includes(civId)) {
-        newCivs = newCivs.filter(id => id !== civId);
+      // Controllo universale (ID o Nome)
+      const isSelected = newCivs.some(val => 
+        String(val).toLowerCase().trim() === civId.toLowerCase().trim() || 
+        String(val).toLowerCase().trim() === civName.toLowerCase().trim()
+      );
+
+      if (isSelected) {
+        // Rimuovi tutte le occorrenze (sia ID che Nome per pulizia)
+        newCivs = newCivs.filter(val => 
+          String(val).toLowerCase().trim() !== civId.toLowerCase().trim() && 
+          String(val).toLowerCase().trim() !== civName.toLowerCase().trim()
+        );
       } else if (newCivs.length < 3) {
         newCivs = [...newCivs, civId];
       }
@@ -208,12 +237,20 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
           <label className="text-[10px] font-black text-yellow-500 uppercase tracking-widest block">
             MAPPE E GAME
           </label>
-          <button
-            onClick={addMap}
-            className="flex items-center gap-2 px-3 py-1.5 bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 rounded-lg text-[10px] font-bold uppercase hover:bg-yellow-500/20 transition-all"
-          >
-            <Plus size={14} /> Aggiungi Game
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={resetMatch}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 border border-red-500/30 text-red-500 rounded-lg text-[10px] font-bold uppercase hover:bg-red-500/20 transition-all"
+            >
+              <Trash2 size={14} /> Svuota Tutto
+            </button>
+            <button
+              onClick={addMap}
+              className="flex items-center gap-2 px-3 py-1.5 bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 rounded-lg text-[10px] font-bold uppercase hover:bg-yellow-500/20 transition-all"
+            >
+              <Plus size={14} /> Aggiungi Game
+            </button>
+          </div>
         </div>
 
         <div className="space-y-6">
@@ -287,9 +324,10 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
                         </label>
                         <div className="grid grid-cols-6 gap-2 bg-black/40 p-3 rounded-xl border border-white/5">
                           {civilizationsData.map((civ) => {
-                            // Confronto ultra-robusto per evitare problemi con dati Supabase
+                            // Confronto ultra-robusto per evitare problemi con dati Supabase (ID o Nome)
                             const isSelected = (selectedCivs || []).some((id: string) => 
-                              String(id).toLowerCase().trim() === String(civ.id).toLowerCase().trim()
+                              String(id).toLowerCase().trim() === civ.id.toLowerCase().trim() ||
+                              String(id).toLowerCase().trim() === civ.name.toLowerCase().trim()
                             );
                             
                             return (
@@ -299,8 +337,7 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
                                 onClick={(e) => {
                                   e.preventDefault();
                                   e.stopPropagation();
-                                  console.log('Toggling civ:', civ.id, 'for map', mIdx, 'team', tKey);
-                                  toggleCiv(mIdx, tKey, String(civ.id).trim());
+                                  toggleCiv(mIdx, tKey, civ.id, civ.name);
                                 }}
                                 title={civ.name}
                                 className={`w-full aspect-square rounded-full border-2 transition-all overflow-hidden cursor-pointer relative z-30 ${

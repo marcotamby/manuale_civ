@@ -4,10 +4,15 @@
     "name": "Abbasidi",
     "flag": "/civs/Abbasid Dynasty.webp",
     "difficulty": "Medio",
-    "short_description": "A flexible and adaptable civilization focused on the House of Wisdom.",
+    "short_description": "La Dinastia Abbaside persegue una fiorente Età dell'Oro concentrando gli edifici attorno alla propria Casa della Sapienza, il che permette di sbloccare significativi vantaggi economici. La Casa della Sapienza guida inoltre il progresso attraverso le varie età e garantisce l'accesso a tecnologie avanzate. Le unità di cammelli abbasidi sono esperte nel contrastare la cavalleria nemica.",
     "passive_bonuses": [
-      "Constructing buildings near the House of Wisdom increases the Golden Age tier.",
-      "Berry bushes gather 30% faster but cannot hunt Boars."
+      "Casa della Sapienza: non costruiscono landmarks per avanzare di epoca, ma scelgono delle \"Ali\" dalla Casa della Saggezza. Questo permette di ricercare tecnologie uniche man mano che si progredisce di età.",
+      "Raccolgono dai cespugli di bacche il 30% più velocemente.",
+      "Età dell'Oro: costruendo edifici all'interno dell'influenza della Casa della Sapienza, si sbloccano livelli di Età dell'Oro che forniscono bonus globali (velocità di raccolta +15%, velocità di ricerca +50%, e velocità di produzione +20% ai livelli massimi).",
+      "La fanteria può costruire Arieti, Torri d'Assedio, Mangani e Springalde direttamente sul campo senza aver bisogno della tech \"Ingegneria d'Assedio\".",
+      "I porti costano il 50% in meno.",
+      "Non possono raccogliere carne dai cinghiali.",
+      "Le unità a cammello riducono il danno dei cavalieri nemici vicini del 20%."
     ],
     "unique_units": [
       {
@@ -74,11 +79,121 @@
           "Crossbowmen"
         ],
         "description": "Anti-cavalry specialist that applies the Camels Unease debuff."
+      },
+      {
+        "id": "lancer-abb",
+        "age": 3,
+        "name": "Lancer",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.63,
+          "attack": 24,
+          "health": 230
+        },
+        "imageId": "https://data.aoe4world.com/images/units/lancer-3.png",
+        "strengths": [
+          "Heavy combat"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Standard heavy cavalry for the Abbasid Dynasty."
       }
     ],
     "technologies": [],
-    "videos": [],
-    "build_orders": [],
+    "videos": [
+      "8-k8Gzx_f8w",
+      "vjM4rDqfocE",
+      "RJKPp9MmlKM",
+      "O3EFMjs1EdM",
+      "AigSbuthKg4",
+      "N7C-EHk-Up8",
+      "LMHDa4Z0QNY"
+    ],
+    "build_orders": [
+      {
+        "id": "bo-1773268874683",
+        "steps": [
+          {
+            "note": "costruire mulino tra due cespugli di bacche e dividere i villi in 2 gruppi di 3 su due cespugli diversi",
+            "time": "00:00",
+            "action": "6 Abitanti alle bacche"
+          },
+          {
+            "note": "",
+            "time": "00:20",
+            "action": "1° abitante all'oro che costruirà casa e miniera"
+          },
+          {
+            "note": "",
+            "time": "00:40",
+            "action": "2° abitante all'oro"
+          },
+          {
+            "note": "N.B. se si è contro una civ aggressiva mandare questi due villi alle bacche, se NON si teme un aggressione early da parte dell'avversario prendere le pecore.",
+            "time": "1:00",
+            "action": "I prossimi due abitanti al cibo"
+          },
+          {
+            "note": "",
+            "time": "1:40",
+            "action": "1 abitante  che costruirà la casa della sapienza e poi all'oro"
+          },
+          {
+            "note": "",
+            "time": "2:00",
+            "action": "1 abitante all'oro"
+          },
+          {
+            "note": "",
+            "time": "2:20",
+            "action": "Passare d'età con \"Ala economica\" e mandare l'abitante che è uscito all'oro (5 totali)"
+          },
+          {
+            "note": "",
+            "time": "2:20",
+            "action": "Nel momento in cui si sta passando bisogna lasciare solo 4 al cibo e 5 all'oro, il resto alla legna"
+          },
+          {
+            "note": "",
+            "time": "3:10",
+            "action": "una volta ottenuti 150 d'oro mandare i 5 villi alla pietra"
+          },
+          {
+            "note": "",
+            "time": "4:00 ",
+            "action": "arrivare ad 8 villi alla legna e poi 8 alla pietra"
+          },
+          {
+            "note": "",
+            "time": "4:10",
+            "action": "fare tecnologie mezzaluna fertile e prodotti alimentari fresca"
+          },
+          {
+            "note": "",
+            "time": "5:40",
+            "action": "arrivare a 490 di pietra e mettere giù il secondo tc con gli abitanti della pietra in più radunare di nuoov i villi al cibo"
+          },
+          {
+            "note": "",
+            "time": "6:00",
+            "action": "mettere giù il terzo tc con gli abitanti della legna."
+          },
+          {
+            "note": "N.B SE il tuo avversario sta pushando meglio truppare anzichè andare in terza",
+            "time": "6:40 ",
+            "action": "finita la costruzione dei tc radunare 2 tc al cibo e 1 tc all'oro fino ai castelli"
+          }
+        ],
+        "title": "3 TC boom (Team games/1v1)",
+        "source": "https://www.youtube.com/watch?v=49K_Ig-uJOo",
+        "difficulty": "Medium",
+        "author_rank": "Conqueror 2",
+        "description": "In questa build si vedrà come realizzare 3 tc in 6 minuti per poi esplodere economicamente e demolire l'avversario.  (Vedere il video allegato per una dimostrazione pratica della build)",
+        "author_nickname": "AXL/Jeiden"
+      }
+    ],
     "landmarks": [
       {
         "id": "town-center",
@@ -193,14 +308,15 @@
       }
     ],
     "strengths": [
-      "Migliore civiltà per il boom economico in team games (multi-TC)",
-      "Cammelli che debuffano cavalleria e supportano fanteria",
-      "Ghulam: fanteria pesante con doppio attacco"
+      "Migliore civiltà per il boom economico in team games (multi-TC): grazie all'Ala Economica, possono costruire centri città e fattorie scontati. Questo, insieme alla tech \"Fresh food stuff\", rende gli Abbasidi i re delle civiltà da boom.",
+      "I loro cammelli non solo spaventano la cavalleria nemica (riducendone il danno), ma possono fornire bonus di armatura e danno alla fanteria vicina tramite tecnologie uniche.",
+      "Possiedono i Ghulam, una fanteria pesante con un attacco doppio che annienta le unità leggere e resiste molto bene sotto il fuoco delle frecce."
     ],
     "weaknesses": [
-      "Inizio lento e vulnerabilità iniziale",
-      "Dipendenza dalla Casa della Sapienza",
-      "Transizione a farm critica dopo bacche"
+      "Inizio lento: poiché i loro bonus scalano con il numero di edifici (Età dell'Oro), sono inizialmente vulnerabili alle civiltà che aggrediscono molto presto (come Mongoli o Inglesi).",
+      "La Casa della Sapienza è il cuore della civiltà. Se viene distrutta, l'avanzamento tecnologico e i bonus dell'Età dell'Oro si fermano.",
+      "Una volta finiti i cespugli di bacche, se non hanno effettuato correttamente la transizione alle fattorie, possono raccogliere sì cibo dai cervi ma non dai cinghiali.",
+      "Prevedibilità: spesso sono costretti a giocare in modo difensivo per proteggere il loro boom economico, rendendo i loro movimenti iniziali facili da leggere per un avversario esperto."
     ]
   },
   {
@@ -208,9 +324,15 @@
     "name": "Ayyubidi",
     "flag": "/civs/Ayyubids.webp",
     "difficulty": "Medio",
-    "short_description": "A versatile civilization leveraging Desert Raiders and House of Wisdom advancements.",
+    "short_description": "La civiltà variante degli Abbasidi. Unità a cammello uniche e numerose scelte per l'age up dalla Casa della Sapienza, che permette di sbloccare potenti bonus dell'Età dell'Oro e di avanzare attraverso le ere. Gli Ayyubidi si concentrano su unità versatili per ottenere un vantaggio tattico sul campo di battaglia.",
     "passive_bonuses": [
-      "House of Wisdom wings grant unique, immediate bonuses when advancing."
+      "Non usano abitanti per avanzare di epoca. Si scelgono delle \"Ali\" (Economica, Militare, Tecnologica, Culturale) che forniscono bonus immediati (come unità istantanee o risorse) che scalano di potenza in base all'era in cui vengono ricercate.",
+      "I mulini vicino ai cespugli di bacche aumentano la capacità di cibo di +100. Gli abitanti raccolgono bacche il 25% più velocemente.",
+      "Le unità a cammello riducono il danno dei cavalieri nemici vicini del 20%.",
+      "I mercanti vanno molto più veloci (tuttavia portano meno oro).",
+      "Costruendo edifici nell'area di influenza della Casa della Saggezza, si sbloccano bonus speciali (velocità di raccolta, ricerca e produzione), suddivisi in 3 livelli.",
+      "I porti costano il 50% in meno.",
+      "Non possono raccogliere carne dai cinghiali."
     ],
     "unique_units": [
       {
@@ -272,11 +394,144 @@
           "Knights"
         ],
         "description": "Tough infantry with a double-strike attack."
+      },
+      {
+        "id": "manjaniq-ayy",
+        "age": 3,
+        "name": "Manjaniq",
+        "type": "Siege",
+        "stats": {
+          "armor": 0,
+          "speed": 0.75,
+          "attack": 40,
+          "health": 130
+        },
+        "imageId": "mangonel-3",
+        "strengths": [
+          "Massed units"
+        ],
+        "weaknesses": [
+          "Springalds"
+        ],
+        "description": "Improved mangonel variant with unique projectiles."
+      },
+      {
+        "id": "atabeg-ayy",
+        "age": 2,
+        "name": "Atabeg",
+        "type": "Religious",
+        "stats": {
+          "armor": 0,
+          "speed": 1,
+          "attack": 0,
+          "health": 90
+        },
+        "imageId": "monk-1",
+        "strengths": [
+          "Buffing"
+        ],
+        "weaknesses": [
+          "Combat units"
+        ],
+        "description": "Support unit that increases the health of trained units."
+      },
+      {
+        "id": "tower-sultan-ayy",
+        "age": 3,
+        "name": "Tower of the Sultan",
+        "type": "Siege",
+        "stats": {
+          "armor": 0,
+          "speed": 0.5,
+          "attack": 600,
+          "health": 800
+        },
+        "imageId": "https://data.aoe4world.com/images/units/tower-of-the-sultan-3.png",
+        "strengths": [
+          "Buildings",
+          "Tanking"
+        ],
+        "weaknesses": [
+          "Melee"
+        ],
+        "description": "Massive siege tower that transports infantry."
       }
     ],
     "technologies": [],
-    "videos": [],
-    "build_orders": [],
+    "videos": [
+      "WYleGQJH6CI",
+      "50-nZof-uGM",
+      "cacvDac1U0o",
+      "N7C-EHk-Up8",
+      "sD8GS0fydCA"
+    ],
+    "build_orders": [
+      {
+        "id": "bo-1773601206733",
+        "steps": [
+          {
+            "note": "",
+            "time": "00:00",
+            "action": "Tutti gli abitanti costruiscono un mulino e cominciano a raccogliere le bacche, l'esploratore può ora cercare più pecore possibili senza dover tornare a depositarle al centro città dopo poco."
+          },
+          {
+            "note": "",
+            "time": "00:20",
+            "action": "+1 al cibo, mentre va alle bacche, costruisce una casa, la cui influenza deve unire il centro città al mulino. "
+          },
+          {
+            "note": "",
+            "time": "00:40 ",
+            "action": "+2 all'oro"
+          },
+          {
+            "note": "",
+            "time": "1:00",
+            "action": "+1 abitante che costruisce la Casa della Saggezza, poi va all'oro"
+          },
+          {
+            "note": "",
+            "time": "1:20",
+            "action": "+1 oro all'oro, per un totale di 4 all'oro. Il resto al cibo finchè non clicchiamo per la feudale, dove sceglieremo l'Ala Culturale: Logistica."
+          },
+          {
+            "note": "",
+            "time": "2:30",
+            "action": "Una volta cliccato l'avanzamento di età, spostiamo 5 abitanti dal cibo al legno, dovranno prendere 150 di legno per una torre sull'oro e una casa aggiuntiva, poi prenderanno 50 di pietra (senza area mineraria) per potenziare la torre che sta salendo sull'oro.\n\nFatto questo, tornano al cibo. Se la pressione avversaria è troppo soffocante, mettiamo 8 abitanti al legno e costruiamo una scuderia in un posto sicuro vicino al centro città, la combo Delvish + Camel Riders dovrebbe scongiurare il peggio."
+          },
+          {
+            "note": "",
+            "time": "2:50",
+            "action": "+1 oro (5 in totale), il resto al cibo"
+          },
+          {
+            "note": "",
+            "time": "~6:30",
+            "action": "Cercando di non perdere nessun abitante e prendendo meno danni possibili in generale, clicchiamo il prima possibile l'età 3, scegliendo l'Ala Economica: Industria\n\nQuesto ci fornirà 900 di legno e 400 di pietra e bonus alla costruzione. \n\nSe è sicuro, cominciamo a spostare i nostri due dervish vicino a due reliquie diverse, pronti a raccogliere appena saremo in terza.\n\nSe vogliamo fare cammelli pesanti, cominciamo a produrre più abitanti e posizionarli sull'oro, costruiamo una seconda torre sull'oro in caso, mettendo abbastanza abitanti dal cibo al legno per prepararci all'età III.\n"
+          },
+          {
+            "note": "",
+            "time": "8:00",
+            "action": "Arrivati in età III, decidiamo cosa fare:\n\nsicuramente costruiamo una moschea, per ospitare le reliquie che ora è prioritario prendere.\n\nPoi, se stiamo subendo molta pressione, usiamo la pietra per potenziare la/le nostre torri, possiamo fortificarle e munirle di spingarda con i 400 pietra che abbia, se necessario. \n\nPossiamo invece giocare di macro, mettendo giù un secondo centro città (casi isolati, meglio strutture militari)\n\nNel altri casi: \n\n- costruiamo un mercato e vendiamo la pietra\n- costriamo 2-3 scuderie aggiuntive e cominciare a produrre cammellieri pesanti in massa.\n\n- Se l'avversario invece ha molte picche ma non ha cavalieri pesanti: costruisce 2-3 caserme e prediligi i ghoulam\n\n\n- con il legno che stai raccogliendo, costruisci un fabbro!\n\n"
+          },
+          {
+            "note": "",
+            "time": "> 8:00",
+            "action": "La tua età dei castelli deve trovare il tuo avversario in un momento di difficoltà, sfrutta i cammelli pesanti o i ghulam per guadagnare controllo sulla mappa, vai subito in base al tuo avversario e cerca di far danno quanto prima!\n\nMentre lo fai, cerca di prendere tutte e 5 le reliquie e porta i tuoi abitanti fuori nella mappa a prendere cervi od altre risorse utili, aiutandoli con una torre se necessario.\n\nRicordati che le tue unità ferite possono essere curate dai tuoi Dervish!\n\n"
+          },
+          {
+            "note": "",
+            "time": "10:00",
+            "action": "Divertiti!"
+          }
+        ],
+        "title": "FC Dervish + Industry (Età 3 veloce)",
+        "difficulty": "Medium",
+        "author_rank": "Conquistatore II",
+        "description": "Gli ayyubidi sono una civiltà che fa del tempismo la loro arma migliore. \nIn età 3 ottengono molti bonus e unità temibili che, se schierate nel momento corretto, possono facilmente conquistare mappa ed a volte proprio vincere la partita in poco tempo.",
+        "author_nickname": "Sparta"
+      }
+    ],
     "landmarks": [
       {
         "id": "town-center",
@@ -410,10 +665,14 @@
     "name": "Bizantini",
     "flag": "/civs/Byzantines.webp",
     "difficulty": "Difficile",
-    "short_description": "A complex defensive civilization utilizing an aqueduct network and mercenaries.",
+    "short_description": "Una complessa civiltà difensiva che utilizza una rete di acquedotti e mercenari. I Bizantini costruiscono vaste reti di cisterne e assoldano mercenari tremite l'olio d'oliva.",
     "passive_bonuses": [
-      "Aqueducts increase production speed and gather rates.",
-      "Can hire foreign mercenaries using Olive Oil."
+      "Sistema di cisterne e acquedotti: le Cisterne offrono vari bonus selezionabili, come l'aumento della velocità di raccolta degli abitanti, della produzione di unità o della ricerca tecnologica. Collegando le cisterne con gli acquedotti, l'effetto di questi bonus aumenta (fino al livello 5).",
+      "Olio d'Oliva (Risorsa Unica): gli abitanti generano Olio d'Oliva raccogliendo bacche, pescando o dagli uliveti. Questa risorsa serve esclusivamente per assoldare mercenari.",
+      "Attraverso la \"Mercenary House\", i Bizantini possono assoldare unità uniche di altre civiltà, utilizzando l'Olio d'Oliva, scegliendo tra tre diversi contratti.",
+      "Ottengono una piccola quantità di pietra bonus per ogni edificio costruito.",
+      "Al posto degli arieti hanno a disposizione i \"cherosifoni\" che sono arieti più forti e che letteralmente sputano fuoco",
+      "Oltre a usare l'olio di oliva per i contratti nel \"Mercenary House\", è possibile posizionare quest ultima vicina un mercato neutrale per avere a disposizione ulteriori due scelte di unità senza sancire nessun contratto"
     ],
     "unique_units": [
       {
@@ -498,7 +757,20 @@
       }
     ],
     "technologies": [],
-    "videos": [],
+    "videos": [
+      "R6duDrI-rxI",
+      "Ra8hy4Fw-Uo",
+      "3TpCRZJGVi8",
+      "5Z1prUa8Bqg",
+      "pAPlT9T5G7Y",
+      "oc_3Z1VhdzA",
+      "EhRODYQAWBU",
+      "O3EFMjs1EdM",
+      "WuO27sFFziM",
+      "tnIr4DNaOZo",
+      "5UmUDsInRI0",
+      "W7Ms4yEn2Bc"
+    ],
     "build_orders": [],
     "landmarks": [
       {
@@ -555,15 +827,18 @@
       }
     ],
     "strengths": [
-      "Accesso a unità uniche: Limitanei, Varangian Guard, Catafratti, Cheirosiphon",
+      "Accesso a unità uniche: Limitanei (con abilità \"muro di scudi\" che diminuisce i danni a distanza) Varangian Guard (possono attivare la modalità Berserking, sacrificando la difesa per un attacco più potente), Catafratti (con la loro modalità trample), Cheirosiphon",
       "Può reclutare truppe gratis grazie all'olio d'oliva ed il covo dei mercenari",
-      "Flessibilità grazie ai mercenari",
-      "Sistema di cisterne per boost produzione ed economia"
+      "Flessibilità dell'Esercito: grazie ai mercenari, i Bizantini possono colmare le lacune della loro composizione base, adattandosi a ogni playstyle",
+      "Il sistema delle cisterne permette di accelerare la ricerca di tecnologie o la produzione militare a seconda delle necessità del momento",
+      "Le cisterne aumentano la resistenza degli edifici vicini e forniscono un vantaggio difensivo notevole durante i raid nemici"
     ],
     "weaknesses": [
-      "Elevata complessità di gestione",
-      "Richiede pietra presto per cisterne",
-      "Dipendenza dalla rete idrica"
+      "È considerata una delle civiltà più difficili da usare. Gestire contemporaneamente la rete idrica, i contratti mercenari e l'Olio d'Oliva richiede un'attenzione costante",
+      "Costruire cisterne e acquedotti richiede l'uso della pietra fin dalle prime fasi di gioco, il che può rallentare l'espansione militare iniziale rispetto a civiltà più aggressive",
+      "L'efficacia dei mercenari dipende dalla scelta del contratto giusto. Una scelta sbagliata può rendere difficile contrastare l'esercito nemico nel mid-game.",
+      "Se un avversario distrugge gli acquedotti o le cisterne, i bonus economici e di produzione calano rapidamente",
+      "Punto debole: dark age, soffre l'apertura di picche in quanto deve raccogliere tre risorse contemporaneamente (cibo, oro e pietra)"
     ]
   },
   {
@@ -571,12 +846,12 @@
     "name": "Cinesi",
     "flag": "/civs/Chinese.webp",
     "difficulty": "Difficile",
-    "short_description": "Civiltà flessibile che si evolve attraverso le Grandi Dinastie. Costruisce velocemente, tassa le risorse e padroneggia la polvere da sparo.",
+    "short_description": "Civiltà flessibile che si evolve attraverso le Grandi Dinastie. Costruisce velocemente, tassa le risorse e padroneggia la polvere da sparo. I Cinesi possono cambiare la propria strategia attraverso le epoche, schierando numerose unità uniche e costruendo rapidamente.",
     "passive_bonuses": [
       "Inizia nella Dinastia Tang: +30% raggio visivo degli Esploratori e accesso al Villaggio.",
-      "Unità addestrate, tecnologie ricercate e risorse restituite generano Tasse (Oro) raccoglibili dagli Ufficiali Imperiali.",
-      "Costruisce entrambi i Landmark di un'Età per sbloccare una Dinastia con bonus unici (Song, Yuan, Ming).",
-      "I Villici costruiscono difese +50% più veloci e tutti gli altri edifici +100% più velocemente.",
+      "Unità addestrate, tecnologie ricercate e risorse restituite generano Tasse (oro) raccoglibili dagli Ufficiali Imperiali.",
+      "Può costruire entrambi i Landmark di ogni era per sbloccare una Dinastia con bonus unici (Song, Yuan, Ming).",
+      "I villi costruiscono strutture difensive il +50% più velocemente e tutti gli altri edifici +100% più velocemente.",
       "La tecnologia Chimica è gratuita in Età I: difese usano Feritoie a Cannone invece di quelle standard.",
       "I Cantieri Navali lavorano il +10% più velocemente."
     ],
@@ -713,7 +988,13 @@
       }
     ],
     "technologies": [],
-    "videos": [],
+    "videos": [
+      "13Vg4Um-gTM",
+      "1Xv7KzxSxV0",
+      "EhRODYQAWBU",
+      "t-MJVp4Cza4",
+      "XVZz2RGxDNg"
+    ],
     "build_orders": [],
     "landmarks": [
       {
@@ -768,10 +1049,17 @@
       }
     ],
     "strengths": [
-      "Dinastia Song (Velocità produzione abitanti +33%)"
+      "Dinastia Song (Velocità produzione abitanti +33%)",
+      "Sistema delle dinastie: costruendo entrambi i landmark delle età, i cinesi attivano una dinastia (Tang, Song, Yuan o Ming). Ogni dinastia sblocca bonus unici (come velocità di produzione o salute extra) e unità o edifici esclusivi.",
+      "Ufficiali imperiali: queste unità economiche possono \"supervisionare\" gli edifici per accelerare la produzione o la raccolta di risorse, oltre a raccogliere oro dalle tasse generate dalle strutture vicine.",
+      "Supremazia della polvere da sparo: hanno accesso ad alcune delle unità a distanza più letali del gioco, come i nidi d'api e cannonieri che beneficiano di potenziamenti tecnologici unici."
     ],
     "weaknesses": [
-      "Civiltà complessa con gameplay da adattare in base ai matchup"
+      "Civiltà complessa con gameplay da adattare in base ai matchup",
+      "Inizio lento: i cinesi richiedono tempo per ingranare. nelle prime fasi di gioco sono vulnerabili a civiltà molto aggressive",
+      "Costo delle dinastie: per sbloccare i bonus dinastici bisogna spendere risorse per due landmark anziché uno. Questo investimento può rallentare l'avanzamento tecnologico se non gestito con attenzione.",
+      "Gestire gli ufficiali imperiali per ottimizzare le tasse e la supervisione richiede molta attenzione costante per non perdere efficienza.",
+      "I granai richiedono molto più spazio, rendendo la base cinese molto estesa e più difficile da proteggere"
     ]
   },
   {
@@ -779,10 +1067,13 @@
     "name": "Dinastia di Tughlaq",
     "flag": "/civs/Tughlaq Dynasty.png",
     "difficulty": "Medio",
-    "short_description": "A variant of the Delhi Sultanate heavily utilizing elephants and defensive structures.",
+    "short_description": "La Dinastia di Tughlaq getta le basi per la vittoria grazie agli elefanti da lavoro, che garantiscono un punto di consegna mobile per tutte le risorse. Con la costruzione di ogni fortezza di Tughlaqabad, potrai nominare un governatore per attivare bonus unici. Raduna un esercito temibile con tre nuovi elefanti che dimostrano la vera potenza di questa civiltà.",
     "passive_bonuses": [
-      "Earlier access to War Elephants.",
-      "Stronger defensive network integration."
+      "Non dispone di costruzioni per la raccolta delle risorse ma hanno gli \"Elefanti da lavoro\" che fungono da depositi universali e possono muoversi liberamente. gli elefanti da lavoro, i centri città ed i moli conferiscono risorse bonus quando gli abitanti e le navi da pesca effettuano depositi.",
+      "Possono costruire i \"Forti Tughlaqabad\" disponibili dall'età feudale. Questa costruzione difensiva può essere potenziata per aumentarne i danni e la saluti, e sbloccare un governatore che fornisce bonus unici a tua scelta.",
+      "Gli abitanti raccolgono il 30% più velocemente dalle bacche ma non possono raccogliere cibo dai cinghiali. Gli abitanti del villaggio trasportano +3 unità di cibo dai cespugli di bacche.",
+      "Le barche da pesca scagliano frecce e hanno il 50% di salute in più",
+      "Le tecnologie costano di più ma la loro ricerca è pressochè istantanea."
     ],
     "unique_units": [
       {
@@ -796,7 +1087,7 @@
           "attack": 0,
           "health": 400
         },
-        "imageId": "worker-elephant",
+        "imageId": "https://data.aoe4world.com/images/units/worker-elephant-2.png",
         "strengths": [
           "Resource gathering",
           "Mobile drop-off"
@@ -817,7 +1108,7 @@
           "attack": 0,
           "health": 250
         },
-        "imageId": "healer-elephant",
+        "imageId": "https://data.aoe4world.com/images/units/healer-elephant-2.png",
         "strengths": [
           "Healing in combat",
           "Garrison relics"
@@ -838,7 +1129,7 @@
           "attack": 20,
           "health": 600
         },
-        "imageId": "tower-war-elephant",
+        "imageId": "https://data.aoe4world.com/images/units/raider-elephant-2.png",
         "strengths": [
           "Siege",
           "Buildings"
@@ -903,7 +1194,7 @@
           "attack": 12,
           "health": 150
         },
-        "imageId": "amir-warrior",
+        "imageId": "https://data.aoe4world.com/images/units/amir-warrior-1.png",
         "strengths": [
           "Zero population cost",
           "Powerful near forts"
@@ -947,7 +1238,7 @@
         "age": 3,
         "name": "Compound of the Defender",
         "type": "Defensive",
-        "imageId": "compound-of-the-defender-3",
+        "imageId": "https://data.aoe4world.com/images/buildings/compound-of-the-defender-2.png",
         "description": "Reduces Stone cost of buildings by 20%. Unlocks an additional upgrade to each Tughlaqabad Fort which enhances health and Governor benefits."
       },
       {
@@ -955,7 +1246,7 @@
         "age": 3,
         "name": "House of Learning",
         "type": "Technology",
-        "imageId": "house-of-learning-3",
+        "imageId": "https://data.aoe4world.com/images/buildings/house-of-learning-2.png",
         "description": "Advances to the next Age and contains many unique technologies."
       },
       {
@@ -963,7 +1254,7 @@
         "age": 4,
         "name": "Hisar Academy",
         "type": "Technology",
-        "imageId": "hisar-academy-4",
+        "imageId": "https://data.aoe4world.com/images/buildings/hisar-academy-3.png",
         "description": "Acts as a Madrasa. Generates 70 Food and 70 Gold per minute for every active Governor."
       },
       {
@@ -971,13 +1262,15 @@
         "age": 4,
         "name": "Palace of the Sultan",
         "type": "Military",
-        "imageId": "palace-of-the-sultan-4",
+        "imageId": "https://data.aoe4world.com/images/buildings/palace-of-the-sultan-3.png",
         "description": "Grants the fourth-tier benefactor bonus of an appointed Governor immediately."
       }
     ],
     "strengths": [
       "Elefanti guaritori",
-      "Può costruire fortezze a partire dall'età feudale"
+      "Può costruire fortezze a partire dall'età feudale",
+      "Gli upgrade vengono ricercati quasi istantaneamente",
+      "Può selezionare dei \"Governatori \" all'interno delle fortezze per sbloccare bonus unici della civiltà"
     ],
     "weaknesses": [
       "Gli upgrade sono molto più costosi",
@@ -991,8 +1284,12 @@
     "difficulty": "Difficile",
     "short_description": "A fast-paced Imperial variant of the Chinese emphasizing early Dynasties.",
     "passive_bonuses": [
-      "Cheaper officials and streamlined access to powerful Shaolin Monks and Chu Ko Nu.",
-      "Earlier access to robust technologies."
+      "Può costruire entrambi i Landmark di ogni era per sbloccare una Dinastia con bonus unici (Song, Yuan, Ming)",
+      "Dinastia Tang (Iniziale): Riduce il costo di costruzione dei Monumenti (Landmarks) del 15% e sblocca il Villaggio (una casa avanzata con più spazio per la popolazione).",
+      "Funzionario Imperiali: unità che permettono di supervisionare una struttura aumentandone le risorse raccolte e la velocità di prodizione",
+      "Gli Zhuge Nu e i Granatieri sono accessibili senza dover necessariamente attivare le relative dinastie.",
+      "Bonus di Costruzione: I coloni costruiscono gli edifici difensivi il 50% più velocemente e tutti gli altri edifici il 100% più velocemente.",
+      "Sistema Tasse: Gli abitanti generano tasse (oro) quando depositano una risorsa (non al tc). Le tasse vengono generate anche dagli edifici di produzione militare e tecnologiche ogni volta che una truppa o una tecnologia viene fatta. Le tasse possono essere prese dai funzionari imperiali."
     ],
     "unique_units": [
       {
@@ -1055,10 +1352,30 @@
           "Spearmen"
         ],
         "description": "Extremely fast light cavalry."
+      },
+      {
+        "id": "unit-1773666925981",
+        "age": 4,
+        "name": "Imperial Guard",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.625,
+          "attack": 28,
+          "health": 340
+        },
+        "imageId": "https://data.aoe4world.com/images/units/imperial-guard-4.png",
+        "strengths": [],
+        "weaknesses": [],
+        "description": ""
       }
     ],
     "technologies": [],
-    "videos": [],
+    "videos": [
+      "50-nZof-uGM",
+      "kcblq47HGzU",
+      "XVZz2RGxDNg"
+    ],
     "build_orders": [],
     "landmarks": [
       {
@@ -1116,11 +1433,15 @@
       }
     ],
     "strengths": [
-      "Fast Castle più veloce del gioco"
+      "Fast Castle più veloce del gioco",
+      "Age up scontato nella prima dinastia",
+      "I funzionari imperiali se gestiti correttamente possono fare la differenza.",
+      "zhu-ghe-nu e granatieri disponibili senza dinastie"
     ],
     "weaknesses": [
       "Non hanno arcieri",
-      "Transizione a Farm lenta"
+      "Transizione a Farm lenta",
+      "Richiede un alto livello di micro-gestione"
     ]
   },
   {
@@ -1128,11 +1449,17 @@
     "name": "Francesi",
     "flag": "/civs/French.webp",
     "difficulty": "Facile",
-    "short_description": "A cavalry-focused civilization with a strong trading economy and powerful Royal Knights.",
+    "short_description": "I francesi schierano potenti unità di cavalleria e possono ricevere bonus di produzione in posizioni fortificate. \n\nI nemici devono essere pronti a resistere alle cariche di potenti cavalieri reali ed altre unità corazzate.",
     "passive_bonuses": [
-      "Villagers and Scouts are produced 10/15/20% faster per Age.",
-      "Economic technology upgrades cost 30% less.",
-      "Traders can return any resource to Markets."
+      "Abitanti del villaggio ed esploratori vengono prodotti il 10/15/20% più veloce con il passare di età.",
+      "Le tecnologie economiche costano il 30% in meno.",
+      "Gli edifici economici, come il mulino, la falegnameria e la miniera, costano 50% in meno.",
+      "Fin dall'inizio della partita, possono vedere sulla minimappa la posizione dei mercati neutrali.",
+      "I mercanti possono far guadagnare cibo o legna invece di oro se richiesto.",
+      "Le navi mercantili garantiscono il 20% di risorse in più.",
+      "Il fabbro, una volta costruito, garantisce gratuitamente ed automaticamente il bonus di attacco corpo a corpo.",
+      "Le fortezze costano il 10% in meno (810 di pietra) e garantiscono influenza sugli edifici attorno. \nCostruendo stalle ed arcieri sotto l'influenza della fortezza, questi godranno di uno sconto sul costo delle unità del 20%.",
+      "Il porto garantisce un aumento di 10 della popolazione massima."
     ],
     "unique_units": [
       {
@@ -1216,8 +1543,144 @@
         "description": "Improves French influence, reducing unit cost around Keeps by 10%."
       }
     ],
-    "videos": [],
-    "build_orders": [],
+    "videos": [
+      "pAPlT9T5G7Y",
+      "ke1j9wULVMw",
+      "t-MJVp4Cza4",
+      "tnIr4DNaOZo",
+      "5UmUDsInRI0"
+    ],
+    "build_orders": [
+      {
+        "id": "bo-1773418204454",
+        "steps": [
+          {
+            "note": "",
+            "time": "",
+            "action": "Subito 4 abitanti al cibo, 2 all'oro costruiscono una miniera.\nIl centro città produce abitanti e manda al cibo."
+          },
+          {
+            "note": "",
+            "time": "00:01",
+            "action": "L'esploratore gira attorno alla base e cerca di individuare il prima possibile il branco di cervi. Nel mentre e subito dopo, continua a cercare pecore in giro per la mappa."
+          },
+          {
+            "note": "",
+            "time": "00:02",
+            "action": "Un abitante dal cibo costruire una casa, poi torna al cibo.\n\n+2 all'oro appena abbiamo 8 abitanti che raccolgono cibo in totale."
+          },
+          {
+            "note": "",
+            "time": "<1:00",
+            "action": "Se abbiamo trovato i cervi, inviamo 5 abitanti dal cibo ai cervi, si costruisce un mulino vicino ad essi, poi si sviluppa subito tecniche di sopravvivenza e carriola."
+          },
+          {
+            "note": "",
+            "time": "1:05",
+            "action": "+2 al legno; Avendo ricercato 2 tecnologie economiche, i prossimi due abitanti prodotti dal centro città andranno al legno o non ne avremo abbastanza per costruire una seconda casa."
+          },
+          {
+            "note": "",
+            "time": ">1:05",
+            "action": "Continuiamo a produrre abitanti ed a mandarli al cibo."
+          },
+          {
+            "note": "",
+            "time": "~2:40",
+            "action": "Da sotto al centro città, prendiamo 4 abitanti e passiamo d'età con la Scuola di Cavalleria, quando avranno finito, andranno al legno, per un totale di 6 al legno.\n\nContinuiamo a mandare abitanti alle pecore."
+          },
+          {
+            "note": "",
+            "time": "~4:10",
+            "action": "Raggiunta l'età feudale, cominciamo a mettere subito in coda almeno 1 cavaliere reale e mandarlo subito sulle risorse scoperte del nemico, dobbiamo cercare di fare danno economico in questa fase dove i nostri cavalli sono superiori a quasi tutte le unità nemiche. Importante non prendere troppi danni o addirittura perdere questi cavalieri.\n\nMentre facciamo questo, ricerchiamo subito nella falegnameria Ascia Doppia, Piccone Specializzato dall'area mineraria ed Orticultura dal mulino appena possibile."
+          },
+          {
+            "note": "",
+            "time": "5:00",
+            "action": "Il nemico dovrà in qualche modo reagire, se produce picche per difendersi e/o aggredire, dovremo costruire 1 o 2 arcerie e produrre arcieri per proteggere i nostri cavalli pesanti; Per far questo dovremo spostare qualche abitante dal cibo alla legna siccome avremo bisogno di molto legname per produrre costantemente arcieri.\n\nSe invece produce a sua volta cavalleria o non produce molto in questa prima fase, possiamo valutare una seconda scuderia e, aggiungendo dal cibo all'oro 3/4 abitanti e continuando a fare cibo."
+          },
+          {
+            "note": "",
+            "time": "12:00",
+            "action": "A seconda di come sta andando la partita, attorno al 12esimo minuto dovremmo essere in grado entrare nella base del nemico e chiudere la partita, in alternativa possiamo smettere di produrre unità militari e pensare ad un passaggio all'età 3.\n\nAppena avremo 1200 di cibo e 600 di oro, passeremo con la Sala della Gilda con 8 abitanti presi dal cibo o, se ne abbiamo troppo perchè abbiamo fatto per lo più arcieri, dall'oro."
+          },
+          {
+            "note": "",
+            "time": "12:05",
+            "action": "Mentre stiamo salendo di età, possiamo valutare di spostare 5 abitanti alla pietra per costruire una fortezza sulle nostre strutture militari poco dopo l'età 3."
+          },
+          {
+            "note": "",
+            "time": "13:00",
+            "action": "Divertiti!"
+          }
+        ],
+        "title": "Cervi e tecnologie economiche in età 1",
+        "difficulty": "Medium",
+        "author_rank": "Conquistatore 1",
+        "description": "Quando la mappa garantisce un branco di cervi vicino alla base, è sempre un bene approfittare di questa cosa. I francesi sono molto bravi nel farlo, per avere un passaggio di età più veloce, avere tante risorse per i cavalli e ricercare subito tecnologie economiche che permettono alla propria economia di fiorire fin da subito.",
+        "author_nickname": "Sparta"
+      },
+      {
+        "id": "bo-1773442140917",
+        "steps": [
+          {
+            "note": "",
+            "time": "00:00",
+            "action": "Tutti gli abitanti al cibo, lo scout cerca subito più pecore possibili."
+          },
+          {
+            "note": "",
+            "time": "00:02",
+            "action": "1  abitante dal cibo costruisce una casa."
+          },
+          {
+            "note": "",
+            "time": "00:02",
+            "action": "+4 nuovi abitanti all'oro."
+          },
+          {
+            "note": "",
+            "time": "2:00",
+            "action": "Tutti gli altri abitanti prodotti dal centro città vanno al cibo fino a che non si può passare all'età 2."
+          },
+          {
+            "note": "",
+            "time": "2:30",
+            "action": "Con 4 abitanti dal cibo andiamo a costruire la Scuola di Cavalleria, questi 4 andranno poi destinati al legno."
+          },
+          {
+            "note": "",
+            "time": "2:30",
+            "action": "+2 abitanti al legno, poi di nuovo tutto il cibo."
+          },
+          {
+            "note": "",
+            "time": "4:00",
+            "action": "Appena passati, mettiamo subito in coda di produzione un cavallo reale e, assieme al nostro esploratore, proviamo a trovare danno il prima possibile, cercando di tenere il nostro avversario in base il più possibile, fargli perdere tempo e se possibile ucciderne gli abitanti. \n\nNOTA BENE: occhio ad andare troppo sotto al centro città nemico, subire danni in questa fase potrebbe rendere i tuoi cavalieri non usabili per causare altri danni, è importante preservarli bene, chi ha i cavalieri ridotti meglio, può permettersi migliori combattimenti."
+          },
+          {
+            "note": "",
+            "time": "4:05",
+            "action": "Con un abitante che sta raccogliendo legno costruiamo una falegnameria e cerchiamo Ascia Doppia e nella miniera Piccone Specializzato. \n\nAppena le pecore cominciano a finire, costruiamo mulino sulla bacche se la situazione è ancora bilanciata, se abbiamo fatto danno invece possiamo permetterci di andare ai cervi con 5 abitanti del cibo, magari costruendo una torre vicino al mulino per proteggere i nostri abitanti.\n\n- se siamo andati alle bacche, ricerchiamo il prima possibile carriola;\n\n- se siamo andati a cervi, cerchiamo subito Tecniche di Sopravvivenza, poi Carriola appena possibile."
+          },
+          {
+            "note": "",
+            "time": ">4:05",
+            "action": "Appena possiamo, costruiamo un fabbro per accedere subito al +1 d'attacco per i nostri cavalli e lancieri e ricerchiamo difesa frecce +1 in modo da poter combattere meglio in base nemica.\n\nSe le cose vanno come devono, aggiungiamo 3/4 abitanti all'oro e mettiamo giù un'altra scuderia per far in modo che il numero di cavalieri reali tra le nostre fila sia sempre più folto e costringiamo il nostro avversario a fare scelte che non vorrebbe.\n\nSe l'avversario prova dei raid a sua volta per liberarsi dal nostro assedio, possiamo sia fare una seconda scuderia, sia fare una caserma e posizionare lancieri vicino agli abitanti all'oro oppure vicino a cervi, insomma dove servono per proteggerci; stessa cosa se stiamo perdendo la battaglia tra cavalli reali.\n\nA differenza di altri match-up, sconsiglio di andare arcieri in feudale, non sono davvero la risposta che si cerca di solito, a meno che l'avversario non scelga di andare per 3/4 caserme e lancieri, ma sarebbe un regalo a nostro favore."
+          },
+          {
+            "note": "",
+            "time": "99:99",
+            "action": "Divertiti!"
+          }
+        ],
+        "title": "Francia vs Francia",
+        "difficulty": "Medium",
+        "description": "Potrà capitarti di incontrare un altro giocatore francese durante le tue classificate!\n\nSpesso queste partite si decidono producendo più cavalieri reali dell'avversario e gestendoli in modo più oculato. \n\nI cavalieri attaccano, i lancieri difendono le basi ed i punti chiave.\n\nA differenza della build dei cervi e dello sviluppo economico, qui punteremo ad arrivare ai cavalieri reali il prima possibile.\n\n",
+        "author_nickname": "Sparta"
+      }
+    ],
     "landmarks": [
       {
         "id": "town-center",
@@ -1225,57 +1688,58 @@
         "name": "Centro Città",
         "type": "Economic",
         "imageId": "town-center-1",
-        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+        "description": "Tutte le risorse possono essere depositate qui.\nProduce abitanti del villaggio, esploratori e aumenta la popolazione massima.\nAggiunge attacchi extra quando ci sono unità di presidio.\n\nI centri città, esclusi quelli delle capitali, non possono rivelare le unità furtive o travestite."
       },
       {
         "id": "chamber-of-commerce",
         "age": 2,
-        "name": "Chamber of Commerce",
+        "name": "Camera di Commercio",
         "type": "Economic",
-        "description": "Acts as a Market. All Traders return +30% more resources."
+        "description": "Funge da mercato. Produce un mercante gratuito per ogni tecnologia economica sviluppata."
       },
       {
         "id": "school-of-cavalry",
         "age": 2,
-        "name": "School of Cavalry",
+        "name": "Scuola di cavalleria",
         "type": "Military",
-        "description": "Acts as a Stable. All Stables produce units 20% faster."
+        "description": "Agisce come una scuderia. Tutte le scuderie producono il 20% più velocemente."
       },
       {
         "id": "guild-hall",
         "age": 3,
-        "name": "Guild Hall",
+        "name": "Sala della Gilda",
         "type": "Economic",
-        "description": "Stores resources over time; generation speed increases with accumulation."
+        "description": "Genera ed immagazzina le risorse nel tempo.\nPiù risorse vengono immagazzinate, più velocemente vengono generate.\nScegli cibo, legname, pietra oppure oro. \n\nGenera pietra a metà della velocità."
       },
       {
         "id": "royal-institute",
         "age": 3,
-        "name": "Royal Institute",
+        "name": "Istituto Reale",
         "type": "Technology",
-        "description": "Houses unique French technologies at a 20% reduced cost."
+        "description": "Ospita le tecnologie uniche dei francesi. Lo sviluppo qui costa il 30% in meno ed ignora i requisiti d'età."
       },
       {
         "id": "college-of-artillery",
         "age": 4,
-        "name": "College of Artillery",
+        "name": "Collegio di Artiglieria",
         "type": "Military",
-        "description": "Provides access to Royal Artillery units with +20% damage."
+        "description": "Produce le versioni Reali di cannone, ribadocchino e colubrina, garantendone 30% di danni in più. Sblocca l'abilità Artiglieria per i cannoni. Contiene tecnologie d'assedio e tecnologie di polvere da sparo. Velocità di addestramento delle unità e velocità di sviluppo delle tecnologie: 50% in più."
       },
       {
         "id": "red-palace",
         "age": 4,
-        "name": "Red Palace",
+        "name": "Palazzo Rosso",
         "type": "Defensive",
-        "description": "Acts as a powerful Keep with high-damage arbalest bolts."
+        "description": "Funge da fortezza. Contiene postazioni per balestrieri scelti che infliggono danni ingenti. \nOgni unità a presidio aggiunge un balestriere scelto aggiuntivo. \n\nAttiva una postazione balestriere scelto in tutte le fortezze e centri città."
       }
     ],
     "strengths": [
-      "Hanno i balestrieri più forti del gioco",
-      "Cavalieri pesanti disponibili in età feudale"
+      "Cavalieri pesanti disponibili in età feudale, la loro punta di diamante, forti e buoni per fare danno economico al nemico.",
+      "Possono contare sugli Arbalétrier, sostituto dei balestieri, davvero formidabili, con una abilità che fornisce bonus contro i danni a distanza."
     ],
     "weaknesses": [
-      "Soffrono molto le dark age con rush di picche"
+      "I cavalli pesanti sono molto forti, ma richiedono molta micro, perdere tanti cavalli ad inizio partita può compromettere la stessa.",
+      "Hanno costantemente bisogno di oro e quindi di difenderlo a tutti i costi, vederselo negare potrebbe essere fatale."
     ]
   },
   {
@@ -1283,10 +1747,14 @@
     "name": "Giapponesi",
     "flag": "/civs/Japanese.webp",
     "difficulty": "Medio",
-    "short_description": "An infantry and farming-centric civilization utilizing Samurai and Shinobi.",
+    "short_description": "A capo dei territori giapponesi, il Daimyo promuove lo sviluppo dell'agricoltura e impiega i samurai per difendere il proprio territorio. L'esclusiva Fucina lavora instancabilmente per affilare le loro lame e garantire loro un vantaggio in battaglia. I feroci samurai al comando guidano il loro variegato esercito di fanteria e cavalleria verso la vittoria.",
     "passive_bonuses": [
-      "Town Centers can upgrade into Daimyo Manors to increase farm gather rates.",
-      "Forges offer unique melee upgrade paths."
+      "I villi che depositano oro generano automaticamente il 20% di Pietra extra (e viceversa), facilitando la costruzione di fortificazioni e potenziamenti Daimyo senza dover minare attivamente troppa pietra.",
+      "Accesso a unità uniche di fanteria come l'Onna-Bugeisha (fanteria leggera velocissima con portata elevata) e gli stendardieri (Bannermen) che forniscono aura di potenziamento (+15% danno) alle truppe vicine.",
+      "Le barche da pesca costano il 25% in meno.",
+      "Il costo di costruzione delle caserme è ridotto del 50%, portando il loro costo a 75 di legno.",
+      "Le case fungono da Mulino e le Fucine fungono sia da fabbro che da deposito minerario.",
+      "I centri città possono essere potenziati trasformandoli in costruzioni speciali: Residenza del Daimyo, palazzo del Daimyo e castello dello shogunato. queste costruzioni forniscono bonus di 20%/40%/60% agli abitanti del villaggio vicini che lavorano nelle fattorie. Il centro città aumenta anche i suoi punti vita e migliorano le armi di difesa. Aumentano inoltre il limite di stendardieri possibili da reclutare di +1/+2/+3. "
     ],
     "unique_units": [
       {
@@ -1369,10 +1837,203 @@
           "Cavalry"
         ],
         "description": "Siege infantry armed with hand cannons."
+      },
+      {
+        "id": "yumi-ashigaru",
+        "age": 2,
+        "name": "Yumi Ashigaru",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.38,
+          "attack": 5,
+          "health": 65
+        },
+        "imageId": "https://data.aoe4world.com/images/units/yumi-ashigaru-2.png",
+        "strengths": [
+          "Unarmored Units"
+        ],
+        "weaknesses": [
+          "Cavalry"
+        ],
+        "description": "Quick and cheap ranged infantry effective against unarmored targets."
+      },
+      {
+        "id": "buddhist-monk",
+        "age": 3,
+        "name": "Buddhist Monk",
+        "type": "Religious",
+        "stats": {
+          "armor": 0,
+          "speed": 1.25,
+          "attack": 0,
+          "health": 90
+        },
+        "imageId": "monk-3",
+        "strengths": [
+          "Debuff"
+        ],
+        "weaknesses": [
+          "Combat Units"
+        ],
+        "description": "Support unit with the 'Sohei's Favor' ability to decrease nearby enemy attack damage."
+      },
+      {
+        "id": "shinto-priest",
+        "age": 3,
+        "name": "Shinto Priest",
+        "type": "Religious",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 0,
+          "health": 90
+        },
+        "imageId": "monk-2",
+        "strengths": [
+          "Buff"
+        ],
+        "weaknesses": [
+          "Combat Units"
+        ],
+        "description": "Support unit that can deposit Yorishiro into buildings to provide economic or military buffs."
+      },
+      {
+        "id": "yumi-bannerman",
+        "age": 2,
+        "name": "Yumi Bannerman",
+        "type": "Ranged",
+        "stats": {
+          "armor": 1,
+          "speed": 1.38,
+          "attack": 5,
+          "health": 140
+        },
+        "imageId": "https://data.aoe4world.com/images/units/yumi-bannerman-2.png",
+        "strengths": [
+          "Aura",
+          "Ranged Infantry"
+        ],
+        "weaknesses": [
+          "Horsemen"
+        ],
+        "description": "Samurai archer that provides a damage-boosting aura. Features Deflective Armor."
+      },
+      {
+        "id": "katana-bannerman",
+        "age": 2,
+        "name": "Katana Bannerman",
+        "type": "Infantry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.38,
+          "attack": 8,
+          "health": 155
+        },
+        "imageId": "https://data.aoe4world.com/images/units/katana-bannerman-2.png",
+        "strengths": [
+          "Aura",
+          "Melee Infantry"
+        ],
+        "weaknesses": [
+          "Crossbowmen"
+        ],
+        "description": "Samurai infantry with a damage-boosting aura and Deflective Armor."
+      },
+      {
+        "id": "uma-bannerman",
+        "age": 2,
+        "name": "Uma Bannerman",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.62,
+          "attack": 16,
+          "health": 230
+        },
+        "imageId": "https://data.aoe4world.com/images/units/uma-bannerman-2.png",
+        "strengths": [
+          "Aura",
+          "Cavalry"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Mounted Samurai with a damage-boosting aura and Deflective Armor."
+      },
+      {
+        "id": "onna-musha",
+        "age": 3,
+        "name": "Onna-Musha",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.62,
+          "attack": 10,
+          "health": 80
+        },
+        "imageId": "https://data.aoe4world.com/images/units/onna-musha-3.png",
+        "strengths": [
+          "Kiting",
+          "Heavy Units"
+        ],
+        "weaknesses": [
+          "Archers"
+        ],
+        "description": "Mounted unit with a short-range bow, specialized in hit-and-run tactics."
+      },
+      {
+        "id": "mounted-samurai",
+        "age": 3,
+        "name": "Mounted Samurai",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.62,
+          "attack": 24,
+          "health": 230
+        },
+        "imageId": "https://data.aoe4world.com/images/units/mounted-samurai-3.png",
+        "strengths": [
+          "Deflective Armor"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Standard heavy cavalry with unique Japanese defensive capabilities."
+      },
+      {
+        "id": "handcannon-ashigaru",
+        "age": 4,
+        "name": "Handcannon Ashigaru",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 38,
+          "health": 130
+        },
+        "imageId": "handcannoneer-4",
+        "strengths": [
+          "High Damage"
+        ],
+        "weaknesses": [
+          "Horsemen"
+        ],
+        "description": "Powerful gunpowder unit that synergizes with Yumi Bannerman auras."
       }
     ],
     "technologies": [],
-    "videos": [],
+    "videos": [
+      "WYleGQJH6CI",
+      "HxlVI2JmSGI",
+      "6ir0CKgj8M0",
+      "L-NnvO0EMSk",
+      "WuO27sFFziM",
+      "jt-ZAaejaQs",
+      "LMHDa4Z0QNY",
+      "bmHZc7agrU0"
+    ],
     "build_orders": [],
     "landmarks": [
       {
@@ -1430,10 +2091,15 @@
       }
     ],
     "strengths": [
-      "Gli alloggiamenti costano solo 75 legno"
+      "Armatura Deflettiva (Deflective Armor): una meccanica unica dei Samurai (a piedi e a cavallo) che permette di bloccare completamente il primo colpo ricevuto (corpo a corpo o a distanza) ogni pochi secondi. Ottimo per assorbire i colpi iniziali dei cavalieri o delle balestre.",
+      "Sistema dei Daimyo: i Centri Città possono essere potenziati in Manieri, Palazzi e Castelli dello Shogunato. Questi non solo migliorano le difese, ma aumentano la velocità di raccolta delle fattorie vicine (fino al +60%) e permettono di schierare più stendardieri (Bannermen).",
+      "La casa (Farmhouse) funge sia da abitazione che da mulino.",
+      "La Fucina (Forge) sostituisce il campo minerario e il fabbro, permettendo di ricercare tecnologie militari già dall'Età Oscura."
     ],
     "weaknesses": [
-      "Non può costruire fortezze fino all'età Imperiale"
+      "Non può costruire fortezze fino all'età Imperiale",
+      "Non possiede comuni balestre: i Giapponesi non hanno il balestriere classico; lo sostituiscono con l'Onna-Musha (arciera a cavallo), che è molto mobile ma richiede una microgestione superiore e ha meno salute della controparte a piedi.",
+      "Dipendenza dal posizionamento dei tc: per massimizzare i bonus economici, le fattorie devono essere costruite attorno ai Centri Città potenziati. Questo rende l'economia vulnerabile a raid mirati su punti nevralgici."
     ]
   },
   {
@@ -1441,10 +2107,12 @@
     "name": "Giovanna d'Arco",
     "flag": "/civs/Jeanne d'Arc.webp",
     "difficulty": "Difficile",
-    "short_description": "A hero-led civilization where Jeanne d'Arc levels up and leads her army to victory.",
+    "short_description": "Una fiamma di speranza per il popolo francese, Giovanna d'Arco scende in campo e infonde coraggio ai suoi seguaci. Partendo da umili origini come contadina, Giovanna intraprende il suo percorso da eroina nell'Età Oscura. L'esperienza la trasforma in una leader carismatica, consentendole di circondarsi di compagni fidati e acquisire potenti abilità che daranno forma all'impero che era destinata a creare. La civiltà variante dei francesi e senza dubbio la più eroe-centrica del gioco.",
     "passive_bonuses": [
-      "Jeanne d'Arc gains experience from building, combat, and landmarks to unlock powerful abilities.",
-      "Highly aggressive and tempo-based."
+      "Giovanna d'Arco è un'unità eroica che guadagna esperienza uccidendo unità, distruggendo edifici o (al primo livello) costruendo e raccogliendo risorse. Con l'avanzare dei livelli sbloccherà abilità uniche che aiuteranno sia l'economia in base sia le unità militari con bonus al combattimento.",
+      "Il costo dei potenziamenti economici è ridotto del 35%",
+      "I mercanti possono decidere se trasportare oro cibo o legno.",
+      "Ha disponibili i cavalieri pesanti già dall'età feudale."
     ],
     "unique_units": [
       {
@@ -1458,7 +2126,7 @@
           "attack": 10,
           "health": 150
         },
-        "imageId": "jeanne-hero-1",
+        "imageId": "https://data.aoe4world.com/images/units/jeanne-darc-peasant-1.png",
         "strengths": [
           "Versatility"
         ],
@@ -1506,10 +2174,59 @@
           "Crossbowmen"
         ],
         "description": "Heavy infantry elite protector."
+      },
+      {
+        "id": "royal-knight-jd",
+        "age": 2,
+        "name": "Royal Knight",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.63,
+          "attack": 19,
+          "health": 190
+        },
+        "imageId": "knight-2",
+        "strengths": [
+          "Archers",
+          "Infantry"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Heavy cavalry that heals out of combat."
+      },
+      {
+        "id": "arbaletrier-jd",
+        "age": 3,
+        "name": "Arbalétrier",
+        "type": "Ranged",
+        "stats": {
+          "armor": 1,
+          "speed": 1.13,
+          "attack": 11,
+          "health": 80
+        },
+        "imageId": "arbaletrier-3",
+        "strengths": [
+          "Heavy Units"
+        ],
+        "weaknesses": [
+          "Archers"
+        ],
+        "description": "Elite crossbowman with a Pavise shield."
       }
     ],
     "technologies": [],
-    "videos": [],
+    "videos": [
+      "R6duDrI-rxI",
+      "3TpCRZJGVi8",
+      "d_aIoM5Seq0",
+      "1tmWiCZBsnk",
+      "1Xv7KzxSxV0",
+      "dQQ3IASE0nU",
+      "oSCSyoDkLM4"
+    ],
     "build_orders": [],
     "landmarks": [
       {
@@ -1570,10 +2287,15 @@
       }
     ],
     "strengths": [
-      "Ha come Eroe \"Giovanna D'Arco\" un'unità in grado di svilupparsi 4 volte"
+      "Ha come Eroe \"Giovanna D'Arco\" un'unità in grado di svilupparsi 4 volte: giovanna inizia come una semplice popolana e sale di livello guadagnando esperienza attraverso il combattimento o la costruzione. Ogni livello sblocca abilità attive (cure, danni ad area, evocazioni) e passive potentissime. Per questi motivi viene considerata una civiltà molto aggressiva che cerca lo scontro e l'all-in.",
+      "Produzione militare scontata: riduce il costo delle unità prodotte nelle strutture militari grazie al \"giglio\" di Giovanna, che si ricerca ogni tot secondi.",
+      "Giovanna può evocare istantaneamente unità sul campo (Compagni di Giovanna e Campioni di Giovanna) senza passare dalle strutture militari. Quando sale al livello 3 e sceglie il suo percorso, sblocca l'unità scelta anche dalle caserme o dalle scuderie."
     ],
     "weaknesses": [
-      "Economia scarsa"
+      "Economia più scarsa della civiltà madre dei Francesi, in quanto non produce abitanti più velocemente come loro.",
+      "Dipendenza totale dall'Eroe: se Giovanna viene uccisa, la civiltà perde gran parte della sua spinta offensiva e dei suoi buff. Anche se può essere resuscitata presso il centro città, il costo in oro aumenta e il tempo di assenza dal campo può costare la partita.",
+      "Vulnerabilità al \"Focus Fire\": i giocatori esperti cercheranno di bersagliare Giovanna con unità ad alto danno (balestre o cannoni) per rimuoverla subito dal combattimento.",
+      "Prevedibilità: poiché Giovanna deve combattere per guadagnare esperienza, l'avversario sa che dovrà aspettarsi aggressioni costanti."
     ]
   },
   {
@@ -1581,11 +2303,15 @@
     "name": "Inglesi",
     "flag": "/civs/English.webp",
     "difficulty": "Facile",
-    "short_description": "A defensive civilization with a strong agricultural economy and the formidable Longbowman.",
+    "short_description": "Man at arms sin dall'Età Oscura, arcieri con arco lungo (l'unità con maggiore gittata del gioco dopo i Wynguard Rangers) e le fattorie più efficenti del gioco rendono gli inglesi la civiltà perfetta per chi è alle prime armi. Si basano su un gameplay estremamente difensivo, ma che può risultare letale se lasciati indisturbati.",
     "passive_bonuses": [
-      "Farms are 50% cheaper to construct.",
-      "Network of Castles: Town Centers, Outposts, Towers, and Keeps grant a +25% attack speed bonus.",
-      "Vanguard Men-at-Arms available in the Dark Age (I)."
+      "Fattorie economiche: costo ridotto del 50% e tasso di raccolta aumentato se vicine a un mulino del +20%/25%/30%/30% dopo ogni avanzamento d'età.",
+      "Quando i nemici attaccano vicino a un Centro Città, Avamposto o Castello, tutte le unità inglesi vicine ricevono un bonus alla velocità d'attacco (+20% o +40%con il dovuto upgrade).",
+      "La produzione della fanteria scelta inglese aumenta del 50%",
+      "Difesa: i Centri Città sparano il doppio delle frecce rispetto alle altre civiltà. Gli abitanti sono equipaggiati con archi corti quando attaccano unità nemiche",
+      "Recinzioni (Enclosures): tecnologia unica dell'Età Imperiale che genera oro passivamente per ogni fattoria posseduta (una delle migliori tech economiche \"late-game\" del gioco).",
+      "Le navi hanno un costo ridotto del 10%",
+      "Gli esploratori e la fanteria scelta possono creare un falò, che aumenta di +30% il campo visivo delle unità vicine e di +10% la velocità di raccolta della carne cacciata."
     ],
     "unique_units": [
       {
@@ -1599,7 +2325,7 @@
           "attack": 16,
           "health": 220
         },
-        "imageId": "king-2",
+        "imageId": "https://data.aoe4world.com/images/units/king-2.png",
         "strengths": [
           "Raiding",
           "Heal Support"
@@ -1666,7 +2392,7 @@
           "attack": 12,
           "health": 125
         },
-        "imageId": "longbowman-4",
+        "imageId": "https://data.aoe4world.com/images/units/wynguard-ranger-4.png",
         "strengths": [
           "Standard Infantry"
         ],
@@ -1687,7 +2413,7 @@
           "attack": 20,
           "health": 280
         },
-        "imageId": "man-at-arms-4",
+        "imageId": "https://data.aoe4world.com/images/units/wynguard-footman-4.png",
         "strengths": [
           "Frontline Tanking"
         ],
@@ -1714,7 +2440,17 @@
         "description": "Trebuchets deal AoE damage."
       }
     ],
-    "videos": [],
+    "videos": [
+      "tB98m5TWOfU",
+      "fyHjmbag8ao",
+      "xWoBZ6RyPno",
+      "RJKPp9MmlKM",
+      "Z6ARNxdZUqo",
+      "L-NnvO0EMSk",
+      "Js0YZ-BZIRY",
+      "qv-t8COdUIg",
+      "W7Ms4yEn2Bc"
+    ],
     "build_orders": [],
     "landmarks": [
       {
@@ -1771,11 +2507,15 @@
     ],
     "strengths": [
       "Accesso a unità uniche: King, Longbowman, Vanguard Man-at-Arms, Wynguard Ranger, Wynguard Footman",
-      "Miglior Civiltà difensiva"
+      "Miglior civiltà difensiva",
+      "I villi inglesi sono equipaggiati con archi corti anziché semplici pugnali. Questo li rende molto efficaci nel respingere piccoli raid iniziali senza bisogno di supporto militare.",
+      "Le fattorie inglesi costano il 50% in meno di legno e, se costruite nel raggio di influenza dei mulini, producono cibo molto più velocemente (fino al +30% nell'Età Imperiale).",
+      "Archi lunghi (Longbowmen): Gli arcieri inglesi hanno una portata superiore a qualsiasi altro arciere del gioco e possono piazzare palizzate difensive per bloccare le cariche della cavalleria."
     ],
     "weaknesses": [
       "Lenta ad ingranare poichè ha bisogno di settare le farm",
-      "Ha poche strategie funzionanti"
+      "Mobilità limitata: l'esercito inglese è tipicamente lento e basato sulla fanteria. Soffrono molto contro civiltà altamente mobili (come Mongoli o Francesi) se colti fuori posizione.",
+      "Per massimizzare i bonus, devono \"espandersi a macchia d'olio\" portando avanti torri e avamposti. Combattere lontano dalla propria \"Rete di Castelli\" riduce drasticamente l'efficacia delle truppe."
     ]
   },
   {
@@ -1783,10 +2523,15 @@
     "name": "Knights Templar",
     "flag": "/civs/Knights Templar.png",
     "difficulty": "Medio",
-    "short_description": "A variant of the French with a fanatical cavalry focus and unique religious orders.",
+    "short_description": "Fondati per proteggere i deboli e gli afflitti, i Cavalieri Templari istituiscono alleanze in tutta Europa per radunare i propri eserciti. Schierando una spettacolare schiera di truppe pesanti, i Templari guidano la carica in battaglia con disciplina e coraggio. Le fortezze costellano il paesaggio fornendo posizioni difensive strategiche e un rifugio sicuro ai pellegrini che in viaggio verso i luoghi sacri.",
     "passive_bonuses": [
-      "Powerful Templar Knights with charge bonuses.",
-      "Monasteries provide unique military upgrades."
+      "Gli avanzamenti d'età vengono fatti nei centri città, ci sono 3 scelte per ogni avanzamento d'età. Ogni scelta sblocca permanentemente un'unità riservata e un bonus.",
+      "Le fortezze sono disponibili nell'età feudale. Le unità a distanza vicino a una fortezza ottengono +15% gittata d'attacco mentre le mura di pietra posizionate nell'area d'influenza di una fortezza ottengono +25% salute ed una freccia standard per difendersi.",
+      "I cavalieri templari non possono addestrare mercanti. (tranne scegliendo \"Venezia\" all'età imperiale che genera solo 5 mercanti molto veloci) Ogni 60 secondi un gruppo di pellegrini partirà dal centro città verso un luogo sacro generando oro all'arrivo in base alla distanza percorsa. La dimensione del gruppo aumenta di 1 per ogni fortezza attiva, fino ad un massimo di 10.",
+      "Gli abitanti depositano automaticamente legname senza aver bisogno di una falegnameria. Il legname viene raccolto un 20%  più velocemente in ogni età e un 20% del legname viene prodotto come cibo aggiuntivo",
+      "I laboratori d'assedio e le armi d'assedio costano il 25% di legno in meno",
+      "I luoghi sacri e le reliquie vengono rivelate all'inizio della partita",
+      "I loro porti sono più costosi ma hanno una salute maggiore, difese più forti e più spazio di presidio per le navi da pesca."
     ],
     "unique_units": [
       {
@@ -1853,7 +2598,7 @@
       },
       {
         "id": "heavy-spearman",
-        "age": 2,
+        "age": 3,
         "name": "Heavy Spearman",
         "type": "Infantry",
         "stats": {
@@ -1873,7 +2618,7 @@
       },
       {
         "id": "condottiero",
-        "age": 3,
+        "age": 4,
         "name": "Condottiero",
         "type": "Infantry",
         "stats": {
@@ -1997,10 +2742,35 @@
           "Vulnerable to small ships"
         ],
         "description": "Large oared vessel with a long-range forward-mounted Trebuchet."
+      },
+      {
+        "id": "genitour",
+        "age": 3,
+        "name": "Genitour",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.63,
+          "attack": 6,
+          "health": 105
+        },
+        "imageId": "https://data.aoe4world.com/images/units/genitour-3.png",
+        "strengths": [
+          "Archers",
+          "High Mobility"
+        ],
+        "weaknesses": [
+          "Melee Units"
+        ],
+        "description": "Extremely mobile ranged cavalry that attacks by throwing javelins."
       }
     ],
     "technologies": [],
-    "videos": [],
+    "videos": [
+      "0Ld_Kum3sh0",
+      "R5ZvaFmTobU",
+      "RONBa3ydUD0"
+    ],
     "build_orders": [],
     "landmarks": [
       {
@@ -2061,27 +2831,37 @@
       }
     ],
     "strengths": [
-      "Grande quantità di unità uniche",
-      "Fortezze disponibili dall'età feudale"
+      "Grande quantità di unità uniche grazie alla tripla scelta per ogni passaggio di età.",
+      "I cavalieri templari (e gli Szlachta polacchi di IV età) sono tra le unità di cavalleria più forti del gioco. Hanno più salute e danni rispetto ai cavalieri standard e possiedono abilità che li rendono estremamente difficili da abbattere.",
+      "Fortezze disponibili sin dall'età feudale. Ogni fortezza aumenta di +1 il numero di pellegrini",
+      "Oro passivo grazie ai pellegrini.",
+      "Raccolta di legna estremamente efficente senza necessità di depositarla."
     ],
-    "weaknesses": []
+    "weaknesses": [
+      "Economia estremamente debole su mappe di terra se si decide di non fare la build 2 TC. Anche facendola, è difficile sopravvivere finché questa scelta ripaga a livello economico.",
+      "Non posso mettere su il trade come le altre civiltà, in quanto guadagnano già oro dai pellegrini",
+      "Passando di era dal centro città, si perde la produzione di 3 villi. Ricercando le tech dei pellegrini, si perde la produzione di 1 villo per ognuna delle 2 tech. Questo porta i Templari ad avere meno villi delle altre civiltà sin dall'inizio del game.",
+      "Assenza di cannonieri e armi d'assedio di IV età come le altre civiltà."
+    ]
   },
   {
     "id": "lancaster",
     "name": "Lancaster",
     "flag": "/civs/House of Lancaster.webp",
     "difficulty": "Facile",
-    "short_description": "A variant of the English with powerful longbowmen upgrades and defensive traits.",
+    "short_description": "Civiltà variante degli Inglesi, La Casata di Lancaster si afferma come un potente ramo della monarchia inglese. I manieri costituiscono la spina dorsale della sua economia. La potenza militare dei Lancaster si basa su un vantaggio tecnologico e su tattiche superiori sul campo di battaglia. ",
     "passive_bonuses": [
-      "Enhanced defensive networks.",
-      "Focus on ranged superiority and area denial."
+      "Costruisci manieri per generare entrate passive. I manieri fungono da depositi per tutti i tipi di risorse e forniscono +10 di spazio popolazione. Ogni maniero generà 30 unità di cibo e 10 di legname al minuto. Aumenta anche di 4 unità di cibo e 2 di legname aggiuntivo per ogni abitante nelle vicinanze.",
+      "Ogni centro città genera 4 pecore. Gli abitanti raccolgono cibo dalle pecore il 20% più velocemente",
+      "Le Fortezze conferiscono 3 \"Guardie del conte\" (Man-at-arms) gratuiti quando vengono costruite ed ogni fortezza attiva conferisce +1 danni alle guardie del conte e ai cavalieri leggeri fino ad un massimo di +4.",
+      "Le navi costano il 10% in meno"
     ],
     "unique_units": [
       {
         "id": "lord-of-lancaster",
         "age": 1,
         "name": "Lord of Lancaster",
-        "type": "Cavalry",
+        "type": "Infantry",
         "stats": {
           "armor": 2,
           "speed": 1.62,
@@ -2188,8 +2968,66 @@
       }
     ],
     "technologies": [],
-    "videos": [],
-    "build_orders": [],
+    "videos": [
+      "BlUjHRlpSFU",
+      "fyHjmbag8ao",
+      "R5ZvaFmTobU",
+      "stGrmOcwWBY",
+      "RONBa3ydUD0"
+    ],
+    "build_orders": [
+      {
+        "id": "bo-1773663600000-lanc",
+        "steps": [
+          {
+            "note": "",
+            "time": "",
+            "action": "6 al cibo e mettere il rally sull'oro."
+          },
+          {
+            "note": "in questa fase è bene verificare dove posizionare il maniero. se posizionata correttamente ti può garantire un income passivo enorme. dare priorità al cibo e all'oro.",
+            "time": "0:20",
+            "action": "Rally sull'oro fino a 3 abitanti, il primo abitante che esce costruisce la casa e la miniera. Poi rally sulle pecore fino all'age up "
+          },
+          {
+            "note": "nota bene: se il maniero non dovessimo riuscire a posizionarlo tra cibo oro e legna, i villi che raccolgono al legno dovrebbero choppare la woodline lasciano intoccati i 3 alberelli attorno al TC che al 99% delle volte sono nell'area di influenza del maniero. se hai fortuna, e il maniero include anche la woodline, beh allora incomincia a volare.",
+            "time": "2:00",
+            "action": "attorno ai 2 minuti riesci a cliccare l'age up. per salire usa i 3 abitanti dell'oro e il consiglio è salire con il castello dei lancaster cercando di coprire più risorse possibili. dare priorità a oro-pietra-legno in quest'ordine. spostare 5 villi dal cibo alla pietra e il resto al legno, lasciandone 3 sulle pecore.  mettere rally sul legno e lasciare fino a quando non si hanno le risorse per il terzo TC."
+          },
+          {
+            "note": "se sei fortunato con lo spawn, hai circa 100-120 risorse passive dal maniero.",
+            "time": "4:05",
+            "action": "complimenti, sei appena salito in seconda. i 3 villi dell'age up costruiscono il maniero e poi si spostano alla legna. i 5 villi alla pietra rimangono li fino a quando non ne hai raccolta abbastanza per il terzo tc. i 3 villi alle pecore ti bastano. Ora il tuo compito è molto semplice: raccogli legna e cerca di lasciare tutti gli abitanti nel raggio di influenza del maniero. il rally del tc sempre alla legna fino a quando non hai le risorse per il terzo tc. "
+          },
+          {
+            "note": "ricordati, 5 villi alla pietra fino a quando hai raccolto 350, poi spostali al cibo. la disposizione dei villi è\n3 cibo, 5 pietra, 8 oro, resto legno.",
+            "time": "5:35",
+            "action": "ottimo, hai le risorse per mettere giu il primo TC! fallo con 8 villi e piazzalo vicino all'oro. questi 8 villi andranno poi a raccogliere oro fino all'age up di terza. rally sempre alla legna. fino a quando hai raccolto i 400 che ti servono per il terzo tc. il maniero a questo punto ti dovrebbe dare circa 180 risorse al minuto.  "
+          },
+          {
+            "note": "",
+            "time": "6:45",
+            "action": "dovresti avere le risorse per mettere giu il terzo tc. il consiglio è metterlo in una posizione abbastanza difensiva, esempio ti può coprire la woodline. appena il terzo tc è costruito, metti tutti i villi al cibo e lasciane 8 all'oro. rally sul cibo. I 2 tc aggiuntivi ti danno anche 8 pecore."
+          },
+          {
+            "note": "",
+            "time": "8:50",
+            "action": "la missione è praticamente compiuta, se non hai le risorse per passare in terza poco ci manca. il maniero con 40 villi equivale a 230 risorse al minuto. quanti villi all'age up dipende se ti stanno pushando. 8 - 10  - 12 - 16, a te la scelta."
+          },
+          {
+            "note": "",
+            "time": "12:00",
+            "action": "al minuto 12 dovresti avere 65-70 villi con il maniero che ti genera fino a 330 risorse passive. scegli tu come distruggere l'avversario: pioggia d'archi? balestrieri? un tsunami di hobelar? se senti di non aver fatto pena abbastanza, passa in quarta!!"
+          }
+        ],
+        "title": "3tc + WT",
+        "source": "https://www.youtube.com/watch?v=VjxcgSuINKE",
+        "difficulty": "Medium",
+        "author_rank": "Unranked",
+        "description": "Se 2tc + WT degli inglesi non ti basta, questa è la build perfetta per te. Il maniero, se posizionato correttamente, ti garantisce il terzo TC \"gratis\". Ti piace abbuffarti di pecore e legno? ti piace boommare come gli abbassidi ma con più stile? non ti rimane che provare.",
+        "author_nickname": "Michael Alberti"
+      }
+    ],
     "landmarks": [
       {
         "id": "town-center",
@@ -2249,53 +3087,240 @@
       }
     ],
     "strengths": [
-      "Se sfruttati correttamente i manieri garantistico un ottimo boom economico"
+      "Se sfruttati correttamente i manieri garantistico un ottimo boom economico.",
+      "Gli hobelar sostituiscono il classico cavaliere leggero, costa cibo e oro ed è ottimo a raidare. Diventa ancora più forte con le tecnologie di età III tramite il King's College.",
+      "Gli Yeoman hanno l'abilità Synchronized Shot: se l'avversario è distratto, devasteranno la sua backline con una pioggia di frecce infuocate."
     ],
-    "weaknesses": []
+    "weaknesses": [
+      "Sono stati nerfati parecchio e hanno subito modifiche importanti: i lord dell'Abbazia del Re ora muoiono più facilmente e i manieri costano di più.",
+      "Il landmark di età II \"Lancaster Castle\" non dà alcun particolare vantaggio."
+    ]
   },
   {
     "id": "macedonian",
     "name": "Macedoni",
     "flag": "/civs/Macedonian Dynasty.webp",
     "difficulty": "Facile",
-    "short_description": "A variant of the Byzantines featuring robust frontline units and unique mercenaries.",
+    "short_description": "Variante dei Bizantini.\n\nL'imperatore Basilio II impiegò i Variaghi per difendersi dalle rivolte fomentate dai nobili bizantini. Arrivati per mare dal nord, questi guerrieri forestieri non furono influenzati dalla politica e dalla cultura bizantina, creando una divisione d'assalto d'élite che protesse gli imperatori per i secoli a venire. La dinastia macedone conia l'argento come risorsa riservata da spendere negli arsenali variaghi, dove affilano le lame e affinano le loro abilità mentre proteggono l'imperatore.",
     "passive_bonuses": [
-      "Specialized infantry formations.",
-      "Unique mercenary contracts."
+      "aQuesta civiltà ha a disposizione una risorsa in più: \"L'argento\". Questa risorsa è usata per migliorare tecnologie all'interno dell\"Arsenale Variago\". Gli abitanti ottengono una quantità di argento pari al 40% di oro o pietra estratti. Bisogna costruire un arsenale variago vicino un area mineraria per avviare la raccolta d'argento.",
+      "Al posto degli arieti hanno a disposizione i \"cherosifoni\" che sono arieti più forti e che letteralmente sputano fuoco",
+      "L'esercito può usare abilità attivabili per bonus durante il combattimento",
+      "Al raggiungimento di un certo numero di guerrieri caduti in battaglia dei guerrieri variaghi gratuiti verranno creati."
     ],
-    "unique_units": [],
-    "technologies": [],
-    "videos": [],
-    "build_orders": [
+    "unique_units": [
       {
-        "steps": [
-          {
-            "action": "6 pecore, uno costruisce casa"
-          },
-          {
-            "action": "2 oro"
-          },
-          {
-            "action": "villi al cibo fino a feudale"
-          },
-          {
-            "action": "4 villi dal cibo costruiscono Ippodromo"
-          },
-          {
-            "action": "1 villo da cibo a legno costruisce falegnameria"
-          },
-          {
-            "action": "2 villi al legno"
-          },
-          {
-            "action": "tutti gli altri al cibo"
-          }
+        "id": "atgeirmadr",
+        "age": 1,
+        "name": "Atgeirmaðr",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.25,
+          "attack": 7,
+          "health": 90
+        },
+        "imageId": "spearman-1",
+        "strengths": [
+          "Cavalry",
+          "Speed"
         ],
-        "title": "BUILD ORDER FEUDALE",
-        "difficulty": "Easy",
-        "description": "Apertura standard con Ippodromo."
+        "weaknesses": [
+          "Archers"
+        ],
+        "description": "Replaces Spearmen. Attacks faster when near Varangian Guards."
+      },
+      {
+        "id": "bogmadr",
+        "age": 1,
+        "name": "Bogmaðr",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.25,
+          "attack": 5,
+          "health": 80
+        },
+        "imageId": "https://data.aoe4world.com/images/units/bogmadr-2.png",
+        "strengths": [
+          "Rate of Fire"
+        ],
+        "weaknesses": [
+          "Cavalry"
+        ],
+        "description": "Unique archer variant with high dps output."
+      },
+      {
+        "id": "varangian-guard-mac",
+        "age": 1,
+        "name": "Varangian Guard",
+        "type": "Infantry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.12,
+          "attack": 11,
+          "health": 125
+        },
+        "imageId": "varangian-guard-3",
+        "strengths": [
+          "Berserking",
+          "Heavy Infantry"
+        ],
+        "weaknesses": [
+          "Crossbowmen"
+        ],
+        "description": "Elite frontline infantry that can switch between defensive and offensive modes."
+      },
+      {
+        "id": "hippodrome-horseman",
+        "age": 1,
+        "name": "Hippodrome Horseman",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 2,
+          "speed": 1.88,
+          "attack": 13,
+          "health": 220
+        },
+        "imageId": "horseman-1",
+        "strengths": [
+          "Regeneration",
+          "Speed"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Variant horseman produced from the Hippodrome."
+      },
+      {
+        "id": "cataphract-mac",
+        "age": 3,
+        "name": "Cataphract",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 5,
+          "speed": 1.63,
+          "attack": 32,
+          "health": 405
+        },
+        "imageId": "cataphract-3",
+        "strengths": [
+          "Heavy Charge",
+          "Tanky"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Heavy armored shock cavalry."
+      },
+      {
+        "id": "cheirosiphon-mac",
+        "age": 3,
+        "name": "Cheirosiphon",
+        "type": "Siege",
+        "stats": {
+          "armor": 0,
+          "speed": 0.86,
+          "attack": 280,
+          "health": 310
+        },
+        "imageId": "https://data.aoe4world.com/images/units/cheirosiphon-3.png",
+        "strengths": [
+          "Area Fire",
+          "Buildings"
+        ],
+        "weaknesses": [
+          "Melee"
+        ],
+        "description": "Durable ram variant equipped with a flamethrower."
+      },
+      {
+        "id": "royal-cannon-mac",
+        "age": 4,
+        "name": "Royal Cannon",
+        "type": "Siege",
+        "stats": {
+          "armor": 0,
+          "speed": 0.88,
+          "attack": 500,
+          "health": 190
+        },
+        "imageId": "bombard-4",
+        "strengths": [
+          "Buildings"
+        ],
+        "weaknesses": [
+          "Melee Units"
+        ],
+        "description": "Massive cannon produced at the Foreign Engineering Company."
+      },
+      {
+        "id": "riddari",
+        "age": 3,
+        "name": "Riddari",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.7,
+          "attack": 24,
+          "health": 240
+        },
+        "imageId": "https://data.aoe4world.com/images/units/riddari-3.png",
+        "strengths": [
+          "Heavy Cavalry"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Standard heavy cavalry variant."
+      },
+      {
+        "id": "hippodrome-scout",
+        "age": 1,
+        "name": "Hippodrome Scout",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.63,
+          "attack": 3,
+          "health": 220
+        },
+        "imageId": "scout-1",
+        "strengths": [
+          "Scouting"
+        ],
+        "weaknesses": [
+          "Combat Units"
+        ],
+        "description": "High-health scout produced from the Hippodrome."
+      },
+      {
+        "id": "hippodrome-riddari",
+        "age": 1,
+        "name": "Hippodrome Riddari",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.7,
+          "attack": 29,
+          "health": 280
+        },
+        "imageId": "https://data.aoe4world.com/images/units/hippodrome-riddari-1.png",
+        "strengths": [
+          "Early Pressure"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Heavy cavalry available remarkably early from the Hippodrome."
       }
     ],
+    "technologies": [],
+    "videos": [
+      "p5DkJ1n4DHI",
+      "Zhoru1aK8Iw"
+    ],
+    "build_orders": [],
     "landmarks": [
       {
         "id": "town-center",
@@ -2308,50 +3333,50 @@
       {
         "id": "grand-winery-mac",
         "age": 2,
-        "name": "Grand Winery",
+        "name": "Grande Cantina",
         "type": "Economic",
         "imageId": "grand-winery-1",
-        "description": "+60% Olive Oil from nearby farms; acts as a Monastery."
+        "description": "Funge da mulino e monastero.\n\nGli abitanti del villaggio raccolgono cibo il 30% più velocemente sotto la sua aura. \n\nLe reliquie presidiate generano argento anzichè oro."
       },
       {
         "id": "imperial-hippodrome-mac",
         "age": 2,
-        "name": "Imperial Hippodrome",
+        "name": "Ippodromo Imperiale",
         "type": "Military",
         "imageId": "imperial-hippodrome-1",
-        "description": "Unlocks Triumph ability for cavalry speed/heal."
+        "description": "Funge da scuderia.\n\nUn potente campione esploratore, un soldato a cavallo ed un riddari vengono addestrati gratuitamente nel tempo.\n\nI campioni emanano un'aura che aumenta i danni da incendio, potenzia i danni della cavalleria ed inspira la fanteria a muoversi più velocemente."
       },
       {
         "id": "cistern-first-hill-mac",
         "age": 3,
-        "name": "Cistern of the First Hill",
+        "name": "Cisterna del primo colle",
         "type": "Defensive",
         "imageId": "cistern-of-the-first-hill-2",
-        "description": "Acts as a large Cistern; provides healing flasks."
+        "description": "Carica un'abilità usata per aumentare la velocità di lavoro delle costruzioni militari e di sviluppo.\n\nSe si utilizza su un'area mineraria, una falegnameria o una fattoria, inizia a guadagnare 160 unità d'oro, legname o cibo per 60 secondi.\n\nPuò contenere 9 cariche."
       },
       {
         "id": "golden-horn-tower-mac",
         "age": 3,
-        "name": "Golden Horn Tower",
+        "name": "Torre del Corno d'Oro",
         "type": "Military",
         "imageId": "golden-horn-tower-2",
-        "description": "Periodically spawns free Mercenary units."
+        "description": "Costruzione difensiva equipaggiata con postazioni per balestre ed ampio campo visivo.\n\nGenera periodicamente truppe di balestieri gratuite.\n\nIndividua unità furtive o travestite."
       },
       {
         "id": "foreign-engineering-mac",
         "age": 4,
-        "name": "Foreign Engineering Company",
+        "name": "Società di Ingegneria Straniera",
         "type": "Military",
         "imageId": "foreign-engineering-company-3",
-        "description": "Produces unique mercenary siege units."
+        "description": "Consente la produzione di nidi d'api, huihui pao e cannoni reali in cambio di argento."
       },
       {
         "id": "palatine-school-mac",
         "age": 4,
-        "name": "Palatine School",
+        "name": "Accademia Palatina",
         "type": "Technology",
         "imageId": "palatine-school-3",
-        "description": "Acts as a University; produces free elite mercenary units when researching technologies."
+        "description": "Presso questo luogo storico è possibile produrre rapidamente gruppi di catafratti d'elite in cambio di argento."
       }
     ],
     "strengths": [
@@ -2371,10 +3396,13 @@
     "name": "Maliani",
     "flag": "/civs/Malians.webp",
     "difficulty": "Difficile",
-    "short_description": "An economy-driven civilization focused on Gold, Cattle, and stealthy infantry.",
+    "short_description": "L'economia dei maliani è tra le più forte del gioco grazie al cibo e all'oro passivi. Sfruttando i giacimenti auriferi delle loro miniere a cielo aperto, i maliani traggono vantaggio da questa crescita per creare unità di fanteria uniche, capaci di attaccare di sorpresa e scagliare giavellotti contro i nemici.",
     "passive_bonuses": [
-      "Pit Mines automatically generate Gold",
-      "Musofadi Warriors can utilize stealth."
+      "I Maliani possono produrre mucche presso il mulino. Le mucche possono essere abbattute per cibo immediato o messe in un recinto per generare cibo passivamente (fino a 20 mucche totali)",
+      "I guerrieri musofadi e le cannoniere musofadi possono andare in stealth",
+      "Possono costruire una struttura speciale sopra i depositi d'oro. Questa genera oro passivamente senza bisogno di villi. Se circondata da case, la velocità di generazione del gold aumenta.",
+      "Le barche da pesca depositano un 10% del loro cibo come oro. Le navi da trasporto attaccano con giavellotti per ciascuna unità presidiata.",
+      "Non possono raccogliere carne dai cinghiali."
     ],
     "unique_units": [
       {
@@ -2456,37 +3484,204 @@
           "Spearmen"
         ],
         "description": "Fast and relatively cheap heavy cavalry."
+      },
+      {
+        "id": "musofadi-gunner-mal",
+        "age": 4,
+        "name": "Musofadi Gunner",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.25,
+          "attack": 41,
+          "health": 130
+        },
+        "imageId": "https://data.aoe4world.com/images/units/musofadi-gunner-4.png",
+        "strengths": [
+          "High Damage"
+        ],
+        "weaknesses": [
+          "Horsemen"
+        ],
+        "description": "Elite gunpowder unit."
+      },
+      {
+        "id": "warrior-scout-mal",
+        "age": 1,
+        "name": "Warrior Scout",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.75,
+          "attack": 7,
+          "health": 110
+        },
+        "imageId": "scout-1",
+        "strengths": [
+          "Scouting"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Fast scout variant capable of combat."
+      },
+      {
+        "id": "mansa-javelineer",
+        "age": 2,
+        "name": "Mansa Javelineer",
+        "type": "Ranged",
+        "stats": {
+          "armor": 3,
+          "speed": 1.31,
+          "attack": 8,
+          "health": 70
+        },
+        "imageId": "https://data.aoe4world.com/images/units/mansa-javelineer-2.png",
+        "strengths": [
+          "Archers"
+        ],
+        "weaknesses": [
+          "Cavalry"
+        ],
+        "description": "Unique ranged unit produced by the Mansa Quarry."
+      },
+      {
+        "id": "freeborn-warrior",
+        "age": 3,
+        "name": "Freeborn Warrior",
+        "type": "Infantry",
+        "stats": {
+          "armor": 5,
+          "speed": 1.38,
+          "attack": 9,
+          "health": 175
+        },
+        "imageId": "musofadi-warrior-2",
+        "strengths": [
+          "Infantry"
+        ],
+        "weaknesses": [
+          "Crossbowmen"
+        ],
+        "description": "Elite infantry unit produced at the Farimba Garrison."
+      },
+      {
+        "id": "mansa-musofadi-warrior",
+        "age": 2,
+        "name": "Mansa Musofadi Warrior",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.25,
+          "attack": 9,
+          "health": 80
+        },
+        "imageId": "https://data.aoe4world.com/images/units/mansa-musofadi-warrior-2.png",
+        "strengths": [
+          "Stealth"
+        ],
+        "weaknesses": [
+          "Archers"
+        ],
+        "description": "Unique stealth infantry produced by the Mansa Quarry."
       }
     ],
     "technologies": [],
-    "videos": [],
+    "videos": [
+      "ZK5fPbCzeeI",
+      "TEpN6tA4UIs",
+      "ke1j9wULVMw",
+      "4PTiDqbcreU",
+      "m1UugMNb5dc",
+      "kcblq47HGzU"
+    ],
     "build_orders": [
       {
         "steps": [
           {
-            "note": "Shiftare i 5 al legno alle pecore dopo il primo albero.",
+            "note": "Shiftare i 5 al legno alle pecore in modo che al termine dell'albero vadano da soli\n",
             "time": "00:00",
             "action": "5 su un albero vicino al tc ed 1 a costruire la Pitmine"
           },
           {
-            "note": "Presa la legna, spostare al cibo.",
+            "note": "Al minuto 1:20 dovrebbe aver già preso 25 legna",
             "time": "00:20",
-            "action": "Mandare il primo villo su un secondo albero a prendere SOLO 25 di legna. Rally al cibo."
+            "action": "Mandare il primo villo su un secondo albero a prendere SOLO 25 di legna. Impostare il rally degli abitanti sul cibo"
           },
           {
-            "note": "Fino a 7 case lasciando spazio per miniera.",
+            "note": "Fino a 7 case lasciando uno spazio per la miniera che servirà successivamente\n",
             "time": "00:35",
             "action": "Costruire case attorno alla pitmine"
           },
           {
-            "note": "Costruirla lontano dal cowboom.",
+            "note": "Costruirla in un posto che non intralci la costruzione di recinti \nShiftare i 5 villi al cibo così che vanno da soli al cibo",
             "time": "02:45",
-            "action": "Passare all'età feudale con 5 abitanti e 'CAVA DI MANSA'"
+            "action": "Passare all'età feudale con 5 abitanti e \"CAVA DI MANSA\""
+          },
+          {
+            "note": "",
+            "time": "2:45",
+            "action": "Da questo momento lasciare solo 4 al cibo e radunare fino a 10 al legno, dopo che saranno 10 al legno, tornare con il rally sull cibo"
+          },
+          {
+            "note": "",
+            "time": "3:20",
+            "action": "costruire una falegnameria"
+          },
+          {
+            "note": "",
+            "time": "3:40",
+            "action": "costruire un mulino "
+          },
+          {
+            "note": "",
+            "time": "4:10",
+            "action": "Ricercare \"Carriola\" non appena il mulino finisce di essere costruito"
+          },
+          {
+            "note": "\n",
+            "time": "4:10",
+            "action": "a questo minutaggio la  costruzione della \"Cava di Mansa\" dovrà essere finita, subito dopo ricercare \"Ascia Doppia\" dalla falegnameria non appena avete l'oro"
+          },
+          {
+            "note": "E fare \"Donso\" non appena finisce",
+            "time": "4:30",
+            "action": "Costruire un alloggiamento con uno del cibo"
+          },
+          {
+            "note": "fare Arcieri/Giavellotti in base al matchup",
+            "time": "5:05",
+            "action": "costruire un arceria con l'abitante precedente"
+          },
+          {
+            "note": "",
+            "time": "5:50",
+            "action": "Dovreste già avere due donso e un'unità a distanza così da poter scortare un abitante che dal legno andrà a costruire la seconda pitmine e case attorno."
+          },
+          {
+            "note": "Importante, mettete il rally point del mulino sul recinto una volta che è costruito, così che le mucche entreranno da sole\n",
+            "time": "6:50",
+            "action": "Iniziate a produrre mucche dal mulino e costruite i recinti"
+          },
+          {
+            "note": "",
+            "time": "7:00",
+            "action": "Se siete a corto di cibo potete tranquillamente andare a prendere risorse fuori la base poichè avrete abbastanza truppe per difendere gli abitanti (costruite anche una torre se non siete sicuri)"
+          },
+          {
+            "note": "dovete posizionarla al centro tra tutti i recinti",
+            "time": "7:50",
+            "action": "continuate a fare mucche finchè non ne avete 12 e poi andate a castelli con \" Grande Corral Furlani\""
+          },
+          {
+            "note": "",
+            "time": "Durante e dopo Castle age",
+            "action": "continuate a riempire i recinti (dovranno essere 7 recinti per le 20 mucche) dopodichè dovete spammare unità all'infinito perchè avrete un'economia  devastante. costruite più produzione, fate cavalli se necessario per poter raidare e costruite una terza pitmine."
           }
         ],
-        "title": "BUILD ORDER STRUTTURATO",
-        "difficulty": "Medium",
-        "description": "Ottimizzazione Pitmine e Cowboom."
+        "title": "Start Maliano vs aggressione feudale",
+        "source": "https://www.youtube.com/watch?v=ApuGahvKpf0",
+        "description": "In questa Build order vedremo come comportarsi contro un matchup aggressivo assicurando la costruzione delle pitmine e recinti"
       }
     ],
     "landmarks": [
@@ -2545,11 +3740,14 @@
       }
     ],
     "strengths": [
-      "Risorse passive grazie alle pitmines e le mucche nei recinti"
+      "Risorse passive grazie alle pitmines e le mucche nei recinti",
+      "Fanteria speciale: non usano i man at arms, ma hanno unità uniche come i musofadi, capaci di diventare invisibile, e il donso, un lanciere che lancia giavellotti a distanza prima di caricare.",
+      "Allevamento bovino: a differenza delle altre civiltà, i maliani possono produrre bovini dai mulini o dai ranch. il bestiame può essere macellato per cibo istantaneo o lasciato nei ranch per una generazione passiva e infinita di cibo. Questo, unito al gold passivo delle pitmines, rende i maliani una civiltà in grado di resistere a raid devastanti e ribaltare il game anche dopo aver perso molti villi."
     ],
     "weaknesses": [
-      "Unità meno performanti in età imperiale",
-      "Indisponibilità di balestre"
+      "Unità meno performanti in età imperiale rispetto alle altre civiltà",
+      "Mancanza di unità pesanti e balestrieri: i maliani non hanno veri cavalieri corazzati o man at arms. Questo li rende vulnerabili negli scontri diretti \"testa a testa\" se non sfruttano bene le abilità e il posizionamento.",
+      "Fragilità delle pitmines: sono costose e costruite fuori dalla base. Se l'avversario le distrugge, l'economia maliana subisce un colpo durissimo."
     ]
   },
   {
@@ -2557,11 +3755,16 @@
     "name": "Mongoli",
     "flag": "/civs/Mongols.webp",
     "difficulty": "Difficile",
-    "short_description": "A nomadic civilization capable of moving their bases, excelling in rapid cavalry strikes.",
+    "short_description": "Maestri della mobilità e della guerra a cavallo, i mongoli possono spostare facilmente i propri accampamenti. Traggono vantaggi economici dall'insediarsi nei pressi di affioramenti rocciosi e dal saccheggiare gli edifici nemici. I nemici devono affrontare gli attacchi della cavalleria fin dai primi momenti di gioco.",
     "passive_bonuses": [
-      "All buildings can be packed up and moved to a new location.",
-      "Start with maximum population limit; no need to build houses.",
-      "Cavalry produce 50% faster, or can produce double with stone."
+      "Tutte le costrizioni possono essere smontate e poi dispiegate in una nuova posizione.",
+      "Iniziano con la popolazione al massimo, non hanno bisogno di costruire case.",
+      "Le torri conferiscono il 15% di velocità di movimento alla cavalleria e ai mercanti vicini",
+      "Il Khan disponibile fin da subito è un'unità eroica a cavallo che attacca a distanza e fornisce potenti bonus a tutte le unità militare vicino. ",
+      "I soldati a cavallo vengono prodotti il 25% più velocemente",
+      "Incendiando strutture nemiche si ottengono 25 di oro e 25 di cibo",
+      "I mercanti trasportano risorse aggiuntive in base al numero di mercanti attivi;\nOltre 5 mercanti: +10% cibo\nOltre 10 mercanti: +10% cibo, legname\nOltre 15 mercanti: +10% cibo, legname, oro",
+      "I mongoli possono raccogliere la pietra solo tramite l'ovoo, una struttura che raccoglie la pietra +70/+100/+130/+160 al minuto in base all'avanzamento di età. le costruzioni realizzate all'interno dell'area di  d'influenza sono in grado di raddoppiare la produzione o sviluppare tecnologie uniche/migliorate"
     ],
     "unique_units": [
       {
@@ -2626,6 +3829,26 @@
           "Spearmen"
         ],
         "description": "Heavy cavalry that heals when attacking."
+      },
+      {
+        "id": "early-horseman-mon",
+        "age": 2,
+        "name": "Early Horseman",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.88,
+          "attack": 8,
+          "health": 115
+        },
+        "imageId": "horseman-1",
+        "strengths": [
+          "Archers"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Early light cavalry variant."
       }
     ],
     "technologies": [
@@ -2644,8 +3867,76 @@
         "description": "Traders also provide stone alongside gold."
       }
     ],
-    "videos": [],
-    "build_orders": [],
+    "videos": [
+      "x66WfzK3d2s",
+      "CSBO_dQhYy4",
+      "stGrmOcwWBY",
+      "ox4pEuivqcM",
+      "3kRkJcyP5WI",
+      "sD8GS0fydCA"
+    ],
+    "build_orders": [
+      {
+        "id": "bo-1773486904361",
+        "steps": [
+          {
+            "note": "Importante: il centro città va messo vicino alla woodline. Se siete fortunati coprirà anche l'oro. Se siete super fortunati sia oro che pietra.",
+            "time": "00:00",
+            "action": "Con un villo costruire subito l'ovoo, con gli altri 5 andare a choppare una woodline."
+          },
+          {
+            "note": "",
+            "time": "01:30",
+            "action": "Una volta raccolti 150 di legno, mandare un villo a costruire una stalla nell'area di influenza dell'ovoo"
+          },
+          {
+            "note": "Questa disposizione resterà fino a che non ne avrete 12 al cibo. A quel punto mandate un secondo villo al legno.",
+            "time": "01:35",
+            "action": "Mentre la stalla viene costruita, redistribuire i villi mandandoli tutti al cibo tranne uno, che resta al legno"
+          },
+          {
+            "note": "La vostra priorità devono essere francesi, sengoku, giappoesi, ma anche abbasidi. ",
+            "time": "02:40",
+            "action": "Entro questo minutaggio circa avrete pietra sufficiente (120) per produrre il doppio pezzotto dalla scuderia. "
+          },
+          {
+            "note": "Nel frattempo, tornando alla disposizione di villi, dovrete averne 12 al cibo, 2 al legno, 2 all'oro, e i successivi tutti al legno. Questo perché la build si basa anche sul costruire pascoli sin dalla dark age. Il rally dei villi al legno e i 12 villi al cibo vi consentirà di continuare a produrre pezzotti non-stop e di iniziare a mettere giù 1-2 pascoli prima della feudale.",
+            "time": "03:00",
+            "action": "Una volta prodotti i 2 pezzotti in un unico batch, continuare a produrre un pezzotto alla volta finché la pietra non torna a 120 e potrete metterne in coda 2 un'altra volta."
+          },
+          {
+            "note": "Ovviamente, quando avrete circa 10 villi al legno e abbastanza pecore dai pascoli per sostenere più di 12 villi al cibo, mettetene tranquillamente altri al cibo. Se intanto l''oro è aumentato troppo (anche con soli 2 villi rischiate di mismacrare un po' lì, ricercate carriola)",
+            "time": "03:00 - 08:00",
+            "action": "In questi 5 minuti il vostro scopo è raidare, raidare, raidare. Quando avrete dai 10 pezzotti in su, non temete le torri, torciatele. Bruciate tutto ciò che potete. Ogni edificio bruciato vi darà risorse. Seminate il panico. Portate devastazione. Se uno dei player avversari è troppo protetto, passate a un altro."
+          },
+          {
+            "note": "Se passate anche voi con l'Albero, ricordatevi di ricercare la velocità di spostamento degli edifici dall'ovoo, così da posizionare poi l'Albero rapidamente per startare il trade.",
+            "time": "08:00",
+            "action": "Intorno a questo minutaggio riuscirete finalmente a cliccare la feudale senza smettere mai di produrre pezzotti. Solitamente io passo con l'Albero d'Argento."
+          },
+          {
+            "note": "Ricordatevi i pascoli!",
+            "time": "08:00 - 14:00",
+            "action": "Il vostro obiettivo nei 6 minuti successivi non cambia: raidate come dei dannati. Nel frattempo arrivate a 5 villi all'oro in modo tale da riuscire a fare almeno doppia ascia bipenne, upgrade del fabbro e startare pian piano il trade."
+          },
+          {
+            "note": "15 minuti è indicativo, dipende sempre da come va il game, è plausibile anche prima",
+            "time": "15:00",
+            "action": "Age up in terza con il Kurultai."
+          },
+          {
+            "note": "",
+            "time": "15:30",
+            "action": "Con il Kurultai potete fightare qualsiasi cosa: avrete 40, 50 pezzotti, trade solidissimo, pascoli transition ormai ultimata... e i vostri team mate nel frattempo avranno fatto quello che volevano. Bello no? Chiudete il game e spammate /10 e /21 in chat."
+          }
+        ],
+        "title": "Crazy pezzotti build",
+        "difficulty": "Medium",
+        "author_rank": "Conqueror I",
+        "description": "Questa build è pensata esclusivamente per i team games. Si tratta di una strategia super aggressiva, basata su una dark age generalmente molto lunga (7-8 minuti), che ha lo scopo di comprare tempo ai tuoi team mate per boomare o fare fast terza. Gli avversari saranno troppo impegnati a difendersi dai raid.",
+        "author_nickname": "marcotamby"
+      }
+    ],
     "landmarks": [
       {
         "id": "town-center",
@@ -2662,13 +3953,6 @@
         "type": "Military",
         "imageId": "deer-stones-1",
         "description": "Grants access to the Khan's Hunter at the Archery Range and instantly researches the Yam Network technology."
-      },
-      {
-        "id": "yam-network",
-        "age": 2,
-        "name": "Yam Network",
-        "type": "Military",
-        "description": "Outposts grant a speed boost to all nearby cavalry and traders."
       },
       {
         "id": "silver-tree",
@@ -2709,12 +3993,16 @@
       }
     ],
     "strengths": [
-      "Non ha bisogno di costruire case",
-      "Gli edifici si possono spostare",
-      "Possibilità di produrre due unità alla volta"
+      "Non hanno bisogno di costruire case e partono già con 200 di popolazione libera",
+      "Gli edifici si possono spostare a piacimento",
+      "Possibilità di produrre due unità alla volta tramite le strutture militari posizionate nell'area di influenza dell'ovoo.",
+      "Mangudai: l'unità simbolo della civiltà, capace di scoccare frecce mentre galoppa. Fondamentale per raidare.",
+      "Yam network: la rete di avamposti fornisce un bonus di velocità di movimento cruciale non solo per le truppe, ma anche per i mercanti, rendendo le loro linee commerciali molto difficili da intercettare."
     ],
     "weaknesses": [
-      "Non possono costruire mura"
+      "Assenza di mura: la loro filosofia difensiva è \"attaccare per non essere attaccati\". la mancanza li rende vulnerabili se perdono il controllo della mappa o se vengono sorpresi da un esercito numeroso nella loro base.",
+      "Microgestione del khan: il khan è fondamentale per il successo dei combattimenti; se viene gestito male e muore spesso, l'esercito perde i bonus tattici (frecce segnaletiche) necessari per avere la meglio nei fight.",
+      "I pascoli sono costosi (150 legno) e spesso portano molti villi a raccogliere cibo dalla stessa pecora, perdendo qualcosa in efficenza."
     ]
   },
   {
@@ -2722,10 +4010,14 @@
     "name": "Orda d'Oro",
     "flag": "/civs/Golden Horde.webp",
     "difficulty": "Medio",
-    "short_description": "An aggressive variant of the Mongols focusing on early cavalry and economy.",
+    "short_description": "Alla guida dell'Orda d'Oro, Batu Khan estese l'Impero mongolo fino al cuore dell'Europa orientale. La grande Tenda d'Oro del Khan costituiva il fulcro di una rete di controllo, con avamposti che consentivano loro di governare un vasto territorio. Pur rimanendo potenti predoni, l'Orda d'Oro sacrificò la mobilità dei propri accampamenti per schierare le forze più numerose necessarie a controllare i propri stati vassalli.",
     "passive_bonuses": [
-      "Mobile buildings like the Mongols.",
-      "Increased early economic and military pressure."
+      "Producono villi e unità a 2 a 2 (al doppio del costo). Per produrre 2 villi impiegnao 37 secondi, contro i 40 di una civiltà normale. Questo li porta ad averne di più dell'avversario dopo un certo tempo di gioco.",
+      "Torgud: unità di cavalleria con poco danno ma tanti punti vita, ottima per \"tankare\".",
+      "Se ricercano \"Rinforzi\" dalla scuderia, dalla caserma o dall'area di tiro con l'arco, le unità escono a gruppi di 3 anziché 2, producendone di fatto una gratis.",
+      "I loro recinti,  permettono a 4 villi di raccogliere cibo senza doversi spostare, assicurando ottimi introti di cibo.",
+      "Per avanzare d'età non ha bisogno di usare gli abitanti perchè si potrà avanzare d'età attraverso \"La tenda d'oro\"",
+      "Costruisci gli ovoo sopra i giacimenti di pietra per raccoglierla senza aver bisogno abitanti. Il numero massimo di ovoo che puoi costruire aumenta di +1 per ogni avanzamento d'età"
     ],
     "unique_units": [
       {
@@ -2739,6 +4031,7 @@
           "attack": 6,
           "health": 50
         },
+        "imageId": "https://data.aoe4world.com/images/units/kharash-2.png",
         "strengths": [
           "Supporto",
           "Costo"
@@ -2759,6 +4052,7 @@
           "attack": 10,
           "health": 190
         },
+        "imageId": "https://data.aoe4world.com/images/units/batu-khan-2.png",
         "strengths": [
           "Supporto",
           "Manovre"
@@ -2779,6 +4073,7 @@
           "attack": 10,
           "health": 220
         },
+        "imageId": "https://data.aoe4world.com/images/units/torguud-2.png",
         "strengths": [
           "Bodyguard",
           "Alta Salute"
@@ -2821,6 +4116,7 @@
           "attack": 10,
           "health": 105
         },
+        "imageId": "https://data.aoe4world.com/images/units/kipchak-archer-3.png",
         "strengths": [
           "Mobilità",
           "Hit-and-Run"
@@ -2893,7 +4189,9 @@
       }
     ],
     "technologies": [],
-    "videos": [],
+    "videos": [
+      "Skfh1-iTtfg"
+    ],
     "build_orders": [],
     "landmarks": [
       {
@@ -2954,18 +4252,30 @@
       }
     ],
     "strengths": [
-      "Accesso a unità uniche: Torguud"
+      "Accesso a unità uniche: Torguud, Batu Khan,  Kipchak,  Kharash e Rus Tribute",
+      "Rispetto alla civiltà madre, possono costruire mura.",
+      "I loro avamposti sono già fortificati e sono più resistenti.",
+      "Il passaggio di età avviene tramite la Tenda d'Oro, senza impiegare villi."
     ],
-    "weaknesses": []
+    "weaknesses": [
+      "Dipendono molto dalla pietra degli oovo. Perderli può costare molto dal punto di vista tecnologico e della produzione di Torgud.",
+      "Gli stockyards costano 250 legno, rendendo la transizione al cibo molto costosa.",
+      "Il passaggio di età tramite la Tenda d'Oro è molto lento e non può essere velocizzato, aspetto problematico se si è sotto attacco.",
+      "Le tech più importanti (come Reinforcements) costano tantissima pietra (1150)."
+    ]
   },
   {
     "id": "orderofthedragon",
     "name": "Ordine del Drago",
     "flag": "/civs/Order of the Dragon.webp",
     "difficulty": "Facile",
-    "short_description": "An elite variant of the Holy Roman Empire, focusing on fewer, but incredibly powerful units.",
+    "short_description": "Civiltà variante del Sacro Romano Impero, l'Ordine del Drago è stato fondato da un gruppo di ricchi membri dell'élite, accuratamente selezionati, con l'obiettivo di annientare gli imperi ostili. Investendo ingenti risorse nell'addestramento di pochi guerrieri eccezionali, l'Ordine è riuscito a costituire un esercito d'élite senza pari.",
     "passive_bonuses": [
-      "Units are individually much stronger but cost double the resources and population space."
+      "Tutte le unità militari sono varianti \"Dorate\". Hanno statistiche (punti vita e attacco) circa doppie rispetto alle unità standard, ma costano il doppio e occupano 2 spazi popolazione ciascuna",
+      "Abitanti Dorati: Costano di più (+25% cibo) e impiegano più tempo a essere addestrati, ma raccolgono risorse il 25% più velocemente, costruiscono il 25% più in fretta e hanno più punti vita.",
+      "Riparazione d'Emergenza: Gli edifici nel raggio d'influenza dei Centri Città possono attivare una riparazione rapida automatica che non consuma legno.",
+      "I costi per fortificare le torri e le fortezze è ridotto del 20%. Il campo visivo è aumentato del 20%",
+      "La capacità di trasporto degli abitanti è del +40% rispetto alle altre civiltà"
     ],
     "unique_units": [
       {
@@ -3076,10 +4386,76 @@
           "Knights"
         ],
         "description": "Elite variant of the Landsknecht with double health and damage."
+      },
+      {
+        "id": "gilded-man-at-arms",
+        "age": 2,
+        "name": "Gilded Man-at-Arms",
+        "type": "Infantry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.13,
+          "attack": 14,
+          "health": 230
+        },
+        "imageId": "man-at-arms-2",
+        "strengths": [
+          "Heavy Infantry"
+        ],
+        "weaknesses": [
+          "Crossbowmen"
+        ],
+        "description": "Elite variant of the Man-at-Arms."
+      },
+      {
+        "id": "gilded-crossbowman",
+        "age": 3,
+        "name": "Gilded Crossbowman",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.13,
+          "attack": 15,
+          "health": 140
+        },
+        "imageId": "crossbowman-3",
+        "strengths": [
+          "Heavy Units"
+        ],
+        "weaknesses": [
+          "Archers"
+        ],
+        "description": "Elite variant of the Crossbowman."
+      },
+      {
+        "id": "gilded-handcannoneer",
+        "age": 4,
+        "name": "Gilded Handcannoneer",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.13,
+          "attack": 41,
+          "health": 250
+        },
+        "imageId": "handcannoneer-4",
+        "strengths": [
+          "High Damage"
+        ],
+        "weaknesses": [
+          "Horsemen"
+        ],
+        "description": "Elite variant of the Handcannoneer."
       }
     ],
     "technologies": [],
-    "videos": [],
+    "videos": [
+      "zhSvMC6euco",
+      "50FBAal_5MY",
+      "5Z1prUa8Bqg",
+      "Z6ARNxdZUqo",
+      "jt-ZAaejaQs"
+    ],
     "build_orders": [],
     "landmarks": [
       {
@@ -3140,19 +4516,27 @@
       }
     ],
     "strengths": [
-      "Unità più costose ma più forti"
+      "Unità dorate: quasi tutte le unità militari sono versioni potenziate delle truppe standard. Hanno molta più salute, infliggono più danni e possiedono abilità speciali uniche.",
+      "Poiché ogni unità vale quanto due o tre unità normali, l'Ordine può raggiungere una potenza bellica devastante anche con un numero limitato di truppe.",
+      "Le unità dorate sono estremamente difficili da abbattere. Possono resistere a lungo anche senza gli upgrade militari del fabbro."
     ],
-    "weaknesses": []
+    "weaknesses": [
+      "Costi elevati: ogni unità persa è un danno economico considerevole. Produrre una singola unità dorata richiede molto tempo e una grande quantità di risorse. Essere colti fuori posizione può portare a una sconfitta rapida.",
+      "Economia fragile: sebbene i villi siano più resistenti, perderli più problematico perché ognuno di essi rappresenta una fetta maggiore della tua economia."
+    ]
   },
   {
     "id": "ottomans",
     "name": "Ottomani",
     "flag": "/civs/Ottomans.webp",
     "difficulty": "Medio",
-    "short_description": "A military powerhouse offering free troop production through Military Schools.",
+    "short_description": "L'esercito ottomano è in grado di espandersi per dominare il campo di battaglia, grazie al sostegno delle scuole militari che producono gratuitamente unità per rafforzare i ranghi delle proprie formazioni. A sostegno di tali formazioni, i tamburi da guerra Mehter ispirano le truppe a perforare meglio in battaglia.",
     "passive_bonuses": [
-      "Military Schools produce units slowly for free.",
-      "Gain Vizier Points to unlock powerful civilization-wide abilities."
+      "Gli edifici militari costruiti nel raggio d'influenza di un Fabbro o di un'Università ottengono un bonus alla velocità di produzione (che aumenta a ogni epoca).",
+      "Scuole militari: edifici unici che producono unità militari gratuitamente e continuamente (ma a una velocità ridotta rispetto alla produzione standard). Il numero massimo di scuole aumenta con l'avanzare delle epoche.",
+      "Sistema del Gran Visir: compiendo azioni (come produrre unità o ricercare tecnologie), gli Ottomani accumulano punti esperienza per sbloccare fino a 9 bonus unici",
+      "Hanno accesso ai giannizzeri sin dall'età III, unità con polvere da sparo anti cavalleria capace di riparare le armi d'assedio sul campo.",
+      "Non possono raccogliere carne dai cinghiali."
     ],
     "unique_units": [
       {
@@ -3235,11 +4619,137 @@
           "Melee Cavalry"
         ],
         "description": "The largest and most powerful siege cannon."
+      },
+      {
+        "id": "lancer-ott",
+        "age": 3,
+        "name": "Lancer",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.63,
+          "attack": 24,
+          "health": 230
+        },
+        "imageId": "https://data.aoe4world.com/images/units/lancer-3.png",
+        "strengths": [
+          "Heavy combat"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Standard heavy cavalry for the Ottoman Empire."
       }
     ],
     "technologies": [],
-    "videos": [],
-    "build_orders": [],
+    "videos": [
+      "xFRGNXAUe34",
+      "zRNJZ0tmqS8",
+      "JMGJWXmB5JE"
+    ],
+    "build_orders": [
+      {
+        "id": "bo-1776434335191",
+        "steps": [
+          {
+            "note": "Gli abitanti alla pietra devono fare solo un giro di raccolta, non devono tornare una seconda volta alla pietra!",
+            "time": "00:00",
+            "action": "Mandare subito 5 abitanti a raccogliere la pietra (senza costruire area mineraria) e uno, il sesto abitante, a costruire una casa"
+          },
+          {
+            "note": "",
+            "time": "00:20",
+            "action": "Mandare i nuovi abitanti al cibo"
+          },
+          {
+            "note": "",
+            "time": "00:30",
+            "action": "Dopo aver droppato nel tc i 50 di pietra, raccogliere 50 di legno da uno dei 3 alberelli intorno al tc e poi spostare i villi al cibo"
+          },
+          {
+            "note": "Iniziate già a pensare al posizionamento delle strutture militari nella vostra base, in quanto è importante lasciare uno spazio \"centrale\" per il fabbro e buffare così la velocità di produzione degli edifici.",
+            "time": "00:35",
+            "action": "Con un villo costruire la scuola militare"
+          },
+          {
+            "note": "",
+            "time": "00:55 - 01:05",
+            "action": "Una volta che si hanno 8 villi al cibo, mandarli all'oro (con costruzione di area mineraria) fino ad averne 3"
+          },
+          {
+            "note": "",
+            "time": "02:00",
+            "action": "Dopo aver mandato 3 villi all'oro, rimettere il rally del TC al cibo"
+          },
+          {
+            "note": "Attenzione: la Madrasa è un mulino e genera automaticamente bacche ogni tot minuti, ma non dovete per forza posizionarla vicino alle bacche della vostra base. Questo perché le bacche potrebbero essere esposte e vi ritrovereste a non sfruttare con tranquillità il bonus del landmark. Costruitela quindi al sicuro, anche attaccata al centro città (ma non dalla parte delle strutture militari).",
+            "time": "02:50",
+            "action": "Costruire il landmark di feudale con 4 villi del cibo, scegliendo la Madrasa"
+          },
+          {
+            "note": "Usate le picche per harrassare l'avversario, meglio se riuscite a dargli fastidio sul gold, o per pushare pian piano i cervi vicino al tc (il deer push è stato nerfato, ma sempre meglio avere cervi vicini che lontani).",
+            "time": "03:00",
+            "action": "E le picche prodotte dalla scuola militare?"
+          },
+          {
+            "note": "Spostare un villo dell'oro alla pietra e 5 villi del cibo al legno. Quando si hanno nuovamente 50 di legno, costruire un'rea mineraria sulla pietra.",
+            "time": "03:15",
+            "action": "Gestione della macro durante l'age up"
+          },
+          {
+            "note": "",
+            "time": "03:30",
+            "action": "Mandare altri 2 villi alla pietra con il rally del TC"
+          },
+          {
+            "note": "",
+            "time": "03:40",
+            "action": "Costruire una casa e mettere il rally dei villi al legno, quindi costruire una falegnameria"
+          },
+          {
+            "note": "Quei 4 villi potete mandarli alle bacche della Madrasa: finché non avrete ricercato orticoltura e carriola, le bacche sostengono tranquillamente 4 villi. Dopo potrete tenerne soltanto 3.",
+            "time": "04:30",
+            "action": "I 4 villi dell'age up mandarli al cibo e impostare la scuola militare sulla produzione di sipahi"
+          },
+          {
+            "note": "Disposizione villi in questo momento: all'incirca 8 al cibo, 9 al legno, 3 alla pietra",
+            "time": "04:45",
+            "action": "Costruire una scuderia e iniziare a produrre sipahi"
+          },
+          {
+            "note": "",
+            "time": "05:20",
+            "action": "Costruire la seconda scuola militare e impostarla subito sui sipahi, cancellando la picca"
+          },
+          {
+            "note": "Vi servirà più avanti per la terza scuola militare",
+            "time": "05:25",
+            "action": "Smettere di raccogliere pietra non appena ne avrete altra 100"
+          },
+          {
+            "note": "",
+            "time": "05:30",
+            "action": "Costruire il fabbro, facendo attenzione che la sua area di influenza comprenda sia la scuderia che le 2 scuole militari"
+          },
+          {
+            "note": "Il riscatto dei primi punti vizier varia molto sia in base al vostro stile di gioco che alle necessità di mappa e matchup. A me piace riscattare le pecore come primo bonus (che aumenta anche il gather rate dell'oro), ma molti preferiscono i 2 iman, soprattutto in caso di fast castle oppure per curare i sipahi in caso di aggressione feudale. L'importante è che il secondo punto vizier riscattato sia la scuola militare aggiuntiva.\n\nPer quanto riguarda il mehter, trattandosi di un'unità molto costosa ma indispensabile per gli ottomani, potete impostare una scuola militare (la seconda o, eventualmente, la terza una volta che l'avrete sbloccata coi punti vizier) per la loro produzione.",
+            "time": "05:45",
+            "action": "Punti vizier e mehter"
+          },
+          {
+            "note": "A questo punto siete a un bivio: continuare la produzione di unitò aggiungendo arcerie o caserme in base alle necessità - da affiancare ai sipahi - oppure spostare qualche villo all'oro e andare vlocemente a castelli. Nel frattempo non dimenticate di harrassare costantemente coi sipahi. Del resto si tratta della cavalleria leggera più forte del gioco!",
+            "time": "06:00",
+            "action": "Fine del build order"
+          }
+        ],
+        "title": "Build standard 2026",
+        "source": "https://www.youtube.com/watch?v=HdlqFpLRkOk",
+        "difficulty": "Medium",
+        "author_rank": "Conqueror I",
+        "description": "Build order univoco per settare 2 tra le strategie principali della civiltà ottomana: fast castle per il controllo della mappa oppure aggressione feudale. ",
+        "author_nickname": "marcotamby"
+      }
+    ],
     "landmarks": [
       {
         "id": "town-center",
@@ -3305,7 +4815,10 @@
       "La grande bombarda è un'arma d'assedio che infligge danni AOE alle unità e maggiori danni alle strutture"
     ],
     "weaknesses": [
-      "Non hanno bonus economici unici"
+      "Non hanno bonus economici unici rispetto a tante altre civiltà",
+      "Lentezza dell'artiglieria: le grandi bombarde sono letali ma estremamente lente e costose.",
+      "Gestione degli spazi: le scuole militari occupano spazio e richiedono tempo per essere messe a regime. Un attacco che distrugge queste strutture può paralizzare la produzione ottomana.",
+      "Punti vizir limitati: non puoi sbloccare tutti i bonus in una sola partita. Devi scegliere l'ordine dei potenziamenti in base al game e al matchup: una scelta sbagliata può costarti al partita."
     ]
   },
   {
@@ -3313,10 +4826,13 @@
     "name": "Rusiani",
     "flag": "/civs/Rus.webp",
     "difficulty": "Medio",
-    "short_description": "A hunting and forestry civilization relying on Bounties and robust Wooden Fortresses.",
+    "short_description": "I Rusiani sono in grado di procurarsi risorse più facilmente grazie alla caccia (che genera oro) a ai capanni. Possono schierare cavalieri pesanti sin dall'Età Feudale. I loro nemici dovranno affrontare solide fortificazioni di legno nelle prime fasi del gioco e un'economia diversificata che non può essere facilmente compromessa.",
     "passive_bonuses": [
-      "Gain Bounty from hunting animals, increasing global gather rates.",
-      "Produce strong early knights and wooden defensive structures."
+      "Guadagnano oro raccogliendo carne cacciata, ottenendo anche \"Bounty\" che aumentano la velocità di raccolta degli abitanti. Ha 3 livelli di potenziamento",
+      "Guadagnano oro passivo grazie ai capanni di caccia vicino al legno (più legno, più oro passivo)",
+      "Le loro navi possono essere convertite in qualsiasi tipo (pesca, trasporto, guerra) senza dover essere ricostruite.",
+      "Le fortezze di legno aumentano la quantità di legname depositato dai villi del 20% se hanno una falegnameria nella sua area d'influenza.",
+      "I cavalieri pesanti dei Rusiani hanno tecnologie uniche che ne aumentano i punti salute e i danni da carica."
     ],
     "unique_units": [
       {
@@ -3385,39 +4901,54 @@
       }
     ],
     "technologies": [],
-    "videos": [],
+    "videos": [
+      "KVKLQROJv-A",
+      "9tF33wSHaVc",
+      "bmHZc7agrU0"
+    ],
     "build_orders": [
       {
         "steps": [
           {
-            "note": "Appena cliccato age-up 5 al cibo, 4 alla porta d'oro e tutti gli altri alla legna finché non se ne hanno 8, poi di nuovo tutti al cibo.",
+            "note": "Appena cliccato age-up 5 al cibo, 4 alla porta d'orone tutti gli altri alla legna finchè non se ne hanno 8, poi di nuovo tutti al cibo (anche con quelli che finiscono il landmark",
             "time": "00:00",
             "action": "Tutti al cibo dopo aver raccolto con 4 abitanti 2 giri di legna (3 capanni più casa)"
           },
           {
-            "note": "Se non contestano proscout, fortezza di legno sulla woodline subito.",
+            "note": "Momento delicato della partita, cercare di essere fastidiosi con gli scout e capire cosa vuole fare l'avversario",
             "time": "04:30",
-            "action": "Vendere 100 cibo alla porta d'oro e cliccare proscout. Aggiungere poi edificio militare."
+            "action": "Vendere 100 cibo alla porta d'oro e cliccare proscout. aggiungere poi edificio militare, se non contestano proscout fortezza di legno sulla woodline subito"
           },
           {
-            "note": "Prepara le aree di tiro con l'arco o scuderia.",
-            "time": "09:XX",
-            "action": "Vendere la legna progressivamente per passare in terza epoca."
+            "note": "Prepara le aree di tiro con l'arco a meno di evidenti segnali che li sconsigliano. scuderia è un ottima alternativa",
+            "time": "09:00",
+            "action": "Se tutto è andato bene vendere la legna progressivamente per ottenere l'oro e passare in terza"
           },
           {
-            "note": "Iniziare transizione a farm. NON toccare oro.",
-            "time": "12:XX",
-            "action": "Addestrare HA da almeno 3 aree di tiro. Monastero, Fabbro."
+            "note": " Lasciare 6 al cibo, avanzare di epoca con la casa alta con almeno 10 abitanti, 6 lasciarli a raccogliere i cervi e tutti gli altri al legno appena finito, rally point del TC sulla legna",
+            "time": "09:00",
+            "action": "Subito dopo aver cliccato ci servirà tantissima legna per preparare le fasi successive della partita"
           },
           {
-            "note": "Il vantaggio massimo è ORA.",
-            "time": "20:XX",
-            "action": "Mettere qualche bombarda nel mix per chiudere la partita."
+            "note": "Cerca di aggiungere qualche farm a spot, la transizione sarà importante perchè ci si treoverà senza cibo. NON toccare oro per nessun motivo",
+            "time": "12:00",
+            "action": "Dovresti addestrare HA da almeno 3 aree di tiro. costruire nell'ordine il monastero, il fabbro e aggiungere aree di tiro"
+          },
+          {
+            "note": "(spaskaya consigliata su propria eco) qui la tempistica dipende molto da come è andata la partita finora, potreste anche aver quittato da un pezzo :)",
+            "time": "15:00",
+            "action": "Continua ad addestrare unità, quando i tickets della porta d'oro, usali per passare in imperial appena possibile"
+          },
+          {
+            "note": "Il vantaggio massimo della build è ORA, scuderie con il legno, streltzi con l'oro passivo, pezzotti e assedio e si chiude la partita.",
+            "time": "20:00",
+            "action": "È ora di vincere la partita, cercare di mettere qualche bombarda nel mix e se la partita si protrae ancora allora bisogna abbandonare il pigiama e cambiare totalmente strat"
           }
         ],
-        "title": "BUILD ORDER STRUTTURATO",
-        "difficulty": "Advanced",
-        "description": "Build order focalizzata sulla Porta d'Oro e ProScouts."
+        "title": "Staffimperial",
+        "author_rank": "Conqueror I",
+        "description": "Idea principale: sfruttare l'oro passivo della civ per passare in imp molto velocemente. In generale fast castle con proscout classica (al max 1 edificio militare per proteggere il proscout), dopodiché map control con gli Horse Archers (HA) e cercare di prendere più reliquie possibili. Cercare di mettere pressione sull'avversario (specialmente sulle risorse, evitare lo scontro con le sue unità militari, kitare e cercare di non perdere gli HA (la massa critica è fondamentale da mantenere). Entro il minuto 17/18 passare in IMP (anche prima, dipende da come sta reagendo l'avversario) perchè quegli Horse Archer hanno freddo e reclamano un bel pigiamino. Da evitare contro GH (il +2 di range armor in castle per i keshik e il nerf al danno degli HA spiegano da soli il perchè). Anche i sofa di terza dei maliani sono un bel problema, consiglio altre comp contro queste civs.\nNOTA: una volta arrivati in quarta stabilizzare e passare a cavalieri leggeri (pezzotti) + streltzi + assedio è consigliato.",
+        "author_nickname": "Superstaff33"
       }
     ],
     "landmarks": [
@@ -3481,11 +5012,12 @@
       "Mura in legno più resistenti rispetto a quelle normali",
       "Dispongono di cavalleria pesante già dall'età feudale",
       "Raccolgono le reliquie più velocemente grazie ai \"Monaci guerrieri\" unità religiose a cavallo",
-      "Le torri sono più forti e possono riparare 8 abitanti"
+      "Le torri sono più forti e possono mettere al riparo fino a 8 abitanti (rispetto ai 5 di una torre classica)"
     ],
     "weaknesses": [
       "Non hanno mura in pietra senza la \"Spasskaya Tower\" (Landmark età IV)",
-      "L'economia dipende dalla carne cacciata che di base sono risorse esposte sulla mappa."
+      "Dipendenza dalla mappa: se la mappa ha pochi animali o poca foresta, i Rusiani perdono gran parte dei loro bonus iniziali. Un avversario che \"ruba\" le prede ai Rusiani può azzoppare la loro economia.",
+      "Microgestione iniziale: per ottenere il massimo, il giocatore deve usare gli scout in modo aggressivo su tutta la mappa fin dai primi secondi, il che richiede molta micro e multitasking."
     ]
   },
   {
@@ -3493,12 +5025,21 @@
     "name": "Sacro Romano Impero",
     "flag": "/civs/Holy Roman Empire.webp",
     "difficulty": "Medio",
-    "short_description": "An infantry-heavy civilization buffed by religious Prelates.",
+    "short_description": "I prelati contribuiscono alla prosperità economica del Sacro Romano Impero, mentre le potenti unità di fanteria costituiscono il nucleo delle sue forze armate. I nemici devono affrontare un avversario in grado di riprendersi rapidamente dagli attacchi e di sferrare potenti contrattacchi.",
     "passive_bonuses": [
-      "Prelates can inspire economy and military units.",
-      "Early Men-at-Arms access and powerful relic bonuses."
+      "Può posizionare le reliquie in avamposti e fortezze aumentandone così del 25% la corazza, 25% i danni, 25% gittata e del 20% il campo visivo. Le reliquie possono essere posizionate nei moli per aumentare del 5% la velocità d'attacco delle navi (cumulabile fino al 25%. Le reliquie posizionate in questo modo continueranno a generare oro.",
+      "Le costruzioni realizzate all'interno dell'aria d'influenza di un centro città ottengono \"Riparazioni di emergenza\" che può essere attivata per riparare la costruzione selezionata di 150 punti al secondo per un totale di 20 secondi",
+      "Riparazioni d'emergenza: una capacità attiva che permette agli edifici nel raggio di influenza dei centri città di ripararsi automaticamente senza spendere risorse.",
+      "I costi per fortificare le torri e le fortezze è ridotto del 20%. Il campo visivo è aumentato del 20%",
+      "I prelati possono usare l'abilità \" Ispirazione sacra\" sugli abitanti del villaggio per aumentarne la velocità di raccolta del 35% per 30 secondi",
+      "Passaggio in IV età scontato del 10% se si sceglie il Palazzo di Svevia.",
+      "Velocità di movimento della fanteria aumentata del +5% in età oscura e +10% dall'età feudale.",
+      "La capacità di trasporto degli abitanti è del +40% rispetto alle altre civiltà"
     ],
     "unique_units": [
+      "Landsknecht - (Età 3)",
+      "Prelato - (Età 1)",
+      "Man-at-Arms - (Età 2)",
       {
         "id": "prelate",
         "age": 1,
@@ -3563,10 +5104,140 @@
           "Heavy Cavalry"
         ],
         "description": "Tough infantry with good damage and armor, available an age earlier for the Holy Roman Empire."
+      },
+      {
+        "id": "spearman-hre",
+        "age": 1,
+        "name": "Spearman",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.25,
+          "attack": 7,
+          "health": 80
+        },
+        "imageId": "spearman-1",
+        "strengths": [
+          "Cavalry"
+        ],
+        "weaknesses": [
+          "Archers"
+        ],
+        "description": "Standard anti-cavalry infantry."
+      },
+      {
+        "id": "archer-hre",
+        "age": 2,
+        "name": "Archer",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.25,
+          "attack": 5,
+          "health": 70
+        },
+        "imageId": "archer-2",
+        "strengths": [
+          "Spearmen"
+        ],
+        "weaknesses": [
+          "Cavalry"
+        ],
+        "description": "Standard ranged infantry."
+      },
+      {
+        "id": "horseman-hre",
+        "age": 2,
+        "name": "Horseman",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.88,
+          "attack": 9,
+          "health": 125
+        },
+        "imageId": "horseman-2",
+        "strengths": [
+          "Archers"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Standard light cavalry."
+      },
+      {
+        "id": "knight-hre",
+        "age": 3,
+        "name": "Knight",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.63,
+          "attack": 24,
+          "health": 230
+        },
+        "imageId": "knight-3",
+        "strengths": [
+          "Archers"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Standard heavy cavalry."
+      },
+      {
+        "id": "crossbowman-hre",
+        "age": 3,
+        "name": "Crossbowman",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.13,
+          "attack": 11,
+          "health": 80
+        },
+        "imageId": "crossbowman-3",
+        "strengths": [
+          "Heavy Units"
+        ],
+        "weaknesses": [
+          "Horsemen"
+        ],
+        "description": "Standard anti-heavy ranged unit."
+      },
+      {
+        "id": "handcannoneer-hre",
+        "age": 4,
+        "name": "Handcannoneer",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.13,
+          "attack": 38,
+          "health": 130
+        },
+        "imageId": "handcannoneer-4",
+        "strengths": [
+          "High Damage"
+        ],
+        "weaknesses": [
+          "Horsemen"
+        ],
+        "description": "Standard gunpowder unit."
       }
     ],
     "technologies": [],
-    "videos": [],
+    "videos": [
+      "9tF33wSHaVc",
+      "xFRGNXAUe34",
+      "zRNJZ0tmqS8",
+      "m2OxKag7XQ0",
+      "4PTiDqbcreU",
+      "m1UugMNb5dc",
+      "yxws2qQBvqE",
+      "oSCSyoDkLM4",
+      "50FBAal_5MY"
+    ],
     "build_orders": [],
     "landmarks": [
       {
@@ -3622,11 +5293,14 @@
     ],
     "strengths": [
       "Man-At-Arms tra i più forti del gioco",
-      "La fanteria è del 10% più veloce",
-      "Economia molto forte con le reliquie ed il boost dei prelati"
+      "La fanteria è del 10% più veloce grazie alla tech nativa di partenza \"Marching drills\".",
+      "Prelati: all'inizio parti già con un prelato e ne puoi addestrare altri già nell'età oscura (I). La loro ispirazione aumenta la velocità di raccolta dei villi del 35%, rendendo l'economia iniziale una delle più forti del gioco.",
+      "Le reliquie non generano solo oro; se collocate all'interno di avamposti, castelli o torri, ne aumentano i danni, la gittata e la corazza. Nei porti, aumentano la velocità d'attacco delle navi. Passando in terza con la Cattedrale di Regniz, generano ancora più oro."
     ],
     "weaknesses": [
-      "Lento nelle prime fasi"
+      "Prevedibilità: il piano di gioco è quasi sempre lo stesso (corsa all'età III per le reliquie) Un avversario esperto cercherà di negare l'accesso alle reliquie (anche murandole) o di intercettare i prelati sulla mappa.",
+      "Dipendenza dal prelati: se i prelati vengono uccisi durante i raid nemici, l'efficienza economica crolla drasticamente, poiché la civiltà è bilanciata attorno al loro bonus del 40%.",
+      "Sono fragili nell'età dei castelli, soprattutto contro civiltà che hanno bonus migliori. Per questo motivo cercano di passare in IV età con lo Svevia il prima possibile e recuperare economia producendo abitanti velocemente."
     ]
   },
   {
@@ -3634,10 +5308,14 @@
     "name": "Sengoku Daimyo",
     "flag": "/civs/Sengoku Daimyo.webp",
     "difficulty": "Difficile",
-    "short_description": "A variant of the Japanese focusing intensely on Samurai warfare and rapid expansion.",
+    "short_description": "Civiltà variante dei Giapponesi, i Sengoku basano la propria forza su tre clan rivali, che gli permettono di ottenere potenti vantaggi per la fanteria da tiro, la fanteria da mischia o la cavalleria. Anche nel pieno della guerra c'era tempo per festeggiare: il festival Matsuri è il fulcro del commercio e degli scambi e garantisce potenti bonus all'economia. ",
     "passive_bonuses": [
-      "Aggressive early game melee bonuses.",
-      "Enhanced Daimyo mechanics for military production."
+      "Tenute dei Clan che aumentano al velocità di produzione delle strutture militari adiacenti",
+      "Gli abitanti che depositano oro generano automaticamente il 20% di Pietra extra (e viceversa)",
+      "Il Matsuri è un mercato disponibile dalla prima età che produce Yatai che forniscono cibo nel tempo in base al grado di risorsa di cibo vicina. Quando lo Yatai ha raccolto abbastanza cibo invia un mercantedi cibo al Matsuri migliorando un'aura che aumenta il tasso di velocità di raccolta degli abitanti vicini (Fino al 30%)",
+      "Le case fungono da Mulino e le Fucine fungono sia da fabbro che da deposito minerario.",
+      "Le barche da pesca costano il 25% in meno.",
+      "La posizione di tutti i cervi e cinghiali è già rivelata sulla mappa."
     ],
     "unique_units": [
       {
@@ -3661,26 +5339,6 @@
         "description": "Heavy infantry with Deflective Armor that blocks strikes."
       },
       {
-        "id": "onna-bugeisha-sd",
-        "age": 2,
-        "name": "Onna-Bugeisha",
-        "type": "Infantry",
-        "stats": {
-          "armor": 0,
-          "speed": 1.38,
-          "attack": 8,
-          "health": 80
-        },
-        "imageId": "onna-bugeisha-2",
-        "strengths": [
-          "Light Units"
-        ],
-        "weaknesses": [
-          "Archers"
-        ],
-        "description": "Fast light infantry with high attack range."
-      },
-      {
         "id": "shinobi-sd",
         "age": 2,
         "name": "Shinobi",
@@ -3699,11 +5357,359 @@
           "Detection"
         ],
         "description": "Stealth unit that can teleport and sabotage buildings."
+      },
+      {
+        "id": "yatai",
+        "age": 1,
+        "name": "Yatai",
+        "type": "Worker",
+        "stats": {
+          "armor": 0,
+          "speed": 0.88,
+          "attack": 0,
+          "health": 370
+        },
+        "imageId": "https://data.aoe4world.com/images/units/yatai-1.png",
+        "strengths": [
+          "Mobile Drop-off"
+        ],
+        "weaknesses": [
+          "Vulnerable"
+        ],
+        "description": "Mobile food stall that acts as a mobile drop-off point."
+      },
+      {
+        "id": "naginata-samurai",
+        "age": 1,
+        "name": "Naginata Samurai",
+        "type": "Infantry",
+        "stats": {
+          "armor": 2,
+          "speed": 1.12,
+          "attack": 8,
+          "health": 100
+        },
+        "imageId": "samurai-1",
+        "strengths": [
+          "Armor",
+          "Heavy Infantry"
+        ],
+        "weaknesses": [
+          "Crossbowmen"
+        ],
+        "description": "Versatile heavy infantry with high armor."
+      },
+      {
+        "id": "kanabo-samurai",
+        "age": 3,
+        "name": "Kanabo Samurai",
+        "type": "Infantry",
+        "stats": {
+          "armor": 1,
+          "speed": 1.12,
+          "attack": 3,
+          "health": 185
+        },
+        "imageId": "https://data.aoe4world.com/images/units/kanabo-samurai-2.png",
+        "strengths": [
+          "Anti-Heavy"
+        ],
+        "weaknesses": [
+          "Crossbowmen"
+        ],
+        "description": "Club-wielding infantry that deals percentage-based damage to high-health targets."
+      },
+      {
+        "id": "tanegashima-ashigaru",
+        "age": 3,
+        "name": "Tanegashima Ashigaru",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 15,
+          "health": 95
+        },
+        "imageId": "https://data.aoe4world.com/images/units/tanegashima-ashigaru-3.png",
+        "strengths": [
+          "Burst Damage"
+        ],
+        "weaknesses": [
+          "Cavalry"
+        ],
+        "description": "Specialized matchlock unit with high burst damage."
+      },
+      {
+        "id": "yari-cavalry",
+        "age": 2,
+        "name": "Yari Cavalry",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.88,
+          "attack": 9,
+          "health": 135
+        },
+        "imageId": "https://data.aoe4world.com/images/units/yari-cavalry-2.png",
+        "strengths": [
+          "Charge",
+          "Archers"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Spear-wielding light cavalry specialized in charging and counter-ranged tactics."
+      },
+      {
+        "id": "ikko-ikki-monk",
+        "age": 3,
+        "name": "Ikko-ikki Monk",
+        "type": "Religious",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 13,
+          "health": 160
+        },
+        "imageId": "https://data.aoe4world.com/images/units/ikko-ikki-monk-3.png",
+        "strengths": [
+          "Combat Religious"
+        ],
+        "weaknesses": [
+          "Archers"
+        ],
+        "description": "Unique support unit with powerful field abilities and religious influence."
+      },
+      {
+        "id": "daimyo",
+        "age": 2,
+        "name": "Daimyo",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 2,
+          "speed": 1.62,
+          "attack": 18,
+          "health": 240
+        },
+        "imageId": "https://data.aoe4world.com/images/units/daimyo-2.png",
+        "strengths": [
+          "Aura",
+          "Hero"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Heroic leader unit with high stats and powerful military auras."
+      },
+      {
+        "id": "yumi-ashigaru-sd",
+        "age": 2,
+        "name": "Yumi Ashigaru",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.38,
+          "attack": 4,
+          "health": 65
+        },
+        "imageId": "https://data.aoe4world.com/images/units/yumi-ashigaru-2.png",
+        "strengths": [
+          "Unarmored Units"
+        ],
+        "weaknesses": [
+          "Cavalry"
+        ],
+        "description": "Quick and cheap ranged infantry."
+      },
+      {
+        "id": "ozutsu-sd",
+        "age": 4,
+        "name": "Ozutsu",
+        "type": "Infantry",
+        "stats": {
+          "armor": 3,
+          "speed": 1,
+          "attack": 35,
+          "health": 160
+        },
+        "imageId": "ozutsu-4",
+        "strengths": [
+          "Buildings"
+        ],
+        "weaknesses": [
+          "Cavalry"
+        ],
+        "description": "Siege infantry armed with hand cannons."
+      },
+      {
+        "id": "mounted-samurai-sd",
+        "age": 3,
+        "name": "Mounted Samurai",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.63,
+          "attack": 24,
+          "health": 230
+        },
+        "imageId": "https://data.aoe4world.com/images/units/mounted-samurai-3.png",
+        "strengths": [
+          "Heavy Armor"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Standard heavy cavalry with unique Japanese defensive capabilities."
+      },
+      {
+        "id": "atakebune-sd",
+        "age": 4,
+        "name": "Atakebune",
+        "type": "Siege",
+        "stats": {
+          "armor": 0,
+          "speed": 1.25,
+          "attack": 40,
+          "health": 650
+        },
+        "imageId": "https://data.aoe4world.com/images/units/atakebune-4.png",
+        "strengths": [
+          "Buildings",
+          "Ships"
+        ],
+        "weaknesses": [
+          "Small Ships"
+        ],
+        "description": "Large heavy warship."
       }
     ],
     "technologies": [],
-    "videos": [],
-    "build_orders": [],
+    "videos": [
+      "H92Vl2QUiJs"
+    ],
+    "build_orders": [
+      {
+        "id": "bo-1773338708942",
+        "steps": [
+          {
+            "note": "se possibile anche vicino all'oro",
+            "time": "",
+            "action": "1 villo costruisce Matsuri vicino alla legna"
+          },
+          {
+            "note": "",
+            "time": "",
+            "action": "5 villi iniziano a raccogliere la legna vicino al Matsuri"
+          },
+          {
+            "note": "prossimi 3 villi alle bacche",
+            "time": "0:20",
+            "action": "1 villo a costruire casa vicino le bacche"
+          },
+          {
+            "note": "",
+            "time": "0:45",
+            "action": "Ricerca Tawara dalla casa"
+          },
+          {
+            "note": "mandalo sul cinghiale",
+            "time": "1:08",
+            "action": "Crea primo Yatai dal matsuri"
+          },
+          {
+            "note": "",
+            "time": "1:30",
+            "action": "manda i prossimi villi sulle pecore"
+          },
+          {
+            "note": "mandalo sui cervi",
+            "time": "1:55",
+            "action": "crea secondo Yatai dal matsuri"
+          },
+          {
+            "note": "mandalo tra le bacche e le pecore",
+            "time": "2:25",
+            "action": "crea terzo Yatai dal matsuri"
+          },
+          {
+            "note": "assicurati di avere 100 di legna prima di spostare i villi",
+            "time": "2:50",
+            "action": "costruisci la forgia sull'oro con i 6 villi della legna"
+          },
+          {
+            "note": "usa un villo delle bacche",
+            "time": "3:00",
+            "action": "costruisci una seconda casa sulle bacche"
+          },
+          {
+            "note": "dovresti avere 5 villi alle pecore",
+            "time": "3:20",
+            "action": "Manda i prossimi villi sulla legna"
+          },
+          {
+            "note": "Forza i villi a conservare l'oro che hanno raccolto\nRyokan al lato opposto del Matsuri, rispetto al centro città\ni landmarks sono entrambi validi, sta a voi decidere quale gameplay usare (se vi abituate ad usare il koka township usate quello)",
+            "time": "3:48",
+            "action": "Costruisci il Ryokan (o il Koka Township) con i 5 ville alle pecore"
+          },
+          {
+            "note": "",
+            "time": "5:10",
+            "action": "Compra 100 legna dal Matsuri"
+          },
+          {
+            "note": "Manda 4 villi del Ryokan alle pecore\nUn villo del Ryokan costruisce una scuderia vicino al Ryokan",
+            "time": "5:15",
+            "action": "Sei passato in età feudale"
+          },
+          {
+            "note": "Forza i villi a conservare la legna che hanno raccolto\nrecluta Yari quando le scuderie sono complete",
+            "time": "5:30",
+            "action": "Costruisci una scuderia accanto al Ryokan/Koka con un villo delle pecore"
+          },
+          {
+            "note": "",
+            "time": "5:40",
+            "action": " Compra legna dal Matsuri"
+          },
+          {
+            "note": "con i 2 villi che hanno costruito le scuderie",
+            "time": "6:10",
+            "action": "Costruisci Takeda Clan Daimyo vicino alle scuderie"
+          },
+          {
+            "note": "",
+            "time": "6:20",
+            "action": "Costruisci casa sulle bacche"
+          },
+          {
+            "note": "",
+            "time": "6:25",
+            "action": "Ricerca Takezaiku da una casa"
+          },
+          {
+            "note": "",
+            "time": "6:35",
+            "action": "Ricerca Tatara dalla forgia"
+          },
+          {
+            "note": "",
+            "time": "6:55",
+            "action": "Ricerca Horse Training dal Takeda Clan Daimyo"
+          },
+          {
+            "note": "Ricerca altri upgrade dalle forge\nSe serve puoi fare arcierie e Yumi\nPrendi i boar con i villi difendendoli con il tuo esercito\nSe hai costruito Koka Township crea shinobi usando la sua abilità\nvai in età dei castelli",
+            "time": "",
+            "action": "Continua..."
+          }
+        ],
+        "title": "Start Matsuri alla legna",
+        "source": "https://www.youtube.com/watch?v=s2LUxq_E7pE",
+        "difficulty": "Medium",
+        "author_rank": "Unranked",
+        "description": "Questa build è utile in mappe con una woodline vicina al tc",
+        "author_nickname": "Kani | AoeItalia.com"
+      }
+    ],
     "landmarks": [
       {
         "id": "town-center",
@@ -3763,19 +5769,32 @@
       }
     ],
     "strengths": [
-      "Accesso a unità uniche: Samurai, Onna-Bugeisha, Shinobi"
+      "Alti introiti di cibo grazie agli yatai ed alti introiti di oro grazie alla \"distilleria di sakè\" disponibile in età dei castelli",
+      "I Matsuri se potenziati garantiscono fino al 30% di velocità alla raccolta agli abitanti nella loro aura",
+      "Cavalleria molto forte",
+      "Il Daimyo è un'unità a cavallo pesante che garantisce un bonus alla velocità d'attacco alle unità vicino e anche 10 secondi dopo la sua morte. il bonus alla velocità d'attacco scala in base all'età d'avanzamento.",
+      "Le Tenute dei Clan sono edifici che velocizzano la produzione militare circostante. Se ne possono costruire fino a 3, ognuna delle quali aumenta il livello del clan (max livello 3). Non è possibile avere due clan contemporaneamente al livello massimo."
     ],
-    "weaknesses": []
+    "weaknesses": [
+      "Non può costruire fortezze fino all'età Imperiale",
+      "Fanteria relativamente scarsa",
+      "Dipendenza dagli Yatai",
+      "Ha bisogno di  costruire gli edifici in maniera precisa"
+    ]
   },
   {
     "id": "delhi",
     "name": "Sultanato di Delhi",
     "flag": "/civs/Delhi Sultanate.webp",
     "difficulty": "Difficile",
-    "short_description": "A research-focused civilization with free technologies and War Elephants.",
+    "short_description": "Il Sultanato di Delhi mantiene un netto vantaggio sui propri nemici grazie a una vasta rete di studiosi che aumentano la velocità di ricerca delle tecnologie, tutte gratuite. Una volta raggiunta la piena potenza, schiera i temibili elefanti da guerra e travolge chiunque si trovi sul suo cammino.",
     "passive_bonuses": [
-      "All technologies are free but take longer to research.",
-      "Scholars speed up research times significantly."
+      "Ricerca a costo zero: tutte le tecnologie costano 0 risorse ma hanno tempi di ricerca base più lunghi.",
+      "Cattura precoce: possibilità di catturare i luoghi sacri nell'età II (richiede la tecnologia \"santità\").",
+      "Il mulino aumenta la capacità di cibo delle bacche di +100. Gli abitanti che raccolgono cibo dai cespugli di bacche lo fanno il 25% più velocemente e trasportano +3 unità di cibo dai cespugli di bacche.",
+      "Ghazi rider: una variante del cavaliere leggero disponibile dall'età II, più resistente e con bonus contro le unità pesanti.",
+      "Hanno accesso agli elefanti. Unità militari che occupano più spazio di popolazione e hanno due attacchi, uno grazie all'elefante e l'altro grazie ai soldati che lo cavalcano.",
+      "Non possono raccogliere carne dai cinghiali."
     ],
     "unique_units": [
       {
@@ -3789,7 +5808,7 @@
           "attack": 0,
           "health": 90
         },
-        "imageId": "scholar-1",
+        "imageId": "https://data.aoe4world.com/images/units/scholar-2.png",
         "strengths": [
           "Research Boost"
         ],
@@ -3839,11 +5858,158 @@
           "Crossbowmen"
         ],
         "description": "Massive high-health melee unit."
+      },
+      {
+        "id": "tower-elephant",
+        "age": 3,
+        "name": "Tower Elephant",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 7,
+          "speed": 0.88,
+          "attack": 15,
+          "health": 600
+        },
+        "imageId": "https://data.aoe4world.com/images/units/tower-elephant-3.png",
+        "strengths": [
+          "Ranged Resistance",
+          "Siege"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Large elephant carrying two archers. Excellent for tanking and sieging."
+      },
+      {
+        "id": "sultan-elite-elephant",
+        "age": 4,
+        "name": "Sultan's Elite Tower Elephant",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 7,
+          "speed": 0.88,
+          "attack": 76,
+          "health": 600
+        },
+        "imageId": "https://data.aoe4world.com/images/units/sultans-elite-tower-elephant-3.png",
+        "strengths": [
+          "High Ranged Damage",
+          "Tanky"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Springalds"
+        ],
+        "description": "Produced by the Sultan's Palace. Features handcannoneer riders instead of archers."
+      },
+      {
+        "id": "lancer-del",
+        "age": 3,
+        "name": "Lancer",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.63,
+          "attack": 24,
+          "health": 230
+        },
+        "imageId": "https://data.aoe4world.com/images/units/lancer-3.png",
+        "strengths": [
+          "Heavy combat"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Standard heavy cavalry for the Delhi Sultanate."
       }
     ],
     "technologies": [],
-    "videos": [],
-    "build_orders": [],
+    "videos": [
+      "OwTuGgYt9CM",
+      "ox4pEuivqcM",
+      "8-k8Gzx_f8w",
+      "RdKnN8HWsUI",
+      "5wsNUFVBc4s",
+      "vjM4rDqfocE",
+      "qf1mUdIn4i4",
+      "eT8Px9TSZO4",
+      "JMGJWXmB5JE",
+      "qv-t8COdUIg",
+      "AigSbuthKg4"
+    ],
+    "build_orders": [
+      {
+        "id": "bo-1773496096706",
+        "steps": [
+          {
+            "note": "I villi devono fare un solo giro, raccogliendo 50 di legno.",
+            "time": "00:00",
+            "action": "Mandare subito un villo a costruire il mulino sulle bacche e gli altri 5 a choppare un albero vicino al tc."
+          },
+          {
+            "note": "La moschea deve avere nell'area di influenza il mulino. Questo è molto importante per velocizzare la ricerca di carriola.",
+            "time": "00:30",
+            "action": "Dopo aver raccolto quei 50 di legno, mandare i 5 villi alle bacche, ma nel percorso prendetene uno e fategli costruire una casa, poi un secondo e gli fate costruire la moschea."
+          },
+          {
+            "note": "",
+            "time": "00:35",
+            "action": "Ricordatevi di mettere in coda tutti gli upgrade: carriola e tecniche di sopravvivenza dal mulino, produzione efficente e pietù dalla moschea."
+          },
+          {
+            "note": "A cosa servono i 3 villi all'oro? Ora ve lo dico.",
+            "time": "02:40",
+            "action": "Questo è circa il minuto in cui cliccherete la feudale, ovviamente Torre della Vittoria. Prima avrete mandato 8 villi alle bacche, poi 3 all'oro, poi un nono villo alle bacche, e poi infine rally al legno. Durante l'age up (con 4 villi) tenerne 4 al cibo, 3 all'oro e resto legno. "
+          },
+          {
+            "note": "Finché non avrete una stalla, il secondo studioso potete tenerlo nella moschea per velocizzare ulteriormente gli upgrade.",
+            "time": "03:20",
+            "action": "Raggiunti i 130 di oro extra (la miniera deve essere a 3770 di oro rimasti), togliere quei villi dal gold e metterli al legno. Dalla moschea mettere in pausa la ricerca di Pietà (il progresso della tech non verrà cancellato) e produrre uno studioso."
+          },
+          {
+            "note": "Tenere sempre tutti i villi al legno tranne 4 al cibo.",
+            "time": "04:30",
+            "action": "A questo punto ovviamente sarete in feudale, avrete costruito una falegnameria, e dovrete far partire tutti gli upgrade (mulino, falegnameria, area mineraria), in particolare dalla moschea. Priorità assoluta a Santità, che se fatta partire al momento giusto vi permetterà di catturare i luoghi sacri intorno al minuto 7."
+          },
+          {
+            "note": "Mettete in coda tutti gli up del fabbro, 2 su uno e 3 sull'altro. I primi 2 di ricerca per ogni fabbro devono essere difesa frecce e attacco frecce.",
+            "time": "05:00",
+            "action": "Costruire un fabbro. Poi costruirne un altro."
+          },
+          {
+            "note": "Spostate i 2 studiosi dentro le strutture militari per produrre unità più velocemente.",
+            "time": "05:30",
+            "action": "Costruire una stalla e una area di tiro con l'arco. Se siete contro knight civ va bene fare stalla e caserma. "
+          },
+          {
+            "note": "",
+            "time": "07:00",
+            "action": "Uscire dalla base con le unità che si hanno e uno solo dei 2 studiosi. Obiettivo: catturare un luogo sacro e non far morire lo studioso, per niente al mondo."
+          },
+          {
+            "note": "La massa di archi è il vero punto di forza di questa build: con il 20% di velocità di attacco diventa letale.",
+            "time": "07:30",
+            "action": "Quando avrete preso il primo luogo sacro, spostatevi sul secondo. Difendete sempre lo studioso. Nel frattempo cercate di fare sì ghazi rider, ma soprattutto di  massare arcieri."
+          },
+          {
+            "note": "Se volete, ogni tanto mettete in coda qualche studioso. Più ne avete, meglio è. Anche se non rischierei di perderli in battaglia.",
+            "time": "09:00",
+            "action": "Quando inizierete ad avere un buon income di oro grazie ai luoghi sacri, costruire un mercato, vendete mano a mano l'oro per comprarvi legno e cibo, costruire altre strutture militari e continuare a massare unità come se non ci fosse un domani. "
+          },
+          {
+            "note": "",
+            "time": "10:00",
+            "action": "Pushate duro oppure tenere i luoghi sacri e andate in terza. A vostra discrezione!"
+          }
+        ],
+        "title": "All-in con Torre della Vittoria",
+        "source": "https://www.youtube.com/watch?v=vjM4rDqfocE",
+        "difficulty": "Medium",
+        "author_rank": "Conqueror I",
+        "description": "Build order base (primi 7 minuti) per un all-in con Torre della Vittoria, che assegna alle vostre unità di fanteria, sia melee che a distanza, un bonus di velocità di attacco del 20%. Buona per gli 1v1, anche se un po' caduta in disuso nelle ultime season/patch. Importante ricordarsi che il buff si applica alle strutture militari nell'area di influenza di moschee e Torre della Vittoria. Di solito non è un problema e l'influenza copre tutta la base.",
+        "author_nickname": "marcotamby"
+      }
+    ],
     "landmarks": [
       {
         "id": "town-center",
@@ -3903,8 +6069,17 @@
       }
     ],
     "strengths": [
-      "Accesso a unità uniche: Scholar, Ghazi Raider, War Elephant"
+      "Accesso a unità uniche: studiosi, Ghazi Raider, elefanti",
+      "Tecnologie gratuite: non spendi mai oro, cibo o legno per le ricerche (fabbro, università, tech economiche, ecc.). Questo permette di investire il 100% delle risorse nella creazione di un esercito massiccio.",
+      "Controllo dei luoghi sacri: i Delhi può catturare i luoghi sacri già dall'età feudale (II) grazie ai suoi studiosi. questi generano oro passivamente molto più velocemente rispetto alle altre civiltà.",
+      "Elefanti: possiedono le unità più resistenti del gioco. gli elefanti da guerra (corpo a corpo) e gli elefanti con torre (a distanza) possono assorbire enormi quantità di danni e distruggere edifici.",
+      "La fanteria può costruire palizzate di legna (e mura di pietra con il landmark Compound of the Defender).",
+      "Studiosi: presidiando moschee e strutture di ricerca con gli studiosi, la velocità di ricerca aumenta esponenzialmente. inoltre, queste unità possono curare l'esercito durante la battaglia."
     ],
-    "weaknesses": []
+    "weaknesses": [
+      "Ricerca lenta all'inizio: senza un numero sufficiente di studiosi, le tecnologie richiedono diversi minuti per essere completate. se perdi le moschee o gli studiosi vengono uccisi, il progresso tecnologico si ferma.",
+      "Map control: gran parte dell'introito di oro deriva dai luoghi sacri. Se l'avversario riesce a negarti il controllo della mappa, farai molta fatica a produrre unità costose o a passare di età.",
+      "Costo delle unità d'élite: gli elefanti sono potentissimi ma occupano molto pop space e costano molte risorse. Perderne uno è un colpo durissimo"
+    ]
   }
 ]
