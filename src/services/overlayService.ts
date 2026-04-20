@@ -3,10 +3,10 @@ import { supabase } from '../lib/supabaseClient';
 
 
 export interface OverlayState {
-  t1: { name: string; score: number; players: string[] };
-  t2: { name: string; score: number; players: string[] };
+  t1: { name: string; score: number; players: string[]; active?: boolean };
+  t2: { name: string; score: number; players: string[]; active?: boolean };
   maps: any[];
-  timer: { active: boolean; min: number; sec: number; timestamp: number };
+  timer: { active: boolean; min?: number; sec?: number; timestamp?: number; startTime?: number | null };
   casters: { active: boolean; name: string }[];
 }
 
