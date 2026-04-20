@@ -6,7 +6,6 @@ import { overlayService } from '../services/overlayService';
 import type { OverlayState } from '../services/overlayService';
 
 interface AoE4MatchDashboardProps {
-  onSuccess: (msg: string) => void;
   onError: (msg: string) => void;
 }
 
@@ -23,7 +22,7 @@ const DEFAULT_STATE: OverlayState = {
   ]
 };
 
-export function AoE4MatchDashboard({ onSuccess, onError }: AoE4MatchDashboardProps) {
+export function AoE4MatchDashboard({ onError }: { onError: (msg: string) => void }) {
   const [state, setState] = useState<OverlayState | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 

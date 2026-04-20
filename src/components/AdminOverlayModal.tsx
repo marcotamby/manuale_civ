@@ -202,7 +202,6 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                     <div className="animate-in slide-in-from-bottom-4 fade-in duration-500">
                       {selectedOverlay.id === 'aoe4-match' ? (
                         <AoE4MatchDashboard 
-                          onSuccess={(msg) => setToast({ isVisible: true, message: msg, type: 'success' })}
                           onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })}
                         />
                       ) : (
