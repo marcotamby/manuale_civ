@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, ExternalLink, Copy, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft } from 'lucide-react';
+import { X, ExternalLink, Copy, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft, Pencil, Check } from 'lucide-react';
 import { AoE4MatchDashboard } from './AoE4MatchDashboard';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
+import { overlayService } from '../services/overlayService';
 
 interface OverlayItem {
   id: string;
@@ -27,6 +28,12 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
     message: '',
     type: 'success'
   });
+  // Inline name editing
+  const [overlayDisplayName, setOverlayDisplayName] = useState<string>('');
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editNameValue, setEditNameValue] = useState<string>('');
+  const [isSavingName, setIsSavingName] = useState(false);
+  const editNameInputRef = useRef<HTMLInputElement>(null);
 
   const overlays: OverlayItem[] = [
     {
@@ -60,6 +67,48 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
       setSelectedOverlay(overlays[0]);
     }
   }, [isOpen]);
+
+  // Load display name from DB whenever the selected overlay changes
+  useEffect(() => {
+    if (!selectedOverlay) return;
+    setOverlayDisplayName(selectedOverlay.name); // fallback
+    overlayService.getOverlayName(selectedOverlay.id).then(name => {
+      if (name) setOverlayDisplayName(name);
+    });
+  }, [selectedOverlay]);
+
+  // Auto-focus when entering edit mode
+  useEffect(() => {
+    if (isEditingName && editNameInputRef.current) {
+      editNameInputRef.current.focus();
+      editNameInputRef.current.select();
+    }
+  }, [isEditingName]);
+
+  const handleSaveName = async () => {
+    if (!selectedOverlay || !editNameValue.trim()) return;
+    setIsSavingName(true);
+    try {
+      await overlayService.updateOverlayName(selectedOverlay.id, editNameValue.trim());
+      setOverlayDisplayName(editNameValue.trim());
+      setIsEditingName(false);
+      setToast({ isVisible: true, message: 'Nome aggiornato con successo! ✏️', type: 'success' });
+    } catch {
+      setToast({ isVisible: true, message: 'Errore nel salvataggio del nome.', type: 'error' });
+    } finally {
+      setIsSavingName(false);
+    }
+  };
+
+  const handleStartEditName = () => {
+    setEditNameValue(overlayDisplayName);
+    setIsEditingName(true);
+  };
+
+  const handleCancelEditName = () => {
+    setIsEditingName(false);
+    setEditNameValue('');
+  };
 
   useEffect(() => {
     setActiveTab('preview');
@@ -144,8 +193,47 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
             {selectedOverlay ? (
               <>
                 <div className="flex items-start justify-between mb-6">
-                  <div className="max-w-[240px]">
-                    <h3 className="text-2xl font-bold text-white mb-1">{selectedOverlay.name}</h3>
+                  <div className="max-w-[280px]">
+                    {/* Editable Name */}
+                    {isEditingName ? (
+                      <div className="flex items-center gap-2 mb-1">
+                        <input
+                          ref={editNameInputRef}
+                          value={editNameValue}
+                          onChange={e => setEditNameValue(e.target.value)}
+                          onKeyDown={e => { if (e.key === 'Enter') handleSaveName(); if (e.key === 'Escape') handleCancelEditName(); }}
+                          className="bg-white/10 border border-yellow-500/50 rounded-lg px-3 py-1.5 text-white text-lg font-bold focus:outline-none focus:border-yellow-400 w-full"
+                          placeholder="Nome overlay..."
+                          disabled={isSavingName}
+                        />
+                        <button
+                          onClick={handleSaveName}
+                          disabled={isSavingName}
+                          title="Salva"
+                          className="p-2 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-green-400 border border-green-500/30 transition-colors shrink-0"
+                        >
+                          {isSavingName ? <span className="text-xs">...</span> : <Check size={16} />}
+                        </button>
+                        <button
+                          onClick={handleCancelEditName}
+                          title="Annulla"
+                          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 border border-white/10 transition-colors shrink-0"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 group/name mb-1">
+                        <h3 className="text-2xl font-bold text-white">{overlayDisplayName}</h3>
+                        <button
+                          onClick={handleStartEditName}
+                          title="Modifica nome"
+                          className="p-1.5 rounded-lg opacity-0 group-hover/name:opacity-100 hover:bg-white/10 text-gray-500 hover:text-yellow-400 transition-all"
+                        >
+                          <Pencil size={14} />
+                        </button>
+                      </div>
+                    )}
                     <p className="text-sm text-gray-400 leading-snug">{selectedOverlay.description}</p>
                   </div>
                   <div className="flex gap-2 shrink-0 pt-1">

@@ -26,6 +26,34 @@ export const overlayService = {
     return data.state as OverlayState;
   },
 
+  async getOverlayName(id: string = 'aoe4-match'): Promise<string | null> {
+    const { data, error } = await supabase
+      .from('stream_overlays')
+      .select('display_name')
+      .eq('id', id)
+      .single();
+    if (error || !data) return null;
+    return (data as any).display_name as string | null;
+  },
+
+  async updateOverlayName(id: string = 'aoe4-match', displayName: string) {
+    const { data, error } = await supabase
+      .from('stream_overlays')
+      .update({ display_name: displayName })
+      .eq('id', id)
+      .select();
+
+    if (error) throw error;
+
+    // Se record non esiste ancora, inseriscilo
+    if (!data || data.length === 0) {
+      const { error: insertError } = await supabase
+        .from('stream_overlays')
+        .insert({ id, display_name: displayName });
+      if (insertError) throw insertError;
+    }
+  },
+
   async updateOverlayState(id: string = 'aoe4-match', state: OverlayState) {
     try {
       // 1. Prova prima l'aggiornamento
