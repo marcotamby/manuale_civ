@@ -83,7 +83,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                setTimeout(() => {
                  const boElement = document.getElementById(`admin-bo-${initialId}`);
                  if (boElement) {
-                   boElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                   boElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
                    boElement.classList.add('ring-2', 'ring-yellow-500', 'bg-yellow-500/20');
                    setTimeout(() => boElement.classList.remove('ring-2', 'ring-yellow-500', 'bg-yellow-500/20'), 3000);
                  }

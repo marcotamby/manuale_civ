@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
-import { Trash2, Plus, User, CheckCircle, XCircle, X } from 'lucide-react';
+import { Trash2, Plus, User, CheckCircle, XCircle, X, Upload, Loader2 } from 'lucide-react';
 import type { ToastType } from './Toast';
 
 interface SuggestionFormProps {
@@ -26,6 +26,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
     message: '',
     type: 'success'
   });
+  const [isUploading, setIsUploading] = useState(false);
 
   // Build Order structured state
   const [boSteps, setBoSteps] = useState<{ time: string; action: string; note: string }[]>([
@@ -58,6 +59,41 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
     setBannerUrl('');
     setIsSigned(false);
   }, [user?.email]);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setToast({ isVisible: true, message: 'Immagine troppo grande (max 5MB)', type: 'error' });
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `suggestion-${Date.now()}.${fileExt}`;
+      const filePath = `build-orders/suggestions/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('civilizations')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('civilizations')
+        .getPublicUrl(filePath);
+
+      setBannerUrl(publicUrl);
+      setToast({ isVisible: true, message: 'Immagine caricata con successo!', type: 'success' });
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      setToast({ isVisible: true, message: `Errore caricamento: ${error.message}`, type: 'error' });
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -274,18 +310,41 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Immagine Banner (URL JPG/PNG)</label>
-              <input
-                type="text"
-                placeholder="https://imgur.com/... (opzionale)"
-                value={bannerUrl}
-                onChange={(e) => setBannerUrl(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
-                title="Inserisci l'URL di un'immagine da mostrare come anteprima"
-              />
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Immagine Banner (JPG/PNG)</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Inserisci link immagine o carica file..."
+                  value={bannerUrl}
+                  onChange={(e) => setBannerUrl(e.target.value)}
+                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-blue-300 focus:outline-none focus:border-blue-500 transition-colors"
+                />
+                <label className={`cursor-pointer flex items-center justify-center p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors w-12 h-full shrink-0 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                   <input 
+                     type="file" 
+                     className="hidden" 
+                     accept="image/*"
+                     onChange={handleFileUpload}
+                   />
+                   {isUploading ? (
+                     <Loader2 size={20} className="text-yellow-500 animate-spin" />
+                   ) : (
+                     <Upload size={20} className="text-gray-400" />
+                   )}
+                </label>
+              </div>
               {bannerUrl && (
-                <div className="mt-2 relative h-32 w-full rounded-xl overflow-hidden border border-white/10">
+                <div className="mt-2 relative h-32 w-full rounded-xl overflow-hidden border border-white/10 group/preview">
                   <img src={bannerUrl} alt="Anteprima" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex items-center justify-center">
+                     <button 
+                       type="button"
+                       onClick={() => setBannerUrl('')}
+                       className="p-1 px-3 bg-red-600 text-xs font-bold text-white rounded-lg uppercase flex items-center gap-1 shadow-lg"
+                     >
+                       <Trash2 size={12} /> Rimuovi
+                     </button>
+                  </div>
                 </div>
               )}
             </div>
