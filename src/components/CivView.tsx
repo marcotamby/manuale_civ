@@ -155,8 +155,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
   // Q&A State
   const [questions, setQuestions] = useState<any[]>([]);
-  const [qaLoading, setQaLoading] = useState(false);
-  const [questionText, setQuestionText] = useState('');
+  const [isSignOpen, setIsSignOpen] = useState(false);
+  const [expandedBOs, setExpandedBOs] = useState<Set<string>>(new Set());
+  const [activeTab, setActiveTab] = useState<'bonuses' | 'army' | 'landmarks' | 'buildorders'>('bonuses');
   const [replyTo, setReplyTo] = useState<{ questionId: string, parentId?: string } | null>(null);
   const [answerText, setAnswerText] = useState('');
   const [qaMessage, setQaMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
@@ -718,11 +719,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                             <Map size={48} className="text-white/10" />
                           </div>
                         )}
-                        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#1a1c23] to-transparent" />
-                        <div className="absolute inset-0 bg-black/20" />
-                        <div className="absolute bottom-3 left-4 flex gap-0.5">
+                        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#1a1c23] via-[#1a1c23]/60 to-transparent" />
+                        <div className="absolute inset-0 bg-black/10" />
+                        <div className="absolute bottom-4 left-5 flex gap-1.5 drop-shadow-2xl">
                           {Array.from({ length: 3 }).map((_, i) => (
-                            <span key={i} className={`text-xs ${i < bo.difficulty ? 'text-yellow-500' : 'text-white/20'}`}>⭐</span>
+                            <span key={i} className={`text-lg filter ${i < bo.difficulty ? 'text-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.8)]' : 'text-white/10'}`}>⭐</span>
                           ))}
                         </div>
                       </div>
@@ -731,9 +732,28 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                       <div className="p-5 flex-1 flex flex-col bg-[#1a1c23]/50">
                         <h3 className="text-lg font-black text-white group-hover:text-yellow-400 transition-colors uppercase tracking-tight mb-2 line-clamp-1">{bo.title}</h3>
                         
-                        <p className="text-sm text-gray-400 line-clamp-2 mb-6 leading-relaxed flex-1">
-                           {bo.description}
-                        </p>
+                        <div className="relative group/desc">
+                          <p className={`text-sm text-gray-300 leading-relaxed transition-all duration-300 ${expandedBOs.has(bo.id) ? '' : 'line-clamp-2'} mb-4`}>
+                             {bo.description}
+                          </p>
+                          {bo.description && bo.description.length > 100 && (
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExpandedBOs(prev => {
+                                  const next = new Set(prev);
+                                  if (next.has(bo.id)) next.delete(bo.id);
+                                  else next.add(bo.id);
+                                  return next;
+                                });
+                              }}
+                              className="text-[10px] font-black uppercase text-yellow-500/80 hover:text-yellow-500 transition-colors mb-4 flex items-center gap-1"
+                            >
+                              {expandedBOs.has(bo.id) ? 'Mostra meno' : 'Leggi tutto'}
+                              <ChevronDown size={10} className={`transition-transform duration-300 ${expandedBOs.has(bo.id) ? 'rotate-180' : ''}`} />
+                            </button>
+                          )}
+                        </div>
 
                         <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
                            <div className="flex items-center gap-2">
