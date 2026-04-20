@@ -223,12 +223,12 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                         </button>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2 group/name mb-1">
+                      <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-2xl font-bold text-white">{overlayDisplayName}</h3>
                         <button
                           onClick={handleStartEditName}
                           title="Modifica nome"
-                          className="p-1.5 rounded-lg opacity-0 group-hover/name:opacity-100 hover:bg-white/10 text-gray-500 hover:text-yellow-400 transition-all"
+                          className="p-1.5 rounded-lg hover:bg-white/10 text-gray-500 hover:text-yellow-400 transition-all"
                         >
                           <Pencil size={14} />
                         </button>
