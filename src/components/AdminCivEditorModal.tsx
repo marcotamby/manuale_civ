@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, X, Loader2, Play, Map, Plus, Trash2, CheckCircle, Clock, Zap, ChevronUp, ChevronDown, Info, Cog, Edit, AlertTriangle } from 'lucide-react';
+import { Save, X, Loader2, Play, Map, Plus, Trash2, CheckCircle, Clock, Zap, ChevronUp, ChevronDown, Info, Cog, Edit, AlertTriangle, Upload } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { YouTubePickerModal } from './YouTubePickerModal';
 import { Toast } from './Toast';
@@ -32,6 +32,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
     message: '',
     type: 'success'
   });
+  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
 
   // Refs for scrolling
   const sectionRefs = {
@@ -76,11 +77,24 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
           const ref = (sectionRefs as any)[initialSection.toLowerCase()];
           if (ref?.current) {
             ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Highlight the section briefly
-            ref.current.classList.add('ring-2', 'ring-yellow-500', 'bg-yellow-500/10');
-            setTimeout(() => {
-              ref.current?.classList.remove('ring-2', 'ring-yellow-500', 'bg-yellow-500/10');
-            }, 2000);
+            
+            // If we have an ID (e.g. for a specific Build Order), try to find and highlight it
+            if (initialId && initialSection === 'buildorders') {
+               setTimeout(() => {
+                 const boElement = document.getElementById(`admin-bo-${initialId}`);
+                 if (boElement) {
+                   boElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                   boElement.classList.add('ring-2', 'ring-yellow-500', 'bg-yellow-500/20');
+                   setTimeout(() => boElement.classList.remove('ring-2', 'ring-yellow-500', 'bg-yellow-500/20'), 3000);
+                 }
+               }, 500);
+            } else {
+              // Highlight the section briefly
+              ref.current.classList.add('ring-2', 'ring-yellow-500', 'bg-yellow-500/10');
+              setTimeout(() => {
+                ref.current?.classList.remove('ring-2', 'ring-yellow-500', 'bg-yellow-500/10');
+              }, 2000);
+            }
           }
         }, 300);
       }
@@ -212,6 +226,45 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
     }
 
     setEditedCiv({ ...editedCiv, [field]: newArr });
+  };
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, boIdx: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setToast({ isVisible: true, message: 'Immagine troppo grande (max 5MB)', type: 'error' });
+      return;
+    }
+
+    setUploadingIdx(boIdx);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${editedCiv.id}-${Date.now()}-${boIdx}.${fileExt}`;
+      const filePath = `build-orders/${fileName}`;
+
+      // Upload to 'civilizations' bucket
+      const { error: uploadError } = await supabase.storage
+        .from('civilizations')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('civilizations')
+        .getPublicUrl(filePath);
+
+      updateArrayField('buildOrders', boIdx, 'banner_url', publicUrl);
+      setToast({ isVisible: true, message: 'Immagine caricata con successo!', type: 'success' });
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      setToast({ isVisible: true, message: `Errore: ${error.message}`, type: 'error' });
+    } finally {
+      setUploadingIdx(null);
+    }
   };
 
   const removeFromArray = <T extends keyof Civilization>(field: T, index: number) => {
@@ -528,7 +581,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                 </div>
                 <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                   {(editedCiv.buildOrders || []).map((bo: any, idx: number) => (
-                    <div key={idx} className="bg-black/50 border border-gray-700 rounded-lg p-3 relative group">
+                    <div key={idx} id={`admin-bo-${bo.id}`} className="bg-black/50 border border-gray-700 rounded-lg p-3 relative group transition-all">
                       <button onClick={() => removeFromArray('buildOrders', idx)} className="absolute top-2 right-2 text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                         <Trash2 size={16} />
                       </button>
@@ -551,17 +604,40 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                         </select>
                       </div>
                       <div className="mb-2">
-                        <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block text-yellow-500">Banner Image URL (JPG/PNG)</label>
-                        <input 
-                          type="text" 
-                          value={bo.banner_url || ''} 
-                          onChange={e => updateArrayField('buildOrders', idx, 'banner_url', e.target.value)} 
-                          placeholder="https://... (PNG/JPG)" 
-                          className="w-full bg-gray-800 text-blue-300 text-[10px] rounded px-2 py-1 border border-gray-600 focus:border-yellow-500 outline-none" 
-                        />
+                        <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block text-yellow-500">Immagine Banner (JPG/PNG)</label>
+                        <div className="flex gap-2 mb-2">
+                          <input 
+                            type="text" 
+                            value={bo.banner_url || ''} 
+                            onChange={e => updateArrayField('buildOrders', idx, 'banner_url', e.target.value)} 
+                            placeholder="Inserisci link immagine o carica file..." 
+                            className="flex-1 bg-gray-800 text-blue-300 text-[10px] rounded px-2 py-1.5 border border-gray-600 focus:border-yellow-500 outline-none" 
+                          />
+                          <label className={`cursor-pointer flex items-center justify-center p-1.5 rounded border border-gray-600 bg-gray-800 hover:bg-gray-700 transition-colors w-9 h-full shrink-0 ${uploadingIdx === idx ? 'opacity-50 pointer-events-none' : ''}`}>
+                             <input 
+                               type="file" 
+                               className="hidden" 
+                               accept="image/*"
+                               onChange={(e) => handleFileUpload(e, idx)}
+                             />
+                             {uploadingIdx === idx ? (
+                               <Loader2 size={16} className="text-yellow-500 animate-spin" />
+                             ) : (
+                               <Upload size={16} className="text-gray-400 group-hover:text-yellow-500" />
+                             )}
+                          </label>
+                        </div>
                         {bo.banner_url && (
-                          <div className="mt-1 relative h-20 w-full rounded overflow-hidden border border-white/10">
+                          <div className="mt-1 relative h-24 w-full rounded-lg overflow-hidden border border-white/10 group/preview">
                             <img src={bo.banner_url} alt="Preview" className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex items-center justify-center">
+                               <button 
+                                 onClick={() => updateArrayField('buildOrders', idx, 'banner_url', '')}
+                                 className="p-1 px-2 bg-red-600 text-[10px] font-bold text-white rounded uppercase flex items-center gap-1"
+                               >
+                                 <Trash2 size={10} /> Rimuovi
+                               </button>
+                            </div>
                           </div>
                         )}
                       </div>

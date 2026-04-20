@@ -797,12 +797,23 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0f1115] via-[#0f1115]/40 to-transparent" />
                     
-                    <button 
-                      onClick={() => setSearchParams({}, { replace: true })}
-                      className="absolute top-4 right-4 p-2 bg-black/60 hover:bg-black/80 text-white rounded-full backdrop-blur-md border border-white/10 transition-all z-10"
-                    >
-                      <X size={24} />
-                    </button>
+                    <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+                      {isAdmin && (
+                        <button 
+                          onClick={() => (window as any).openCivEditor?.('buildorders', selectedBO.id)}
+                          className="p-2 bg-yellow-500/80 hover:bg-yellow-500 text-black rounded-full backdrop-blur-md border border-white/10 transition-all flex items-center gap-2 px-4"
+                        >
+                          <Edit size={18} />
+                          <span className="text-xs font-black uppercase tracking-widest">Modifica</span>
+                        </button>
+                      )}
+                      <button 
+                        onClick={() => setSearchParams({}, { replace: true })}
+                        className="p-2 bg-black/60 hover:bg-black/80 text-white rounded-full backdrop-blur-md border border-white/10 transition-all"
+                      >
+                        <X size={24} />
+                      </button>
+                    </div>
 
                     <div className="absolute bottom-6 left-8 right-8">
                        <div className="flex items-center gap-2 mb-2">
