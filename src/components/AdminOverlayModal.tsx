@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, ExternalLink, Copy, Clock, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft } from 'lucide-react';
+import { X, ExternalLink, Copy, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft } from 'lucide-react';
 import { AoE4MatchDashboard } from './AoE4MatchDashboard';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
