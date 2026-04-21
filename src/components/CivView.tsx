@@ -62,6 +62,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   };
 
   const civ = civilizations.find(c => c.id === civId);
+  const themeColor = civ?.primaryColor || '#d4af37';
   
   // Find selected BO for overlay
   const selectedBO = civ?.buildOrders?.find(bo => bo.id === selectedBOId);
@@ -554,9 +555,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         <div 
           className="absolute inset-0 pointer-events-none hidden md:block rounded-tr-xl" 
           style={{
-            borderTop: '2px solid rgba(212, 175, 55, 0.5)',
-            borderRight: '2px solid rgba(212, 175, 55, 0.5)',
-            boxShadow: 'inset -20px 20px 40px -20px rgba(212, 175, 55, 0.15)',
+            borderTop: `2px solid ${themeColor}80`,
+            borderRight: `2px solid ${themeColor}80`,
+            boxShadow: `inset -20px 20px 40px -20px ${themeColor}26`,
             maskImage: 'linear-gradient(to left, black, transparent), linear-gradient(to bottom, black, transparent)',
             WebkitMaskImage: 'linear-gradient(to left, black, transparent), linear-gradient(to bottom, black, transparent)',
             maskComposite: 'intersect',
@@ -565,7 +566,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         />
         
         {/* Subtle atmospheric glow in the top-right corner */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gold-500/5 blur-[100px] pointer-events-none rounded-full -mr-32 -mt-32"></div>
+        <div 
+          className="absolute top-0 right-0 w-64 h-64 blur-[100px] pointer-events-none rounded-full -mr-32 -mt-32"
+          style={{ backgroundColor: `${themeColor}1a` }}
+        ></div>
 
         {/* Header Content */}
         <div className="relative z-10 px-6 pt-10 pb-6 flex items-center min-h-[180px]">

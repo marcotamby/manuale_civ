@@ -73,6 +73,7 @@ export interface Civilization {
   buildOrders?: BuildOrder[];
   strengths?: string[];
   weaknesses?: string[];
+  primaryColor?: string;
 }
 
 export const unitsList: Unit[] = [
@@ -184,6 +185,7 @@ export const civilizationsData: Civilization[] = [
     name: "Abbasidi",
     flag: "/civs/Abbasid Dynasty.webp",
     difficulty: "Medio",
+    primaryColor: "#1f2937",
     shortDescription: "A flexible and adaptable civilization focused on the House of Wisdom.",
     passiveBonuses: ["Constructing buildings near the House of Wisdom increases the Golden Age tier.", "Berry bushes gather 30% faster but cannot hunt Boars."],
     uniqueUnits: [
@@ -237,6 +239,7 @@ export const civilizationsData: Civilization[] = [
     name: "Ayyubidi",
     flag: "/civs/Ayyubids.webp",
     difficulty: "Medio",
+    primaryColor: "#059669",
     shortDescription: "A versatile civilization leveraging Desert Raiders and House of Wisdom advancements.",
     passiveBonuses: ["House of Wisdom wings grant unique, immediate bonuses when advancing."],
     uniqueUnits: [
@@ -272,6 +275,7 @@ export const civilizationsData: Civilization[] = [
     name: "Sultanato di Delhi",
     flag: "/civs/Delhi Sultanate.webp",
     difficulty: "Difficile",
+    primaryColor: "#10b981",
     shortDescription: "A research-focused civilization with free technologies and War Elephants.",
     passiveBonuses: ["All technologies are free but take longer to research.", "Scholars speed up research times significantly."],
     uniqueUnits: [
@@ -298,6 +302,7 @@ export const civilizationsData: Civilization[] = [
     name: "Bizantini",
     flag: "/civs/Byzantines.webp",
     difficulty: "Difficile",
+    primaryColor: "#8b5cf6",
     shortDescription: "A complex defensive civilization utilizing an aqueduct network and mercenaries.",
     passiveBonuses: ["Aqueducts increase production speed and gather rates.", "Can hire foreign mercenaries using Olive Oil."],
     uniqueUnits: [
@@ -322,6 +327,7 @@ export const civilizationsData: Civilization[] = [
     name: "Cinesi",
     flag: "/civs/Chinese.webp",
     difficulty: "Difficile",
+    primaryColor: "#ef4444",
     shortDescription: "Civiltà flessibile che si evolve attraverso le Grandi Dinastie. Costruisce velocemente, tassa le risorse e padroneggia la polvere da sparo.",
     passiveBonuses: [
       "Inizia nella Dinastia Tang: +30% raggio visivo degli Esploratori e accesso al Villaggio.",
@@ -415,6 +421,7 @@ export const civilizationsData: Civilization[] = [
     name: "Inglesi",
     flag: "/civs/English.webp",
     difficulty: "Facile",
+    primaryColor: "#f59e0b",
     shortDescription: "A defensive civilization with a strong agricultural economy and the formidable Longbowman.",
     passiveBonuses: [
       "Farms are 50% cheaper to construct.",
@@ -497,6 +504,7 @@ export const civilizationsData: Civilization[] = [
     name: "Francesi",
     flag: "/civs/French.webp",
     difficulty: "Facile",
+    primaryColor: "#3b82f6",
     shortDescription: "A cavalry-focused civilization with a strong trading economy and powerful Royal Knights.",
     passiveBonuses: [
       "Villagers and Scouts are produced 10/15/20% faster per Age.",
@@ -557,6 +565,7 @@ export const civilizationsData: Civilization[] = [
     name: "Orda d'Oro",
     flag: "/civs/Golden Horde.webp",
     difficulty: "Medio",
+    primaryColor: "#f59e0b",
     shortDescription: "An aggressive variant of the Mongols focusing on early cavalry and economy.",
     passiveBonuses: ["Mobile buildings like the Mongols.", "Increased early economic and military pressure."],
     uniqueUnits: [
@@ -657,6 +666,7 @@ export const civilizationsData: Civilization[] = [
     name: "Sacro Romano Impero",
     flag: "/civs/Holy Roman Empire.webp",
     difficulty: "Medio",
+    primaryColor: "#fbbf24",
     shortDescription: "An infantry-heavy civilization buffed by religious Prelates.",
     passiveBonuses: ["Prelates can inspire economy and military units.", "Early Men-at-Arms access and powerful relic bonuses."],
     uniqueUnits: [
@@ -716,6 +726,7 @@ export const civilizationsData: Civilization[] = [
     name: "Giapponesi",
     flag: "/civs/Japanese.webp",
     difficulty: "Medio",
+    primaryColor: "#e11d48",
     shortDescription: "An infantry and farming-centric civilization utilizing Samurai and Shinobi.",
     passiveBonuses: ["Town Centers can upgrade into Daimyo Manors to increase farm gather rates.", "Forges offer unique melee upgrade paths."],
     uniqueUnits: [
@@ -749,6 +760,7 @@ export const civilizationsData: Civilization[] = [
     name: "Giovanna d'Arco",
     flag: "/civs/jeannedarc.webp",
     difficulty: "Difficile",
+    primaryColor: "#3b82f6",
     shortDescription: "A hero-led civilization where Jeanne d'Arc levels up and leads her army to victory.",
     passiveBonuses: ["Jeanne d'Arc gains experience from building, combat, and landmarks to unlock powerful abilities.", "Highly aggressive and tempo-based."],
     uniqueUnits: [
@@ -774,6 +786,7 @@ export const civilizationsData: Civilization[] = [
     name: "Lancaster",
     flag: "/civs/House of Lancaster.webp",
     difficulty: "Facile",
+    primaryColor: "#ef4444",
     shortDescription: "A variant of the English with powerful longbowmen upgrades and defensive traits.",
     passiveBonuses: ["Enhanced defensive networks.", "Focus on ranged superiority and area denial."],
     uniqueUnits: [
@@ -849,6 +862,7 @@ export const civilizationsData: Civilization[] = [
     name: "Macedoni",
     flag: "/civs/Macedonian Dynasty.webp",
     difficulty: "Facile",
+    primaryColor: "#8b5cf6",
     shortDescription: "A variant of the Byzantines featuring robust frontline units and unique mercenaries.",
     passiveBonuses: ["Specialized infantry formations.", "Unique mercenary contracts."],
     uniqueUnits: [
@@ -879,6 +893,7 @@ export const civilizationsData: Civilization[] = [
     name: "Maliani",
     flag: "/civs/Malians.webp",
     difficulty: "Difficile",
+    primaryColor: "#ef4444",
     shortDescription: "An economy-driven civilization focused on Gold, Cattle, and stealthy infantry.",
     passiveBonuses: ["Pit Mines automatically generate Gold", "Musofadi Warriors can utilize stealth."],
     uniqueUnits: [
@@ -908,6 +923,7 @@ export const civilizationsData: Civilization[] = [
     name: "Mongoli",
     flag: "/civs/Mongols.webp",
     difficulty: "Difficile",
+    primaryColor: "#06b6d4",
     shortDescription: "A nomadic civilization capable of moving their bases, excelling in rapid cavalry strikes.",
     passiveBonuses: [
       "All buildings can be packed up and moved to a new location.",
@@ -960,6 +976,7 @@ export const civilizationsData: Civilization[] = [
     name: "Ordine del Drago",
     flag: "/civs/Order of the Dragon.webp",
     difficulty: "Facile",
+    primaryColor: "#fbbf24",
     shortDescription: "An elite variant of the Holy Roman Empire, focusing on fewer, but incredibly powerful units.",
     passiveBonuses: ["Units are individually much stronger but cost double the resources and population space."],
     uniqueUnits: [
@@ -988,6 +1005,7 @@ export const civilizationsData: Civilization[] = [
     name: "Ottomani",
     flag: "/civs/Ottomans.webp",
     difficulty: "Medio",
+    primaryColor: "#dc2626",
     shortDescription: "A military powerhouse offering free troop production through Military Schools.",
     passiveBonuses: ["Military Schools produce units slowly for free.", "Gain Vizier Points to unlock powerful civilization-wide abilities."],
     uniqueUnits: [
@@ -1013,6 +1031,7 @@ export const civilizationsData: Civilization[] = [
     name: "Rusiani",
     flag: "/civs/Rus.webp",
     difficulty: "Medio",
+    primaryColor: "#b91c1c",
     shortDescription: "A hunting and forestry civilization relying on Bounties and robust Wooden Fortresses.",
     passiveBonuses: ["Gain Bounty from hunting animals, increasing global gather rates.", "Produce strong early knights and wooden defensive structures."],
     uniqueUnits: [
@@ -1066,6 +1085,7 @@ export const civilizationsData: Civilization[] = [
     name: "Sengoku Daimyo",
     flag: "/civs/Sengoku Daimyo.webp",
     difficulty: "Difficile",
+    primaryColor: "#e11d48",
     shortDescription: "A variant of the Japanese focusing intensely on Samurai warfare and rapid expansion.",
     passiveBonuses: ["Aggressive early game melee bonuses.", "Enhanced Daimyo mechanics for military production."],
     uniqueUnits: [
@@ -1100,6 +1120,7 @@ export const civilizationsData: Civilization[] = [
     name: "Knights Templar",
     flag: "/civs/Knights Templar.png",
     difficulty: "Medio",
+    primaryColor: "#dc2626",
     shortDescription: "A variant of the French with a fanatical cavalry focus and unique religious orders.",
     passiveBonuses: ["Powerful Templar Knights with charge bonuses.", "Monasteries provide unique military upgrades."],
     uniqueUnits: [
@@ -1241,6 +1262,7 @@ export const civilizationsData: Civilization[] = [
     name: "Dinastia di Tughlaq",
     flag: "/civs/Tughlaq Dynasty.png",
     difficulty: "Medio",
+    primaryColor: "#0d9488",
     shortDescription: "A variant of the Delhi Sultanate heavily utilizing elephants and defensive structures.",
     passiveBonuses: ["Earlier access to War Elephants.", "Stronger defensive network integration."],
     uniqueUnits: [
@@ -1267,6 +1289,7 @@ export const civilizationsData: Civilization[] = [
     name: "Eredità di Zhu Xi",
     flag: "/civs/Zhu Xis Legacy.png",
     difficulty: "Difficile",
+    primaryColor: "#16a34a",
     shortDescription: "A fast-paced Imperial variant of the Chinese emphasizing early Dynasties.",
     passiveBonuses: ["Cheaper officials and streamlined access to powerful Shaolin Monks and Chu Ko Nu.", "Earlier access to robust technologies."],
     uniqueUnits: [
