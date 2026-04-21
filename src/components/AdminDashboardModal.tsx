@@ -817,96 +817,101 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                              return 0;
                           })
                           .map(u => (
-                            <div key={u.id} className={`bg-white/[0.03] border rounded-2xl p-4 flex items-center justify-between group hover:bg-white/[0.05] transition-all ${u.role === 'admin' ? 'border-yellow-500/20' : 'border-white/5'}`}>
-                              <div className="flex items-center gap-3">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center border text-lg font-bold ${u.role === 'admin' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
+                            <div key={u.id} className={`bg-white/[0.03] border rounded-2xl p-5 flex flex-col gap-4 group hover:bg-white/[0.05] transition-all ${u.role === 'admin' ? 'border-yellow-500/20' : 'border-white/5'}`}>
+                              <div className="flex items-center gap-4">
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center border text-xl font-bold shrink-0 ${u.role === 'admin' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
                                   {u.nickname?.[0]?.toUpperCase() || u.email?.[0]?.toUpperCase() || 'U'}
                                 </div>
-                                <div className="flex flex-col min-w-0">
-                                    <div className="flex items-center gap-2">
-                                       {editingNickname === u.email ? (
-                                         <div className="flex items-center gap-2">
-                                           <input
-                                             autoFocus
-                                             className="bg-black/60 border border-blue-500/50 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-yellow-500 transition-all"
-                                             value={tempNickname}
-                                             disabled={isSavingNickname === u.email}
-                                             onChange={(e) => setTempNickname(e.target.value)}
-                                             onKeyDown={(e) => {
-                                               if (e.key === 'Enter') handleUpdateNickname(u.email, tempNickname);
-                                               if (e.key === 'Escape') setEditingNickname(null);
-                                             }}
-                                             onBlur={() => { if (!isSavingNickname) setEditingNickname(null); }}
-                                           />
+                                <div className="flex flex-col min-w-0 flex-1">
+                                   <div className="flex items-center gap-2">
+                                      {editingNickname === u.email ? (
+                                        <div className="flex items-center gap-2">
+                                          <input
+                                            autoFocus
+                                            className="bg-black/60 border border-blue-500/50 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-yellow-500 transition-all"
+                                            value={tempNickname}
+                                            disabled={isSavingNickname === u.email}
+                                            onChange={(e) => setTempNickname(e.target.value)}
+                                            onKeyDown={(e) => {
+                                              if (e.key === 'Enter') handleUpdateNickname(u.email, tempNickname);
+                                              if (e.key === 'Escape') setEditingNickname(null);
+                                            }}
+                                            onBlur={() => { if (!isSavingNickname) setEditingNickname(null); }}
+                                          />
+                                          <button 
+                                            onClick={() => handleUpdateNickname(u.email, tempNickname)}
+                                            disabled={isSavingNickname === u.email}
+                                            className="text-green-500 hover:text-green-400 disabled:opacity-50"
+                                          >
+                                            {isSavingNickname === u.email ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <div className="flex items-center gap-2 group/nick relative">
+                                           <span className={`text-base md:text-lg font-bold text-white truncate leading-tight transition-colors ${savedSuccess === u.email ? 'text-green-400' : ''}`}>
+                                             {u.nickname || 'Senza Nickname'}
+                                           </span>
+                                           {savedSuccess === u.email && <CheckCircle size={12} className="text-green-400 animate-in zoom-in duration-300" />}
                                            <button 
-                                             onClick={() => handleUpdateNickname(u.email, tempNickname)}
-                                             disabled={isSavingNickname === u.email}
-                                             className="text-green-500 hover:text-green-400 disabled:opacity-50"
+                                             onClick={() => { setEditingNickname(u.email); setTempNickname(u.nickname || ''); }}
+                                             className="opacity-0 group-hover/nick:opacity-100 p-1 text-gray-500 hover:text-blue-400 transition-all"
+                                             title="Modifica Nickname"
                                            >
-                                             {isSavingNickname === u.email ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
+                                             <Edit2 size={12} />
                                            </button>
-                                         </div>
-                                       ) : (
-                                         <div className="flex items-center gap-2 group/nick relative">
-                                            <span className={`text-base md:text-lg font-bold text-white truncate leading-tight transition-colors ${savedSuccess === u.email ? 'text-green-400' : ''}`}>
-                                              {u.nickname || 'Senza Nickname'}
-                                            </span>
-                                            {savedSuccess === u.email && <CheckCircle size={12} className="text-green-400 animate-in zoom-in duration-300" />}
-                                            <button 
-                                              onClick={() => { setEditingNickname(u.email); setTempNickname(u.nickname || ''); }}
-                                              className="opacity-0 group-hover/nick:opacity-100 p-1 text-gray-500 hover:text-blue-400 transition-all"
-                                              title="Modifica Nickname"
-                                            >
-                                              <Edit2 size={12} />
-                                            </button>
-                                         </div>
-                                       )}
-                                       {u.role === 'admin' && <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded font-black uppercase">Creator</span>}
-                                    </div>
-                                   <span className="text-xs md:text-sm text-gray-500 truncate">{u.email}</span>
-                                   <span className="text-xs text-blue-400/70 truncate font-mono mt-0.5">{u.rank || 'Unranked'}</span>
+                                        </div>
+                                      )}
+                                      {u.role === 'admin' && <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded font-black uppercase">Creator</span>}
+                                   </div>
+                                  <span className="text-xs md:text-sm text-gray-500 truncate block">{u.email}</span>
+                                  <div className="flex items-center gap-2 mt-0.5">
+                                     <span className="text-[10px] font-bold text-blue-400/70 border border-blue-500/20 px-1.5 py-0.5 rounded bg-blue-500/5">{u.rank || 'Unranked'}</span>
+                                  </div>
                                 </div>
                               </div>
 
-                              <div className="flex items-center gap-2">
+                              <div className="pt-3 border-t border-white/5 flex items-center justify-between gap-4">
+                                 <span className="text-[10px] font-black text-gray-700 uppercase tracking-[0.2em] select-none">Configurazione Permessi</span>
                                  {/* Unified Permissions Group */}
-                                <div className="flex items-center gap-1 bg-black/40 p-1 rounded-2xl border border-white/5 shadow-inner">
-                                    {/* Tournaments */}
-                                    <button 
-                                      onClick={() => handleToggleUserRole(u.email, 'can_manage_tournaments', !u.can_manage_tournaments)}
-                                      className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all ${u.can_manage_tournaments ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
-                                      title="Gestione Tornei"
-                                    >
-                                      <Trophy size={16} />
-                                    </button>
+                                 <div className="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/5 shadow-inner">
+                                     {/* Tournaments */}
+                                     <button 
+                                       onClick={() => handleToggleUserRole(u.email, 'can_manage_tournaments', !u.can_manage_tournaments)}
+                                       className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_tournaments ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                                       title="Gestione Tornei"
+                                     >
+                                       <Trophy size={16} />
+                                     </button>
 
-                                    {/* Civs */}
-                                    <button 
-                                      onClick={() => handleToggleUserRole(u.email, 'can_manage_civs', !u.can_manage_civs)}
-                                      className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all ${u.can_manage_civs ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
-                                      title="Gestione Civiltà"
-                                    >
-                                      <BookOpen size={16} />
-                                    </button>
+                                     {/* Civs */}
+                                     <button 
+                                       onClick={() => handleToggleUserRole(u.email, 'can_manage_civs', !u.can_manage_civs)}
+                                       className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_civs ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                                       title="Gestione Civiltà"
+                                     >
+                                       <BookOpen size={16} />
+                                     </button>
 
-                                    {/* Build Orders */}
-                                    <button 
-                                      onClick={() => handleToggleUserRole(u.email, 'can_manage_buildorders', !u.can_manage_buildorders)}
-                                      className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all ${u.can_manage_buildorders ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
-                                      title="Gestione Build Orders"
-                                    >
-                                      <Zap size={16} />
-                                    </button>
+                                     {/* Build Orders */}
+                                     <button 
+                                       onClick={() => handleToggleUserRole(u.email, 'can_manage_buildorders', !u.can_manage_buildorders)}
+                                       className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_buildorders ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                                       title="Gestione Build Orders"
+                                     >
+                                       <Zap size={16} />
+                                     </button>
 
-                                    {/* Streamer Toggle */}
-                                    <button 
-                                      onClick={() => handleToggleUserRole(u.email, 'is_streamer', !u.is_streamer)}
-                                      className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all ${u.is_streamer ? 'bg-pink-600 text-white shadow-[0_0_15px_rgba(219,39,119,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-pink-400'}`}
-                                      title={u.is_streamer ? 'Rimuovi Streamer' : 'Segna come Streamer'}
-                                    >
-                                       <Radio size={16} />
-                                    </button>
-                                </div>
+                                     <div className="w-px h-4 bg-white/10 mx-1" />
+
+                                     {/* Streamer Toggle */}
+                                     <button 
+                                       onClick={() => handleToggleUserRole(u.email, 'is_streamer', !u.is_streamer)}
+                                       className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.is_streamer ? 'bg-pink-600 text-white shadow-[0_0_15px_rgba(219,39,119,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-pink-400'}`}
+                                       title={u.is_streamer ? 'Rimuovi Streamer' : 'Segna come Streamer'}
+                                     >
+                                        <Radio size={16} />
+                                     </button>
+                                 </div>
                               </div>
                             </div>
                           ))}
