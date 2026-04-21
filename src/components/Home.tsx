@@ -67,7 +67,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full bg-[var(--color-brand-dark)]">
       <header className="mb-8 flex flex-col gap-4">
-        <div className="flex flex-row items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="hidden md:block">
             <CustomSelect
               options={[
@@ -82,62 +82,54 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
             />
           </div>
 
-          <div className="flex items-center gap-2 ml-auto">
+          <div className="flex flex-row items-center gap-2 w-full md:w-auto">
+            {/* Build Orders Button */}
+            <div className="flex-1 md:flex-initial flex items-center glass p-1 rounded-xl h-[42px]">
+              <button
+                onClick={() => {
+                  setIsBOMode(!isBOMode);
+                  if (isCompareMode) setIsCompareMode(false);
+                }}
+                className={`flex-1 flex items-center justify-center gap-2 px-3 h-full rounded-lg text-[11px] xs:text-xs font-bold transition-all ${isBOMode
+                  ? 'bg-[#00f3ff] text-black shadow-[0_0_15px_rgba(0,243,255,0.4)]'
+                  : 'text-gray-400 hover:text-gray-200'
+                  }`}
+              >
+                <Zap size={14} fill={isBOMode ? 'black' : 'none'} />
+                <span className="whitespace-nowrap">Build Orders</span>
+              </button>
+            </div>
+
             {/* Confronta Tool */}
-            <div className="flex items-center glass p-1 rounded-xl h-[42px]">
+            <div className="flex-1 md:flex-initial flex items-center glass p-1 rounded-xl h-[42px]">
               <button
                 onClick={() => {
                   setIsCompareMode(!isCompareMode);
                   if (isBOMode) setIsBOMode(false);
                 }}
-                className={`flex items-center gap-2 px-4 h-full rounded-lg text-sm font-bold transition-all ${isCompareMode
+                className={`flex-1 flex items-center justify-center gap-2 px-3 h-full rounded-lg text-[11px] xs:text-xs font-bold transition-all ${isCompareMode
                   ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.4)]'
                   : 'text-gray-400 hover:text-gray-200'
                   }`}
               >
-                <BarChart2 size={16} fill={isCompareMode ? 'black' : 'none'} />
-                <span>{isCompareMode ? 'Ok' : 'Confronta'}</span>
+                <BarChart2 size={14} fill={isCompareMode ? 'black' : 'none'} />
+                <span>{isCompareMode ? 'Annulla' : 'Confronta'}</span>
               </button>
-              {isCompareMode && selectedForCompare.length === 2 && (
-                <button
-                  onClick={handleStartCompare}
-                  className="animate-in fade-in zoom-in duration-300 flex items-center gap-2 px-3 h-full bg-green-600 text-white font-bold rounded-lg shadow-[0_0_15px_rgba(22,163,74,0.4)] border border-green-400/50 hover:bg-green-500 transition-all text-sm ml-1"
-                >
-                  Ok
-                </button>
-              )}
             </div>
 
             {/* Favorite Filter Tool */}
             <div className="flex items-center glass p-1 rounded-xl h-[42px]">
               <button
                 onClick={() => setDifficultyFilter(difficultyFilter === 'Preferiti' ? 'Tutte' : 'Preferiti')}
-                className={`flex items-center justify-center px-3.5 h-full rounded-lg text-sm font-bold transition-all ${difficultyFilter === 'Preferiti'
+                className={`flex items-center justify-center px-3 h-full rounded-lg transition-all ${difficultyFilter === 'Preferiti'
                   ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]'
                   : 'text-gray-400 hover:text-gray-200'
                   }`}
               >
-                <Heart size={18} fill={difficultyFilter === 'Preferiti' ? 'white' : 'none'} />
+                <Heart size={16} fill={difficultyFilter === 'Preferiti' ? 'white' : 'none'} />
               </button>
             </div>
           </div>
-        </div>
-
-        {/* Build Orders Button - Dedicated Line for High Visibility on Mobile */}
-        <div className="flex items-center glass p-1 rounded-xl h-[48px] w-full md:w-fit self-start">
-          <button
-            onClick={() => {
-              setIsBOMode(!isBOMode);
-              if (isCompareMode) setIsCompareMode(false);
-            }}
-            className={`flex-1 md:flex-initial flex items-center justify-center gap-3 px-6 h-full rounded-lg text-sm font-black uppercase tracking-wider transition-all ${isBOMode
-              ? 'bg-[#00f3ff] text-black shadow-[0_0_25px_rgba(0,243,255,0.6)]'
-              : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
-              }`}
-          >
-            <Zap size={18} fill={isBOMode ? 'black' : 'none'} className={isBOMode ? 'animate-pulse' : ''} />
-            <span>Build Orders</span>
-          </button>
         </div>
       </header>
 
