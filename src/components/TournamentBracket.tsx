@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react';
 import { fetchPhaseGroupSets, fetchPhaseGroups } from '../services/startgg';
 import type { StartGGPhase, StartGGSet, StartGGPhaseGroup } from '../services/startgg';

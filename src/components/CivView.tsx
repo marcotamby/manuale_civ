@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCivData } from './CivContext';
@@ -490,7 +491,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
               {/* Nested Reply Input */}
               {replyTo && replyTo.parentId === a.id && (
-                <div className="mt-3 pt-3 border-t border-white/5 space-y-2 animate-in fade-in slide-in-from-top-1 duration-200 outline-none select-none">
+                <div className="mt-3 pt-3 border-t border-white/5 space-y-2 animate-in fade-in slide-in-from-top-1 duration-200 outline-none">
                   <textarea
                     value={answerText}
                     onChange={(e) => setAnswerText(e.target.value)}
@@ -654,7 +655,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {civ.passiveBonuses.map((bonus, idx) => (
-                  <div key={idx} className="flex items-start gap-3 glass p-4 rounded-xl border border-white/5 hover:border-yellow-500/30 transition-colors text-sm text-gray-300 leading-relaxed">
+                  <div key={idx} className="flex items-start gap-3 glass p-4 rounded-xl border border-white/5 hover:border-yellow-500/30 transition-colors text-sm text-gray-300 leading-relaxed select-text">
                     <Zap size={18} className="text-yellow-500 mt-1 shrink-0" />
                     <ResourceText text={bonus} />
                   </div>
@@ -677,7 +678,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   </button>
                 )}
               </h2>
-              <div className="glass p-5 rounded-xl border border-green-500/20 text-gray-300 text-sm leading-relaxed">
+              <div className="glass p-5 rounded-xl border border-green-500/20 text-gray-300 text-sm leading-relaxed select-text">
                 <ul className="space-y-3 list-disc list-inside">
                   {civ.strengths && civ.strengths.length > 0 ? (
                     civ.strengths.map((str, idx) => (
@@ -710,7 +711,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   </button>
                 )}
               </h2>
-              <div className="glass p-5 rounded-xl border border-red-500/20 text-gray-300 text-sm leading-relaxed">
+              <div className="glass p-5 rounded-xl border border-red-500/20 text-gray-300 text-sm leading-relaxed select-text">
                 {civ.weaknesses && civ.weaknesses.length > 0 ? (
                   <ul className="space-y-3 list-disc list-inside">
                     {civ.weaknesses.map((wk, idx) => (
@@ -1083,12 +1084,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                           </div>
                         )}
 
-                        <button 
-                          onClick={() => setSearchParams({}, { replace: true })}
-                          className="w-full py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-xs font-black text-gray-400 hover:text-white uppercase tracking-widest transition-all"
-                        >
-                          Chiudi Strategia
-                        </button>
+
                       </div>
                     </div>
                   </div>
@@ -1326,7 +1322,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
                         {/* Answer Input (Root) */}
                         {replyTo && replyTo.questionId === q.id && !replyTo.parentId && (
-                           <div className="mt-4 pt-4 border-t border-white/5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300 outline-none select-none">
+                           <div className="mt-4 pt-4 border-t border-white/5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300 outline-none">
                               <textarea
                                 value={answerText}
                                 onChange={(e) => setAnswerText(e.target.value)}

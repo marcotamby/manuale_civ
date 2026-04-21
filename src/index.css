@@ -17,6 +17,35 @@
   background-color: var(--color-brand-dark);
   color: #f8f8f2;
   overscroll-behavior-x: none;
+  /* Default to no selection for the app-like feel */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Enable selection on content elements, but default cursor to inherit unless in a real text area */
+p, li, h1, h2, h3, h4, h5, h6, td, th, strong, em, b, i, blockquote, code, pre {
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: inherit; /* Don't force I-beam by default */
+}
+
+/* Explicitly disable selection on interactive/UI elements to avoid the I-beam cursor */
+button, a, [role="button"], .cursor-pointer, .select-none, img, svg {
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: pointer !important;
+}
+
+/* Re-enable selection and I-beam for specific elements */
+input, textarea, [contenteditable="true"], .select-text {
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text !important;
+}
+
+/* Ensure headings/paragraphs inside buttons or interactive elements keep the pointer cursor */
+button *, a *, [role="button"] *, .cursor-pointer * {
+  cursor: inherit;
 }
 
 body {
@@ -29,6 +58,7 @@ body {
   background-attachment: fixed;
   touch-action: pan-y;
   overscroll-behavior-x: none;
+  cursor: default; /* Root cursor */
 }
 
 /* Apply scrollbar globally */

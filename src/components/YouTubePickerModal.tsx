@@ -16,19 +16,19 @@ export function YouTubePickerModal({ isOpen, onClose, onSelect, selectedIds }: Y
   const [search, setSearch] = useState('');
   const [pendingSelection, setPendingSelection] = useState<string[]>(selectedIds);
 
-  useEffect(() => {
-    if (isOpen) {
-      loadVideos();
-      setPendingSelection(selectedIds);
-    }
-  }, [isOpen, selectedIds]);
-
   const loadVideos = async () => {
     setLoading(true);
     const data = await fetchRecentVideos();
     setVideos(data);
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      loadVideos();
+      setPendingSelection(selectedIds);
+    }
+  }, [isOpen, selectedIds]);
 
   const handleToggleVideo = (id: string) => {
     setPendingSelection(prev => 

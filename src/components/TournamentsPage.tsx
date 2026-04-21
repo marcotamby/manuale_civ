@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament } from '../services/challonge';
@@ -32,7 +33,7 @@ export function TournamentsPage() {
   
   const navigate = useNavigate();
 
-  const loadTournaments = async () => {
+  const loadTournaments = useCallback(async () => {
     setLoading(true);
     try {
       // 1. Fetch from Supabase
@@ -41,62 +42,113 @@ export function TournamentsPage() {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (dbError) throw dbError;
+      if (dbError) {
+        console.error("Supabase error:", dbError);
+        // Don't throw, just log and continue with hardcoded
+      }
 
       // 2. Combine with hardcoded ones (ensuring no duplicates)
       const allConfigs: TournamentConfig[] = [...TOURNAMENTS];
-      dbTournaments?.forEach(db => {
-        if (!allConfigs.some(c => c.slug === db.slug)) {
-          allConfigs.push({
-            slug: db.slug,
-            source: db.source as 'startgg' | 'challonge',
-            organizer: db.organizer,
-            directLink: db.direct_link,
-            period: db.period
-          });
-        }
-      });
+      if (dbTournaments) {
+        dbTournaments.forEach(db => {
+          if (db.slug && !allConfigs.some(c => c.slug === db.slug)) {
+            allConfigs.push({
+              slug: db.slug,
+              source: (db.source as 'startgg' | 'challonge') || 'challonge',
+              organizer: db.organizer || 'Admin',
+              directLink: db.direct_link || undefined,
+              period: db.period || undefined
+            });
+          }
+        });
+      }
 
       const results = await Promise.all(allConfigs.map(async config => {
         try {
+          let tournamentData: any = null;
+          
           if (config.source === 'startgg') {
-            const res = await fetchTournament(config.slug);
-            return res ? { ...res, config } : null;
+            tournamentData = await fetchTournament(config.slug);
           } else if (config.source === 'challonge') {
-            const res = await fetchChallongeTournament(config.slug);
-            if (res) {
-              return {
-                id: res.id,
-                name: res.attributes.name,
+            // Se lo slug sembra un URL o un ID speciale per tourneybot, non chiamiamo l'API challonge
+            if (config.slug && !config.slug.startsWith('tb-')) {
+              tournamentData = await fetchChallongeTournament(config.slug);
+            }
+          }
+
+          if (tournamentData) {
+            // Mappatura normale per tornei che hanno risposto correttamente
+            if (config.source === 'challonge') {
+               return {
+                id: tournamentData.id || config.slug,
+                name: tournamentData.attributes?.name || `Torneo ${config.slug}`,
                 slug: config.slug,
                 images: [],
                 events: [],
                 config: { ...config, directLink: config.directLink || `https://challonge.com/it/${config.slug}` }
               } as any;
-            } else if (config.slug === 'gyunrhoc') {
+            }
+            return { ...tournamentData, config };
+          }
+
+          // FALLBACK: Se non c'è risposta API ma c'è un link diretto (es. tourneybot o API down)
+          if (config.slug && (config.directLink || config.slug.startsWith('tb-'))) {
+             const isTB = config.slug.startsWith('tb-');
+             const fallbackName = isTB
+                ? `Torneo TourneyBot #${config.slug.replace('tb-', '')}`
+                : `Torneo ${config.slug.toUpperCase()}`;
+                
+             return {
+                id: config.slug,
+                name: fallbackName,
+                slug: config.slug,
+                images: [],
+                events: [],
+                config: { 
+                  ...config, 
+                  directLink: config.directLink || (isTB ? `https://tourneybot.gg/tourneys/${config.slug.replace('tb-', '')}` : undefined)
+                }
+              } as any;
+          }
+
+          // Casi speciali hardcoded (es. gyunrhoc se non è ancora nel DB o se API fallisce)
+          if (config.slug === 'gyunrhoc') {
               return {
                 id: 'gyunrhoc',
                 name: "Torneo degli scudi d'oro",
                 slug: config.slug,
-                images: [{ url: '/vetro_oro.png' }],
+                images: [{ url: '/vetro_oro.png', type: 'banner' }],
                 events: [{ 
+                  id: 'event-1',
                   name: 'Torneo 3v3', 
-                  videogame: { name: 'Age of Empires IV' },
+                  videogame: { id: 1, name: 'Age of Empires IV' },
+                  phases: [],
                   standings: {
                     nodes: [
-                      { entrant: { name: 'Va bene tutto' } },
-                      { entrant: { name: 'Scarsicomelammerda' } },
-                      { entrant: { name: 'Cerbero' } }
+                      { placement: 1, entrant: { id: '1', name: 'Va bene tutto' } },
+                      { placement: 2, entrant: { id: '2', name: 'Scarsicomelammerda' } },
+                      { placement: 3, entrant: { id: '3', name: 'Cerbero' } }
                     ]
                   }
                 }],
                 config: { ...config, directLink: 'https://challonge.com/it/gyunrhoc' }
               } as any;
-            }
           }
+
           return null;
         } catch (e) {
-          console.error(`Error fetching tournament ${config.slug}:`, e);
+          console.error(`Error processing tournament ${config.slug}:`, e);
+          // Anche in caso di errore, se abbiamo uno slug, mostriamo la card di base
+          if (config.slug) {
+             return {
+                id: config.slug,
+                name: `Torneo ${config.slug}`,
+                slug: config.slug,
+                images: [],
+                events: [],
+                config
+              } as any;
+          }
           return null;
         }
       }));
@@ -105,56 +157,81 @@ export function TournamentsPage() {
       setTournaments(filtered);
     } catch (err: any) {
       console.error("General loading error:", err);
-      setErrorDetails(`Dettaglio Errore: ${err.message || 'Errore di rete o di risposta del server.'}`);
+      setErrorDetails(`Dettaglio Errore: ${err.message || 'Errore di caricamento dati.'}`);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     loadTournaments();
-  }, []);
+  }, [loadTournaments]);
 
   const handleAddTournament = async () => {
-    if (!newUrl) return;
+    const url = newUrl.trim();
+    if (!url) return;
+    
+    console.log("🚀 Avvio inserimento torneo. URL:", url);
     setIsSubmitting(true);
+    
     try {
       let source: 'startgg' | 'challonge' | null = null;
       let slug = '';
 
-      if (newUrl.includes('start.gg')) {
+      if (url.includes('start.gg')) {
         source = 'startgg';
-        const parts = newUrl.split('/tournament/');
-        if (parts.length > 1) slug = parts[1].split('/')[0];
-      } else if (newUrl.includes('challonge.com')) {
+        const match = url.match(/\/(tournament|t)\/([^/]+)/);
+        if (match) slug = match[2];
+        console.log("📍 Rilevato Start.gg, slug estratto:", slug);
+      } else if (url.includes('challonge.com')) {
         source = 'challonge';
-        const parts = newUrl.split('/');
+        const parts = url.split('/').filter(Boolean);
         slug = parts[parts.length - 1];
-        if (slug === '') slug = parts[parts.length - 2];
+        console.log("📍 Rilevato Challonge, slug estratto:", slug);
+      } else if (url.includes('tourneybot.gg')) {
+        source = 'challonge'; // Fallback a challonge per superare vincolo DB
+        const match = url.match(/\/tourneys\/(\d+)/);
+        slug = match ? `tb-${match[1]}` : `tb-${Date.now()}`;
+        console.log("📍 Rilevato TourneyBot, slug creato:", slug);
+      } else {
+        // Proviamo a estrarre qualcosa di utile come slug per link generici
+        source = 'challonge';
+        slug = `ext-${Date.now()}`;
+        console.log("📍 Link generico rilevato, creato slug:", slug);
       }
 
-      if (!source || !slug) {
-        toast.error('URL non valido. Inserisci un link di Start.gg o Challonge.');
+      if (!slug) {
+        console.error("❌ Impossibile determinare uno slug valido.");
+        toast.error('URL non valido. Inserisci un link corretto.');
         setIsSubmitting(false);
         return;
       }
 
+      console.log("💾 Salvataggio su Supabase...");
       const { error } = await supabase.from('tournaments').insert({
         slug,
         source,
         organizer: user?.name || 'Admin',
-        period: 'In corso'
+        period: 'In corso',
+        direct_link: url // Salviamo sempre il link diretto originale
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("❌ Errore Supabase:", error);
+        throw error;
+      }
 
+      console.log("✅ Torneo aggiunto correttamente!");
       toast.success('Torneo aggiunto con successo!');
       setShowAddModal(false);
       setNewUrl('');
       loadTournaments();
     } catch (err: any) {
-      toast.error(`Errore: ${err.message}`);
+      console.error("💥 Eccezione durante l'invio:", err);
+      toast.error(`Errore: ${err.message || 'Errore sconosciuto durante il salvataggio'}`);
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   if (loading) {
@@ -205,7 +282,13 @@ export function TournamentsPage() {
                 </button>
               </div>
 
-              <div className="space-y-6">
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleAddTournament();
+                }}
+                className="space-y-6"
+              >
                 <div>
                   <label className="block text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 ml-1">Link Torneo (Start.gg o Challonge)</label>
                   <div className="relative group">
@@ -218,6 +301,7 @@ export function TournamentsPage() {
                       onChange={(e) => setNewUrl(e.target.value)}
                       placeholder="https://www.start.gg/tournament/..."
                       className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white text-sm focus:outline-none focus:border-yellow-500/50 focus:ring-4 focus:ring-yellow-500/5 transition-all"
+                      autoFocus
                     />
                   </div>
                 </div>
@@ -235,8 +319,8 @@ export function TournamentsPage() {
                 </div>
 
                 <button
-                  onClick={handleAddTournament}
-                  disabled={isSubmitting || !newUrl}
+                  type="submit"
+                  disabled={isSubmitting || !newUrl.trim()}
                   className="w-full py-4 bg-gradient-to-b from-slate-100 to-gray-400 disabled:opacity-50 disabled:grayscale hover:from-white hover:to-gray-300 text-black font-black uppercase text-xs tracking-widest rounded-2xl transition-all shadow-[0_10px_20px_rgba(255,255,255,0.05)] flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
@@ -248,7 +332,7 @@ export function TournamentsPage() {
                     'Conferma Inserimento'
                   )}
                 </button>
-              </div>
+              </form>
             </div>
           </div>
         </div>

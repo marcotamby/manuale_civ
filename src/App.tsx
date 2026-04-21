@@ -179,7 +179,7 @@ function App() {
       />
 
       <div className="flex-1 flex flex-row overflow-hidden relative">
-        {((currentPage !== 'home' || favorites.length > 0) && (currentPage !== 'home' || isSidebarOpen)) && (
+        {(currentPage !== 'home' || isSidebarOpen) && (
           <Sidebar
             selectedCiv={selectedCiv}
             onSelectCiv={handleSelectCiv}

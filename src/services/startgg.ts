@@ -37,6 +37,9 @@ export interface StartGGSet {
   round: number;
   displayScore: string | null;
   slots: StartGGSlot[];
+  state?: number;
+  winnerId?: string | number;
+  completed?: boolean;
 }
 
 export interface StartGGPhaseGroup {

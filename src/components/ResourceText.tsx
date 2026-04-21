@@ -51,7 +51,7 @@ export function ResourceText({ text, className = '', iconSize = 16 }: ResourceTe
     const parts = text.split(pattern);
 
     return (
-        <span className={className}>
+        <span className={`${className} select-text`}>
             {parts.map((part, i) => {
                 const lowerPart = part.toLowerCase();
                 const resource = RESOURCES.find(r => r.keywords.includes(lowerPart));
