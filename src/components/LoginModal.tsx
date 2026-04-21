@@ -25,7 +25,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
     login({
       name: decoded.name,
       email: decoded.email,
-      picture: decoded.picture
+      avatar_url: decoded.picture
     });
     onClose();
   };

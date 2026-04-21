@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabaseClient';
 interface UserData {
   name: string | null;
   email?: string;
-  picture?: string;
+  avatar_url?: string | null;
   rank?: string;
   nickname?: string;
 }
@@ -28,7 +28,7 @@ interface AuthContextType {
   logout: () => void;
   toggleFavorite: (civId: string) => void;
   updateRank: (rank: string) => void;
-  updateProfile: (data: { rank?: string; nickname?: string }) => void;
+  updateProfile: (data: { rank?: string; nickname?: string; avatar_url?: string | null }) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -144,7 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('nickname, rank, role, is_streamer, can_manage_tournaments, can_manage_civs, can_manage_buildorders')
+        .select('nickname, rank, avatar_url, role, is_streamer, can_manage_tournaments, can_manage_civs, can_manage_buildorders')
         .eq('email', userEmail.toLowerCase())
         .single();
       
@@ -164,7 +164,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const updated = { 
             ...prev, 
             rank: currentRank, 
-            nickname: currentNickname, 
+            avatar_url: data.avatar_url,
             role: data.role, 
             is_streamer: data.is_streamer,
             can_manage_tournaments: data.can_manage_tournaments,
@@ -183,6 +183,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
              ...parsed, 
              rank: currentRank, 
              nickname: currentNickname, 
+             avatar_url: data.avatar_url,
              role: data.role, 
              is_streamer: data.is_streamer,
              can_manage_tournaments: data.can_manage_tournaments,
@@ -290,7 +291,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     updateProfile({ rank });
   };
 
-  const updateProfile = (data: { rank?: string; nickname?: string }) => {
+  const updateProfile = (data: { rank?: string; nickname?: string; avatar_url?: string | null }) => {
     if (user) {
       const updatedUser = { ...user, ...data };
       const email = user.email?.toLowerCase() || 'guest';
@@ -315,6 +316,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email: email, 
             nickname: updatedUser.nickname || '', 
             rank: updatedUser.rank || 'Unranked',
+            avatar_url: updatedUser.avatar_url || null,
             updated_at: new Date().toISOString()
           })
           .then(({ error }) => {

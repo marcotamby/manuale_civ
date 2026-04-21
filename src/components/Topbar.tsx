@@ -250,7 +250,9 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
                 title="Il Tuo Profilo"
               >
                 <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30 group-hover:border-yellow-500/60 transition-colors overflow-hidden relative">
-                  {user?.rank && user.rank !== 'Unranked' ? (
+                  {user?.avatar_url ? (
+                    <img src={user.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : user?.rank && user.rank !== 'Unranked' ? (
                     <img src={RANK_ICONS[user.rank]} alt={user.rank} className="w-7 h-7 object-contain" />
                   ) : (
                     <User size={18} />
@@ -298,8 +300,10 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
                 className="relative flex items-center gap-2.5 group transition-all hover:scale-110 hover:-translate-y-1 duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
                 title="Il Tuo Profilo"
               >
-                <div className="p-1 rounded-full bg-blue-600/10 border border-blue-500/30 text-blue-400 group-hover:bg-blue-600/20 group-hover:border-blue-500/50 transition-all">
-                  {user?.rank && user.rank !== 'Unranked' ? (
+                <div className="p-1 rounded-full bg-blue-600/10 border border-blue-500/30 text-blue-400 group-hover:bg-blue-600/20 group-hover:border-blue-500/50 transition-all overflow-hidden">
+                  {user?.avatar_url ? (
+                    <img src={user.avatar_url} alt="Avatar" className="w-8 h-8 object-cover rounded-full" />
+                  ) : user?.rank && user.rank !== 'Unranked' ? (
                     <img src={RANK_ICONS[user.rank]} alt={user.rank} className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]" />
                   ) : (
                     <div className="w-8 h-8 flex items-center justify-center">

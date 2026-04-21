@@ -54,6 +54,7 @@ export interface BuildOrder {
   source?: string;
   author_nickname?: string;
   author_rank?: string;
+  author_avatar?: string;
   banner_url?: string;
   banner_position?: number;
 }

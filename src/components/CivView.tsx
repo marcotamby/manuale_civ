@@ -244,7 +244,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         .from('questions')
         .select(`
           *,
-          answers:answers(*)
+          profile:profiles!questions_user_id_fkey(avatar_url),
+          answers:answers(
+            *,
+            profile:profiles!answers_user_id_fkey(avatar_url)
+          )
         `)
         .eq('civ_id', civId)
         .eq('status', 'approved')
@@ -443,8 +447,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         <div className="glass p-4 rounded-xl border border-white/5 bg-white/[0.01] group/a">
           <div className="flex items-start gap-3">
             <div className="shrink-0">
-              <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                {a.user_rank && getRankIcon(a.user_rank) ? (
+              <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20 overflow-hidden">
+                {a.profile?.avatar_url ? (
+                  <img src={a.profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                ) : a.user_rank && getRankIcon(a.user_rank) ? (
                   <img src={getRankIcon(a.user_rank) || ''} alt={a.user_rank} className="w-5 h-5 object-contain" />
                 ) : (
                   <UserCircle size={18} className="text-gray-600" />
@@ -543,6 +549,20 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           {/* Smoothing gradients */}
           <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-brand-dark)] via-transparent to-[var(--color-brand-dark)]/10" />
         </div>
+
+        {/* Decorative Gradient Border - Top and Right fading out */}
+        <div 
+          className="absolute inset-0 pointer-events-none hidden md:block" 
+          style={{
+            borderTop: '1px solid rgba(212, 175, 55, 0.4)',
+            borderRight: '1px solid rgba(212, 175, 55, 0.4)',
+            maskImage: 'linear-gradient(to bottom left, black 0%, transparent 60%)',
+            WebkitMaskImage: 'linear-gradient(to bottom left, black 0%, transparent 60%)'
+          }}
+        />
+        
+        {/* Subtle atmospheric glow in the top-right corner */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gold-500/5 blur-[100px] pointer-events-none rounded-full -mr-32 -mt-32"></div>
 
         {/* Header Content */}
         <div className="relative z-10 px-6 pt-10 pb-6 flex items-center min-h-[180px]">
@@ -844,8 +864,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                            {/* Row 1: Author & Button */}
                            <div className="flex items-center justify-between gap-2 flex-nowrap">
                               <div className="flex items-center gap-2 shrink-0 min-w-0">
-                                <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20 shrink-0">
-                                  {bo.author_rank && getRankIcon(bo.author_rank) ? (
+                                <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20 shrink-0 overflow-hidden">
+                                  {bo.author_avatar ? (
+                                    <img src={bo.author_avatar} alt="" className="w-full h-full object-cover" />
+                                  ) : bo.author_rank && getRankIcon(bo.author_rank) ? (
                                     <img src={getRankIcon(bo.author_rank) || ''} alt={bo.author_rank} className="w-5 h-5 object-contain" />
                                   ) : (
                                     <UserCircle size={18} className="text-gray-600" />
@@ -1027,9 +1049,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         <div className="bg-white/5 rounded-3xl border border-white/5 p-6 space-y-4">
                            <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Informazioni Autore</h4>
                            <div className="flex items-center gap-4">
-                              <div className="w-16 h-16 rounded-2xl bg-[#0f1115] border border-blue-500/20 flex items-center justify-center p-2">
-                                 {selectedBO.author_rank && getRankIcon(selectedBO.author_rank) ? (
-                                   <img src={getRankIcon(selectedBO.author_rank) || ''} alt={selectedBO.author_rank} className="w-full h-full object-contain" />
+                              <div className="w-16 h-16 rounded-2xl bg-[#0f1115] border border-blue-500/20 flex items-center justify-center overflow-hidden">
+                                 {selectedBO.author_avatar ? (
+                                   <img src={selectedBO.author_avatar} alt="" className="w-full h-full object-cover" />
+                                 ) : selectedBO.author_rank && getRankIcon(selectedBO.author_rank) ? (
+                                   <img src={getRankIcon(selectedBO.author_rank) || ''} alt={selectedBO.author_rank} className="w-full h-full object-contain p-2" />
                                  ) : (
                                    <UserCircle size={40} className="text-gray-800" />
                                  )}
@@ -1260,8 +1284,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             {user ? (
                <div className="glass p-6 rounded-2xl border border-white/5 space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
-                      {user.rank && getRankIcon(user.rank) ? (
+                    <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20 overflow-hidden">
+                      {user.avatar_url ? (
+                        <img src={user.avatar_url} alt="You" className="w-full h-full object-cover" />
+                      ) : user.rank && getRankIcon(user.rank) ? (
                         <img src={getRankIcon(user.rank) || ''} alt={user.rank} className="w-6 h-6 object-contain" />
                       ) : (
                         <UserCircle size={24} className="text-gray-500" />
@@ -1316,8 +1342,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                       <div className="glass p-6 rounded-2xl border border-white/10 relative overflow-hidden group/q outline-none select-none">
                          <div className="flex items-start gap-4 mb-4">
                            <div className="shrink-0 flex flex-col items-center gap-1">
-                              <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
-                                {q.user_rank && getRankIcon(q.user_rank) ? (
+                              <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20 overflow-hidden">
+                                {q.profile?.avatar_url ? (
+                                  <img src={q.profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                                ) : q.user_rank && getRankIcon(q.user_rank) ? (
                                   <img src={getRankIcon(q.user_rank) || ''} alt={q.user_rank} className="w-8 h-8 object-contain" />
                                 ) : (
                                   <UserCircle size={28} className="text-gray-600" />

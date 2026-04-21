@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { X, User, Heart, MessageSquare, Trophy, ExternalLink, Loader2, ChevronDown, LogOut } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, User, Heart, MessageSquare, Trophy, ExternalLink, Loader2, ChevronDown, LogOut, Camera, Trash2 as TrashIcon } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
 import { supabase } from '../lib/supabaseClient';
@@ -133,14 +133,18 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     // Local state for pending changes
     const [pendingNickname, setPendingNickname] = useState(user?.nickname || '');
     const [pendingRank, setPendingRank] = useState(user?.rank || 'Unranked');
+    const [pendingAvatar, setPendingAvatar] = useState<string | null>(user?.avatar_url || null);
     const [showSaveSuccess, setShowSaveSuccess] = useState(false);
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Sync local state ONLY when modal opens
     useEffect(() => {
         if (isOpen) {
             setPendingNickname(user?.nickname || '');
             setPendingRank(user?.rank || 'Unranked');
+            setPendingAvatar(user?.avatar_url || null);
             setShowSaveSuccess(false);
 
             // REFRESH Notification Data from localStorage whenever modal opens
@@ -151,15 +155,71 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
         }
     }, [isOpen, user?.email]); // Only sync on open, or if user changes while open
 
-    const hasChanges = pendingNickname !== (user?.nickname || '') || pendingRank !== (user?.rank || 'Unranked');
+    const hasChanges = pendingNickname !== (user?.nickname || '') || 
+                       pendingRank !== (user?.rank || 'Unranked') || 
+                       pendingAvatar !== (user?.avatar_url || null);
 
     const handleSaveProfile = () => {
         updateProfile({
             nickname: pendingNickname,
-            rank: pendingRank
+            rank: pendingRank,
+            avatar_url: pendingAvatar
         });
         setShowSaveSuccess(true);
         setTimeout(() => setShowSaveSuccess(false), 1000);
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validation
+        if (!file.type.startsWith('image/')) {
+            alert('Per favore seleziona un\'immagine.');
+            return;
+        }
+
+        setIsUploading(true);
+        try {
+            // Client-side compression using Canvas
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_SIZE = 120; // 120x120 is plenty for a small avatar
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_SIZE) {
+                            height *= MAX_SIZE / width;
+                            width = MAX_SIZE;
+                        }
+                    } else {
+                        if (height > MAX_SIZE) {
+                            width *= MAX_SIZE / height;
+                            height = MAX_SIZE;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx?.drawImage(img, 0, 0, width, height);
+
+                    // Convert to low-quality JPEG base64 to keep it small in DB
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                    setPendingAvatar(compressedBase64);
+                    setIsUploading(false);
+                };
+                img.src = event.target?.result as string;
+            };
+            reader.readAsDataURL(file);
+        } catch (err) {
+            console.error('Upload error:', err);
+            setIsUploading(false);
+        }
     };
 
     const lastSeenKey = user?.email ? `lastSeenCounts_${user.email}` : null;
@@ -225,8 +285,39 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-white/10 bg-gradient-to-r from-[#0d1424] to-[#1a1c32] rounded-t-2xl shrink-0">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-blue-600/20 flex items-center justify-center border border-blue-500/30 text-blue-400">
-                            <User size={24} />
+                        <div className="relative group/avatar">
+                            <div className="w-16 h-16 rounded-full bg-blue-600/20 flex items-center justify-center border border-blue-500/30 text-blue-400 overflow-hidden">
+                                {isUploading ? (
+                                    <Loader2 size={24} className="animate-spin" />
+                                ) : pendingAvatar ? (
+                                    <img src={pendingAvatar} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                    <User size={32} />
+                                )}
+                            </div>
+                            <button 
+                                onClick={() => fileInputRef.current?.click()}
+                                className="absolute inset-0 bg-black/60 opacity-0 group-hover/avatar:opacity-100 rounded-full flex items-center justify-center transition-opacity border border-blue-400/50"
+                                title="Cambia immagine"
+                            >
+                                <Camera size={20} className="text-white" />
+                            </button>
+                            <input 
+                                type="file" 
+                                ref={fileInputRef} 
+                                onChange={handleFileChange} 
+                                accept="image/*" 
+                                className="hidden" 
+                            />
+                            {pendingAvatar && (
+                                <button 
+                                    onClick={() => setPendingAvatar(null)}
+                                    className="absolute -top-1 -right-1 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover/avatar:opacity-100 transition-opacity hover:bg-red-500 shadow-lg"
+                                    title="Rimuovi immagine"
+                                >
+                                    <TrashIcon size={12} />
+                                </button>
+                            )}
                         </div>
                         <div>
                             <div className="flex items-center gap-2">

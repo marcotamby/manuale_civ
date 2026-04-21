@@ -104,8 +104,8 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
           await adminChannel.track({
             user: {
               email: user.email,
-              name: user.name,
-              avatar: user.picture
+              name: user.name || user.nickname || 'Admin',
+              avatar: user.avatar_url
             },
             activity: { type: 'idle' },
             onlineAt: new Date().toISOString(),
@@ -125,8 +125,8 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
       await channel.track({
         user: {
           email: user.email,
-          name: user.name,
-          avatar: user.picture
+          name: user.name || user.nickname || 'Admin',
+          avatar: user.avatar_url
         },
         activity,
         onlineAt: new Date().toISOString(),
