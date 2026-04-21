@@ -92,6 +92,35 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     }
   };
 
+  const fetchQA = async () => {
+    try {
+      setQaLoading(true);
+      const { data: qData, error: qError } = await supabase
+        .from('questions')
+        .select('*')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
+
+      const { data: aData, error: aError } = await supabase
+        .from('answers')
+        .select('*, questions(question_text, civ_id)')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
+
+      if (qError) throw qError;
+      if (aError) throw aError;
+
+      setQuestions(qData || []);
+      setAnswers(aData || []);
+    } catch (err: any) {
+      setQaLoading(false);
+      console.error('Error fetching QA:', err);
+      setToast({ isVisible: true, message: 'Errore caricamento QA', type: 'error' });
+    } finally {
+      setQaLoading(false);
+    }
+  };
+
   const fetchUsers = async () => {
     if (!isSuperAdmin) return;
     try {
