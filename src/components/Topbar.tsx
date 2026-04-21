@@ -144,7 +144,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
           href="https://discord.gg/8Tx2YdXrEu"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/20 hover:border-indigo-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
+          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/20 hover:border-indigo-500/50 transition-all text-xs font-bold uppercase tracking-wider group hover:scale-110 hover:-translate-y-1 duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
           title="Unisci al Discord di Aoeitalia"
         >
           <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -158,7 +158,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
             (window as any).closeAllModals?.();
             (window as any).resetHomeFilters?.();
           }}
-          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-sky-500/30 text-sky-400 hover:bg-sky-500/20 hover:border-sky-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
+          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-sky-500/30 text-sky-400 hover:bg-sky-500/20 hover:border-sky-500/50 transition-all text-xs font-bold uppercase tracking-wider group hover:scale-110 hover:-translate-y-1 duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
           title="Domande Frequenti"
         >
           <HelpCircle size={14} className="group-hover:scale-110 transition-transform" />
@@ -168,7 +168,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
           href="https://ko-fi.com/marcotamby"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 hover:border-rose-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
+          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 hover:border-rose-500/50 transition-all text-xs font-bold uppercase tracking-wider group hover:scale-110 hover:-translate-y-1 duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
           title="Sostieni il progetto su Ko-fi"
         >
           <Coffee size={14} className="group-hover:scale-110 transition-transform" />
@@ -180,7 +180,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
             (window as any).closeAllModals?.();
             (window as any).resetHomeFilters?.();
           }}
-          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
+          className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all text-xs font-bold uppercase tracking-wider group hover:scale-110 hover:-translate-y-1 duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
           title="Tornei Ufficiali"
         >
           <Trophy size={14} className="group-hover:scale-110 transition-transform" />
@@ -189,7 +189,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
         {(isAdmin || isStreamer) && user?.email !== 'alessio.bella97@gmail.com' && window.innerWidth >= 1024 && (
           <button
             onClick={onOpenAdminOverlay}
-            className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-fuchsia-500/30 text-fuchsia-400 hover:bg-fuchsia-500/20 hover:border-fuchsia-500/50 transition-all text-xs font-bold uppercase tracking-wider group"
+            className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg border border-fuchsia-500/30 text-fuchsia-400 hover:bg-fuchsia-500/20 hover:border-fuchsia-500/50 transition-all text-xs font-bold uppercase tracking-wider group hover:scale-110 hover:-translate-y-1 duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
             title="Gestione Overlay Stream"
           >
             <Monitor size={14} className="group-hover:scale-110 transition-transform" />
@@ -246,7 +246,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
                   (window as any).openProfileModal?.();
                   (window as any).clearNotifications?.();
                 }}
-                className="relative flex items-center gap-3 text-yellow-500 hover:opacity-80 transition-opacity group shrink-0"
+                className="relative flex items-center gap-3 text-yellow-500 hover:opacity-80 transition-all group shrink-0 hover:scale-110 hover:-translate-y-1 duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
                 title="Il Tuo Profilo"
               >
                 <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30 group-hover:border-yellow-500/60 transition-colors overflow-hidden relative">
@@ -270,7 +270,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
               {isAdmin && (
                 <button
                   onClick={onOpenAdminDashboard}
-                  className="relative text-[11px] md:text-xs text-yellow-500 hover:text-white transition-colors border border-yellow-500/20 px-3 py-2 rounded-lg hover:bg-yellow-500/10 font-bold tracking-widest uppercase flex items-center gap-1 shrink-0"
+                  className="relative text-[11px] md:text-xs text-yellow-500 hover:text-white transition-all border border-yellow-500/20 px-3 py-2 rounded-lg hover:bg-yellow-500/10 font-bold tracking-widest uppercase flex items-center gap-1 shrink-0 hover:scale-110 hover:-translate-y-1 duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
                 >
                   Pannello
                   {(pendingCount + pendingQaCount) > 0 && (
@@ -295,7 +295,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
                   (window as any).openProfileModal?.();
                   (window as any).clearNotifications?.();
                 }}
-                className="relative flex items-center gap-2.5 group transition-all"
+                className="relative flex items-center gap-2.5 group transition-all hover:scale-110 hover:-translate-y-1 duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
                 title="Il Tuo Profilo"
               >
                 <div className="p-1 rounded-full bg-blue-600/10 border border-blue-500/30 text-blue-400 group-hover:bg-blue-600/20 group-hover:border-blue-500/50 transition-all">
@@ -325,7 +325,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
         ) : (
           <button
             onClick={openLoginModal}
-            className="flex items-center gap-2 px-6 py-2 bg-yellow-600/10 hover:bg-yellow-600/20 text-yellow-500 font-bold rounded-lg border border-yellow-500/30 transition-all shadow-[0_0_15px_rgba(212,175,55,0.1)] hover:shadow-[0_0_20px_rgba(212,175,55,0.2)] uppercase text-xs tracking-widest"
+            className="flex items-center gap-2 px-6 py-2 bg-yellow-600/10 hover:bg-yellow-600/20 text-yellow-500 font-bold rounded-lg border border-yellow-500/30 transition-all shadow-[0_0_15px_rgba(212,175,55,0.1)] hover:shadow-[0_0_20px_rgba(212,175,55,0.2)] uppercase text-xs tracking-widest hover:scale-110 hover:-translate-y-1 duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
           >
             <User size={14} />
             Accedi
