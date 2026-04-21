@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useCivData } from './CivContext';
 import { CustomSelect } from './CustomSelect';
-import { Heart, BarChart2, Zap } from 'lucide-react';
+import { Heart, BarChart2, Zap, FileText } from 'lucide-react';
 import { useAuth } from './AuthContext';
 
 interface HomeProps {
@@ -109,7 +109,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                  if (isCompareMode) setIsCompareMode(false);
                }}
                className={`flex items-center gap-2 px-3 md:px-4 h-full rounded-lg text-sm font-bold transition-all ${isBOMode
-                 ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.4)]'
+                 ? 'bg-cyan-500 text-black shadow-[0_0_15px_rgba(6,182,212,0.4)]'
                  : 'text-gray-400 hover:text-gray-200'
                }`}
             >
@@ -133,34 +133,6 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
         </div>
       </header>
 
-      {/* Quick Access Build Orders Row (Desktop & Mobile) */}
-      <div className="mb-6 animate-in slide-in-from-left duration-500">
-        <div className="flex items-center justify-between mb-3 px-1">
-          <h2 className="text-xs font-black text-gray-500 uppercase tracking-[0.2em] flex items-center gap-2">
-             <Zap size={12} className="text-yellow-500" />
-             Accesso Rapido Build Orders
-          </h2>
-          <span className="text-[10px] text-gray-400 font-bold hidden md:inline">Scegli una civiltà per le strategie</span>
-        </div>
-        <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 scroll-smooth">
-          {civilizationsData.map(civ => (
-            <button
-              key={`quick-${civ.id}`}
-              onClick={() => onSelectCiv(civ.id, 'build-orders')}
-              className="flex-shrink-0 group flex flex-col items-center gap-2"
-            >
-              <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-[#1a1c23] border border-white/5 p-2 transition-all group-hover:border-yellow-500/50 group-hover:scale-110 shadow-lg relative overflow-hidden">
-                <img src={civ.flag} className="w-full h-full object-contain relative z-10" alt={civ.name} />
-                <div className="absolute inset-0 bg-yellow-500/0 group-hover:bg-yellow-500/5 transition-colors" />
-              </div>
-              <span className="text-[10px] font-black text-gray-500 group-hover:text-yellow-500 transition-colors uppercase tracking-tighter truncate max-w-[64px]">
-                {civ.name}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
-
       <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 md:gap-5 pb-20">
         {filteredCivs.map(civ => {
           const isSelected = selectedForCompare.includes(civ.id);
@@ -171,11 +143,11 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
             <div
               key={civ.id}
               onClick={() => handleCardClick(civ.id)}
-              className={`group relative h-40 md:h-56 rounded-xl cursor-pointer overflow-hidden border transition-all duration-500 ${isSelected
-                ? 'border-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.4)] scale-[0.98]'
+              className={`group relative h-40 md:h-56 rounded-xl cursor-pointer overflow-hidden border transition-all duration-500 z-10 ${isSelected
+                ? 'border-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.4)] scale-[0.98] z-20'
                 : isUnselectable
                   ? 'border-[#D4AF37]/5 opacity-40 grayscale-[0.3] cursor-not-allowed'
-                  : 'border-[#D4AF37]/20 hover:border-yellow-400 hover:shadow-[0_0_30px_rgba(212,175,55,0.25)] hover:-translate-y-1'
+                  : 'border-[#D4AF37]/20 hover:border-white/50 hover:shadow-[0_20px_50px_rgba(0,0,0,0.8)] hover:-translate-y-2 hover:scale-[1.05] hover:z-20'
                 }`}
             >
               {/* Full Cover Flag Background */}
@@ -187,7 +159,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                   onLoad={(e) => {
                     (e.target as HTMLImageElement).classList.remove('opacity-0');
                   }}
-                  className={`w-full h-full object-cover transition-all duration-1000 opacity-0 ${!isUnselectable ? 'group-hover:scale-110' : ''}`}
+                  className={`w-full h-full object-cover transition-all duration-1000 opacity-0 ${!isUnselectable ? 'group-hover:scale-[1.3] group-hover:rotate-1' : ''}`}
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>';
                     (e.target as HTMLImageElement).classList.remove('opacity-0');
@@ -199,7 +171,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
 
               {/* Selection Indicator */}
               {isCompareMode && (
-                <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${isSelected 
+                <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 z-30 ${isSelected 
                   ? 'bg-blue-600/20' 
                   : isUnselectable 
                     ? 'hidden' 
@@ -210,11 +182,11 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                 </div>
               )}
 
-              {/* Build Order Shortcut Indicator */}
+              {/* Build Order Shortcut Indicator (DESKTOP HOVER) */}
               {isBOMode && !isCompareMode && (
-                 <div className="absolute inset-0 bg-yellow-900/10 flex items-center justify-center animate-in fade-in duration-300">
-                    <div className="bg-yellow-500 text-black px-3 py-1 rounded-full font-black text-[10px] uppercase tracking-widest shadow-[0_0_20px_rgba(234,179,8,0.4)] flex items-center gap-1.5">
-                       <Zap size={12} fill="black" />
+                 <div className="absolute inset-0 bg-cyan-900/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30">
+                    <div className="bg-cyan-500 text-black px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] shadow-[0_0_25px_rgba(6,182,212,0.6)] border border-cyan-300 flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                       <Zap size={14} fill="black" />
                        Build Orders
                     </div>
                  </div>
@@ -250,17 +222,17 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                 </button>
               )}
 
-              {/* Desktop Hover Build Orders Button */}
+              {/* Desktop Hover Standard Button */}
               {!isCompareMode && !isBOMode && (
                  <button
                    onClick={(e) => {
                      e.stopPropagation();
-                     onSelectCiv(civ.id, 'build-orders');
+                     onSelectCiv(civ.id);
                    }}
-                   className="absolute bottom-20 left-1/2 -translate-x-1/2 hidden md:flex items-center gap-2 px-3 py-1.5 bg-yellow-500 text-black opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 rounded-lg font-black text-[10px] uppercase tracking-widest whitespace-nowrap shadow-xl border border-yellow-400"
+                   className="absolute bottom-20 left-1/2 -translate-x-1/2 hidden md:flex items-center gap-2 px-4 py-2 bg-gradient-to-b from-[#e5e7eb] to-[#9ca3af] text-black opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] whitespace-nowrap shadow-[0_10px_25px_rgba(0,0,0,0.5)] border border-white/40 z-30"
                  >
-                    <Zap size={12} fill="black" />
-                    Strategie
+                    <FileText size={14} fill="black" />
+                    Scheda civiltà
                  </button>
               )}
 
