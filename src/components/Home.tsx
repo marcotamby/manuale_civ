@@ -104,16 +104,24 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
             <div className="flex-1 md:flex-initial flex items-center glass p-1 rounded-xl h-[42px]">
               <button
                 onClick={() => {
-                  setIsCompareMode(!isCompareMode);
-                  if (isBOMode) setIsBOMode(false);
+                  if (isCompareMode && selectedForCompare.length === 2) {
+                    handleStartCompare();
+                  } else {
+                    setIsCompareMode(!isCompareMode);
+                    if (isBOMode) setIsBOMode(false);
+                  }
                 }}
                 className={`flex-1 flex items-center justify-center gap-2 px-3 h-full rounded-lg text-[11px] xs:text-xs font-bold transition-all ${isCompareMode
-                  ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.4)]'
+                  ? selectedForCompare.length === 2 ? 'bg-green-600 text-white shadow-[0_0_15px_rgba(22,163,74,0.4)]' : 'bg-red-500/20 text-red-400 border border-red-500/30'
                   : 'text-gray-400 hover:text-gray-200'
                   }`}
               >
-                <BarChart2 size={14} fill={isCompareMode ? 'black' : 'none'} />
-                <span>{isCompareMode ? 'Annulla' : 'Confronta'}</span>
+                <BarChart2 size={14} fill={isCompareMode ? (selectedForCompare.length === 2 ? 'white' : 'currentColor') : 'none'} />
+                <span>
+                  {isCompareMode 
+                    ? (selectedForCompare.length === 2 ? 'Conferma' : 'Annulla') 
+                    : 'Confronta'}
+                </span>
               </button>
             </div>
 
