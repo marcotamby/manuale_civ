@@ -161,7 +161,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
     try {
       setIsSaving(true);
 
-      let finalBuildOrders = [...editedCiv.buildOrders];
+      let finalBuildOrders = [...(editedCiv.buildOrders || [])];
       
       // Apply signature if checked
       if (isSigned && user) {
