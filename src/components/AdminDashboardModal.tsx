@@ -54,6 +54,8 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [newUemail, setNewUemail] = useState('');
   const [editingNickname, setEditingNickname] = useState<string | null>(null);
   const [tempNickname, setTempNickname] = useState('');
+  const [isSavingNickname, setIsSavingNickname] = useState<string | null>(null);
+  const [savedSuccess, setSavedSuccess] = useState<string | null>(null);
 
   const getYoutubeId = (url: string) => {
     if (!url) return null;
@@ -166,6 +168,29 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       setToast({ isVisible: true, message: 'Errore durante l\'aggiunta', type: 'error' });
     } finally {
       setUserLoading(false);
+    }
+  };
+
+  const handleUpdateNickname = async (email: string, nickname: string) => {
+    try {
+      setIsSavingNickname(email);
+      const { error } = await supabase
+        .from('profiles')
+        .update({ nickname })
+        .eq('email', email);
+      
+      if (error) throw error;
+      
+      setUsers(prev => prev.map(u => u.email === email ? { ...u, nickname } : u));
+      setEditingNickname(null);
+      setSavedSuccess(email);
+      setToast({ isVisible: true, message: 'Nickname aggiornato!', type: 'success' });
+      setTimeout(() => setSavedSuccess(null), 3000);
+    } catch (err: any) {
+      console.error('Error updating nickname:', err);
+      setToast({ isVisible: true, message: 'Errore aggiornamento', type: 'error' });
+    } finally {
+      setIsSavingNickname(null);
     }
   };
 
@@ -798,30 +823,35 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                   {u.nickname?.[0]?.toUpperCase() || u.email?.[0]?.toUpperCase() || 'U'}
                                 </div>
                                 <div className="flex flex-col min-w-0">
-                                   <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2">
                                        {editingNickname === u.email ? (
                                          <div className="flex items-center gap-2">
                                            <input
                                              autoFocus
-                                             className="bg-black/60 border border-blue-500/50 rounded px-2 py-1 text-sm text-white focus:outline-none"
+                                             className="bg-black/60 border border-blue-500/50 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-yellow-500 transition-all"
                                              value={tempNickname}
+                                             disabled={isSavingNickname === u.email}
                                              onChange={(e) => setTempNickname(e.target.value)}
                                              onKeyDown={(e) => {
-                                               if (e.key === 'Enter') handleToggleUserRole(u.email, 'nickname', tempNickname).then(() => setEditingNickname(null));
+                                               if (e.key === 'Enter') handleUpdateNickname(u.email, tempNickname);
                                                if (e.key === 'Escape') setEditingNickname(null);
                                              }}
-                                             onBlur={() => setEditingNickname(null)}
+                                             onBlur={() => { if (!isSavingNickname) setEditingNickname(null); }}
                                            />
                                            <button 
-                                             onMouseDown={(e) => { e.preventDefault(); handleToggleUserRole(u.email, 'nickname', tempNickname).then(() => setEditingNickname(null)); }}
-                                             className="text-green-500 hover:text-green-400"
+                                             onClick={() => handleUpdateNickname(u.email, tempNickname)}
+                                             disabled={isSavingNickname === u.email}
+                                             className="text-green-500 hover:text-green-400 disabled:opacity-50"
                                            >
-                                             <CheckCircle size={16} />
+                                             {isSavingNickname === u.email ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
                                            </button>
                                          </div>
                                        ) : (
-                                         <div className="flex items-center gap-2 group/nick">
-                                            <span className="text-base md:text-lg font-bold text-white truncate leading-tight">{u.nickname || 'Senza Nickname'}</span>
+                                         <div className="flex items-center gap-2 group/nick relative">
+                                            <span className={`text-base md:text-lg font-bold text-white truncate leading-tight transition-colors ${savedSuccess === u.email ? 'text-green-400' : ''}`}>
+                                              {u.nickname || 'Senza Nickname'}
+                                            </span>
+                                            {savedSuccess === u.email && <CheckCircle size={12} className="text-green-400 animate-in zoom-in duration-300" />}
                                             <button 
                                               onClick={() => { setEditingNickname(u.email); setTempNickname(u.nickname || ''); }}
                                               className="opacity-0 group-hover/nick:opacity-100 p-1 text-gray-500 hover:text-blue-400 transition-all"
@@ -839,12 +869,12 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                               </div>
 
                               <div className="flex items-center gap-2">
-                                 {/* Granular Permissions for Editors */}
-                                <div className="flex items-center gap-1 bg-black/40 p-1.5 rounded-2xl border border-white/5 ">
+                                 {/* Unified Permissions Group */}
+                                <div className="flex items-center gap-1 bg-black/40 p-1 rounded-2xl border border-white/5 shadow-inner">
                                     {/* Tournaments */}
                                     <button 
                                       onClick={() => handleToggleUserRole(u.email, 'can_manage_tournaments', !u.can_manage_tournaments)}
-                                      className={`p-2 rounded-xl transition-all ${u.can_manage_tournaments ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                                      className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all ${u.can_manage_tournaments ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
                                       title="Gestione Tornei"
                                     >
                                       <Trophy size={16} />
@@ -853,7 +883,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                     {/* Civs */}
                                     <button 
                                       onClick={() => handleToggleUserRole(u.email, 'can_manage_civs', !u.can_manage_civs)}
-                                      className={`p-2 rounded-xl transition-all ${u.can_manage_civs ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                                      className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all ${u.can_manage_civs ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
                                       title="Gestione Civiltà"
                                     >
                                       <BookOpen size={16} />
@@ -862,21 +892,21 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                     {/* Build Orders */}
                                     <button 
                                       onClick={() => handleToggleUserRole(u.email, 'can_manage_buildorders', !u.can_manage_buildorders)}
-                                      className={`p-2 rounded-xl transition-all ${u.can_manage_buildorders ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                                      className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all ${u.can_manage_buildorders ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
                                       title="Gestione Build Orders"
                                     >
                                       <Zap size={16} />
                                     </button>
-                                </div>
 
-                                {/* Streamer Toggle */}
-                                <button 
-                                  onClick={() => handleToggleUserRole(u.email, 'is_streamer', !u.is_streamer)}
-                                  className={`p-2.5 rounded-xl border transition-all ${u.is_streamer ? 'bg-pink-600 border-pink-400 text-white shadow-[0_0_15px_rgba(219,39,119,0.3)]' : 'bg-gray-900/50 border-white/10 text-gray-500 hover:border-pink-400/50'}`}
-                                  title={u.is_streamer ? 'Rimuovi Streamer' : 'Segna come Streamer'}
-                                >
-                                   <Radio size={20} />
-                                </button>
+                                    {/* Streamer Toggle */}
+                                    <button 
+                                      onClick={() => handleToggleUserRole(u.email, 'is_streamer', !u.is_streamer)}
+                                      className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all ${u.is_streamer ? 'bg-pink-600 text-white shadow-[0_0_15px_rgba(219,39,119,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-pink-400'}`}
+                                      title={u.is_streamer ? 'Rimuovi Streamer' : 'Segna come Streamer'}
+                                    >
+                                       <Radio size={16} />
+                                    </button>
+                                </div>
                               </div>
                             </div>
                           ))}
