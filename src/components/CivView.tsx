@@ -527,26 +527,24 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   return (
     <div className="flex-1 overflow-y-auto overflow-x-hidden w-full civ-view-container">
       {/* Unified Cinematic Top Section (Header + Navbar) */}
-      <div className="relative border-b border-[#D4AF37]/15 bg-[var(--color-brand-dark)]">
-        {/* Unified Cinematic Fading Flag Background */}
+      <div className="relative bg-[var(--color-brand-dark)]">
+        {/* Unified Cinematic Fading Flag Background - Spans both Header and Navbar */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
-          {/* Flag image: Optimized to avoid sgranatura (pixelation) by using height-based scaling */}
           <img 
             src={civ.flag} 
             alt="" 
-            className="h-full w-auto max-w-[80vw] object-contain object-left opacity-[0.5] sm:opacity-[0.6]"
+            className="h-full w-full object-cover object-left opacity-[0.4] md:opacity-[0.6]"
             style={{
-              maskImage: 'linear-gradient(to right, black 0%, black 10%, transparent 70%)',
-              WebkitMaskImage: 'linear-gradient(to right, black 0%, black 10%, transparent 70%)'
+              maskImage: 'linear-gradient(to right, black 0%, black 15%, transparent 70%)',
+              WebkitMaskImage: 'linear-gradient(to right, black 0%, black 15%, transparent 70%)'
             }}
           />
           {/* Smoothing gradients */}
           <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-brand-dark)] via-transparent to-[var(--color-brand-dark)]/10" />
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--color-brand-dark)]/40 to-[var(--color-brand-dark)]" />
         </div>
 
         {/* Header Content */}
-        <div className="relative z-10 min-h-[200px] px-6 pt-10 pb-6 flex items-center">
+        <div className="relative z-10 px-6 pt-10 pb-6 flex items-center min-h-[180px]">
           <div className="flex flex-col items-start gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-3 flex-wrap mb-2">
@@ -606,8 +604,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           </div>
         </div>
 
-        {/* Navigation Bar (Nested within unified section) */}
-        <div className="relative sticky top-0 bg-black/40 backdrop-blur-md z-10 border-t border-white/5 w-full">
+        {/* Navigation Bar - Fully Transparent over the cinematic background */}
+        <div className="relative sticky top-0 z-20 border-y border-[#D4AF37]/15 w-full bg-transparent backdrop-blur-sm">
           <div
             ref={scrollContainerRef}
             onScroll={checkScroll}
@@ -629,7 +627,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           </div>
 
           {canScrollRight && (
-            <div className="md:hidden absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-black/80 to-transparent pointer-events-none flex items-center justify-end pr-2">
+            <div className="md:hidden absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[var(--color-brand-dark)]/90 to-transparent pointer-events-none flex items-center justify-end pr-2">
               <ChevronRight size={16} className="text-yellow-500/70 animate-pulse" />
             </div>
           )}
