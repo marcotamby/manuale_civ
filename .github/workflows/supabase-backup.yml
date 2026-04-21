@@ -28,8 +28,6 @@ jobs:
 
       - name: Run Backup Script
         env:
-          # Assicurati di aggiungere questi Secrets nelle impostazioni della repo su GitHub:
-          # Settings -> Secrets and variables -> Actions -> New repository secret
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           VITE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.VITE_SUPABASE_SERVICE_ROLE_KEY }}
@@ -44,6 +42,7 @@ jobs:
           git add backups/civilizations_latest.json --force
           git add backups/suggestions_latest.json --force
           git add backups/faq_latest.json --force
+          git add backups/build_order_votes_latest.json --force
           
           # Se non ci sono modifiche nei dati, github eviterà di fare un commit vuoto
           if git diff --staged --quiet; then

@@ -21,7 +21,8 @@ const TABLES_TO_BACKUP = [
   'faq_settings',
   'faq_sections',
   'faq_items',
-  'profiles'
+  'profiles',
+  'build_order_votes'
 ];
 
 async function backupDatabase() {
@@ -55,17 +56,7 @@ async function backupDatabase() {
     }
   }
 
-  console.log('\n📦 Automatizzazione Git...');
-  try {
-    const { execSync } = await import('child_process');
-    execSync('git add backups/', { stdio: 'inherit' });
-    execSync(`git commit -m "Automated database backup: ${timestamp}"`, { stdio: 'inherit' });
-    console.log('✅ Commit Git eseguito con successo.');
-  } catch (gitError) {
-    console.warn('⚠️ Impossibile eseguire il commit Git (forse non ci sono modifiche o Git non è configurato):', (gitError as any).message);
-  }
-
-  console.log('\n🎉 Backup completato con successo! Tutti i dati sono al sicuro sul tuo PC e su Git.');
+  console.log('\n🎉 Backup dei file JSON completato con successo!');
 }
 
 backupDatabase();
