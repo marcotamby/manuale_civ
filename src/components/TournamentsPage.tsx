@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
-import { Trophy, Calendar, Users, ArrowRight, Loader2, Terminal, Plus, Link as LinkIcon, X, CheckCircle2 } from 'lucide-react';
+import { Trophy, Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
@@ -27,13 +27,10 @@ export function TournamentsPage() {
   const [tournaments, setTournaments] = useState<(StartGGTournament & { config: TournamentConfig })[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
-  const [debugLogs, setDebugLogs] = useState<string[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newUrl, setNewUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const isDebugMode = new URLSearchParams(location.search).get('debug') === 'true';
-
   const navigate = useNavigate();
 
   const loadTournaments = async () => {
