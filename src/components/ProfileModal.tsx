@@ -279,13 +279,13 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300 overflow-y-auto">
-            <div className="bg-[#0f1423] border border-blue-500/30 rounded-2xl w-full max-w-2xl my-auto flex flex-col shadow-[0_0_50px_rgba(37,99,235,0.2)] relative">
+        <div className="fixed inset-0 z-[150] flex items-start justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300 overflow-y-auto pt-20 md:pt-40">
+            <div className="bg-[#0f1423] border border-blue-500/30 rounded-2xl w-full max-w-2xl mb-20 flex flex-col shadow-[0_0_50px_rgba(37,99,235,0.2)] relative">
                 
                 {/* Close Button */}
                 <button 
                     onClick={onClose} 
-                    className="absolute top-4 right-4 z-[90] p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+                    className="absolute top-4 right-4 z-[160] p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
                 >
                     <X size={24} />
                 </button>

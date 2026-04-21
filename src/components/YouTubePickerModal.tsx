@@ -48,7 +48,7 @@ export function YouTubePickerModal({ isOpen, onClose, onSelect, selectedIds }: Y
   );
 
   return (
-    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4 backdrop-blur-md">
+    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[150] p-4 backdrop-blur-md">
       <div className="bg-[#0f1115] border border-red-500/30 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(239,68,68,0.3)]">
         
         <div className="p-6 border-b border-white/10 flex justify-between items-center bg-red-500/5">
