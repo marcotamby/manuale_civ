@@ -533,7 +533,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           <img 
             src={civ.flag} 
             alt="" 
-            className="h-full w-full object-cover object-left opacity-[0.5] md:opacity-[0.6]"
+            className="h-full w-full object-cover object-center md:object-left opacity-[0.5] md:opacity-[0.6]"
             style={{
               maskImage: 'linear-gradient(to right, black 0%, black 40%, transparent 90%)',
               WebkitMaskImage: 'linear-gradient(to right, black 0%, black 40%, transparent 90%)'
