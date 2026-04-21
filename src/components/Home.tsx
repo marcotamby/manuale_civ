@@ -132,7 +132,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
             </button>
 
             <button
-              onClick={() => showFavorites ? setDifficultyFilter('Tutte') : setDifficultyFilter('Preferiti')}
+              onClick={() => difficultyFilter === 'Preferiti' ? setDifficultyFilter('Tutte') : setDifficultyFilter('Preferiti')}
               className={`flex items-center justify-center px-4 h-full text-sm font-bold transition-all ${difficultyFilter === 'Preferiti'
                 ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]'
                 : 'text-gray-400 hover:text-gray-200'
