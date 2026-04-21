@@ -181,7 +181,7 @@ export function TournamentsPage() {
         {isAdmin && (
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-3 px-6 py-4 bg-yellow-500 font-black text-black rounded-2xl hover:bg-yellow-400 transition-all hover:scale-[1.05] shadow-[0_0_20px_rgba(234,179,8,0.3)] uppercase text-xs tracking-widest active:scale-[0.98]"
+            className="flex items-center gap-3 px-6 py-4 bg-gradient-to-b from-slate-100 to-gray-400 font-black text-black rounded-2xl hover:from-white hover:to-gray-300 transition-all hover:scale-[1.05] shadow-[0_0_20px_rgba(255,255,255,0.1)] uppercase text-xs tracking-widest active:scale-[0.98]"
           >
             <Plus size={20} strokeWidth={3} />
             Aggiungi Torneo
@@ -237,7 +237,7 @@ export function TournamentsPage() {
                 <button
                   onClick={handleAddTournament}
                   disabled={isSubmitting || !newUrl}
-                  className="w-full py-4 bg-yellow-500 disabled:opacity-50 disabled:grayscale hover:bg-yellow-400 text-black font-black uppercase text-xs tracking-widest rounded-2xl transition-all shadow-[0_10px_20px_rgba(234,179,8,0.2)] flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-gradient-to-b from-slate-100 to-gray-400 disabled:opacity-50 disabled:grayscale hover:from-white hover:to-gray-300 text-black font-black uppercase text-xs tracking-widest rounded-2xl transition-all shadow-[0_10px_20px_rgba(255,255,255,0.05)] flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <>
