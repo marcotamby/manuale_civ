@@ -62,7 +62,34 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   };
 
   const civ = civilizations.find(c => c.id === civId);
-  const themeColor = civ?.primaryColor || '#d4af37';
+  
+  // Robust fallback for theme colors
+  const THEME_COLORS: Record<string, string> = {
+    abbasid: "#1f2937",
+    ayyubids: "#059669",
+    delhi: "#10b981",
+    byzantines: "#8b5cf6",
+    chinese: "#ef4444",
+    english: "#ef4444",
+    french: "#3b82f6",
+    goldenhorde: "#f59e0b",
+    hre: "#fbbf24",
+    japanese: "#e11d48",
+    jeannedarc: "#3b82f6",
+    lancaster: "#ef4444",
+    macedonian: "#8b5cf6",
+    malians: "#ef4444",
+    mongols: "#06b6d4",
+    orderofthedragon: "#fbbf24",
+    ottomans: "#dc2626",
+    rus: "#b91c1c",
+    sengoku: "#e11d48",
+    templar: "#dc2626",
+    tughlaq: "#0d9488",
+    zhuxi: "#16a34a"
+  };
+
+  const themeColor = civ?.primaryColor || THEME_COLORS[civId] || '#d4af37';
   
   // Find selected BO for overlay
   const selectedBO = civ?.buildOrders?.find(bo => bo.id === selectedBOId);
