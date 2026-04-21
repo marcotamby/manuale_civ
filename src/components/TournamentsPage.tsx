@@ -71,7 +71,8 @@ export function TournamentsPage() {
             period: db.period || undefined,
             bannerUrl: db.banner_url || undefined,
             status: db.status || 'Concluso',
-            podium: db.podium || undefined
+            podium: db.podium || undefined,
+            name: db.name || undefined
           };
 
           if (existingIdx !== -1) {
