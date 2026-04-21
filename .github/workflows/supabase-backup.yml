@@ -17,11 +17,13 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '22' # Versione stabile LTS
 
       - name: Install Dependencies
         run: npm ci
@@ -35,19 +37,17 @@ jobs:
 
       - name: Commit and Push
         run: |
+          # Fix per l'errore 128 (Dubious ownership)
+          git config --global --add safe.directory /github/workspace
           git config --global user.name "GitHub Action Backup Bot"
           git config --global user.email "action@github.com"
           
-          # Aggiungiamo solo i file "latest" per non far esplodere la repo con i timestamp
-          git add backups/civilizations_latest.json --force
-          git add backups/suggestions_latest.json --force
-          git add backups/faq_latest.json --force
-          git add backups/build_order_votes_latest.json --force
+          git add backups/*.json --force
           
-          # Se non ci sono modifiche nei dati, github eviterà di fare un commit vuoto
+          # Evita errore se non ci sono modifiche
           if git diff --staged --quiet; then
             echo "Nessun nuovo dato nel backup di oggi. Commit skippato."
           else
-            git commit -m "📦 Salvataggio automatico database Supabase"
-            git push
+            git commit -m "📦 Salvataggio automatico database Supabase [skip ci]"
+            git push origin main
           fi
