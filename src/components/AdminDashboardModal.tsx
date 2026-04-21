@@ -135,9 +135,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
         .from('profiles')
         .select('*')
         .order('nickname', { ascending: true });
-      
+
       if (error) throw error;
-      
+
       console.log('👥 Users fetched for Admin:', data?.length || 0);
       setUsers(data || []);
     } catch (err) {
@@ -152,13 +152,13 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     try {
       setUserLoading(true);
       const email = newUemail.trim().toLowerCase();
-      
+
       const { error } = await supabase
         .from('profiles')
         .upsert({ email }, { onConflict: 'email' });
-        
+
       if (error) throw error;
-      
+
       setNewUemail('');
       setIsAddingUser(false);
       await fetchUsers();
@@ -178,9 +178,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
         .from('profiles')
         .update({ nickname })
         .eq('email', email);
-      
+
       if (error) throw error;
-      
+
       setUsers(prev => prev.map(u => u.email === email ? { ...u, nickname } : u));
       setEditingNickname(null);
       setSavedSuccess(email);
@@ -200,9 +200,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
         .from('profiles')
         .update({ [field]: value })
         .eq('email', userEmail);
-      
+
       if (error) throw error;
-      
+
       setUsers(prev => prev.map(u => u.email === userEmail ? { ...u, [field]: value } : u));
       setToast({ isVisible: true, message: 'Permessi aggiornati', type: 'success' });
     } catch (err: any) {
@@ -364,7 +364,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       setRejectionModalSugg(null);
       setRejectionReason('');
       fetchPendingNotifCount();
-      
+
       if (newStatus === 'implemented') {
         refreshCivs();
       }
@@ -381,7 +381,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const handleUpdateQAStatus = async (item: any, type: 'question' | 'answer', newStatus: 'approved' | 'rejected' | 'deleted') => {
     try {
       const table = type === 'question' ? 'questions' : 'answers';
-      
+
       let error;
       if (newStatus === 'deleted') {
         const { error: delError } = await supabase
@@ -477,28 +477,28 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
           <div className="flex items-center justify-between md:justify-end w-full md:w-auto gap-4">
             <div className="flex bg-black/40 p-1 rounded-xl border border-white/5">
-                 <button
-                   onClick={() => setActiveTab('proposte')}
-                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'proposte' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
-                 >
-                   Proposte
-                   {suggestions.length > 0 && (
-                     <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] rounded-full">
-                       {suggestions.length}
-                     </span>
-                   )}
-                 </button>
-               <button
-                  onClick={() => setActiveTab('qa')}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'qa' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
-                >
-                  Q&A
-                  {(questions.length + answers.length) > 0 && (
-                    <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-yellow-500 text-black text-[10px] rounded-full font-black">
-                      {questions.length + answers.length}
-                    </span>
-                  )}
-                </button>
+              <button
+                onClick={() => setActiveTab('proposte')}
+                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'proposte' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+              >
+                Proposte
+                {suggestions.length > 0 && (
+                  <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] rounded-full">
+                    {suggestions.length}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab('qa')}
+                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'qa' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+              >
+                Q&A
+                {(questions.length + answers.length) > 0 && (
+                  <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-yellow-500 text-black text-[10px] rounded-full font-black">
+                    {questions.length + answers.length}
+                  </span>
+                )}
+              </button>
               {isSuperAdmin && (
                 <button
                   onClick={() => setActiveTab('users')}
@@ -517,21 +517,21 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
           </div>
         </div>
 
-          {isLoading || qaLoading ? (
-            <div className="flex flex-col items-center justify-center h-40">
-              <Loader2 size={32} className="animate-spin text-blue-500 mb-4" />
-              <p className="text-gray-400">Caricamento in corso...</p>
-            </div>
-          ) : activeTab === 'proposte' ? (
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 custom-scrollbar">
-              {suggestions.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-60 text-center glass rounded-xl border border-white/5">
-                  <Inbox size={48} className="text-gray-600 mb-4" />
-                  <h3 className="text-xl font-bold text-white mb-2">Nessuna proposta in sospeso</h3>
-                  <p className="text-gray-400 text-sm">Hai gestito tutti i suggerimenti della community!</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
+        {isLoading || qaLoading ? (
+          <div className="flex flex-col items-center justify-center h-40">
+            <Loader2 size={32} className="animate-spin text-blue-500 mb-4" />
+            <p className="text-gray-400">Caricamento in corso...</p>
+          </div>
+        ) : activeTab === 'proposte' ? (
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 custom-scrollbar">
+            {suggestions.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-60 text-center glass rounded-xl border border-white/5">
+                <Inbox size={48} className="text-gray-600 mb-4" />
+                <h3 className="text-xl font-bold text-white mb-2">Nessuna proposta in sospeso</h3>
+                <p className="text-gray-400 text-sm">Hai gestito tutti i suggerimenti della community!</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
                 {suggestions.map((sugg) => (
                   <div key={sugg.id} className="bg-black/40 border border-[#D4AF37]/30 rounded-xl p-5 hover:border-blue-500/50 transition-colors relative overflow-hidden group">
                     <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/50 hidden group-hover:block blur-sm"></div>
@@ -711,304 +711,304 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                 ))}
               </div>
             )}
-            </div>
-          ) : activeTab === 'users' && isSuperAdmin ? (
-            <div className="flex-1 flex flex-col min-h-0 bg-black/20">
-              {/* Permessi Management Toolbar */}
-              <div className="p-4 md:p-6 border-b border-white/5 space-y-4">
-                <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-                  <div className="relative w-full md:w-96">
-                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                    <input 
-                      type="text" 
-                      placeholder="Cerca per email o nickname..." 
-                      value={userSearch}
-                      onChange={(e) => setUserSearch(e.target.value)}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:border-blue-500 outline-none transition-all"
-                    />
-                  </div>
+          </div>
+        ) : activeTab === 'users' && isSuperAdmin ? (
+          <div className="flex-1 flex flex-col min-h-0 bg-black/20">
+            {/* Permessi Management Toolbar */}
+            <div className="p-4 md:p-6 border-b border-white/5 space-y-4">
+              <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div className="relative w-full md:w-96">
+                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <input
+                    type="text"
+                    placeholder="Cerca per email o nickname..."
+                    value={userSearch}
+                    onChange={(e) => setUserSearch(e.target.value)}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:border-blue-500 outline-none transition-all"
+                  />
+                </div>
 
-                  <div className="flex items-center gap-3 w-full md:w-auto">
-                    {isAddingUser ? (
-                      <div className="flex gap-2 w-full animate-in slide-in-from-right-4 duration-300">
-                        <input 
-                          type="email" 
-                          autoFocus
-                          placeholder="Inserisci email..."
-                          value={newUemail}
-                          onChange={(e) => setNewUemail(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && handleAddUser()}
-                          className="flex-1 bg-blue-500/10 border border-blue-500/30 rounded-xl px-4 py-2 text-sm text-white outline-none focus:border-blue-400"
-                        />
-                        <button 
-                          onClick={handleAddUser}
-                          disabled={!newUemail.trim()}
-                          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs uppercase disabled:opacity-50"
-                        >
-                          Aggiungi
-                        </button>
-                        <button 
-                          onClick={() => { setIsAddingUser(false); setNewUemail(''); }}
-                          className="p-2 text-gray-500 hover:text-white"
-                        >
-                          <X size={20} />
-                        </button>
-                      </div>
-                    ) : (
-                      <button 
-                        onClick={() => setIsAddingUser(true)}
-                        className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-xl border border-blue-500/30 transition-all font-bold text-xs uppercase"
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                  {isAddingUser ? (
+                    <div className="flex gap-2 w-full animate-in slide-in-from-right-4 duration-300">
+                      <input
+                        type="email"
+                        autoFocus
+                        placeholder="Inserisci email..."
+                        value={newUemail}
+                        onChange={(e) => setNewUemail(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddUser()}
+                        className="flex-1 bg-blue-500/10 border border-blue-500/30 rounded-xl px-4 py-2 text-sm text-white outline-none focus:border-blue-400"
+                      />
+                      <button
+                        onClick={handleAddUser}
+                        disabled={!newUemail.trim()}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs uppercase disabled:opacity-50"
                       >
-                        <UserPlus size={16} /> Aggiungi Utente
+                        Aggiungi
                       </button>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-5 text-[11px] uppercase font-bold text-gray-400 border-t border-white/5 pt-4">
-                   <span className="flex items-center gap-2"><Trophy size={16} className="text-yellow-500" /> Tornei</span>
-                   <span className="flex items-center gap-2"><BookOpen size={16} className="text-blue-400" /> Civiltà</span>
-                   <span className="flex items-center gap-2"><Zap size={16} className="text-orange-400" /> Build Orders</span>
-                   <span className="flex items-center gap-2"><Radio size={16} className="text-pink-400" /> Streamer</span>
+                      <button
+                        onClick={() => { setIsAddingUser(false); setNewUemail(''); }}
+                        className="p-2 text-gray-500 hover:text-white"
+                      >
+                        <X size={20} />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setIsAddingUser(true)}
+                      className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-xl border border-blue-500/30 transition-all font-bold text-xs uppercase"
+                    >
+                      <UserPlus size={16} /> Aggiungi Utente
+                    </button>
+                  )}
                 </div>
               </div>
 
-              {/* Users List */}
-              <div className="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar">
-                {userLoading ? (
-                  <div className="flex flex-col items-center justify-center h-60">
-                    <Loader2 size={32} className="animate-spin text-blue-500 mb-2" />
-                    <p className="text-gray-400 text-sm">Caricamento...</p>
-                  </div>
-                ) : (
-                  <div className="space-y-8">
-                    {/* List Section: Staff Attivo or Search Results */}
-                    <div>
-                      <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                        {userSearch ? 'Risultati Ricerca' : 'Staff Attivo'}
-                        <span className="h-px flex-1 bg-white/5 ml-2" />
-                      </h3>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {users
-                          .filter(u => {
-                            const email = u.email?.toLowerCase();
-                            const matchSearch = !userSearch || 
-                              u.email?.toLowerCase().includes(userSearch.toLowerCase()) || 
-                              u.nickname?.toLowerCase().includes(userSearch.toLowerCase());
-                            
-                            // Define staff fallbacks to match AuthContext
-                            const hardcodedStaff = [
-                              'marcotamby@gmail.com', 'marco.tamborrino.94@gmail.com',
-                              'alessio.bella97@gmail.com', 'contattodisparta@gmail.com',
-                              'cani.vincenzo@gmail.com', 'dadduedo@gmail.com', 'djalfredoneservice@gmail.com'
-                            ];
+              <div className="flex flex-wrap gap-4 text-[10px] uppercase font-bold text-gray-500 border-t border-white/5 pt-4">
+                <span className="flex items-center gap-1.5"><Trophy size={14} className="text-yellow-500" /> Tornei</span>
+                <span className="flex items-center gap-1.5"><BookOpen size={14} className="text-blue-400" /> Civiltà</span>
+                <span className="flex items-center gap-1.5"><Zap size={14} className="text-orange-400" /> Build Orders</span>
+                <span className="flex items-center gap-1.5"><Radio size={14} className="text-pink-400" /> Streamer</span>
+              </div>
+            </div>
 
-                            // If no search, only show "Staff" (role editor/admin, is_streamer, or hardcoded fallback)
-                            if (!userSearch) {
-                              return u.role === 'editor' || u.role === 'admin' || u.is_streamer === true || (email && hardcodedStaff.includes(email));
-                            }
-                            return matchSearch;
-                          })
-                          .sort((a, b) => {
-                             // Sort staff: admins first, then editors
-                             if (a.role === 'admin') return -1;
-                             if (b.role === 'admin') return 1;
-                             return 0;
-                          })
-                          .map(u => (
-                            <div key={u.id} className={`bg-white/[0.03] border rounded-2xl p-5 flex flex-col gap-4 group hover:bg-white/[0.05] transition-all ${u.role === 'admin' ? 'border-yellow-500/20' : 'border-white/5'}`}>
-                              <div className="flex items-center gap-4">
-                                <div className={`w-12 h-12 rounded-full flex items-center justify-center border text-xl font-bold shrink-0 ${u.role === 'admin' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
-                                  {u.nickname?.[0]?.toUpperCase() || u.email?.[0]?.toUpperCase() || 'U'}
-                                </div>
-                                <div className="flex flex-col min-w-0 flex-1">
-                                   <div className="flex items-center gap-2">
-                                      {editingNickname === u.email ? (
-                                        <div className="flex items-center gap-2">
-                                          <input
-                                            autoFocus
-                                            className="bg-black/60 border border-blue-500/50 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-yellow-500 transition-all"
-                                            value={tempNickname}
-                                            disabled={isSavingNickname === u.email}
-                                            onChange={(e) => setTempNickname(e.target.value)}
-                                            onKeyDown={(e) => {
-                                              if (e.key === 'Enter') handleUpdateNickname(u.email, tempNickname);
-                                              if (e.key === 'Escape') setEditingNickname(null);
-                                            }}
-                                            onBlur={() => { if (!isSavingNickname) setEditingNickname(null); }}
-                                          />
-                                          <button 
-                                            onClick={() => handleUpdateNickname(u.email, tempNickname)}
-                                            disabled={isSavingNickname === u.email}
-                                            className="text-green-500 hover:text-green-400 disabled:opacity-50"
-                                          >
-                                            {isSavingNickname === u.email ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
-                                          </button>
-                                        </div>
-                                      ) : (
-                                        <div className="flex items-center gap-2 group/nick relative">
-                                           <span className={`text-base md:text-lg font-bold text-white truncate leading-tight transition-colors ${savedSuccess === u.email ? 'text-green-400' : ''}`}>
-                                             {u.nickname || 'Senza Nickname'}
-                                           </span>
-                                           {savedSuccess === u.email && <CheckCircle size={12} className="text-green-400 animate-in zoom-in duration-300" />}
-                                           <button 
-                                             onClick={() => { setEditingNickname(u.email); setTempNickname(u.nickname || ''); }}
-                                             className="opacity-0 group-hover/nick:opacity-100 p-1 text-gray-500 hover:text-blue-400 transition-all"
-                                             title="Modifica Nickname"
-                                           >
-                                             <Edit2 size={12} />
-                                           </button>
-                                        </div>
-                                      )}
-                                      {u.role === 'admin' && <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded font-black uppercase">Creator</span>}
-                                   </div>
-                                  <span className="text-xs md:text-sm text-gray-400 truncate block">{u.email}</span>
-                                  <div className="flex items-center gap-2 mt-0.5">
-                                     <span className="text-[10px] font-bold text-blue-400/70 border border-blue-500/20 px-1.5 py-0.5 rounded bg-blue-500/5">{u.rank || 'Unranked'}</span>
-                                  </div>
-                                </div>
+            {/* Users List */}
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar">
+              {userLoading ? (
+                <div className="flex flex-col items-center justify-center h-60">
+                  <Loader2 size={32} className="animate-spin text-blue-500 mb-2" />
+                  <p className="text-gray-400 text-sm">Caricamento...</p>
+                </div>
+              ) : (
+                <div className="space-y-8">
+                  {/* List Section: Staff Attivo or Search Results */}
+                  <div>
+                    <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                      {userSearch ? 'Risultati Ricerca' : 'Staff Attivo'}
+                      <span className="h-px flex-1 bg-white/5 ml-2" />
+                    </h3>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {users
+                        .filter(u => {
+                          const email = u.email?.toLowerCase();
+                          const matchSearch = !userSearch ||
+                            u.email?.toLowerCase().includes(userSearch.toLowerCase()) ||
+                            u.nickname?.toLowerCase().includes(userSearch.toLowerCase());
+
+                          // Define staff fallbacks to match AuthContext
+                          const hardcodedStaff = [
+                            'marcotamby@gmail.com', 'marco.tamborrino.94@gmail.com',
+                            'alessio.bella97@gmail.com', 'contattodisparta@gmail.com',
+                            'cani.vincenzo@gmail.com', 'dadduedo@gmail.com', 'djalfredoneservice@gmail.com'
+                          ];
+
+                          // If no search, only show "Staff" (role editor/admin, is_streamer, or hardcoded fallback)
+                          if (!userSearch) {
+                            return u.role === 'editor' || u.role === 'admin' || u.is_streamer === true || (email && hardcodedStaff.includes(email));
+                          }
+                          return matchSearch;
+                        })
+                        .sort((a, b) => {
+                          // Sort staff: admins first, then editors
+                          if (a.role === 'admin') return -1;
+                          if (b.role === 'admin') return 1;
+                          return 0;
+                        })
+                        .map(u => (
+                          <div key={u.id} className={`bg-white/[0.03] border rounded-2xl p-5 flex flex-col gap-4 group hover:bg-white/[0.05] transition-all ${u.role === 'admin' ? 'border-yellow-500/20' : 'border-white/5'}`}>
+                            <div className="flex items-center gap-4">
+                              <div className={`w-12 h-12 rounded-full flex items-center justify-center border text-xl font-bold shrink-0 ${u.role === 'admin' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
+                                {u.nickname?.[0]?.toUpperCase() || u.email?.[0]?.toUpperCase() || 'U'}
                               </div>
-
-                              <div className="pt-3 border-t border-white/5 flex items-center justify-between gap-4">
-                                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] select-none">Configurazione Permessi</span>
-                                 {/* Unified Permissions Group */}
-                                 <div className="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/5 shadow-inner">
-                                     {/* Tournaments */}
-                                     <button 
-                                       onClick={() => handleToggleUserRole(u.email, 'can_manage_tournaments', !u.can_manage_tournaments)}
-                                       className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_tournaments ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
-                                       title="Gestione Tornei"
-                                     >
-                                       <Trophy size={16} />
-                                     </button>
-
-                                     {/* Civs */}
-                                     <button 
-                                       onClick={() => handleToggleUserRole(u.email, 'can_manage_civs', !u.can_manage_civs)}
-                                       className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_civs ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
-                                       title="Gestione Civiltà"
-                                     >
-                                       <BookOpen size={16} />
-                                     </button>
-
-                                     {/* Build Orders */}
-                                     <button 
-                                       onClick={() => handleToggleUserRole(u.email, 'can_manage_buildorders', !u.can_manage_buildorders)}
-                                       className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_buildorders ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
-                                       title="Gestione Build Orders"
-                                     >
-                                       <Zap size={16} />
-                                     </button>
-
-                                     <div className="w-px h-4 bg-white/10 mx-1" />
-
-                                     {/* Streamer Toggle */}
-                                     <button 
-                                       onClick={() => handleToggleUserRole(u.email, 'is_streamer', !u.is_streamer)}
-                                       className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.is_streamer ? 'bg-pink-600 text-white shadow-[0_0_15px_rgba(219,39,119,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-pink-400'}`}
-                                       title={u.is_streamer ? 'Rimuovi Streamer' : 'Segna come Streamer'}
-                                     >
-                                        <Radio size={16} />
-                                     </button>
-                                 </div>
+                              <div className="flex flex-col min-w-0 flex-1">
+                                <div className="flex items-center gap-2">
+                                  {editingNickname === u.email ? (
+                                    <div className="flex items-center gap-2">
+                                      <input
+                                        autoFocus
+                                        className="bg-black/60 border border-blue-500/50 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-yellow-500 transition-all"
+                                        value={tempNickname}
+                                        disabled={isSavingNickname === u.email}
+                                        onChange={(e) => setTempNickname(e.target.value)}
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter') handleUpdateNickname(u.email, tempNickname);
+                                          if (e.key === 'Escape') setEditingNickname(null);
+                                        }}
+                                        onBlur={() => { if (!isSavingNickname) setEditingNickname(null); }}
+                                      />
+                                      <button
+                                        onClick={() => handleUpdateNickname(u.email, tempNickname)}
+                                        disabled={isSavingNickname === u.email}
+                                        className="text-green-500 hover:text-green-400 disabled:opacity-50"
+                                      >
+                                        {isSavingNickname === u.email ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center gap-2 group/nick relative">
+                                      <span className={`text-base md:text-lg font-bold text-white truncate leading-tight transition-colors ${savedSuccess === u.email ? 'text-green-400' : ''}`}>
+                                        {u.nickname || 'Senza Nickname'}
+                                      </span>
+                                      {savedSuccess === u.email && <CheckCircle size={12} className="text-green-400 animate-in zoom-in duration-300" />}
+                                      <button
+                                        onClick={() => { setEditingNickname(u.email); setTempNickname(u.nickname || ''); }}
+                                        className="opacity-0 group-hover/nick:opacity-100 p-1 text-gray-500 hover:text-blue-400 transition-all"
+                                        title="Modifica Nickname"
+                                      >
+                                        <Edit2 size={12} />
+                                      </button>
+                                    </div>
+                                  )}
+                                  {u.role === 'admin' && <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded font-black uppercase">Owner</span>}
+                                </div>
+                                <span className="text-xs md:text-sm text-gray-500 truncate block">{u.email}</span>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  <span className="text-[10px] font-bold text-blue-400/70 border border-blue-500/20 px-1.5 py-0.5 rounded bg-blue-500/5">{u.rank || 'Unranked'}</span>
+                                </div>
                               </div>
                             </div>
-                          ))}
-                        
-                        {/* Empty State */}
-                        {!userSearch && users.filter(u => u.role === 'editor' || u.role === 'admin' || u.is_streamer === true).length === 0 && (
-                          <div className="col-span-full py-20 text-center bg-white/[0.02] border border-dashed border-white/5 rounded-3xl">
-                             <ShieldCheck size={40} className="mx-auto text-gray-700 mb-4 opacity-20" />
-                             <p className="text-gray-500 text-sm italic">Nessun membro dello staff assegnato.</p>
+
+                            <div className="pt-3 border-t border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                              <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] select-none">Configurazione Permessi</span>
+                              {/* Unified Permissions Group */}
+                              <div className="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/5 shadow-inner">
+                                {/* Tournaments */}
+                                <button
+                                  onClick={() => handleToggleUserRole(u.email, 'can_manage_tournaments', !u.can_manage_tournaments)}
+                                  className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_tournaments ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                                  title="Gestione Tornei"
+                                >
+                                  <Trophy size={16} />
+                                </button>
+
+                                {/* Civs */}
+                                <button
+                                  onClick={() => handleToggleUserRole(u.email, 'can_manage_civs', !u.can_manage_civs)}
+                                  className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_civs ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                                  title="Gestione Civiltà"
+                                >
+                                  <BookOpen size={16} />
+                                </button>
+
+                                {/* Build Orders */}
+                                <button
+                                  onClick={() => handleToggleUserRole(u.email, 'can_manage_buildorders', !u.can_manage_buildorders)}
+                                  className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_buildorders ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                                  title="Gestione Build Orders"
+                                >
+                                  <Zap size={16} />
+                                </button>
+
+                                <div className="w-px h-4 bg-white/10 mx-1" />
+
+                                {/* Streamer Toggle */}
+                                <button
+                                  onClick={() => handleToggleUserRole(u.email, 'is_streamer', !u.is_streamer)}
+                                  className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.is_streamer ? 'bg-pink-600 text-white shadow-[0_0_15px_rgba(219,39,119,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-pink-400'}`}
+                                  title={u.is_streamer ? 'Rimuovi Streamer' : 'Segna come Streamer'}
+                                >
+                                  <Radio size={16} />
+                                </button>
+                              </div>
+                            </div>
                           </div>
-                        )}
+                        ))}
+
+                      {/* Empty State */}
+                      {!userSearch && users.filter(u => u.role === 'editor' || u.role === 'admin' || u.is_streamer === true).length === 0 && (
+                        <div className="col-span-full py-20 text-center bg-white/[0.02] border border-dashed border-white/5 rounded-3xl">
+                          <ShieldCheck size={40} className="mx-auto text-gray-700 mb-4 opacity-20" />
+                          <p className="text-gray-500 text-sm italic">Nessun membro dello staff assegnato.</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          /* Q&A Tab Content */
+          <div className="space-y-8 overflow-y-auto px-4 md:px-6 py-4 max-h-[70vh]">
+            {/* Pending Questions */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-black text-yellow-500 uppercase tracking-widest flex items-center gap-3">
+                <MessageSquare size={16} className="text-yellow-500 shrink-0" /> Domande da Approvare ({questions.length})
+              </h3>
+              {questions.length === 0 ? (
+                <p className="text-gray-500 text-sm italic py-4">Nessuna domanda in sospeso.</p>
+              ) : (
+                <div className="grid gap-4">
+                  {questions.map(q => (
+                    <div key={q.id} className="glass p-5 rounded-xl border border-white/5 space-y-4">
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="px-2 py-0.5 bg-yellow-500/10 text-yellow-500 text-[10px] font-black rounded border border-yellow-500/20 uppercase">{q.civ_id}</span>
+                            <span className="text-xs font-bold text-white">{q.user_nickname}</span>
+                            <span className="text-[10px] text-gray-500">({q.user_rank})</span>
+                          </div>
+                          <p className="text-gray-200 text-sm">{q.question_text}</p>
+                          <div className="flex gap-2">
+                            {canManageCivs && (
+                              <>
+                                <button onClick={() => handleUpdateQAStatus(q, 'question', 'approved')} className="p-2 bg-green-500/10 text-green-500 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-all" title="Approva"><CheckCircle size={18} /></button>
+                                <button onClick={() => handleUpdateQAStatus(q, 'question', 'rejected')} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all" title="Rifiuta"><XCircle size={18} /></button>
+                                <button onClick={() => setDeleteConfirm({ id: q.id, type: 'question', item: q })} className="p-2 bg-gray-500/10 text-gray-500 rounded-lg border border-gray-500/20 hover:bg-red-500/20 hover:text-red-500 transition-all" title="Elimina"><Inbox size={18} /></button>
+                              </>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
-          ) : (
-            /* Q&A Tab Content */
-          <div className="space-y-8 overflow-y-auto px-4 md:px-6 py-4 max-h-[70vh]">
-             {/* Pending Questions */}
-             <div className="space-y-4">
-                <h3 className="text-sm font-black text-yellow-500 uppercase tracking-widest flex items-center gap-3">
-                  <MessageSquare size={16} className="text-yellow-500 shrink-0" /> Domande da Approvare ({questions.length})
-                </h3>
-                  {questions.length === 0 ? (
-                    <p className="text-gray-500 text-sm italic py-4">Nessuna domanda in sospeso.</p>
-                  ) : (
-                    <div className="grid gap-4">
-                      {questions.map(q => (
-                        <div key={q.id} className="glass p-5 rounded-xl border border-white/5 space-y-4">
-                          <div className="flex justify-between items-start gap-4">
-                            <div className="flex-1">
-                               <div className="flex items-center gap-2 mb-2">
-                                  <span className="px-2 py-0.5 bg-yellow-500/10 text-yellow-500 text-[10px] font-black rounded border border-yellow-500/20 uppercase">{q.civ_id}</span>
-                                  <span className="text-xs font-bold text-white">{q.user_nickname}</span>
-                                  <span className="text-[10px] text-gray-500">({q.user_rank})</span>
-                               </div>
-                               <p className="text-gray-200 text-sm">{q.question_text}</p>
-                                                        <div className="flex gap-2">
-                                  {canManageCivs && (
-                                    <>
-                                      <button onClick={() => handleUpdateQAStatus(q, 'question', 'approved')} className="p-2 bg-green-500/10 text-green-500 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-all" title="Approva"><CheckCircle size={18} /></button>
-                                      <button onClick={() => handleUpdateQAStatus(q, 'question', 'rejected')} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all" title="Rifiuta"><XCircle size={18} /></button>
-                                      <button onClick={() => setDeleteConfirm({ id: q.id, type: 'question', item: q })} className="p-2 bg-gray-500/10 text-gray-500 rounded-lg border border-gray-500/20 hover:bg-red-500/20 hover:text-red-500 transition-all" title="Elimina"><Inbox size={18} /></button>
-                                    </>
-                                  )}
-                                </div>
-        </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-               </div>
 
-             {/* Pending Answers */}
-             <div className="space-y-4">
-                <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest flex items-center gap-3">
-                  <Send size={16} className="text-blue-400 shrink-0" /> Risposte da Approvare ({answers.length})
-                </h3>
-                  {answers.length === 0 ? (
-                    <p className="text-gray-500 text-sm italic py-4">Nessuna risposta in sospeso.</p>
-                  ) : (
-                    <div className="grid gap-4">
-                      {answers.map(a => (
-                        <div key={a.id} className="glass p-5 rounded-xl border border-white/5 space-y-4">
-                          <div className="flex justify-between items-start gap-4">
-                            <div className="flex-1">
-                               <div className="bg-white/5 p-3 rounded-lg border border-white/5 mb-3">
-                                  <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">In risposta a:</p>
-                                  <p className="text-xs text-gray-400 italic line-clamp-1">"{a.questions?.question_text}"</p>
-                               </div>
-                               <div className="flex items-center gap-2 mb-2">
-                                  <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-[10px] font-black rounded border border-blue-500/20 uppercase">{a.questions?.civ_id}</span>
-                                  <span className="text-xs font-bold text-white">{a.user_nickname}</span>
-                                  <span className="text-[10px] text-gray-500">({a.user_rank})</span>
-                               </div>
-                               <p className="text-gray-200 text-sm">{a.answer_text}</p>
-                            </div>
-                             <div className="flex gap-2">
-                                {canManageCivs && (
-                                  <>
-                                    <button onClick={() => handleUpdateQAStatus(a, 'answer', 'approved')} className="p-2 bg-green-500/10 text-green-500 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-all" title="Approva"><CheckCircle size={18} /></button>
-                                    <button onClick={() => handleUpdateQAStatus(a, 'answer', 'rejected')} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all" title="Rifiuta"><XCircle size={18} /></button>
-                                    <button onClick={() => setDeleteConfirm({ id: a.id, type: 'answer', item: a })} className="p-2 bg-gray-500/10 text-gray-500 rounded-lg border border-gray-500/20 hover:bg-red-500/20 hover:text-red-500 transition-all" title="Elimina"><Inbox size={18} /></button>
-                                  </>
-                                )}
-                             </div>
+            {/* Pending Answers */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest flex items-center gap-3">
+                <Send size={16} className="text-blue-400 shrink-0" /> Risposte da Approvare ({answers.length})
+              </h3>
+              {answers.length === 0 ? (
+                <p className="text-gray-500 text-sm italic py-4">Nessuna risposta in sospeso.</p>
+              ) : (
+                <div className="grid gap-4">
+                  {answers.map(a => (
+                    <div key={a.id} className="glass p-5 rounded-xl border border-white/5 space-y-4">
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="flex-1">
+                          <div className="bg-white/5 p-3 rounded-lg border border-white/5 mb-3">
+                            <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">In risposta a:</p>
+                            <p className="text-xs text-gray-400 italic line-clamp-1">"{a.questions?.question_text}"</p>
                           </div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-[10px] font-black rounded border border-blue-500/20 uppercase">{a.questions?.civ_id}</span>
+                            <span className="text-xs font-bold text-white">{a.user_nickname}</span>
+                            <span className="text-[10px] text-gray-500">({a.user_rank})</span>
+                          </div>
+                          <p className="text-gray-200 text-sm">{a.answer_text}</p>
                         </div>
-                      ))}
+                        <div className="flex gap-2">
+                          {canManageCivs && (
+                            <>
+                              <button onClick={() => handleUpdateQAStatus(a, 'answer', 'approved')} className="p-2 bg-green-500/10 text-green-500 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-all" title="Approva"><CheckCircle size={18} /></button>
+                              <button onClick={() => handleUpdateQAStatus(a, 'answer', 'rejected')} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all" title="Rifiuta"><XCircle size={18} /></button>
+                              <button onClick={() => setDeleteConfirm({ id: a.id, type: 'answer', item: a })} className="p-2 bg-gray-500/10 text-gray-500 rounded-lg border border-gray-500/20 hover:bg-red-500/20 hover:text-red-500 transition-all" title="Elimina"><Inbox size={18} /></button>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  )}
-               </div>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          </div>
+        )}
 
         {/* Fixed Footer with Send Notifications Button */}
         {pendingNotifCount > 0 && (
