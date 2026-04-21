@@ -437,7 +437,15 @@ export function TournamentsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Tipologia</label>
-                  <input type="text" value={editForm.type} onChange={e => setEditForm({...editForm, type: e.target.value})} placeholder="Es: 1v1, 3v3, Open" className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors" />
+                  <select 
+                    value={editForm.type} 
+                    onChange={e => setEditForm({...editForm, type: e.target.value})} 
+                    className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors appearance-none cursor-pointer"
+                  >
+                    {['1v1', '2v2', '3v3', '4v4', 'FFA', 'Mod'].map(opt => (
+                      <option key={opt} value={opt} className="bg-[#121620]">{opt}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="space-y-1">
                   <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Organizzatore</label>
