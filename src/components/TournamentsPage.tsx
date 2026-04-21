@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
-import { Trophy, Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Trophy, Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
@@ -437,15 +437,18 @@ export function TournamentsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Tipologia</label>
-                  <select 
-                    value={editForm.type} 
-                    onChange={e => setEditForm({...editForm, type: e.target.value})} 
-                    className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors appearance-none cursor-pointer"
-                  >
-                    {['1v1', '2v2', '3v3', '4v4', 'FFA', 'Mod'].map(opt => (
-                      <option key={opt} value={opt} className="bg-[#121620]">{opt}</option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select 
+                      value={editForm.type} 
+                      onChange={e => setEditForm({...editForm, type: e.target.value})} 
+                      className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors appearance-none cursor-pointer"
+                    >
+                      {['1v1', '2v2', '3v3', '4v4', 'FFA', 'Mod'].map(opt => (
+                        <option key={opt} value={opt} className="bg-[#121620]">{opt}</option>
+                      ))}
+                    </select>
+                    <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                  </div>
                 </div>
                 <div className="space-y-1">
                   <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Organizzatore</label>
