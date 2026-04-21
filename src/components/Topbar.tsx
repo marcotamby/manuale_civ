@@ -230,14 +230,58 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
             <div className="flex items-center gap-3 md:gap-4 font-sans">
               {/* Active presence indicators - Only visible on Desktop */}
               {Object.keys(_activeAdmins).length > 0 && (
-                <div className="hidden md:flex items-center gap-2 px-3 py-2 bg-yellow-500/10 rounded-full border border-yellow-500/30 shadow-[0_0_15px_rgba(212,175,55,0.1)] shrink-0 whitespace-nowrap">
-                  <div className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
+                <div className="relative group z-[101]">
+                  <div className="hidden md:flex items-center gap-2 px-3 py-2 bg-yellow-500/10 rounded-full border border-yellow-500/30 shadow-[0_0_15px_rgba(212,175,55,0.1)] shrink-0 whitespace-nowrap cursor-help transition-all group-hover:bg-yellow-500/20 group-hover:border-yellow-500/50">
+                    <div className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
+                    </div>
+                    <span className="text-[11px] font-bold text-yellow-500 uppercase tracking-widest leading-none">
+                      {Object.keys(_activeAdmins).length} {Object.keys(_activeAdmins).length === 1 ? 'Admin' : 'Admins'} LIVE
+                    </span>
                   </div>
-                  <span className="text-[11px] font-bold text-yellow-500 uppercase tracking-widest leading-none">
-                    {Object.keys(_activeAdmins).length} {Object.keys(_activeAdmins).length === 1 ? 'Admin' : 'Admins'} LIVE
-                  </span>
+
+                  {/* Presence Tooltip */}
+                  <div className="absolute top-full left-0 mt-2 w-64 bg-[#111827] border border-yellow-500/30 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-[200] overflow-hidden">
+                    <div className="p-3 border-b border-white/10 bg-yellow-500/5">
+                      <h4 className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.2em]">Staff Online</h4>
+                    </div>
+                    <div className="p-2 space-y-1 max-h-60 overflow-y-auto custom-scrollbar">
+                      {Object.values(_activeAdmins).map((admin, idx) => {
+                        const activityCiv = admin.activity?.civId 
+                          ? civilizations.find(c => c.id === admin.activity.civId)?.name 
+                          : null;
+                        
+                        return (
+                          <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
+                            <div className="w-8 h-8 rounded-full border border-yellow-500/20 overflow-hidden bg-yellow-500/5 shrink-0">
+                              {admin.user.avatar ? (
+                                <img src={admin.user.avatar} alt={admin.user.name} className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <User size={14} className="text-yellow-500/50" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-white truncate uppercase tracking-tighter">
+                                {admin.user.name}
+                              </p>
+                              <p className="text-[10px] text-gray-400 truncate flex items-center gap-1.5 font-medium italic">
+                                {admin.activity.type === 'editing' ? (
+                                  <><span className="w-1 h-1 rounded-full bg-red-500 animate-pulse"></span> In modifica: {activityCiv || '...'} {admin.activity.section && admin.activity.section !== 'all' ? <span className="opacity-60">({admin.activity.section})</span> : ''}</>
+                                ) : admin.activity.type === 'viewing' ? (
+                                  <><span className="w-1 h-1 rounded-full bg-blue-400"></span> Visualizza: {activityCiv || '...'}</>
+                                ) : (
+                                  <><span className="w-1 h-1 rounded-full bg-gray-600"></span> Attivo</>
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               )}
 
