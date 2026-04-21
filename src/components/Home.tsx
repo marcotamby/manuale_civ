@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useCivData } from './CivContext';
 import { CustomSelect } from './CustomSelect';
-import { Heart, BarChart2, Zap, FileText } from 'lucide-react';
+import { Heart, BarChart2, Zap, Shield } from 'lucide-react';
 import { useAuth } from './AuthContext';
 
 interface HomeProps {
@@ -43,7 +43,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
         return prev;
       });
     } else {
-      onSelectCiv(civId, isBOMode ? 'build-orders' : undefined);
+      onSelectCiv(civId, isBOMode ? 'buildorders' : undefined);
     }
   };
 
@@ -109,7 +109,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                  if (isCompareMode) setIsCompareMode(false);
                }}
                className={`flex items-center gap-2 px-3 md:px-4 h-full rounded-lg text-sm font-bold transition-all ${isBOMode
-                 ? 'bg-cyan-500 text-black shadow-[0_0_15px_rgba(6,182,212,0.4)]'
+                 ? 'bg-[#00f3ff] text-black shadow-[0_0_20px_rgba(0,243,255,0.5)]'
                  : 'text-gray-400 hover:text-gray-200'
                }`}
             >
@@ -185,7 +185,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
               {/* Build Order Shortcut Indicator (DESKTOP HOVER) */}
               {isBOMode && !isCompareMode && (
                  <div className="absolute inset-0 bg-cyan-900/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30">
-                    <div className="bg-cyan-500 text-black px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] shadow-[0_0_25px_rgba(6,182,212,0.6)] border border-cyan-300 flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                    <div className="bg-[#00f3ff] text-black px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] shadow-[0_0_25px_rgba(0,243,255,0.6)] border border-cyan-200 flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                        <Zap size={14} fill="black" />
                        Build Orders
                     </div>
@@ -231,7 +231,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                    }}
                    className="absolute bottom-20 left-1/2 -translate-x-1/2 hidden md:flex items-center gap-2 px-4 py-2 bg-gradient-to-b from-[#e5e7eb] to-[#9ca3af] text-black opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] whitespace-nowrap shadow-[0_10px_25px_rgba(0,0,0,0.5)] border border-white/40 z-30"
                  >
-                    <FileText size={14} fill="black" />
+                    <Shield size={14} fill="black" />
                     Scheda civiltà
                  </button>
               )}
