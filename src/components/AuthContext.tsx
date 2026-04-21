@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('nickname, rank')
+        .select('nickname, rank, role, is_streamer')
         .eq('email', userEmail.toLowerCase())
         .single();
       
@@ -136,16 +136,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem(`auth_user_rank_${email}`, currentRank);
         localStorage.setItem(`auth_user_nickname_${email}`, currentNickname);
         
-        // Update user state
-        const updatedUser = prev ? { ...prev, rank: currentRank, nickname: currentNickname, role: data.role, is_streamer: data.is_streamer } : null;
-        setUser(updatedUser);
-        if (updatedUser) checkRoles(updatedUser);
+        // Update user state using functional update to access prev state
+        setUser(prev => {
+          if (!prev) return null;
+          const updated = { 
+            ...prev, 
+            rank: currentRank, 
+            nickname: currentNickname, 
+            role: data.role, 
+            is_streamer: data.is_streamer 
+          };
+          checkRoles(updated);
+          return updated;
+        });
         
         // Update auth_user in localStorage
         const storedUser = localStorage.getItem('auth_user');
         if (storedUser) {
            const parsed = JSON.parse(storedUser);
-           localStorage.setItem('auth_user', JSON.stringify({ ...parsed, rank: currentRank, nickname: currentNickname, role: data.role, is_streamer: data.is_streamer }));
+           localStorage.setItem('auth_user', JSON.stringify({ 
+             ...parsed, 
+             rank: currentRank, 
+             nickname: currentNickname, 
+             role: data.role, 
+             is_streamer: data.is_streamer 
+           }));
         }
       } else if (error && error.code === 'PGRST116') {
         // Profile doesn't exist yet, create it with local values
