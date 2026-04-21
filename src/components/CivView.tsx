@@ -999,7 +999,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                  <div className="absolute left-[-5px] top-1.5 w-[10px] h-[10px] rounded-full bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)] group-hover:scale-125 transition-transform" />
                                  
                                  <div className="space-y-2">
-                                   <div className="flex items-center gap-3">
+                                   <div className="flex items-start gap-3">
                                       {step.time && (
                                         <span className="px-2 py-0.5 bg-yellow-500/10 text-yellow-500 rounded font-mono text-xs font-bold border border-yellow-500/20">
                                           {step.time}
@@ -1046,6 +1046,59 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                            <p className="text-[10px] text-gray-600 italic leading-snug">
                              Questo build order è stato proposto dalla community e verificato dai nostri esperti.
                            </p>
+                        </div>
+
+                        {/* Votes / Feedback */}
+                        <div className="bg-white/5 rounded-3xl border border-white/5 p-6 space-y-4">
+                           <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Feedback Community</h4>
+                           <div className="flex items-center justify-between gap-4">
+                              <button 
+                                onClick={(e) => { e.stopPropagation(); handleVote(selectedBO.id, 1); }}
+                                className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all ${
+                                  boVotes[selectedBO.id]?.userVote === 1 
+                                    ? 'bg-green-500/10 border-green-500/40 text-green-500 shadow-[0_0_15px_rgba(34,197,94,0.1)]' 
+                                    : 'bg-black/20 border-white/5 text-gray-400 hover:border-green-500/20 hover:text-green-400'
+                                }`}
+                              >
+                                <ThumbsUp size={20} />
+                                <span className="text-sm font-black">{boVotes[selectedBO.id]?.up || 0}</span>
+                                <span className="text-[8px] font-bold uppercase tracking-widest">Utile</span>
+                              </button>
+
+                              <button 
+                                onClick={(e) => { e.stopPropagation(); handleVote(selectedBO.id, -1); }}
+                                className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all ${
+                                  boVotes[selectedBO.id]?.userVote === -1 
+                                    ? 'bg-red-500/10 border-red-500/40 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.1)]' 
+                                    : 'bg-black/20 border-white/5 text-gray-400 hover:border-red-500/20 hover:text-red-400'
+                                }`}
+                              >
+                                <ThumbsDown size={20} />
+                                <span className="text-sm font-black">{boVotes[selectedBO.id]?.down || 0}</span>
+                                <span className="text-[8px] font-bold uppercase tracking-widest">Non utile</span>
+                              </button>
+                           </div>
+                           <div className="pt-2">
+                             <div className="h-1.5 w-full bg-black/40 rounded-full overflow-hidden flex border border-white/5">
+                               { (boVotes[selectedBO.id]?.up || 0) + (boVotes[selectedBO.id]?.down || 0) > 0 ? (
+                                 <>
+                                   <div 
+                                     className="h-full bg-green-500/60 shadow-[0_0_10px_rgba(34,197,94,0.3)]" 
+                                     style={{ width: `${((boVotes[selectedBO.id]?.up || 0) / ((boVotes[selectedBO.id]?.up || 0) + (boVotes[selectedBO.id]?.down || 0))) * 100}%` }} 
+                                   />
+                                   <div 
+                                     className="h-full bg-red-500/60 shadow-[0_0_10px_rgba(239,68,68,0.3)]" 
+                                     style={{ width: `${((boVotes[selectedBO.id]?.down || 0) / ((boVotes[selectedBO.id]?.up || 0) + (boVotes[selectedBO.id]?.down || 0))) * 100}%` }} 
+                                   />
+                                 </>
+                               ) : (
+                                 <div className="h-full w-full bg-gray-800" />
+                               )}
+                             </div>
+                             <p className="text-[9px] text-gray-500 text-center mt-2 font-bold uppercase tracking-tighter">
+                               {((boVotes[selectedBO.id]?.up || 0) + (boVotes[selectedBO.id]?.down || 0))} Valutazioni totali
+                             </p>
+                           </div>
                         </div>
 
                         {/* Video / Source */}

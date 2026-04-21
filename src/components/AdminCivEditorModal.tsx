@@ -32,6 +32,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
     message: '',
     type: 'success'
   });
+  const [isSigned, setIsSigned] = useState(false);
   const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
   const [dragState, setDragState] = useState<{ idx: number; startY: number; startPos: number } | null>(null);
 
@@ -160,6 +161,17 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
     try {
       setIsSaving(true);
 
+      let finalBuildOrders = [...editedCiv.buildOrders];
+      
+      // Apply signature if checked
+      if (isSigned && user) {
+        finalBuildOrders = finalBuildOrders.map(bo => ({
+          ...bo,
+          author_nickname: user.nickname || user.name || bo.author_nickname,
+          author_rank: user.rank || bo.author_rank
+        }));
+      }
+
       const { error: civError } = await supabase
         .from('civilizations')
         .update({
@@ -168,7 +180,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
           short_description: editedCiv.shortDescription,
           passive_bonuses: editedCiv.passiveBonuses,
           videos: editedCiv.videos,
-          build_orders: editedCiv.buildOrders,
+          build_orders: finalBuildOrders,
           unique_units: editedCiv.uniqueUnits,
           landmarks: editedCiv.landmarks,
           strengths: editedCiv.strengths?.filter((s: string) => s.trim() !== '') || [],
@@ -805,21 +817,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                           )}
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="w-32">
-                            <div className="flex justify-between items-center mb-1">
-                              <label className="text-[10px] text-gray-500 uppercase font-bold">Posizione Y</label>
-                              <span className="text-[10px] text-yellow-500 font-mono">{bo.banner_position ?? 50}%</span>
-                            </div>
-                            <input
-                              type="range"
-                              min="0"
-                              max="100"
-                              value={bo.banner_position ?? 50}
-                              onChange={e => updateArrayField('buildOrders', idx, 'banner_position', Number(e.target.value))}
-                              className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-yellow-500"
-                            />
-                          </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block text-blue-400">Rank Autore</label>
                             <input
@@ -835,6 +833,37 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                     </div>
                   ))}
                   {(!editedCiv.buildOrders || editedCiv.buildOrders.length === 0) && <p className="text-gray-500 text-sm italic text-center py-4">Nessun build order</p>}
+                  
+                  {editedCiv.buildOrders && editedCiv.buildOrders.length > 0 && (
+                    <div className="mt-8 pt-6 border-t border-white/10 flex flex-col items-center gap-4">
+                      <div 
+                        className="flex items-center gap-3 cursor-pointer group bg-yellow-500/5 hover:bg-yellow-500/10 px-6 py-4 rounded-2xl border border-yellow-500/20 transition-all"
+                        onClick={() => {
+                          if (!user?.nickname) {
+                            setToast({
+                              isVisible: true,
+                              message: 'Completa il tuo profilo admin con un nickname per firmare il contenuto',
+                              type: 'error'
+                            });
+                          } else {
+                            setIsSigned(!isSigned);
+                          }
+                        }}
+                      >
+                        <div className={`w-6 h-6 rounded-lg border-2 transition-all flex items-center justify-center ${
+                          isSigned 
+                            ? 'bg-yellow-500 border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.4)]' 
+                            : 'bg-black/40 border-white/20 group-hover:border-yellow-500/50'
+                        }`}>
+                          {isSigned && <CheckCircle size={14} className="text-black" />}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-black text-white uppercase tracking-tight">Firma come {user?.nickname || 'Admin'}</span>
+                          <span className="text-[10px] text-gray-500 font-medium">Applica il tuo nickname e rank a tutti i build order salvati</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
