@@ -263,7 +263,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
                 )}
                 <div className="flex flex-col text-left">
                   <span className="font-bold hidden md:block text-xs leading-none text-white/90 uppercase tracking-widest">Il Tuo Profilo</span>
-                  <span className="text-[10px] text-yellow-600 font-bold uppercase tracking-widest leading-none mt-1">{isStreamer ? 'Streamer' : 'Owner'}</span>
+                  <span className="text-[10px] text-yellow-600 font-bold uppercase tracking-widest leading-none mt-1">{isAdmin || isSuperAdmin ? 'Owner' : isStreamer ? 'Streamer' : 'Utente'}</span>
                 </div>
               </button>
 
