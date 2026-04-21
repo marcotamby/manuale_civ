@@ -61,6 +61,9 @@ export function TournamentsPage() {
         .order('created_at', { ascending: false });
 
       if (dbError) console.error("Supabase error:", dbError);
+      
+      // DEBUG CLOUD: Log raw DB data to help identify persistence issues
+      console.log("DB Tournaments:", dbTournaments);
 
       const allConfigs: TournamentConfig[] = [...TOURNAMENTS];
       if (dbTournaments) {
@@ -101,6 +104,7 @@ export function TournamentsPage() {
                 directLink: 'https://challonge.com/it/gyunrhoc',
                 bannerUrl: config.bannerUrl || '/vetro_oro.png',
                 period: config.period || 'Marzo 2026',
+                type: config.type || '3v3', // Default to 3v3 for Scudi d'oro unless DB says otherwise
                 podium: config.podium || [
                   { placement: 1, entrant: { name: 'Va bene tutto' } },
                   { placement: 2, entrant: { name: 'Scarsicomelammerda' } },
@@ -502,18 +506,18 @@ export function TournamentsPage() {
 
               <div className="space-y-1">
                 <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Banner Immagine</label>
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
+                <div className="flex gap-2 items-stretch h-12">
+                  <div className="relative flex-1 h-full">
                     <ImageIcon size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
                     <input 
                       type="text" 
                       value={editForm.bannerUrl} 
                       onChange={e => setEditForm({...editForm, bannerUrl: e.target.value})} 
                       placeholder="Link immagine o carica file"
-                      className="w-full bg-black/40 border border-white/10 p-3 pl-10 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors text-xs" 
+                      className="w-full h-full bg-black/40 border border-white/10 px-3 pl-10 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors text-xs" 
                     />
                   </div>
-                  <label className={`cursor-pointer flex items-center justify-center p-3 rounded-xl border border-white/10 bg-black/40 hover:bg-white/5 transition-colors w-12 h-12 shrink-0 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                  <label className={`cursor-pointer flex items-center justify-center rounded-xl border border-white/10 bg-black/40 hover:bg-white/5 transition-colors w-12 h-full shrink-0 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
                     <input 
                       type="file" 
                       className="hidden" 
