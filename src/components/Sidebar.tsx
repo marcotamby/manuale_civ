@@ -124,7 +124,7 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
 
         {/* Main List - Hide on Home */}
         {currentPage !== 'home' && (
-          <nav className="flex flex-col w-full pb-12 elegant-scrollbar overflow-y-auto max-h-[calc(100vh-180px)] pr-1">
+          <nav className="flex flex-col w-full pb-24 pr-1">
             {civilizationsData.map((civ) => (
               <button
                 key={civ.id}
