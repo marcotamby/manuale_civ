@@ -3,8 +3,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
-import { Trophy, Calendar, Users, ArrowRight, Loader2, Terminal } from 'lucide-react';
+import { Trophy, Calendar, Users, ArrowRight, Loader2, Terminal, Plus, Link as LinkIcon, X, CheckCircle2 } from 'lucide-react';
 import { clsx } from 'clsx';
+import { useAuth } from './AuthContext';
+import { supabase } from '../lib/supabaseClient';
+import { toast } from 'react-hot-toast';
 interface TournamentConfig {
   slug: string;
   source: 'startgg' | 'challonge';
@@ -19,91 +22,144 @@ const TOURNAMENTS: TournamentConfig[] = [
 ];
 
 export function TournamentsPage() {
+  const { isAdmin, user } = useAuth();
   const location = useLocation();
   const [tournaments, setTournaments] = useState<(StartGGTournament & { config: TournamentConfig })[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [debugLogs, setDebugLogs] = useState<string[]>([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newUrl, setNewUrl] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const isDebugMode = new URLSearchParams(location.search).get('debug') === 'true';
 
-  const addDebugLog = (msg: string) => {
-    setDebugLogs(prev => [...prev, `${new Date().toLocaleTimeString()} - ${msg}`]);
-  };
-
-  const runDebugAPI = async () => {
-    addDebugLog('Avvio test manuale...');
-    try {
-      const data = await fetchTournament('torneo-1v1-2026');
-      if (data) addDebugLog(`SUCCESSO: Trovato ${data.name}`);
-      else addDebugLog('ERRORE: Risposta NULL dal server.');
-    } catch (err: any) {
-      addDebugLog(`ERRORE CRITICO: ${err.message}`);
-    }
-  };
   const navigate = useNavigate();
 
-  useEffect(() => {
-    async function loadTournaments() {
-      setLoading(true);
-      setErrorDetails(null);
-      try {
-        const results = await Promise.all(TOURNAMENTS.map(async config => {
-          try {
-            if (config.source === 'startgg') {
-              const res = await fetchTournament(config.slug);
-              return res ? { ...res, config } : null;
-            } else if (config.source === 'challonge') {
-              const res = await fetchChallongeTournament(config.slug);
-              if (res) {
-                return {
-                  id: res.id,
-                  name: res.attributes.name,
-                  slug: config.slug,
-                  images: [],
-                  events: [],
-                  config
-                } as any;
-              } else {
-                // Fallback robusto: se l'API blocca l'accesso ai tornei dei collaboratori (limite OAuth v2),
-                // forziamo la sua comparsa manuale nella UI per non far sparire l'evento.
-                if (config.slug === 'gyunrhoc' || config.slug === '17624499') {
-                  return {
-                    id: 'gyunrhoc',
-                    name: "Torneo degli scudi d'oro",
-                    slug: config.slug,
-                    images: [{ url: '/vetro_oro.png' }], // Immagine custom Inserita dall'utente
-                    events: [{ 
-                      name: 'Torneo 3v3', 
-                      videogame: { name: 'Age of Empires IV' },
-                      standings: {
-                        nodes: [
-                          { entrant: { name: 'Va bene tutto' } },
-                          { entrant: { name: 'Scarsicomelammerda' } },
-                          { entrant: { name: 'Cerbero' } }
-                        ]
-                      }
-                    }],
-                    config: { ...config, directLink: 'https://challonge.com/it/gyunrhoc' }
-                  } as any;
-                }
-              }
+  const loadTournaments = async () => {
+    setLoading(true);
+    try {
+      // 1. Fetch from Supabase
+      const { data: dbTournaments, error: dbError } = await supabase
+        .from('tournaments')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (dbError) throw dbError;
+
+      // 2. Combine with hardcoded ones (ensuring no duplicates)
+      const allConfigs: TournamentConfig[] = [...TOURNAMENTS];
+      dbTournaments?.forEach(db => {
+        if (!allConfigs.some(c => c.slug === db.slug)) {
+          allConfigs.push({
+            slug: db.slug,
+            source: db.source as 'startgg' | 'challonge',
+            organizer: db.organizer,
+            directLink: db.direct_link,
+            period: db.period
+          });
+        }
+      });
+
+      const results = await Promise.all(allConfigs.map(async config => {
+        try {
+          if (config.source === 'startgg') {
+            const res = await fetchTournament(config.slug);
+            return res ? { ...res, config } : null;
+          } else if (config.source === 'challonge') {
+            const res = await fetchChallongeTournament(config.slug);
+            if (res) {
+              return {
+                id: res.id,
+                name: res.attributes.name,
+                slug: config.slug,
+                images: [],
+                events: [],
+                config: { ...config, directLink: config.directLink || `https://challonge.com/it/${config.slug}` }
+              } as any;
+            } else if (config.slug === 'gyunrhoc') {
+              return {
+                id: 'gyunrhoc',
+                name: "Torneo degli scudi d'oro",
+                slug: config.slug,
+                images: [{ url: '/vetro_oro.png' }],
+                events: [{ 
+                  name: 'Torneo 3v3', 
+                  videogame: { name: 'Age of Empires IV' },
+                  standings: {
+                    nodes: [
+                      { entrant: { name: 'Va bene tutto' } },
+                      { entrant: { name: 'Scarsicomelammerda' } },
+                      { entrant: { name: 'Cerbero' } }
+                    ]
+                  }
+                }],
+                config: { ...config, directLink: 'https://challonge.com/it/gyunrhoc' }
+              } as any;
             }
-            return null;
-          } catch (e: any) {
-            console.error(`Error fetching tournament ${config.slug}:`, e);
-            return null;
           }
-        }));
-        const filtered = results.filter((t): t is (StartGGTournament & { config: TournamentConfig }) => t !== null);
-        setTournaments(filtered);
-      } catch (err: any) {
-        console.error("General loading error:", err);
-        setErrorDetails(`Dettaglio Errore: ${err.message || 'Errore di rete o di risposta del server.'}`);
-      }
-      setLoading(false);
+          return null;
+        } catch (e) {
+          console.error(`Error fetching tournament ${config.slug}:`, e);
+          return null;
+        }
+      }));
+
+      const filtered = results.filter((t): t is (StartGGTournament & { config: TournamentConfig }) => t !== null);
+      setTournaments(filtered);
+    } catch (err: any) {
+      console.error("General loading error:", err);
+      setErrorDetails(`Dettaglio Errore: ${err.message || 'Errore di rete o di risposta del server.'}`);
     }
+    setLoading(false);
+  };
+
+  useEffect(() => {
     loadTournaments();
   }, []);
+
+  const handleAddTournament = async () => {
+    if (!newUrl) return;
+    setIsSubmitting(true);
+    try {
+      let source: 'startgg' | 'challonge' | null = null;
+      let slug = '';
+
+      if (newUrl.includes('start.gg')) {
+        source = 'startgg';
+        const parts = newUrl.split('/tournament/');
+        if (parts.length > 1) slug = parts[1].split('/')[0];
+      } else if (newUrl.includes('challonge.com')) {
+        source = 'challonge';
+        const parts = newUrl.split('/');
+        slug = parts[parts.length - 1];
+        if (slug === '') slug = parts[parts.length - 2];
+      }
+
+      if (!source || !slug) {
+        toast.error('URL non valido. Inserisci un link di Start.gg o Challonge.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      const { error } = await supabase.from('tournaments').insert({
+        slug,
+        source,
+        organizer: user?.name || 'Admin',
+        period: 'In corso'
+      });
+
+      if (error) throw error;
+
+      toast.success('Torneo aggiunto con successo!');
+      setShowAddModal(false);
+      setNewUrl('');
+      loadTournaments();
+    } catch (err: any) {
+      toast.error(`Errore: ${err.message}`);
+    }
+    setIsSubmitting(false);
+  };
 
   if (loading) {
     return (
@@ -115,15 +171,92 @@ export function TournamentsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col mb-12">
-        <h1 className="text-3xl md:text-5xl font-inter font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-amber-600 mb-4 uppercase tracking-tighter">
-          Tornei di Aoeitalia
-        </h1>
-        <p className="text-gray-400 font-serif italic text-base md:text-lg max-w-2xl">
-          Segui le competizioni ufficiali di Aoeitalia.
-        </p>
-        <div className="h-1 w-24 bg-gradient-to-r from-yellow-500/50 to-transparent mt-6"></div>
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
+        <div>
+          <h1 className="text-3xl md:text-5xl font-inter font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-amber-600 mb-4 uppercase tracking-tighter">
+            Tornei di Aoeitalia
+          </h1>
+          <p className="text-gray-400 font-serif italic text-base md:text-lg max-w-2xl">
+            Segui le competizioni ufficiali di Aoeitalia.
+          </p>
+          <div className="h-1 w-24 bg-gradient-to-r from-yellow-500/50 to-transparent mt-6"></div>
+        </div>
+
+        {isAdmin && (
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-3 px-6 py-4 bg-yellow-500 font-black text-black rounded-2xl hover:bg-yellow-400 transition-all hover:scale-[1.05] shadow-[0_0_20px_rgba(234,179,8,0.3)] uppercase text-xs tracking-widest active:scale-[0.98]"
+          >
+            <Plus size={20} strokeWidth={3} />
+            Aggiungi Torneo
+          </button>
+        )}
       </div>
+
+      {/* Modal Aggiungi Torneo */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowAddModal(false)} />
+          <div className="relative w-full max-w-lg glass rounded-3xl border border-white/10 shadow-2xl overflow-hidden animate-in zoom-in duration-300">
+            <div className="p-8">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-3 text-yellow-500">
+                  <Trophy size={28} />
+                  <h2 className="text-2xl font-inter font-black uppercase tracking-tighter">Inserisci Torneo</h2>
+                </div>
+                <button onClick={() => setShowAddModal(false)} className="text-gray-500 hover:text-white transition-colors">
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 ml-1">Link Torneo (Start.gg o Challonge)</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-4 flex items-center text-gray-500 group-focus-within:text-yellow-500 transition-colors">
+                      <LinkIcon size={18} />
+                    </div>
+                    <input
+                      type="text"
+                      value={newUrl}
+                      onChange={(e) => setNewUrl(e.target.value)}
+                      placeholder="https://www.start.gg/tournament/..."
+                      className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white text-sm focus:outline-none focus:border-yellow-500/50 focus:ring-4 focus:ring-yellow-500/5 transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-yellow-500/5 border border-yellow-500/10">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 size={18} className="text-yellow-500 mt-0.5" />
+                    <div>
+                      <p className="text-yellow-100 text-xs font-bold mb-1">Cosa succede dopo?</p>
+                      <p className="text-gray-400 text-[10px] leading-relaxed">
+                        Il sistema analizzerà il link, estrarrà i dati del torneo e lo renderà visibile a tutti gli utenti del sito con tabelloni e statistiche aggiornate.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleAddTournament}
+                  disabled={isSubmitting || !newUrl}
+                  className="w-full py-4 bg-yellow-500 disabled:opacity-50 disabled:grayscale hover:bg-yellow-400 text-black font-black uppercase text-xs tracking-widest rounded-2xl transition-all shadow-[0_10px_20px_rgba(234,179,8,0.2)] flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Analisi in corso...
+                    </>
+                  ) : (
+                    'Conferma Inserimento'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {errorDetails && (
         <div className="glass p-8 rounded-2xl border border-red-500/20 mb-8 text-center animate-in zoom-in duration-300">
