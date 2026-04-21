@@ -67,7 +67,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full bg-[var(--color-brand-dark)]">
       <header className="mb-8 flex flex-col gap-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-start gap-4">
           <div className="hidden md:block">
             <CustomSelect
               options={[
@@ -90,7 +90,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                   setIsBOMode(!isBOMode);
                   if (isCompareMode) setIsCompareMode(false);
                 }}
-                className={`flex-1 flex items-center justify-center gap-1.5 px-2 h-full rounded-lg text-xs sm:text-sm font-bold transition-all ${isBOMode
+                className={`flex-1 flex items-center justify-center gap-1.5 px-3 md:px-4 h-full rounded-lg text-xs sm:text-sm font-bold transition-all ${isBOMode
                   ? 'bg-[#00f3ff] text-black shadow-[0_0_15px_rgba(0,243,255,0.4)]'
                   : 'text-gray-400 hover:text-gray-200'
                   }`}
@@ -111,7 +111,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                     if (isBOMode) setIsBOMode(false);
                   }
                 }}
-                className={`flex-1 flex items-center justify-center gap-1.5 px-2 h-full rounded-lg text-xs sm:text-sm font-bold transition-all ${isCompareMode
+                className={`flex-1 flex items-center justify-center gap-1.5 px-3 md:px-4 h-full rounded-lg text-xs sm:text-sm font-bold transition-all ${isCompareMode
                   ? selectedForCompare.length === 2 ? 'bg-green-600 text-white shadow-[0_0_15px_rgba(22,163,74,0.4)]' : 'bg-red-500/20 text-red-400 border border-red-500/30'
                   : 'text-gray-400 hover:text-gray-200'
                   }`}
