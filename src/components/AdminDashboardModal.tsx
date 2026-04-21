@@ -756,13 +756,21 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {users
                           .filter(u => {
+                            const email = u.email?.toLowerCase();
                             const matchSearch = !userSearch || 
                               u.email?.toLowerCase().includes(userSearch.toLowerCase()) || 
                               u.nickname?.toLowerCase().includes(userSearch.toLowerCase());
                             
-                            // If no search, only show "Staff" (role editor/admin or is_streamer)
+                            // Define staff fallbacks to match AuthContext
+                            const hardcodedStaff = [
+                              'marcotamby@gmail.com', 'marco.tamborrino.94@gmail.com',
+                              'alessio.bella97@gmail.com', 'contattodisparta@gmail.com',
+                              'cani.vincenzo@gmail.com', 'dadduedo@gmail.com', 'djalfredoneservice@gmail.com'
+                            ];
+
+                            // If no search, only show "Staff" (role editor/admin, is_streamer, or hardcoded fallback)
                             if (!userSearch) {
-                              return u.role === 'editor' || u.role === 'admin' || u.is_streamer === true;
+                              return u.role === 'editor' || u.role === 'admin' || u.is_streamer === true || (email && hardcodedStaff.includes(email));
                             }
                             return matchSearch;
                           })
