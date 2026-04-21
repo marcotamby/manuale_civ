@@ -44,19 +44,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const EDITOR_EMAILS = ['alessio.bella97@gmail.com', 'contattodisparta@gmail.com'];
   const STREAMER_EMAILS = ['cani.vincenzo@gmail.com', 'dadduedo@gmail.com', 'djalfredoneservice@gmail.com', 'contattodisparta@gmail.com'];
 
-  const checkRoles = (userData: UserData) => {
+  const checkRoles = (userData: any) => {
     const email = userData.email?.toLowerCase();
     const name = userData.name?.toLowerCase();
     
-    const isSA = (email && SUPER_ADMIN_EMAILS.includes(email)) || name === 'admin' || name?.includes('marcotamby');
-    const isEd = email && EDITOR_EMAILS.includes(email);
-    const isStr = email && STREAMER_EMAILS.includes(email);
+    // Safety fallback: Super Admins are always hardcoded for bootstrapping
+    const isSA = (email && SUPER_ADMIN_EMAILS.includes(email)) || name === 'admin' || userData.role === 'admin';
+    const isEd = userData.role === 'admin' || userData.role === 'editor' || (email && EDITOR_EMAILS.includes(email));
+    const isStr = userData.is_streamer || (email && STREAMER_EMAILS.includes(email));
     
     setIsSuperAdmin(!!isSA);
     setIsEditor(!!isEd);
     setIsStreamer(!!isStr);
     setIsAdmin(!!isSA || !!isEd);
-    console.log('🔐 Auth roles checked:', { email, name, isSA, isEd, isStr, isAdmin: !!isSA || !!isEd });
+    console.log('🔐 Auth roles checked:', { email, name, role: userData.role, isSA, isEd, isStr, isAdmin: !!isSA || !!isEd });
   };
 
   // Load user from storage on mount
@@ -136,13 +137,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem(`auth_user_nickname_${email}`, currentNickname);
         
         // Update user state
-        setUser(prev => prev ? { ...prev, rank: currentRank, nickname: currentNickname } : null);
+        const updatedUser = prev ? { ...prev, rank: currentRank, nickname: currentNickname, role: data.role, is_streamer: data.is_streamer } : null;
+        setUser(updatedUser);
+        if (updatedUser) checkRoles(updatedUser);
         
         // Update auth_user in localStorage
         const storedUser = localStorage.getItem('auth_user');
         if (storedUser) {
            const parsed = JSON.parse(storedUser);
-           localStorage.setItem('auth_user', JSON.stringify({ ...parsed, rank: currentRank, nickname: currentNickname }));
+           localStorage.setItem('auth_user', JSON.stringify({ ...parsed, rank: currentRank, nickname: currentNickname, role: data.role, is_streamer: data.is_streamer }));
         }
       } else if (error && error.code === 'PGRST116') {
         // Profile doesn't exist yet, create it with local values
