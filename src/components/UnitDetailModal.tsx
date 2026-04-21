@@ -32,7 +32,7 @@ const StatBar = ({ label, value, max, icon: Icon, colorClass }: { label: string,
 };
 
 export function UnitDetailModal({ unit, onClose, onEdit }: UnitDetailModalProps) {
-  const { isAdmin } = useAuth();
+  const { canManageCivs } = useAuth();
 
   return (
     <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
@@ -63,7 +63,7 @@ export function UnitDetailModal({ unit, onClose, onEdit }: UnitDetailModalProps)
             <X size={24} />
           </button>
           
-          {isAdmin && onEdit && (
+          {canManageCivs && onEdit && (
             <button 
               onClick={() => {
                 const isGlobal = (window as any).currentCivUniqueUnits ? !(window as any).currentCivUniqueUnits.some((uu: any) => uu.id === unit.id) : false;

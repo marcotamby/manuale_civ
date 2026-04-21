@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus } from 'lucide-react';
+import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, Trophy, BookOpen, Zap, Edit2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
@@ -26,7 +26,7 @@ interface AdminDashboardModalProps {
 }
 
 export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProps) {
-  const { isSuperAdmin } = useAuth();
+  const { isSuperAdmin, canManageCivs, canManageBuildorders } = useAuth();
   const { refreshCivs } = useCivData();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -52,6 +52,8 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [qaLoading, setQaLoading] = useState(false);
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [newUemail, setNewUemail] = useState('');
+  const [editingNickname, setEditingNickname] = useState<string | null>(null);
+  const [tempNickname, setTempNickname] = useState('');
 
   const getYoutubeId = (url: string) => {
     if (!url) return null;
@@ -167,7 +169,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     }
   };
 
-  const handleToggleUserRole = async (userEmail: string, field: 'role' | 'is_streamer', value: any) => {
+  const handleToggleUserRole = async (userEmail: string, field: string, value: any) => {
     try {
       const { error } = await supabase
         .from('profiles')
@@ -177,10 +179,10 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       if (error) throw error;
       
       setUsers(prev => prev.map(u => u.email === userEmail ? { ...u, [field]: value } : u));
-      setToast({ isVisible: true, message: 'Ruolo aggiornato con successo', type: 'success' });
+      setToast({ isVisible: true, message: 'Permessi aggiornati', type: 'success' });
     } catch (err: any) {
       console.error('Error updating user role:', err);
-      setToast({ isVisible: true, message: 'Errore durante l\'aggiornamento', type: 'error' });
+      setToast({ isVisible: true, message: 'Errore aggiornamento', type: 'error' });
     }
   };
 
@@ -390,7 +392,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   };
 
   const { isAdmin } = useAuth();
-  if (!isOpen || (!isSuperAdmin && !isAdmin)) return null;
+  if (!isOpen || !isAdmin) return null;
 
   return (
     <div className="fixed inset-0 z-[1001] flex items-center justify-center p-2 md:p-4 bg-black/80 backdrop-blur-md shadow-2xl overflow-y-auto">
@@ -659,21 +661,25 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                       </div>
 
                       <div className="flex md:flex-col gap-3 shrink-0 items-center md:items-end justify-center">
-                        <button
-                          onClick={() => handleUpdateStatus(sugg, 'implemented')}
-                          className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-green-600/20 hover:bg-green-600/40 text-green-400 rounded-lg border border-green-500/30 transition-colors font-medium text-sm"
-                          title="Segna come completata"
-                        >
-                          <CheckCircle size={18} /> Approva
-                        </button>
+                        {((sugg.section === 'build_order' && canManageBuildorders) || (sugg.section !== 'build_order' && canManageCivs)) && (
+                          <button
+                            onClick={() => handleUpdateStatus(sugg, 'implemented')}
+                            className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-green-600/20 hover:bg-green-600/40 text-green-400 rounded-lg border border-green-500/30 transition-colors font-medium text-sm"
+                            title="Segna come completata"
+                          >
+                            <CheckCircle size={18} /> Approva
+                          </button>
+                        )}
 
-                        <button
-                          onClick={() => setRejectionModalSugg(sugg)}
-                          className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/40 text-red-400 rounded-lg border border-red-500/30 transition-colors font-medium text-sm"
-                          title="Rifiuta proposta"
-                        >
-                          <XCircle size={18} /> Scarta
-                        </button>
+                        {((sugg.section === 'build_order' && canManageBuildorders) || (sugg.section !== 'build_order' && canManageCivs)) && (
+                          <button
+                            onClick={() => setRejectionModalSugg(sugg)}
+                            className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/40 text-red-400 rounded-lg border border-red-500/30 transition-colors font-medium text-sm"
+                            title="Rifiuta proposta"
+                          >
+                            <XCircle size={18} /> Scarta
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -734,9 +740,11 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                   </div>
                 </div>
 
-                <div className="flex gap-4 text-[10px] uppercase font-bold text-gray-500 border-t border-white/5 pt-4">
-                   <span className="flex items-center gap-1.5"><ShieldCheck size={12} className="text-blue-400" /> Editor / Mod</span>
-                   <span className="flex items-center gap-1.5"><Radio size={12} className="text-pink-400" /> Streamer</span>
+                <div className="flex flex-wrap gap-4 text-[10px] uppercase font-bold text-gray-500 border-t border-white/5 pt-4">
+                   <span className="flex items-center gap-1.5"><Trophy size={14} className="text-yellow-500" /> Tornei</span>
+                   <span className="flex items-center gap-1.5"><BookOpen size={14} className="text-blue-400" /> Civiltà</span>
+                   <span className="flex items-center gap-1.5"><Zap size={14} className="text-orange-400" /> Build Orders</span>
+                   <span className="flex items-center gap-1.5"><Radio size={14} className="text-pink-400" /> Streamer</span>
                 </div>
               </div>
 
@@ -791,32 +799,83 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                 </div>
                                 <div className="flex flex-col min-w-0">
                                    <div className="flex items-center gap-2">
-                                      <span className="text-sm font-bold text-white truncate">{u.nickname || 'Senza Nickname'}</span>
-                                      {u.role === 'admin' && <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded font-black uppercase">Creator</span>}
-                                   </div>
-                                   <span className="text-[10px] text-gray-500 truncate">{u.email}</span>
-                                   <span className="text-[10px] text-blue-400/70 truncate font-mono mt-0.5">{u.rank || 'Unranked'}</span>
+                                       {editingNickname === u.email ? (
+                                         <div className="flex items-center gap-2">
+                                           <input
+                                             autoFocus
+                                             className="bg-black/60 border border-blue-500/50 rounded px-2 py-1 text-sm text-white focus:outline-none"
+                                             value={tempNickname}
+                                             onChange={(e) => setTempNickname(e.target.value)}
+                                             onKeyDown={(e) => {
+                                               if (e.key === 'Enter') handleToggleUserRole(u.email, 'nickname', tempNickname).then(() => setEditingNickname(null));
+                                               if (e.key === 'Escape') setEditingNickname(null);
+                                             }}
+                                             onBlur={() => setEditingNickname(null)}
+                                           />
+                                           <button 
+                                             onMouseDown={(e) => { e.preventDefault(); handleToggleUserRole(u.email, 'nickname', tempNickname).then(() => setEditingNickname(null)); }}
+                                             className="text-green-500 hover:text-green-400"
+                                           >
+                                             <CheckCircle size={16} />
+                                           </button>
+                                         </div>
+                                       ) : (
+                                         <div className="flex items-center gap-2 group/nick">
+                                            <span className="text-base md:text-lg font-bold text-white truncate leading-tight">{u.nickname || 'Senza Nickname'}</span>
+                                            <button 
+                                              onClick={() => { setEditingNickname(u.email); setTempNickname(u.nickname || ''); }}
+                                              className="opacity-0 group-hover/nick:opacity-100 p-1 text-gray-500 hover:text-blue-400 transition-all"
+                                              title="Modifica Nickname"
+                                            >
+                                              <Edit2 size={12} />
+                                            </button>
+                                         </div>
+                                       )}
+                                       {u.role === 'admin' && <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded font-black uppercase">Creator</span>}
+                                    </div>
+                                   <span className="text-xs md:text-sm text-gray-500 truncate">{u.email}</span>
+                                   <span className="text-xs text-blue-400/70 truncate font-mono mt-0.5">{u.rank || 'Unranked'}</span>
                                 </div>
                               </div>
 
                               <div className="flex items-center gap-2">
-                                {/* Editor Toggle */}
-                                <button 
-                                  disabled={u.role === 'admin'}
-                                  onClick={() => handleToggleUserRole(u.email, 'role', u.role === 'editor' ? 'user' : 'editor')}
-                                  className={`p-2.5 rounded-xl border transition-all ${u.role === 'admin' ? 'bg-yellow-500 border-yellow-400 text-black cursor-default' : u.role === 'editor' ? 'bg-blue-600 border-blue-400 text-white' : 'bg-gray-900/50 border-white/10 text-gray-500 hover:border-blue-400/50'}`}
-                                  title={u.role === 'admin' ? 'Proprietario' : u.role === 'editor' ? 'Rimuovi Editor' : 'Promuovi a Editor'}
-                                >
-                                   <ShieldCheck size={18} />
-                                </button>
+                                 {/* Granular Permissions for Editors */}
+                                <div className="flex items-center gap-1 bg-black/40 p-1.5 rounded-2xl border border-white/5 ">
+                                    {/* Tournaments */}
+                                    <button 
+                                      onClick={() => handleToggleUserRole(u.email, 'can_manage_tournaments', !u.can_manage_tournaments)}
+                                      className={`p-2 rounded-xl transition-all ${u.can_manage_tournaments ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                                      title="Gestione Tornei"
+                                    >
+                                      <Trophy size={16} />
+                                    </button>
+
+                                    {/* Civs */}
+                                    <button 
+                                      onClick={() => handleToggleUserRole(u.email, 'can_manage_civs', !u.can_manage_civs)}
+                                      className={`p-2 rounded-xl transition-all ${u.can_manage_civs ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                                      title="Gestione Civiltà"
+                                    >
+                                      <BookOpen size={16} />
+                                    </button>
+
+                                    {/* Build Orders */}
+                                    <button 
+                                      onClick={() => handleToggleUserRole(u.email, 'can_manage_buildorders', !u.can_manage_buildorders)}
+                                      className={`p-2 rounded-xl transition-all ${u.can_manage_buildorders ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                                      title="Gestione Build Orders"
+                                    >
+                                      <Zap size={16} />
+                                    </button>
+                                </div>
 
                                 {/* Streamer Toggle */}
                                 <button 
                                   onClick={() => handleToggleUserRole(u.email, 'is_streamer', !u.is_streamer)}
-                                  className={`p-2.5 rounded-xl border transition-all ${u.is_streamer ? 'bg-pink-600 border-pink-400 text-white' : 'bg-gray-900/50 border-white/10 text-gray-500 hover:border-pink-400/50'}`}
+                                  className={`p-2.5 rounded-xl border transition-all ${u.is_streamer ? 'bg-pink-600 border-pink-400 text-white shadow-[0_0_15px_rgba(219,39,119,0.3)]' : 'bg-gray-900/50 border-white/10 text-gray-500 hover:border-pink-400/50'}`}
                                   title={u.is_streamer ? 'Rimuovi Streamer' : 'Segna come Streamer'}
                                 >
-                                   <Radio size={18} />
+                                   <Radio size={20} />
                                 </button>
                               </div>
                             </div>
@@ -858,10 +917,14 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                </div>
                                <p className="text-gray-200 text-sm">{q.question_text}</p>
                                                         <div className="flex gap-2">
-                                <button onClick={() => handleUpdateQAStatus(q, 'question', 'approved')} className="p-2 bg-green-500/10 text-green-500 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-all" title="Approva"><CheckCircle size={18} /></button>
-                                <button onClick={() => handleUpdateQAStatus(q, 'question', 'rejected')} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all" title="Rifiuta"><XCircle size={18} /></button>
-                                <button onClick={() => setDeleteConfirm({ id: q.id, type: 'question', item: q })} className="p-2 bg-gray-500/10 text-gray-500 rounded-lg border border-gray-500/20 hover:bg-red-500/20 hover:text-red-500 transition-all" title="Elimina"><Inbox size={18} /></button>
-                             </div>
+                                  {canManageCivs && (
+                                    <>
+                                      <button onClick={() => handleUpdateQAStatus(q, 'question', 'approved')} className="p-2 bg-green-500/10 text-green-500 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-all" title="Approva"><CheckCircle size={18} /></button>
+                                      <button onClick={() => handleUpdateQAStatus(q, 'question', 'rejected')} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all" title="Rifiuta"><XCircle size={18} /></button>
+                                      <button onClick={() => setDeleteConfirm({ id: q.id, type: 'question', item: q })} className="p-2 bg-gray-500/10 text-gray-500 rounded-lg border border-gray-500/20 hover:bg-red-500/20 hover:text-red-500 transition-all" title="Elimina"><Inbox size={18} /></button>
+                                    </>
+                                  )}
+                                </div>
         </div>
                           </div>
                         </div>
@@ -895,9 +958,13 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                <p className="text-gray-200 text-sm">{a.answer_text}</p>
                             </div>
                              <div className="flex gap-2">
-                                <button onClick={() => handleUpdateQAStatus(a, 'answer', 'approved')} className="p-2 bg-green-500/10 text-green-500 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-all" title="Approva"><CheckCircle size={18} /></button>
-                                <button onClick={() => handleUpdateQAStatus(a, 'answer', 'rejected')} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all" title="Rifiuta"><XCircle size={18} /></button>
-                                <button onClick={() => setDeleteConfirm({ id: a.id, type: 'answer', item: a })} className="p-2 bg-gray-500/10 text-gray-500 rounded-lg border border-gray-500/20 hover:bg-red-500/20 hover:text-red-500 transition-all" title="Elimina"><Inbox size={18} /></button>
+                                {canManageCivs && (
+                                  <>
+                                    <button onClick={() => handleUpdateQAStatus(a, 'answer', 'approved')} className="p-2 bg-green-500/10 text-green-500 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-all" title="Approva"><CheckCircle size={18} /></button>
+                                    <button onClick={() => handleUpdateQAStatus(a, 'answer', 'rejected')} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all" title="Rifiuta"><XCircle size={18} /></button>
+                                    <button onClick={() => setDeleteConfirm({ id: a.id, type: 'answer', item: a })} className="p-2 bg-gray-500/10 text-gray-500 rounded-lg border border-gray-500/20 hover:bg-red-500/20 hover:text-red-500 transition-all" title="Elimina"><Inbox size={18} /></button>
+                                  </>
+                                )}
                              </div>
                           </div>
                         </div>

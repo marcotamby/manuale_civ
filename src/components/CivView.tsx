@@ -38,7 +38,7 @@ const getRankIcon = (rank: string | undefined) => {
 
 export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const { civilizations } = useCivData();
-  const { isAdmin, isSuperAdmin, user, toggleFavorite, openLoginModal } = useAuth();
+  const { isAdmin, isSuperAdmin, canManageCivs, canManageBuildorders, user, toggleFavorite, openLoginModal } = useAuth();
   const { updateActivity, activeAdmins: _activeAdmins } = usePresence();
   const { tab } = useParams<{ tab?: string }>();
   const navigate = useNavigate();
@@ -558,7 +558,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   }`}>
                   {civ.difficulty}
                 </span>
-                {isAdmin && (
+                {(canManageCivs || canManageBuildorders) && (
                   <div className="flex gap-2 items-center bg-yellow-500/10 px-3 py-1.5 rounded-lg border border-yellow-500/40 shadow-[0_0_15px_rgba(234,179,8,0.1)]">
                     <div className="flex flex-col">
                       <span className="text-[10px] font-black text-yellow-500 uppercase tracking-widest leading-none mb-1">
@@ -642,7 +642,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <Zap className="text-yellow-500" size={20} />
                 Bonus
-                {isAdmin && (
+                {canManageCivs && (
                   <button
                     onClick={() => (window as any).openCivEditor?.('bonuses')}
                     className="p-1.5 bg-yellow-500 hover:bg-yellow-400 rounded-lg transition-all text-black border border-yellow-400 flex items-center gap-1 shadow-[0_0_10px_rgba(234,179,8,0.3)] group/btn"
@@ -667,7 +667,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <ChevronUp className="text-green-400" size={20} />
                 Punti di Forza
-                {isAdmin && (
+                {canManageCivs && (
                   <button
                     onClick={() => (window as any).openCivEditor?.('strengths')}
                     className="p-1.5 bg-yellow-500 hover:bg-yellow-400 rounded-lg transition-all text-black border border-yellow-400 flex items-center gap-1 shadow-[0_0_10px_rgba(234,179,8,0.3)] group/btn"
@@ -939,7 +939,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0f1115] via-[#0f1115]/40 to-transparent" />
                     
                     <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
-                      {isAdmin && (
+                      {canManageBuildorders && (
                         <button 
                           onClick={() => {
                             setSearchParams({}, { replace: true });
@@ -1288,7 +1288,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                 <span className="text-sm font-black text-yellow-500 uppercase tracking-tight select-text">{q.user_nickname}</span>
                                 <span className="text-[10px] text-gray-500 font-bold px-1.5 py-0.5 bg-white/5 rounded border border-white/5 uppercase select-none">{q.user_rank}</span>
                                 <span className="text-[10px] text-gray-600 select-none">{new Date(q.created_at).toLocaleDateString('it-IT')}</span>
-                                {isAdmin && (
+                                {canManageCivs && (
                                   <button 
                                     onClick={() => handleDeleteQA(q.id, 'question')}
                                     className="ml-auto opacity-0 group-hover/q:opacity-100 p-1.5 text-red-500 hover:bg-red-500/10 rounded-lg transition-all"

@@ -29,7 +29,7 @@ const TOURNAMENTS: TournamentConfig[] = [
 ];
 
 export function TournamentsPage() {
-  const { isAdmin, user } = useAuth();
+  const { canManageTournaments, user } = useAuth();
   const [tournaments, setTournaments] = useState<(StartGGTournament & { config: TournamentConfig })[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
@@ -300,7 +300,7 @@ export function TournamentsPage() {
           <div className="h-1 w-24 bg-gradient-to-r from-gray-500/50 to-transparent mt-6"></div>
         </div>
 
-        {isAdmin && (
+        {canManageTournaments && (
           <button 
             onClick={() => setShowAddModal(true)} 
             className="flex items-center gap-3 px-6 py-4 bg-gradient-to-b from-slate-100 to-gray-400 font-black text-black rounded-2xl hover:from-white hover:to-gray-300 transition-all hover:scale-[1.05] shadow-[0_0_20px_rgba(255,255,255,0.1)] uppercase text-xs tracking-widest active:scale-[0.98]"
@@ -403,7 +403,7 @@ export function TournamentsPage() {
                       >
                         Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" />
                       </button>
-                      {isAdmin && (
+                      {canManageTournaments && (
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();

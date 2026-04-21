@@ -16,6 +16,9 @@ interface AuthContextType {
   isSuperAdmin: boolean;
   isEditor: boolean;
   isStreamer: boolean;
+  canManageTournaments: boolean;
+  canManageCivs: boolean;
+  canManageBuildorders: boolean;
   user: UserData | null;
   favorites: string[];
   isLoginModalOpen: boolean;
@@ -36,6 +39,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [isEditor, setIsEditor] = useState(false);
   const [isStreamer, setIsStreamer] = useState(false);
+  const [canManageTournaments, setCanManageTournaments] = useState(false);
+  const [canManageCivs, setCanManageCivs] = useState(false);
+  const [canManageBuildorders, setCanManageBuildorders] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -48,16 +54,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const email = userData.email?.toLowerCase();
     const name = userData.name?.toLowerCase();
     
-    // Safety fallback: Super Admins are always hardcoded for bootstrapping
     const isSA = (email && SUPER_ADMIN_EMAILS.includes(email)) || name === 'admin' || userData.role === 'admin';
     const isEd = userData.role === 'admin' || userData.role === 'editor' || (email && EDITOR_EMAILS.includes(email));
     const isStr = userData.is_streamer || (email && STREAMER_EMAILS.includes(email));
     
+    // Granular permissions
+    // Admins and hardcoded SuperAdmins get everything
+    // Others get what's in the DB flags
+    const canT = isSA || !!userData.can_manage_tournaments;
+    const canC = isSA || !!userData.can_manage_civs;
+    const canB = isSA || !!userData.can_manage_buildorders;
+
     setIsSuperAdmin(!!isSA);
     setIsEditor(!!isEd);
     setIsStreamer(!!isStr);
     setIsAdmin(!!isSA || !!isEd);
-    console.log('🔐 Auth roles checked:', { email, name, role: userData.role, isSA, isEd, isStr, isAdmin: !!isSA || !!isEd });
+    setCanManageTournaments(canT);
+    setCanManageCivs(canC);
+    setCanManageBuildorders(canB);
+    
+    console.log('🔐 Auth roles checked:', { 
+      email, 
+      role: userData.role, 
+      isSA, 
+      isEd, 
+      permissions: { canT, canC, canB } 
+    });
   };
 
   // Load user from storage on mount
@@ -122,7 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('nickname, rank, role, is_streamer')
+        .select('nickname, rank, role, is_streamer, can_manage_tournaments, can_manage_civs, can_manage_buildorders')
         .eq('email', userEmail.toLowerCase())
         .single();
       
@@ -144,7 +166,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             rank: currentRank, 
             nickname: currentNickname, 
             role: data.role, 
-            is_streamer: data.is_streamer 
+            is_streamer: data.is_streamer,
+            can_manage_tournaments: data.can_manage_tournaments,
+            can_manage_civs: data.can_manage_civs,
+            can_manage_buildorders: data.can_manage_buildorders
           };
           checkRoles(updated);
           return updated;
@@ -159,7 +184,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
              rank: currentRank, 
              nickname: currentNickname, 
              role: data.role, 
-             is_streamer: data.is_streamer 
+             is_streamer: data.is_streamer,
+             can_manage_tournaments: data.can_manage_tournaments,
+             can_manage_civs: data.can_manage_civs,
+             can_manage_buildorders: data.can_manage_buildorders
            }));
         }
       } else if (error && error.code === 'PGRST116') {
@@ -332,6 +360,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isSuperAdmin,
       isEditor,
       isStreamer,
+      canManageTournaments,
+      canManageCivs,
+      canManageBuildorders,
       user,
       favorites,
       isLoginModalOpen,
