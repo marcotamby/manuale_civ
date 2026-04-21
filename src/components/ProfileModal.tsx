@@ -285,39 +285,50 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-white/10 bg-gradient-to-r from-[#0d1424] to-[#1a1c32] rounded-t-2xl shrink-0">
                     <div className="flex items-center gap-4">
-                        <div className="relative group/avatar">
-                            <div className="w-16 h-16 rounded-full bg-blue-600/20 flex items-center justify-center border border-blue-500/30 text-blue-400 overflow-hidden">
-                                {isUploading ? (
-                                    <Loader2 size={24} className="animate-spin" />
-                                ) : pendingAvatar ? (
-                                    <img src={pendingAvatar} alt="Avatar" className="w-full h-full object-cover" />
-                                ) : (
-                                    <User size={32} />
+                        <div className="flex flex-col items-center gap-2">
+                            <div className="relative group/avatar cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                                <div className="w-20 h-20 rounded-full bg-blue-600/10 flex items-center justify-center border-2 border-blue-500/30 text-blue-400 overflow-hidden group-hover/avatar:border-blue-400 group-hover/avatar:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
+                                    {isUploading ? (
+                                        <Loader2 size={24} className="animate-spin" />
+                                    ) : pendingAvatar ? (
+                                        <img src={pendingAvatar} alt="Avatar" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <User size={40} className="text-blue-500/50" />
+                                    )}
+                                </div>
+                                
+                                {/* Camera Badge */}
+                                <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-blue-600 rounded-full border-2 border-[#0f1423] flex items-center justify-center text-white shadow-lg group-hover/avatar:scale-110 group-hover/avatar:bg-blue-500 transition-all">
+                                    <Camera size={14} fill="currentColor" />
+                                </div>
+
+                                <input 
+                                    type="file" 
+                                    ref={fileInputRef} 
+                                    onChange={handleFileChange} 
+                                    accept="image/*" 
+                                    className="hidden" 
+                                />
+                                
+                                {pendingAvatar && (
+                                    <button 
+                                        onClick={(e) => { 
+                                            e.stopPropagation(); 
+                                            setPendingAvatar(null); 
+                                        }}
+                                        className="absolute -top-1 -right-1 bg-red-600 text-white p-1.5 rounded-full opacity-0 group-hover/avatar:opacity-100 transition-opacity hover:bg-red-500 shadow-lg z-10"
+                                        title="Rimuovi immagine"
+                                    >
+                                        <TrashIcon size={12} />
+                                    </button>
                                 )}
                             </div>
                             <button 
                                 onClick={() => fileInputRef.current?.click()}
-                                className="absolute inset-0 bg-black/60 opacity-0 group-hover/avatar:opacity-100 rounded-full flex items-center justify-center transition-opacity border border-blue-400/50"
-                                title="Cambia immagine"
+                                className="text-[10px] font-bold text-blue-400 uppercase tracking-tighter hover:text-blue-300 transition-colors"
                             >
-                                <Camera size={20} className="text-white" />
+                                {pendingAvatar ? 'Cambia Immagine' : 'Carica Immagine'}
                             </button>
-                            <input 
-                                type="file" 
-                                ref={fileInputRef} 
-                                onChange={handleFileChange} 
-                                accept="image/*" 
-                                className="hidden" 
-                            />
-                            {pendingAvatar && (
-                                <button 
-                                    onClick={() => setPendingAvatar(null)}
-                                    className="absolute -top-1 -right-1 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover/avatar:opacity-100 transition-opacity hover:bg-red-500 shadow-lg"
-                                    title="Rimuovi immagine"
-                                >
-                                    <TrashIcon size={12} />
-                                </button>
-                            )}
                         </div>
                         <div>
                             <div className="flex items-center gap-2">
