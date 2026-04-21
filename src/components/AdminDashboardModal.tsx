@@ -765,11 +765,11 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-4 text-[10px] uppercase font-bold text-gray-500 border-t border-white/5 pt-4">
-                   <span className="flex items-center gap-1.5"><Trophy size={14} className="text-yellow-500" /> Tornei</span>
-                   <span className="flex items-center gap-1.5"><BookOpen size={14} className="text-blue-400" /> Civiltà</span>
-                   <span className="flex items-center gap-1.5"><Zap size={14} className="text-orange-400" /> Build Orders</span>
-                   <span className="flex items-center gap-1.5"><Radio size={14} className="text-pink-400" /> Streamer</span>
+                <div className="flex flex-wrap gap-5 text-[11px] uppercase font-bold text-gray-400 border-t border-white/5 pt-4">
+                   <span className="flex items-center gap-2"><Trophy size={16} className="text-yellow-500" /> Tornei</span>
+                   <span className="flex items-center gap-2"><BookOpen size={16} className="text-blue-400" /> Civiltà</span>
+                   <span className="flex items-center gap-2"><Zap size={16} className="text-orange-400" /> Build Orders</span>
+                   <span className="flex items-center gap-2"><Radio size={16} className="text-pink-400" /> Streamer</span>
                 </div>
               </div>
 
@@ -863,7 +863,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                       )}
                                       {u.role === 'admin' && <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded font-black uppercase">Creator</span>}
                                    </div>
-                                  <span className="text-xs md:text-sm text-gray-500 truncate block">{u.email}</span>
+                                  <span className="text-xs md:text-sm text-gray-400 truncate block">{u.email}</span>
                                   <div className="flex items-center gap-2 mt-0.5">
                                      <span className="text-[10px] font-bold text-blue-400/70 border border-blue-500/20 px-1.5 py-0.5 rounded bg-blue-500/5">{u.rank || 'Unranked'}</span>
                                   </div>
@@ -871,7 +871,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                               </div>
 
                               <div className="pt-3 border-t border-white/5 flex items-center justify-between gap-4">
-                                 <span className="text-[10px] font-black text-gray-700 uppercase tracking-[0.2em] select-none">Configurazione Permessi</span>
+                                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] select-none">Configurazione Permessi</span>
                                  {/* Unified Permissions Group */}
                                  <div className="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/5 shadow-inner">
                                      {/* Tournaments */}
