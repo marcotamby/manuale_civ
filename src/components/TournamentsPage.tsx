@@ -20,6 +20,7 @@ interface TournamentConfig {
   status?: string;
   podium?: any[];
   name?: string;
+  type?: string;
 }
 
 const TOURNAMENTS: TournamentConfig[] = [
@@ -43,6 +44,7 @@ export function TournamentsPage() {
     bannerUrl: '',
     status: 'Concluso',
     name: '',
+    type: '1v1',
     podium: [] as any[]
   });
   
@@ -72,7 +74,8 @@ export function TournamentsPage() {
             bannerUrl: db.banner_url || undefined,
             status: db.status || 'Concluso',
             podium: db.podium || undefined,
-            name: db.name || undefined
+            name: db.name || undefined,
+            type: db.type || '1v1'
           };
 
           if (existingIdx !== -1) {
@@ -182,7 +185,7 @@ export function TournamentsPage() {
       }
 
       const { error } = await supabase.from('tournaments').insert({
-        slug, source, organizer: user?.name || 'Admin', period: 'In corso', direct_link: url
+        slug, source, organizer: user?.name || 'Admin', period: 'In corso', direct_link: url, type: '1v1'
       });
       if (error) throw error;
       toast.success('Torneo aggiunto!');
@@ -208,7 +211,8 @@ export function TournamentsPage() {
           period: editForm.period,
           banner_url: editForm.bannerUrl,
           status: editForm.status,
-          podium: editForm.podium
+          podium: editForm.podium,
+          type: editForm.type
         })
         .eq('slug', editingTournament.slug);
       if (error) throw error;
@@ -323,7 +327,7 @@ export function TournamentsPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <Users size={18} className="text-yellow-500/40" /> 
-                        <span>Age of Empires IV</span>
+                        <span>Age of Empires IV - <strong className="text-yellow-500/80">{t.config.type || '1v1'}</strong></span>
                       </div>
                     </div>
 
@@ -367,6 +371,7 @@ export function TournamentsPage() {
                               bannerUrl: t.config.bannerUrl || '',
                               status: t.config.status || 'Concluso',
                               name: t.config.name || t.name || '',
+                              type: t.config.type || '1v1',
                               podium: t.config.podium || (t.events?.[0]?.standings?.nodes || [])
                             });
                             setShowEditModal(true);
@@ -431,13 +436,18 @@ export function TournamentsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
+                  <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Tipologia</label>
+                  <input type="text" value={editForm.type} onChange={e => setEditForm({...editForm, type: e.target.value})} placeholder="Es: 1v1, 3v3, Open" className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors" />
+                </div>
+                <div className="space-y-1">
                   <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Organizzatore</label>
                   <input type="text" value={editForm.organizer} onChange={e => setEditForm({...editForm, organizer: e.target.value})} className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors" />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Periodo</label>
-                  <input type="text" value={editForm.period} onChange={e => setEditForm({...editForm, period: e.target.value})} className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors" />
-                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Periodo</label>
+                <input type="text" value={editForm.period} onChange={e => setEditForm({...editForm, period: e.target.value})} className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors" />
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Banner URL</label>
