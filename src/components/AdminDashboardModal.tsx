@@ -130,8 +130,11 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .order('name', { ascending: true });
+        .order('nickname', { ascending: true });
+      
       if (error) throw error;
+      
+      console.log('👥 Users fetched for Admin:', data?.length || 0);
       setUsers(data || []);
     } catch (err) {
       console.error('Error fetching users:', err);
