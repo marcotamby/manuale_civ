@@ -1048,46 +1048,72 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                            </p>
                         </div>
 
+                        {/* Video / Source */}
+                        {selectedBO.source && (
+                          <div className="bg-white/5 rounded-3xl border border-white/5 p-6 space-y-4">
+                            <h4 className="text-[10px] font-black text-red-500 uppercase tracking-widest">Video Tutorial</h4>
+                            {getYoutubeId(selectedBO.source) ? (
+                              <div className="relative aspect-video rounded-2xl overflow-hidden border border-white/10 group cursor-pointer"
+                                   onClick={() => window.open(selectedBO.source, '_blank')}>
+                                <img 
+                                  src={`https://img.youtube.com/vi/${getYoutubeId(selectedBO.source)}/maxresdefault.jpg`} 
+                                  alt="Tutorial Preview" 
+                                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                                  <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center shadow-xl shadow-black/50 group-hover:scale-110 transition-transform">
+                                    <Play size={24} className="text-white fill-white ml-1" />
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <a href={selectedBO.source} target="_blank" rel="noopener noreferrer" 
+                                 className="flex items-center gap-3 p-4 bg-black/40 rounded-2xl border border-white/5 text-blue-400 hover:text-blue-300 transition-colors group">
+                                <ExternalLink size={20} className="group-hover:scale-110 transition-transform" />
+                                <span className="text-sm font-bold truncate">{selectedBO.source}</span>
+                              </a>
+                            )}
+                          </div>
+                        )}
+
                         {/* Votes / Feedback */}
-                        <div className="bg-white/5 rounded-3xl border border-white/5 p-6 space-y-4">
+                        <div className="bg-white/5 rounded-3xl border border-white/5 p-4 space-y-3">
                            <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Feedback Community</h4>
-                           <div className="flex items-center justify-between gap-4">
+                           <div className="flex items-center justify-between gap-3">
                               <button 
                                 onClick={(e) => { e.stopPropagation(); handleVote(selectedBO.id, 1); }}
-                                className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all ${
+                                className={`flex-1 flex items-center justify-center gap-2 p-2 rounded-xl border transition-all ${
                                   boVotes[selectedBO.id]?.userVote === 1 
-                                    ? 'bg-green-500/10 border-green-500/40 text-green-500 shadow-[0_0_15px_rgba(34,197,94,0.1)]' 
+                                    ? 'bg-green-500/10 border-green-500/40 text-green-500 shadow-[0_0_10px_rgba(34,197,94,0.1)]' 
                                     : 'bg-black/20 border-white/5 text-gray-400 hover:border-green-500/20 hover:text-green-400'
                                 }`}
                               >
-                                <ThumbsUp size={20} />
+                                <ThumbsUp size={16} />
                                 <span className="text-sm font-black">{boVotes[selectedBO.id]?.up || 0}</span>
-                                <span className="text-[8px] font-bold uppercase tracking-widest">Utile</span>
                               </button>
 
                               <button 
                                 onClick={(e) => { e.stopPropagation(); handleVote(selectedBO.id, -1); }}
-                                className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all ${
+                                className={`flex-1 flex items-center justify-center gap-2 p-2 rounded-xl border transition-all ${
                                   boVotes[selectedBO.id]?.userVote === -1 
-                                    ? 'bg-red-500/10 border-red-500/40 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.1)]' 
+                                    ? 'bg-red-500/10 border-red-500/40 text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.1)]' 
                                     : 'bg-black/20 border-white/5 text-gray-400 hover:border-red-500/20 hover:text-red-400'
                                 }`}
                               >
-                                <ThumbsDown size={20} />
+                                <ThumbsDown size={16} />
                                 <span className="text-sm font-black">{boVotes[selectedBO.id]?.down || 0}</span>
-                                <span className="text-[8px] font-bold uppercase tracking-widest">Non utile</span>
                               </button>
                            </div>
-                           <div className="pt-2">
-                             <div className="h-1.5 w-full bg-black/40 rounded-full overflow-hidden flex border border-white/5">
+                           <div className="pt-1">
+                             <div className="h-1 w-full bg-black/40 rounded-full overflow-hidden flex border border-white/5">
                                { (boVotes[selectedBO.id]?.up || 0) + (boVotes[selectedBO.id]?.down || 0) > 0 ? (
                                  <>
                                    <div 
-                                     className="h-full bg-green-500/60 shadow-[0_0_10px_rgba(34,197,94,0.3)]" 
+                                     className="h-full bg-green-500/60 shadow-[0_0_5px_rgba(34,197,94,0.3)]" 
                                      style={{ width: `${((boVotes[selectedBO.id]?.up || 0) / ((boVotes[selectedBO.id]?.up || 0) + (boVotes[selectedBO.id]?.down || 0))) * 100}%` }} 
                                    />
                                    <div 
-                                     className="h-full bg-red-500/60 shadow-[0_0_10px_rgba(239,68,68,0.3)]" 
+                                     className="h-full bg-red-500/60 shadow-[0_0_5px_rgba(239,68,68,0.3)]" 
                                      style={{ width: `${((boVotes[selectedBO.id]?.down || 0) / ((boVotes[selectedBO.id]?.up || 0) + (boVotes[selectedBO.id]?.down || 0))) * 100}%` }} 
                                    />
                                  </>
@@ -1095,49 +1121,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                  <div className="h-full w-full bg-gray-800" />
                                )}
                              </div>
-                             <p className="text-[9px] text-gray-500 text-center mt-2 font-bold uppercase tracking-tighter">
-                               {((boVotes[selectedBO.id]?.up || 0) + (boVotes[selectedBO.id]?.down || 0))} Valutazioni totali
+                             <p className="text-[8px] text-gray-600 text-center mt-1.5 font-bold uppercase tracking-tight">
+                               {((boVotes[selectedBO.id]?.up || 0) + (boVotes[selectedBO.id]?.down || 0))} Valutazioni
                              </p>
                            </div>
                         </div>
-
-                        {/* Video / Source */}
-                        {selectedBO.source && (
-                          <div className="bg-white/5 rounded-3xl border border-white/5 p-6 space-y-4">
-                             <h4 className="text-[10px] font-black text-red-500 uppercase tracking-widest">Video Tutorial</h4>
-                             {getYoutubeId(selectedBO.source) ? (
-                                <a 
-                                  href={`https://www.youtube.com/watch?v=${getYoutubeId(selectedBO.source)}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="group relative block aspect-video rounded-2xl overflow-hidden border border-white/10 bg-black"
-                                >
-                                   <img 
-                                     src={`https://img.youtube.com/vi/${getYoutubeId(selectedBO.source)}/hqdefault.jpg`}
-                                     className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all duration-500"
-                                     alt="YouTube Preview"
-                                   />
-                                   <div className="absolute inset-0 flex items-center justify-center">
-                                      <div className="w-12 h-9 bg-red-600 rounded-xl flex items-center justify-center text-white shadow-xl shadow-red-600/20 translate-y-0 group-hover:-translate-y-1 transition-all">
-                                         <Play size={18} fill="white" />
-                                      </div>
-                                   </div>
-                                </a>
-                             ) : (
-                                <a 
-                                  href={selectedBO.source}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex items-center gap-3 p-4 bg-black/40 rounded-2xl border border-white/10 text-sm text-blue-400 hover:text-white transition-all group"
-                                >
-                                   <ExternalLink size={16} className="group-hover:scale-110 transition-transform" />
-                                   <span className="truncate">Visualizza fonte esterna</span>
-                                </a>
-                             )}
-                          </div>
-                        )}
-
-
                       </div>
                     </div>
                   </div>
