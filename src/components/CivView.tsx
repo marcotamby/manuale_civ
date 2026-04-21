@@ -845,7 +845,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                 </span>
                               </div>
                               
-                              <span className="text-[9px] md:text-[10px] font-black text-yellow-500 uppercase tracking-wider bg-yellow-500/10 px-3 py-2 rounded-xl border border-yellow-500/20 group-hover:bg-yellow-500 group-hover:text-black transition-all shadow-lg whitespace-nowrap shrink-0">
+                              <span className="text-[9px] md:text-[10px] font-black text-yellow-500 uppercase tracking-wider bg-yellow-500/10 px-3 py-2 rounded-xl border border-yellow-500/20 hover:bg-yellow-500 hover:text-black transition-all shadow-lg whitespace-nowrap shrink-0">
                                 Leggi Strategia
                               </span>
                            </div>
@@ -956,24 +956,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                           <span className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.2em] ml-3 bg-yellow-500/10 px-2 py-0.5 rounded border border-yellow-500/20">
                              {selectedBO.difficulty === 1 ? 'Facile' : selectedBO.difficulty === 2 ? 'Media' : 'Difficile'}
                           </span>
-
-                          <div className="ml-auto flex items-center gap-4 bg-black/40 px-4 py-1.5 rounded-full border border-white/5">
-                            <button 
-                              onClick={() => handleVote(selectedBO.id, 1)}
-                              className={`flex items-center gap-2 transition-all hover:scale-110 ${boVotes[selectedBO.id]?.userVote === 1 ? 'text-green-500' : 'text-gray-400 hover:text-green-400'}`}
-                            >
-                              <ThumbsUp size={18} />
-                              <span className="text-sm font-black">{boVotes[selectedBO.id]?.up || 0}</span>
-                            </button>
-                            <div className="w-px h-4 bg-white/10" />
-                            <button 
-                              onClick={() => handleVote(selectedBO.id, -1)}
-                              className={`flex items-center gap-2 transition-all hover:scale-110 ${boVotes[selectedBO.id]?.userVote === -1 ? 'text-red-500' : 'text-gray-400 hover:text-red-400'}`}
-                            >
-                              <ThumbsDown size={18} />
-                              <span className="text-sm font-black">{boVotes[selectedBO.id]?.down || 0}</span>
-                            </button>
-                          </div>
                        </div>
                        <h2 className="text-2xl md:text-4xl font-black text-white uppercase tracking-tighter drop-shadow-lg leading-tight">
                          {selectedBO.title}
