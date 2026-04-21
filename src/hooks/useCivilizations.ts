@@ -37,7 +37,8 @@ export function useCivilizations() {
           videos: (row.videos && row.videos.length > 0) ? row.videos : (localCiv?.videos || []),
           buildOrders: (row.build_orders && row.build_orders.length > 0) ? row.build_orders : (localCiv?.buildOrders || []),
           strengths: (row.strengths && row.strengths.length > 0) ? row.strengths : (localCiv?.strengths || []),
-          weaknesses: (row.weaknesses && row.weaknesses.length > 0) ? row.weaknesses : (localCiv?.weaknesses || [])
+          weaknesses: (row.weaknesses && row.weaknesses.length > 0) ? row.weaknesses : (localCiv?.weaknesses || []),
+          primaryColor: row.primary_color || localCiv?.primaryColor
         };
       });
 
