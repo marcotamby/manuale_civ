@@ -528,19 +528,20 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     <div className="flex-1 overflow-y-auto overflow-x-hidden w-full civ-view-container">
       {/* Civ Hero Header */}
       <div className="relative min-h-[220px] px-6 pt-10 pb-10 border-b border-white/5 overflow-hidden flex items-center bg-[var(--color-brand-dark)]">
-        {/* Full-width Cinematic Fading Flag Background */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {/* Flag image positioned on the left */}
-          <div className="absolute inset-y-0 left-0 w-full sm:w-[60%]">
-            <img 
-              src={civ.flag} 
-              alt="" 
-              className="h-full w-full object-cover object-left opacity-[0.3] md:opacity-[0.4]"
-            />
-          </div>
-          {/* Deep Horizontal Gradient to blend into the brand dark color */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--color-brand-dark)]/60 to-[var(--color-brand-dark)]" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-brand-dark)] via-transparent to-[var(--color-brand-dark)]/20" />
+        {/* Cinematic Fading Flag Background */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden h-full w-full">
+          {/* Flag image with mask-image for professional fade */}
+          <img 
+            src={civ.flag} 
+            alt="" 
+            className="h-full w-full object-cover object-left opacity-[0.6] sm:opacity-[0.8]"
+            style={{
+              maskImage: 'linear-gradient(to right, black 0%, black 20%, transparent 60%)',
+              WebkitMaskImage: 'linear-gradient(to right, black 0%, black 20%, transparent 60%)'
+            }}
+          />
+          {/* Subtle vertical gradient for top/bottom smoothing */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-brand-dark)] via-transparent to-[var(--color-brand-dark)]/10" />
         </div>
         
         <div className="relative z-10 flex flex-col items-start gap-4">
