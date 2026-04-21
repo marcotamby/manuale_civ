@@ -527,17 +527,20 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   return (
     <div className="flex-1 overflow-y-auto overflow-x-hidden w-full civ-view-container">
       {/* Civ Hero Header */}
-      <div className="relative px-6 pt-8 pb-6 border-b border-white/5 overflow-hidden">
-        <div className="absolute inset-0 opacity-5">
-          <img src={civ.flag} alt="" className="w-full h-full object-cover blur-2xl scale-150" />
-        </div>
-        <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-6">
-          <img
-            src={civ.flag}
-            alt={civ.name}
-            className="w-24 h-24 object-contain drop-shadow-[0_0_20px_rgba(212,175,55,0.3)] shrink-0"
-            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+      <div className="relative min-h-[220px] px-6 pt-10 pb-10 border-b border-white/5 overflow-hidden flex items-center">
+        {/* Large Cinematic Fading Flag Background */}
+        <div className="absolute inset-y-0 left-0 w-full sm:w-[50%] pointer-events-none overflow-hidden h-full">
+          <img 
+            src={civ.flag} 
+            alt={civ.name} 
+            className="h-full w-full object-cover object-left opacity-[0.15] mix-blend-screen"
           />
+          {/* Horizontal Gradient Mask to fade to the right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--color-brand-dark)]/80 to-[var(--color-brand-dark)]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-brand-dark)] via-transparent to-transparent" />
+        </div>
+        
+        <div className="relative z-10 flex flex-col items-start gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-3 flex-wrap mb-2">
               <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">
