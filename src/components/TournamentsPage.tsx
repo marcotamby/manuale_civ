@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
-import { Trophy, Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown } from 'lucide-react';
+import { Trophy, Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, Upload } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
@@ -47,6 +47,7 @@ export function TournamentsPage() {
     type: '1v1',
     podium: [] as any[]
   });
+  const [isUploading, setIsUploading] = useState(false);
   
   const navigate = useNavigate();
 
@@ -196,6 +197,44 @@ export function TournamentsPage() {
       toast.error(`Errore: ${err.message}`);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Immagine troppo grande (max 5MB)');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `tournament-${Date.now()}.${fileExt}`;
+      const filePath = `tournaments/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('civilizations')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('civilizations')
+        .getPublicUrl(filePath);
+
+      setEditForm(prev => ({ ...prev, bannerUrl: publicUrl }));
+      toast.success('Immagine caricata!');
+    } catch (error: any) {
+      console.error('Error uploading banner:', error);
+      toast.error(`Errore: ${error.message}`);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -460,13 +499,36 @@ export function TournamentsPage() {
                 <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Periodo</label>
                 <input type="text" value={editForm.period} onChange={e => setEditForm({...editForm, period: e.target.value})} className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors" />
               </div>
+
               <div className="space-y-1">
-                <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Banner URL</label>
-                <div className="relative">
-                  <ImageIcon size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
-                  <input type="text" value={editForm.bannerUrl} onChange={e => setEditForm({...editForm, bannerUrl: e.target.value})} placeholder="https://... o /immagine.png" className="w-full bg-black/40 border border-white/10 p-3 pl-10 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors" />
+                <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Banner Immagine</label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <ImageIcon size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                    <input 
+                      type="text" 
+                      value={editForm.bannerUrl} 
+                      onChange={e => setEditForm({...editForm, bannerUrl: e.target.value})} 
+                      placeholder="Link immagine o carica file"
+                      className="w-full bg-black/40 border border-white/10 p-3 pl-10 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors text-xs" 
+                    />
+                  </div>
+                  <label className={`cursor-pointer flex items-center justify-center p-3 rounded-xl border border-white/10 bg-black/40 hover:bg-white/5 transition-colors w-12 h-12 shrink-0 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <input 
+                      type="file" 
+                      className="hidden" 
+                      accept="image/*"
+                      onChange={handleBannerUpload}
+                    />
+                    {isUploading ? (
+                      <Loader2 size={20} className="text-yellow-500 animate-spin" />
+                    ) : (
+                      <Upload size={20} className="text-gray-400" />
+                    )}
+                  </label>
                 </div>
               </div>
+
               <div className="space-y-2">
                 <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Stato Torneo</label>
                 <div className="flex gap-2 text-center">
