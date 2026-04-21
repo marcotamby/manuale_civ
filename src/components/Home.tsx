@@ -155,7 +155,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                 ? 'border-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.4)] scale-[0.98] z-20'
                 : isUnselectable
                   ? 'border-[#D4AF37]/5 opacity-40 grayscale-[0.3] cursor-not-allowed'
-                  : 'border-[#D4AF37]/20 hover:border-white/60 hover:shadow-[0_40px_80px_rgba(0,0,0,0.9)] hover:-translate-y-4 hover:scale-[1.15] hover:z-50 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]'
+                  : 'border-[#D4AF37]/30 hover:border-white/80 hover:shadow-[0_50px_100px_rgba(0,0,0,1)] hover:-translate-y-1 hover:scale-[1.25] hover:z-50 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]'
                 }`}
             >
               {/* Full Cover Flag Background */}
