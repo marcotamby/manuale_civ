@@ -550,15 +550,15 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-brand-dark)] via-transparent to-[var(--color-brand-dark)]/10" />
         </div>
 
-        {/* Premium Decorative Border - Softer gradient fade */}
+        {/* Premium Decorative Border - Radial fade from corner to edges */}
         <div 
-          className="absolute top-0 right-0 w-[50%] h-[150px] pointer-events-none hidden md:block rounded-tr-xl" 
+          className="absolute inset-0 pointer-events-none hidden md:block rounded-tr-xl" 
           style={{
             borderTop: '2px solid rgba(212, 175, 55, 0.5)',
             borderRight: '2px solid rgba(212, 175, 55, 0.5)',
             boxShadow: 'inset -20px 20px 40px -20px rgba(212, 175, 55, 0.2)',
-            maskImage: 'linear-gradient(to bottom left, black 0%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom left, black 0%, transparent 100%)'
+            maskImage: 'radial-gradient(circle at top right, black 0%, transparent 80%)',
+            WebkitMaskImage: 'radial-gradient(circle at top right, black 0%, transparent 80%)'
           }}
         />
         
