@@ -66,86 +66,8 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
 
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full bg-[var(--color-brand-dark)]">
-      <header className="mb-6 flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-3 pb-2">
-        <div className="flex-1 flex flex-row items-center justify-start xs:justify-end gap-1 md:gap-2 pb-1 xs:pb-0">
-          <div className="flex items-center glass p-1 rounded-xl h-[42px]">
-            <button
-              onClick={() => setIsCompareMode(!isCompareMode)}
-              className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 h-full rounded-lg text-sm font-bold transition-all ${isCompareMode
-                ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]'
-                : 'text-gray-400 hover:text-gray-200'
-                }`}
-            >
-              <BarChart2 size={16} />
-              <span>{isCompareMode ? 'Annulla' : 'Confronta'}</span>
-            </button>
-            {isCompareMode && selectedForCompare.length === 2 && (
-              <button
-                onClick={handleStartCompare}
-                className="animate-in fade-in zoom-in duration-300 flex items-center gap-2 px-3 md:px-4 h-full bg-green-600 text-white font-bold rounded-lg shadow-[0_0_15px_rgba(22,163,74,0.4)] border border-green-400/50 hover:bg-green-500 transition-all text-sm ml-1"
-              >
-                Ok
-              </button>
-            )}
-          </div>
-
-          <div className="flex items-center glass p-1 rounded-xl h-[42px]">
-            <button
-              onClick={() => setDifficultyFilter(difficultyFilter === 'Preferiti' ? 'Tutte' : 'Preferiti')}
-              className={`flex items-center gap-2 px-3 h-full rounded-lg text-sm font-bold transition-all ${difficultyFilter === 'Preferiti'
-                ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]'
-                : 'text-gray-400 hover:text-gray-200'
-                }`}
-            >
-              <Heart size={16} fill={difficultyFilter === 'Preferiti' ? 'currentColor' : 'none'} />
-              <span className="hidden xs:inline">Preferiti</span>
-            </button>
-          </div>
-
-          <div className="flex items-center glass p-1 rounded-xl h-[42px] flex-1">
-            <button
-               onClick={() => {
-                 setIsBOMode(!isBOMode);
-                 if (isCompareMode) setIsCompareMode(false);
-               }}
-               className={`flex-1 flex items-center justify-center gap-2 px-3 h-full rounded-lg text-sm font-bold transition-all ${isBOMode
-                 ? 'bg-[#00f3ff] text-black shadow-[0_0_20px_rgba(0,243,255,0.5)]'
-                 : 'text-gray-400 hover:text-gray-200'
-               }`}
-            >
-               <Zap size={16} fill={isBOMode ? 'black' : 'none'} />
-               <span>Build Order</span>
-            </button>
-          </div>
-
-          <div className="flex items-center glass p-1 rounded-xl h-[42px]">
-            <button
-               onClick={() => {
-                 setIsCompareMode(!isCompareMode);
-                 if (isBOMode) setIsBOMode(false);
-               }}
-               className={`flex items-center gap-2 px-3 h-full rounded-lg text-sm font-bold transition-all ${isCompareMode
-                 ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.4)]'
-                 : 'text-gray-400 hover:text-gray-200'
-               }`}
-            >
-               <BarChart2 size={16} fill={isCompareMode ? 'black' : 'none'} />
-               <span>{isCompareMode ? 'Ok' : 'Confronta'}</span>
-            </button>
-          </div>
-
-          <div className="flex items-center glass p-1 rounded-xl h-[42px]">
-            <button
-              onClick={() => difficultyFilter === 'Preferiti' ? setDifficultyFilter('Tutte') : setDifficultyFilter('Preferiti')}
-              className={`flex items-center justify-center px-4 h-full rounded-lg text-sm font-bold transition-all ${difficultyFilter === 'Preferiti'
-                ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]'
-                : 'text-gray-400 hover:text-gray-200'
-                }`}
-            >
-              <Heart size={16} fill={difficultyFilter === 'Preferiti' ? 'white' : 'none'} />
-            </button>
-          </div>
-
+      <header className="mb-8 flex flex-col gap-4">
+        <div className="flex flex-row items-center justify-between gap-4">
           <div className="hidden md:block">
             <CustomSelect
               options={[
@@ -159,6 +81,63 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
               onChange={setDifficultyFilter}
             />
           </div>
+
+          <div className="flex items-center gap-2 ml-auto">
+            {/* Confronta Tool */}
+            <div className="flex items-center glass p-1 rounded-xl h-[42px]">
+              <button
+                onClick={() => {
+                  setIsCompareMode(!isCompareMode);
+                  if (isBOMode) setIsBOMode(false);
+                }}
+                className={`flex items-center gap-2 px-4 h-full rounded-lg text-sm font-bold transition-all ${isCompareMode
+                  ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.4)]'
+                  : 'text-gray-400 hover:text-gray-200'
+                  }`}
+              >
+                <BarChart2 size={16} fill={isCompareMode ? 'black' : 'none'} />
+                <span>{isCompareMode ? 'Ok' : 'Confronta'}</span>
+              </button>
+              {isCompareMode && selectedForCompare.length === 2 && (
+                <button
+                  onClick={handleStartCompare}
+                  className="animate-in fade-in zoom-in duration-300 flex items-center gap-2 px-3 h-full bg-green-600 text-white font-bold rounded-lg shadow-[0_0_15px_rgba(22,163,74,0.4)] border border-green-400/50 hover:bg-green-500 transition-all text-sm ml-1"
+                >
+                  Ok
+                </button>
+              )}
+            </div>
+
+            {/* Favorite Filter Tool */}
+            <div className="flex items-center glass p-1 rounded-xl h-[42px]">
+              <button
+                onClick={() => setDifficultyFilter(difficultyFilter === 'Preferiti' ? 'Tutte' : 'Preferiti')}
+                className={`flex items-center justify-center px-3.5 h-full rounded-lg text-sm font-bold transition-all ${difficultyFilter === 'Preferiti'
+                  ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]'
+                  : 'text-gray-400 hover:text-gray-200'
+                  }`}
+              >
+                <Heart size={18} fill={difficultyFilter === 'Preferiti' ? 'white' : 'none'} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Build Orders Button - Dedicated Line for High Visibility on Mobile */}
+        <div className="flex items-center glass p-1 rounded-xl h-[48px] w-full md:w-fit self-start">
+          <button
+            onClick={() => {
+              setIsBOMode(!isBOMode);
+              if (isCompareMode) setIsCompareMode(false);
+            }}
+            className={`flex-1 md:flex-initial flex items-center justify-center gap-3 px-6 h-full rounded-lg text-sm font-black uppercase tracking-wider transition-all ${isBOMode
+              ? 'bg-[#00f3ff] text-black shadow-[0_0_25px_rgba(0,243,255,0.6)]'
+              : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+              }`}
+          >
+            <Zap size={18} fill={isBOMode ? 'black' : 'none'} className={isBOMode ? 'animate-pulse' : ''} />
+            <span>Build Orders</span>
+          </button>
         </div>
       </header>
 
