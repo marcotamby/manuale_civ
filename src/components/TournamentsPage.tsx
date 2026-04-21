@@ -19,6 +19,7 @@ interface TournamentConfig {
   bannerUrl?: string;
   status?: string;
   podium?: any[];
+  name?: string;
 }
 
 const TOURNAMENTS: TournamentConfig[] = [
@@ -41,6 +42,7 @@ export function TournamentsPage() {
     period: '',
     bannerUrl: '',
     status: 'Concluso',
+    name: '',
     podium: [] as any[]
   });
   
@@ -200,6 +202,7 @@ export function TournamentsPage() {
       const { error } = await supabase
         .from('tournaments')
         .update({
+          name: editForm.name,
           organizer: editForm.organizer,
           period: editForm.period,
           banner_url: editForm.bannerUrl,
@@ -276,7 +279,7 @@ export function TournamentsPage() {
           return (
             <div key={t.id} className="relative z-10 hover:z-50 group">
               <div 
-                className="glass rounded-3xl overflow-hidden border border-white/5 flex flex-col transition-all duration-500 hover:border-white/80 hover:shadow-[0_50px_100px_rgba(0,0,0,1)] hover:-translate-y-1 hover:scale-[1.15] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
+                className="glass rounded-3xl overflow-hidden border border-white/5 flex flex-col transition-all duration-500 hover:border-white/80 hover:shadow-[0_30px_60px_rgba(0,0,0,0.8)] hover:-translate-y-1 hover:scale-[1.05] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
               >
                 <div className="h-48 relative overflow-hidden cursor-pointer" onClick={() => t.config.directLink ? window.open(t.config.directLink, '_blank') : navigate(`/tornei/${t.slug}`)}>
                     <img src={banner} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt={t.name} />
@@ -308,7 +311,9 @@ export function TournamentsPage() {
 
                 <div className="p-6 flex flex-col flex-grow bg-[#121620]">
                     <span className="text-xs font-bold text-yellow-500/50 uppercase mb-1 tracking-widest">Organizzato da {t.config.organizer}</span>
-                    <h3 className="text-2xl font-black text-white mb-4 line-clamp-2 group-hover:text-yellow-400 transition-colors uppercase tracking-tight">{t.name}</h3>
+                    <h3 className="text-2xl font-black text-white mb-4 line-clamp-1 group-hover:text-yellow-400 transition-colors uppercase tracking-tight">
+                      {t.config.name || t.name}
+                    </h3>
                     
                     <div className="flex flex-col gap-3 mb-6 text-gray-300 text-sm font-medium">
                       <div className="flex items-center gap-3">
@@ -360,6 +365,7 @@ export function TournamentsPage() {
                               period: t.config.period || '',
                               bannerUrl: t.config.bannerUrl || '',
                               status: t.config.status || 'Concluso',
+                              name: t.config.name || t.name || '',
                               podium: t.config.podium || (t.events?.[0]?.standings?.nodes || [])
                             });
                             setShowEditModal(true);
@@ -417,6 +423,11 @@ export function TournamentsPage() {
               <X className="cursor-pointer text-gray-500 hover:text-white transition-colors" onClick={() => setShowEditModal(false)} />
             </div>
             <div className="space-y-6">
+              <div className="space-y-1">
+                <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Titolo Personalizzato</label>
+                <input type="text" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} placeholder="Es: Torneo degli scudi d'oro" className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors" />
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Organizzatore</label>
