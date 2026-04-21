@@ -279,8 +279,8 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[80] flex items-start justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300 overflow-y-auto pt-[80px] sm:pt-[120px]">
-            <div className="bg-[#0f1423] border border-blue-500/30 rounded-2xl w-full max-w-2xl mb-20 flex flex-col shadow-[0_0_50px_rgba(37,99,235,0.2)] relative">
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300 overflow-y-auto">
+            <div className="bg-[#0f1423] border border-blue-500/30 rounded-2xl w-full max-w-2xl my-auto flex flex-col shadow-[0_0_50px_rgba(37,99,235,0.2)] relative">
                 
                 {/* Close Button */}
                 <button 

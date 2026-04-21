@@ -599,7 +599,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         ></div>
 
         {/* Header Content */}
-        <div className="relative z-10 px-6 pt-10 pb-6 flex items-center min-h-[180px] md:min-h-[220px]">
+        <div className="relative z-10 px-6 pt-10 pb-6 flex items-center h-[200px] md:h-[240px]">
           <div className="flex flex-col items-start gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-3 flex-wrap mb-2">
