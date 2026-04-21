@@ -237,12 +237,25 @@ export function TournamentsPage() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12 animate-in fade-in duration-700">
-      <div className="flex justify-between items-center mb-12">
-        <h1 className="text-4xl font-black text-white uppercase tracking-tighter">Tornei Aoeitalia</h1>
+    <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
+        <div>
+          <h1 className="text-3xl md:text-5xl font-inter font-black text-transparent bg-clip-text bg-gradient-to-b from-slate-200 via-gray-400 to-slate-500 mb-4 uppercase tracking-tighter">
+            Tornei Aoeitalia
+          </h1>
+          <p className="text-gray-400 font-serif italic text-base md:text-lg max-w-2xl">
+            Segui le competizioni ufficiali di Aoeitalia.
+          </p>
+          <div className="h-1 w-24 bg-gradient-to-r from-gray-500/50 to-transparent mt-6"></div>
+        </div>
+
         {isAdmin && (
-          <button onClick={() => setShowAddModal(true)} className="px-6 py-3 bg-white text-black font-black rounded-xl hover:scale-105 transition-transform flex items-center gap-2 shadow-xl">
-            <Plus size={20} strokeWidth={3} /> AGGIUNGI
+          <button 
+            onClick={() => setShowAddModal(true)} 
+            className="flex items-center gap-3 px-6 py-4 bg-gradient-to-b from-slate-100 to-gray-400 font-black text-black rounded-2xl hover:from-white hover:to-gray-300 transition-all hover:scale-[1.05] shadow-[0_0_20px_rgba(255,255,255,0.1)] uppercase text-xs tracking-widest active:scale-[0.98]"
+          >
+            <Plus size={20} strokeWidth={3} />
+            Aggiungi Torneo
           </button>
         )}
       </div>
@@ -261,71 +274,104 @@ export function TournamentsPage() {
           const podium = t.config.podium || t.events?.[0]?.standings?.nodes || [];
 
           return (
-            <div key={t.id} className="glass rounded-3xl overflow-hidden border border-white/5 flex flex-col group hover:border-yellow-500/30 transition-all duration-300">
-               <div className="h-48 relative overflow-hidden cursor-pointer" onClick={() => t.config.directLink ? window.open(t.config.directLink, '_blank') : navigate(`/tornei/${t.slug}`)}>
-                  <img src={banner} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={t.name} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0d1424] to-transparent" />
-                  <div className="absolute top-4 right-4">
-                    <span className={clsx(
-                      "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest backdrop-blur-md border shadow-lg",
-                      status === 'In corso' ? "bg-yellow-500/20 border-yellow-500 text-yellow-500" : 
-                      status === 'Programmato' ? "bg-blue-500/20 border-blue-500 text-blue-400" :
-                      "bg-red-500/10 border-red-500/20 text-red-500/80"
-                    )}>
-                      {status === 'In corso' && <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 inline-block mr-1.5 animate-pulse" />}
-                      {status}
-                    </span>
-                  </div>
-               </div>
-               <div className="p-6 flex flex-col flex-grow bg-[#121620]">
-                  <span className="text-[9px] font-bold text-yellow-500/50 uppercase mb-1">Organizzato da {t.config.organizer}</span>
-                  <h3 className="text-xl font-bold text-white mb-4 line-clamp-1 group-hover:text-yellow-500/80 transition-colors">{t.name}</h3>
-                  <div className="flex flex-col gap-2 mb-6 text-gray-400 text-xs">
-                     <div className="flex items-center gap-2"><Calendar size={14} className="text-yellow-500/40" /> {t.config.period || 'Data da definire'}</div>
-                     <div className="flex items-center gap-2"><Users size={14} className="text-yellow-500/40" /> Age of Empires IV</div>
-                  </div>
+            <div key={t.id} className="relative z-10 hover:z-50 group">
+              <div 
+                className="glass rounded-3xl overflow-hidden border border-white/5 flex flex-col transition-all duration-500 hover:border-white/80 hover:shadow-[0_50px_100px_rgba(0,0,0,1)] hover:-translate-y-1 hover:scale-[1.15] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
+              >
+                <div className="h-48 relative overflow-hidden cursor-pointer" onClick={() => t.config.directLink ? window.open(t.config.directLink, '_blank') : navigate(`/tornei/${t.slug}`)}>
+                    <img src={banner} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt={t.name} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0d1424] to-transparent" />
+                    
+                    {/* Status Badges Overlay */}
+                    <div className="absolute top-4 right-4 flex flex-col items-end gap-2 z-20">
+                      <div className="px-3 py-1 rounded-full bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 text-yellow-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg scale-90 md:scale-100">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
+                        </span>
+                        Informazioni Disponibili
+                      </div>
 
-                  {podium.length > 0 && (
-                    <div className="mb-6 p-3 rounded-2xl bg-white/[0.02] border border-white/5">
-                      <p className="text-[8px] font-bold text-gray-500 uppercase tracking-widest mb-2 border-b border-white/5 pb-1">Risultati Finali</p>
-                      <div className="space-y-1">
-                        {podium.slice(0, 3).map((s: any, idx: number) => (
-                          <div key={idx} className="flex justify-between text-[11px] items-center">
-                            <span className="text-gray-300 truncate max-w-[140px]"> {['🥇','🥈','🥉'][idx]} {s.entrant?.name || '---'}</span>
-                            <span className="text-white/20 font-black italic uppercase text-[9px]">{idx === 0 ? 'WINNER' : `${idx+1}°`}</span>
-                          </div>
-                        ))}
+                      <div className={clsx(
+                        "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest backdrop-blur-md border shadow-lg flex items-center gap-2",
+                        status === 'In corso' ? "bg-green-500/20 border-green-500 text-green-500" : 
+                        status === 'Programmato' ? "bg-blue-500/20 border-blue-500 text-blue-400" :
+                        "bg-red-500/10 border-red-500/20 text-red-500/80"
+                      )}>
+                        {status === 'In corso' && <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block mr-0.5 animate-pulse" />}
+                        {status === 'Concluso' && <span className="w-1.5 h-1.5 rounded-full bg-red-500/80 inline-block mr-0.5" />}
+                        {status === 'Programmato' && <Calendar size={10} className="mr-0.5" />}
+                        {status}
                       </div>
                     </div>
-                  )}
+                </div>
 
-                  <div className="mt-auto flex gap-2">
-                    <button 
-                      onClick={() => t.config.directLink ? window.open(t.config.directLink, '_blank') : navigate(`/tornei/${t.slug}`)} 
-                      className="flex-grow py-3 bg-white/5 hover:bg-white/10 rounded-xl text-white text-[10px] font-black uppercase transition-all tracking-widest flex items-center justify-center gap-2 group/det"
-                    >
-                      Dettagli <ArrowRight size={12} className="group-hover/det:translate-x-1 transition-transform" />
-                    </button>
-                    {isAdmin && (
-                      <button 
-                        onClick={() => {
-                          setEditingTournament(t);
-                          setEditForm({
-                            organizer: t.config.organizer || '',
-                            period: t.config.period || '',
-                            bannerUrl: t.config.bannerUrl || '',
-                            status: t.config.status || 'Concluso',
-                            podium: t.config.podium || (t.events?.[0]?.standings?.nodes || [])
-                          });
-                          setShowEditModal(true);
-                        }} 
-                        className="p-3 bg-white/5 hover:bg-white/10 rounded-xl text-yellow-500 transition-all border border-white/5 hover:border-yellow-500/30"
-                      >
-                        <Edit2 size={16} />
-                      </button>
+                <div className="p-6 flex flex-col flex-grow bg-[#121620]">
+                    <span className="text-xs font-bold text-yellow-500/50 uppercase mb-1 tracking-widest">Organizzato da {t.config.organizer}</span>
+                    <h3 className="text-2xl font-black text-white mb-4 line-clamp-2 group-hover:text-yellow-400 transition-colors uppercase tracking-tight">{t.name}</h3>
+                    
+                    <div className="flex flex-col gap-3 mb-6 text-gray-300 text-sm font-medium">
+                      <div className="flex items-center gap-3">
+                        <Calendar size={18} className="text-yellow-500/40" /> 
+                        <span>{t.config.period || 'Data da definire'}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Users size={18} className="text-yellow-500/40" /> 
+                        <span>Age of Empires IV</span>
+                      </div>
+                    </div>
+
+                    {podium.length > 0 && (
+                      <div className="mb-6 p-4 rounded-2xl bg-white/[0.03] border border-white/5 shadow-inner">
+                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3 border-b border-white/5 pb-2">Risultati Finali</p>
+                        <div className="space-y-2">
+                          {podium.slice(0, 3).map((s: any, idx: number) => (
+                            <div key={idx} className="flex justify-between text-sm items-center group/standing">
+                              <div className="flex items-center gap-3">
+                                <span className="text-lg">{['🥇','🥈','🥉'][idx]}</span>
+                                <span className={clsx(
+                                  "font-bold transition-colors truncate max-w-[140px]",
+                                  idx === 0 ? "text-yellow-100" : "text-gray-400"
+                                )}>
+                                  {s.entrant?.name || '---'}
+                                </span>
+                              </div>
+                              <span className="text-white/10 font-black italic uppercase text-[10px] group-hover/standing:text-white/30 transition-colors">{idx === 0 ? 'WINNER' : `${idx+1}° PLACE`}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     )}
-                  </div>
-               </div>
+
+                    <div className="mt-auto flex gap-3 pt-4 border-t border-white/5">
+                      <button 
+                        onClick={() => t.config.directLink ? window.open(t.config.directLink, '_blank') : navigate(`/tornei/${t.slug}`)} 
+                        className="flex-grow py-4 bg-white/5 hover:bg-white/10 rounded-2xl text-white text-xs font-black uppercase transition-all tracking-[0.2em] flex items-center justify-center gap-3 group/det shadow-lg active:scale-95"
+                      >
+                        Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" />
+                      </button>
+                      {isAdmin && (
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingTournament(t);
+                            setEditForm({
+                              organizer: t.config.organizer || '',
+                              period: t.config.period || '',
+                              bannerUrl: t.config.bannerUrl || '',
+                              status: t.config.status || 'Concluso',
+                              podium: t.config.podium || (t.events?.[0]?.standings?.nodes || [])
+                            });
+                            setShowEditModal(true);
+                          }} 
+                          className="p-4 bg-white/5 hover:bg-white/10 rounded-2xl text-yellow-500 transition-all border border-white/5 hover:border-yellow-500/30 active:scale-95 shadow-lg"
+                        >
+                          <Edit2 size={20} />
+                        </button>
+                      )}
+                    </div>
+                </div>
+              </div>
             </div>
           );
         })}
@@ -351,7 +397,11 @@ export function TournamentsPage() {
                 <CheckCircle2 size={16} className="text-yellow-500 shrink-0 mt-0.5" />
                 <p className="text-[10px] text-gray-400 leading-tight">Verranno estratti automaticamente banner e statistiche dal link fornito.</p>
               </div>
-              <button onClick={handleAddTournament} disabled={isSubmitting} className="w-full py-4 bg-yellow-500 text-black font-black rounded-xl active:scale-95 transition-all text-xs tracking-widest">
+              <button 
+                onClick={handleAddTournament} 
+                disabled={isSubmitting} 
+                className="w-full py-4 bg-gradient-to-b from-slate-100 to-gray-400 text-black font-black rounded-xl active:scale-95 transition-all text-xs tracking-widest shadow-xl"
+              >
                 {isSubmitting ? 'ANALISI IN CORSO...' : 'CONFERMA INSERIMENTO'}
               </button>
             </div>
@@ -386,9 +436,9 @@ export function TournamentsPage() {
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Stato Torneo</label>
-                <div className="flex gap-2">
+                <div className="flex gap-2 text-center">
                   {['Programmato', 'In corso', 'Concluso'].map(s => (
-                    <button key={s} onClick={() => setEditForm({...editForm, status: s})} className={clsx("flex-grow py-2 rounded-lg border text-[10px] font-black uppercase transition-all", editForm.status === s ? "bg-yellow-500/20 border-yellow-500 text-yellow-500" : "bg-white/5 border-white/10 text-gray-500 hover:border-white/20")}>{s}</button>
+                    <button key={s} onClick={() => setEditForm({...editForm, status: s})} className={clsx("flex-grow py-3 rounded-xl border text-[10px] font-black uppercase transition-all tracking-widest", editForm.status === s ? "bg-yellow-500/20 border-yellow-500 text-yellow-500" : "bg-white/5 border-white/10 text-gray-500 hover:border-white/20")}>{s}</button>
                   ))}
                 </div>
               </div>
@@ -401,27 +451,31 @@ export function TournamentsPage() {
                         setEditForm({...editForm, podium: [...editForm.podium, {placement: editForm.podium.length + 1, entrant: {name: ''}}]});
                       }
                     }} 
-                    className="text-yellow-500 text-[10px] font-bold hover:underline" 
+                    className="text-yellow-500 text-[10px] font-black hover:underline" 
                     hidden={editForm.podium.length >= 3}
                   >
-                    + AGGIUNGI
+                    + AGGIUNGI RIGA
                   </button>
                 </div>
                 {editForm.podium.map((p, i) => (
-                  <div key={i} className="flex gap-2 items-center bg-black/20 p-2 rounded-xl border border-white/5">
-                    <span className="text-sm w-6 text-center">{['🥇','🥈','🥉'][i] || `${i+1}°`}</span>
+                  <div key={i} className="flex gap-2 items-center bg-black/20 p-3 rounded-2xl border border-white/5">
+                    <span className="text-base w-8 text-center">{['🥇','🥈','🥉'][i] || `${i+1}°`}</span>
                     <input type="text" value={p.entrant?.name || ''} onChange={e => {
                       const np = [...editForm.podium]; np[i] = {...p, entrant: {name: e.target.value}}; setEditForm({...editForm, podium: np});
                     }} placeholder={`Nome ${i+1}° classificato`} className="flex-grow bg-transparent border-none text-white text-sm outline-none" />
-                    <button onClick={() => setEditForm({...editForm, podium: editForm.podium.filter((_, idx) => idx !== i)})} className="p-1.5 text-red-500/50 hover:text-red-500 transition-colors"><Trash2 size={14}/></button>
+                    <button onClick={() => setEditForm({...editForm, podium: editForm.podium.filter((_, idx) => idx !== i)})} className="p-2 text-red-500/50 hover:text-red-500 transition-colors"><Trash2 size={16}/></button>
                   </div>
                 ))}
               </div>
-              <div className="flex gap-4 pt-4 border-t border-white/5">
-                <button onClick={handleUpdateTournament} disabled={isSubmitting} className="flex-grow py-4 bg-yellow-500 text-black font-black rounded-xl flex items-center justify-center gap-2 hover:bg-yellow-400 transition-all text-xs tracking-widest">
-                  {isSubmitting ? <Loader2 className="animate-spin" size={16}/> : <Save size={16}/>} SALVA MODIFICHE
+              <div className="flex gap-4 pt-6 border-t border-white/5">
+                <button 
+                  onClick={handleUpdateTournament} 
+                  disabled={isSubmitting} 
+                  className="flex-grow py-4 bg-gradient-to-b from-yellow-300 to-yellow-600 text-black font-black rounded-2xl flex items-center justify-center gap-3 hover:brightness-110 transition-all text-xs tracking-widest shadow-xl"
+                >
+                  {isSubmitting ? <Loader2 className="animate-spin" size={18}/> : <Save size={18}/>} SALVA MODIFICHE
                 </button>
-                <button onClick={() => handleDeleteTournament(editingTournament.slug)} className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl hover:bg-red-500/20 transition-all"><Trash2 size={20}/></button>
+                <button onClick={() => handleDeleteTournament(editingTournament.slug)} className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl hover:bg-red-500/20 transition-all shadow-lg"><Trash2 size={24}/></button>
               </div>
             </div>
           </div>
