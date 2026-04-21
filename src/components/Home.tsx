@@ -102,38 +102,42 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
             </button>
           </div>
 
-          <div className="flex-1 flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden h-full w-full">
+          <div className="flex items-center glass p-1 rounded-xl h-[42px] flex-1">
             <button
                onClick={() => {
                  setIsBOMode(!isBOMode);
                  if (isCompareMode) setIsCompareMode(false);
                }}
-               className={`flex-1 flex items-center justify-center gap-2 px-3 md:px-4 h-full text-sm font-bold transition-all ${isBOMode
+               className={`flex-1 flex items-center justify-center gap-2 px-3 h-full rounded-lg text-sm font-bold transition-all ${isBOMode
                  ? 'bg-[#00f3ff] text-black shadow-[0_0_20px_rgba(0,243,255,0.5)]'
                  : 'text-gray-400 hover:text-gray-200'
                }`}
             >
                <Zap size={16} fill={isBOMode ? 'black' : 'none'} />
-               <span className="text-sm">Build Order</span>
+               <span>Build Order</span>
             </button>
-            
+          </div>
+
+          <div className="flex items-center glass p-1 rounded-xl h-[42px]">
             <button
                onClick={() => {
                  setIsCompareMode(!isCompareMode);
                  if (isBOMode) setIsBOMode(false);
                }}
-               className={`flex-1 flex items-center justify-center gap-2 px-3 md:px-4 h-full text-sm font-bold transition-all ${isCompareMode
+               className={`flex items-center gap-2 px-3 h-full rounded-lg text-sm font-bold transition-all ${isCompareMode
                  ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.4)]'
                  : 'text-gray-400 hover:text-gray-200'
                }`}
             >
                <BarChart2 size={16} fill={isCompareMode ? 'black' : 'none'} />
-               <span className="text-sm">Confronta</span>
+               <span>{isCompareMode ? 'Ok' : 'Confronta'}</span>
             </button>
+          </div>
 
+          <div className="flex items-center glass p-1 rounded-xl h-[42px]">
             <button
               onClick={() => difficultyFilter === 'Preferiti' ? setDifficultyFilter('Tutte') : setDifficultyFilter('Preferiti')}
-              className={`flex items-center justify-center px-4 h-full text-sm font-bold transition-all ${difficultyFilter === 'Preferiti'
+              className={`flex items-center justify-center px-4 h-full rounded-lg text-sm font-bold transition-all ${difficultyFilter === 'Preferiti'
                 ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]'
                 : 'text-gray-400 hover:text-gray-200'
                 }`}
