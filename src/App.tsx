@@ -24,6 +24,7 @@ import { MobileFooter } from './components/MobileFooter';
 import { TournamentsPage } from './components/TournamentsPage';
 import { TournamentDetail } from './components/TournamentDetail';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   const navigate = useNavigate();
@@ -328,6 +329,14 @@ function App() {
           }}
         />
       )}
+      <Toaster position="bottom-right" toastOptions={{
+        style: {
+          background: '#1a1c23',
+          color: '#fff',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '16px',
+        },
+      }} />
     </div>
   );
 }

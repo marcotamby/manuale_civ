@@ -178,31 +178,35 @@ export function TournamentsPage() {
       let source: 'startgg' | 'challonge' | null = null;
       let slug = '';
 
-      if (url.includes('start.gg')) {
+      const isTB = url.includes('tourneybot.gg');
+      const isStartGG = url.includes('start.gg');
+      const isChallonge = url.includes('challonge.com');
+
+      if (isStartGG) {
         source = 'startgg';
         const match = url.match(/\/(tournament|t)\/([^/]+)/);
         if (match) slug = match[2];
         console.log("📍 Rilevato Start.gg, slug estratto:", slug);
-      } else if (url.includes('challonge.com')) {
+      } else if (isChallonge) {
         source = 'challonge';
-        const parts = url.split('/').filter(Boolean);
+        // Gestiamo URL tipo challonge.com/it/slug o challonge.com/slug
+        const parts = url.split('/').map(p => p.trim()).filter(p => p && p !== 'it');
         slug = parts[parts.length - 1];
         console.log("📍 Rilevato Challonge, slug estratto:", slug);
-      } else if (url.includes('tourneybot.gg')) {
-        source = 'challonge'; // Fallback a challonge per superare vincolo DB
+      } else if (isTB) {
+        source = 'challonge'; // Fallback per schema DB
         const match = url.match(/\/tourneys\/(\d+)/);
         slug = match ? `tb-${match[1]}` : `tb-${Date.now()}`;
         console.log("📍 Rilevato TourneyBot, slug creato:", slug);
       } else {
-        // Proviamo a estrarre qualcosa di utile come slug per link generici
         source = 'challonge';
-        slug = `ext-${Date.now()}`;
-        console.log("📍 Link generico rilevato, creato slug:", slug);
+        const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
+        slug = urlObj.pathname.split('/').filter(Boolean).pop() || `ext-${Date.now()}`;
+        console.log("📍 Link generico, slug indovinato:", slug);
       }
 
       if (!slug) {
-        console.error("❌ Impossibile determinare uno slug valido.");
-        toast.error('URL non valido. Inserisci un link corretto.');
+        toast.error('Impossibile estrarre lo slug del torneo.');
         setIsSubmitting(false);
         return;
       }
