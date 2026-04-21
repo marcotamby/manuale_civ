@@ -279,7 +279,7 @@ export function TournamentsPage() {
           return (
             <div key={t.id} className="relative z-10 hover:z-50 group">
               <div 
-                className="glass rounded-3xl overflow-hidden border border-white/5 flex flex-col transition-all duration-500 hover:border-white/80 hover:shadow-[0_30px_60px_rgba(0,0,0,0.8)] hover:-translate-y-1 hover:scale-[1.05] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
+                className="glass rounded-3xl overflow-hidden border border-white/5 flex flex-col transition-all duration-500 hover:border-white/80 hover:shadow-[0_30px_60px_rgba(0,0,0,0.8)] hover:-translate-y-1 hover:scale-[1.05] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] [backface-visibility:hidden] [transform-style:preserve-3d]"
               >
                 <div className="h-48 relative overflow-hidden cursor-pointer" onClick={() => t.config.directLink ? window.open(t.config.directLink, '_blank') : navigate(`/tornei/${t.slug}`)}>
                     <img src={banner} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt={t.name} />
@@ -309,7 +309,7 @@ export function TournamentsPage() {
                     </div>
                 </div>
 
-                <div className="p-6 flex flex-col flex-grow bg-[#121620]">
+                <div className="p-6 flex flex-col flex-grow bg-[#121620] relative z-10 -mt-px">
                     <span className="text-xs font-bold text-yellow-500/50 uppercase mb-1 tracking-widest">Organizzato da {t.config.organizer}</span>
                     <h3 className="text-2xl font-black text-white mb-4 line-clamp-1 group-hover:text-yellow-400 transition-colors uppercase tracking-tight">
                       {t.config.name || t.name}
@@ -341,7 +341,7 @@ export function TournamentsPage() {
                                   {s.entrant?.name || '---'}
                                 </span>
                               </div>
-                              <span className="text-white/10 font-black italic uppercase text-[10px] group-hover/standing:text-white/30 transition-colors">{idx === 0 ? 'WINNER' : `${idx+1}° PLACE`}</span>
+                              <span className="text-white/40 font-black italic uppercase text-[10px] group-hover/standing:text-white/80 transition-colors">{idx === 0 ? 'WINNER' : `${idx+1}° PLACE`}</span>
                             </div>
                           ))}
                         </div>
