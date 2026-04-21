@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search } from 'lucide-react';
+import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
@@ -50,6 +50,8 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [questions, setQuestions] = useState<any[]>([]);
   const [answers, setAnswers] = useState<any[]>([]);
   const [qaLoading, setQaLoading] = useState(false);
+  const [isAddingUser, setIsAddingUser] = useState(false);
+  const [newUemail, setNewUemail] = useState('');
 
   const getYoutubeId = (url: string) => {
     if (!url) return null;
@@ -133,6 +135,30 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       setUsers(data || []);
     } catch (err) {
       console.error('Error fetching users:', err);
+    } finally {
+      setUserLoading(false);
+    }
+  };
+
+  const handleAddUser = async () => {
+    if (!newUemail.trim() || !isSuperAdmin) return;
+    try {
+      setUserLoading(true);
+      const email = newUemail.trim().toLowerCase();
+      
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({ email }, { onConflict: 'email' });
+        
+      if (error) throw error;
+      
+      setNewUemail('');
+      setIsAddingUser(false);
+      await fetchUsers();
+      setToast({ isVisible: true, message: 'Email aggiunta alla lista', type: 'success' });
+    } catch (err: any) {
+      console.error('Error adding user:', err);
+      setToast({ isVisible: true, message: 'Errore durante l\'aggiunta', type: 'error' });
     } finally {
       setUserLoading(false);
     }
@@ -407,14 +433,14 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 md:p-6 border-b border-[#D4AF37]/20 bg-gradient-to-r from-[#0d1424] to-[#1a1c32] rounded-t-2xl shrink-0 gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20 text-blue-400">
-              {activeTab === 'proposte' ? <Inbox size={24} /> : <MessageSquare size={24} />}
+              {activeTab === 'proposte' ? <Inbox size={24} /> : activeTab === 'users' ? <ShieldCheck size={24} /> : <MessageSquare size={24} />}
             </div>
             <div>
               <h2 className="text-lg md:text-xl font-bold text-white uppercase tracking-wider">
-                {activeTab === 'proposte' ? 'Gestione Proposte' : 'Gestione Q&A'}
+                {activeTab === 'proposte' ? 'Gestione Proposte' : activeTab === 'users' ? 'Gestione Permessi' : 'Gestione Q&A'}
               </h2>
               <p className="text-[10px] md:text-xs text-gray-400">
-                {activeTab === 'proposte' ? 'Revisiona i suggerimenti della community' : 'Modera le domande e risposte degli utenti'}
+                {activeTab === 'proposte' ? 'Revisiona i suggerimenti della community' : activeTab === 'users' ? 'Gestisci i ruoli e i permessi del team' : 'Modera le domande e risposte degli utenti'}
               </p>
             </div>
           </div>
@@ -448,12 +474,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                   onClick={() => setActiveTab('users')}
                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'users' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
                 >
-                  Utenti
-                  {users.length > 0 && (
-                    <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-pink-500 text-white text-[10px] rounded-full">
-                      {users.length}
-                    </span>
-                  )}
+                  Permessi
                 </button>
               )}
             </div>
@@ -659,19 +680,58 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
             </div>
           ) : activeTab === 'users' && isSuperAdmin ? (
             <div className="flex-1 flex flex-col min-h-0 bg-black/20">
-              {/* User Management Toolbar */}
-              <div className="p-4 md:p-6 border-b border-white/5 flex flex-col md:flex-row gap-4 items-center justify-between">
-                <div className="relative w-full md:w-96">
-                   <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                   <input 
-                     type="text" 
-                     placeholder="Cerca per nome, email o nickname..." 
-                     value={userSearch}
-                     onChange={(e) => setUserSearch(e.target.value)}
-                     className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:border-blue-500 outline-none transition-all"
-                   />
+              {/* Permessi Management Toolbar */}
+              <div className="p-4 md:p-6 border-b border-white/5 space-y-4">
+                <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                  <div className="relative w-full md:w-96">
+                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                    <input 
+                      type="text" 
+                      placeholder="Cerca per email o nickname..." 
+                      value={userSearch}
+                      onChange={(e) => setUserSearch(e.target.value)}
+                      className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:border-blue-500 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-3 w-full md:w-auto">
+                    {isAddingUser ? (
+                      <div className="flex gap-2 w-full animate-in slide-in-from-right-4 duration-300">
+                        <input 
+                          type="email" 
+                          autoFocus
+                          placeholder="Inserisci email..."
+                          value={newUemail}
+                          onChange={(e) => setNewUemail(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && handleAddUser()}
+                          className="flex-1 bg-blue-500/10 border border-blue-500/30 rounded-xl px-4 py-2 text-sm text-white outline-none focus:border-blue-400"
+                        />
+                        <button 
+                          onClick={handleAddUser}
+                          disabled={!newUemail.trim()}
+                          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs uppercase disabled:opacity-50"
+                        >
+                          Aggiungi
+                        </button>
+                        <button 
+                          onClick={() => { setIsAddingUser(false); setNewUemail(''); }}
+                          className="p-2 text-gray-500 hover:text-white"
+                        >
+                          <X size={20} />
+                        </button>
+                      </div>
+                    ) : (
+                      <button 
+                        onClick={() => setIsAddingUser(true)}
+                        className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-xl border border-blue-500/30 transition-all font-bold text-xs uppercase"
+                      >
+                        <UserPlus size={16} /> Aggiungi Utente
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div className="flex gap-4 text-[10px] uppercase font-bold text-gray-500">
+
+                <div className="flex gap-4 text-[10px] uppercase font-bold text-gray-500 border-t border-white/5 pt-4">
                    <span className="flex items-center gap-1.5"><ShieldCheck size={12} className="text-blue-400" /> Editor / Mod</span>
                    <span className="flex items-center gap-1.5"><Radio size={12} className="text-pink-400" /> Streamer</span>
                 </div>
@@ -682,55 +742,84 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                 {userLoading ? (
                   <div className="flex flex-col items-center justify-center h-60">
                     <Loader2 size={32} className="animate-spin text-blue-500 mb-2" />
-                    <p className="text-gray-400 text-sm">Caricamento profili...</p>
+                    <p className="text-gray-400 text-sm">Caricamento...</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {users
-                      .filter(u => 
-                        !userSearch || 
-                        u.name?.toLowerCase().includes(userSearch.toLowerCase()) || 
-                        u.email?.toLowerCase().includes(userSearch.toLowerCase()) || 
-                        u.nickname?.toLowerCase().includes(userSearch.toLowerCase())
-                      )
-                      .map(u => (
-                        <div key={u.id} className="bg-white/[0.03] border border-white/5 rounded-2xl p-4 flex items-center justify-between group hover:bg-white/[0.05] transition-all">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600/20 to-blue-900/20 flex items-center justify-center border border-blue-500/20 text-blue-400 text-lg font-bold">
-                              {u.name?.[0]?.toUpperCase() || 'U'}
-                            </div>
-                            <div className="flex flex-col min-w-0">
-                               <div className="flex items-center gap-2">
-                                  <span className="text-sm font-bold text-white truncate">{u.name || 'Senza Nome'}</span>
-                                  {u.role === 'admin' && <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded font-black uppercase">Creator</span>}
-                               </div>
-                               <span className="text-[10px] text-gray-500 truncate">{u.email}</span>
-                               <span className="text-[10px] text-blue-400/70 truncate font-mono mt-0.5">{u.nickname || 'Nessun Nickname'} • {u.rank || 'Unranked'}</span>
-                            </div>
-                          </div>
+                  <div className="space-y-8">
+                    {/* List Section: Staff Attivo or Search Results */}
+                    <div>
+                      <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        {userSearch ? 'Risultati Ricerca' : 'Staff Attivo'}
+                        <span className="h-px flex-1 bg-white/5 ml-2" />
+                      </h3>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {users
+                          .filter(u => {
+                            const matchSearch = !userSearch || 
+                              u.email?.toLowerCase().includes(userSearch.toLowerCase()) || 
+                              u.nickname?.toLowerCase().includes(userSearch.toLowerCase());
+                            
+                            // If no search, only show "Staff" (role editor/admin or is_streamer)
+                            if (!userSearch) {
+                              return u.role === 'editor' || u.role === 'admin' || u.is_streamer === true;
+                            }
+                            return matchSearch;
+                          })
+                          .sort((a, b) => {
+                             // Sort staff: admins first, then editors
+                             if (a.role === 'admin') return -1;
+                             if (b.role === 'admin') return 1;
+                             return 0;
+                          })
+                          .map(u => (
+                            <div key={u.id} className={`bg-white/[0.03] border rounded-2xl p-4 flex items-center justify-between group hover:bg-white/[0.05] transition-all ${u.role === 'admin' ? 'border-yellow-500/20' : 'border-white/5'}`}>
+                              <div className="flex items-center gap-3">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center border text-lg font-bold ${u.role === 'admin' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
+                                  {u.nickname?.[0]?.toUpperCase() || u.email?.[0]?.toUpperCase() || 'U'}
+                                </div>
+                                <div className="flex flex-col min-w-0">
+                                   <div className="flex items-center gap-2">
+                                      <span className="text-sm font-bold text-white truncate">{u.nickname || 'Senza Nickname'}</span>
+                                      {u.role === 'admin' && <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded font-black uppercase">Creator</span>}
+                                   </div>
+                                   <span className="text-[10px] text-gray-500 truncate">{u.email}</span>
+                                   <span className="text-[10px] text-blue-400/70 truncate font-mono mt-0.5">{u.rank || 'Unranked'}</span>
+                                </div>
+                              </div>
 
-                          <div className="flex items-center gap-2">
-                            {/* Editor Toggle */}
-                            <button 
-                              disabled={u.role === 'admin'}
-                              onClick={() => handleToggleUserRole(u.email, 'role', u.role === 'editor' ? 'user' : 'editor')}
-                              className={`p-2.5 rounded-xl border transition-all ${u.role === 'editor' ? 'bg-blue-600 border-blue-400 text-white' : 'bg-gray-900/50 border-white/10 text-gray-500 hover:border-blue-400/50'}`}
-                              title={u.role === 'editor' ? 'Rimuovi Editor' : 'Promuovi a Editor'}
-                            >
-                               <ShieldCheck size={18} />
-                            </button>
+                              <div className="flex items-center gap-2">
+                                {/* Editor Toggle */}
+                                <button 
+                                  disabled={u.role === 'admin'}
+                                  onClick={() => handleToggleUserRole(u.email, 'role', u.role === 'editor' ? 'user' : 'editor')}
+                                  className={`p-2.5 rounded-xl border transition-all ${u.role === 'admin' ? 'bg-yellow-500 border-yellow-400 text-black cursor-default' : u.role === 'editor' ? 'bg-blue-600 border-blue-400 text-white' : 'bg-gray-900/50 border-white/10 text-gray-500 hover:border-blue-400/50'}`}
+                                  title={u.role === 'admin' ? 'Proprietario' : u.role === 'editor' ? 'Rimuovi Editor' : 'Promuovi a Editor'}
+                                >
+                                   <ShieldCheck size={18} />
+                                </button>
 
-                            {/* Streamer Toggle */}
-                            <button 
-                              onClick={() => handleToggleUserRole(u.email, 'is_streamer', !u.is_streamer)}
-                              className={`p-2.5 rounded-xl border transition-all ${u.is_streamer ? 'bg-pink-600 border-pink-400 text-white' : 'bg-gray-900/50 border-white/10 text-gray-500 hover:border-pink-400/50'}`}
-                              title={u.is_streamer ? 'Rimuovi Streamer' : 'Segna come Streamer'}
-                            >
-                               <Radio size={18} />
-                            </button>
+                                {/* Streamer Toggle */}
+                                <button 
+                                  onClick={() => handleToggleUserRole(u.email, 'is_streamer', !u.is_streamer)}
+                                  className={`p-2.5 rounded-xl border transition-all ${u.is_streamer ? 'bg-pink-600 border-pink-400 text-white' : 'bg-gray-900/50 border-white/10 text-gray-500 hover:border-pink-400/50'}`}
+                                  title={u.is_streamer ? 'Rimuovi Streamer' : 'Segna come Streamer'}
+                                >
+                                   <Radio size={18} />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        
+                        {/* Empty State */}
+                        {!userSearch && users.filter(u => u.role === 'editor' || u.role === 'admin' || u.is_streamer === true).length === 0 && (
+                          <div className="col-span-full py-20 text-center bg-white/[0.02] border border-dashed border-white/5 rounded-3xl">
+                             <ShieldCheck size={40} className="mx-auto text-gray-700 mb-4 opacity-20" />
+                             <p className="text-gray-500 text-sm italic">Nessun membro dello staff assegnato.</p>
                           </div>
-                        </div>
-                      ))}
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
