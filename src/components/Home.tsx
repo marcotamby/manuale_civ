@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useCivData } from './CivContext';
 import { CustomSelect } from './CustomSelect';
-import { Heart, BarChart2, Zap, FileText, ChevronRight } from 'lucide-react';
+import { Heart, BarChart2, Zap } from 'lucide-react';
 import { useAuth } from './AuthContext';
 
 interface HomeProps {
-  onSelectCiv: (civId: string) => void;
+  onSelectCiv: (civId: string, tab?: string) => void;
   onCompareCivs?: (civIds: string[]) => void;
 }
 
-export function Home({ onSelectCiv, onCompareCivs }: { onSelectCiv: (id: string, tab?: string) => void, onCompareCivs?: (ids: string[]) => void }) {
+export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
   const { favorites, toggleFavorite, isAuthenticated, openLoginModal } = useAuth();
   const { civilizations: civilizationsData } = useCivData();
   const [difficultyFilter, setDifficultyFilter] = useState<'Tutte' | 'Facile' | 'Medio' | 'Difficile' | 'Preferiti'>('Tutte');
