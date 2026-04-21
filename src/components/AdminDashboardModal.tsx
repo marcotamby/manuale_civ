@@ -53,7 +53,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
   const getYoutubeId = (url: string) => {
     if (!url) return null;
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
   };
@@ -181,7 +181,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
           try {
             const body = await (invokeError as any).context.json();
             msg = body.error || body.message || msg;
-          } catch (e) { }
+          } catch (e) {
+            // Silently ignore parsing errors
+          }
         }
         throw new Error(msg || 'Errore durante l\'invio delle notifiche');
       }

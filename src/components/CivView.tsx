@@ -1136,7 +1136,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                     try {
                       const url = new URL(finalId);
                       finalId = url.searchParams.get('v') || url.pathname.slice(1) || finalId;
-                    } catch (e) { }
+                    } catch (e) {
+          // Silently ignore parsing errors
+        }
                   }
                   return (
                     <div key={`${finalId}-${index}`} className="flex flex-col h-full">

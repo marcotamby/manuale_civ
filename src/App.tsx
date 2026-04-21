@@ -42,13 +42,17 @@ function App() {
   
   const currentPage = isHome ? 'home' : isCompare ? 'compare' : isCiv ? 'civ' : isFaq ? 'faq' : isTournaments ? 'tornei' : 'home';
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isAdminOverlayOpen, setIsAdminOverlayOpen] = useState(false);
   const [isCivEditorOpen, setIsCivEditorOpen] = useState(false);
   const [civEditorTarget, setCivEditorTarget] = useState<{ section?: string; id?: string }>({});
 
-  // Expose methods via window on every render to ensure they are always present and up to date
+  // Expose methods via window in a controlled way inside useEffect
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     (window as any).openProfileModal = () => setIsProfileModalOpen(true);
     (window as any).openCivEditor = (section?: string, id?: string) => {
       setCivEditorTarget({ section, id });
@@ -62,16 +66,7 @@ function App() {
       setIsCivEditorOpen(false);
       setIsSidebarOpen(false);
     };
-  }, []); // Keep in empty dependency to avoid unnecessary re-assignments, 
-          // but the state setters are stable so it's fine.
-
-  // Re-assign explicitly to window to handle potential losses during navigations or hot-reloads
-  if (typeof window !== 'undefined') {
-    (window as any).openCivEditor = (section?: string, id?: string) => {
-      setCivEditorTarget({ section, id });
-      setIsCivEditorOpen(true);
-    };
-  }
+  }, []); // State setters are stable, so empty dep array is fine
 
   const prevPathRef = useRef(location.pathname);
   useEffect(() => {
@@ -97,8 +92,6 @@ function App() {
     prevPathRef.current = currentPath;
   }, [location.pathname]);
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false);
   const touchStartX = useRef<number | null>(null);
 
   const handleTouchStart = (e: React.TouchEvent) => {
