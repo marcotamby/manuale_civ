@@ -115,21 +115,23 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
             >
                <Zap size={16} fill={isBOMode ? 'black' : 'none'} />
                <span className="hidden sm:inline">Build Orders</span>
-               <span className="sm:hidden">Build</span>
+               <span className="sm:hidden text-[10px]">Build</span>
             </button>
           </div>
 
-          <CustomSelect
-            options={[
-              { value: 'Tutte', label: 'Tutte le civiltà' },
-              { value: 'Preferiti', label: 'Civiltà Preferite' },
-              { value: 'Facile', label: 'Facile' },
-              { value: 'Medio', label: 'Medio' },
-              { value: 'Difficile', label: 'Difficile' }
-            ]}
-            value={difficultyFilter}
-            onChange={setDifficultyFilter}
-          />
+          <div className="hidden md:block">
+            <CustomSelect
+              options={[
+                { value: 'Tutte', label: 'Tutte le civiltà' },
+                { value: 'Preferiti', label: 'Civiltà Preferite' },
+                { value: 'Facile', label: 'Facile' },
+                { value: 'Medio', label: 'Medio' },
+                { value: 'Difficile', label: 'Difficile' }
+              ]}
+              value={difficultyFilter}
+              onChange={setDifficultyFilter}
+            />
+          </div>
         </div>
       </header>
 
