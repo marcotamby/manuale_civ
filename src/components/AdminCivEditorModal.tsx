@@ -221,38 +221,46 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
   };
 
   const handleBonusChange = (index: number, value: string) => {
-    const newBonuses = [...editedCiv.passiveBonuses];
-    newBonuses[index] = value;
-    setEditedCiv({ ...editedCiv, passiveBonuses: newBonuses });
+    setEditedCiv(prev => {
+      const newBonuses = [...prev.passiveBonuses];
+      newBonuses[index] = value;
+      return { ...prev, passiveBonuses: newBonuses };
+    });
   };
 
-  const updateArrayField = <T extends keyof Civilization>(field: T, index: number, key: string, value: any) => {
-    const newArr = [...(editedCiv[field] as any[])];
+  const updateArrayField = <T extends keyof Civilization>(field: T, index: number, key: string | { [key: string]: any }, value?: any) => {
+    setEditedCiv(prev => {
+      const newArr = [...(prev[field] as any[])];
+      
+      if (typeof key === 'object') {
+        newArr[index] = { ...newArr[index], ...key };
+      } else {
+        if (key === 'steps' && field === 'buildOrders') {
+          newArr[index] = { ...newArr[index], steps: value };
+        } else if (key === 'updateStep' && field === 'buildOrders') {
+          const { stepIndex, stepField, stepValue } = value;
+          const steps = [...(newArr[index].steps || [])];
+          steps[stepIndex] = { ...steps[stepIndex], [stepField === 'notes' ? 'note' : stepField]: stepValue };
+          newArr[index] = { ...newArr[index], steps };
+        } else if (key === 'addStep' && field === 'buildOrders') {
+          const steps = [...(newArr[index].steps || []), { time: '', action: '', note: '' }];
+          newArr[index] = { ...newArr[index], steps };
+        } else if (key === 'removeStep' && field === 'buildOrders') {
+          const steps = [...(newArr[index].steps || [])];
+          steps.splice(value, 1);
+          newArr[index] = { ...newArr[index], steps };
+        } else if (['attack', 'armor', 'speed', 'health'].includes(key)) {
+          newArr[index] = {
+            ...newArr[index],
+            stats: { ...(newArr[index].stats || {}), [key]: Number(value) }
+          };
+        } else {
+          newArr[index] = { ...newArr[index], [key]: key === 'age' ? Number(value) : value };
+        }
+      }
 
-    if (key === 'steps' && field === 'buildOrders') {
-      newArr[index] = { ...newArr[index], steps: value };
-    } else if (key === 'updateStep' && field === 'buildOrders') {
-      const { stepIndex, stepField, stepValue } = value;
-      const steps = [...(newArr[index].steps || [])];
-      steps[stepIndex] = { ...steps[stepIndex], [stepField === 'notes' ? 'note' : stepField]: stepValue };
-      newArr[index] = { ...newArr[index], steps };
-    } else if (key === 'addStep' && field === 'buildOrders') {
-      const steps = [...(newArr[index].steps || []), { time: '', action: '', note: '' }];
-      newArr[index] = { ...newArr[index], steps };
-    } else if (key === 'removeStep' && field === 'buildOrders') {
-      const steps = [...(newArr[index].steps || [])];
-      steps.splice(value, 1);
-      newArr[index] = { ...newArr[index], steps };
-    } else if (['attack', 'armor', 'speed', 'health'].includes(key)) {
-      newArr[index] = {
-        ...newArr[index],
-        stats: { ...(newArr[index].stats || {}), [key]: Number(value) }
-      };
-    } else {
-      newArr[index] = { ...newArr[index], [key]: key === 'age' ? Number(value) : value };
-    }
-
-    setEditedCiv({ ...editedCiv, [field]: newArr });
+      return { ...prev, [field]: newArr };
+    });
   };
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, boIdx: number) => {
     const file = e.target.files?.[0];
@@ -805,7 +813,17 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                           )}
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block text-blue-400">Nickname Autore</label>
+                            <input
+                              type="text"
+                              value={bo.author_nickname || ''}
+                              onChange={e => updateArrayField('buildOrders', idx, 'author_nickname', e.target.value)}
+                              placeholder="marcotamby"
+                              className="w-full bg-gray-800 text-white text-sm rounded px-3 py-2 border border-gray-600 focus:border-blue-500 outline-none"
+                            />
+                          </div>
                           <div>
                             <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block text-blue-400">Rank Autore</label>
                             <input
@@ -828,18 +846,29 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                                   });
                                 } else {
                                   const alreadySigned = bo.author_nickname === user.nickname;
-                                  updateArrayField('buildOrders', idx, 'author_nickname', alreadySigned ? '' : user.nickname);
-                                  updateArrayField('buildOrders', idx, 'author_rank', alreadySigned ? '' : user.rank);
+                                  updateArrayField('buildOrders', idx, {
+                                    author_nickname: alreadySigned ? '' : user.nickname,
+                                    author_rank: alreadySigned ? '' : user.rank
+                                  });
                                 }
                               }}
-                              className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all text-[10px] font-black uppercase tracking-tight ${
+                              className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-all text-xs font-bold uppercase tracking-tight h-[38px] ${
                                 bo.author_nickname === user?.nickname 
-                                  ? 'bg-yellow-500 text-black border-yellow-400 shadow-[0_0_10px_rgba(234,179,8,0.3)]' 
-                                  : 'bg-black/40 text-yellow-500 border-yellow-500/30 hover:bg-yellow-500/10'
+                                  ? 'bg-yellow-500 text-black border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.4)]' 
+                                  : 'bg-black/40 text-yellow-500 border-yellow-500/30 hover:bg-yellow-500/20'
                               }`}
                             >
-                              <CheckCircle size={12} fill={bo.author_nickname === user?.nickname ? 'black' : 'none'} />
-                              {bo.author_nickname === user?.nickname ? 'Firmato' : 'Firma questo BO'}
+                              {bo.author_nickname === user?.nickname ? (
+                                <>
+                                  <CheckCircle size={14} fill="black" />
+                                  <span>Firmato da te</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Edit size={14} />
+                                  <span>Firma come {user?.nickname?.split(' ')[0] || 'Me'}</span>
+                                </>
+                              )}
                             </button>
                           </div>
                         </div>
