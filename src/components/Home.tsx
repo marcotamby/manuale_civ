@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useCivData } from './CivContext';
 import { CustomSelect } from './CustomSelect';
-import { Heart, BarChart2 } from 'lucide-react';
+import { Heart, BarChart2, Zap, FileText, ChevronRight } from 'lucide-react';
 import { useAuth } from './AuthContext';
 
 interface HomeProps {
@@ -9,12 +9,13 @@ interface HomeProps {
   onCompareCivs?: (civIds: string[]) => void;
 }
 
-export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
+export function Home({ onSelectCiv, onCompareCivs }: { onSelectCiv: (id: string, tab?: string) => void, onCompareCivs?: (ids: string[]) => void }) {
   const { favorites, toggleFavorite, isAuthenticated, openLoginModal } = useAuth();
   const { civilizations: civilizationsData } = useCivData();
   const [difficultyFilter, setDifficultyFilter] = useState<'Tutte' | 'Facile' | 'Medio' | 'Difficile' | 'Preferiti'>('Tutte');
   const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
   const [isCompareMode, setIsCompareMode] = useState(false);
+  const [isBOMode, setIsBOMode] = useState(false);
   const isMaxReached = selectedForCompare.length >= 2;
 
   const filteredCivs = civilizationsData.filter(civ => {
@@ -42,7 +43,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
         return prev;
       });
     } else {
-      onSelectCiv(civId);
+      onSelectCiv(civId, isBOMode ? 'build-orders' : undefined);
     }
   };
 
@@ -101,6 +102,23 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
             </button>
           </div>
 
+          <div className="flex items-center glass p-1 rounded-xl h-[42px]">
+            <button
+               onClick={() => {
+                 setIsBOMode(!isBOMode);
+                 if (isCompareMode) setIsCompareMode(false);
+               }}
+               className={`flex items-center gap-2 px-3 md:px-4 h-full rounded-lg text-sm font-bold transition-all ${isBOMode
+                 ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.4)]'
+                 : 'text-gray-400 hover:text-gray-200'
+               }`}
+            >
+               <Zap size={16} fill={isBOMode ? 'black' : 'none'} />
+               <span className="hidden sm:inline">Build Orders</span>
+               <span className="sm:hidden">Build</span>
+            </button>
+          </div>
+
           <CustomSelect
             options={[
               { value: 'Tutte', label: 'Tutte le civiltà' },
@@ -114,6 +132,34 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
           />
         </div>
       </header>
+
+      {/* Quick Access Build Orders Row (Desktop & Mobile) */}
+      <div className="mb-6 animate-in slide-in-from-left duration-500">
+        <div className="flex items-center justify-between mb-3 px-1">
+          <h2 className="text-xs font-black text-gray-500 uppercase tracking-[0.2em] flex items-center gap-2">
+             <Zap size={12} className="text-yellow-500" />
+             Accesso Rapido Build Orders
+          </h2>
+          <span className="text-[10px] text-gray-400 font-bold hidden md:inline">Scegli una civiltà per le strategie</span>
+        </div>
+        <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 scroll-smooth">
+          {civilizationsData.map(civ => (
+            <button
+              key={`quick-${civ.id}`}
+              onClick={() => onSelectCiv(civ.id, 'build-orders')}
+              className="flex-shrink-0 group flex flex-col items-center gap-2"
+            >
+              <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-[#1a1c23] border border-white/5 p-2 transition-all group-hover:border-yellow-500/50 group-hover:scale-110 shadow-lg relative overflow-hidden">
+                <img src={civ.flag} className="w-full h-full object-contain relative z-10" alt={civ.name} />
+                <div className="absolute inset-0 bg-yellow-500/0 group-hover:bg-yellow-500/5 transition-colors" />
+              </div>
+              <span className="text-[10px] font-black text-gray-500 group-hover:text-yellow-500 transition-colors uppercase tracking-tighter truncate max-w-[64px]">
+                {civ.name}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 md:gap-5 pb-20">
         {filteredCivs.map(civ => {
@@ -164,6 +210,16 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                 </div>
               )}
 
+              {/* Build Order Shortcut Indicator */}
+              {isBOMode && !isCompareMode && (
+                 <div className="absolute inset-0 bg-yellow-900/10 flex items-center justify-center animate-in fade-in duration-300">
+                    <div className="bg-yellow-500 text-black px-3 py-1 rounded-full font-black text-[10px] uppercase tracking-widest shadow-[0_0_20px_rgba(234,179,8,0.4)] flex items-center gap-1.5">
+                       <Zap size={12} fill="black" />
+                       Build Orders
+                    </div>
+                 </div>
+              )}
+
               {/* Content Top Left: Difficulty (Desktop Only) */}
               {!isCompareMode && (
                 <div className={`absolute top-3 left-3 text-[10px] font-bold px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border hidden md:block ${civ.difficulty === 'Facile' ? 'text-green-400 border-green-400/30' :
@@ -192,6 +248,20 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                 >
                   <Heart className="w-3 h-3 md:w-4 md:h-4" fill={isFavorite ? "currentColor" : "none"} />
                 </button>
+              )}
+
+              {/* Desktop Hover Build Orders Button */}
+              {!isCompareMode && !isBOMode && (
+                 <button
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     onSelectCiv(civ.id, 'build-orders');
+                   }}
+                   className="absolute bottom-20 left-1/2 -translate-x-1/2 hidden md:flex items-center gap-2 px-3 py-1.5 bg-yellow-500 text-black opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 rounded-lg font-black text-[10px] uppercase tracking-widest whitespace-nowrap shadow-xl border border-yellow-400"
+                 >
+                    <Zap size={12} fill="black" />
+                    Strategie
+                 </button>
               )}
 
               {/* Text at bottom */}

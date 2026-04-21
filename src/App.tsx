@@ -127,8 +127,12 @@ function App() {
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const { civilizations: civilizationsData, loading, error, refreshCivs, updateCivLocally, updateGlobalUnitLocally } = useCivData();
 
-  const handleSelectCiv = (civId: string) => {
-    navigate(`/civ/${civId}`);
+  const handleSelectCiv = (civId: string, tab?: string) => {
+    if (tab) {
+      navigate(`/civ/${civId}/${tab}`);
+    } else {
+      navigate(`/civ/${civId}`);
+    }
     setIsSidebarOpen(false);
   };
 
