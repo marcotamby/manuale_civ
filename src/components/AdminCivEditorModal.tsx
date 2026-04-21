@@ -32,7 +32,6 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
     message: '',
     type: 'success'
   });
-  const [isSigned, setIsSigned] = useState(false);
   const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
   const [dragState, setDragState] = useState<{ idx: number; startY: number; startPos: number } | null>(null);
 
@@ -161,17 +160,6 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
     try {
       setIsSaving(true);
 
-      let finalBuildOrders = [...(editedCiv.buildOrders || [])];
-      
-      // Apply signature if checked
-      if (isSigned && user) {
-        finalBuildOrders = finalBuildOrders.map(bo => ({
-          ...bo,
-          author_nickname: user.nickname || user.name || bo.author_nickname,
-          author_rank: user.rank || bo.author_rank
-        }));
-      }
-
       const { error: civError } = await supabase
         .from('civilizations')
         .update({
@@ -180,7 +168,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
           short_description: editedCiv.shortDescription,
           passive_bonuses: editedCiv.passiveBonuses,
           videos: editedCiv.videos,
-          build_orders: finalBuildOrders,
+          build_orders: editedCiv.buildOrders,
           unique_units: editedCiv.uniqueUnits,
           landmarks: editedCiv.landmarks,
           strengths: editedCiv.strengths?.filter((s: string) => s.trim() !== '') || [],
@@ -828,42 +816,37 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                               className="w-full bg-gray-800 text-white text-sm rounded px-3 py-2 border border-gray-600 focus:border-blue-500 outline-none"
                             />
                           </div>
+                          <div className="flex items-end">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (!user?.nickname) {
+                                  setToast({
+                                    isVisible: true,
+                                    message: 'Completa il tuo profilo admin con un nickname per firmare il contenuto',
+                                    type: 'error'
+                                  });
+                                } else {
+                                  const alreadySigned = bo.author_nickname === user.nickname;
+                                  updateArrayField('buildOrders', idx, 'author_nickname', alreadySigned ? '' : user.nickname);
+                                  updateArrayField('buildOrders', idx, 'author_rank', alreadySigned ? '' : user.rank);
+                                }
+                              }}
+                              className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all text-[10px] font-black uppercase tracking-tight ${
+                                bo.author_nickname === user?.nickname 
+                                  ? 'bg-yellow-500 text-black border-yellow-400 shadow-[0_0_10px_rgba(234,179,8,0.3)]' 
+                                  : 'bg-black/40 text-yellow-500 border-yellow-500/30 hover:bg-yellow-500/10'
+                              }`}
+                            >
+                              <CheckCircle size={12} fill={bo.author_nickname === user?.nickname ? 'black' : 'none'} />
+                              {bo.author_nickname === user?.nickname ? 'Firmato' : 'Firma questo BO'}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
                   ))}
                   {(!editedCiv.buildOrders || editedCiv.buildOrders.length === 0) && <p className="text-gray-500 text-sm italic text-center py-4">Nessun build order</p>}
-                  
-                  {editedCiv.buildOrders && editedCiv.buildOrders.length > 0 && (
-                    <div className="mt-8 pt-6 border-t border-white/10 flex flex-col items-center gap-4">
-                      <div 
-                        className="flex items-center gap-3 cursor-pointer group bg-yellow-500/5 hover:bg-yellow-500/10 px-6 py-4 rounded-2xl border border-yellow-500/20 transition-all"
-                        onClick={() => {
-                          if (!user?.nickname) {
-                            setToast({
-                              isVisible: true,
-                              message: 'Completa il tuo profilo admin con un nickname per firmare il contenuto',
-                              type: 'error'
-                            });
-                          } else {
-                            setIsSigned(!isSigned);
-                          }
-                        }}
-                      >
-                        <div className={`w-6 h-6 rounded-lg border-2 transition-all flex items-center justify-center ${
-                          isSigned 
-                            ? 'bg-yellow-500 border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.4)]' 
-                            : 'bg-black/40 border-white/20 group-hover:border-yellow-500/50'
-                        }`}>
-                          {isSigned && <CheckCircle size={14} className="text-black" />}
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-black text-white uppercase tracking-tight">Firma come {user?.nickname || 'Admin'}</span>
-                          <span className="text-[10px] text-gray-500 font-medium">Applica il tuo nickname e rank a tutti i build order salvati</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
 
