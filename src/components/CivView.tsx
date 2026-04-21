@@ -526,109 +526,114 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
   return (
     <div className="flex-1 overflow-y-auto overflow-x-hidden w-full civ-view-container">
-      {/* Civ Hero Header */}
-      <div className="relative min-h-[220px] px-6 pt-10 pb-10 border-b border-white/5 overflow-hidden flex items-center bg-[var(--color-brand-dark)]">
-        {/* Cinematic Fading Flag Background */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden h-full w-full">
-          {/* Flag image with mask-image for professional fade */}
+      {/* Unified Cinematic Top Section (Header + Navbar) */}
+      <div className="relative border-b border-[#D4AF37]/15 bg-[var(--color-brand-dark)]">
+        {/* Unified Cinematic Fading Flag Background */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
+          {/* Flag image: Optimized to avoid sgranatura (pixelation) by using height-based scaling */}
           <img 
             src={civ.flag} 
             alt="" 
-            className="h-full w-full object-cover object-left opacity-[0.6] sm:opacity-[0.8]"
+            className="h-full w-auto max-w-[80vw] object-contain object-left opacity-[0.5] sm:opacity-[0.6]"
             style={{
-              maskImage: 'linear-gradient(to right, black 0%, black 20%, transparent 60%)',
-              WebkitMaskImage: 'linear-gradient(to right, black 0%, black 20%, transparent 60%)'
+              maskImage: 'linear-gradient(to right, black 0%, black 10%, transparent 70%)',
+              WebkitMaskImage: 'linear-gradient(to right, black 0%, black 10%, transparent 70%)'
             }}
           />
-          {/* Subtle vertical gradient for top/bottom smoothing */}
+          {/* Smoothing gradients */}
           <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-brand-dark)] via-transparent to-[var(--color-brand-dark)]/10" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--color-brand-dark)]/40 to-[var(--color-brand-dark)]" />
         </div>
-        
-        <div className="relative z-10 flex flex-col items-start gap-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 flex-wrap mb-2">
-              <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">
-                {civ.name}
-              </h1>
-              <span className={`text-xs font-bold px-3 py-1 rounded-full border ${civ.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/10' :
-                civ.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-500/40 bg-yellow-500/10' :
-                  'text-red-400 border-red-400/30 bg-red-500/10'
-                }`}>
-                {civ.difficulty}
-              </span>
-              {isAdmin && (
-                <div className="flex gap-2 items-center bg-yellow-500/10 px-3 py-1.5 rounded-lg border border-yellow-500/40 shadow-[0_0_15px_rgba(234,179,8,0.1)]">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-black text-yellow-500 uppercase tracking-widest leading-none mb-1">
-                      {isSuperAdmin ? 'MODALITÀ ADMIN' : 'MODALITÀ EDITOR'}
-                    </span>
-                    <span className="text-[8px] text-yellow-500/60 font-medium leading-none">{user?.email}</span>
+
+        {/* Header Content */}
+        <div className="relative z-10 min-h-[200px] px-6 pt-10 pb-6 flex items-center">
+          <div className="flex flex-col items-start gap-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 flex-wrap mb-2">
+                <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">
+                  {civ.name}
+                </h1>
+                <span className={`text-xs font-bold px-3 py-1 rounded-full border ${civ.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/10' :
+                  civ.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-500/40 bg-yellow-500/10' :
+                    'text-red-400 border-red-400/30 bg-red-500/10'
+                  }`}>
+                  {civ.difficulty}
+                </span>
+                {isAdmin && (
+                  <div className="flex gap-2 items-center bg-yellow-500/10 px-3 py-1.5 rounded-lg border border-yellow-500/40 shadow-[0_0_15px_rgba(234,179,8,0.1)]">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-black text-yellow-500 uppercase tracking-widest leading-none mb-1">
+                        {isSuperAdmin ? 'MODALITÀ ADMIN' : 'MODALITÀ EDITOR'}
+                      </span>
+                      <span className="text-[8px] text-yellow-500/60 font-medium leading-none">{user?.email}</span>
+                    </div>
+                    <button
+                      onClick={() => (window as any).openCivEditor?.()}
+                      className="ml-2 px-3 py-1.5 bg-yellow-600 hover:bg-yellow-500 text-black text-[10px] font-black rounded uppercase transition-all active:scale-95 flex items-center gap-1 shadow-lg border border-yellow-400/50"
+                    >
+                      <Edit size={12} fill="black" /> Modifica
+                    </button>
                   </div>
-                  <button
-                    onClick={() => (window as any).openCivEditor?.()}
-                    className="ml-2 px-3 py-1.5 bg-yellow-600 hover:bg-yellow-500 text-black text-[10px] font-black rounded uppercase transition-all active:scale-95 flex items-center gap-1 shadow-lg border border-yellow-400/50"
-                  >
-                    <Edit size={12} fill="black" /> Modifica
-                  </button>
+                )}
+              </div>
+
+              {/* Active presence indicators */}
+              {Object.values(_activeAdmins).some(a => a.user?.email !== user?.email && a.activity?.civId === civId) && (
+                <div className="flex -space-x-2 overflow-hidden mt-3 items-center">
+                  {Object.values(_activeAdmins)
+                    .filter(admin => admin.user?.email !== user?.email && admin.activity?.civId === civId)
+                    .map((admin, idx) => (
+                      <div
+                        key={idx}
+                        className="inline-block h-6 w-6 rounded-full ring-2 ring-[var(--color-brand-dark)] bg-yellow-500/10 flex items-center justify-center overflow-hidden"
+                        title={`${admin.user.name} sta guardando questa civiltà`}
+                      >
+                        {admin.user.avatar ? (
+                          <img src={admin.user.avatar} alt="" className="h-full w-full object-cover" />
+                        ) : (
+                          <span className="text-[10px] font-bold text-yellow-500">{admin.user.name?.charAt(0)}</span>
+                        )}
+                      </div>
+                    ))}
+                  <span className="ml-4 text-[10px] text-gray-500 font-medium italic">
+                    Altri admin stanno consultando questa civiltà
+                  </span>
                 </div>
               )}
+
+              <p className="text-gray-300 max-w-2xl leading-relaxed">{civ.shortDescription}</p>
             </div>
-
-            {/* Active presence indicators */}
-            {Object.values(_activeAdmins).some(a => a.user?.email !== user?.email && a.activity?.civId === civId) && (
-              <div className="flex -space-x-2 overflow-hidden mt-3 items-center">
-                {Object.values(_activeAdmins)
-                  .filter(admin => admin.user?.email !== user?.email && admin.activity?.civId === civId)
-                  .map((admin, idx) => (
-                    <div
-                      key={idx}
-                      className="inline-block h-6 w-6 rounded-full ring-2 ring-[var(--color-brand-dark)] bg-yellow-500/10 flex items-center justify-center overflow-hidden"
-                      title={`${admin.user.name} sta guardando questa civiltà`}
-                    >
-                      {admin.user.avatar ? (
-                        <img src={admin.user.avatar} alt="" className="h-full w-full object-cover" />
-                      ) : (
-                        <span className="text-[10px] font-bold text-yellow-500">{admin.user.name?.charAt(0)}</span>
-                      )}
-                    </div>
-                  ))}
-                <span className="ml-4 text-[10px] text-gray-500 font-medium italic">
-                  Altri admin stanno consultando questa civiltà
-                </span>
-              </div>
-            )}
-
-            <p className="text-gray-300 max-w-2xl leading-relaxed">{civ.shortDescription}</p>
           </div>
         </div>
-      </div>
 
-      <div className="relative sticky top-0 bg-[var(--color-brand-dark)] z-10 border-b border-[#D4AF37]/15 w-full">
-        <div
-          ref={scrollContainerRef}
-          onScroll={checkScroll}
-          className="px-4 overflow-x-auto flex flex-nowrap gap-0 relative w-full no-scrollbar"
-        >
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => handleTabChange(tab.id)}
-              className={`flex items-center gap-2 px-5 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.id
-                ? 'border-yellow-500 text-yellow-400'
-                : 'border-transparent text-gray-400 hover:text-gray-200'
-                }`}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {canScrollRight && (
-          <div className="md:hidden absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[var(--color-brand-dark)] to-transparent pointer-events-none flex items-center justify-end pr-2">
-            <ChevronRight size={16} className="text-yellow-500/70 animate-pulse" />
+        {/* Navigation Bar (Nested within unified section) */}
+        <div className="relative sticky top-0 bg-black/40 backdrop-blur-md z-10 border-t border-white/5 w-full">
+          <div
+            ref={scrollContainerRef}
+            onScroll={checkScroll}
+            className="px-4 overflow-x-auto flex flex-nowrap gap-0 relative w-full no-scrollbar"
+          >
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                className={`flex items-center gap-2 px-5 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.id
+                  ? 'border-yellow-500 text-yellow-400'
+                  : 'border-transparent text-gray-400 hover:text-gray-200'
+                  }`}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
           </div>
-        )}
+
+          {canScrollRight && (
+            <div className="md:hidden absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-black/80 to-transparent pointer-events-none flex items-center justify-end pr-2">
+              <ChevronRight size={16} className="text-yellow-500/70 animate-pulse" />
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="p-4 md:p-8">
