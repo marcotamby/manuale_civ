@@ -85,16 +85,16 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
     }, []);
 
     return (
-      <div className={`relative ${isSm ? (showName ? 'w-[180px]' : 'w-[75px]') : 'w-full'}`} ref={dropdownRef}>
+      <div className={`relative ${isSm ? (showName ? 'w-[180px]' : 'w-[65px]') : 'w-full'}`} ref={dropdownRef}>
         <div 
           onClick={() => setIsOpen(!isOpen)}
-          className={`flex items-center gap-3 bg-[#0a0f1a] border border-white/10 rounded-xl cursor-pointer hover:border-blue-500/50 transition-all ${isSm ? 'px-2 py-2' : 'px-5 py-4'}`}
+          className={`flex items-center gap-2 bg-[#0d111a] border border-white/10 rounded-xl cursor-pointer hover:border-blue-500/50 transition-all ${isSm ? 'px-1.5 py-1.5' : 'px-5 py-4'}`}
         >
-          <div className={`flex-shrink-0 ${isSm ? 'w-10 h-7' : 'w-10 h-7'} rounded-md bg-white/5 overflow-hidden border border-white/10 shadow-inner`}>
+          <div className={`flex-shrink-0 ${isSm ? 'w-9 h-6' : 'w-10 h-7'} rounded bg-black/40 overflow-hidden border border-white/10 shadow-inner`}>
              {selectedCiv ? (
                <img src={selectedCiv.flag} className="w-full h-full object-cover" />
              ) : (
-               <Trophy className="w-full h-full p-1 text-gray-700" />
+               <Trophy className="w-full h-full p-1 text-gray-800" />
              )}
           </div>
           {showName && (
@@ -102,7 +102,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
               {selectedCiv ? selectedCiv.name : (isSm ? 'CIV' : 'SELEZIONA CIVILTA\'')}
             </span>
           )}
-          <div className="text-gray-600 text-[10px] pr-0.5">▼</div>
+          <div className="text-gray-600 text-[10px]">▼</div>
         </div>
 
         {isOpen && (
@@ -173,30 +173,29 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
 
   const renderMatchInputs = (matchId: string, label: string) => {
     const match = state.bracket[matchId] || { p1: '', p2: '', p1Civ: '', p2Civ: '', w: 0 };
-    const isFinal = matchId === 'f';
     
     return (
-      <div className={`bg-black/50 border border-white/10 rounded-3xl ${isFinal ? 'p-8' : 'p-6'} space-y-6 shadow-2xl relative group hover:border-blue-500/20 transition-all`}>
-        <div className="flex items-center justify-between mb-1">
-          <span className={`text-[10px] font-black ${isFinal ? 'text-yellow-500 scale-110' : 'text-blue-400'} uppercase tracking-[0.2em] opacity-60`}>{label}</span>
+      <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-4 shadow-xl hover:border-blue-500/10 transition-all">
+        <div className="flex items-center justify-between mb-0.5">
+          <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest opacity-40">{label}</span>
         </div>
         
-        <div className="space-y-6">
+        <div className="space-y-3">
           {[1, 2].map(idx => {
             const pKey = `p${idx}`;
             const cKey = `p${idx}Civ`;
             return (
-              <div key={idx} className="flex items-center gap-4">
+              <div key={idx} className="flex items-center gap-2.5">
                 <input
                   type="text"
                   value={match[pKey]}
                   onChange={(e) => setState({ ...state, bracket: { ...state.bracket, [matchId]: { ...match, [pKey]: e.target.value } } })}
                   placeholder={`GIOCATORE ${idx === 1 ? 'A' : 'B'}`}
-                  className="flex-1 bg-[#0d111a] border border-white/10 rounded-xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/30 font-black uppercase shadow-inner"
+                  className="flex-1 bg-[#05080f] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-blue-500/30 font-bold uppercase shadow-inner"
                 />
                 <button 
                   onClick={() => updateMatchWinner(matchId, idx)}
-                  className={`w-12 h-12 rounded-xl flex items-center justify-center text-xs font-black transition-all ${match.w === idx ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/30' : 'bg-white/5 text-gray-600 hover:text-white'}`}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black transition-all ${match.w === idx ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'bg-white/5 text-gray-600 hover:text-white'}`}
                 >
                   W
                 </button>
@@ -208,6 +207,19 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
       </div>
     );
   };
+
+  const TabButton = ({ active, label, onClick }: { active: boolean, label: string, onClick: () => void }) => (
+    <button
+      onClick={onClick}
+      className={`px-12 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border ${
+        active 
+          ? 'bg-gradient-to-b from-white to-gray-400 text-black shadow-[0_0_25px_rgba(255,255,255,0.25)] border-white' 
+          : 'bg-white/5 text-gray-500 border-white/5 hover:text-white hover:border-white/20 hover:bg-white/10'
+      }`}
+    >
+      {label}
+    </button>
+  );
 
   return (
     <div className="flex flex-col h-full bg-[#05080f] font-inter">
@@ -229,9 +241,9 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
           )}
         </div>
 
-        <div className="flex gap-1 bg-black/60 p-1.5 rounded-2xl border border-white/5 shadow-inner">
-          <button onClick={() => setActiveTab('match')} className={`px-10 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'match' ? 'bg-white/10 text-white shadow-xl border border-white/10' : 'text-gray-500 hover:text-white'}`}>Match Attivo</button>
-          <button onClick={() => setActiveTab('bracket')} className={`px-10 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'bracket' ? 'bg-white/10 text-white shadow-xl border border-white/10' : 'text-gray-500 hover:text-white'}`}>Tabellone</button>
+        <div className="flex gap-2 bg-black/60 p-1.5 rounded-2xl border border-white/5 shadow-inner">
+          <TabButton active={activeTab === 'match'} label="Match Attivo" onClick={() => setActiveTab('match')} />
+          <TabButton active={activeTab === 'bracket'} label="Tabellone" onClick={() => setActiveTab('bracket')} />
         </div>
       </div>
 
@@ -284,30 +296,28 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
             <div className="flex justify-center pt-8"><SaveButton className="px-32 py-5" /></div>
           </div>
         ) : (
-          <div className="max-w-[1600px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-32 pb-64">
-            <div className="grid grid-cols-3 gap-32 items-stretch">
-              <div className="space-y-40 flex flex-col justify-between">
-                <h4 className="text-center text-[12px] font-black text-blue-400 uppercase tracking-[0.5em] pb-3 border-b-2 border-blue-400/20 mb-8">Quarti di Finale</h4>
+          <div className="max-w-[1400px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-16 pb-64">
+            <div className="grid grid-cols-3 gap-12 items-stretch">
+              <div className="space-y-4 flex flex-col justify-between">
+                <h4 className="text-center text-[10px] font-black text-blue-400 uppercase tracking-[0.5em] pb-2 border-b border-blue-400/20 mb-4">Quarti di Finale</h4>
                 {renderMatchInputs('q1', 'Match #01')}
                 {renderMatchInputs('q2', 'Match #02')}
                 {renderMatchInputs('q3', 'Match #03')}
                 {renderMatchInputs('q4', 'Match #04')}
               </div>
-              <div className="flex flex-col justify-around py-40">
-                <h4 className="text-center text-[12px] font-black text-blue-400 uppercase tracking-[0.5em] pb-3 border-b-2 border-blue-400/20 mb-8">Semifinali</h4>
-                <div className="space-y-[420px]">
-                  {renderMatchInputs('s1', 'Semifinale Nord')}
-                  {renderMatchInputs('s2', 'Semifinale Sud')}
+              <div className="flex flex-col justify-around py-20">
+                <h4 className="text-center text-[10px] font-black text-blue-400 uppercase tracking-[0.5em] pb-2 border-b border-blue-400/20 mb-4">Semifinali</h4>
+                <div className="space-y-40">
+                  {renderMatchInputs('s1', 'Semi Nord')}
+                  {renderMatchInputs('s2', 'Semi Sud')}
                 </div>
               </div>
               <div className="flex flex-col justify-center">
-                <h4 className="text-center text-[14px] font-black text-yellow-500 uppercase tracking-[0.6em] pb-4 border-b-2 border-yellow-500/30 mb-12">Gran Finale</h4>
-                <div className="p-4 bg-yellow-500/5 rounded-[64px] border-2 border-yellow-500/30 shadow-2xl shadow-yellow-500/10">
-                  {renderMatchInputs('f', 'Finalissima Oro')}
-                </div>
+                <h4 className="text-center text-[11px] font-black text-yellow-500 uppercase tracking-[0.5em] pb-2 border-b border-yellow-500/20 mb-6">Gran Finale</h4>
+                {renderMatchInputs('f', 'Finalissima Oro')}
               </div>
             </div>
-            <div className="flex justify-center pt-20 border-t border-white/5"><SaveButton className="px-32 py-5" /></div>
+            <div className="flex justify-center pt-12 border-t border-white/5"><SaveButton className="px-20 py-4" /></div>
           </div>
         )}
       </div>
