@@ -152,7 +152,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
       <div className="bg-[#161b2b] border border-[#D4AF37]/20 rounded-2xl p-4 space-y-4 shadow-xl transition-all hover:border-[#D4AF37]/40">
         <div className="flex justify-between items-center mb-1">
           <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-widest">{label}</span>
-          <div className="text-[8px] text-gray-500 uppercase tracking-tighter">Seleziona Vincitore con W</div>
+          <div className="text-[8px] text-emerald-400 font-bold uppercase tracking-tighter animate-pulse">Seleziona Vincitore con W</div>
         </div>
 
         <div className="space-y-3">
