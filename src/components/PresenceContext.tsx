@@ -81,48 +81,73 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
 
   // 2. Global User Presence (privacy-focused)
   useEffect(() => {
-    // Track everyone (logged in or guests)
-    // Generate a session-persistent guest ID if not logged in
-    let guestId = sessionStorage.getItem('presence_guest_id');
-    if (!guestId) {
-      guestId = 'guest-' + Math.random().toString(36).substring(2, 9);
-      sessionStorage.setItem('presence_guest_id', guestId);
-    }
+    let timeoutId: any;
+    let channel: any;
 
-    const presenceKey = user?.email || guestId;
-
-    const channel = supabase.channel('global-presence', {
-      config: { presence: { key: presenceKey } }
-    });
-
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState();
-        const keys = Object.keys(state);
-        setOnlineUserCount(keys.length);
-
-        // Calculate distribution
-        const distribution: Record<string, number> = {};
-        keys.forEach(key => {
-          const p = state[key] as any[];
-          if (p.length > 0 && p[0].page) {
-            const page = p[0].page;
-            distribution[page] = (distribution[page] || 0) + 1;
+    // We delay the presence connection by 2 seconds to allow 
+    // the main data fetch (civilizations) to complete first.
+    // This helps bypass some corporate firewall "burst" blocks.
+    timeoutId = setTimeout(() => {
+      try {
+        let guestId = 'guest-temp';
+        try {
+          guestId = sessionStorage.getItem('presence_guest_id') || '';
+          if (!guestId) {
+            guestId = 'guest-' + Math.random().toString(36).substring(2, 9);
+            sessionStorage.setItem('presence_guest_id', guestId);
           }
-        });
-        setUsersByPage(distribution);
-      })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          await channel.track({
-            // Minimal data for privacy
-            page: activity.civId || activity.section || 'home',
-            active: true
-          });
+        } catch (e) {
+          console.warn('sessionStorage not available, using temporary guest ID');
         }
-      });
 
-    return () => { channel.unsubscribe(); };
+        const presenceKey = user?.email || guestId;
+
+        channel = supabase.channel('global-presence', {
+          config: { presence: { key: presenceKey } }
+        });
+
+        channel
+          .on('presence', { event: 'sync' }, () => {
+            const state = channel.presenceState();
+            const keys = Object.keys(state);
+            setOnlineUserCount(keys.length);
+
+            const distribution: Record<string, number> = {};
+            keys.forEach(key => {
+              const p = state[key] as any[];
+              if (p.length > 0 && p[0].page) {
+                const page = p[0].page;
+                distribution[page] = (distribution[page] || 0) + 1;
+              }
+            });
+            setUsersByPage(distribution);
+          })
+          .subscribe(async (status: string) => {
+            if (status === 'CHANNEL_ERROR') {
+              console.warn('Connessione al counter bloccata dalla rete (probabile firewall aziendale).');
+              return;
+            }
+            
+            if (status === 'SUBSCRIBED') {
+              try {
+                await channel.track({
+                  page: activity.civId || activity.section || 'home',
+                  active: true
+                });
+              } catch (err) {
+                console.error('Error tracking presence:', err);
+              }
+            }
+          });
+      } catch (err) {
+        console.error('Failed to initialize presence channel:', err);
+      }
+    }, 2000);
+
+    return () => { 
+      clearTimeout(timeoutId);
+      if (channel) channel.unsubscribe(); 
+    };
   }, [user?.email, activity]);
 
   const updateActivity = (newActivity: any) => {

@@ -70,8 +70,34 @@ export function useCivilizations() {
 
       setGlobalUnits(formattedGlobalUnits);
     } catch (err: any) {
-      console.error('Error fetching data:', err);
-      setError(err.message);
+      console.error('Error fetching data from Supabase:', err);
+      
+      // If we have a network error or block, fallback to local data
+      // so the site remains usable even if the server is unreachable
+      if (civs.length === 0) {
+        console.log('Using local fallback data...');
+        const localFormattedCivs: Civilization[] = civilizationsData.map(c => ({
+          ...c,
+          shortDescription: c.shortDescription || '',
+          passiveBonuses: c.passiveBonuses || [],
+          uniqueUnits: c.uniqueUnits || [],
+          technologies: c.technologies || [],
+          landmarks: c.landmarks || [],
+          videos: c.videos || [],
+          buildOrders: c.buildOrders || [],
+          strengths: c.strengths || [],
+          weaknesses: c.weaknesses || []
+        }));
+        setCivs(localFormattedCivs);
+        setGlobalUnits(unitsList as Unit[]);
+      }
+      
+      // We set a non-blocking error message or null if we have fallback data
+      setError(null); 
+      // Log specifically the connection issue for debugging
+      if (err.message === 'Failed to fetch') {
+        console.warn('Connessione al database bloccata. Verificare se la rete aziendale limita i WebSockets o le API Supabase.');
+      }
     } finally {
       setLoading(false);
     }
