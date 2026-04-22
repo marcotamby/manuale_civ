@@ -205,21 +205,28 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
           (window as any).closeAllModals?.();
           (window as any).resetHomeFilters?.();
         }}
-        className="flex flex-col items-center justify-center text-center w-full md:w-1/3 group cursor-pointer hover:opacity-90 transition-opacity"
+        className="flex flex-col items-center justify-center text-center w-full md:w-1/3 group cursor-pointer hover:opacity-95 transition-all py-2"
       >
-        <h2 className="text-xs md:text-sm font-sackers font-bold text-yellow-500/90 tracking-[0.15em] uppercase mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+        <h2 className="text-[10px] md:text-[11px] font-medium text-gray-500 tracking-[0.4em] uppercase mb-1 drop-shadow-sm px-4">
           Age of Empires IV
         </h2>
-        <h1 className="text-3xl md:text-4xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 via-yellow-400 to-amber-600 drop-shadow-[0_0_15px_rgba(212,175,55,0.3)] tracking-tight">
-          Manuale delle Civiltà
-        </h1>
-        <div className="flex items-center gap-3 mt-3 mb-2">
-          <div className="h-px w-12 bg-gradient-to-r from-transparent to-yellow-500/50"></div>
-          <div className="w-1.5 h-1.5 rotate-45 bg-yellow-500/60 transition-transform group-hover:rotate-[135deg] duration-500"></div>
-          <div className="h-px w-12 bg-gradient-to-l from-transparent to-yellow-500/50"></div>
+        
+        <div className="relative">
+          <h1 className="text-3xl md:text-4xl font-cinzel font-bold text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-400 to-amber-700 drop-shadow-[0_2px_10px_rgba(212,175,55,0.2)] tracking-tighter leading-none">
+            Manuale delle Civiltà
+          </h1>
+          {/* Subtle shine effect line */}
+          <div className="absolute -inset-x-4 top-1/2 h-px bg-gradient-to-r from-transparent via-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
         </div>
-        <p className="text-xs text-gray-400/90 italic hidden sm:block font-serif tracking-wider">
-          Benvenuto sul sito dedicato alle guide di tutte le civiltà di AoE IV!
+
+        <div className="flex items-center gap-4 mt-3 mb-2 opacity-60">
+          <div className="h-[1px] w-8 bg-gradient-to-r from-transparent to-amber-500/50"></div>
+          <div className="w-1.5 h-1.5 rotate-45 border border-amber-500/50 transition-all group-hover:rotate-[135deg] group-hover:bg-amber-500/20 duration-700"></div>
+          <div className="h-[1px] w-8 bg-gradient-to-l from-transparent to-amber-500/50"></div>
+        </div>
+        
+        <p className="text-[10px] md:text-11px text-gray-500 italic hidden sm:block font-sans tracking-wide max-w-xs leading-tight opacity-80">
+          Strategie, Build Orders e Database Unità
         </p>
       </Link>
 
