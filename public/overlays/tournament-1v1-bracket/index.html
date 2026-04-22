@@ -90,19 +90,26 @@
         .bracket-civ-flag {
             position: absolute; inset: 0; width: 100%; height: 100%;
             background-size: cover; background-position: center;
-            opacity: 0.15; z-index: 1; transition: all 0.4s ease;
-            -webkit-mask-image: linear-gradient(to right, black 30%, transparent 90%);
-            mask-image: linear-gradient(to right, black 30%, transparent 90%);
+            opacity: 0.35; z-index: 1; transition: all 0.4s ease;
+            -webkit-mask-image: linear-gradient(to right, black 30%, transparent 95%);
+            mask-image: linear-gradient(to right, black 30%, transparent 95%);
         }
 
         .bracket-player .name { position: relative; z-index: 2; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; letter-spacing: 1px; }
         
-        .bracket-player.winner { color: #fff; background: rgba(212, 175, 55, 0.25); text-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
+        .bracket-player.winner { color: #fff; background: rgba(212, 175, 55, 0.3); text-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
         .bracket-player.winner::after { content: '🏆'; position: absolute; right: 12px; font-size: 14px; z-index: 3; }
-        .bracket-player.winner .bracket-civ-flag { opacity: 0.35; }
+        .bracket-player.winner .bracket-civ-flag { opacity: 0.6; }
         
-        .bracket-player.loser { opacity: 0.25; filter: grayscale(1); }
+        .bracket-player.loser { opacity: 0.2; filter: grayscale(1); }
         .bracket-player.loser .bracket-civ-flag { opacity: 0.05; }
+
+        /* BRACKET LINES */
+        .bracket-lines {
+            position: absolute; inset: 0; pointer-events: none; z-index: 0;
+            width: 100%; height: 100%;
+        }
+        .bracket-line { stroke: rgba(212, 175, 55, 0.2); stroke-width: 2; fill: none; }
 
         /* CASTERS */
         #casters-container { position: absolute; bottom: 25px; width: 100%; display: flex; justify-content: space-between; padding: 0 50px; box-sizing: border-box; pointer-events: none; }
@@ -153,6 +160,19 @@
     </div>
     
     <div id="bracket-container">
+        <!-- Lines Layer -->
+        <svg class="bracket-lines" viewBox="0 0 1400 600">
+            <!-- Q1/Q2 to S1 -->
+            <path class="bracket-line" d="M 355,75 L 460,75 L 460,125 L 565,125" />
+            <path class="bracket-line" d="M 355,225 L 460,225 L 460,175 L 565,175" />
+            <!-- Q3/Q4 to S2 -->
+            <path class="bracket-line" d="M 355,375 L 460,375 L 460,425 L 565,425" />
+            <path class="bracket-line" d="M 355,525 L 460,525 L 460,475 L 565,475" />
+            <!-- S1/S2 to F -->
+            <path class="bracket-line" d="M 835,150 L 940,150 L 940,275 L 1045,275" />
+            <path class="bracket-line" d="M 835,450 L 940,450 L 940,325 L 1045,325" />
+        </svg>
+
         <!-- Quarter Finals -->
         <div class="bracket-round">
             <div class="round-label">Quarti di Finale</div>
@@ -328,7 +348,10 @@
                         if (players[1]) {
                             players[1].querySelector('.name').innerText = m.p2 || '--';
                             const flag = players[1].querySelector('.bracket-civ-flag');
-                            if (flag) flag.style.backgroundImage = m.p2Civ ? `url('${getCivFlagUrl(m.p2Civ)}')` : 'none';
+                            if (flag) {
+                                flag.style.backgroundImage = m.p2Civ ? `url('${getCivFlagUrl(m.p2Civ)}')` : 'none';
+                                flag.style.opacity = m.p2Civ ? '1' : '0';
+                            }
 
                             players[1].classList.remove('winner', 'loser');
                             if (m.w === 2) players[1].classList.add('winner');

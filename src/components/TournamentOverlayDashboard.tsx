@@ -93,14 +93,13 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
       // Automatic Progression
       if (field === 'w' && value > 0) {
         const winnerName = value === 1 ? newState.bracket[matchId].p1 : newState.bracket[matchId].p2;
-        const winnerCiv = value === 1 ? newState.bracket[matchId].p1Civ : newState.bracket[matchId].p2Civ;
         
-        if (matchId === 'q1') { newState.bracket.s1.p1 = winnerName; newState.bracket.s1.p1Civ = winnerCiv; }
-        if (matchId === 'q2') { newState.bracket.s1.p2 = winnerName; newState.bracket.s1.p2Civ = winnerCiv; }
-        if (matchId === 'q3') { newState.bracket.s2.p1 = winnerName; newState.bracket.s2.p1Civ = winnerCiv; }
-        if (matchId === 'q4') { newState.bracket.s2.p2 = winnerName; newState.bracket.s2.p2Civ = winnerCiv; }
-        if (matchId === 's1') { newState.bracket.f.p1 = winnerName; newState.bracket.f.p1Civ = winnerCiv; }
-        if (matchId === 's2') { newState.bracket.f.p2 = winnerName; newState.bracket.f.p2Civ = winnerCiv; }
+        if (matchId === 'q1') { newState.bracket.s1.p1 = winnerName; newState.bracket.s1.p1Civ = ''; }
+        if (matchId === 'q2') { newState.bracket.s1.p2 = winnerName; newState.bracket.s1.p2Civ = ''; }
+        if (matchId === 'q3') { newState.bracket.s2.p1 = winnerName; newState.bracket.s2.p1Civ = ''; }
+        if (matchId === 'q4') { newState.bracket.s2.p2 = winnerName; newState.bracket.s2.p2Civ = ''; }
+        if (matchId === 's1') { newState.bracket.f.p1 = winnerName; newState.bracket.f.p1Civ = ''; }
+        if (matchId === 's2') { newState.bracket.f.p2 = winnerName; newState.bracket.f.p2Civ = ''; }
       }
 
       return newState;
