@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, Mic, Timer as TimerIcon, Map as MapIcon, Check, Trophy, MousePointer2 } from 'lucide-react';
+import { Save, Mic, Timer as TimerIcon, Map as MapIcon, Trophy, MousePointer2 } from 'lucide-react';
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
 import { overlayService } from '../services/overlayService';
