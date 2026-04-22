@@ -195,7 +195,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                 />
                 <button 
                   onClick={() => updateMatchWinner(matchId, idx)}
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black transition-all ${match.w === idx ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/30' : 'bg-white/5 text-gray-600 hover:text-white'}`}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black transition-all ${match.w === idx ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'bg-white/5 text-gray-600 hover:text-white'}`}
                 >
                   W
                 </button>
@@ -277,21 +277,30 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
             </div>
 
             <div className="grid grid-cols-3 gap-8">
-              <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-8 space-y-6 shadow-xl"><label className="text-[13px] font-black text-blue-400 uppercase tracking-widest opacity-70">Mappa Corrente</label>
+              <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-8 space-y-4 shadow-xl">
+                <label className="text-[13px] font-black text-blue-400 uppercase tracking-widest opacity-70 mb-6 block">Mappa Corrente</label>
                 <div className="relative group"><MapIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-400/40" size={18} />
                   <select value={state.map} onChange={(e) => setState({ ...state, map: e.target.value })} className="w-full bg-black/40 border border-white/10 rounded-xl pl-12 pr-12 py-5 text-lg text-white focus:border-blue-500/50 outline-none font-black uppercase appearance-none cursor-pointer">{AOE4_MAPS.map(m => <option key={m} value={m} className="bg-slate-950">{m.toUpperCase()}</option>)}</select>
                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500" size={20} /></div></div>
-              <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-8 space-y-6 shadow-xl">
-                <div className="flex items-center justify-between"><label className="text-[13px] font-black text-blue-400 uppercase tracking-widest opacity-70">Timer Overlay</label>
+              <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-8 space-y-4 shadow-xl">
+                <div className="flex items-center justify-between mb-6">
+                  <label className="text-[13px] font-black text-blue-400 uppercase tracking-widest opacity-70">Timer Overlay</label>
                   <div onClick={() => setState({ ...state, timer: { ...state.timer, active: !state.timer.active, timestamp: Date.now() } })} className={`w-12 h-6 rounded-full relative cursor-pointer transition-all ${state.timer.active ? 'bg-cyan-500 shadow-lg shadow-cyan-500/20' : 'bg-white/10'}`}><div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${state.timer.active ? 'left-7' : 'left-1'}`}></div></div></div>
                 <div className="flex gap-3 items-center bg-black/40 rounded-xl p-4 border border-white/5 shadow-inner"><TimerIcon size={20} className="text-cyan-500/50" />
                   <input type="number" value={state.timer.min} onChange={(e) => setState({...state, timer: {...state.timer, min: parseInt(e.target.value)||0}})} className="w-16 bg-transparent text-center font-black text-white text-2xl" /><span className="text-gray-600 font-black">:</span>
                   <input type="number" value={state.timer.sec} onChange={(e) => setState({...state, timer: {...state.timer, sec: parseInt(e.target.value)||0}})} className="w-16 bg-transparent text-center font-black text-white text-2xl" /></div></div>
-              <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-8 space-y-6 shadow-xl"><label className="text-[13px] font-black text-blue-400 uppercase tracking-widest opacity-70">Casters Status</label>
+              <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-8 space-y-4 shadow-xl">
+                <label className="text-[13px] font-black text-blue-400 uppercase tracking-widest opacity-70 mb-6 block">Casters Status</label>
                 <div className="space-y-4">{state.casters.map((c: any, idx: number) => (
                   <div key={idx} className="flex items-center gap-4 bg-black/40 p-4 rounded-xl border border-white/5 hover:border-blue-500/20 transition-all group">
-                    <div onClick={() => { const nc = [...state.casters]; nc[idx].active = !nc[idx].active; setState({...state, casters: nc}); }} className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all ${c.active ? 'bg-blue-500 border-blue-500 shadow-lg shadow-blue-500/20' : 'border-white/10 group-hover:border-white/30'}`}>{c.active && <Check size={16} className="text-white font-black" />}</div>
-                    <input type="text" value={c.name} onChange={(e) => { const nc = [...state.casters]; nc[idx].name = e.target.value; setState({...state, casters: nc}); }} placeholder={`Nome Caster ${idx+1}`} className="flex-1 bg-transparent text-base font-black text-white outline-none placeholder:text-gray-700" /></div>))}</div></div>
+                    <input type="text" value={c.name} onChange={(e) => { const nc = [...state.casters]; nc[idx].name = e.target.value; setState({...state, casters: nc}); }} placeholder={`Nome Caster ${idx+1}`} className="flex-1 bg-transparent text-base font-black text-white outline-none placeholder:text-gray-700" />
+                    <div 
+                      onClick={() => { const nc = [...state.casters]; nc[idx].active = !nc[idx].active; setState({...state, casters: nc}); }}
+                      className={`w-10 h-5 rounded-full relative cursor-pointer transition-all flex-shrink-0 ${c.active ? 'bg-blue-500 shadow-lg shadow-blue-500/20' : 'bg-white/10'}`}
+                    >
+                      <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${c.active ? 'left-5.5' : 'left-0.5'}`}></div>
+                    </div>
+                  </div>))}</div></div>
             </div>
             <div className="flex justify-center pt-8"><SaveButton className="px-32 py-5 scale-110" /></div>
           </div>
