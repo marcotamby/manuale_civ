@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
-import { Trophy, Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, Upload } from 'lucide-react';
+import { Trophy, Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, Upload, BookOpen } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
@@ -21,6 +21,8 @@ interface TournamentConfig {
   podium?: any[];
   name?: string;
   type?: string;
+  hasRegolamento?: boolean;
+  regolamentoContent?: string;
 }
 
 const TOURNAMENTS: TournamentConfig[] = [
@@ -45,7 +47,9 @@ export function TournamentsPage() {
     status: 'Concluso',
     name: '',
     type: '1v1',
-    podium: [] as any[]
+    podium: [] as any[],
+    hasRegolamento: false,
+    regolamentoContent: ''
   });
   const [isUploading, setIsUploading] = useState(false);
   
@@ -79,7 +83,9 @@ export function TournamentsPage() {
             status: db.status || 'Concluso',
             podium: db.podium || undefined,
             name: db.name || undefined,
-            type: db.type || '1v1'
+            type: db.type || '1v1',
+            hasRegolamento: db.has_regolamento || false,
+            regolamentoContent: db.regolamento_content || ''
           };
 
           if (existingIdx !== -1) {
@@ -255,7 +261,10 @@ export function TournamentsPage() {
           banner_url: editForm.bannerUrl,
           status: editForm.status,
           podium: editForm.podium,
-          type: editForm.type
+          type: editForm.type,
+          has_regolamento: editForm.hasRegolamento,
+          regolamento_content: editForm.regolamentoContent,
+          updated_at: new Date().toISOString()
         })
         .eq('slug', editingTournament.slug);
       if (error) throw error;
@@ -396,13 +405,23 @@ export function TournamentsPage() {
                       </div>
                     )}
 
-                    <div className="mt-auto flex gap-3 pt-4 border-t border-white/5">
-                      <button 
-                        onClick={() => t.config.directLink ? window.open(t.config.directLink, '_blank') : navigate(`/tornei/${t.slug}`)} 
-                        className="flex-grow py-4 bg-white/5 hover:bg-white/10 rounded-2xl text-white text-xs font-black uppercase transition-all tracking-[0.2em] flex items-center justify-center gap-3 group/det shadow-lg active:scale-95"
-                      >
-                        Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" />
-                      </button>
+                    <div className="mt-auto flex flex-col gap-3 pt-4 border-t border-white/5">
+                      <div className="flex gap-3">
+                        {t.config.hasRegolamento && (
+                          <button 
+                            onClick={() => navigate(`/tornei/${t.slug}/regolamento`)} 
+                            className="flex-grow py-4 bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 rounded-2xl text-yellow-500 text-xs font-black uppercase transition-all tracking-[0.2em] flex items-center justify-center gap-3 group/reg shadow-lg active:scale-95"
+                          >
+                            Regolamento <BookOpen size={14} className="group-hover/reg:scale-110 transition-transform" />
+                          </button>
+                        )}
+                        <button 
+                          onClick={() => t.config.directLink ? window.open(t.config.directLink, '_blank') : navigate(`/tornei/${t.slug}`)} 
+                          className="flex-grow py-4 bg-white/5 hover:bg-white/10 rounded-2xl text-white text-xs font-black uppercase transition-all tracking-[0.2em] flex items-center justify-center gap-3 group/det shadow-lg active:scale-95"
+                        >
+                          Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" />
+                        </button>
+                      </div>
                       {canManageTournaments && (
                         <button 
                           onClick={(e) => {
@@ -415,7 +434,9 @@ export function TournamentsPage() {
                               status: t.config.status || 'Concluso',
                               name: t.config.name || t.name || '',
                               type: t.config.type || '1v1',
-                              podium: t.config.podium || (t.events?.[0]?.standings?.nodes || [])
+                              podium: t.config.podium || (t.events?.[0]?.standings?.nodes || []),
+                              hasRegolamento: t.config.hasRegolamento || false,
+                              regolamentoContent: t.config.regolamentoContent || ''
                             });
                             setShowEditModal(true);
                           }} 
@@ -540,6 +561,39 @@ export function TournamentsPage() {
                     <button key={s} onClick={() => setEditForm({...editForm, status: s})} className={clsx("flex-grow py-3 rounded-xl border text-[10px] font-black uppercase transition-all tracking-widest", editForm.status === s ? "bg-yellow-500/20 border-yellow-500 text-yellow-500" : "bg-white/5 border-white/10 text-gray-500 hover:border-white/20")}>{s}</button>
                   ))}
                 </div>
+              </div>
+
+              <div className="space-y-4 p-4 rounded-2xl bg-yellow-500/5 border border-yellow-500/10">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <BookOpen size={20} className="text-yellow-500" />
+                    <div>
+                      <p className="text-xs font-bold text-white uppercase tracking-tight">Regolamento</p>
+                      <p className="text-[10px] text-gray-500">Aggiungi un regolamento professionale</p>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      className="sr-only peer" 
+                      checked={editForm.hasRegolamento} 
+                      onChange={e => setEditForm({...editForm, hasRegolamento: e.target.checked})} 
+                    />
+                    <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-gray-400 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-500 peer-checked:after:bg-white"></div>
+                  </label>
+                </div>
+
+                {editForm.hasRegolamento && (
+                  <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <textarea 
+                      value={editForm.regolamentoContent} 
+                      onChange={e => setEditForm({...editForm, regolamentoContent: e.target.value})}
+                      placeholder="Scrivi qui il regolamento (puoi usare HTML o testo semplice)..."
+                      className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-white text-sm outline-none focus:border-yellow-500 transition-colors min-h-[200px] font-serif"
+                    />
+                    <p className="text-[9px] text-gray-500 italic">Il testo verrà visualizzato in una pagina dedicata con formattazione professionale.</p>
+                  </div>
+                )}
               </div>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">

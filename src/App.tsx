@@ -23,6 +23,7 @@ import { FAQPage } from './components/FAQPage';
 import { MobileFooter } from './components/MobileFooter';
 import { TournamentsPage } from './components/TournamentsPage';
 import { TournamentDetail } from './components/TournamentDetail';
+import { TournamentRegolamento } from './components/TournamentRegolamento';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { usePresence } from './components/PresenceContext';
@@ -283,6 +284,7 @@ function App() {
                 <Route path="/faq" element={<FAQPage />} />
                 <Route path="/tornei" element={<TournamentsPage />} />
                 <Route path="/tornei/:slug" element={<TournamentDetail />} />
+                <Route path="/tornei/:slug/regolamento" element={<TournamentRegolamento />} />
                 <Route path="/tornei/tournament/:slug" element={<TournamentDetail />} />
                 <Route path="/admin/overlays" element={<Home onSelectCiv={handleSelectCiv} onCompareCivs={handleCompare} />} />
                 <Route path="/admin/overlays/:overlayId" element={<Home onSelectCiv={handleSelectCiv} onCompareCivs={handleCompare} />} />
