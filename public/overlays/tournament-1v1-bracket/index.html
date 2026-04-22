@@ -13,7 +13,6 @@
             background: transparent url('../background/background.png') no-repeat center center/cover;
         }
 
-        /* Header - Current Match */
         #header { 
             position: absolute; top: 0; width: 100%; height: 140px; 
             display: flex; justify-content: center; align-items: center; 
@@ -23,104 +22,49 @@
             z-index: 100;
         }
         .player-box { width: 550px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; }
-        .player-flag-bg {
-            position: absolute; top: 0; bottom: 0; width: 45%;
-            opacity: 0.55; background-size: cover; background-position: center;
-            background-repeat: no-repeat; z-index: 1;
-        }
+        .player-flag-bg { position: absolute; top: 0; bottom: 0; width: 45%; opacity: 0.55; background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 1; }
         #p1-flag { left: 0; -webkit-mask-image: linear-gradient(to right, black 50%, transparent 100%); mask-image: linear-gradient(to right, black 50%, transparent 100%); }
         #p2-flag { right: 0; -webkit-mask-image: linear-gradient(to left, black 50%, transparent 100%); mask-image: linear-gradient(to left, black 50%, transparent 100%); }
-        
-        .player-content { position: relative; z-index: 3; text-align: center; }
         .player-name { font-size: 48px; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 4px 15px rgba(0,0,0,0.9); }
-        .player-civ { font-size: 20px; font-weight: 700; color: var(--gold); text-transform: uppercase; margin-top: -2px; letter-spacing: 2px; opacity: 0.9; }
-        
-        .score-box { 
-            font-size: 64px; font-weight: 900; background: var(--red); 
-            min-width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;
-            border: 2px solid var(--gold); border-radius: 12px; margin: 0 30px;
-            box-shadow: 0 0 30px rgba(139, 0, 0, 0.6); z-index: 105;
-        }
-
+        .score-box { font-size: 64px; font-weight: 900; background: var(--red); min-width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--gold); border-radius: 12px; margin: 0 30px; box-shadow: 0 0 30px rgba(139, 0, 0, 0.6); z-index: 105; }
         .match-info { text-align: center; width: 300px; z-index: 105; }
         .map-name { font-size: 18px; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 5px; }
         .vs-label { font-size: 12px; font-weight: 400; color: #888; text-transform: uppercase; letter-spacing: 8px; }
 
-        /* TIMER - Electric Blue & Deep Navy */
-        #timer-container { 
-            position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); 
-            display: none; flex-direction: column; align-items: center; gap: 10px; z-index: 100;
-        }
-        #timer-label {
-            color: #00f2ff; font-size: 16px; font-weight: 950; text-transform: uppercase; letter-spacing: 6px;
-            text-shadow: 0 0 20px rgba(0, 242, 255, 0.8);
-        }
-        #timer-display { 
-            color: #fff; font-size: 56px; font-weight: 950; font-variant-numeric: tabular-nums;
-            background: linear-gradient(180deg, #0a192f 0%, #000c1d 100%); 
-            padding: 10px 50px; border-radius: 24px; border: 4px solid #00f2ff; 
-            box-shadow: 0 0 45px rgba(0, 242, 255, 0.5), inset 0 0 25px rgba(0, 242, 255, 0.2);
-            position: relative; overflow: hidden; letter-spacing: 2px;
-        }
+        #timer-container { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); display: none; flex-direction: column; align-items: center; gap: 10px; z-index: 100; }
+        #timer-label { color: #00f2ff; font-size: 16px; font-weight: 950; text-transform: uppercase; letter-spacing: 6px; text-shadow: 0 0 20px rgba(0, 242, 255, 0.8); }
+        #timer-display { color: #fff; font-size: 56px; font-weight: 950; font-variant-numeric: tabular-nums; background: linear-gradient(180deg, #0a192f 0%, #000c1d 100%); padding: 10px 50px; border-radius: 24px; border: 4px solid #00f2ff; box-shadow: 0 0 45px rgba(0, 242, 255, 0.5), inset 0 0 25px rgba(0, 242, 255, 0.2); position: relative; overflow: hidden; letter-spacing: 2px; }
 
-        /* BRACKET AREA */
         #bracket-container {
             position: absolute; top: 220px; left: 50%; transform: translateX(-50%);
-            width: 1440px; height: 520px;
+            width: 1440px; height: 550px;
             display: flex; justify-content: space-between; align-items: stretch;
             padding: 45px 50px;
-            background: rgba(10, 15, 28, 0.8);
-            backdrop-filter: blur(12px);
-            border-radius: 40px; border: 1px solid rgba(212, 175, 55, 0.2);
-            box-shadow: 0 35px 70px rgba(0,0,0,0.8);
+            background: rgba(10, 15, 28, 0.85);
+            backdrop-filter: blur(15px);
+            border-radius: 40px; border: 1px solid rgba(212, 175, 55, 0.25);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.9);
         }
 
-        .bracket-round { flex: 1; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: center; padding-top: 10px; }
-        
-        .round-label { 
-            position: absolute; top: -55px; left: 50%; transform: translateX(-50%);
-            background: #fff; color: #000; padding: 6px 24px; border-radius: 12px; 
-            font-size: 13px; font-weight: 950; text-transform: uppercase; letter-spacing: 4px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.7), 0 0 20px rgba(255, 255, 255, 0.4);
-            border: 2px solid #fff; white-space: nowrap; z-index: 10;
-        }
+        .bracket-round { flex: 1; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: center; }
+        .round-label { position: absolute; top: -55px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 6px 26px; border-radius: 12px; font-size: 14px; font-weight: 950; text-transform: uppercase; letter-spacing: 4px; box-shadow: 0 8px 25px rgba(0,0,0,0.7); border: 2px solid #fff; z-index: 10; }
 
-        .matchup {
-            width: 290px; background: rgba(15, 23, 42, 0.98);
-            border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px;
-            overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.9);
-            position: relative; transition: all 0.4s ease;
-        }
-        .matchup.active { border-color: var(--gold); box-shadow: 0 0 40px rgba(212, 175, 55, 0.4); transform: scale(1.04); }
-
-        .bracket-player { 
-            display: flex; align-items: center; background: rgba(13, 17, 26, 0.98); 
-            height: 52px; width: 100%; position: relative; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.4s ease;
-        }
+        .matchup { width: 300px; background: rgba(15, 23, 42, 0.98); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 18px; overflow: hidden; box-shadow: 0 15px 45px rgba(0,0,0,0.95); position: relative; transition: all 0.4s ease; }
+        .bracket-player { display: flex; align-items: center; background: rgba(13, 17, 26, 0.98); height: 56px; width: 100%; position: relative; border-bottom: 1px solid rgba(255, 255, 255, 0.08); transition: all 0.4s ease; }
         .bracket-player:last-child { border-bottom: none; }
+        .bracket-civ-flag { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 1; z-index: 1; transition: all 0.5s ease; -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%); mask-image: linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%); }
+        .bracket-player .name { position: relative; z-index: 2; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 950; padding-left: 22px; color: #fff; font-size: 17px; }
         
-        .bracket-civ-flag {
-            position: absolute; inset: 0; background-size: cover; background-position: center;
-            opacity: 1; z-index: 1; transition: all 0.5s ease;
-            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
-            mask-image: linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
-        }
-
-        .bracket-player .name { position: relative; z-index: 2; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 900; padding-left: 20px; color: #fff; font-size: 16px; }
+        .bracket-player.winner { background: rgba(255, 255, 255, 0.1); }
+        .bracket-player.winner::after { content: '🏆'; position: absolute; right: 18px; font-size: 20px; z-index: 3; filter: drop-shadow(0 0 12px var(--gold)); }
         
-        .bracket-player.winner { background: rgba(192, 192, 192, 0.4); border-color: rgba(192, 192, 192, 0.7); }
-        .bracket-player.winner .name { color: #fff; text-shadow: 0 0 15px rgba(255, 255, 255, 0.5); }
-        .bracket-player.winner::after { content: '🏆'; position: absolute; right: 16px; font-size: 18px; z-index: 3; filter: drop-shadow(0 0 10px rgba(212, 175, 55, 1)); }
-        
-        .bracket-player.loser { opacity: 0.5; }
-        .bracket-player.loser .bracket-civ-flag { opacity: 0.4; }
+        .bracket-player.loser { opacity: 0.85; }
+        .bracket-player.loser .bracket-civ-flag { opacity: 0.45; filter: none !important; }
 
         .bracket-lines { position: absolute; inset: 0; pointer-events: none; z-index: 0; width: 100%; height: 100%; }
-        .bracket-line { stroke: rgba(255, 255, 255, 0.1); stroke-width: 3; fill: none; transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
-        .bracket-line.active { stroke: rgba(220, 220, 220, 0.95); stroke-width: 5; filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.5)); }
+        .bracket-line { stroke: rgba(255, 255, 255, 0.15); stroke-width: 3.5; fill: none; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .bracket-line.active { stroke: rgba(255, 255, 255, 0.9); stroke-width: 5.5; filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4)); }
 
-        /* CASTERS */
         #casters-container { position: absolute; bottom: 35px; width: 100%; display: flex; justify-content: space-between; padding: 0 65px; box-sizing: border-box; pointer-events: none; }
         .caster-box { display: flex; flex-direction: column; align-items: center; gap: 12px; visibility: hidden; opacity: 0; transform: translateY(25px); transition: all 0.7s ease; }
         .caster-box.active { visibility: visible; opacity: 1; transform: translateY(0); }
@@ -140,7 +84,7 @@
     </div>
     
     <div id="bracket-container">
-        <svg id="bracket-svg" class="bracket-lines" viewBox="0 0 1440 520">
+        <svg id="bracket-svg" class="bracket-lines" style="width:100%; height:100%;">
             <path id="line-q1" class="bracket-line" d="" />
             <path id="line-q2" class="bracket-line" d="" />
             <path id="line-q3" class="bracket-line" d="" />
@@ -240,41 +184,40 @@
 
         function updateLines() {
             const container = document.getElementById('bracket-container');
-            const svg = document.getElementById('bracket-svg');
             const containerRect = container.getBoundingClientRect();
 
             const matchups = {
-                q1: { start: 'q1', end: 's1', idx: 0 },
-                q2: { start: 'q2', end: 's1', idx: 1 },
-                q3: { start: 'q3', end: 's2', idx: 0 },
-                q4: { start: 'q4', end: 's2', idx: 1 },
-                s1: { start: 's1', end: 'f', idx: 0 },
-                s2: { start: 's2', end: 'f', idx: 1 }
+                q1: { start: 'q1', end: 's1', slot: 0 },
+                q2: { start: 'q2', end: 's1', slot: 1 },
+                q3: { start: 'q3', end: 's2', slot: 0 },
+                q4: { start: 'q4', end: 's2', slot: 1 },
+                s1: { start: 's1', end: 'f', slot: 0 },
+                s2: { start: 's2', end: 'f', slot: 1 }
             };
 
             Object.entries(matchups).forEach(([mid, config]) => {
-                const startEl = document.getElementById(config.start);
-                const endEl = document.getElementById(config.end);
+                const startMatch = document.getElementById(config.start);
+                const endMatch = document.getElementById(config.end);
                 const path = document.getElementById(`line-${mid}`);
 
-                if (startEl && endEl && path) {
-                    const sRect = startEl.getBoundingClientRect();
-                    const eRect = endEl.getBoundingClientRect();
+                if (startMatch && endMatch && path) {
+                    const sRect = startMatch.getBoundingClientRect();
+                    const eRect = endMatch.getBoundingClientRect();
 
-                    // Relative to container
+                    // Absolute coordinates relative to the container
                     const xStart = sRect.right - containerRect.left;
-                    const yStart = (sRect.top + sRect.height/2) - containerRect.top;
+                    const yStart = (sRect.top + sRect.height / 2) - containerRect.top;
                     
                     const xEnd = eRect.left - containerRect.left;
-                    const yTarget = (eRect.top + eRect.height/2) - containerRect.top;
+                    const yBase = (eRect.top + eRect.height / 2) - containerRect.top;
                     
-                    // Final Y depends on which slot (top or bottom) of the next match
-                    const playerH = 52;
-                    const yEnd = yTarget + (config.idx === 0 ? -playerH/2 : playerH/2);
+                    // The next match has 2 players. Center is the division.
+                    // Top player center is 28px above, bottom is 28px below (56/2)
+                    const yEnd = yBase + (config.slot === 0 ? -28 : 28);
 
-                    const xm = xStart + (xEnd - xStart) / 2;
+                    const xMid = xStart + 40; // Step out 40px
                     
-                    const d = `M ${xStart},${yStart} L ${xm},${yStart} L ${xm},${yEnd} L ${xEnd},${yEnd}`;
+                    const d = `M ${xStart},${yStart} L ${xMid},${yStart} L ${xMid},${yEnd} L ${xEnd},${yEnd}`;
                     path.setAttribute('d', d);
                 }
             });
@@ -288,11 +231,9 @@
                 document.getElementById('p1-name').innerText = state.p1?.name || '--';
                 document.getElementById('p1-score').innerText = state.p1?.score ?? 0;
                 document.getElementById('p1-flag').style.backgroundImage = state.p1?.civId ? `url('${getCivFlagUrl(state.p1.civId)}')` : 'none';
-                
                 document.getElementById('p2-name').innerText = state.p2?.name || '--';
                 document.getElementById('p2-score').innerText = state.p2?.score ?? 0;
                 document.getElementById('p2-flag').style.backgroundImage = state.p2?.civId ? `url('${getCivFlagUrl(state.p2.civId)}')` : 'none';
-                
                 document.getElementById('current-map').innerText = state.map || 'MAPPA DA DEFINIRE';
             } catch (e) {}
 
@@ -320,14 +261,11 @@
                                 }
                             }
                         });
-
                         const line = document.getElementById(`line-${rid}`);
                         if (line) line.classList.toggle('active', winner > 0);
                     }
                 });
-                
-                // Trigger line update AFTER DOM changes
-                setTimeout(updateLines, 50);
+                setTimeout(updateLines, 100);
             } catch (e) { console.error(e); }
 
             try {
@@ -357,7 +295,6 @@
 
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(updateTimer, 1000);
-            
             window.addEventListener('resize', updateLines);
         }
         init();
