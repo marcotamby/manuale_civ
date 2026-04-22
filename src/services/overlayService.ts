@@ -61,54 +61,27 @@ export const overlayService = {
   },
 
   async updateOverlayName(id: string = 'aoe4-match', displayName: string) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('stream_overlays')
-      .update({ display_name: displayName })
-      .eq('id', id)
-      .select();
+      .upsert({ id, display_name: displayName }, { onConflict: 'id' });
 
     if (error) throw error;
-
-    if (!data || data.length === 0) {
-      const { error: insertError } = await supabase
-        .from('stream_overlays')
-        .insert({ id, display_name: displayName });
-      if (insertError) throw insertError;
-    }
   },
 
   async updateOverlayIcon(id: string = 'aoe4-match', iconUrl: string) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('stream_overlays')
-      .update({ icon_url: iconUrl })
-      .eq('id', id)
-      .select();
+      .upsert({ id, icon_url: iconUrl }, { onConflict: 'id' });
 
     if (error) throw error;
-
-    if (!data || data.length === 0) {
-      const { error: insertError } = await supabase
-        .from('stream_overlays')
-        .insert({ id, icon_url: iconUrl });
-      if (insertError) throw insertError;
-    }
   },
 
   async updateOverlayDescription(id: string = 'aoe4-match', description: string) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('stream_overlays')
-      .update({ description })
-      .eq('id', id)
-      .select();
+      .upsert({ id, description }, { onConflict: 'id' });
 
     if (error) throw error;
-
-    if (!data || data.length === 0) {
-      const { error: insertError } = await supabase
-        .from('stream_overlays')
-        .insert({ id, description });
-      if (insertError) throw insertError;
-    }
   },
 
   async updateOverlayState(id: string = 'aoe4-match', state: OverlayState) {
