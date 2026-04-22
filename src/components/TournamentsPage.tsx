@@ -414,8 +414,8 @@ export function TournamentsPage() {
 
                     {podium.length > 0 && (
                       <div className="mb-6 p-4 rounded-2xl bg-white/[0.03] border border-white/5 shadow-inner">
-                        <div className="p-1 md:p-2 bg-white/[0.02]"></div>
-                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3 border-b border-white/5 pb-2">Risultati Finali</p>
+                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent mb-4"></div>
+                        <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-3 border-b border-white/5 pb-2">Risultati Finali</p>
                         <div className="space-y-2">
                           {podium.slice(0, 3).map((s: any, idx: number) => (
                             <div key={idx} className="flex justify-between text-sm items-center group/standing">
