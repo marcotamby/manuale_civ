@@ -685,7 +685,6 @@ export function TournamentsPage() {
                         onInput={(e) => setEditForm({...editForm, regolamentoContent: e.currentTarget.innerHTML})}
                         onBlur={(e) => setEditForm({...editForm, regolamentoContent: e.currentTarget.innerHTML})}
                         dangerouslySetInnerHTML={{ __html: editForm.regolamentoContent }}
-                        placeholder="Scrivi qui il regolamento professionale..."
                         className="w-full bg-black/40 border border-white/10 p-6 rounded-2xl text-white text-base outline-none focus:border-blue-500/50 transition-all min-h-[400px] prose prose-invert max-w-none prose-p:my-2 prose-h2:mt-6 prose-h2:mb-4 overflow-y-auto"
                         style={{ fontFamily: 'Inter, sans-serif' }}
                       />
