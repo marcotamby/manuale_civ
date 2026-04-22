@@ -186,15 +186,6 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
     setIsEditingDesc(true);
   };
 
-  const handleCancelEditName = () => {
-    setIsEditingName(false);
-    setEditNameValue('');
-  };
-
-  const handleCancelEditDesc = () => {
-    setIsEditingDesc(false);
-    setEditDescValue('');
-  };
 
   const copyToClipboard = (path: string) => {
     const fullUrl = `${window.location.origin}${path}`;
