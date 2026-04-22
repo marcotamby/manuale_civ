@@ -5,7 +5,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --gold: #d4af37; --gold-bright: #ffed4a; --red: #8b0000; --slate: #1e293b; --silver: #c0c0c0; }
+        :root { --gold: #d4af37; --gold-bright: #ffed4a; --red: #8b0000; --slate: #1e293b; --silver: #c0c0c0; --navy-electric: #0044ff; --navy-dark: #001133; }
         * { font-family: 'Inter', sans-serif !important; margin: 0; padding: 0; box-sizing: border-box; }
         
         body { 
@@ -42,7 +42,7 @@
 
         #bracket-container {
             position: absolute; top: 220px; left: 50%; transform: translateX(-50%);
-            width: 1380px; height: 600px;
+            width: 1320px; height: 600px;
             display: flex; justify-content: space-between; align-items: stretch;
             padding: 40px 55px;
             background: rgba(10, 15, 28, 0.6);
@@ -90,8 +90,8 @@
         #casters-container { position: absolute; bottom: 15px; width: 100%; display: flex; justify-content: space-between; padding: 0 40px; box-sizing: border-box; pointer-events: none; }
         .caster-box { display: flex; flex-direction: column; align-items: center; gap: 8px; visibility: hidden; opacity: 0; transform: translateY(15px); transition: all 0.7s ease; }
         .caster-box.active { visibility: visible; opacity: 1; transform: translateY(0); }
-        .webcam-frame { width: 320px; height: 180px; border: 3px solid var(--gold); background: rgba(0,0,0,0.6); border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.9); }
-        .caster-name { background: var(--gold); color: black; font-weight: 950; padding: 8px 30px; font-size: 18px; border-radius: 12px; text-transform: uppercase; min-width: 220px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.6); letter-spacing: 1.5px; }
+        .webcam-frame { width: 320px; height: 180px; border: 3px solid var(--navy-electric); background: rgba(0,0,0,0.6); border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.9); }
+        .caster-name { background: var(--navy-electric); color: white; font-weight: 950; padding: 8px 30px; font-size: 18px; border-radius: 12px; text-transform: uppercase; min-width: 220px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.6); letter-spacing: 1.5px; border: 1px solid rgba(255,255,255,0.2); }
     </style>
 </head>
 <body>
