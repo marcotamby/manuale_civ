@@ -136,22 +136,25 @@ export function TournamentRegolamento() {
 
           {/* Regulation Text */}
           <div className="p-8 md:p-16 bg-[#0d1117]/50">
-            <div className="prose prose-invert prose-yellow max-w-none 
+            <div className="prose prose-invert prose-slate max-w-none 
               prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tight
-              prose-h2:border-b prose-h2:border-white/5 prose-h2:pb-4 prose-h2:mt-12
+              prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-4 prose-h2:mt-12 prose-h2:text-slate-200
               prose-p:text-gray-300 prose-p:leading-relaxed prose-p:text-lg
               prose-li:text-gray-300
-              prose-strong:text-yellow-500
-              font-serif
+              prose-strong:text-white prose-strong:font-black
+              prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
+              font-sans
             ">
-              <div dangerouslySetInnerHTML={{ __html: tournament.regolamento_content?.replace(/\n/g, '<br/>') || '' }} />
-              
-              {/* Fallback formatting if no HTML was provided but plain text with newlines */}
-              {!tournament.regolamento_content?.includes('<') && (
-                <div className="whitespace-pre-wrap leading-relaxed text-gray-300 text-lg">
-                  {tournament.regolamento_content}
-                </div>
-              )}
+              <div 
+                className="regulation-content"
+                dangerouslySetInnerHTML={{ 
+                  __html: tournament.regolamento_content 
+                    ? (tournament.regolamento_content.includes('<') 
+                        ? tournament.regolamento_content 
+                        : tournament.regolamento_content.replace(/\n/g, '<br/>'))
+                    : '' 
+                }} 
+              />
             </div>
           </div>
 
