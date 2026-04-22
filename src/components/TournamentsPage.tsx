@@ -298,7 +298,7 @@ export function TournamentsPage() {
       setTimeout(() => {
         setSaveStatus('idle');
         setShowEditModal(false);
-      }, 1500);
+      }, 3000);
       
       loadTournaments();
     } catch (err: any) {
@@ -435,22 +435,23 @@ export function TournamentsPage() {
                           ))}
                         </div>
                       </div>
-                    )}
-
-                     <div className="mt-auto flex items-center gap-3 pt-4 border-t border-white/5">
+                                    <div className="mt-auto flex items-center gap-2 pt-4 border-t border-white/5 h-16">
                         {t.config.hasRegolamento && (
                           <button 
                             onClick={() => navigate(`/tornei/${t.slug}/regolamento`)} 
-                            className="flex-grow py-3 bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 rounded-2xl text-yellow-500 text-[9px] font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/reg shadow-lg active:scale-95"
+                            className="flex-grow h-full bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 rounded-2xl text-yellow-500 text-[10px] font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/reg shadow-lg active:scale-95"
                           >
-                            Regolamento <BookOpen size={12} className="group-hover/reg:scale-110 transition-transform" />
+                            Regolamento <BookOpen size={14} className="group-hover/reg:scale-110 transition-transform" />
                           </button>
                         )}
                         <button 
                           onClick={() => t.config.directLink ? window.open(t.config.directLink, '_blank') : navigate(`/tornei/${t.slug}`)} 
-                          className="flex-grow py-3 bg-white/5 hover:bg-white/10 rounded-2xl text-white text-[9px] font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/det shadow-lg active:scale-95"
+                          className={clsx(
+                            "flex-grow h-full bg-white/5 hover:bg-white/10 rounded-2xl text-white font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/det shadow-lg active:scale-95",
+                            t.config.hasRegolamento ? "text-[10px]" : "text-xs"
+                          )}
                         >
-                          Tabellone <ArrowRight size={12} className="group-hover/det:translate-x-1 transition-transform" />
+                          Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" />
                         </button>
                         {canManageTournaments && (
                           <button 
@@ -470,7 +471,7 @@ export function TournamentsPage() {
                               });
                               setShowEditModal(true);
                             }} 
-                            className="p-4 bg-white/5 hover:bg-white/10 rounded-2xl text-blue-400 transition-all border border-white/5 hover:border-blue-500/30 active:scale-95 shadow-lg"
+                            className="w-14 h-full bg-white/5 hover:bg-white/10 rounded-2xl text-blue-400 transition-all border border-white/5 hover:border-blue-500/30 active:scale-95 shadow-lg flex items-center justify-center shrink-0"
                           >
                             <Edit2 size={20} />
                           </button>
