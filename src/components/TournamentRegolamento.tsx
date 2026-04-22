@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
-import { Loader2, ArrowLeft, BookOpen, Shield, Clock, Info } from 'lucide-react';
+import { Loader2, ArrowLeft, BookOpen, Shield } from 'lucide-react';
 
 export function TournamentRegolamento() {
   const { slug } = useParams<{ slug: string }>();
