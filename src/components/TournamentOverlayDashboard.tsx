@@ -183,7 +183,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                       className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-yellow-500/50 outline-none transition-all cursor-pointer"
                     >
                       <option value="" className="bg-slate-900 text-white">Nessuna</option>
-                      {civilizationsData.map(c => <option key={c.id} value={c.name} className="bg-slate-900 text-white">{c.name}</option>)}
+                      {civilizationsData.map(c => <option key={c.id} value={c.id} className="bg-slate-900 text-white">{c.name}</option>)}
                     </select>
                   </div>
                 </div>
@@ -222,7 +222,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                       className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-yellow-500/50 outline-none transition-all cursor-pointer"
                     >
                       <option value="" className="bg-slate-900 text-white">Nessuna</option>
-                      {civilizationsData.map(c => <option key={c.id} value={c.name} className="bg-slate-900 text-white">{c.name}</option>)}
+                      {civilizationsData.map(c => <option key={c.id} value={c.id} className="bg-slate-900 text-white">{c.name}</option>)}
                     </select>
                   </div>
                 </div>

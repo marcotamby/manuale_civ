@@ -196,30 +196,43 @@
         const SUB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhbGlpdXFqcHhhbmh3aHhhamxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjQ5MjEsImV4cCI6MjA4ODU0MDkyMX0.1xIE1MXy1JxgGzpP0Hitotz8o3aMwASV8NUr06bQjkA";
         const OVERLAY_ID = "tournament-1v1-bracket";
 
-        const civMap = {
-            'abbasid': 'Abbasid Dynasty.png',
-            'ayyubids': 'Ayyubids.png',
-            'byzantines': 'Byzantines.png',
-            'chinese': 'Chinese.png',
-            'delhi': 'Delhi Sultanate.png',
-            'english': 'English.png',
-            'french': 'French.png',
-            'goldenhorde': 'Golden Horde.png',
-            'hre': 'Holy Roman Empire.png',
-            'japanese': 'Japanese.png',
-            'jeannedarc': "jeannedarc.png",
-            'lancaster': "House of Lancaster.png",
-            'malians': 'Malians.png',
-            'mongols': 'Mongols.png',
-            'orderofthedragon': "Order of the Dragon.png",
-            'ottomans': 'Ottomans.png',
-            'rus': 'Rus.png',
-            'templar': "Knights Templar.png",
-            'zhuxi': "Zhu Xis Legacy.png",
-            'tughlaq': 'Tughlaq Dynasty.png',
-            'sengoku': 'Sengoku Daimyo.png',
-            'macedonian': 'Macedonian Dynasty.png'
+        const CIV_DATA = {
+            'abbasid': { name: 'Abbaside', flag: 'Abbasid Dynasty.png' },
+            'ayyubids': { name: 'Ayyubidi', flag: 'Ayyubids.png' },
+            'byzantines': { name: 'Bisantini', flag: 'Byzantines.png' },
+            'chinese': { name: 'Cinesi', flag: 'Chinese.png' },
+            'delhi': { name: 'Sultanato di Delhi', flag: 'Delhi Sultanate.png' },
+            'english': { name: 'Inglesi', flag: 'English.png' },
+            'french': { name: 'Francesi', flag: 'French.png' },
+            'goldenhorde': { name: 'Orda d\'Oro', flag: 'Golden Horde.png' },
+            'hre': { name: 'Sacro Romano Impero', flag: 'Holy Roman Empire.png' },
+            'japanese': { name: 'Giapponesi', flag: 'Japanese.png' },
+            'jeannedarc': { name: 'Jeanne d\'Arc', flag: 'jeannedarc.png' },
+            'lancaster': { name: 'Casato di Lancaster', flag: 'House of Lancaster.png' },
+            'malians': { name: 'Maliesi', flag: 'Malians.png' },
+            'mongols': { name: 'Mongoli', flag: 'Mongols.png' },
+            'orderofthedragon': { name: 'Ordine del Dragone', flag: 'Order of the Dragon.png' },
+            'ottomans': { name: 'Ottomani', flag: 'Ottomans.png' },
+            'rus': { name: 'Rus', flag: 'Rus.png' },
+            'templar': { name: 'Templari', flag: 'Knights Templar.png' },
+            'zhuxi': { name: 'Eredità di Zhu Xi', flag: 'Zhu Xis Legacy.png' },
+            'tughlaq': { name: 'Dinastia Tughlaq', flag: 'Tughlaq Dynasty.png' },
+            'sengoku': { name: 'Sengoku Daimyo', flag: 'Sengoku Daimyo.png' },
+            'macedonian': { name: 'Dinastia Macedone', flag: 'Macedonian Dynasty.png' }
         };
+
+        function getCivFlagUrl(id) {
+            if (!id) return '';
+            const data = CIV_DATA[id.toLowerCase()];
+            const filename = data ? data.flag : (id + '.png');
+            return `/civs/${filename}`;
+        }
+
+        function getCivName(id) {
+            if (!id) return '--';
+            const data = CIV_DATA[id.toLowerCase()];
+            return data ? data.name : id;
+        }
         const { createClient } = window.supabase;
         const client = createClient(SUB_URL, SUB_KEY);
         let lastState = null;
@@ -258,12 +271,12 @@
 
             // Current Match
             document.getElementById('p1-name').innerText = state.p1?.name || '--';
-            document.getElementById('p1-civ').innerText = state.p1?.civId || '--';
+            document.getElementById('p1-civ').innerText = getCivName(state.p1?.civId);
             document.getElementById('p1-score').innerText = state.p1?.score ?? 0;
             document.getElementById('p1-flag').style.backgroundImage = state.p1?.civId ? `url('${getCivFlagUrl(state.p1.civId)}')` : 'none';
 
             document.getElementById('p2-name').innerText = state.p2?.name || '--';
-            document.getElementById('p2-civ').innerText = state.p2?.civId || '--';
+            document.getElementById('p2-civ').innerText = getCivName(state.p2?.civId);
             document.getElementById('p2-score').innerText = state.p2?.score ?? 0;
             document.getElementById('p2-flag').style.backgroundImage = state.p2?.civId ? `url('${getCivFlagUrl(state.p2.civId)}')` : 'none';
 
