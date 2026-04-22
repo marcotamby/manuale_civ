@@ -297,7 +297,6 @@ export function TournamentsPage() {
       setSaveStatus('saved');
       setTimeout(() => {
         setSaveStatus('idle');
-        loadTournaments();
       }, 3000);
     } catch (err: any) {
       toast.error(`Errore: ${err.message}`);
@@ -521,7 +520,7 @@ export function TournamentsPage() {
           <div className="bg-[#121620] border border-white/10 p-8 rounded-3xl w-full max-w-2xl my-auto shadow-2xl animate-in zoom-in-95 duration-300">
              <div className="flex justify-between mb-8 text-slate-300">
                <div className="flex items-center gap-2"><Edit2 size={24} className="text-blue-400"/><h2 className="text-xl font-bold uppercase tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-200 to-slate-500">Modifica Torneo</h2></div>
-               <X className="cursor-pointer text-gray-500 hover:text-white transition-colors" onClick={() => setShowEditModal(false)} />
+               <X className="cursor-pointer text-gray-500 hover:text-white transition-colors" onClick={() => { setShowEditModal(false); loadTournaments(); }} />
              </div>
             <div className="space-y-6">
               <div className="space-y-1">
