@@ -599,11 +599,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         ></div>
 
         {/* Header Content */}
-        <div className="relative z-10 px-6 pt-10 pb-6 flex items-center h-[200px] md:h-[240px]">
+        <div className="relative z-10 px-6 pt-12 md:pt-10 pb-6 flex items-center min-h-[320px] md:h-[240px]">
           <div className="flex flex-col items-start gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-3 flex-wrap mb-2">
-                <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">
+                <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">
                   {civ.name}
                 </h1>
                 <span className={`text-xs font-bold px-3 py-1 rounded-full border ${civ.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/10' :
@@ -654,7 +654,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 </div>
               )}
 
-              <p className="text-gray-300 max-w-2xl leading-relaxed">{civ.shortDescription}</p>
+              <p className="text-gray-300 text-sm md:text-base max-w-2xl leading-relaxed">{civ.shortDescription}</p>
             </div>
           </div>
         </div>
