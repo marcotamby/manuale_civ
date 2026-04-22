@@ -340,7 +340,9 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
                       {Object.values(_activeAdmins).map((admin, idx) => {
                         const activityCiv = admin.activity?.civId 
                           ? civilizations.find(c => c.id === admin.activity.civId)?.name 
-                          : null;
+                          : admin.activity?.section 
+                            ? admin.activity.section.charAt(0).toUpperCase() + admin.activity.section.slice(1)
+                            : null;
                         
                         return (
                           <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
