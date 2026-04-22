@@ -69,7 +69,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
     setShowResetConfirm(false);
   };
 
-  const CustomCivSelect = ({ value, onChange, isSm = false }: { value: string, onChange: (val: string) => void, isSm?: boolean }) => {
+  const CustomCivSelect = ({ value, onChange, isSm = false, showName = true }: { value: string, onChange: (val: string) => void, isSm?: boolean, showName?: boolean }) => {
     const [isOpen, setIsOpen] = useState(false);
     const selectedCiv = civilizationsData.find(c => c.id === value);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -85,26 +85,28 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
     }, []);
 
     return (
-      <div className={`relative ${isSm ? 'w-[180px]' : 'w-full'}`} ref={dropdownRef}>
+      <div className={`relative ${isSm ? (showName ? 'w-[180px]' : 'w-[75px]') : 'w-full'}`} ref={dropdownRef}>
         <div 
           onClick={() => setIsOpen(!isOpen)}
           className={`flex items-center gap-3 bg-[#0a0f1a] border border-white/10 rounded-xl cursor-pointer hover:border-blue-500/50 transition-all ${isSm ? 'px-2 py-2' : 'px-5 py-4'}`}
         >
-          <div className={`flex-shrink-0 ${isSm ? 'w-8 h-6' : 'w-10 h-7'} rounded-md bg-white/5 overflow-hidden border border-white/10 shadow-inner`}>
+          <div className={`flex-shrink-0 ${isSm ? 'w-10 h-7' : 'w-10 h-7'} rounded-md bg-white/5 overflow-hidden border border-white/10 shadow-inner`}>
              {selectedCiv ? (
                <img src={selectedCiv.flag} className="w-full h-full object-cover" />
              ) : (
                <Trophy className="w-full h-full p-1 text-gray-700" />
              )}
           </div>
-          <span className={`flex-1 font-black uppercase tracking-wider text-white truncate ${isSm ? 'text-[10px]' : 'text-sm'}`}>
-            {selectedCiv ? selectedCiv.name : (isSm ? 'CIV' : 'SELEZIONA CIVILTA\'')}
-          </span>
-          <div className="text-gray-600 text-[10px] pr-1">▼</div>
+          {showName && (
+            <span className={`flex-1 font-black uppercase tracking-wider text-white truncate ${isSm ? 'text-[10px]' : 'text-sm'}`}>
+              {selectedCiv ? selectedCiv.name : (isSm ? 'CIV' : 'SELEZIONA CIVILTA\'')}
+            </span>
+          )}
+          <div className="text-gray-600 text-[10px] pr-0.5">▼</div>
         </div>
 
         {isOpen && (
-          <div className="absolute z-[100] left-0 right-0 mt-2 bg-[#0d111a] border border-white/20 rounded-2xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-150">
+          <div className="absolute z-[100] left-0 mt-2 bg-[#0d111a] border border-white/20 rounded-2xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-150 min-w-[200px]">
              {civilizationsData.map(civ => (
                <div 
                  key={civ.id}
@@ -198,7 +200,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                 >
                   W
                 </button>
-                <CustomCivSelect isSm={true} value={match[cKey]} onChange={(val) => setState({ ...state, bracket: { ...state.bracket, [matchId]: { ...match, [cKey]: val } } })} />
+                <CustomCivSelect isSm={true} showName={false} value={match[cKey]} onChange={(val) => setState({ ...state, bracket: { ...state.bracket, [matchId]: { ...match, [cKey]: val } } })} />
               </div>
             );
           })}
@@ -284,7 +286,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
         ) : (
           <div className="max-w-[1600px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-32 pb-64">
             <div className="grid grid-cols-3 gap-32 items-stretch">
-              <div className="space-y-32 flex flex-col justify-between">
+              <div className="space-y-40 flex flex-col justify-between">
                 <h4 className="text-center text-[12px] font-black text-blue-400 uppercase tracking-[0.5em] pb-3 border-b-2 border-blue-400/20 mb-8">Quarti di Finale</h4>
                 {renderMatchInputs('q1', 'Match #01')}
                 {renderMatchInputs('q2', 'Match #02')}
@@ -293,7 +295,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
               </div>
               <div className="flex flex-col justify-around py-40">
                 <h4 className="text-center text-[12px] font-black text-blue-400 uppercase tracking-[0.5em] pb-3 border-b-2 border-blue-400/20 mb-8">Semifinali</h4>
-                <div className="space-y-[380px]">
+                <div className="space-y-[420px]">
                   {renderMatchInputs('s1', 'Semifinale Nord')}
                   {renderMatchInputs('s2', 'Semifinale Sud')}
                 </div>
