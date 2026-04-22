@@ -130,8 +130,6 @@ export function TournamentRegolamento() {
           </div>
         </div>
       </div>
-        </div>
-      </div>
     </div>
   );
 }
