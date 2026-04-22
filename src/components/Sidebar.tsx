@@ -74,11 +74,11 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
         )}
         {/* Main Navigation - Hide on Home */}
         {currentPage !== 'home' && (
-          <div className="flex flex-col gap-4 mb-4 shrink-0 w-full px-2 md:px-4">
+          <div className="flex flex-col gap-4 mb-4 shrink-0 w-full">
             <button
               onClick={() => onSelectPage('home')}
               title="Torna alla Home"
-              className="w-full aspect-square rounded-2xl glass flex items-center justify-center text-yellow-500 border border-[#D4AF37]/20 hover:border-yellow-400 hover:shadow-[0_0_15px_rgba(212,175,55,0.4)] transition-all group"
+              className="w-full aspect-square rounded-md glass flex items-center justify-center text-yellow-500 border border-[#D4AF37]/20 hover:border-yellow-400 hover:shadow-[0_0_15px_rgba(212,175,55,0.4)] transition-all group"
             >
               <HomeIcon size={24} />
             </button>
