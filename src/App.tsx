@@ -65,12 +65,12 @@ function App() {
       setIsAdminOverlayOpen(false);
       setIsCivEditorOpen(false);
       setIsSidebarOpen(false);
-      if (location.pathname === '/admin/overlays') navigate('/');
+      if (location.pathname.startsWith('/admin/overlays')) navigate('/');
     };
   }, []); // State setters are stable, so empty dep array is fine
 
   useEffect(() => {
-    if (location.pathname === '/admin/overlays') {
+    if (location.pathname.startsWith('/admin/overlays')) {
       setIsAdminOverlayOpen(true);
     } else {
       setIsAdminOverlayOpen(false);
@@ -178,7 +178,7 @@ function App() {
         activeFilter="Tutte"
         setActiveFilter={() => { }}
         onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
-        onOpenAdminOverlay={() => setIsAdminOverlayOpen(true)}
+        onOpenAdminOverlay={() => navigate('/admin/overlays')}
       />
 
       <div className="flex-1 flex flex-row overflow-hidden relative">
@@ -313,7 +313,7 @@ function App() {
           isOpen={isAdminOverlayOpen}
           onClose={() => {
             setIsAdminOverlayOpen(false);
-            if (location.pathname === '/admin/overlays') navigate('/');
+            if (location.pathname.startsWith('/admin/overlays')) navigate('/');
           }}
         />
       )}

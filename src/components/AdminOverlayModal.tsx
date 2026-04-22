@@ -20,6 +20,23 @@ interface AdminOverlayModalProps {
   onClose: () => void;
 }
 
+const OVERLAYS: OverlayItem[] = [
+  {
+    id: 'aoe4-match',
+    name: 'AoE4 Match 3V3',
+    description: 'Overlay professionale per Match 3V3 con mappe, casters e timer.',
+    path: '/overlays/match-aoe4/index.html',
+    icon: Trophy
+  },
+  {
+    id: 'tournament-1v1-bracket',
+    name: 'Torneo 1V1 (Tabellone)',
+    description: 'Overlay 1V1 con tabellone progressivo a 8 partecipanti.',
+    path: '/overlays/tournament-1v1-bracket/index.html',
+    icon: Trophy
+  }
+];
+
 export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
   const [selectedOverlay, setSelectedOverlay] = useState<OverlayItem | null>(null);
   const [activeTab, setActiveTab] = useState<'preview' | 'dashboard'>('preview');
@@ -44,29 +61,12 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
   const editDescInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const overlays: OverlayItem[] = [
-    {
-      id: 'aoe4-match',
-      name: 'AoE4 Match 3V3',
-      description: 'Overlay professionale per Match 3V3 con mappe, casters e timer.',
-      path: '/overlays/match-aoe4/index.html',
-      icon: Trophy
-    },
-    {
-      id: 'tournament-1v1-bracket',
-      name: 'Torneo 1V1 (Tabellone)',
-      description: 'Overlay 1V1 con tabellone progressivo a 8 partecipanti.',
-      path: '/overlays/tournament-1v1-bracket/index.html',
-      icon: Trophy
-    }
-  ];
-
   const { overlayId, tab } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (isOpen) {
-      overlays.forEach(ov => {
+      OVERLAYS.forEach(ov => {
         overlayService.getOverlayName(ov.id).then(name => {
           if (name) setOverlayNames(prev => ({ ...prev, [ov.id]: name }));
         });
@@ -83,10 +83,12 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
   useEffect(() => {
     if (isOpen) {
       if (overlayId) {
-        const found = overlays.find(o => o.id === overlayId);
+        const found = OVERLAYS.find(o => o.id === overlayId);
         if (found) setSelectedOverlay(found);
-      } else if (overlays.length > 0) {
-        setSelectedOverlay(overlays[0]);
+      } else if (OVERLAYS.length > 0) {
+        setSelectedOverlay(OVERLAYS[0]);
+        // Se non c'è overlayId nell'URL, lo aggiungiamo per coerenza
+        navigate(`/admin/overlays/${OVERLAYS[0].id}/${tab === 'config' ? 'config' : 'preview'}`, { replace: true });
       }
       
       if (tab === 'config') {
@@ -105,9 +107,8 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
   const handleToggleTab = () => {
     const nextTab = activeTab === 'preview' ? 'dashboard' : 'preview';
     setActiveTab(nextTab);
-    if (selectedOverlay) {
-      navigate(`/admin/overlays/${selectedOverlay.id}/${nextTab === 'dashboard' ? 'config' : 'preview'}`);
-    }
+    const targetOverlayId = selectedOverlay?.id || overlayId || OVERLAYS[0].id;
+    navigate(`/admin/overlays/${targetOverlayId}/${nextTab === 'dashboard' ? 'config' : 'preview'}`);
   };
 
   const overlayDisplayName = (selectedOverlay && overlayNames[selectedOverlay.id]) || selectedOverlay?.name || '';
@@ -249,12 +250,12 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
         <div className="flex flex-1 overflow-hidden">
           <div className="w-[380px] border-r border-white/5 bg-black/20 flex flex-col overflow-y-auto custom-scrollbar p-6 space-y-6">
             <h4 className="text-[11px] font-black text-gray-500 uppercase tracking-[0.3em] px-2">Overlay Disponibili</h4>
-            <div className="space-y-4">
-              {overlays.map((ov) => {
-                const isSelected = selectedOverlay?.id === ov.id;
-                const displayName = overlayNames[ov.id] || ov.name;
-                const displayIcon = overlayIcons[ov.id] || '';
-                const displayDesc = overlayDescriptions[ov.id] || ov.description;
+              <div className="flex-1 overflow-y-auto elegant-scrollbar pr-2 space-y-3">
+                {OVERLAYS.map((ov) => {
+                  const isSelected = selectedOverlay?.id === ov.id;
+                  const displayName = overlayNames[ov.id] || ov.name;
+                  const displayIcon = overlayIcons[ov.id] || '';
+                  const displayDesc = overlayDescriptions[ov.id] || ov.description;
                 
                 return (
                   <button
