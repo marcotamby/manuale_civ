@@ -33,6 +33,8 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState<'match' | 'bracket'>('match');
+  const [isConfirmingReset, setIsConfirmingReset] = useState(false);
+  const [showResetSuccess, setShowResetSuccess] = useState(false);
 
   useEffect(() => {
     overlayService.getOverlayState('tournament-1v1-bracket').then(savedState => {
@@ -58,6 +60,13 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
     }
   };
 
+  const resetTournament = () => {
+    setState(DEFAULT_STATE);
+    setIsConfirmingReset(false);
+    setShowResetSuccess(true);
+    setTimeout(() => setShowResetSuccess(false), 3000);
+  };
+
   const updateBracket = (matchId: string, field: string, value: any) => {
     setState((prev: any) => ({
       ...prev,
@@ -72,6 +81,57 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
 
   return (
     <div className="space-y-6">
+      {/* Reset & Sync Actions */}
+      <div className="flex justify-between items-center bg-white/5 border border-white/10 rounded-2xl p-4 mb-4">
+        <div className="flex items-center gap-4">
+          <h2 className="text-sm font-black text-white uppercase tracking-widest hidden sm:block">Gestione Torneo 1V1</h2>
+          
+          {!isConfirmingReset && !showResetSuccess ? (
+            <button
+              onClick={() => setIsConfirmingReset(true)}
+              className="flex items-center gap-1.5 px-4 py-2 bg-red-600/20 border border-red-500/30 text-red-500 rounded-lg text-[10px] font-black uppercase hover:bg-red-500 hover:text-white transition-all whitespace-nowrap"
+            >
+              Reset Campi
+            </button>
+          ) : showResetSuccess ? (
+            <div className="flex items-center gap-2 text-green-500 animate-in fade-in zoom-in duration-300">
+              <Check size={14} />
+              <span className="text-[10px] font-black uppercase tracking-widest text-green-400">Reset Completato!</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 animate-in fade-in slide-in-from-left-2 duration-300 whitespace-nowrap">
+              <span className="text-[10px] font-black text-red-400 uppercase tracking-widest">Sei sicuro?</span>
+              <button
+                onClick={resetTournament}
+                className="px-4 py-1.5 bg-red-600 text-white rounded-lg text-[10px] font-black uppercase hover:bg-red-500 transition-all border border-red-400 shadow-lg shadow-red-900/40"
+              >
+                Sì
+              </button>
+              <button
+                onClick={() => setIsConfirmingReset(false)}
+                className="px-4 py-1.5 bg-white/5 text-gray-400 rounded-lg text-[10px] font-black uppercase hover:bg-white/10 transition-all border border-white/10"
+              >
+                Annulla
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest text-right mr-2">Sincronizza modifiche live</span>
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className={`flex items-center gap-2 px-6 py-2 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${
+              showSuccess 
+                ? 'bg-green-500 text-white shadow-lg shadow-green-500/20' 
+                : 'bg-yellow-500 text-black hover:bg-yellow-400 shadow-lg shadow-yellow-500/20'
+            }`}
+          >
+            {isSaving ? '...' : showSuccess ? <Check size={16} /> : <Save size={16} />}
+            {showSuccess ? 'Sincronizzato' : 'Sincronizza'}
+          </button>
+        </div>
+      </div>
       {/* Tab Selector */}
       <div className="flex gap-2 p-1 bg-black/40 border border-white/5 rounded-xl w-fit mx-auto mb-6">
         <button
