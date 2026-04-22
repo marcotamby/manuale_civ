@@ -114,6 +114,23 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
     }
   };
 
+  const handleStartEditName = () => {
+    setEditNameValue(overlayDisplayName);
+    setIsEditingName(true);
+  };
+
+  const handleCancelEditName = () => {
+    setIsEditingName(false);
+    setEditNameValue('');
+  };
+
+  const copyToClipboard = (path: string) => {
+    const fullUrl = `${window.location.origin}${path}`;
+    navigator.clipboard.writeText(fullUrl).then(() => {
+      setToast({ isVisible: true, message: 'URL copiato negli appunti! 📋', type: 'success' });
+    });
+  };
+
   const handleIconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !selectedOverlay) return;
