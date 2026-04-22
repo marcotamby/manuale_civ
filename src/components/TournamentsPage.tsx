@@ -416,7 +416,8 @@ export function TournamentsPage() {
 
                     {podium.length > 0 && (
                       <div className="mb-6 p-4 rounded-2xl bg-white/[0.03] border border-white/5 shadow-inner">
-                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3 border-b border-white/5 pb-2">Risultati Finali</p>
+                        <div className="p-1 md:p-2 bg-white/[0.02]"></div>
+                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3 border-b border-white/5 pb-2">Risultati Finali</p>
                         <div className="space-y-2">
                           {podium.slice(0, 3).map((s: any, idx: number) => (
                             <div key={idx} className="flex justify-between text-sm items-center group/standing">
@@ -429,7 +430,7 @@ export function TournamentsPage() {
                                   {s.entrant?.name || '---'}
                                 </span>
                               </div>
-                              <span className="text-white/40 font-black italic uppercase text-[10px] group-hover/standing:text-white/80 transition-colors">{idx === 0 ? 'WINNER' : `${idx+1}° PLACE`}</span>
+                              <span className="text-white/40 font-black italic uppercase text-[9px] group-hover/standing:text-white/80 transition-colors">{idx === 0 ? 'WINNER' : `${idx+1}° PLACE`}</span>
                             </div>
                           ))}
                         </div>
@@ -440,16 +441,16 @@ export function TournamentsPage() {
                         {t.config.hasRegolamento && (
                           <button 
                             onClick={() => navigate(`/tornei/${t.slug}/regolamento`)} 
-                            className="flex-grow py-4 bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 rounded-2xl text-yellow-500 text-xs font-black uppercase transition-all tracking-[0.2em] flex items-center justify-center gap-3 group/reg shadow-lg active:scale-95"
+                            className="flex-grow py-3 bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 rounded-2xl text-yellow-500 text-[9px] font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/reg shadow-lg active:scale-95"
                           >
-                            Regolamento <BookOpen size={14} className="group-hover/reg:scale-110 transition-transform" />
+                            Regolamento <BookOpen size={12} className="group-hover/reg:scale-110 transition-transform" />
                           </button>
                         )}
                         <button 
                           onClick={() => t.config.directLink ? window.open(t.config.directLink, '_blank') : navigate(`/tornei/${t.slug}`)} 
-                          className="flex-grow py-4 bg-white/5 hover:bg-white/10 rounded-2xl text-white text-xs font-black uppercase transition-all tracking-[0.2em] flex items-center justify-center gap-3 group/det shadow-lg active:scale-95"
+                          className="flex-grow py-3 bg-white/5 hover:bg-white/10 rounded-2xl text-white text-[9px] font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/det shadow-lg active:scale-95"
                         >
-                          Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" />
+                          Tabellone <ArrowRight size={12} className="group-hover/det:translate-x-1 transition-transform" />
                         </button>
                         {canManageTournaments && (
                           <button 
@@ -505,7 +506,7 @@ export function TournamentsPage() {
               <button 
                 onClick={handleAddTournament} 
                 disabled={isSubmitting} 
-                className="w-full py-4 bg-gradient-to-b from-slate-100 to-gray-400 text-black font-black rounded-xl active:scale-95 transition-all text-xs tracking-widest shadow-xl"
+                className="w-full py-4 bg-gradient-to-b from-slate-100 to-gray-400 text-black font-black rounded-xl active:scale-95 transition-all text-[10px] tracking-widest shadow-xl"
               >
                 {isSubmitting ? 'ANALISI IN CORSO...' : 'CONFERMA INSERIMENTO'}
               </button>
@@ -591,7 +592,7 @@ export function TournamentsPage() {
                        key={s} 
                        onClick={() => setEditForm({...editForm, status: s})} 
                        className={clsx(
-                         "flex-grow py-3 rounded-xl border text-[10px] font-black uppercase transition-all tracking-widest", 
+                         "flex-grow py-3 rounded-xl border text-[10px] font-black uppercase transition-all tracking-wider", 
                          editForm.status === s 
                            ? s === 'In corso' ? "bg-green-500/10 border-green-500 text-green-400" :
                              s === 'Programmato' ? "bg-blue-500/10 border-blue-500 text-blue-400" :
