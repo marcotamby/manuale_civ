@@ -205,13 +205,13 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
           (window as any).closeAllModals?.();
           (window as any).resetHomeFilters?.();
         }}
-        className="flex flex-col items-center justify-center text-center w-full md:w-1/3 group cursor-pointer hover:opacity-95 transition-all py-1"
+        className="flex flex-col items-center justify-center text-center w-full md:w-auto md:min-w-[40%] group cursor-pointer hover:opacity-95 transition-all py-1 px-4"
       >
-        <h2 className="text-[10px] md:text-[11px] font-bold text-slate-500 tracking-[0.5em] uppercase mb-0.5 px-4">
+        <h2 className="text-[10px] md:text-[11px] font-bold text-slate-500 tracking-[0.5em] uppercase mb-0.5 whitespace-nowrap">
           Age of Empires IV
         </h2>
         
-        <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 drop-shadow-[0_4px_12px_rgba(255,255,255,0.1)] tracking-tighter leading-tight italic">
+        <h1 className="text-2xl md:text-4xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 drop-shadow-[0_4px_12px_rgba(255,255,255,0.1)] tracking-tight leading-tight">
           Manuale delle Civiltà
         </h1>
 
