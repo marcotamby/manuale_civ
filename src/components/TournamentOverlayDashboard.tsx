@@ -222,7 +222,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
   );
 
   return (
-    <div className="flex flex-col h-full bg-[#05080f] font-inter">
+    <div className="flex flex-col bg-[#05080f] font-inter">
       {/* Top Action Bar */}
       <div className="flex items-center justify-between p-6 bg-black/40 border-b border-white/10 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-4">
@@ -247,9 +247,9 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-8 bg-gradient-to-b from-transparent to-black/20">
+      <div className="p-8 bg-gradient-to-b from-transparent to-black/20">
         {activeTab === 'match' ? (
-          <div className="max-w-6xl mx-auto space-y-12 animate-in fade-in slide-in-from-top-4 duration-500 pb-32">
+          <div className="max-w-6xl mx-auto space-y-12 animate-in fade-in slide-in-from-top-4 duration-500">
             <div className="grid grid-cols-2 gap-8">
               {[1, 2].map(idx => {
                 const p = idx === 1 ? state.p1 : state.p2;
@@ -311,7 +311,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
             <div className="flex justify-center pt-8"><SaveButton className="px-32 py-5 scale-110" /></div>
           </div>
         ) : (
-          <div className="max-w-[1400px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-16 pb-64">
+          <div className="max-w-[1400px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-12">
             <div className="grid grid-cols-3 gap-12 items-stretch">
               <div className="space-y-4 flex flex-col justify-between">
                 <h4 className="text-center text-[10px] font-black text-blue-400 uppercase tracking-[0.5em] pb-2 border-b border-blue-400/20 mb-4">Quarti di Finale</h4>
@@ -320,9 +320,9 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                 {renderMatchInputs('q3', 'Match #03')}
                 {renderMatchInputs('q4', 'Match #04')}
               </div>
-              <div className="flex flex-col justify-around py-20">
+              <div className="flex flex-col justify-around py-10">
                 <h4 className="text-center text-[10px] font-black text-blue-400 uppercase tracking-[0.5em] pb-2 border-b border-blue-400/20 mb-4">Semifinale</h4>
-                <div className="space-y-40">
+                <div className="space-y-24">
                   {renderMatchInputs('s1', 'semifinale #01')}
                   {renderMatchInputs('s2', 'semifinale #02')}
                 </div>
