@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, Timer as TimerIcon, Map as MapIcon, Trophy, RefreshCcw, Plus, Minus, Check, X } from 'lucide-react';
+import { Save, Timer as TimerIcon, Map as MapIcon, Trophy, RefreshCcw, Plus, Minus, Check, X, ChevronDown } from 'lucide-react';
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
 import { overlayService } from '../services/overlayService';
@@ -102,7 +102,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
               {selectedCiv ? selectedCiv.name : (isSm ? 'CIV' : 'SELEZIONA CIVILTA\'')}
             </span>
           )}
-          <div className="text-gray-600 text-[10px]">▼</div>
+          <ChevronDown className="text-gray-600" size={isSm ? 12 : 16} />
         </div>
 
         {isOpen && (
@@ -177,7 +177,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
     return (
       <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-4 shadow-xl hover:border-blue-500/10 transition-all">
         <div className="flex items-center justify-between mb-0.5">
-          <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest opacity-40">{label}</span>
+          <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest opacity-40">{label}</span>
         </div>
         
         <div className="space-y-3">
@@ -195,7 +195,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                 />
                 <button 
                   onClick={() => updateMatchWinner(matchId, idx)}
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black transition-all ${match.w === idx ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'bg-white/5 text-gray-600 hover:text-white'}`}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black transition-all ${match.w === idx ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/30' : 'bg-white/5 text-gray-600 hover:text-white'}`}
                 >
                   W
                 </button>
@@ -211,7 +211,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
   const TabButton = ({ active, label, onClick }: { active: boolean, label: string, onClick: () => void }) => (
     <button
       onClick={onClick}
-      className={`px-12 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border ${
+      className={`px-12 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-all border ${
         active 
           ? 'bg-gradient-to-b from-white to-gray-400 text-black shadow-[0_0_25px_rgba(255,255,255,0.25)] border-white' 
           : 'bg-white/5 text-gray-500 border-white/5 hover:text-white hover:border-white/20 hover:bg-white/10'
@@ -256,7 +256,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                 return (
                   <div key={idx} className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-8 space-y-8 shadow-2xl hover:border-blue-500/20 transition-all">
                     <div className="flex items-center justify-between">
-                      <label className="text-[10px] font-black text-blue-400 uppercase tracking-widest opacity-60">Giocatore {idx === 1 ? 'Sinistra (P1)' : 'Destra (P2)'}</label>
+                      <label className="text-[13px] font-black text-blue-400 uppercase tracking-widest opacity-70">Giocatore {idx === 1 ? 'Sinistra (P1)' : 'Destra (P2)'}</label>
                       <div className="flex items-center bg-black/60 rounded-xl p-1 border border-white/10">
                         <button onClick={() => setState({...state, [idx === 1 ? 'p1' : 'p2']: {...p, score: Math.max(0, p.score - 1)}})} className="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all"><Minus size={18}/></button>
                         <span className="w-12 text-center font-black text-blue-500 text-2xl">{p.score}</span>
@@ -268,7 +268,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                       value={p.name}
                       onChange={(e) => setState({ ...state, [idx === 1 ? 'p1' : 'p2']: { ...p, name: e.target.value } })}
                       placeholder="NOME GIOCATORE"
-                      className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-5 text-xl text-white focus:border-blue-500/50 outline-none transition-all font-black uppercase tracking-wider shadow-inner"
+                      className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-5 text-2xl text-white focus:border-blue-500/50 outline-none transition-all font-black uppercase tracking-wider shadow-inner"
                     />
                     <CustomCivSelect value={p.civId} onChange={(val) => setState({ ...state, [idx === 1 ? 'p1' : 'p2']: { ...p, civId: val } })} />
                   </div>
@@ -277,23 +277,23 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
             </div>
 
             <div className="grid grid-cols-3 gap-8">
-              <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-8 space-y-4 shadow-xl"><label className="text-[10px] font-black text-blue-400 uppercase tracking-widest opacity-60">Mappa Corrente</label>
+              <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-8 space-y-6 shadow-xl"><label className="text-[13px] font-black text-blue-400 uppercase tracking-widest opacity-70">Mappa Corrente</label>
                 <div className="relative group"><MapIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-400/40" size={18} />
-                  <select value={state.map} onChange={(e) => setState({ ...state, map: e.target.value })} className="w-full bg-black/40 border border-white/10 rounded-xl pl-12 pr-12 py-4 text-sm text-white focus:border-blue-500/50 outline-none font-black uppercase appearance-none cursor-pointer">{AOE4_MAPS.map(m => <option key={m} value={m} className="bg-slate-950">{m.toUpperCase()}</option>)}</select>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">▼</div></div></div>
-              <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-8 space-y-4 shadow-xl">
-                <div className="flex items-center justify-between"><label className="text-[10px] font-black text-blue-400 uppercase tracking-widest opacity-60">Timer Overlay</label>
+                  <select value={state.map} onChange={(e) => setState({ ...state, map: e.target.value })} className="w-full bg-black/40 border border-white/10 rounded-xl pl-12 pr-12 py-5 text-lg text-white focus:border-blue-500/50 outline-none font-black uppercase appearance-none cursor-pointer">{AOE4_MAPS.map(m => <option key={m} value={m} className="bg-slate-950">{m.toUpperCase()}</option>)}</select>
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500" size={20} /></div></div>
+              <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-8 space-y-6 shadow-xl">
+                <div className="flex items-center justify-between"><label className="text-[13px] font-black text-blue-400 uppercase tracking-widest opacity-70">Timer Overlay</label>
                   <div onClick={() => setState({ ...state, timer: { ...state.timer, active: !state.timer.active, timestamp: Date.now() } })} className={`w-12 h-6 rounded-full relative cursor-pointer transition-all ${state.timer.active ? 'bg-cyan-500 shadow-lg shadow-cyan-500/20' : 'bg-white/10'}`}><div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${state.timer.active ? 'left-7' : 'left-1'}`}></div></div></div>
-                <div className="flex gap-3 items-center bg-black/40 rounded-xl p-3 border border-white/5 shadow-inner"><TimerIcon size={18} className="text-cyan-500/50" />
-                  <input type="number" value={state.timer.min} onChange={(e) => setState({...state, timer: {...state.timer, min: parseInt(e.target.value)||0}})} className="w-12 bg-transparent text-center font-black text-white text-lg" /><span className="text-gray-600 font-black">:</span>
-                  <input type="number" value={state.timer.sec} onChange={(e) => setState({...state, timer: {...state.timer, sec: parseInt(e.target.value)||0}})} className="w-12 bg-transparent text-center font-black text-white text-lg" /></div></div>
-              <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-8 space-y-4 shadow-xl"><label className="text-[10px] font-black text-blue-400 uppercase tracking-widest opacity-60">Casters Status</label>
-                <div className="space-y-3">{state.casters.map((c: any, idx: number) => (
-                  <div key={idx} className="flex items-center gap-4 bg-black/40 p-3 rounded-xl border border-white/5 hover:border-blue-500/20 transition-all group">
-                    <div onClick={() => { const nc = [...state.casters]; nc[idx].active = !nc[idx].active; setState({...state, casters: nc}); }} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all ${c.active ? 'bg-blue-500 border-blue-500 shadow-lg shadow-blue-500/20' : 'border-white/10 group-hover:border-white/30'}`}>{c.active && <Check size={14} className="text-white font-black" />}</div>
-                    <input type="text" value={c.name} onChange={(e) => { const nc = [...state.casters]; nc[idx].name = e.target.value; setState({...state, casters: nc}); }} placeholder={`Nome Caster ${idx+1}`} className="flex-1 bg-transparent text-xs font-black text-white outline-none placeholder:text-gray-700" /></div>))}</div></div>
+                <div className="flex gap-3 items-center bg-black/40 rounded-xl p-4 border border-white/5 shadow-inner"><TimerIcon size={20} className="text-cyan-500/50" />
+                  <input type="number" value={state.timer.min} onChange={(e) => setState({...state, timer: {...state.timer, min: parseInt(e.target.value)||0}})} className="w-16 bg-transparent text-center font-black text-white text-2xl" /><span className="text-gray-600 font-black">:</span>
+                  <input type="number" value={state.timer.sec} onChange={(e) => setState({...state, timer: {...state.timer, sec: parseInt(e.target.value)||0}})} className="w-16 bg-transparent text-center font-black text-white text-2xl" /></div></div>
+              <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-8 space-y-6 shadow-xl"><label className="text-[13px] font-black text-blue-400 uppercase tracking-widest opacity-70">Casters Status</label>
+                <div className="space-y-4">{state.casters.map((c: any, idx: number) => (
+                  <div key={idx} className="flex items-center gap-4 bg-black/40 p-4 rounded-xl border border-white/5 hover:border-blue-500/20 transition-all group">
+                    <div onClick={() => { const nc = [...state.casters]; nc[idx].active = !nc[idx].active; setState({...state, casters: nc}); }} className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all ${c.active ? 'bg-blue-500 border-blue-500 shadow-lg shadow-blue-500/20' : 'border-white/10 group-hover:border-white/30'}`}>{c.active && <Check size={16} className="text-white font-black" />}</div>
+                    <input type="text" value={c.name} onChange={(e) => { const nc = [...state.casters]; nc[idx].name = e.target.value; setState({...state, casters: nc}); }} placeholder={`Nome Caster ${idx+1}`} className="flex-1 bg-transparent text-base font-black text-white outline-none placeholder:text-gray-700" /></div>))}</div></div>
             </div>
-            <div className="flex justify-center pt-8"><SaveButton className="px-32 py-5" /></div>
+            <div className="flex justify-center pt-8"><SaveButton className="px-32 py-5 scale-110" /></div>
           </div>
         ) : (
           <div className="max-w-[1400px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-16 pb-64">
