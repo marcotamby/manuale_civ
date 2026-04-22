@@ -435,7 +435,9 @@ export function TournamentsPage() {
                           ))}
                         </div>
                       </div>
-                                    <div className="mt-auto flex items-center gap-2 pt-4 border-t border-white/5 h-16">
+                    )}
+
+                    <div className="mt-auto flex items-center gap-2 pt-4 border-t border-white/5 h-16">
                         {t.config.hasRegolamento && (
                           <button 
                             onClick={() => navigate(`/tornei/${t.slug}/regolamento`)} 
