@@ -74,11 +74,11 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
     const isSm = size === "sm";
     
     return (
-      <div className="relative group">
+      <div className="relative group flex-1">
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className={`w-full bg-[#0a0f1a] border border-white/10 rounded-xl pl-12 pr-4 ${isSm ? 'py-2.5 text-[11px]' : 'py-3.5 text-sm'} text-white focus:border-[#D4AF37]/50 outline-none transition-all cursor-pointer appearance-none font-bold uppercase tracking-wider`}
+          className={`w-full bg-[#0a0f1a] border border-white/10 rounded-xl pl-11 pr-4 ${isSm ? 'py-3 text-[11px]' : 'py-4 text-sm'} text-white focus:border-[#D4AF37]/50 outline-none transition-all cursor-pointer appearance-none font-bold uppercase tracking-wider`}
         >
           <option value="">{isSm ? 'CIV' : 'SELEZIONA CIVILTA\''}</option>
           {civilizationsData.map(civ => (
@@ -89,15 +89,66 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
         </select>
         {selectedCiv ? (
           <img 
-            src={selectedCiv.flag.startsWith('/') ? selectedCiv.flag : `/civs/${selectedCiv.flag}`} 
+            src={selectedCiv.flag} 
             alt="" 
-            className={`absolute left-3.5 top-1/2 -translate-y-1/2 ${isSm ? 'w-5 h-5' : 'w-6 h-6'} rounded-md object-cover border border-white/10 shadow-sm pointer-events-none`}
+            className={`absolute left-3 top-1/2 -translate-y-1/2 ${isSm ? 'w-5 h-5' : 'w-6 h-6'} rounded-md object-cover border border-white/10 shadow-sm pointer-events-none`}
+            onError={(e) => {
+               const target = e.target as HTMLImageElement;
+               if (!target.src.includes('/civs/')) {
+                 target.src = '/civs/' + selectedCiv.flag.split('/').pop();
+               }
+            }}
           />
         ) : (
-          <Trophy className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none" size={isSm ? 14 : 18} />
+          <Trophy className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none" size={isSm ? 14 : 18} />
         )}
       </div>
     );
+  };
+
+  const updateMatchWinner = (matchId: string, winnerIdx: number) => {
+    const match = state.bracket[matchId];
+    const newWinner = match.w === winnerIdx ? 0 : winnerIdx;
+    
+    let nextState = {
+      ...state,
+      bracket: {
+        ...state.bracket,
+        [matchId]: { ...match, w: newWinner }
+      }
+    };
+
+    // Auto-propagation logic
+    const propagationMap: Record<string, { target: string, slot: 1 | 2 }> = {
+      'q1': { target: 's1', slot: 1 },
+      'q2': { target: 's1', slot: 2 },
+      'q3': { target: 's2', slot: 1 },
+      'q4': { target: 's2', slot: 2 },
+      's1': { target: 'f', slot: 1 },
+      's2': { target: 'f', slot: 2 }
+    };
+
+    if (propagationMap[matchId]) {
+      const { target, slot } = propagationMap[matchId];
+      const targetMatch = nextState.bracket[target];
+      if (newWinner > 0) {
+        const winnerName = newWinner === 1 ? match.p1 : match.p2;
+        const winnerCiv = newWinner === 1 ? match.p1Civ : match.p2Civ;
+        nextState.bracket[target] = {
+          ...targetMatch,
+          [`p${slot}`]: winnerName,
+          [`p${slot}Civ`]: winnerCiv
+        };
+      } else {
+        nextState.bracket[target] = {
+          ...targetMatch,
+          [`p${slot}`]: '',
+          [`p${slot}Civ`]: ''
+        };
+      }
+    }
+
+    setState(nextState);
   };
 
   const renderMatchInputs = (matchId: string, label: string) => {
@@ -114,53 +165,51 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
     };
 
     return (
-      <div className="bg-black/50 border border-white/10 rounded-3xl p-5 space-y-4 shadow-2xl relative group hover:border-[#D4AF37]/30 transition-all">
+      <div className="bg-black/50 border border-white/10 rounded-3xl p-6 space-y-5 shadow-2xl relative group hover:border-[#D4AF37]/30 transition-all">
         <div className="flex items-center justify-between mb-1">
           <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-[0.2em] opacity-60">{label}</span>
         </div>
         
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <div className="relative">
-              <input
-                type="text"
-                value={match.p1}
-                onChange={(e) => updateMatch('p1', e.target.value)}
-                placeholder="PLAYER A"
-                className="w-full bg-[#0d111a] border border-white/10 rounded-xl pl-4 pr-12 py-3 text-sm text-white outline-none focus:border-yellow-500/30 font-black uppercase"
-              />
-              <button 
-                onClick={() => updateMatch('w', match.w === 1 ? 0 : 1)}
-                className={`absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black transition-all ${match.w === 1 ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/30' : 'bg-white/5 text-gray-600 hover:text-white'}`}
-              >
-                W
-              </button>
-            </div>
+        <div className="space-y-6">
+          {/* Player 1 Row */}
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              value={match.p1}
+              onChange={(e) => updateMatch('p1', e.target.value)}
+              placeholder="PLAYER A"
+              className="flex-[1.5] bg-[#0d111a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-yellow-500/30 font-black uppercase"
+            />
+            <button 
+              onClick={() => updateMatchWinner(matchId, 1)}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-black transition-all ${match.w === 1 ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/30' : 'bg-white/5 text-gray-600 hover:text-white'}`}
+            >
+              W
+            </button>
             <CivDropdown size="sm" value={match.p1Civ} onChange={(val) => updateMatch('p1Civ', val)} />
           </div>
 
-          <div className="flex items-center gap-2 justify-center opacity-20">
+          <div className="flex items-center gap-3 justify-center opacity-10">
             <div className="h-[1px] flex-1 bg-white"></div>
-            <span className="text-[8px] font-black">VS</span>
+            <span className="text-[7px] font-black tracking-widest">VS</span>
             <div className="h-[1px] flex-1 bg-white"></div>
           </div>
 
-          <div className="space-y-2">
-            <div className="relative">
-              <input
-                type="text"
-                value={match.p2}
-                onChange={(e) => updateMatch('p2', e.target.value)}
-                placeholder="PLAYER B"
-                className="w-full bg-[#0d111a] border border-white/10 rounded-xl pl-4 pr-12 py-3 text-sm text-white outline-none focus:border-yellow-500/30 font-black uppercase"
-              />
-              <button 
-                onClick={() => updateMatch('w', match.w === 2 ? 0 : 2)}
-                className={`absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black transition-all ${match.w === 2 ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/30' : 'bg-white/5 text-gray-600 hover:text-white'}`}
-              >
-                W
-              </button>
-            </div>
+          {/* Player 2 Row */}
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              value={match.p2}
+              onChange={(e) => updateMatch('p2', e.target.value)}
+              placeholder="PLAYER B"
+              className="flex-[1.5] bg-[#0d111a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-yellow-500/30 font-black uppercase"
+            />
+            <button 
+              onClick={() => updateMatchWinner(matchId, 2)}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-black transition-all ${match.w === 2 ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/30' : 'bg-white/5 text-gray-600 hover:text-white'}`}
+            >
+              W
+            </button>
             <CivDropdown size="sm" value={match.p2Civ} onChange={(val) => updateMatch('p2Civ', val)} />
           </div>
         </div>
@@ -179,7 +228,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
             className={`flex items-center gap-2 px-8 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg ${isSaving ? 'bg-gray-800 text-gray-500' : showSuccess ? 'bg-green-600 text-white shadow-green-500/20' : 'bg-yellow-500 text-black hover:bg-yellow-400 shadow-yellow-500/20'}`}
           >
             {isSaving ? <RefreshCcw size={14} className="animate-spin" /> : <Save size={14} />}
-            {isSaving ? 'Sincronizzando...' : showSuccess ? 'Configurato!' : 'Configura'}
+            {isSaving ? 'Salvataggio...' : showSuccess ? 'Salvato!' : 'Salva'}
           </button>
           
           <div className="flex items-center gap-2">
@@ -330,10 +379,10 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
             </div>
           </div>
         ) : (
-          <div className="max-w-[1500px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-16 pb-32">
-            <div className="grid grid-cols-3 gap-20 items-stretch">
+          <div className="max-w-[1500px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-24 pb-32">
+            <div className="grid grid-cols-3 gap-24 items-stretch">
               {/* QUARTERS */}
-              <div className="space-y-12 flex flex-col justify-between">
+              <div className="space-y-16 flex flex-col justify-between">
                 <h4 className="text-center text-[11px] font-black text-[#D4AF37] uppercase tracking-[0.5em] pb-3 border-b-2 border-[#D4AF37]/20 mb-8">Quarti di Finale</h4>
                 {renderMatchInputs('q1', 'Match #01')}
                 {renderMatchInputs('q2', 'Match #02')}
@@ -344,7 +393,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
               {/* SEMIS */}
               <div className="flex flex-col justify-around py-32">
                 <h4 className="text-center text-[11px] font-black text-[#D4AF37] uppercase tracking-[0.5em] pb-3 border-b-2 border-[#D4AF37]/20 mb-8">Semifinali</h4>
-                <div className="space-y-64">
+                <div className="space-y-72">
                   {renderMatchInputs('s1', 'Semifinale Nord')}
                   {renderMatchInputs('s2', 'Semifinale Sud')}
                 </div>
@@ -353,10 +402,22 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
               {/* FINAL */}
               <div className="flex flex-col justify-center">
                 <h4 className="text-center text-[11px] font-black text-[#D4AF37] uppercase tracking-[0.5em] pb-3 border-b-2 border-[#D4AF37]/20 mb-8">Gran Finale</h4>
-                <div className="p-3 bg-yellow-500/5 rounded-[48px] border-2 border-yellow-500/20 shadow-2xl shadow-yellow-500/10">
+                <div className="p-4 bg-yellow-500/5 rounded-[56px] border-2 border-yellow-500/20 shadow-2xl shadow-yellow-500/10">
                   {renderMatchInputs('f', 'Finalissima Oro')}
                 </div>
               </div>
+            </div>
+
+            {/* Bottom Save Button */}
+            <div className="flex justify-center pt-20 border-t border-white/5">
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className={`flex items-center gap-4 px-20 py-6 rounded-2xl font-black text-xl uppercase tracking-[0.3em] transition-all shadow-2xl ${isSaving ? 'bg-gray-800 text-gray-500' : showSuccess ? 'bg-green-600 text-white shadow-green-500/30 scale-105' : 'bg-yellow-500 text-black hover:bg-yellow-400 hover:scale-105 shadow-yellow-500/30'}`}
+              >
+                {isSaving ? <RefreshCcw size={28} className="animate-spin" /> : <Save size={28} />}
+                {isSaving ? 'Salvataggio...' : showSuccess ? 'SALVATO!' : 'SALVA TUTTO'}
+              </button>
             </div>
           </div>
         )}
