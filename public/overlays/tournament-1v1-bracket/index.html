@@ -66,7 +66,7 @@
         /* BRACKET AREA */
         #bracket-container {
             position: absolute; top: 220px; left: 50%; transform: translateX(-50%);
-            width: 1440px; height: 500px;
+            width: 1440px; height: 520px;
             display: flex; justify-content: space-between; align-items: stretch;
             padding: 45px 50px;
             background: rgba(10, 15, 28, 0.8);
@@ -89,7 +89,7 @@
             width: 290px; background: rgba(15, 23, 42, 0.98);
             border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px;
             overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.9);
-            position: relative; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative; transition: all 0.4s ease;
         }
         .matchup.active { border-color: var(--gold); box-shadow: 0 0 40px rgba(212, 175, 55, 0.4); transform: scale(1.04); }
 
@@ -102,28 +102,27 @@
         
         .bracket-civ-flag {
             position: absolute; inset: 0; background-size: cover; background-position: center;
-            opacity: 0.8; z-index: 1; transition: all 0.5s ease;
-            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 90%);
-            mask-image: linear-gradient(to right, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 90%);
+            opacity: 1; z-index: 1; transition: all 0.5s ease;
+            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
+            mask-image: linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
         }
 
         .bracket-player .name { position: relative; z-index: 2; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 900; padding-left: 20px; color: #fff; font-size: 16px; }
         
-        .bracket-player.winner { background: rgba(192, 192, 192, 0.35); border-color: rgba(192, 192, 192, 0.7); }
+        .bracket-player.winner { background: rgba(192, 192, 192, 0.4); border-color: rgba(192, 192, 192, 0.7); }
         .bracket-player.winner .name { color: #fff; text-shadow: 0 0 15px rgba(255, 255, 255, 0.5); }
         .bracket-player.winner::after { content: '🏆'; position: absolute; right: 16px; font-size: 18px; z-index: 3; filter: drop-shadow(0 0 10px rgba(212, 175, 55, 1)); }
-        .bracket-player.winner .bracket-civ-flag { opacity: 0.8; }
         
-        .bracket-player.loser { opacity: 0.6; filter: grayscale(0.5); }
-        .bracket-player.loser .bracket-civ-flag { opacity: 0.25; }
+        .bracket-player.loser { opacity: 0.5; }
+        .bracket-player.loser .bracket-civ-flag { opacity: 0.4; }
 
         .bracket-lines { position: absolute; inset: 0; pointer-events: none; z-index: 0; width: 100%; height: 100%; }
-        .bracket-line { stroke: rgba(255, 255, 255, 0.1); stroke-width: 3; fill: none; transition: all 0.7s ease; }
+        .bracket-line { stroke: rgba(255, 255, 255, 0.1); stroke-width: 3; fill: none; transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         .bracket-line.active { stroke: rgba(220, 220, 220, 0.95); stroke-width: 5; filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.5)); }
 
         /* CASTERS */
         #casters-container { position: absolute; bottom: 35px; width: 100%; display: flex; justify-content: space-between; padding: 0 65px; box-sizing: border-box; pointer-events: none; }
-        .caster-box { display: flex; flex-direction: column; align-items: center; gap: 12px; visibility: hidden; opacity: 0; transform: translateY(25px); transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
+        .caster-box { display: flex; flex-direction: column; align-items: center; gap: 12px; visibility: hidden; opacity: 0; transform: translateY(25px); transition: all 0.7s ease; }
         .caster-box.active { visibility: visible; opacity: 1; transform: translateY(0); }
         .webcam-frame { width: 380px; height: 210px; border: 3px solid var(--gold); background: rgba(0,0,0,0.6); border-radius: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); }
         .caster-name { background: var(--gold); color: black; font-weight: 950; padding: 10px 35px; font-size: 22px; border-radius: 14px; text-transform: uppercase; min-width: 260px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.6); letter-spacing: 1.5px; }
@@ -141,7 +140,7 @@
     </div>
     
     <div id="bracket-container">
-        <svg class="bracket-lines" viewBox="0 0 1440 500">
+        <svg id="bracket-svg" class="bracket-lines" viewBox="0 0 1440 520">
             <path id="line-q1" class="bracket-line" d="" />
             <path id="line-q2" class="bracket-line" d="" />
             <path id="line-q3" class="bracket-line" d="" />
@@ -208,15 +207,6 @@
             'macedonian': { name: 'Dinastia Macedone', flag: 'Macedonian Dynasty.webp' }
         };
 
-        const BRACKET_PATHS = {
-            q1: { n: [65, 130], p1: [41, 130], p2: [89, 130], x1: 395, x2: 575, xm: 485 },
-            q2: { n: [215, 178], p1: [191, 178], p2: [239, 178], x1: 395, x2: 575, xm: 485 },
-            q3: { n: [365, 430], p1: [341, 430], p2: [389, 430], x1: 395, x2: 575, xm: 485 },
-            q4: { n: [515, 478], p1: [491, 478], p2: [539, 478], x1: 395, x2: 575, xm: 485 },
-            s1: { n: [140, 275], p1: [116, 275], p2: [164, 275], x1: 865, x2: 1045, xm: 955 },
-            s2: { n: [440, 325], p1: [416, 325], p2: [464, 325], x1: 865, x2: 1045, xm: 955 }
-        };
-
         const { createClient } = window.supabase;
         const client = createClient(SUB_URL, SUB_KEY);
         let lastState = null;
@@ -246,6 +236,48 @@
             let remaining = total - elapsed;
             if (remaining < 0) remaining = 0;
             document.getElementById('timer-display').innerText = formatTime(remaining);
+        }
+
+        function updateLines() {
+            const container = document.getElementById('bracket-container');
+            const svg = document.getElementById('bracket-svg');
+            const containerRect = container.getBoundingClientRect();
+
+            const matchups = {
+                q1: { start: 'q1', end: 's1', idx: 0 },
+                q2: { start: 'q2', end: 's1', idx: 1 },
+                q3: { start: 'q3', end: 's2', idx: 0 },
+                q4: { start: 'q4', end: 's2', idx: 1 },
+                s1: { start: 's1', end: 'f', idx: 0 },
+                s2: { start: 's2', end: 'f', idx: 1 }
+            };
+
+            Object.entries(matchups).forEach(([mid, config]) => {
+                const startEl = document.getElementById(config.start);
+                const endEl = document.getElementById(config.end);
+                const path = document.getElementById(`line-${mid}`);
+
+                if (startEl && endEl && path) {
+                    const sRect = startEl.getBoundingClientRect();
+                    const eRect = endEl.getBoundingClientRect();
+
+                    // Relative to container
+                    const xStart = sRect.right - containerRect.left;
+                    const yStart = (sRect.top + sRect.height/2) - containerRect.top;
+                    
+                    const xEnd = eRect.left - containerRect.left;
+                    const yTarget = (eRect.top + eRect.height/2) - containerRect.top;
+                    
+                    // Final Y depends on which slot (top or bottom) of the next match
+                    const playerH = 52;
+                    const yEnd = yTarget + (config.idx === 0 ? -playerH/2 : playerH/2);
+
+                    const xm = xStart + (xEnd - xStart) / 2;
+                    
+                    const d = `M ${xStart},${yStart} L ${xm},${yStart} L ${xm},${yEnd} L ${xEnd},${yEnd}`;
+                    path.setAttribute('d', d);
+                }
+            });
         }
 
         function render(state) {
@@ -289,15 +321,13 @@
                             }
                         });
 
-                        const pathData = BRACKET_PATHS[rid];
                         const line = document.getElementById(`line-${rid}`);
-                        if (pathData && line) {
-                            const d = `M ${pathData.x1},${pathData.n[0]} L ${pathData.xm},${pathData.n[0]} L ${pathData.xm},${pathData.n[1]} L ${pathData.x2},${pathData.n[1]}`;
-                            line.setAttribute('d', d);
-                            line.classList.toggle('active', winner > 0);
-                        }
+                        if (line) line.classList.toggle('active', winner > 0);
                     }
                 });
+                
+                // Trigger line update AFTER DOM changes
+                setTimeout(updateLines, 50);
             } catch (e) { console.error(e); }
 
             try {
@@ -327,6 +357,8 @@
 
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(updateTimer, 1000);
+            
+            window.addEventListener('resize', updateLines);
         }
         init();
     </script>
