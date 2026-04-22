@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, ExternalLink, Copy, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft, Pencil, Check } from 'lucide-react';
+import { X, ExternalLink, Copy, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft, Pencil, Check, Image as ImageIcon, Upload } from 'lucide-react';
 import { AoE4MatchDashboard } from './AoE4MatchDashboard';
 import { TournamentOverlayDashboard } from './TournamentOverlayDashboard';
 import { Toast } from './Toast';
@@ -30,12 +30,13 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
     type: 'success'
   });
   
-  // Overlay names mapping to keep track of custom names from DB
   const [overlayNames, setOverlayNames] = useState<Record<string, string>>({});
+  const [overlayIcons, setOverlayIcons] = useState<Record<string, string>>({});
   const [isEditingName, setIsEditingName] = useState(false);
   const [editNameValue, setEditNameValue] = useState<string>('');
   const [isSavingName, setIsSavingName] = useState(false);
   const editNameInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const overlays: OverlayItem[] = [
     {
@@ -54,24 +55,24 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
     }
   ];
 
-  // Initial load of all names
   useEffect(() => {
     if (isOpen) {
       overlays.forEach(ov => {
         overlayService.getOverlayName(ov.id).then(name => {
-          if (name) {
-            setOverlayNames(prev => ({ ...prev, [ov.id]: name }));
-          }
+          if (name) setOverlayNames(prev => ({ ...prev, [ov.id]: name }));
+        });
+        overlayService.getOverlayIcon(ov.id).then(icon => {
+          if (icon) setOverlayIcons(prev => ({ ...prev, [ov.id]: icon }));
         });
       });
     }
   }, [isOpen]);
 
   const overlayDisplayName = (selectedOverlay && overlayNames[selectedOverlay.id]) || selectedOverlay?.name || '';
+  const overlayDisplayIcon = (selectedOverlay && overlayIcons[selectedOverlay.id]) || '';
 
   useEffect(() => {
     if (activeTab !== 'preview') return;
-    
     const updateScale = () => {
       const container = containerRef.current;
       if (container) {
@@ -80,7 +81,6 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
         setPreviewScale(scale);
       }
     };
-
     updateScale();
     window.addEventListener('resize', updateScale);
     return () => window.removeEventListener('resize', updateScale);
@@ -92,9 +92,6 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
     }
   }, [isOpen]);
 
-
-
-  // Auto-focus when entering edit mode
   useEffect(() => {
     if (isEditingName && editNameInputRef.current) {
       editNameInputRef.current.focus();
@@ -109,7 +106,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
       await overlayService.updateOverlayName(selectedOverlay.id, editNameValue.trim());
       setOverlayNames(prev => ({ ...prev, [selectedOverlay.id]: editNameValue.trim() }));
       setIsEditingName(false);
-      setToast({ isVisible: true, message: 'Nome aggiornato con successo! ✏️', type: 'success' });
+      setToast({ isVisible: true, message: 'Nome aggiornato! ✏️', type: 'success' });
     } catch {
       setToast({ isVisible: true, message: 'Errore nel salvataggio del nome.', type: 'error' });
     } finally {
@@ -117,29 +114,27 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
     }
   };
 
-  const handleStartEditName = () => {
-    setEditNameValue(overlayDisplayName);
-    setIsEditingName(true);
-  };
+  const handleIconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedOverlay) return;
+    
+    if (file.size > 200 * 1024) {
+      setToast({ isVisible: true, message: 'Immagine troppo grande (max 200KB)', type: 'error' });
+      return;
+    }
 
-  const handleCancelEditName = () => {
-    setIsEditingName(false);
-    setEditNameValue('');
-  };
-
-  useEffect(() => {
-    setActiveTab('preview');
-  }, [selectedOverlay]);
-
-  const copyToClipboard = (path: string) => {
-    const fullUrl = `${window.location.origin}${path}`;
-    navigator.clipboard.writeText(fullUrl).then(() => {
-      setToast({
-        isVisible: true,
-        message: 'URL copiato negli appunti! 📋',
-        type: 'success'
-      });
-    });
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64 = reader.result as string;
+      try {
+        await overlayService.updateOverlayIcon(selectedOverlay.id, base64);
+        setOverlayIcons(prev => ({ ...prev, [selectedOverlay.id]: base64 }));
+        setToast({ isVisible: true, message: 'Icona aggiornata! 🖼️', type: 'success' });
+      } catch {
+        setToast({ isVisible: true, message: 'Errore caricamento icona.', type: 'error' });
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   if (!isOpen) return null;
@@ -147,211 +142,193 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
   return (
     <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
       <div className="bg-[#0f1423] border border-[#D4AF37]/30 rounded-3xl w-full max-w-[95vw] h-[90vh] flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden relative">
-        
-        {/* Header */}
-        <div className="px-6 py-5 border-b border-[#D4AF37]/20 bg-gradient-to-r from-[#0d1424] to-[#1a1c32] flex items-center justify-between shrink-0">
+        <div className="flex items-center justify-between px-8 py-6 bg-black/40 border-b border-white/5 backdrop-blur-md">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center text-yellow-500">
-              <Monitor size={24} />
+            <div className="p-3 bg-[#D4AF37]/10 rounded-2xl border border-[#D4AF37]/30 shadow-lg shadow-[#D4AF37]/5">
+              <Monitor className="text-[#D4AF37]" size={24} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white uppercase tracking-wider">Gestione Overlay Stream</h2>
+              <h2 className="text-xl font-black text-white uppercase tracking-wider">Gestione Overlay Stream</h2>
               <div className="flex items-center gap-2 mt-0.5">
-                <ShieldCheck size={12} className="text-green-500" />
-                <span className="text-[10px] text-gray-400 uppercase font-black tracking-widest">Accesso Admin Riservato</span>
+                <ShieldCheck size={14} className="text-green-500" />
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Accesso Admin Riservato</span>
               </div>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
-          >
-            <X size={28} />
-          </button>
+          <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full text-gray-500 hover:text-white transition-all"><X size={24} /></button>
         </div>
 
-        <div className="flex-1 flex overflow-hidden">
-          {/* Sidebar - List of Overlays */}
-          <div className="w-80 border-r border-white/5 bg-black/20 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-            <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 px-2">Overlay Disponibili</h3>
-            {overlays.map((overlay) => (
-              <button
-                key={overlay.id}
-                onClick={() => setSelectedOverlay(overlay)}
-                className={`w-full flex items-start gap-4 p-4 rounded-2xl transition-all border ${
-                  selectedOverlay?.id === overlay.id
-                    ? 'bg-yellow-500/10 border-yellow-500/50 shadow-lg shadow-yellow-500/5'
-                    : 'bg-white/5 border-transparent hover:bg-white/10'
-                }`}
-              >
-                <div className={`p-2 rounded-lg ${selectedOverlay?.id === overlay.id ? 'text-yellow-500 bg-yellow-500/20' : 'text-gray-400 bg-black/40'}`}>
-                  <overlay.icon size={20} />
-                </div>
-                <div className="text-left">
-                  <div className={`font-bold text-sm ${selectedOverlay?.id === overlay.id ? 'text-white' : 'text-gray-300'}`}>
-                    {overlayNames[overlay.id] || overlay.name}
-                  </div>
-                  <div className="text-[10px] text-gray-500 line-clamp-1 mt-1">{overlay.description}</div>
-                </div>
-              </button>
-            ))}
+        <div className="flex flex-1 overflow-hidden">
+          <div className="w-[380px] border-r border-white/5 bg-black/20 flex flex-col overflow-y-auto custom-scrollbar p-6 space-y-6">
+            <h4 className="text-[11px] font-black text-gray-500 uppercase tracking-[0.3em] px-2">Overlay Disponibili</h4>
+            <div className="space-y-4">
+              {overlays.map((ov) => {
+                const isSelected = selectedOverlay?.id === ov.id;
+                const displayName = overlayNames[ov.id] || ov.name;
+                const displayIcon = overlayIcons[ov.id] || '';
+                
+                return (
+                  <button
+                    key={ov.id}
+                    onClick={() => setSelectedOverlay(ov)}
+                    className={`w-full group p-5 rounded-2xl border transition-all text-left relative flex items-center gap-4 ${
+                      isSelected 
+                        ? 'bg-gradient-to-br from-[#D4AF37]/20 to-black border-[#D4AF37]/50 shadow-xl' 
+                        : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'
+                    }`}
+                  >
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center border shrink-0 overflow-hidden ${
+                      isSelected ? 'bg-[#D4AF37]/20 border-[#D4AF37]/30' : 'bg-white/5 border-white/10'
+                    }`}>
+                      {displayIcon ? (
+                        <img src={displayIcon} className="w-full h-full object-cover" />
+                      ) : (
+                        <ov.icon className={isSelected ? 'text-[#D4AF37]' : 'text-gray-500'} size={20} />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-black text-sm text-white uppercase tracking-wider truncate">{displayName}</div>
+                      <div className="text-[10px] text-gray-500 mt-1 line-clamp-1 group-hover:text-gray-400 transition-colors font-medium">{ov.description}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
 
-            <div className="mt-8 p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl">
-              <div className="flex items-center gap-2 text-blue-400 mb-2">
-                <Info size={16} />
-                <span className="text-xs font-bold uppercase">Come usarli</span>
+            <div className="mt-auto p-6 bg-blue-500/5 rounded-3xl border border-blue-500/20 space-y-4">
+              <div className="flex items-center gap-3 text-blue-400">
+                <Info size={18} />
+                <span className="font-black text-xs uppercase tracking-widest">Come usarli</span>
               </div>
-              <p className="text-[11px] text-gray-400 leading-relaxed">
-                Copia l'URL e incollalo in una <strong>Sorgente Browser</strong> su OBS Studio o Streamlabs. Imposta la risoluzione desiderata (es. 1920x1080).
+              <p className="text-[11px] text-gray-400 leading-relaxed font-medium">
+                Copia l'URL e incollalo in una <span className="text-white font-bold">Sorgente Browser</span> su OBS Studio o Streamlabs. Imposta la risoluzione desiderata (es. 1920x1080).
               </p>
             </div>
           </div>
 
-          {/* Main Content - Preview & Details */}
-          <div className="flex-1 flex flex-col bg-black/40 p-6 overflow-hidden">
-            {selectedOverlay ? (
-              <>
-                <div className="flex items-start justify-between mb-6">
-                  <div className="max-w-[280px]">
-                    {/* Editable Name */}
-                    {isEditingName ? (
-                      <div className="flex items-center gap-2 mb-1">
-                        <input
-                          ref={editNameInputRef}
-                          value={editNameValue}
-                          onChange={e => setEditNameValue(e.target.value)}
-                          onKeyDown={e => { if (e.key === 'Enter') handleSaveName(); if (e.key === 'Escape') handleCancelEditName(); }}
-                          className="bg-white/10 border border-yellow-500/50 rounded-lg px-3 py-1.5 text-white text-lg font-bold focus:outline-none focus:border-yellow-400 w-full"
-                          placeholder="Nome overlay..."
-                          disabled={isSavingName}
-                        />
-                        <button
-                          onClick={handleSaveName}
-                          disabled={isSavingName}
-                          title="Salva"
-                          className="p-2 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-green-400 border border-green-500/30 transition-colors shrink-0"
+          <div className="flex-1 bg-black/40 flex flex-col overflow-hidden relative">
+            {!selectedOverlay ? (
+              <div className="flex-1 flex flex-col items-center justify-center space-y-4 text-gray-600">
+                <Monitor size={64} className="opacity-20" />
+                <p className="font-black text-sm uppercase tracking-widest">Seleziona un overlay per iniziare</p>
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="px-10 py-10 flex items-start justify-between bg-gradient-to-b from-black/60 to-transparent border-b border-white/5">
+                  <div className="flex-1 min-w-0 pr-12">
+                    <div className="flex items-center gap-6 group mb-3">
+                      <div className="relative group/icon shrink-0">
+                        <div className="w-16 h-16 bg-[#D4AF37]/10 rounded-2xl border border-[#D4AF37]/30 flex items-center justify-center overflow-hidden shadow-2xl transition-all group-hover/icon:border-[#D4AF37]/60">
+                          {overlayDisplayIcon ? (
+                            <img src={overlayDisplayIcon} className="w-full h-full object-cover" />
+                          ) : (
+                            <selectedOverlay.icon className="text-[#D4AF37]" size={32} />
+                          )}
+                        </div>
+                        <button 
+                          onClick={() => fileInputRef.current?.click()}
+                          className="absolute -bottom-2 -right-2 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white border-2 border-[#0f1423] hover:bg-blue-500 transition-all shadow-lg scale-0 group-hover/icon:scale-100"
                         >
-                          {isSavingName ? <span className="text-xs">...</span> : <Check size={16} />}
+                          <Upload size={14} />
                         </button>
-                        <button
-                          onClick={handleCancelEditName}
-                          title="Annulla"
-                          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 border border-white/10 transition-colors shrink-0"
-                        >
-                          <X size={16} />
-                        </button>
+                        <input type="file" ref={fileInputRef} onChange={handleIconUpload} accept="image/*" className="hidden" />
                       </div>
-                    ) : (
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-2xl font-bold text-white">{overlayDisplayName}</h3>
-                        <button
-                          onClick={handleStartEditName}
-                          title="Modifica nome"
-                          className="p-1.5 rounded-lg hover:bg-white/10 text-gray-500 hover:text-yellow-400 transition-all"
-                        >
-                          <Pencil size={14} />
-                        </button>
+                      
+                      <div className="flex-1 min-w-0">
+                        {isEditingName ? (
+                          <div className="flex items-center gap-3 animate-in fade-in slide-in-from-left-4 duration-200 w-full">
+                            <input
+                              ref={editNameInputRef}
+                              type="text"
+                              value={editNameValue}
+                              onChange={(e) => setEditNameValue(e.target.value)}
+                              onKeyDown={(e) => e.key === 'Enter' && handleSaveName()}
+                              onBlur={handleCancelEditName}
+                              className="bg-white/5 border border-blue-500/50 rounded-xl px-4 py-2 text-2xl font-black text-white uppercase tracking-tight focus:outline-none focus:ring-2 ring-blue-500/20 w-full max-w-xl"
+                            />
+                            <button onClick={handleSaveName} disabled={isSavingName} className="p-3 bg-green-600 text-white rounded-xl hover:bg-green-500 transition-all shadow-lg shadow-green-900/20">
+                              {isSavingName ? <RefreshCcw size={20} className="animate-spin" /> : <Check size={20} />}
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-4 group/title max-w-full overflow-hidden">
+                            <h3 className="text-3xl font-black text-white uppercase tracking-tight truncate flex-1 min-w-0 leading-tight">
+                              {overlayDisplayName}
+                            </h3>
+                            <button onClick={handleStartEditName} className="p-2 rounded-lg hover:bg-white/10 text-gray-500 hover:text-yellow-400 transition-all shrink-0">
+                              <Pencil size={18} />
+                            </button>
+                          </div>
+                        )}
+                        <p className="text-base text-gray-400 leading-snug mt-2 line-clamp-1">{selectedOverlay.description}</p>
                       </div>
-                    )}
-                    <p className="text-sm text-gray-400 leading-snug">{selectedOverlay.description}</p>
+                    </div>
                   </div>
-                  <div className="flex gap-2 shrink-0 pt-1">
+                  
+                  <div className="flex gap-3 shrink-0 pt-2">
                     <button
                       onClick={() => setActiveTab(activeTab === 'preview' ? 'dashboard' : 'preview')}
-                      className={`flex items-center gap-2.5 px-5 py-2.5 font-black rounded-xl transition-all text-[11px] uppercase border shadow-lg whitespace-nowrap ${
+                      className={`flex items-center gap-2.5 px-6 py-3 font-black rounded-xl transition-all text-[11px] uppercase border shadow-xl whitespace-nowrap ${
                         activeTab === 'dashboard'
                           ? 'bg-indigo-600 text-white border-indigo-400 shadow-indigo-500/20'
                           : 'bg-indigo-500/10 text-indigo-300 border-indigo-500/50 hover:bg-indigo-500/20'
                       }`}
                     >
-                      {activeTab === 'preview' ? <Settings size={16} /> : <ChevronLeft size={16} />}
+                      {activeTab === 'preview' ? <Settings size={18} /> : <ChevronLeft size={18} />}
                       {activeTab === 'preview' ? 'Configura' : 'Indietro'}
                     </button>
                     <button
                       onClick={() => copyToClipboard(selectedOverlay.path)}
-                      className="flex items-center gap-2.5 px-5 py-2.5 bg-emerald-600 text-white font-black rounded-xl hover:bg-emerald-500 transition-all text-[11px] uppercase shadow-lg shadow-emerald-900/20 border border-emerald-400/30 whitespace-nowrap"
+                      className="flex items-center gap-2.5 px-6 py-3 bg-emerald-600 text-white font-black rounded-xl hover:bg-emerald-500 transition-all text-[11px] uppercase shadow-xl shadow-emerald-900/20 border border-emerald-400/30 whitespace-nowrap"
                     >
-                      <Copy size={16} /> Copia URL
+                      <Copy size={18} /> Copia URL
                     </button>
                     <a
                       href={selectedOverlay.path}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2.5 px-5 py-2.5 bg-sky-600 text-white font-black rounded-xl hover:bg-sky-500 transition-all text-[11px] uppercase border border-sky-400/30 shadow-lg shadow-sky-900/20 whitespace-nowrap"
+                      className="flex items-center gap-2.5 px-6 py-3 bg-sky-600 text-white font-black rounded-xl hover:bg-sky-500 transition-all text-[11px] uppercase border border-sky-400/30 shadow-xl shadow-sky-900/20 whitespace-nowrap"
                     >
-                      <ExternalLink size={16} /> Apri Overlay
+                      <ExternalLink size={18} /> Apri Overlay
                     </a>
                   </div>
                 </div>
 
                 <div className="flex-1 overflow-y-auto custom-scrollbar">
                   {activeTab === 'preview' ? (
-                    <div className="h-full flex flex-col p-4">
-                      <div className="flex-1 bg-black rounded-3xl border border-white/5 overflow-hidden shadow-2xl relative group min-h-[650px]">
-                        <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full border border-white/10 text-[10px] font-bold text-gray-400 flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <div className="h-full flex flex-col p-8">
+                      <div className="flex-1 bg-black rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl relative group min-h-[650px]">
+                        <div className="absolute top-6 left-6 z-10 px-4 py-2 bg-black/60 backdrop-blur-md rounded-full border border-white/10 text-[11px] font-black text-gray-300 flex items-center gap-3">
+                          <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></div>
                           ANTEPRIMA LIVE (1920x1080)
                         </div>
-                        
-                        {/* Scaling Iframe Container */}
-                        <div className="absolute inset-0 flex items-center justify-center p-4">
+                        <div className="absolute inset-0 flex items-center justify-center p-6">
                           <div className="w-full h-full relative" ref={containerRef}>
-                            <iframe
-                              src={selectedOverlay.path}
-                              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border-none pointer-events-none"
-                              style={{
-                                width: '1920px',
-                                height: '1080px',
-                                transform: `scale(${previewScale})`,
-                                transformOrigin: 'center center'
-                              }}
-                              title="Overlay Preview"
-                            />
+                            <iframe src={selectedOverlay.path} className="absolute top-0 left-0 border-none bg-transparent origin-top-left" style={{ width: '1920px', height: '1080px', transform: `scale(${previewScale})` }} title="Overlay Preview" />
                           </div>
                         </div>
-                        <div className="absolute inset-0 bg-transparent group-hover:bg-black/5 transition-colors pointer-events-none"></div>
-                      </div>
-
-                      <div className="mt-4 flex items-center gap-2 text-[10px] text-gray-500 font-mono italic">
-                        <span>URL sorgente:</span>
-                        <span className="text-yellow-500/70">{window.location.origin}{selectedOverlay.path}</span>
                       </div>
                     </div>
                   ) : (
-                    <div className="animate-in slide-in-from-bottom-4 fade-in duration-500">
+                    <div className="h-full bg-black/20 p-8">
                       {selectedOverlay.id === 'aoe4-match' ? (
-                        <AoE4MatchDashboard 
-                          onError={(msg: string) => setToast({ isVisible: true, message: msg, type: 'error' })}
-                        />
-                      ) : selectedOverlay.id === 'tournament-1v1-bracket' ? (
-                        <TournamentOverlayDashboard
-                          onError={(msg: string) => setToast({ isVisible: true, message: msg, type: 'error' })}
-                        />
+                        <AoE4MatchDashboard onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} />
                       ) : (
-                        <div className="p-12 text-center text-gray-500 bg-white/5 rounded-3xl border border-dashed border-white/10">
-                          Configurazione rapida non ancora disponibile per questo overlay.
-                        </div>
+                        <TournamentOverlayDashboard onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} />
                       )}
                     </div>
                   )}
                 </div>
-              </>
-            ) : (
-              <div className="flex-1 flex flex-col items-center justify-center text-center opacity-40">
-                <Monitor size={64} className="mb-4" />
-                <p>Seleziona un overlay per visualizzare l'anteprima.</p>
               </div>
             )}
           </div>
         </div>
       </div>
-
-      <Toast
-        isVisible={toast.isVisible}
-        message={toast.message}
-        type={toast.type}
-        onClose={() => setToast({ ...toast, isVisible: false })}
-      />
+      <Toast isVisible={toast.isVisible} message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, isVisible: false })} />
     </div>
   );
 }
+
+const RefreshCcw = ({ size, className }: { size: number; className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" /><path d="M16 16h5v5" /></svg>
+);
