@@ -296,9 +296,9 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                     <input type="text" value={c.name} onChange={(e) => { const nc = [...state.casters]; nc[idx].name = e.target.value; setState({...state, casters: nc}); }} placeholder={`Nome Caster ${idx+1}`} className="flex-1 bg-transparent text-base font-black text-white outline-none placeholder:text-gray-700" />
                     <div 
                       onClick={() => { const nc = [...state.casters]; nc[idx].active = !nc[idx].active; setState({...state, casters: nc}); }}
-                      className={`w-10 h-5 rounded-full relative cursor-pointer transition-all flex-shrink-0 ${c.active ? 'bg-blue-500 shadow-lg shadow-blue-500/20' : 'bg-white/10'}`}
+                      className={`w-12 h-6 rounded-full relative cursor-pointer transition-all flex-shrink-0 mr-1 ${c.active ? 'bg-cyan-500 shadow-lg shadow-cyan-500/20' : 'bg-white/10'}`}
                     >
-                      <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${c.active ? 'left-5.5' : 'left-0.5'}`}></div>
+                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${c.active ? 'left-7' : 'left-1'}`}></div>
                     </div>
                   </div>))}</div></div>
             </div>
