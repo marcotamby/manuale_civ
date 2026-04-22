@@ -56,7 +56,14 @@
         .round-semis { justify-content: space-around; }
         .round-final { justify-content: center; }
         
-        .round-label { position: absolute; top: -105px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 8px 30px; border-radius: 14px; font-size: 15px; font-weight: 950; text-transform: uppercase; letter-spacing: 5px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); border: 3px solid #fff; z-index: 10; white-space: nowrap; }
+        .round-label { 
+            position: absolute; top: -105px; left: 50%; transform: translateX(-50%); 
+            background: linear-gradient(135deg, #ffffff 0%, #b0b0b0 100%); 
+            color: #000; padding: 10px 40px; border-radius: 14px; 
+            font-size: 16px; font-weight: 950; text-transform: uppercase; letter-spacing: 5px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8); border: 2px solid #fff; z-index: 10; 
+            white-space: nowrap; 
+        }
 
         .matchup { width: 310px; background: rgba(15, 23, 42, 0.98); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.95); position: relative; }
         .bracket-player { display: flex; align-items: center; background: rgba(13, 17, 26, 0.98); height: 60px; width: 100%; position: relative; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
@@ -167,8 +174,14 @@
 
         function getCivFlagUrl(id) {
             if (!id || typeof id !== 'string') return '';
+            if (id.startsWith('/civs/') || id.endsWith('.webp') || id.endsWith('.png')) {
+                return id.startsWith('/') ? id : `/${id}`;
+            }
             const data = CIV_DATA[id.toLowerCase()];
-            return `/civs/${data ? data.flag : (id + '.webp')}`;
+            if (data) {
+                return data.flag.startsWith('/') ? data.flag : `/civs/${data.flag}`;
+            }
+            return `/civs/${id}.webp`;
         }
 
         function formatTime(seconds) {

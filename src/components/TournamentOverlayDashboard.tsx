@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, Timer as TimerIcon, Map as MapIcon, Trophy, MousePointer2, RefreshCcw, Plus, Minus, Check, AlertCircle, X } from 'lucide-react';
+import { Save, Timer as TimerIcon, Map as MapIcon, Trophy, RefreshCcw, Plus, Minus, Check, X } from 'lucide-react';
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
 import { overlayService } from '../services/overlayService';
@@ -89,7 +89,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
         </select>
         {selectedCiv ? (
           <img 
-            src={`/civs/${selectedCiv.flag}`} 
+            src={selectedCiv.flag.startsWith('/') ? selectedCiv.flag : `/civs/${selectedCiv.flag}`} 
             alt="" 
             className={`absolute left-3.5 top-1/2 -translate-y-1/2 ${isSm ? 'w-5 h-5' : 'w-6 h-6'} rounded-md object-cover border border-white/10 shadow-sm pointer-events-none`}
           />
