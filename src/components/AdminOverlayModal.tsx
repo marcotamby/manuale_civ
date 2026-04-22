@@ -287,7 +287,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                 <div className="flex-1 overflow-y-auto custom-scrollbar">
                   {activeTab === 'preview' ? (
                     <div className="h-full flex flex-col p-4">
-                      <div className="flex-1 bg-black rounded-3xl border border-white/5 overflow-hidden shadow-2xl relative group min-h-[400px]">
+                      <div className="flex-1 bg-black rounded-3xl border border-white/5 overflow-hidden shadow-2xl relative group min-h-[650px]">
                         <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full border border-white/10 text-[10px] font-bold text-gray-400 flex items-center gap-2">
                           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                           ANTEPRIMA LIVE (1920x1080)

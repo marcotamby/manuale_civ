@@ -280,76 +280,93 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
       </div>
 
       {activeTab === 'match' ? (
-        <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-6">
-          <div className="flex-1 bg-black/40 rounded-3xl border border-[#D4AF37]/10 p-4 relative min-h-[500px]">
-            <div className="absolute top-4 left-4 flex items-center gap-2">
-              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-              <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Live Preview</span>
-            </div>
-            <div className="w-full h-full flex items-center justify-center p-4">
-              <div className="relative w-full h-full max-w-[1200px] max-h-[675px] aspect-video bg-[#0d111a] rounded-xl overflow-hidden shadow-2xl border border-white/5">
-                <iframe 
-                  src="/overlays/tournament-1v1-bracket/index.html" 
-                  className="w-[1920px] h-[1080px] border-0 origin-top-left scale-[0.6] pointer-events-none"
-                  style={{ transform: 'scale(var(--preview-scale, 0.58))', width: '1920px', height: '1080px' }}
+        <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-8">
+          <div className="grid grid-cols-2 gap-8">
+            {/* Player 1 Row */}
+            <div className="bg-[#161b2b] border border-[#D4AF37]/20 rounded-2xl p-6 space-y-4">
+              <label className="text-[10px] font-black text-[#D4AF37] uppercase tracking-widest px-1">Player 1 (Sinistra)</label>
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={state.p1.name}
+                  onChange={(e) => setState({ ...state, p1: { ...state.p1, name: e.target.value } })}
+                  placeholder="NOME GIOCATORE"
+                  className="flex-1 bg-[#0d111a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-[#D4AF37]/50 outline-none transition-all font-bold"
+                />
+                <input
+                  type="number"
+                  value={state.p1.score}
+                  onChange={(e) => setState({ ...state, p1: { ...state.p1, score: parseInt(e.target.value) || 0 } })}
+                  className="w-20 bg-[#0d111a] border border-white/10 rounded-xl px-4 py-3 text-center text-sm text-[#D4AF37] font-black outline-none"
                 />
               </div>
+              <CivDropdown value={state.p1.civId} onChange={(val) => setState({ ...state, p1: { ...state.p1, civId: val } })} />
             </div>
-          </div>
-          <div className="space-y-6">
-            <div className="flex gap-6 items-center">
-              <div className="flex-1 space-y-2">
-                <label className="text-[10px] font-black text-[#D4AF37] uppercase tracking-widest px-1">Player 1</label>
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    value={state.p1.name}
-                    onChange={(e) => setState({ ...state, p1: { ...state.p1, name: e.target.value } })}
-                    className="flex-1 bg-[#0d111a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-[#D4AF37]/50 outline-none transition-all font-bold"
-                  />
-                  <CivDropdown value={state.p1.civId} onChange={(val) => setState({ ...state, p1: { ...state.p1, civId: val } })} />
-                  <input
-                    type="number"
-                    value={state.p1.score}
-                    onChange={(e) => setState({ ...state, p1: { ...state.p1, score: parseInt(e.target.value) || 0 } })}
-                    className="w-20 bg-[#0d111a] border border-white/10 rounded-xl px-4 py-3 text-center text-sm text-[#D4AF37] font-black outline-none"
-                  />
-                </div>
-              </div>
 
-              <div className="flex-1 space-y-2">
-                <label className="text-[10px] font-black text-[#D4AF37] uppercase tracking-widest px-1">Player 2</label>
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    value={state.p2.name}
-                    onChange={(e) => setState({ ...state, p2: { ...state.p2, name: e.target.value } })}
-                    className="flex-1 bg-[#0d111a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-[#D4AF37]/50 outline-none transition-all font-bold"
-                  />
-                  <CivDropdown value={state.p2.civId} onChange={(val) => setState({ ...state, p2: { ...state.p2, civId: val } })} />
-                  <input
-                    type="number"
-                    value={state.p2.score}
-                    onChange={(e) => setState({ ...state, p2: { ...state.p2, score: parseInt(e.target.value) || 0 } })}
-                    className="w-20 bg-[#0d111a] border border-white/10 rounded-xl px-4 py-3 text-center text-sm text-[#D4AF37] font-black outline-none"
-                  />
-                </div>
+            {/* Player 2 Row */}
+            <div className="bg-[#161b2b] border border-[#D4AF37]/20 rounded-2xl p-6 space-y-4">
+              <label className="text-[10px] font-black text-[#D4AF37] uppercase tracking-widest px-1">Player 2 (Destra)</label>
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={state.p2.name}
+                  onChange={(e) => setState({ ...state, p2: { ...state.p2, name: e.target.value } })}
+                  placeholder="NOME GIOCATORE"
+                  className="flex-1 bg-[#0d111a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-[#D4AF37]/50 outline-none transition-all font-bold"
+                />
+                <input
+                  type="number"
+                  value={state.p2.score}
+                  onChange={(e) => setState({ ...state, p2: { ...state.p2, score: parseInt(e.target.value) || 0 } })}
+                  className="w-20 bg-[#0d111a] border border-white/10 rounded-xl px-4 py-3 text-center text-sm text-[#D4AF37] font-black outline-none"
+                />
               </div>
+              <CivDropdown value={state.p2.civId} onChange={(val) => setState({ ...state, p2: { ...state.p2, civId: val } })} />
             </div>
           </div>
 
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <MapIcon size={16} className="text-yellow-500" />
-              <label className="text-[10px] font-black text-yellow-500 uppercase tracking-widest block">Mappa Match Attuale</label>
+          <div className="bg-[#161b2b] border border-[#D4AF37]/20 rounded-2xl p-6">
+            <div className="flex items-center gap-6">
+              <div className="flex-1">
+                <label className="text-[10px] font-black text-[#D4AF37] uppercase tracking-widest px-1 block mb-2">Mappa di gioco</label>
+                <div className="relative group">
+                  <MapIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-[#D4AF37]/40 group-focus-within:text-[#D4AF37] transition-colors" size={18} />
+                  <select
+                    value={state.map}
+                    onChange={(e) => setState({ ...state, map: e.target.value })}
+                    className="w-full bg-[#0d111a] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm text-white focus:border-[#D4AF37]/50 outline-none transition-all cursor-pointer appearance-none font-bold"
+                  >
+                    {AOE4_MAPS.map(m => <option key={m} value={m} className="bg-slate-900 text-white">{m.toUpperCase()}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div className="w-64">
+                <label className="text-[10px] font-black text-[#D4AF37] uppercase tracking-widest px-1 block mb-2">Timer Inizio (MM:SS)</label>
+                <div className="flex gap-2 items-center bg-[#0d111a] border border-white/10 rounded-xl p-1 px-3 group focus-within:border-[#D4AF37]/50 transition-all">
+                  <TimerIcon className="text-[#D4AF37]/40 group-focus-within:text-[#D4AF37] transition-colors" size={18} />
+                  <input
+                    type="number"
+                    value={state.timer.min}
+                    onChange={(e) => setState({ ...state, timer: { ...state.timer, min: parseInt(e.target.value) || 0 } })}
+                    className="w-12 bg-transparent text-center text-sm text-white font-bold outline-none"
+                  />
+                  <span className="text-gray-600">:</span>
+                  <input
+                    type="number"
+                    value={state.timer.sec}
+                    onChange={(e) => setState({ ...state, timer: { ...state.timer, sec: parseInt(e.target.value) || 0 } })}
+                    className="w-12 bg-transparent text-center text-sm text-white font-bold outline-none"
+                  />
+                  <button 
+                    onClick={() => setState({ ...state, timer: { ...state.timer, active: !state.timer.active, timestamp: Date.now() } })}
+                    className={`ml-2 px-3 py-1 rounded-lg text-[10px] font-black transition-all ${state.timer.active ? 'bg-red-500/20 text-red-500 border border-red-500/30' : 'bg-[#D4AF37] text-black'}`}
+                  >
+                    {state.timer.active ? 'STOP' : 'START'}
+                  </button>
+                </div>
+              </div>
             </div>
-            <select
-              value={state.map}
-              onChange={(e) => setState({ ...state, map: e.target.value })}
-              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-lg font-bold outline-none focus:border-yellow-500/50 transition-all cursor-pointer appearance-none hover:bg-black/60"
-            >
-              {AOE4_MAPS.map(m => <option key={m} value={m} className="bg-slate-900 text-white">{m}</option>)}
-            </select>
           </div>
         </div>
       ) : (
