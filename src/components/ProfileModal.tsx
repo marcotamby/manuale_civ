@@ -279,7 +279,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[150] flex items-start justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300 overflow-y-auto pt-20 md:pt-40">
+        <div className="fixed inset-0 z-[150] flex items-start justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300 overflow-y-auto pt-20 md:pt-24">
             <div className="bg-[#0f1423] border border-blue-500/30 rounded-2xl w-full max-w-2xl mb-20 flex flex-col shadow-[0_0_50px_rgba(37,99,235,0.2)] relative">
                 
                 {/* Close Button */}
@@ -475,25 +475,22 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                                     <img 
                                                         src={civ.flag} 
                                                         alt="" 
-                                                        className="w-full h-full object-cover opacity-20 group-hover:opacity-40 transition-opacity duration-500 group-hover:scale-110" 
+                                                        className="w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-500 group-hover:scale-110" 
                                                     />
-                                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0f1423]/80 to-[#0f1423]" />
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0f1423]/60 to-[#0f1423] opacity-90" />
                                                 </div>
                                             )}
 
                                             <div className="flex items-center justify-between w-full relative z-10">
                                                 <div className="flex items-center gap-3">
-                                                    {civ?.flag && (
-                                                        <img src={civ.flag} alt="" className="w-8 h-8 object-contain rounded shadow-lg border border-white/10" />
-                                                    )}
-                                                    <span className="capitalize text-sm font-black tracking-wide text-white drop-shadow-md">
+                                                    <span className="capitalize text-sm font-black tracking-wide text-white drop-shadow-lg">
                                                         {civ?.name || favId}
                                                     </span>
                                                 </div>
                                                 <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity text-blue-400" />
                                             </div>
 
-                                            <div className="flex flex-wrap gap-1.5 mt-1 relative z-10 pl-11">
+                                            <div className="flex flex-wrap gap-1.5 mt-1 relative z-10">
                                                 {hasNewBO && (
                                                     <span className="text-[8px] bg-yellow-500 text-black px-1.5 py-0.5 rounded font-black uppercase tracking-tighter animate-in zoom-in">
                                                         Nuova BO
