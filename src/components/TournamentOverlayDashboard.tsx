@@ -281,109 +281,58 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
 
       {activeTab === 'match' ? (
         <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-6">
-          <div className="grid grid-cols-2 gap-6">
-            {/* Player 1 */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-              <label className="text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-4 block">Giocatore 1 (Sinistra)</label>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-[10px] text-gray-500 uppercase mb-1 block">Nome</label>
+          <div className="flex-1 bg-black/40 rounded-3xl border border-[#D4AF37]/10 p-4 relative min-h-[500px]">
+            <div className="absolute top-4 left-4 flex items-center gap-2">
+              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+              <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Live Preview</span>
+            </div>
+            <div className="w-full h-full flex items-center justify-center p-4">
+              <div className="relative w-full h-full max-w-[1200px] max-h-[675px] aspect-video bg-[#0d111a] rounded-xl overflow-hidden shadow-2xl border border-white/5">
+                <iframe 
+                  src="/overlays/tournament-1v1-bracket/index.html" 
+                  className="w-[1920px] h-[1080px] border-0 origin-top-left scale-[0.6] pointer-events-none"
+                  style={{ transform: 'scale(var(--preview-scale, 0.58))', width: '1920px', height: '1080px' }}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="space-y-6">
+            <div className="flex gap-6 items-center">
+              <div className="flex-1 space-y-2">
+                <label className="text-[10px] font-black text-[#D4AF37] uppercase tracking-widest px-1">Player 1</label>
+                <div className="flex gap-3">
                   <input
                     type="text"
                     value={state.p1.name}
                     onChange={(e) => setState({ ...state, p1: { ...state.p1, name: e.target.value } })}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-yellow-500/50 outline-none"
-                    placeholder="Nome Giocatore"
+                    className="flex-1 bg-[#0d111a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-[#D4AF37]/50 outline-none transition-all font-bold"
+                  />
+                  <CivDropdown value={state.p1.civId} onChange={(val) => setState({ ...state, p1: { ...state.p1, civId: val } })} />
+                  <input
+                    type="number"
+                    value={state.p1.score}
+                    onChange={(e) => setState({ ...state, p1: { ...state.p1, score: parseInt(e.target.value) || 0 } })}
+                    className="w-20 bg-[#0d111a] border border-white/10 rounded-xl px-4 py-3 text-center text-sm text-[#D4AF37] font-black outline-none"
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-[10px] text-gray-500 uppercase mb-1 block">Score</label>
-                    <div className="flex items-center bg-black/40 border border-white/10 rounded-lg overflow-hidden h-[42px]">
-                      <button 
-                        onClick={() => setState({ ...state, p1: { ...state.p1, score: Math.max(0, state.p1.score - 1) } })}
-                        className="h-full px-3 hover:bg-white/5 text-gray-400 transition-colors"
-                      >
-                        <span className="text-lg font-bold">−</span>
-                      </button>
-                      <input
-                        type="number"
-                        value={state.p1.score}
-                        onChange={(e) => setState({ ...state, p1: { ...state.p1, score: parseInt(e.target.value) || 0 } })}
-                        className="w-full bg-transparent text-center text-sm text-white font-bold outline-none"
-                      />
-                      <button 
-                        onClick={() => setState({ ...state, p1: { ...state.p1, score: state.p1.score + 1 } })}
-                        className="h-full px-3 hover:bg-white/5 text-gray-400 transition-colors"
-                      >
-                        <span className="text-lg font-bold">+</span>
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <label className="text-[10px] text-gray-500 uppercase mb-1 block">Civiltà</label>
-                    <select
-                      value={state.p1.civId}
-                      onChange={(e) => setState({ ...state, p1: { ...state.p1, civId: e.target.value } })}
-                      className="w-full h-[42px] bg-black/40 border border-white/10 rounded-lg px-3 text-sm text-white focus:border-yellow-500/50 outline-none transition-all cursor-pointer"
-                    >
-                      <option value="" className="bg-slate-900 text-white">Nessuna</option>
-                      {civilizationsData.map(c => <option key={c.id} value={c.id} className="bg-slate-900 text-white">{c.name}</option>)}
-                    </select>
-                  </div>
-                </div>
               </div>
-            </div>
 
-            {/* Player 2 */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-              <label className="text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-4 block">Giocatore 2 (Destra)</label>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-[10px] text-gray-500 uppercase mb-1 block">Nome</label>
+              <div className="flex-1 space-y-2">
+                <label className="text-[10px] font-black text-[#D4AF37] uppercase tracking-widest px-1">Player 2</label>
+                <div className="flex gap-3">
                   <input
                     type="text"
                     value={state.p2.name}
                     onChange={(e) => setState({ ...state, p2: { ...state.p2, name: e.target.value } })}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-yellow-500/50 outline-none"
-                    placeholder="Nome Giocatore"
+                    className="flex-1 bg-[#0d111a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-[#D4AF37]/50 outline-none transition-all font-bold"
                   />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-[10px] text-gray-500 uppercase mb-1 block">Score</label>
-                    <div className="flex items-center bg-black/40 border border-white/10 rounded-lg overflow-hidden h-[42px]">
-                      <button 
-                        onClick={() => setState({ ...state, p2: { ...state.p2, score: Math.max(0, state.p2.score - 1) } })}
-                        className="h-full px-3 hover:bg-white/5 text-gray-400 transition-colors"
-                      >
-                        <span className="text-lg font-bold">−</span>
-                      </button>
-                      <input
-                        type="number"
-                        value={state.p2.score}
-                        onChange={(e) => setState({ ...state, p2: { ...state.p2, score: parseInt(e.target.value) || 0 } })}
-                        className="w-full bg-transparent text-center text-sm text-white font-bold outline-none"
-                      />
-                      <button 
-                        onClick={() => setState({ ...state, p2: { ...state.p2, score: state.p2.score + 1 } })}
-                        className="h-full px-3 hover:bg-white/5 text-gray-400 transition-colors"
-                      >
-                        <span className="text-lg font-bold">+</span>
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <label className="text-[10px] text-gray-500 uppercase mb-1 block">Civiltà</label>
-                    <select
-                      value={state.p2.civId}
-                      onChange={(e) => setState({ ...state, p2: { ...state.p2, civId: e.target.value } })}
-                      className="w-full h-[42px] bg-black/40 border border-white/10 rounded-lg px-3 text-sm text-white focus:border-yellow-500/50 outline-none transition-all cursor-pointer"
-                    >
-                      <option value="" className="bg-slate-900 text-white">Nessuna</option>
-                      {civilizationsData.map(c => <option key={c.id} value={c.id} className="bg-slate-900 text-white">{c.name}</option>)}
-                    </select>
-                  </div>
+                  <CivDropdown value={state.p2.civId} onChange={(val) => setState({ ...state, p2: { ...state.p2, civId: val } })} />
+                  <input
+                    type="number"
+                    value={state.p2.score}
+                    onChange={(e) => setState({ ...state, p2: { ...state.p2, score: parseInt(e.target.value) || 0 } })}
+                    className="w-20 bg-[#0d111a] border border-white/10 rounded-xl px-4 py-3 text-center text-sm text-[#D4AF37] font-black outline-none"
+                  />
                 </div>
               </div>
             </div>
@@ -409,7 +358,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
           <div className="grid grid-cols-3 gap-6 items-start">
             {/* Quarters */}
             <div className="space-y-4">
-              <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 text-center">Quarti di Finale</h4>
+              <h4 className="text-[10px] font-black text-[#C0C0C0] uppercase tracking-[0.2em] mb-4 text-center">Quarti di Finale</h4>
               {renderMatchInputs('q1', 'Match 1')}
               {renderMatchInputs('q2', 'Match 2')}
               {renderMatchInputs('q3', 'Match 3')}
@@ -418,7 +367,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
 
             {/* Semis */}
             <div className="space-y-4 pt-12">
-              <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 text-center">Semifinali</h4>
+              <h4 className="text-[10px] font-black text-[#C0C0C0] uppercase tracking-[0.2em] mb-4 text-center">Semifinali</h4>
               <div className="space-y-24">
                 {renderMatchInputs('s1', 'Semi 1')}
                 {renderMatchInputs('s2', 'Semi 2')}
@@ -427,8 +376,8 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
 
             {/* Final */}
             <div className="space-y-4 pt-48">
-              <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 text-center">Gran Finale</h4>
-              <div className="p-1 bg-yellow-500/10 border border-yellow-500/20 rounded-2xl shadow-2xl">
+              <h4 className="text-[10px] font-black text-[#C0C0C0] uppercase tracking-[0.2em] mb-4 text-center">Gran Finale</h4>
+              <div className="p-1 bg-white/5 border border-white/10 rounded-2xl shadow-2xl">
                 {renderMatchInputs('f', 'Finalissima')}
               </div>
             </div>
