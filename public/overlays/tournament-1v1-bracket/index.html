@@ -109,7 +109,8 @@
             position: absolute; inset: 0; pointer-events: none; z-index: 0;
             width: 100%; height: 100%;
         }
-        .bracket-line { stroke: rgba(212, 175, 55, 0.6); stroke-width: 3; fill: none; filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3)); }
+        .bracket-line { stroke: rgba(212, 175, 55, 0.1); stroke-width: 2; fill: none; transition: all 0.6s ease; }
+        .bracket-line.active { stroke: rgba(192, 192, 192, 0.9); stroke-width: 4; filter: drop-shadow(0 0 10px rgba(192, 192, 192, 0.6)); }
 
         /* CASTERS */
         #casters-container { position: absolute; bottom: 25px; width: 100%; display: flex; justify-content: space-between; padding: 0 50px; box-sizing: border-box; pointer-events: none; }
@@ -162,15 +163,24 @@
     <div id="bracket-container">
         <!-- Lines Layer -->
         <svg class="bracket-lines" viewBox="0 0 1400 600">
-            <!-- Q1/Q2 to S1 -->
-            <path class="bracket-line" d="M 355,75 L 460,75 L 460,125 L 565,125" />
-            <path class="bracket-line" d="M 355,225 L 460,225 L 460,175 L 565,175" />
-            <!-- Q3/Q4 to S2 -->
-            <path class="bracket-line" d="M 355,375 L 460,375 L 460,425 L 565,425" />
-            <path class="bracket-line" d="M 355,525 L 460,525 L 460,475 L 565,475" />
-            <!-- S1/S2 to F -->
-            <path class="bracket-line" d="M 835,150 L 940,150 L 940,275 L 1045,275" />
-            <path class="bracket-line" d="M 835,450 L 940,450 L 940,325 L 1045,325" />
+            <!-- Q1 to S1 -->
+            <path id="line-q1-w1" class="bracket-line" d="M 355,51 L 460,51 L 460,126 L 565,126" />
+            <path id="line-q1-w2" class="bracket-line" d="M 355,99 L 460,99 L 460,126 L 565,126" />
+            <!-- Q2 to S1 -->
+            <path id="line-q2-w1" class="bracket-line" d="M 355,201 L 460,201 L 460,174 L 565,174" />
+            <path id="line-q2-w2" class="bracket-line" d="M 355,249 L 460,249 L 460,174 L 565,174" />
+            <!-- Q3 to S2 -->
+            <path id="line-q3-w1" class="bracket-line" d="M 355,351 L 460,351 L 460,426 L 565,426" />
+            <path id="line-q3-w2" class="bracket-line" d="M 355,399 L 460,399 L 460,426 L 565,426" />
+            <!-- Q4 to S2 -->
+            <path id="line-q4-w1" class="bracket-line" d="M 355,501 L 460,501 L 460,474 L 565,474" />
+            <path id="line-q4-w2" class="bracket-line" d="M 355,549 L 460,549 L 460,474 L 565,474" />
+            <!-- S1 to F -->
+            <path id="line-s1-w1" class="bracket-line" d="M 835,126 L 940,126 L 940,276 L 1045,276" />
+            <path id="line-s1-w2" class="bracket-line" d="M 835,174 L 940,174 L 940,276 L 1045,276" />
+            <!-- S2 to F -->
+            <path id="line-s2-w1" class="bracket-line" d="M 835,426 L 940,426 L 940,324 L 1045,324" />
+            <path id="line-s2-w2" class="bracket-line" d="M 835,474 L 940,474 L 940,324 L 1045,324" />
         </svg>
 
         <!-- Quarter Finals -->
@@ -357,6 +367,12 @@
                             if (m.w === 2) players[1].classList.add('winner');
                             if (m.w === 1) players[1].classList.add('loser');
                         }
+
+                        // Update Lines
+                        const l1 = document.getElementById(`line-${rid}-w1`);
+                        const l2 = document.getElementById(`line-${rid}-w2`);
+                        if (l1) l1.classList.toggle('active', m.w === 1);
+                        if (l2) l2.classList.toggle('active', m.w === 2);
                     }
                 });
             } catch (e) { console.error("Error rendering bracket:", e); }
