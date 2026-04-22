@@ -475,9 +475,9 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                                     <img 
                                                         src={civ.flag} 
                                                         alt="" 
-                                                        className="w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-500 group-hover:scale-110" 
+                                                        className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500 group-hover:scale-110" 
                                                     />
-                                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0f1423]/60 to-[#0f1423] opacity-90" />
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0f1423]/40 to-[#0f1423] opacity-90" />
                                                 </div>
                                             )}
 
