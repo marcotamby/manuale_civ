@@ -254,22 +254,43 @@ export function TournamentsPage() {
     setIsSubmitting(true);
     setSaveStatus('saving');
     try {
-      const { error } = await supabase
+      // First, check if the tournament already exists in the DB
+      const { data: existing } = await supabase
         .from('tournaments')
-        .upsert({
-          slug: editingTournament.slug,
-          source: editingTournament.config.source || 'challonge',
-          name: editForm.name,
-          organizer: editForm.organizer,
-          period: editForm.period,
-          banner_url: editForm.bannerUrl,
-          status: editForm.status,
-          podium: editForm.podium,
-          type: editForm.type,
-          has_regolamento: editForm.hasRegolamento,
-          regolamento_content: editForm.regolamentoContent,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'slug' });
+        .select('id')
+        .eq('slug', editingTournament.slug)
+        .single();
+
+      const tournamentData = {
+        slug: editingTournament.slug,
+        source: editingTournament.config.source || 'challonge',
+        name: editForm.name,
+        organizer: editForm.organizer,
+        period: editForm.period,
+        banner_url: editForm.bannerUrl,
+        status: editForm.status,
+        podium: editForm.podium,
+        type: editForm.type,
+        has_regolamento: editForm.hasRegolamento,
+        regolamento_content: editForm.regolamentoContent,
+        updated_at: new Date().toISOString()
+      };
+
+      let error;
+      if (existing) {
+        // Update existing record
+        const { error: updateError } = await supabase
+          .from('tournaments')
+          .update(tournamentData)
+          .eq('slug', editingTournament.slug);
+        error = updateError;
+      } else {
+        // Insert new record
+        const { error: insertError } = await supabase
+          .from('tournaments')
+          .insert(tournamentData);
+        error = insertError;
+      }
       
       if (error) throw error;
       
