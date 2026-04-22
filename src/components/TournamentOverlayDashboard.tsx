@@ -106,7 +106,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
         </div>
 
         {isOpen && (
-          <div className="absolute z-[100] left-0 mt-2 bg-[#0d111a] border border-white/20 rounded-2xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-150 min-w-[200px]">
+          <div className={`absolute z-[100] ${isSm ? 'right-0' : 'left-0'} mt-2 bg-[#0d111a] border border-white/20 rounded-2xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-150 min-w-[200px]`}>
              {civilizationsData.map(civ => (
                <div 
                  key={civ.id}
