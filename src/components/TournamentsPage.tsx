@@ -297,7 +297,6 @@ export function TournamentsPage() {
       setSaveStatus('saved');
       setTimeout(() => {
         setSaveStatus('idle');
-        setShowEditModal(false);
         loadTournaments();
       }, 3000);
     } catch (err: any) {
