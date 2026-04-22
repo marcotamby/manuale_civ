@@ -358,7 +358,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                     <section>
                         <div className="flex items-center gap-2 mb-4 text-blue-400 tracking-widest uppercase text-xs font-bold">
                             <Trophy size={14} />
-                            <span>Informazioni In-Gioco</span>
+                            <span>Informazioni In Gioco</span>
                         </div>
                         <div className="bg-white/[0.03] border border-white/8 rounded-xl p-5 space-y-5">
 
@@ -467,28 +467,47 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                         <button
                                             key={favId}
                                             onClick={() => { onSelectCiv(favId); onClose(); }}
-                                            className="bg-white/[0.03] px-4 py-3 rounded-xl border border-white/5 text-gray-300 hover:text-white hover:border-blue-400/50 hover:bg-blue-400/5 transition-all flex flex-col gap-1 group relative overflow-hidden"
+                                            className="bg-white/[0.03] px-4 py-3 rounded-xl border border-white/5 text-gray-300 hover:text-white hover:border-blue-400/50 hover:bg-blue-400/5 transition-all flex flex-col gap-1 group relative overflow-hidden h-20 justify-center"
                                         >
-                                            <div className="flex items-center justify-between w-full">
-                                                <span className="capitalize text-sm font-bold tracking-wide">{favId}</span>
-                                                <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            {/* Flag Background with Fade */}
+                                            {civ?.flag && (
+                                                <div className="absolute inset-0 z-0 pointer-events-none">
+                                                    <img 
+                                                        src={civ.flag} 
+                                                        alt="" 
+                                                        className="w-full h-full object-cover opacity-20 group-hover:opacity-40 transition-opacity duration-500 group-hover:scale-110" 
+                                                    />
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0f1423]/80 to-[#0f1423]" />
+                                                </div>
+                                            )}
+
+                                            <div className="flex items-center justify-between w-full relative z-10">
+                                                <div className="flex items-center gap-3">
+                                                    {civ?.flag && (
+                                                        <img src={civ.flag} alt="" className="w-8 h-8 object-contain rounded shadow-lg border border-white/10" />
+                                                    )}
+                                                    <span className="capitalize text-sm font-black tracking-wide text-white drop-shadow-md">
+                                                        {civ?.name || favId}
+                                                    </span>
+                                                </div>
+                                                <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity text-blue-400" />
                                             </div>
 
-                                            <div className="flex flex-wrap gap-1.5 mt-1">
+                                            <div className="flex flex-wrap gap-1.5 mt-1 relative z-10 pl-11">
                                                 {hasNewBO && (
-                                                    <span className="text-[9px] bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-1.5 py-0.5 rounded font-black uppercase tracking-tighter animate-in zoom-in">
-                                                        Nuovo Build Order!
+                                                    <span className="text-[8px] bg-yellow-500 text-black px-1.5 py-0.5 rounded font-black uppercase tracking-tighter animate-in zoom-in">
+                                                        Nuova BO
                                                     </span>
                                                 )}
                                                 {hasNewVideo && (
-                                                    <span className="text-[9px] bg-red-500/10 text-red-500 border border-red-500/20 px-1.5 py-0.5 rounded font-black uppercase tracking-tighter animate-in zoom-in">
-                                                        Nuovo Video!
+                                                    <span className="text-[8px] bg-red-500 text-white px-1.5 py-0.5 rounded font-black uppercase tracking-tighter animate-in zoom-in">
+                                                        Nuovo Video
                                                     </span>
                                                 )}
                                             </div>
 
                                             {(hasNewBO || hasNewVideo) && (
-                                                <div className="absolute top-0 right-0 w-8 h-8 bg-red-500/10 blur-xl rounded-full -mr-4 -mt-4 animate-pulse"></div>
+                                                <div className="absolute top-0 right-0 w-8 h-8 bg-red-500/20 blur-xl rounded-full -mr-4 -mt-4 animate-pulse z-10"></div>
                                             )}
                                         </button>
                                     );
