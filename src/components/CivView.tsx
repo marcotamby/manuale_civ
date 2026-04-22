@@ -896,21 +896,21 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
                         <div className="flex flex-col mt-auto pt-4 border-t border-white/5 gap-4">
                            {/* Row 1: Author & Button */}
-                           <div className="flex items-center justify-between gap-2 flex-nowrap">
-                              <div className="flex items-center gap-2 shrink-0 min-w-0">
-                                <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20 shrink-0 overflow-hidden">
-                                  {bo.author_avatar ? (
-                                    <img src={bo.author_avatar} alt="" className="w-full h-full object-cover" />
-                                  ) : bo.author_rank && getRankIcon(bo.author_rank) ? (
-                                    <img src={getRankIcon(bo.author_rank) || ''} alt={bo.author_rank} className="w-5 h-5 object-contain" />
-                                  ) : (
-                                    <UserCircle size={18} className="text-gray-600" />
-                                  )}
-                                </div>
-                                <span className="text-[11px] font-bold text-blue-400 uppercase tracking-tighter truncate">
-                                  {bo.author_nickname || 'Anonimo'}
-                                </span>
-                              </div>
+                           <div className="flex items-center justify-between gap-3 flex-nowrap">
+                               <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
+                                 <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20 shrink-0 overflow-hidden">
+                                   {bo.author_avatar ? (
+                                     <img src={bo.author_avatar} alt="" className="w-full h-full object-cover" />
+                                   ) : bo.author_rank && getRankIcon(bo.author_rank) ? (
+                                     <img src={getRankIcon(bo.author_rank) || ''} alt={bo.author_rank} className="w-5 h-5 object-contain" />
+                                   ) : (
+                                     <UserCircle size={18} className="text-gray-600" />
+                                   )}
+                                 </div>
+                                 <span className="text-[11px] font-bold text-blue-400 uppercase tracking-tighter truncate flex-1">
+                                   {bo.author_nickname || 'Anonimo'}
+                                 </span>
+                               </div>
                               
                               <span className="text-[9px] md:text-[10px] font-black text-yellow-500 uppercase tracking-wider bg-yellow-500/10 px-3 py-2 rounded-xl border border-yellow-500/20 hover:bg-yellow-500 hover:text-black transition-all shadow-lg whitespace-nowrap shrink-0">
                                 Leggi Strategia
