@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
-import { Trophy, Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, Upload, BookOpen } from 'lucide-react';
+import { Trophy, Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
@@ -612,7 +612,6 @@ export function TournamentsPage() {
                      <BookOpen size={20} className="text-slate-400" />
                      <div>
                        <p className="text-xs font-bold text-white uppercase tracking-tight">Regolamento</p>
-                       <p className="text-[10px] text-gray-500">Aggiungi un regolamento professionale</p>
                      </div>
                    </div>
                    <label className="relative inline-flex items-center cursor-pointer">
@@ -627,52 +626,71 @@ export function TournamentsPage() {
                  </div>
 
                  {editForm.hasRegolamento && (
-                   <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                     <div className="flex flex-wrap gap-1 mb-1 p-1 bg-black/20 rounded-lg border border-white/5">
-                        {[
-                          { label: 'B', tag: 'b', title: 'Bold' },
-                          { label: 'I', tag: 'i', title: 'Italic', className: 'italic' },
-                          { label: 'U', tag: 'u', title: 'Underline', className: 'underline' },
-                          { label: 'H2', tag: 'h2', title: 'Heading' },
-                          { label: 'P', tag: 'p', title: 'Paragraph' },
-                          { label: '🔗', tag: 'a', title: 'Link' },
-                          { label: '😀', tag: 'emoji', title: 'Emoji' }
-                        ].map(tool => (
-                          <button 
-                            key={tool.label}
-                            onClick={() => {
-                              const textarea = document.getElementById('regolamento-editor') as HTMLTextAreaElement;
-                              if (!textarea) return;
-                              const start = textarea.selectionStart;
-                              const end = textarea.selectionEnd;
-                              const text = textarea.value;
-                              const selected = text.substring(start, end);
-                              let replacement = '';
-                              if (tool.tag === 'emoji') {
-                                replacement = text.substring(0, start) + '🏆' + text.substring(end);
-                              } else if (tool.tag === 'a') {
-                                replacement = text.substring(0, start) + `<a href="#" class="text-yellow-500 hover:underline">${selected || 'link'}</a>` + text.substring(end);
-                              } else {
-                                replacement = text.substring(0, start) + `<${tool.tag}>${selected}</${tool.tag}>` + text.substring(end);
-                              }
-                              setEditForm({ ...editForm, regolamentoContent: replacement });
-                            }}
-                            className={clsx("px-3 py-1.5 rounded-md hover:bg-white/10 text-xs font-bold transition-all", tool.className)}
-                            title={tool.title}
-                          >
-                            {tool.label}
-                          </button>
-                        ))}
-                     </div>
-                     <textarea 
-                       id="regolamento-editor"
-                       value={editForm.regolamentoContent} 
-                       onChange={e => setEditForm({...editForm, regolamentoContent: e.target.value})}
-                       placeholder="Scrivi qui il regolamento (usa la toolbar sopra o HTML)..."
-                       className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-white text-sm outline-none focus:border-slate-500 transition-colors min-h-[200px] font-serif"
-                     />
-                     <p className="text-[9px] text-gray-500 italic">Il testo verrà visualizzato in una pagina dedicata con formattazione professionale.</p>
-                   </div>
+                   <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="flex flex-wrap gap-2 mb-1 p-2 bg-black/40 rounded-xl border border-white/10 sticky top-0 z-20 backdrop-blur-md">
+                         {/* Text Style Group */}
+                         <div className="flex items-center gap-1 pr-2 border-r border-white/10">
+                           <button onClick={(e) => { e.preventDefault(); document.execCommand('bold', false); }} className="p-2 hover:bg-white/10 rounded-lg text-white font-bold" title="Grassetto">B</button>
+                           <button onClick={(e) => { e.preventDefault(); document.execCommand('italic', false); }} className="p-2 hover:bg-white/10 rounded-lg text-white italic" title="Corsivo">I</button>
+                           <button onClick={(e) => { e.preventDefault(); document.execCommand('underline', false); }} className="p-2 hover:bg-white/10 rounded-lg text-white underline" title="Sottolineato">U</button>
+                         </div>
+
+                         {/* Alignment Group */}
+                         <div className="flex items-center gap-1 px-2 border-r border-white/10">
+                           <button onClick={(e) => { e.preventDefault(); document.execCommand('justifyLeft', false); }} className="p-2 hover:bg-white/10 rounded-lg text-white" title="Allinea Sinistra"><AlignLeft size={16}/></button>
+                           <button onClick={(e) => { e.preventDefault(); document.execCommand('justifyCenter', false); }} className="p-2 hover:bg-white/10 rounded-lg text-white" title="Allinea Centro"><AlignCenter size={16}/></button>
+                           <button onClick={(e) => { e.preventDefault(); document.execCommand('justifyRight', false); }} className="p-2 hover:bg-white/10 rounded-lg text-white" title="Allinea Destra"><AlignRight size={16}/></button>
+                           <button onClick={(e) => { e.preventDefault(); document.execCommand('justifyFull', false); }} className="p-2 hover:bg-white/10 rounded-lg text-white" title="Giustifica"><AlignJustify size={16}/></button>
+                         </div>
+
+                         {/* Font Selection */}
+                         <div className="flex items-center gap-2 px-2 border-r border-white/10">
+                           <select 
+                             onChange={(e) => { document.execCommand('fontName', false, e.target.value); }}
+                             className="bg-black/60 border border-white/10 rounded-lg text-[10px] p-1.5 text-white outline-none"
+                           >
+                             <option value="Inter, sans-serif">Inter</option>
+                             <option value="Georgia, serif">Serif (Classico)</option>
+                             <option value="monospace">Monospace</option>
+                             <option value="system-ui">Modern</option>
+                             <option value="Garamond, serif">Elegant</option>
+                           </select>
+                         </div>
+
+                         {/* Heading/Format */}
+                         <div className="flex items-center gap-1 px-2 border-r border-white/10">
+                           <button onClick={(e) => { e.preventDefault(); document.execCommand('formatBlock', false, 'H2'); }} className="p-2 hover:bg-white/10 rounded-lg text-white font-black text-[10px]" title="Titolo">H2</button>
+                           <button onClick={(e) => { e.preventDefault(); document.execCommand('formatBlock', false, 'P'); }} className="p-2 hover:bg-white/10 rounded-lg text-white font-black text-[10px]" title="Paragrafo">P</button>
+                         </div>
+
+                         {/* Emoji Popover */}
+                         <div className="relative group/emoji">
+                           <button className="p-2 hover:bg-white/10 rounded-lg text-lg">😀</button>
+                           <div className="absolute top-full left-0 mt-2 p-2 bg-black/90 border border-white/10 rounded-xl hidden group-hover/emoji:grid grid-cols-5 gap-1 z-[100] shadow-2xl backdrop-blur-xl">
+                             {['🏆','🎮','⚔️','🏰','🎖️','🥇','🥈','🥉','📜','⚖️','📢','🔴','🟢','🔵','⭐'].map(emoji => (
+                               <button 
+                                 key={emoji}
+                                 onClick={(e) => { e.preventDefault(); document.execCommand('insertText', false, emoji); }}
+                                 className="p-2 hover:bg-white/20 rounded-lg text-lg transition-transform hover:scale-125"
+                               >
+                                 {emoji}
+                               </button>
+                             ))}
+                           </div>
+                         </div>
+                      </div>
+                      
+                      <div 
+                        contentEditable
+                        onInput={(e) => setEditForm({...editForm, regolamentoContent: e.currentTarget.innerHTML})}
+                        onBlur={(e) => setEditForm({...editForm, regolamentoContent: e.currentTarget.innerHTML})}
+                        dangerouslySetInnerHTML={{ __html: editForm.regolamentoContent }}
+                        placeholder="Scrivi qui il regolamento professionale..."
+                        className="w-full bg-black/40 border border-white/10 p-6 rounded-2xl text-white text-base outline-none focus:border-blue-500/50 transition-all min-h-[400px] prose prose-invert max-w-none prose-p:my-2 prose-h2:mt-6 prose-h2:mb-4 overflow-y-auto"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      />
+                      <p className="text-[9px] text-gray-500 italic">Il testo verrà visualizzato esattamente come lo vedi qui sopra nella pagina dedicata.</p>
+                    </div>
                  )}
                </div>
               <div className="space-y-3">
