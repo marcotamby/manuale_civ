@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, Timer as TimerIcon, Map as MapIcon, Trophy, RefreshCcw, Plus, Minus, Check, X, ChevronDown } from 'lucide-react';
+import { Save, Timer as TimerIcon, Map as MapIcon, Trophy, RefreshCcw, Plus, Minus, X, ChevronDown } from 'lucide-react';
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
 import { overlayService } from '../services/overlayService';
