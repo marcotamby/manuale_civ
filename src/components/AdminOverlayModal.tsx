@@ -74,7 +74,9 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
           if (icon) setOverlayIcons(prev => ({ ...prev, [ov.id]: icon }));
         });
         overlayService.getOverlayDescription(ov.id).then(desc => {
-          if (desc) setOverlayDescriptions(prev => ({ ...prev, [ov.id]: desc }));
+          if (desc !== null && desc !== undefined) {
+            setOverlayDescriptions(prev => ({ ...prev, [ov.id]: desc }));
+          }
         });
       });
     }
