@@ -29,8 +29,9 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
     message: '',
     type: 'success'
   });
-  // Inline name editing
-  const [overlayDisplayName, setOverlayDisplayName] = useState<string>('');
+  
+  // Overlay names mapping to keep track of custom names from DB
+  const [overlayNames, setOverlayNames] = useState<Record<string, string>>({});
   const [isEditingName, setIsEditingName] = useState(false);
   const [editNameValue, setEditNameValue] = useState<string>('');
   const [isSavingName, setIsSavingName] = useState(false);
@@ -52,6 +53,21 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
       icon: Trophy
     }
   ];
+
+  // Initial load of all names
+  useEffect(() => {
+    if (isOpen) {
+      overlays.forEach(ov => {
+        overlayService.getOverlayName(ov.id).then(name => {
+          if (name) {
+            setOverlayNames(prev => ({ ...prev, [ov.id]: name }));
+          }
+        });
+      });
+    }
+  }, [isOpen]);
+
+  const overlayDisplayName = (selectedOverlay && overlayNames[selectedOverlay.id]) || selectedOverlay?.name || '';
 
   useEffect(() => {
     if (activeTab !== 'preview') return;
@@ -76,14 +92,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
     }
   }, [isOpen]);
 
-  // Load display name from DB whenever the selected overlay changes
-  useEffect(() => {
-    if (!selectedOverlay) return;
-    setOverlayDisplayName(selectedOverlay.name); // fallback
-    overlayService.getOverlayName(selectedOverlay.id).then(name => {
-      if (name) setOverlayDisplayName(name);
-    });
-  }, [selectedOverlay]);
+
 
   // Auto-focus when entering edit mode
   useEffect(() => {
@@ -98,7 +107,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
     setIsSavingName(true);
     try {
       await overlayService.updateOverlayName(selectedOverlay.id, editNameValue.trim());
-      setOverlayDisplayName(editNameValue.trim());
+      setOverlayNames(prev => ({ ...prev, [selectedOverlay.id]: editNameValue.trim() }));
       setIsEditingName(false);
       setToast({ isVisible: true, message: 'Nome aggiornato con successo! ✏️', type: 'success' });
     } catch {
@@ -180,7 +189,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                 </div>
                 <div className="text-left">
                   <div className={`font-bold text-sm ${selectedOverlay?.id === overlay.id ? 'text-white' : 'text-gray-300'}`}>
-                    {selectedOverlay?.id === overlay.id ? overlayDisplayName : overlay.name}
+                    {overlayNames[overlay.id] || overlay.name}
                   </div>
                   <div className="text-[10px] text-gray-500 line-clamp-1 mt-1">{overlay.description}</div>
                 </div>
