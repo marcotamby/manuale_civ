@@ -320,7 +320,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-bold text-white truncate uppercase tracking-tighter">
-                              {admin.user.nickname || admin.user.name}
+                              {(admin.user as any).nickname || admin.user.name}
                             </p>
                             <p className="text-[10px] text-gray-400 truncate flex items-center gap-1.5 font-medium italic">
                               {admin.activity.type === 'editing' ? (
