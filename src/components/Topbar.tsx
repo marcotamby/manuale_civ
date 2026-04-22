@@ -211,14 +211,13 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
           Age of Empires IV
         </h2>
         
-        <h1 className="text-2xl md:text-4xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 drop-shadow-[0_4px_12px_rgba(255,255,255,0.1)] tracking-tight leading-tight">
+        <h1 className="text-3xl md:text-5xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 drop-shadow-[0_4px_15px_rgba(255,255,255,0.15)] tracking-tight leading-tight px-2">
           Manuale delle Civiltà
         </h1>
 
-        <div className="flex items-center gap-4 mt-2 mb-3">
-          <div className="h-[2px] w-12 bg-gradient-to-r from-transparent via-sky-500/40 to-transparent"></div>
-          <div className="w-2 h-2 rounded-full border-2 border-sky-400/50 group-hover:scale-125 group-hover:bg-sky-400 group-hover:shadow-[0_0_10px_rgba(56,189,248,0.5)] transition-all duration-500"></div>
-          <div className="h-[2px] w-12 bg-gradient-to-l from-transparent via-sky-500/40 to-transparent"></div>
+        <div className="w-48 h-[1px] bg-gradient-to-r from-transparent via-sky-500/20 to-transparent mt-3 mb-4 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-sky-400/60 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out"></div>
+          <div className="absolute inset-0 bg-sky-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         </div>
         
         <p className="text-[11px] md:text-xs text-slate-400 italic hidden sm:block font-medium tracking-wide">
