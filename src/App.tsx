@@ -45,9 +45,7 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [isAdminOverlayOpen, setIsAdminOverlayOpen] = useState(() => {
-    return localStorage.getItem('admin_overlay_open') === 'true';
-  });
+  const [isAdminOverlayOpen, setIsAdminOverlayOpen] = useState(false);
   const [isCivEditorOpen, setIsCivEditorOpen] = useState(false);
   const [civEditorTarget, setCivEditorTarget] = useState<{ section?: string; id?: string }>({});
 
@@ -60,23 +58,24 @@ function App() {
       setCivEditorTarget({ section, id });
       setIsCivEditorOpen(true);
     };
-    (window as any).openAdminOverlay = () => {
-      setIsAdminOverlayOpen(true);
-      localStorage.setItem('admin_overlay_open', 'true');
-    };
+    (window as any).openAdminOverlay = () => navigate('/admin/overlays');
     (window as any).closeAllModals = () => {
       setIsProfileModalOpen(false);
       setIsAdminDashboardOpen(false);
       setIsAdminOverlayOpen(false);
       setIsCivEditorOpen(false);
       setIsSidebarOpen(false);
-      localStorage.removeItem('admin_overlay_open');
+      if (location.pathname === '/admin/overlays') navigate('/');
     };
   }, []); // State setters are stable, so empty dep array is fine
 
   useEffect(() => {
-    localStorage.setItem('admin_overlay_open', isAdminOverlayOpen.toString());
-  }, [isAdminOverlayOpen]);
+    if (location.pathname === '/admin/overlays') {
+      setIsAdminOverlayOpen(true);
+    } else {
+      setIsAdminOverlayOpen(false);
+    }
+  }, [location.pathname]);
 
   const prevPathRef = useRef(location.pathname);
   useEffect(() => {
@@ -272,6 +271,9 @@ function App() {
                 <Route path="/tornei" element={<TournamentsPage />} />
                 <Route path="/tornei/:slug" element={<TournamentDetail />} />
                 <Route path="/tornei/tournament/:slug" element={<TournamentDetail />} />
+                <Route path="/admin/overlays" element={<Home onSelectCiv={handleSelectCiv} onCompareCivs={handleCompare} />} />
+                <Route path="/admin/overlays/:overlayId" element={<Home onSelectCiv={handleSelectCiv} onCompareCivs={handleCompare} />} />
+                <Route path="/admin/overlays/:overlayId/:tab" element={<Home onSelectCiv={handleSelectCiv} onCompareCivs={handleCompare} />} />
               </Routes>
             </div>
           </div>
@@ -309,7 +311,10 @@ function App() {
       {isAuthenticated && (isAdmin || isStreamer) && (
         <AdminOverlayModal
           isOpen={isAdminOverlayOpen}
-          onClose={() => setIsAdminOverlayOpen(false)}
+          onClose={() => {
+            setIsAdminOverlayOpen(false);
+            if (location.pathname === '/admin/overlays') navigate('/');
+          }}
         />
       )}
 

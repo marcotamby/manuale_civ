@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { X, ExternalLink, Copy, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft, Pencil, Check, Upload } from 'lucide-react';
 import { AoE4MatchDashboard } from './AoE4MatchDashboard';
 import { TournamentOverlayDashboard } from './TournamentOverlayDashboard';
@@ -60,6 +61,9 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
     }
   ];
 
+  const { overlayId, tab } = useParams();
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (isOpen) {
       overlays.forEach(ov => {
@@ -78,21 +82,33 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
 
   useEffect(() => {
     if (isOpen) {
-      const savedOverlayId = localStorage.getItem('last_selected_overlay');
-      if (savedOverlayId) {
-        const found = overlays.find(o => o.id === savedOverlayId);
+      if (overlayId) {
+        const found = overlays.find(o => o.id === overlayId);
         if (found) setSelectedOverlay(found);
-      } else if (overlays.length > 0 && !selectedOverlay) {
+      } else if (overlays.length > 0) {
         setSelectedOverlay(overlays[0]);
       }
+      
+      if (tab === 'config') {
+        setActiveTab('dashboard');
+      } else {
+        setActiveTab('preview');
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, overlayId, tab]);
 
-  useEffect(() => {
+  const handleSelectOverlay = (ov: OverlayItem) => {
+    setSelectedOverlay(ov);
+    navigate(`/admin/overlays/${ov.id}/${activeTab === 'dashboard' ? 'config' : 'preview'}`);
+  };
+
+  const handleToggleTab = () => {
+    const nextTab = activeTab === 'preview' ? 'dashboard' : 'preview';
+    setActiveTab(nextTab);
     if (selectedOverlay) {
-      localStorage.setItem('last_selected_overlay', selectedOverlay.id);
+      navigate(`/admin/overlays/${selectedOverlay.id}/${nextTab === 'dashboard' ? 'config' : 'preview'}`);
     }
-  }, [selectedOverlay]);
+  };
 
   const overlayDisplayName = (selectedOverlay && overlayNames[selectedOverlay.id]) || selectedOverlay?.name || '';
   const overlayDisplayIcon = (selectedOverlay && overlayIcons[selectedOverlay.id]) || '';
@@ -243,7 +259,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                 return (
                   <button
                     key={ov.id}
-                    onClick={() => setSelectedOverlay(ov)}
+                    onClick={() => handleSelectOverlay(ov)}
                     className={`w-full group p-5 rounded-2xl border transition-all text-left relative flex items-center gap-4 ${
                       isSelected 
                         ? 'bg-gradient-to-br from-[#D4AF37]/20 to-black border-[#D4AF37]/50 shadow-xl' 
@@ -363,7 +379,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                   
                   <div className="flex gap-3 shrink-0 pt-2">
                     <button
-                      onClick={() => setActiveTab(activeTab === 'preview' ? 'dashboard' : 'preview')}
+                      onClick={handleToggleTab}
                       className={`flex items-center gap-2.5 px-6 py-3 font-black rounded-xl transition-all text-[11px] uppercase border shadow-xl whitespace-nowrap ${
                         activeTab === 'dashboard'
                           ? 'bg-indigo-600 text-white border-indigo-400 shadow-indigo-500/20'
