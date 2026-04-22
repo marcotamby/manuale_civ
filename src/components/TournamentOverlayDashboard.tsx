@@ -107,6 +107,68 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
     });
   };
 
+  const renderMatchInputs = (id: string, label: string) => {
+    const m = state.bracket[id] || { p1: '', p1Civ: '', p2: '', p2Civ: '', w: 0 };
+    return (
+      <div className="bg-black/20 border border-white/5 rounded-xl p-3 space-y-2">
+        <div className="flex justify-between items-center mb-1">
+          <span className="text-[9px] font-black text-yellow-500/50 uppercase tracking-tighter">{label}</span>
+          <div className="flex gap-1">
+            <button 
+              onClick={() => updateBracket(id, 'w', m.w === 1 ? 0 : 1)}
+              className={`px-1.5 py-0.5 rounded text-[9px] font-black transition-all ${m.w === 1 ? 'bg-yellow-500 text-black' : 'bg-white/5 text-gray-600'}`}
+            >
+              W1
+            </button>
+            <button 
+              onClick={() => updateBracket(id, 'w', m.w === 2 ? 0 : 2)}
+              className={`px-1.5 py-0.5 rounded text-[9px] font-black transition-all ${m.w === 2 ? 'bg-yellow-500 text-black' : 'bg-white/5 text-gray-600'}`}
+            >
+              W2
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={m.p1}
+              onChange={(e) => updateBracket(id, 'p1', e.target.value)}
+              placeholder="Player 1"
+              className="flex-1 bg-black/40 border border-white/5 rounded px-2 py-1 text-[10px] text-white"
+            />
+            <select
+              value={m.p1Civ}
+              onChange={(e) => updateBracket(id, 'p1Civ', e.target.value)}
+              className="w-24 bg-black/60 border border-white/10 rounded px-1 py-0.5 text-[9px] text-gray-400"
+            >
+              <option value="">Civiltà</option>
+              {civilizationsData.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </div>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={m.p2}
+              onChange={(e) => updateBracket(id, 'p2', e.target.value)}
+              placeholder="Player 2"
+              className="flex-1 bg-black/40 border border-white/5 rounded px-2 py-1 text-[10px] text-white"
+            />
+            <select
+              value={m.p2Civ}
+              onChange={(e) => updateBracket(id, 'p2Civ', e.target.value)}
+              className="w-24 bg-black/60 border border-white/10 rounded px-1 py-0.5 text-[9px] text-gray-400"
+            >
+              <option value="">Civiltà</option>
+              {civilizationsData.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   if (!state) return <div className="p-8 text-center text-gray-500 italic">Inizializzazione dashboard...</div>;
 
   return (
@@ -309,85 +371,26 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
             {/* Quarters */}
             <div className="space-y-4">
               <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 text-center">Quarti di Finale</h4>
-              {['q1', 'q2', 'q3', 'q4'].map((rid) => (
-                <div key={rid} className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2">
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Player 1"
-                      value={state.bracket[rid].p1}
-                      onChange={(e) => updateBracket(rid, 'p1', e.target.value)}
-                      className="flex-1 bg-black/40 border border-white/5 rounded px-2 py-1 text-[10px] text-white"
-                    />
-                    <button onClick={() => updateBracket(rid, 'w', state.bracket[rid].w === 1 ? 0 : 1)} className={`p-1 rounded ${state.bracket[rid].w === 1 ? 'bg-yellow-500 text-black' : 'bg-white/5 text-gray-600'}`}><Check size={12} /></button>
-                  </div>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Player 2"
-                      value={state.bracket[rid].p2}
-                      onChange={(e) => updateBracket(rid, 'p2', e.target.value)}
-                      className="flex-1 bg-black/40 border border-white/5 rounded px-2 py-1 text-[10px] text-white"
-                    />
-                    <button onClick={() => updateBracket(rid, 'w', state.bracket[rid].w === 2 ? 0 : 2)} className={`p-1 rounded ${state.bracket[rid].w === 2 ? 'bg-yellow-500 text-black' : 'bg-white/5 text-gray-600'}`}><Check size={12} /></button>
-                  </div>
-                </div>
-              ))}
+              {renderMatchInputs('q1', 'Match 1')}
+              {renderMatchInputs('q2', 'Match 2')}
+              {renderMatchInputs('q3', 'Match 3')}
+              {renderMatchInputs('q4', 'Match 4')}
             </div>
 
             {/* Semis */}
             <div className="space-y-4 pt-12">
               <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 text-center">Semifinali</h4>
-              {['s1', 's2'].map((rid) => (
-                <div key={rid} className="p-4 bg-white/5 border border-white/10 rounded-xl space-y-3 my-12">
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Semifinalista 1"
-                      value={state.bracket[rid].p1}
-                      onChange={(e) => updateBracket(rid, 'p1', e.target.value)}
-                      className="flex-1 bg-black/40 border border-white/5 rounded px-2 py-1 text-xs text-white"
-                    />
-                    <button onClick={() => updateBracket(rid, 'w', state.bracket[rid].w === 1 ? 0 : 1)} className={`p-1 rounded ${state.bracket[rid].w === 1 ? 'bg-yellow-500 text-black' : 'bg-white/5 text-gray-600'}`}><Check size={12} /></button>
-                  </div>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Semifinalista 2"
-                      value={state.bracket[rid].p2}
-                      onChange={(e) => updateBracket(rid, 'p2', e.target.value)}
-                      className="flex-1 bg-black/40 border border-white/5 rounded px-2 py-1 text-xs text-white"
-                    />
-                    <button onClick={() => updateBracket(rid, 'w', state.bracket[rid].w === 2 ? 0 : 2)} className={`p-1 rounded ${state.bracket[rid].w === 2 ? 'bg-yellow-500 text-black' : 'bg-white/5 text-gray-600'}`}><Check size={12} /></button>
-                  </div>
-                </div>
-              ))}
+              <div className="space-y-24">
+                {renderMatchInputs('s1', 'Semi 1')}
+                {renderMatchInputs('s2', 'Semi 2')}
+              </div>
             </div>
 
             {/* Final */}
-            <div className="space-y-4 pt-36">
+            <div className="space-y-4 pt-48">
               <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 text-center">Gran Finale</h4>
-              <div className="p-6 bg-yellow-500/5 border border-yellow-500/30 rounded-2xl space-y-4 shadow-xl">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Finalista 1"
-                    value={state.bracket.f.p1}
-                    onChange={(e) => updateBracket('f', 'p1', e.target.value)}
-                    className="flex-1 bg-black/60 border border-yellow-500/20 rounded px-3 py-2 text-sm text-white font-bold"
-                  />
-                  <button onClick={() => updateBracket('f', 'w', state.bracket.f.w === 1 ? 0 : 1)} className={`px-2 rounded ${state.bracket.f.w === 1 ? 'bg-yellow-500 text-black' : 'bg-white/10 text-gray-400'}`}><Trophy size={16} /></button>
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Finalista 2"
-                    value={state.bracket.f.p2}
-                    onChange={(e) => updateBracket('f', 'p2', e.target.value)}
-                    className="flex-1 bg-black/60 border border-yellow-500/20 rounded px-3 py-2 text-sm text-white font-bold"
-                  />
-                  <button onClick={() => updateBracket('f', 'w', state.bracket.f.w === 2 ? 0 : 2)} className={`px-2 rounded ${state.bracket.f.w === 2 ? 'bg-yellow-500 text-black' : 'bg-white/10 text-gray-400'}`}><Trophy size={16} /></button>
-                </div>
+              <div className="p-1 bg-yellow-500/10 border border-yellow-500/20 rounded-2xl shadow-2xl">
+                {renderMatchInputs('f', 'Finalissima')}
               </div>
             </div>
           </div>
