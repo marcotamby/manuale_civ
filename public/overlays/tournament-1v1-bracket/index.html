@@ -28,11 +28,12 @@
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 100%; height: 180%; opacity: 0.35; filter: blur(6px);
             background-size: cover; background-position: center; z-index: 1;
+            background-repeat: no-repeat;
         }
         /* Fade effect for flags without using mask-image for better compatibility */
         .player-box::after {
             content: ''; position: absolute; inset: 0;
-            background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.8) 80%);
+            background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.6) 85%);
             z-index: 2; pointer-events: none;
         }
         .player-content { position: relative; z-index: 3; text-align: center; }
@@ -201,39 +202,39 @@
         const OVERLAY_ID = "tournament-1v1-bracket";
 
         const CIV_DATA = {
-            'abbasid': { name: 'Abbaside', flag: 'Abbasid Dynasty.png' },
-            'ayyubids': { name: 'Ayyubidi', flag: 'Ayyubids.png' },
-            'byzantines': { name: 'Bisantini', flag: 'Byzantines.png' },
-            'chinese': { name: 'Cinesi', flag: 'Chinese.png' },
-            'delhi': { name: 'Sultanato di Delhi', flag: 'Delhi Sultanate.png' },
-            'english': { name: 'Inglesi', flag: 'English.png' },
-            'french': { name: 'Francesi', flag: 'French.png' },
-            'goldenhorde': { name: 'Orda d\'Oro', flag: 'Golden Horde.png' },
-            'hre': { name: 'Sacro Romano Impero', flag: 'Holy Roman Empire.png' },
-            'japanese': { name: 'Giapponesi', flag: 'Japanese.png' },
-            'jeannedarc': { name: 'Jeanne d\'Arc', flag: 'jeannedarc.png' },
-            'lancaster': { name: 'Casato di Lancaster', flag: 'House of Lancaster.png' },
-            'malians': { name: 'Maliesi', flag: 'Malians.png' },
-            'mongols': { name: 'Mongoli', flag: 'Mongols.png' },
-            'orderofthedragon': { name: 'Ordine del Dragone', flag: 'Order of the Dragon.png' },
-            'ottomans': { name: 'Ottomani', flag: 'Ottomans.png' },
-            'rus': { name: 'Rus', flag: 'Rus.png' },
-            'templar': { name: 'Templari', flag: 'Knights Templar.png' },
-            'zhuxi': { name: 'Eredità di Zhu Xi', flag: 'Zhu Xis Legacy.png' },
-            'tughlaq': { name: 'Dinastia Tughlaq', flag: 'Tughlaq Dynasty.png' },
-            'sengoku': { name: 'Sengoku Daimyo', flag: 'Sengoku Daimyo.png' },
-            'macedonian': { name: 'Dinastia Macedone', flag: 'Macedonian Dynasty.png' }
+            'abbasid': { name: 'Abbaside', flag: 'Abbasid Dynasty.webp' },
+            'ayyubids': { name: 'Ayyubidi', flag: 'Ayyubids.webp' },
+            'byzantines': { name: 'Bisantini', flag: 'Byzantines.webp' },
+            'chinese': { name: 'Cinesi', flag: 'Chinese.webp' },
+            'delhi': { name: 'Sultanato di Delhi', flag: 'Delhi Sultanate.webp' },
+            'english': { name: 'Inglesi', flag: 'English.webp' },
+            'french': { name: 'Francesi', flag: 'French.webp' },
+            'goldenhorde': { name: 'Orda d\'Oro', flag: 'Golden Horde.webp' },
+            'hre': { name: 'Sacro Romano Impero', flag: 'Holy Roman Empire.webp' },
+            'japanese': { name: 'Giapponesi', flag: 'Japanese.webp' },
+            'jeannedarc': { name: 'Jeanne d\'Arc', flag: 'jeannedarc.webp' },
+            'lancaster': { name: 'Casato di Lancaster', flag: 'House of Lancaster.webp' },
+            'malians': { name: 'Maliesi', flag: 'Malians.webp' },
+            'mongols': { name: 'Mongoli', flag: 'Mongols.webp' },
+            'orderofthedragon': { name: 'Ordine del Dragone', flag: 'Order of the Dragon.webp' },
+            'ottomans': { name: 'Ottomani', flag: 'Ottomans.webp' },
+            'rus': { name: 'Rus', flag: 'Rus.webp' },
+            'templar': { name: 'Templari', flag: 'Knights Templar.webp' },
+            'zhuxi': { name: 'Eredità di Zhu Xi', flag: 'Zhu Xis Legacy.webp' },
+            'tughlaq': { name: 'Dinastia Tughlaq', flag: 'Tughlaq Dynasty.webp' },
+            'sengoku': { name: 'Sengoku Daimyo', flag: 'Sengoku Daimyo.webp' },
+            'macedonian': { name: 'Dinastia Macedone', flag: 'Macedonian Dynasty.webp' }
         };
 
         function getCivFlagUrl(id) {
-            if (!id) return '';
+            if (!id || typeof id !== 'string') return '';
             const data = CIV_DATA[id.toLowerCase()];
-            const filename = data ? data.flag : (id + '.png');
+            const filename = data ? data.flag : (id + '.webp');
             return `/civs/${filename}`;
         }
 
         function getCivName(id) {
-            if (!id) return '--';
+            if (!id || typeof id !== 'string') return '--';
             const data = CIV_DATA[id.toLowerCase()];
             return data ? data.name : id;
         }
@@ -262,58 +263,69 @@
             document.getElementById('timer-display').innerText = formatTime(totalSeconds);
         }
 
-        function getCivFlagUrl(id) {
-            if (!id) return '';
-            const normalized = id.toLowerCase().replace(/['\s]/g, '');
-            const filename = civMap[normalized] || id + '.png';
-            return `/civs/${filename}`;
-        }
-
         function render(state) {
             if (!state) return;
             lastState = state;
 
-            // Current Match
-            document.getElementById('p1-name').innerText = state.p1?.name || '--';
-            document.getElementById('p1-civ').innerText = getCivName(state.p1?.civId);
-            document.getElementById('p1-score').innerText = state.p1?.score ?? 0;
-            document.getElementById('p1-flag').style.backgroundImage = state.p1?.civId ? `url('${getCivFlagUrl(state.p1.civId)}')` : 'none';
+            // Current Match - Player 1
+            try {
+                document.getElementById('p1-name').innerText = state.p1?.name || '--';
+                document.getElementById('p1-civ').innerText = getCivName(state.p1?.civId);
+                document.getElementById('p1-score').innerText = state.p1?.score ?? 0;
+                const p1Flag = document.getElementById('p1-flag');
+                if (p1Flag) p1Flag.style.backgroundImage = state.p1?.civId ? `url('${getCivFlagUrl(state.p1.civId)}')` : 'none';
+            } catch (e) { console.error("Error rendering P1:", e); }
 
-            document.getElementById('p2-name').innerText = state.p2?.name || '--';
-            document.getElementById('p2-civ').innerText = getCivName(state.p2?.civId);
-            document.getElementById('p2-score').innerText = state.p2?.score ?? 0;
-            document.getElementById('p2-flag').style.backgroundImage = state.p2?.civId ? `url('${getCivFlagUrl(state.p2.civId)}')` : 'none';
+            // Current Match - Player 2
+            try {
+                document.getElementById('p2-name').innerText = state.p2?.name || '--';
+                document.getElementById('p2-civ').innerText = getCivName(state.p2?.civId);
+                document.getElementById('p2-score').innerText = state.p2?.score ?? 0;
+                const p2Flag = document.getElementById('p2-flag');
+                if (p2Flag) p2Flag.style.backgroundImage = state.p2?.civId ? `url('${getCivFlagUrl(state.p2.civId)}')` : 'none';
+            } catch (e) { console.error("Error rendering P2:", e); }
 
-            document.getElementById('current-map').innerText = state.map || 'MAPPA DA DEFINIRE';
+            try {
+                document.getElementById('current-map').innerText = state.map || 'MAPPA DA DEFINIRE';
+            } catch (e) {}
 
             // Bracket
-            const b = state.bracket || {};
-            const rounds = ['q1', 'q2', 'q3', 'q4', 's1', 's2', 'f'];
-            rounds.forEach(rid => {
-                const m = b[rid] || { p1: '', p2: '', w: 0 };
-                const el = document.getElementById(rid);
-                if (el) {
-                    const players = el.querySelectorAll('.bracket-player');
-                    players[0].querySelector('.name').innerText = m.p1 || '--';
-                    players[1].querySelector('.name').innerText = m.p2 || '--';
-                    players[0].classList.toggle('winner', m.w === 1);
-                    players[1].classList.toggle('winner', m.w === 2);
-                }
-            });
+            try {
+                const b = state.bracket || {};
+                const rounds = ['q1', 'q2', 'q3', 'q4', 's1', 's2', 'f'];
+                rounds.forEach(rid => {
+                    const m = b[rid] || { p1: '', p2: '', w: 0 };
+                    const el = document.getElementById(rid);
+                    if (el) {
+                        const players = el.querySelectorAll('.bracket-player');
+                        if (players[0]) players[0].querySelector('.name').innerText = m.p1 || '--';
+                        if (players[1]) players[1].querySelector('.name').innerText = m.p2 || '--';
+                        
+                        if (players[0]) {
+                            players[0].classList.toggle('winner', m.w === 1);
+                        }
+                        if (players[1]) {
+                            players[1].classList.toggle('winner', m.w === 2);
+                        }
+                    }
+                });
+            } catch (e) { console.error("Error rendering bracket:", e); }
 
             // Casters
-            (state.casters || []).forEach((c, i) => {
-                const box = document.getElementById(`cb-${i+1}`);
-                const name = document.getElementById(`c-${i+1}-name`);
-                if (box && name) {
-                    if (c.active && c.name) {
-                        name.innerText = c.name;
-                        box.classList.add('active');
-                    } else {
-                        box.classList.remove('active');
+            try {
+                (state.casters || []).forEach((c, i) => {
+                    const box = document.getElementById(`cb-${i+1}`);
+                    const name = document.getElementById(`c-${i+1}-name`);
+                    if (box && name) {
+                        if (c.active) {
+                            name.innerText = c.name || '';
+                            box.classList.add('active');
+                        } else {
+                            box.classList.remove('active');
+                        }
                     }
-                }
-            });
+                });
+            } catch (e) { console.error("Error rendering casters:", e); }
 
             updateTimer();
         }

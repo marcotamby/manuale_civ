@@ -39,9 +39,10 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
   useEffect(() => {
     overlayService.getOverlayState('tournament-1v1-bracket').then(savedState => {
       if (savedState) {
-        setState({ ...DEFAULT_STATE, ...savedState });
+        const base = JSON.parse(JSON.stringify(DEFAULT_STATE));
+        setState({ ...base, ...savedState });
       } else {
-        setState(DEFAULT_STATE);
+        setState(JSON.parse(JSON.stringify(DEFAULT_STATE)));
       }
     });
   }, []);
@@ -60,11 +61,17 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
     }
   };
 
-  const resetTournament = () => {
-    setState(DEFAULT_STATE);
-    setIsConfirmingReset(false);
-    setShowResetSuccess(true);
-    setTimeout(() => setShowResetSuccess(false), 3000);
+  const resetTournament = async () => {
+    try {
+      const resetState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+      await overlayService.updateOverlayState('tournament-1v1-bracket', resetState);
+      setState(resetState);
+      setIsConfirmingReset(false);
+      setShowResetSuccess(true);
+      setTimeout(() => setShowResetSuccess(false), 3000);
+    } catch (error: any) {
+      onError(`Errore reset: ${error.message}`);
+    }
   };
 
   const updateBracket = (matchId: string, field: string, value: any) => {
@@ -371,26 +378,28 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
           <div className="space-y-4">
             {state.casters.map((caster: any, idx: number) => (
               <div key={idx} className="flex items-center gap-4">
-                <input
-                  type="checkbox"
-                  checked={caster.active}
-                  onChange={(e) => {
-                    const newCasters = [...state.casters];
-                    newCasters[idx].active = e.target.checked;
-                    setState({ ...state, casters: newCasters });
-                  }}
-                  className="w-4 h-4 rounded border-white/10 bg-black/40 text-yellow-500"
-                />
-                <div className="flex-1 relative">
-                  <Mic size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                   <input
-                    type="text"
-                    value={caster.name}
+                    type="checkbox"
+                    checked={caster.active}
                     onChange={(e) => {
-                      const newCasters = [...state.casters];
-                      newCasters[idx].name = e.target.value;
+                      const newCasters = state.casters.map((c: any, i: number) => 
+                        i === idx ? { ...c, active: e.target.checked } : c
+                      );
                       setState({ ...state, casters: newCasters });
                     }}
+                    className="w-4 h-4 rounded border-white/10 bg-black/40 text-yellow-500"
+                  />
+                  <div className="flex-1 relative">
+                    <Mic size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                    <input
+                      type="text"
+                      value={caster.name}
+                      onChange={(e) => {
+                        const newCasters = state.casters.map((c: any, i: number) => 
+                          i === idx ? { ...c, name: e.target.value } : c
+                        );
+                        setState({ ...state, casters: newCasters });
+                      }}
                     placeholder={`Caster ${idx + 1}`}
                     className="w-full bg-black/40 border border-white/10 rounded-lg pl-8 pr-3 py-2 text-sm text-white"
                   />
