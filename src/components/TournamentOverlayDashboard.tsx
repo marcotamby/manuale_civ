@@ -18,13 +18,13 @@ const DEFAULT_STATE = {
     { name: '', active: false }
   ],
   bracket: {
-    q1: { p1: '', p2: '', w: 0 },
-    q2: { p1: '', p2: '', w: 0 },
-    q3: { p1: '', p2: '', w: 0 },
-    q4: { p1: '', p2: '', w: 0 },
-    s1: { p1: '', p2: '', w: 0 },
-    s2: { p1: '', p2: '', w: 0 },
-    f: { p1: '', p2: '', w: 0 }
+    q1: { p1: '', p1Civ: '', p2: '', p2Civ: '', w: 0 },
+    q2: { p1: '', p1Civ: '', p2: '', p2Civ: '', w: 0 },
+    q3: { p1: '', p1Civ: '', p2: '', p2Civ: '', w: 0 },
+    q4: { p1: '', p1Civ: '', p2: '', p2Civ: '', w: 0 },
+    s1: { p1: '', p1Civ: '', p2: '', p2Civ: '', w: 0 },
+    s2: { p1: '', p1Civ: '', p2: '', p2Civ: '', w: 0 },
+    f: { p1: '', p1Civ: '', p2: '', p2Civ: '', w: 0 }
   }
 };
 
@@ -40,7 +40,13 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
     overlayService.getOverlayState('tournament-1v1-bracket').then(savedState => {
       if (savedState) {
         const base = JSON.parse(JSON.stringify(DEFAULT_STATE));
-        setState({ ...base, ...savedState });
+        const mergedBracket = { ...base.bracket };
+        if (savedState.bracket) {
+          Object.keys(savedState.bracket).forEach(key => {
+            mergedBracket[key] = { ...mergedBracket[key], ...savedState.bracket[key] };
+          });
+        }
+        setState({ ...base, ...savedState, bracket: mergedBracket });
       } else {
         setState(JSON.parse(JSON.stringify(DEFAULT_STATE)));
       }
@@ -75,13 +81,30 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
   };
 
   const updateBracket = (matchId: string, field: string, value: any) => {
-    setState((prev: any) => ({
-      ...prev,
-      bracket: {
-        ...prev.bracket,
-        [matchId]: { ...prev.bracket[matchId], [field]: value }
+    setState((prev: any) => {
+      const newState = {
+        ...prev,
+        bracket: {
+          ...prev.bracket,
+          [matchId]: { ...prev.bracket[matchId], [field]: value }
+        }
+      };
+
+      // Automatic Progression
+      if (field === 'w' && value > 0) {
+        const winnerName = value === 1 ? newState.bracket[matchId].p1 : newState.bracket[matchId].p2;
+        const winnerCiv = value === 1 ? newState.bracket[matchId].p1Civ : newState.bracket[matchId].p2Civ;
+        
+        if (matchId === 'q1') { newState.bracket.s1.p1 = winnerName; newState.bracket.s1.p1Civ = winnerCiv; }
+        if (matchId === 'q2') { newState.bracket.s1.p2 = winnerName; newState.bracket.s1.p2Civ = winnerCiv; }
+        if (matchId === 'q3') { newState.bracket.s2.p1 = winnerName; newState.bracket.s2.p1Civ = winnerCiv; }
+        if (matchId === 'q4') { newState.bracket.s2.p2 = winnerName; newState.bracket.s2.p2Civ = winnerCiv; }
+        if (matchId === 's1') { newState.bracket.f.p1 = winnerName; newState.bracket.f.p1Civ = winnerCiv; }
+        if (matchId === 's2') { newState.bracket.f.p2 = winnerName; newState.bracket.f.p2Civ = winnerCiv; }
       }
-    }));
+
+      return newState;
+    });
   };
 
   if (!state) return <div className="p-8 text-center text-gray-500 italic">Inizializzazione dashboard...</div>;
