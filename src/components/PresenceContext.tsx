@@ -6,6 +6,7 @@ export interface PresenceState {
   user: {
     email: string;
     name: string;
+    nickname?: string;
     avatar?: string;
   };
   activity: {
@@ -104,7 +105,8 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
           await adminChannel.track({
             user: {
               email: user.email,
-              name: user.name || user.nickname || 'Admin',
+              name: user.name || 'Admin',
+              nickname: user.nickname,
               avatar: user.avatar_url
             },
             activity: { type: 'idle' },
@@ -125,7 +127,8 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
       await channel.track({
         user: {
           email: user.email,
-          name: user.name || user.nickname || 'Admin',
+          name: user.name || 'Admin',
+          nickname: user.nickname,
           avatar: user.avatar_url
         },
         activity,
