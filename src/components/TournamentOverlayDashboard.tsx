@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, Mic, Timer as TimerIcon, Map as MapIcon, Check, Trophy } from 'lucide-react';
+import { Save, Mic, Timer as TimerIcon, Map as MapIcon, Trophy } from 'lucide-react';
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
 import { overlayService } from '../services/overlayService';
@@ -30,7 +30,7 @@ const DEFAULT_STATE = {
 
 const OVERLAY_ID = "tournament-1v1-bracket";
 
-export default function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboardProps) {
+export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboardProps) {
   const [state, setState] = useState<any>(DEFAULT_STATE);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);

@@ -321,11 +321,11 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                     <div className="animate-in slide-in-from-bottom-4 fade-in duration-500">
                       {selectedOverlay.id === 'aoe4-match' ? (
                         <AoE4MatchDashboard 
-                          onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })}
+                          onError={(msg: string) => setToast({ isVisible: true, message: msg, type: 'error' })}
                         />
                       ) : selectedOverlay.id === 'tournament-1v1-bracket' ? (
                         <TournamentOverlayDashboard
-                          onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })}
+                          onError={(msg: string) => setToast({ isVisible: true, message: msg, type: 'error' })}
                         />
                       ) : (
                         <div className="p-12 text-center text-gray-500 bg-white/5 rounded-3xl border border-dashed border-white/10">
