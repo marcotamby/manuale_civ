@@ -19,126 +19,134 @@ export interface PresenceState {
 
 interface PresenceContextType {
   activeAdmins: Record<string, PresenceState>;
+  onlineUserCount: number;
+  usersByPage: Record<string, number>;
   updateActivity: (activity: PresenceState['activity']) => void;
 }
 
 const PresenceContext = createContext<PresenceContextType | undefined>(undefined);
 
-const DISABLE_PRESENCE = false; // Phase 1: background logic reactivated
+const DISABLE_PRESENCE = false;
 
 export function PresenceProvider({ children }: { children: React.ReactNode }) {
   const { user, isAdmin, isStreamer } = useAuth();
   const [activeAdmins, setActiveAdmins] = useState<Record<string, PresenceState>>({});
-  const [channel, setChannel] = useState<any>(null);
+  const [onlineUserCount, setOnlineUserCount] = useState(0);
+  const [usersByPage, setUsersByPage] = useState<Record<string, number>>({});
+  const [adminChannel, setAdminChannel] = useState<any>(null);
+  const [userChannel, setUserChannel] = useState<any>(null);
 
   useEffect(() => {
-    if (DISABLE_PRESENCE || (!isAdmin && !isStreamer) || !user || !user.email) {
+    if (DISABLE_PRESENCE || !user || !user.id) {
       setActiveAdmins({});
-      setChannel(null);
+      setOnlineUserCount(0);
+      setUsersByPage({});
       return;
     }
 
-    const adminChannel = supabase.channel('admin-presence', {
-      config: {
-        presence: {
-          key: user.email.toLowerCase(),
-        },
-      },
-    });
+    // 1. Admin Presence Channel (Rich data)
+    let aChannel: any = null;
+    if (isAdmin || isStreamer) {
+      aChannel = supabase.channel('admin-presence', {
+        config: { presence: { key: user.email?.toLowerCase() || user.id } },
+      });
 
-    adminChannel
-      .on('presence', { event: 'sync' }, () => {
-        try {
-          const newState = adminChannel.presenceState();
-          if (!newState) return;
-
-          const simplifiedState: Record<string, PresenceState> = {};
-          
+      aChannel
+        .on('presence', { event: 'sync' }, () => {
+          const newState = aChannel.presenceState();
+          const simplified: Record<string, PresenceState> = {};
           Object.keys(newState).forEach((key) => {
             const presences = newState[key] as any[];
-            if (!presences || presences.length === 0) return;
-
-            // Consolidate multiple presence entries for the same user (e.g., multiple tabs)
-            // Priority: editing > viewing > idle
-            let consolidatedEntry = presences[0];
-            
+            if (!presences?.length) return;
+            let consolidated = presences[0];
             for (let i = 1; i < presences.length; i++) {
               const current = presences[i];
-              if (!current?.activity) continue;
-
-              const currentPriority = 
-                current.activity.type === 'editing' ? 3 : 
-                current.activity.type === 'viewing' ? 2 : 1;
-              
-              const consolidatedPriority = 
-                consolidatedEntry.activity.type === 'editing' ? 3 : 
-                consolidatedEntry.activity.type === 'viewing' ? 2 : 1;
-
-              if (currentPriority > consolidatedPriority) {
-                consolidatedEntry = current;
-              }
+              const p = (a: any) => a?.type === 'editing' ? 3 : a?.type === 'viewing' ? 2 : 1;
+              if (p(current.activity) > p(consolidated.activity)) consolidated = current;
             }
-
-            // Only add to activeAdmins if the data is complete to avoid downstream crashes
-            if (consolidatedEntry && consolidatedEntry.user && consolidatedEntry.user.email && consolidatedEntry.activity) {
-              simplifiedState[key] = {
-                user: consolidatedEntry.user,
-                activity: consolidatedEntry.activity,
-                onlineAt: consolidatedEntry.onlineAt || new Date().toISOString()
+            if (consolidated?.user && consolidated?.activity) {
+              simplified[key] = {
+                user: consolidated.user,
+                activity: consolidated.activity,
+                onlineAt: consolidated.onlineAt || new Date().toISOString()
               };
             }
           });
-          
-          setActiveAdmins(simplifiedState);
-        } catch (err) {
-          console.error('Error syncing presence:', err);
-        }
+          setActiveAdmins(simplified);
+        })
+        .subscribe(async (status: string) => {
+          if (status === 'SUBSCRIBED') {
+            await aChannel.track({
+              user: { email: user.email, name: user.name || 'Admin', nickname: user.nickname, avatar: user.avatar_url },
+              activity: { type: 'idle' },
+              onlineAt: new Date().toISOString(),
+            });
+          }
+        });
+      setAdminChannel(aChannel);
+    }
+
+    // 2. Global User Presence Channel (Privacy focused, count only)
+    const uChannel = supabase.channel('global-presence', {
+      config: { presence: { key: user.id } },
+    });
+
+    uChannel
+      .on('presence', { event: 'sync' }, () => {
+        const newState = uChannel.presenceState();
+        const pageCounts: Record<string, number> = {};
+        let total = 0;
+
+        Object.keys(newState).forEach((key) => {
+          const presences = newState[key] as any[];
+          if (!presences?.length) return;
+          total++;
+          const act = presences[0].activity;
+          if (act?.type === 'viewing' && act.civId) {
+            pageCounts[act.civId] = (pageCounts[act.civId] || 0) + 1;
+          } else if (act?.type === 'viewing' && act.section) {
+            pageCounts[act.section] = (pageCounts[act.section] || 0) + 1;
+          } else {
+            pageCounts['other'] = (pageCounts['other'] || 0) + 1;
+          }
+        });
+
+        setOnlineUserCount(total);
+        setUsersByPage(pageCounts);
       })
-      // .on('presence', { event: 'join' }, ({ key, newPresences }) => {
-      //   console.log('Admin joined:', key, newPresences);
-      // })
-      // .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-      //   console.log('Admin left:', key, leftPresences);
-      // })
-      .subscribe(async (status) => {
+      .subscribe(async (status: string) => {
         if (status === 'SUBSCRIBED') {
-          await adminChannel.track({
-            user: {
-              email: user.email,
-              name: user.name || 'Admin',
-              nickname: user.nickname,
-              avatar: user.avatar_url
-            },
+          await uChannel.track({
             activity: { type: 'idle' },
             onlineAt: new Date().toISOString(),
           });
         }
       });
-
-    setChannel(adminChannel);
+    setUserChannel(uChannel);
 
     return () => {
-      adminChannel.unsubscribe();
+      aChannel?.unsubscribe();
+      uChannel.unsubscribe();
     };
-  }, [isAdmin, isStreamer, user?.email]);
+  }, [user?.id, isAdmin, isStreamer]);
 
   const updateActivity = async (activity: PresenceState['activity']) => {
-    if (channel && user && user.email) {
-      await channel.track({
-        user: {
-          email: user.email,
-          name: user.name || 'Admin',
-          nickname: user.nickname,
-          avatar: user.avatar_url
-        },
-        activity,
-        onlineAt: new Date().toISOString(),
+    const trackData = { activity, onlineAt: new Date().toISOString() };
+    
+    if (adminChannel && user) {
+      await adminChannel.track({
+        ...trackData,
+        user: { email: user.email, name: user.name || 'Admin', nickname: user.nickname, avatar: user.avatar_url }
       });
+    }
+    
+    if (userChannel) {
+      await userChannel.track(trackData);
     }
   };
 
   return (
-    <PresenceContext.Provider value={{ activeAdmins, updateActivity }}>
+    <PresenceContext.Provider value={{ activeAdmins, onlineUserCount, usersByPage, updateActivity }}>
       {children}
     </PresenceContext.Provider>
   );

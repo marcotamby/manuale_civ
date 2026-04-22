@@ -99,10 +99,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
 
   useEffect(() => {
-
-    // Update presence to viewing this civ
-    updateActivity({ type: 'viewing', civId });
-
     // Mark as read for this specific civ (Logged in users only)
     if (user?.email && civ) {
       const lastSeenKey = `lastSeenCounts_${user.email}`;
@@ -124,11 +120,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         (window as any).refreshNotificationCount?.();
       }
     }
-
-    return () => {
-      // Reset activity to idle when leaving the view
-      updateActivity({ type: 'idle' });
-    };
   }, [civId, user?.email, !!civ]);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -630,29 +621,45 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 )}
               </div>
 
-              {/* Active presence indicators */}
-              {Object.values(_activeAdmins).some(a => a.user?.email !== user?.email && a.activity?.civId === civId) && (
-                <div className="flex -space-x-2 overflow-hidden mt-3 items-center">
-                  {Object.values(_activeAdmins)
-                    .filter(admin => admin.user?.email !== user?.email && admin.activity?.civId === civId)
-                    .map((admin, idx) => (
-                      <div
-                        key={idx}
-                        className="inline-block h-6 w-6 rounded-full ring-2 ring-[var(--color-brand-dark)] bg-yellow-500/10 flex items-center justify-center overflow-hidden"
-                        title={`${admin.user.name} sta guardando questa civiltà`}
-                      >
-                        {admin.user.avatar ? (
-                          <img src={admin.user.avatar} alt="" className="h-full w-full object-cover" />
-                        ) : (
-                          <span className="text-[10px] font-bold text-yellow-500">{admin.user.name?.charAt(0)}</span>
-                        )}
-                      </div>
-                    ))}
-                  <span className="ml-4 text-[10px] text-gray-500 font-medium italic">
-                    Altri admin stanno consultando questa civiltà
-                  </span>
-                </div>
-              )}
+              {/* Presence Section */}
+              <div className="flex flex-col gap-2 mt-3">
+                {/* Admin Presence indicators */}
+                {Object.values(_activeAdmins).some(a => a.user?.email !== user?.email && a.activity?.civId === civId) && (
+                  <div className="flex -space-x-2 overflow-hidden items-center">
+                    {Object.values(_activeAdmins)
+                      .filter(admin => admin.user?.email !== user?.email && admin.activity?.civId === civId)
+                      .map((admin, idx) => (
+                        <div
+                          key={idx}
+                          className="inline-block h-6 w-6 rounded-full ring-2 ring-[var(--color-brand-dark)] bg-yellow-500/10 flex items-center justify-center overflow-hidden"
+                          title={`${admin.user.name} sta guardando questa civiltà`}
+                        >
+                          {admin.user.avatar ? (
+                            <img src={admin.user.avatar} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            <span className="text-[10px] font-bold text-yellow-500">{admin.user.name?.charAt(0)}</span>
+                          )}
+                        </div>
+                      ))}
+                    <span className="ml-4 text-[10px] text-gray-500 font-medium italic">
+                      Staff online in questa sezione
+                    </span>
+                  </div>
+                )}
+
+                {/* Community Presence indicator */}
+                {usersByPage[civId] > 1 && (
+                  <div className="flex items-center gap-2 px-3 py-1 bg-slate-500/10 rounded-full border border-slate-500/30 w-fit animate-in fade-in duration-500">
+                    <div className="relative flex h-1.5 w-1.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-slate-500"></span>
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">
+                      {usersByPage[civId]} UTENTI SU QUESTA PAGINA
+                    </span>
+                  </div>
+                )}
+              </div>
 
               <p className="text-gray-300 text-sm md:text-base max-w-2xl leading-relaxed">{civ.shortDescription}</p>
             </div>

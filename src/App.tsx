@@ -77,6 +77,23 @@ function App() {
     }
   }, [location.pathname]);
 
+  const { favorites, isLoginModalOpen, closeLoginModal, isAuthenticated, isAdmin, isStreamer } = useAuth();
+  const { updateActivity } = usePresence();
+  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+  const { civilizations: civilizationsData, loading, error, refreshCivs, updateCivLocally, updateGlobalUnitLocally } = useCivData();
+
+  // Track activity globally
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    if (isCiv && selectedCiv) {
+      updateActivity({ type: 'viewing', civId: selectedCiv });
+    } else {
+      updateActivity({ type: 'viewing', section: currentPage });
+    }
+  }, [currentPage, selectedCiv, isAuthenticated]);
+
   const prevPathRef = useRef(location.pathname);
   useEffect(() => {
     const prevPath = prevPathRef.current;
@@ -125,10 +142,6 @@ function App() {
       setIsSidebarOpen(true);
     }
   };
-  const { favorites, isLoginModalOpen, closeLoginModal, isAuthenticated, isAdmin, isStreamer } = useAuth();
-  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
-  const [compareIds, setCompareIds] = useState<string[]>([]);
-  const { civilizations: civilizationsData, loading, error, refreshCivs, updateCivLocally, updateGlobalUnitLocally } = useCivData();
 
   const handleSelectCiv = (civId: string, tab?: string) => {
     if (tab) {
