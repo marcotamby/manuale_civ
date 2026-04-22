@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, ExternalLink, Copy, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft, Pencil, Check, Image as ImageIcon, Upload } from 'lucide-react';
+import { X, ExternalLink, Copy, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft, Pencil, Check, Upload } from 'lucide-react';
 import { AoE4MatchDashboard } from './AoE4MatchDashboard';
 import { TournamentOverlayDashboard } from './TournamentOverlayDashboard';
 import { Toast } from './Toast';
