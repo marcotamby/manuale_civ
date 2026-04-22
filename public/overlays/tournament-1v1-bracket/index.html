@@ -25,21 +25,20 @@
         }
         .player-box { width: 550px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; }
         .player-flag-bg {
-            position: absolute; inset: 0;
-            width: 100%; height: 100%; opacity: 0.5;
-            background-size: cover; background-position: center; z-index: 1;
-            background-repeat: no-repeat;
+            position: absolute; top: 0; bottom: 0; width: 45%;
+            opacity: 0.55; background-size: cover; background-position: center;
+            background-repeat: no-repeat; z-index: 1;
         }
         #p1-flag {
-            -webkit-mask-image: linear-gradient(to right, black 30%, transparent 95%);
-            mask-image: linear-gradient(to right, black 30%, transparent 95%);
+            left: 0;
+            -webkit-mask-image: linear-gradient(to right, black 50%, transparent 100%);
+            mask-image: linear-gradient(to right, black 50%, transparent 100%);
         }
         #p2-flag {
-            -webkit-mask-image: linear-gradient(to left, black 30%, transparent 95%);
-            mask-image: linear-gradient(to left, black 30%, transparent 95%);
+            right: 0;
+            -webkit-mask-image: linear-gradient(to left, black 50%, transparent 100%);
+            mask-image: linear-gradient(to left, black 50%, transparent 100%);
         }
-        /* Remove the old radial fade */
-        .player-box::after { display: none; }
         .player-content { position: relative; z-index: 3; text-align: center; }
         .player-name { font-size: 48px; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 4px 15px rgba(0,0,0,0.9); }
         .player-civ { font-size: 20px; font-weight: 700; color: var(--gold); text-transform: uppercase; margin-top: -2px; letter-spacing: 2px; opacity: 0.9; }
@@ -118,11 +117,12 @@
 </head>
 <body>
     <div id="header">
+        <div id="p1-flag" class="player-flag-bg"></div>
+        <div id="p2-flag" class="player-flag-bg"></div>
+
         <div class="player-box">
-            <div id="p1-flag" class="player-flag-bg"></div>
             <div class="player-content">
                 <div id="p1-name" class="player-name">--</div>
-                <div id="p1-civ" class="player-civ">--</div>
             </div>
         </div>
         <div class="score-box" id="p1-score">0</div>
@@ -132,10 +132,8 @@
         </div>
         <div class="score-box" id="p2-score">0</div>
         <div class="player-box">
-            <div id="p2-flag" class="player-flag-bg"></div>
             <div class="player-content">
                 <div id="p2-name" class="player-name">--</div>
-                <div id="p2-civ" class="player-civ">--</div>
             </div>
         </div>
     </div>
@@ -274,7 +272,6 @@
             // Current Match - Player 1
             try {
                 document.getElementById('p1-name').innerText = state.p1?.name || '--';
-                document.getElementById('p1-civ').innerText = getCivName(state.p1?.civId);
                 document.getElementById('p1-score').innerText = state.p1?.score ?? 0;
                 const p1Flag = document.getElementById('p1-flag');
                 if (p1Flag) p1Flag.style.backgroundImage = state.p1?.civId ? `url('${getCivFlagUrl(state.p1.civId)}')` : 'none';
@@ -283,7 +280,6 @@
             // Current Match - Player 2
             try {
                 document.getElementById('p2-name').innerText = state.p2?.name || '--';
-                document.getElementById('p2-civ').innerText = getCivName(state.p2?.civId);
                 document.getElementById('p2-score').innerText = state.p2?.score ?? 0;
                 const p2Flag = document.getElementById('p2-flag');
                 if (p2Flag) p2Flag.style.backgroundImage = state.p2?.civId ? `url('${getCivFlagUrl(state.p2.civId)}')` : 'none';
