@@ -109,58 +109,66 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
   const renderMatchInputs = (id: string, label: string) => {
     const m = state.bracket[id] || { p1: '', p1Civ: '', p2: '', p2Civ: '', w: 0 };
     return (
-      <div className="bg-black/20 border border-white/5 rounded-xl p-3 space-y-2">
+      <div className="bg-[#161b2b] border border-[#D4AF37]/20 rounded-2xl p-4 space-y-3 shadow-xl transition-all hover:border-[#D4AF37]/40">
         <div className="flex justify-between items-center mb-1">
-          <span className="text-[9px] font-black text-yellow-500/50 uppercase tracking-tighter">{label}</span>
-          <div className="flex gap-1">
+          <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-widest">{label}</span>
+          <div className="flex gap-2">
             <button 
               onClick={() => updateBracket(id, 'w', m.w === 1 ? 0 : 1)}
-              className={`px-1.5 py-0.5 rounded text-[9px] font-black transition-all ${m.w === 1 ? 'bg-yellow-500 text-black' : 'bg-white/5 text-gray-600'}`}
+              className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all border ${
+                m.w === 1 
+                  ? 'bg-[#D4AF37] text-black border-[#D4AF37] shadow-[0_0_10px_rgba(212,175,55,0.4)]' 
+                  : 'bg-white/5 text-gray-500 border-white/5 hover:bg-white/10'
+              }`}
             >
-              W1
+              VINCE P1
             </button>
             <button 
               onClick={() => updateBracket(id, 'w', m.w === 2 ? 0 : 2)}
-              className={`px-1.5 py-0.5 rounded text-[9px] font-black transition-all ${m.w === 2 ? 'bg-yellow-500 text-black' : 'bg-white/5 text-gray-600'}`}
+              className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all border ${
+                m.w === 2 
+                  ? 'bg-[#D4AF37] text-black border-[#D4AF37] shadow-[0_0_10px_rgba(212,175,55,0.4)]' 
+                  : 'bg-white/5 text-gray-500 border-white/5 hover:bg-white/10'
+              }`}
             >
-              W2
+              VINCE P2
             </button>
           </div>
         </div>
 
-        <div className="space-y-2">
-          <div className="flex gap-2">
+        <div className="space-y-3">
+          <div className="flex gap-3">
             <input
               type="text"
               value={m.p1}
               onChange={(e) => updateBracket(id, 'p1', e.target.value)}
               placeholder="Player 1"
-              className="flex-1 bg-black/40 border border-white/5 rounded px-2 py-1 text-[10px] text-white"
+              className="flex-1 bg-[#0d111a] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder:text-gray-600 focus:border-[#D4AF37]/50 outline-none transition-all"
             />
             <select
               value={m.p1Civ}
               onChange={(e) => updateBracket(id, 'p1Civ', e.target.value)}
-              className="w-24 bg-black/60 border border-white/10 rounded px-1 py-0.5 text-[9px] text-gray-400"
+              className="w-32 bg-[#0d111a] border border-white/10 rounded-xl px-2 py-2 text-[11px] text-[#D4AF37] focus:border-[#D4AF37]/50 outline-none cursor-pointer hover:bg-black/40 transition-all appearance-none text-center font-bold"
             >
-              <option value="">Civiltà</option>
-              {civilizationsData.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              <option value="">CIVILTÀ</option>
+              {civilizationsData.map(c => <option key={c.id} value={c.id} className="bg-[#0d111a] text-white">{c.name.toUpperCase()}</option>)}
             </select>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <input
               type="text"
               value={m.p2}
               onChange={(e) => updateBracket(id, 'p2', e.target.value)}
               placeholder="Player 2"
-              className="flex-1 bg-black/40 border border-white/5 rounded px-2 py-1 text-[10px] text-white"
+              className="flex-1 bg-[#0d111a] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder:text-gray-600 focus:border-[#D4AF37]/50 outline-none transition-all"
             />
             <select
               value={m.p2Civ}
               onChange={(e) => updateBracket(id, 'p2Civ', e.target.value)}
-              className="w-24 bg-black/60 border border-white/10 rounded px-1 py-0.5 text-[9px] text-gray-400"
+              className="w-32 bg-[#0d111a] border border-white/10 rounded-xl px-2 py-2 text-[11px] text-[#D4AF37] focus:border-[#D4AF37]/50 outline-none cursor-pointer hover:bg-black/40 transition-all appearance-none text-center font-bold"
             >
-              <option value="">Civiltà</option>
-              {civilizationsData.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              <option value="">CIVILTÀ</option>
+              {civilizationsData.map(c => <option key={c.id} value={c.id} className="bg-[#0d111a] text-white">{c.name.toUpperCase()}</option>)}
             </select>
           </div>
         </div>

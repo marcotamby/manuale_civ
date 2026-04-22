@@ -146,7 +146,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
 
   return (
     <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
-      <div className="bg-[#0f1423] border border-[#D4AF37]/30 rounded-3xl w-full max-w-6xl h-[85vh] flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden relative">
+      <div className="bg-[#0f1423] border border-[#D4AF37]/30 rounded-3xl w-full max-w-[95vw] h-[90vh] flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden relative">
         
         {/* Header */}
         <div className="px-6 py-5 border-b border-[#D4AF37]/20 bg-gradient-to-r from-[#0d1424] to-[#1a1c32] flex items-center justify-between shrink-0">
