@@ -163,24 +163,12 @@
     <div id="bracket-container">
         <!-- Lines Layer -->
         <svg class="bracket-lines" viewBox="0 0 1400 600">
-            <!-- Q1 to S1 -->
-            <path id="line-q1-w1" class="bracket-line" d="M 355,51 L 460,51 L 460,126 L 565,126" />
-            <path id="line-q1-w2" class="bracket-line" d="M 355,99 L 460,99 L 460,126 L 565,126" />
-            <!-- Q2 to S1 -->
-            <path id="line-q2-w1" class="bracket-line" d="M 355,201 L 460,201 L 460,174 L 565,174" />
-            <path id="line-q2-w2" class="bracket-line" d="M 355,249 L 460,249 L 460,174 L 565,174" />
-            <!-- Q3 to S2 -->
-            <path id="line-q3-w1" class="bracket-line" d="M 355,351 L 460,351 L 460,426 L 565,426" />
-            <path id="line-q3-w2" class="bracket-line" d="M 355,399 L 460,399 L 460,426 L 565,426" />
-            <!-- Q4 to S2 -->
-            <path id="line-q4-w1" class="bracket-line" d="M 355,501 L 460,501 L 460,474 L 565,474" />
-            <path id="line-q4-w2" class="bracket-line" d="M 355,549 L 460,549 L 460,474 L 565,474" />
-            <!-- S1 to F -->
-            <path id="line-s1-w1" class="bracket-line" d="M 835,126 L 940,126 L 940,276 L 1045,276" />
-            <path id="line-s1-w2" class="bracket-line" d="M 835,174 L 940,174 L 940,276 L 1045,276" />
-            <!-- S2 to F -->
-            <path id="line-s2-w1" class="bracket-line" d="M 835,426 L 940,426 L 940,324 L 1045,324" />
-            <path id="line-s2-w2" class="bracket-line" d="M 835,474 L 940,474 L 940,324 L 1045,324" />
+            <path id="line-q1" class="bracket-line" d="" />
+            <path id="line-q2" class="bracket-line" d="" />
+            <path id="line-q3" class="bracket-line" d="" />
+            <path id="line-q4" class="bracket-line" d="" />
+            <path id="line-s1" class="bracket-line" d="" />
+            <path id="line-s2" class="bracket-line" d="" />
         </svg>
 
         <!-- Quarter Finals -->
@@ -263,13 +251,22 @@
             'malians': { name: 'Maliesi', flag: 'Malians.webp' },
             'mongols': { name: 'Mongoli', flag: 'Mongols.webp' },
             'orderofthedragon': { name: 'Ordine del Dragone', flag: 'Order of the Dragon.webp' },
-            'ottomans': { name: 'Ottomani', flag: 'Ottomans.webp' },
+            'ottomans': { name: 'Ottomani', flag: 'Ottomani.webp' },
             'rus': { name: 'Rus', flag: 'Rus.webp' },
             'templar': { name: 'Templari', flag: 'Knights Templar.webp' },
             'zhuxi': { name: 'Eredità di Zhu Xi', flag: 'Zhu Xis Legacy.webp' },
             'tughlaq': { name: 'Dinastia Tughlaq', flag: 'Tughlaq Dynasty.webp' },
             'sengoku': { name: 'Sengoku Daimyo', flag: 'Sengoku Daimyo.webp' },
             'macedonian': { name: 'Dinastia Macedone', flag: 'Macedonian Dynasty.webp' }
+        };
+
+        const BRACKET_PATHS = {
+            q1: { n: [75, 126], p1: [51, 126], p2: [99, 126], x1: 355, x2: 565, xm: 460 },
+            q2: { n: [225, 174], p1: [201, 174], p2: [249, 174], x1: 355, x2: 565, xm: 460 },
+            q3: { n: [375, 426], p1: [351, 426], p2: [399, 426], x1: 355, x2: 565, xm: 460 },
+            q4: { n: [525, 474], p1: [501, 474], p2: [549, 474], x1: 355, x2: 565, xm: 460 },
+            s1: { n: [150, 276], p1: [126, 276], p2: [174, 276], x1: 835, x2: 1045, xm: 940 },
+            s2: { n: [450, 324], p1: [426, 324], p2: [474, 324], x1: 835, x2: 1045, xm: 940 }
         };
 
         function getCivFlagUrl(id) {
@@ -369,10 +366,18 @@
                         }
 
                         // Update Lines
-                        const l1 = document.getElementById(`line-${rid}-w1`);
-                        const l2 = document.getElementById(`line-${rid}-w2`);
-                        if (l1) l1.classList.toggle('active', m.w === 1);
-                        if (l2) l2.classList.toggle('active', m.w === 2);
+                        const pathData = BRACKET_PATHS[rid];
+                        const line = document.getElementById(`line-${rid}`);
+                        if (pathData && line) {
+                            let yStart = pathData.n[0];
+                            if (m.w === 1) yStart = pathData.p1[0];
+                            if (m.w === 2) yStart = pathData.p2[0];
+                            
+                            const yEnd = pathData.n[1];
+                            const d = `M ${pathData.x1},${yStart} L ${pathData.xm},${yStart} L ${pathData.xm},${yEnd} L ${pathData.x2},${yEnd}`;
+                            line.setAttribute('d', d);
+                            line.classList.toggle('active', m.w > 0);
+                        }
                     }
                 });
             } catch (e) { console.error("Error rendering bracket:", e); }
