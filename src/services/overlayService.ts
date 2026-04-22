@@ -50,6 +50,16 @@ export const overlayService = {
     return (data as any).icon_url as string | null;
   },
 
+  async getOverlayDescription(id: string = 'aoe4-match'): Promise<string | null> {
+    const { data, error } = await supabase
+      .from('stream_overlays')
+      .select('description')
+      .eq('id', id)
+      .single();
+    if (error || !data) return null;
+    return (data as any).description as string | null;
+  },
+
   async updateOverlayName(id: string = 'aoe4-match', displayName: string) {
     const { data, error } = await supabase
       .from('stream_overlays')
@@ -80,6 +90,23 @@ export const overlayService = {
       const { error: insertError } = await supabase
         .from('stream_overlays')
         .insert({ id, icon_url: iconUrl });
+      if (insertError) throw insertError;
+    }
+  },
+
+  async updateOverlayDescription(id: string = 'aoe4-match', description: string) {
+    const { data, error } = await supabase
+      .from('stream_overlays')
+      .update({ description })
+      .eq('id', id)
+      .select();
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      const { error: insertError } = await supabase
+        .from('stream_overlays')
+        .insert({ id, description });
       if (insertError) throw insertError;
     }
   },

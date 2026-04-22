@@ -32,10 +32,15 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
   
   const [overlayNames, setOverlayNames] = useState<Record<string, string>>({});
   const [overlayIcons, setOverlayIcons] = useState<Record<string, string>>({});
+  const [overlayDescriptions, setOverlayDescriptions] = useState<Record<string, string>>({});
   const [isEditingName, setIsEditingName] = useState(false);
   const [editNameValue, setEditNameValue] = useState<string>('');
+  const [isEditingDesc, setIsEditingDesc] = useState(false);
+  const [editDescValue, setEditDescValue] = useState<string>('');
   const [isSavingName, setIsSavingName] = useState(false);
+  const [isSavingDesc, setIsSavingDesc] = useState(false);
   const editNameInputRef = useRef<HTMLInputElement>(null);
+  const editDescInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const overlays: OverlayItem[] = [
@@ -64,12 +69,34 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
         overlayService.getOverlayIcon(ov.id).then(icon => {
           if (icon) setOverlayIcons(prev => ({ ...prev, [ov.id]: icon }));
         });
+        overlayService.getOverlayDescription(ov.id).then(desc => {
+          if (desc) setOverlayDescriptions(prev => ({ ...prev, [ov.id]: desc }));
+        });
       });
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (isOpen) {
+      const savedOverlayId = localStorage.getItem('last_selected_overlay');
+      if (savedOverlayId) {
+        const found = overlays.find(o => o.id === savedOverlayId);
+        if (found) setSelectedOverlay(found);
+      } else if (overlays.length > 0 && !selectedOverlay) {
+        setSelectedOverlay(overlays[0]);
+      }
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (selectedOverlay) {
+      localStorage.setItem('last_selected_overlay', selectedOverlay.id);
+    }
+  }, [selectedOverlay]);
+
   const overlayDisplayName = (selectedOverlay && overlayNames[selectedOverlay.id]) || selectedOverlay?.name || '';
   const overlayDisplayIcon = (selectedOverlay && overlayIcons[selectedOverlay.id]) || '';
+  const overlayDisplayDesc = (selectedOverlay && overlayDescriptions[selectedOverlay.id]) || selectedOverlay?.description || '';
 
   useEffect(() => {
     if (activeTab !== 'preview') return;
@@ -87,17 +114,18 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
   }, [activeTab, isOpen, selectedOverlay]);
 
   useEffect(() => {
-    if (isOpen && overlays.length > 0 && !selectedOverlay) {
-      setSelectedOverlay(overlays[0]);
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
     if (isEditingName && editNameInputRef.current) {
       editNameInputRef.current.focus();
       editNameInputRef.current.select();
     }
   }, [isEditingName]);
+
+  useEffect(() => {
+    if (isEditingDesc && editDescInputRef.current) {
+      editDescInputRef.current.focus();
+      editDescInputRef.current.select();
+    }
+  }, [isEditingDesc]);
 
   const handleSaveName = async () => {
     if (!selectedOverlay || !editNameValue.trim()) return;
@@ -114,14 +142,39 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
     }
   };
 
+  const handleSaveDesc = async () => {
+    if (!selectedOverlay || !editDescValue.trim()) return;
+    setIsSavingDesc(true);
+    try {
+      await overlayService.updateOverlayDescription(selectedOverlay.id, editDescValue.trim());
+      setOverlayDescriptions(prev => ({ ...prev, [selectedOverlay.id]: editDescValue.trim() }));
+      setIsEditingDesc(false);
+      setToast({ isVisible: true, message: 'Descrizione aggiornata! 📝', type: 'success' });
+    } catch {
+      setToast({ isVisible: true, message: 'Errore nel salvataggio.', type: 'error' });
+    } finally {
+      setIsSavingDesc(false);
+    }
+  };
+
   const handleStartEditName = () => {
     setEditNameValue(overlayDisplayName);
     setIsEditingName(true);
   };
 
+  const handleStartEditDesc = () => {
+    setEditDescValue(overlayDisplayDesc);
+    setIsEditingDesc(true);
+  };
+
   const handleCancelEditName = () => {
     setIsEditingName(false);
     setEditNameValue('');
+  };
+
+  const handleCancelEditDesc = () => {
+    setIsEditingDesc(false);
+    setEditDescValue('');
   };
 
   const copyToClipboard = (path: string) => {
@@ -149,6 +202,8 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
         setToast({ isVisible: true, message: 'Icona aggiornata! 🖼️', type: 'success' });
       } catch {
         setToast({ isVisible: true, message: 'Errore caricamento icona.', type: 'error' });
+      } finally {
+        if (fileInputRef.current) fileInputRef.current.value = '';
       }
     };
     reader.readAsDataURL(file);
@@ -183,6 +238,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                 const isSelected = selectedOverlay?.id === ov.id;
                 const displayName = overlayNames[ov.id] || ov.name;
                 const displayIcon = overlayIcons[ov.id] || '';
+                const displayDesc = overlayDescriptions[ov.id] || ov.description;
                 
                 return (
                   <button
@@ -205,7 +261,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-black text-sm text-white uppercase tracking-wider truncate">{displayName}</div>
-                      <div className="text-[10px] text-gray-500 mt-1 line-clamp-1 group-hover:text-gray-400 transition-colors font-medium">{ov.description}</div>
+                      <div className="text-[10px] text-gray-500 mt-1 line-clamp-1 group-hover:text-gray-400 transition-colors font-medium">{displayDesc}</div>
                     </div>
                   </button>
                 );
@@ -268,8 +324,8 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                             </button>
                           </div>
                         ) : (
-                          <div className="flex items-center gap-4 group/title max-w-full overflow-hidden">
-                            <h3 className="text-3xl font-black text-white uppercase tracking-tight truncate flex-1 min-w-0 leading-tight">
+                          <div className="flex items-center gap-4 group/title">
+                            <h3 className="text-3xl font-black text-white uppercase tracking-tight leading-tight">
                               {overlayDisplayName}
                             </h3>
                             <button onClick={handleStartEditName} className="p-2 rounded-lg hover:bg-white/10 text-gray-500 hover:text-yellow-400 transition-all shrink-0">
@@ -277,7 +333,30 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                             </button>
                           </div>
                         )}
-                        <p className="text-base text-gray-400 leading-snug mt-2 line-clamp-1">{selectedOverlay.description}</p>
+
+                        {isEditingDesc ? (
+                          <div className="mt-2 flex items-center gap-3 animate-in fade-in slide-in-from-left-4 duration-200 w-full">
+                            <input
+                              ref={editDescInputRef}
+                              type="text"
+                              value={editDescValue}
+                              onChange={(e) => setEditDescValue(e.target.value)}
+                              onKeyDown={(e) => e.key === 'Enter' && handleSaveDesc()}
+                              onBlur={handleCancelEditDesc}
+                              className="bg-white/5 border border-blue-500/50 rounded-lg px-4 py-1.5 text-base text-white focus:outline-none focus:ring-2 ring-blue-500/20 w-full max-w-2xl"
+                            />
+                            <button onClick={handleSaveDesc} disabled={isSavingDesc} className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-500 transition-all">
+                              {isSavingDesc ? <RefreshCcw size={16} className="animate-spin" /> : <Check size={16} />}
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-3 group/desc mt-1">
+                            <p className="text-base text-gray-400 leading-snug line-clamp-1">{overlayDisplayDesc}</p>
+                            <button onClick={handleStartEditDesc} className="p-1 rounded-md hover:bg-white/10 text-gray-600 hover:text-blue-400 transition-all opacity-0 group-hover/desc:opacity-100">
+                              <Pencil size={14} />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
