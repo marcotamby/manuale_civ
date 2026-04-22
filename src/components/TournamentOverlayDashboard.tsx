@@ -120,10 +120,10 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                     <select
                       value={state.p1.civId}
                       onChange={(e) => setState({ ...state, p1: { ...state.p1, civId: e.target.value } })}
-                      className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"
+                      className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-yellow-500/50 outline-none transition-all cursor-pointer"
                     >
-                      <option value="">Nessuna</option>
-                      {civilizationsData.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                      <option value="" className="bg-slate-900 text-white">Nessuna</option>
+                      {civilizationsData.map(c => <option key={c.id} value={c.name} className="bg-slate-900 text-white">{c.name}</option>)}
                     </select>
                   </div>
                 </div>
@@ -159,10 +159,10 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                     <select
                       value={state.p2.civId}
                       onChange={(e) => setState({ ...state, p2: { ...state.p2, civId: e.target.value } })}
-                      className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"
+                      className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-yellow-500/50 outline-none transition-all cursor-pointer"
                     >
-                      <option value="">Nessuna</option>
-                      {civilizationsData.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                      <option value="" className="bg-slate-900 text-white">Nessuna</option>
+                      {civilizationsData.map(c => <option key={c.id} value={c.name} className="bg-slate-900 text-white">{c.name}</option>)}
                     </select>
                   </div>
                 </div>
@@ -178,9 +178,9 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
             <select
               value={state.map}
               onChange={(e) => setState({ ...state, map: e.target.value })}
-              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-lg font-bold outline-none focus:border-yellow-500/50"
+              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-lg font-bold outline-none focus:border-yellow-500/50 transition-all cursor-pointer appearance-none hover:bg-black/60"
             >
-              {AOE4_MAPS.map(m => <option key={m} value={m}>{m}</option>)}
+              {AOE4_MAPS.map(m => <option key={m} value={m} className="bg-slate-900 text-white">{m}</option>)}
             </select>
           </div>
         </div>

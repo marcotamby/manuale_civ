@@ -18,94 +18,101 @@
         #header { 
             position: absolute; top: 0; width: 100%; height: 130px; 
             display: flex; justify-content: center; align-items: center; 
-            background: linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.85)); 
+            background: linear-gradient(to bottom, rgba(0,0,0,0.98), rgba(0,0,0,0.85)); 
             border-bottom: 3px solid var(--gold);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
             z-index: 100;
         }
-        .player-box { width: 500px; text-align: center; position: relative; }
-        .player-name { font-size: 42px; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
-        .player-civ { font-size: 22px; font-weight: 700; color: var(--gold); text-transform: uppercase; margin-top: 4px; letter-spacing: 1px; }
+        .player-box { width: 550px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; }
+        .player-flag-bg {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 100%; height: 200%; opacity: 0.15; filter: blur(10px);
+            background-size: cover; background-position: center; z-index: 1;
+            mask-image: radial-gradient(circle, black, transparent 80%);
+        }
+        .player-content { position: relative; z-index: 2; }
+        .player-name { font-size: 48px; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 20px rgba(0,0,0,0.8); }
+        .player-civ { font-size: 20px; font-weight: 700; color: var(--gold); text-transform: uppercase; margin-top: -2px; letter-spacing: 2px; opacity: 0.9; }
         
         .score-box { 
-            font-size: 60px; font-weight: 900; background: var(--red); 
-            min-width: 90px; height: 90px; display: flex; items-center; justify-content: center;
+            font-size: 64px; font-weight: 900; background: var(--red); 
+            min-width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;
             border: 2px solid var(--gold); border-radius: 12px; margin: 0 30px;
-            box-shadow: 0 0 20px rgba(139, 0, 0, 0.4);
+            box-shadow: 0 0 30px rgba(139, 0, 0, 0.6);
+            z-index: 105;
         }
 
         /* Center Info */
-        .match-info { text-align: center; width: 300px; }
+        .match-info { text-align: center; width: 300px; z-index: 105; }
         .map-name { font-size: 18px; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 5px; }
         .vs-label { font-size: 12px; font-weight: 400; color: #888; text-transform: uppercase; letter-spacing: 8px; }
 
         /* BRACKET AREA */
         #bracket-container {
-            position: absolute; top: 200px; left: 50%; transform: translateX(-50%);
-            width: 1400px; height: 500px;
+            position: absolute; top: 180px; left: 50%; transform: translateX(-50%);
+            width: 1450px; height: 520px;
             display: flex; justify-content: space-between; align-items: stretch;
-            padding: 20px;
-            background: rgba(0,0,0,0.4);
-            backdrop-blur: 5px;
-            border-radius: 30px;
-            border: 1px solid rgba(212, 175, 55, 0.1);
+            padding: 40px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            border-radius: 40px;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
         .bracket-round { flex: 1; display: flex; flex-direction: column; justify-content: space-around; position: relative; }
         .matchup {
-            width: 280px; background: rgba(15, 23, 42, 0.9);
-            border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px;
-            overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            position: relative;
+            width: 290px; background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 16px;
+            overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            position: relative; transition: all 0.3s ease;
         }
-        .matchup.active { border-color: var(--gold); box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); }
+        .matchup.active { border-color: var(--gold); box-shadow: 0 0 30px rgba(212, 175, 55, 0.3); transform: scale(1.02); }
 
         .bracket-player {
-            height: 45px; display: flex; align-items: center; padding: 0 15px;
-            font-size: 16px; font-weight: 700; color: #cbd5e1;
+            height: 48px; display: flex; align-items: center; padding: 0 20px;
+            font-size: 17px; font-weight: 700; color: #cbd5e1;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             position: relative;
         }
         .bracket-player:last-child { border-bottom: none; }
-        .bracket-player.winner { color: var(--gold-bright); background: rgba(212, 175, 55, 0.1); }
-        .bracket-player.winner::after { content: '✓'; position: absolute; right: 15px; font-weight: 900; }
+        .bracket-player.winner { color: var(--gold-bright); background: rgba(212, 175, 55, 0.12); }
+        .bracket-player.winner::after { content: '✓'; position: absolute; right: 20px; font-weight: 900; }
         .bracket-player .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Connectors */
-        .connector { position: absolute; border-color: rgba(212, 175, 55, 0.3); border-style: solid; border-width: 0; }
-        
-        /* QUARTERS TO SEMIS */
-        .q-s-line { position: absolute; right: -40px; width: 40px; border-top-width: 2px; }
-        .q-s-join { position: absolute; right: -40px; width: 20px; border-right-width: 2px; }
-        
         /* CASTERS */
-        #casters-container { position: absolute; bottom: 80px; width: 100%; display: flex; justify-content: space-between; padding: 0 80px; box-sizing: border-box; pointer-events: none; }
-        .caster-box { display: flex; flex-direction: column; align-items: center; gap: 10px; visibility: hidden; }
+        #casters-container { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: space-between; padding: 0 60px; box-sizing: border-box; pointer-events: none; }
+        .caster-box { display: flex; flex-direction: column; align-items: center; gap: 8px; visibility: hidden; transform: scale(0.75); transform-origin: bottom; }
         .caster-box.active { visibility: visible; }
-        .webcam-frame { width: 380px; height: 214px; border: 2px solid var(--gold); background: rgba(0,0,0,0.3); border-radius: 4px; }
-        .caster-name { background: var(--gold); color: black; font-weight: 800; padding: 8px 30px; font-size: 22px; border-radius: 12px; text-transform: uppercase; min-width: 240px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .webcam-frame { width: 340px; height: 190px; border: 2px solid var(--gold); background: rgba(0,0,0,0.4); border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .caster-name { background: var(--gold); color: black; font-weight: 900; padding: 6px 25px; font-size: 18px; border-radius: 10px; text-transform: uppercase; min-width: 220px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
 
         /* TIMER */
         #timer-container {
-            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.9); border: 2px solid var(--gold); border-radius: 12px;
-            padding: 12px 50px; display: none; align-items: center; justify-content: center;
-            min-width: 240px; box-shadow: 0 0 40px rgba(0,0,0,0.9);
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.92); border: 2px solid var(--gold); border-radius: 15px;
+            padding: 8px 45px; display: none; align-items: center; justify-content: center;
+            min-width: 220px; box-shadow: 0 0 50px rgba(0,0,0,0.9); z-index: 10;
         }
-        #timer-display { font-size: 48px; font-weight: 900; color: var(--gold); letter-spacing: 3px; font-variant-numeric: tabular-nums; }
+        #timer-display { font-size: 44px; font-weight: 900; color: var(--gold); letter-spacing: 3px; font-variant-numeric: tabular-nums; }
 
         .round-label {
-            position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
-            font-size: 14px; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 4px;
-            opacity: 0.6;
+            position: absolute; top: -55px; left: 50%; transform: translateX(-50%);
+            font-size: 12px; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 4px;
+            background: rgba(0,0,0,0.85); padding: 6px 16px; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            white-space: nowrap;
         }
     </style>
 </head>
 <body>
     <div id="header">
         <div class="player-box">
-            <div id="p1-name" class="player-name">--</div>
-            <div id="p1-civ" class="player-civ">--</div>
+            <div id="p1-flag" class="player-flag-bg"></div>
+            <div class="player-content">
+                <div id="p1-name" class="player-name">--</div>
+                <div id="p1-civ" class="player-civ">--</div>
+            </div>
         </div>
         <div class="score-box" id="p1-score">0</div>
         <div class="match-info">
@@ -114,8 +121,11 @@
         </div>
         <div class="score-box" id="p2-score">0</div>
         <div class="player-box">
-            <div id="p2-name" class="player-name">--</div>
-            <div id="p2-civ" class="player-civ">--</div>
+            <div id="p2-flag" class="player-flag-bg"></div>
+            <div class="player-content">
+                <div id="p2-name" class="player-name">--</div>
+                <div id="p2-civ" class="player-civ">--</div>
+            </div>
         </div>
     </div>
     
@@ -184,6 +194,30 @@
         const SUB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhbGlpdXFqcHhhbmh3aHhhamxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjQ5MjEsImV4cCI6MjA4ODU0MDkyMX0.1xIE1MXy1JxgGzpP0Hitotz8o3aMwASV8NUr06bQjkA";
         const OVERLAY_ID = "tournament-1v1-bracket";
 
+        const civMap = {
+            'abbasid': 'Abbasid Dynasty.png',
+            'ayyubids': 'Ayyubids.png',
+            'byzantines': 'Byzantines.png',
+            'chinese': 'Chinese.png',
+            'delhi': 'Delhi Sultanate.png',
+            'english': 'English.png',
+            'french': 'French.png',
+            'goldenhorde': 'Golden Horde.png',
+            'hre': 'Holy Roman Empire.png',
+            'japanese': 'Japanese.png',
+            'jeannedarc': "jeannedarc.png",
+            'lancaster': "House of Lancaster.png",
+            'malians': 'Malians.png',
+            'mongols': 'Mongols.png',
+            'orderofthedragon': "Order of the Dragon.png",
+            'ottomans': 'Ottomans.png',
+            'rus': 'Rus.png',
+            'templar': "Knights Templar.png",
+            'zhuxi': "Zhu Xis Legacy.png",
+            'tughlaq': 'Tughlaq Dynasty.png',
+            'sengoku': 'Sengoku Daimyo.png',
+            'macedonian': 'Macedonian Dynasty.png'
+        };
         const { createClient } = window.supabase;
         const client = createClient(SUB_URL, SUB_KEY);
         let lastState = null;
@@ -209,18 +243,28 @@
             document.getElementById('timer-display').innerText = formatTime(totalSeconds);
         }
 
+        function getCivFlagUrl(id) {
+            if (!id) return '';
+            const normalized = id.toLowerCase().replace(/['\s]/g, '');
+            const filename = civMap[normalized] || id + '.png';
+            return `/civs/${filename}`;
+        }
+
         function render(state) {
             if (!state) return;
             lastState = state;
-            console.log("Rendering tournament state:", state);
 
             // Current Match
             document.getElementById('p1-name').innerText = state.p1?.name || '--';
             document.getElementById('p1-civ').innerText = state.p1?.civId || '--';
             document.getElementById('p1-score').innerText = state.p1?.score ?? 0;
+            document.getElementById('p1-flag').style.backgroundImage = state.p1?.civId ? `url('${getCivFlagUrl(state.p1.civId)}')` : 'none';
+
             document.getElementById('p2-name').innerText = state.p2?.name || '--';
             document.getElementById('p2-civ').innerText = state.p2?.civId || '--';
             document.getElementById('p2-score').innerText = state.p2?.score ?? 0;
+            document.getElementById('p2-flag').style.backgroundImage = state.p2?.civId ? `url('${getCivFlagUrl(state.p2.civId)}')` : 'none';
+
             document.getElementById('current-map').innerText = state.map || 'MAPPA DA DEFINIRE';
 
             // Bracket

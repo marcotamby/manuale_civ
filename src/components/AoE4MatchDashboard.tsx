@@ -338,7 +338,7 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
                     <select
                       value={map.name}
                       onChange={(e) => updateMap(mIdx, 'name', e.target.value)}
-                      className="w-full bg-[#0f1423] border border-white/10 rounded-lg pl-8 pr-10 py-2 text-sm text-white outline-none focus:border-yellow-500/50 cursor-pointer hover:bg-[#1a2035] transition-all appearance-none shadow-inner"
+                      className="w-full bg-black/40 border border-white/10 rounded-lg pl-8 pr-10 py-2 text-sm text-white focus:border-yellow-500/50 outline-none transition-all cursor-pointer hover:bg-black/60 appearance-none"
                     >
                       {AOE4_MAPS.map(mapName => (
                         <option key={mapName} value={mapName} className="bg-[#0f1423] text-gray-200">{mapName}</option>
