@@ -258,28 +258,28 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                   <div className="flex gap-2 shrink-0 pt-1">
                     <button
                       onClick={() => setActiveTab(activeTab === 'preview' ? 'dashboard' : 'preview')}
-                      className={`flex items-center gap-2 px-3 py-1.5 font-black rounded-lg transition-all text-[10px] uppercase border shadow-lg whitespace-nowrap lg:px-4 ${
+                      className={`flex items-center gap-2.5 px-5 py-2.5 font-black rounded-xl transition-all text-[11px] uppercase border shadow-lg whitespace-nowrap ${
                         activeTab === 'dashboard'
                           ? 'bg-indigo-600 text-white border-indigo-400 shadow-indigo-500/20'
                           : 'bg-indigo-500/10 text-indigo-300 border-indigo-500/50 hover:bg-indigo-500/20'
                       }`}
                     >
-                      {activeTab === 'preview' ? <Settings size={14} /> : <ChevronLeft size={14} />}
+                      {activeTab === 'preview' ? <Settings size={16} /> : <ChevronLeft size={16} />}
                       {activeTab === 'preview' ? 'Configura' : 'Indietro'}
                     </button>
                     <button
                       onClick={() => copyToClipboard(selectedOverlay.path)}
-                      className="flex items-center gap-2 px-3 py-1.5 bg-emerald-600 text-white font-black rounded-lg hover:bg-emerald-500 transition-all text-[10px] uppercase shadow-lg shadow-emerald-900/20 border border-emerald-400/30 whitespace-nowrap lg:px-4"
+                      className="flex items-center gap-2.5 px-5 py-2.5 bg-emerald-600 text-white font-black rounded-xl hover:bg-emerald-500 transition-all text-[11px] uppercase shadow-lg shadow-emerald-900/20 border border-emerald-400/30 whitespace-nowrap"
                     >
-                      <Copy size={14} /> Copia URL
+                      <Copy size={16} /> Copia URL
                     </button>
                     <a
                       href={selectedOverlay.path}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-1.5 bg-sky-600 text-white font-black rounded-lg hover:bg-sky-500 transition-all text-[10px] uppercase border border-sky-400/30 shadow-lg shadow-sky-900/20 whitespace-nowrap lg:px-4"
+                      className="flex items-center gap-2.5 px-5 py-2.5 bg-sky-600 text-white font-black rounded-xl hover:bg-sky-500 transition-all text-[11px] uppercase border border-sky-400/30 shadow-lg shadow-sky-900/20 whitespace-nowrap"
                     >
-                      <ExternalLink size={14} /> Apri Overlay
+                      <ExternalLink size={16} /> Apri Overlay
                     </a>
                   </div>
                 </div>
