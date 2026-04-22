@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, Mic, Timer as TimerIcon, Map as MapIcon, Trophy } from 'lucide-react';
+import { Save, Mic, Timer as TimerIcon, Map as MapIcon, Check, Trophy, MousePointer2 } from 'lucide-react';
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
 import { overlayService } from '../services/overlayService';
@@ -40,7 +40,6 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
     overlayService.getOverlayState(OVERLAY_ID)
       .then(savedState => {
         if (savedState) {
-          // Merge with default to ensure new fields exist
           setState({
             ...DEFAULT_STATE,
             ...savedState,
@@ -64,17 +63,18 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
     }
   };
 
-  const CivDropdown = ({ value, onChange }: { value: string, onChange: (val: string) => void }) => {
+  const CivDropdown = ({ value, onChange, size = "md" }: { value: string, onChange: (val: string) => void, size?: "sm" | "md" }) => {
     const selectedCiv = civilizationsData.find(c => c.id === value);
+    const isSm = size === "sm";
     
     return (
       <div className="relative group">
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full bg-[#0d111a] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm text-white focus:border-[#D4AF37]/50 outline-none transition-all cursor-pointer appearance-none font-bold"
+          className={`w-full bg-[#0d111a] border border-white/10 rounded-xl pl-12 pr-4 ${isSm ? 'py-2 text-[11px]' : 'py-3 text-sm'} text-white focus:border-[#D4AF37]/50 outline-none transition-all cursor-pointer appearance-none font-bold`}
         >
-          <option value="">SELEZIONA CIVILTA'</option>
+          <option value="">{isSm ? 'CIV' : 'SELEZIONA CIVILTA\''}</option>
           {civilizationsData.map(civ => (
             <option key={civ.id} value={civ.id} className="bg-slate-900">
               {civ.name.toUpperCase()}
@@ -85,10 +85,10 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
           <img 
             src={`/civs/${selectedCiv.flag}`} 
             alt="" 
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-md object-cover border border-white/10 shadow-sm pointer-events-none"
+            className={`absolute left-3.5 top-1/2 -translate-y-1/2 ${isSm ? 'w-5 h-5' : 'w-6 h-6'} rounded-md object-cover border border-white/10 shadow-sm pointer-events-none`}
           />
         ) : (
-          <Trophy className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none" size={18} />
+          <Trophy className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none" size={isSm ? 14 : 18} />
         )}
       </div>
     );
@@ -108,63 +108,46 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
     };
 
     return (
-      <div className="bg-black/30 border border-white/5 rounded-xl p-3 space-y-3">
+      <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-4 shadow-xl">
         <div className="flex items-center justify-between px-1">
-          <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">{label}</span>
-          <div className="flex gap-1">
+          <span className="text-[11px] font-black text-[#D4AF37] uppercase tracking-widest">{label}</span>
+          <div className="flex gap-1.5">
             <button 
               onClick={() => updateMatch('w', match.w === 1 ? 0 : 1)}
-              className={`w-6 h-6 rounded flex items-center justify-center text-[10px] font-black transition-all ${match.w === 1 ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'bg-white/5 text-gray-600 hover:text-white'}`}
+              className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black transition-all ${match.w === 1 ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'bg-white/5 text-gray-500 hover:text-white border border-white/5'}`}
             >
               W
             </button>
             <button 
               onClick={() => updateMatch('w', match.w === 2 ? 0 : 2)}
-              className={`w-6 h-6 rounded flex items-center justify-center text-[10px] font-black transition-all ${match.w === 2 ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'bg-white/5 text-gray-600 hover:text-white'}`}
+              className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black transition-all ${match.w === 2 ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'bg-white/5 text-gray-500 hover:text-white border border-white/5'}`}
             >
               W
             </button>
           </div>
         </div>
         
-        <div className="space-y-2">
-          <div className="flex gap-2">
+        <div className="space-y-3">
+          <div className="space-y-1.5">
             <input
               type="text"
               value={match.p1}
               onChange={(e) => updateMatch('p1', e.target.value)}
               placeholder="Player 1"
-              className="flex-1 bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white outline-none focus:border-yellow-500/30"
+              className="w-full bg-[#0d111a] border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-yellow-500/30 font-bold"
             />
-            <div className="w-24">
-              <select
-                value={match.p1Civ}
-                onChange={(e) => updateMatch('p1Civ', e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-lg px-1 py-1.5 text-[10px] text-gray-400 outline-none"
-              >
-                <option value="">CIV</option>
-                {civilizationsData.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-            </div>
+            <CivDropdown size="sm" value={match.p1Civ} onChange={(val) => updateMatch('p1Civ', val)} />
           </div>
-          <div className="flex gap-2">
+          <div className="h-[1px] bg-white/5 mx-2"></div>
+          <div className="space-y-1.5">
             <input
               type="text"
               value={match.p2}
               onChange={(e) => updateMatch('p2', e.target.value)}
               placeholder="Player 2"
-              className="flex-1 bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white outline-none focus:border-yellow-500/30"
+              className="w-full bg-[#0d111a] border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-yellow-500/30 font-bold"
             />
-            <div className="w-24">
-              <select
-                value={match.p2Civ}
-                onChange={(e) => updateMatch('p2Civ', e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-lg px-1 py-1.5 text-[10px] text-gray-400 outline-none"
-              >
-                <option value="">CIV</option>
-                {civilizationsData.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-            </div>
+            <CivDropdown size="sm" value={match.p2Civ} onChange={(val) => updateMatch('p2Civ', val)} />
           </div>
         </div>
       </div>
@@ -174,22 +157,22 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
   return (
     <div className="p-8 space-y-8">
       {/* Tab Switcher */}
-      <div className="flex gap-1 bg-black/40 p-1 rounded-xl w-fit border border-white/5 mx-auto">
+      <div className="flex gap-1 bg-black/40 p-1.5 rounded-2xl w-fit border border-white/10 mx-auto shadow-inner">
         <button
           onClick={() => setActiveTab('match')}
-          className={`px-8 py-2.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'match' ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'text-gray-500 hover:text-white'}`}
+          className={`px-10 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'match' ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'text-gray-500 hover:text-white'}`}
         >
           Match Attivo
         </button>
         <button
           onClick={() => setActiveTab('bracket')}
-          className={`px-8 py-2.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'bracket' ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'text-gray-500 hover:text-white'}`}
+          className={`px-10 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'bracket' ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'text-gray-500 hover:text-white'}`}
         >
           Tabellone Torneo
         </button>
       </div>
 
-      <div className="min-h-[500px]">
+      <div className="min-h-[600px]">
         {activeTab === 'match' ? (
           <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-8">
             <div className="grid grid-cols-2 gap-8">
@@ -314,26 +297,37 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
             </div>
           </div>
         ) : (
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-6">
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-10">
+            {/* Instruction Banner */}
+            <div className="flex items-center gap-4 bg-yellow-500/10 border border-yellow-500/30 p-5 rounded-2xl">
+              <div className="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center text-yellow-500 shadow-lg shadow-yellow-500/10">
+                <MousePointer2 size={24} />
+              </div>
+              <div>
+                <h4 className="text-sm font-black text-white uppercase tracking-wider">Gestione Vincitore</h4>
+                <p className="text-xs text-gray-400 mt-1">Usa il tasto <span className="text-yellow-500 font-bold px-1.5 py-0.5 bg-yellow-500/10 rounded border border-yellow-500/20">W</span> per indicare chi ha vinto il match e farlo progredire.</p>
+              </div>
+            </div>
+
             {/* Bracket Management */}
-            <div className="grid grid-cols-3 gap-6 items-start">
-              <div className="space-y-4">
-                <h4 className="text-[10px] font-black text-[#C0C0C0] uppercase tracking-[0.2em] mb-4 text-center">Quarti di Finale</h4>
+            <div className="grid grid-cols-3 gap-10 items-start pb-10">
+              <div className="space-y-6">
+                <h4 className="text-xs font-black text-[#D4AF37] uppercase tracking-[0.3em] mb-6 text-center border-b border-white/10 pb-2">Quarti di Finale</h4>
                 {renderMatchInputs('q1', 'Match 1')}
                 {renderMatchInputs('q2', 'Match 2')}
                 {renderMatchInputs('q3', 'Match 3')}
                 {renderMatchInputs('q4', 'Match 4')}
               </div>
-              <div className="space-y-4 pt-12">
-                <h4 className="text-[10px] font-black text-[#C0C0C0] uppercase tracking-[0.2em] mb-4 text-center">Semifinali</h4>
-                <div className="space-y-24">
+              <div className="space-y-6 pt-16">
+                <h4 className="text-xs font-black text-[#D4AF37] uppercase tracking-[0.3em] mb-6 text-center border-b border-white/10 pb-2">Semifinali</h4>
+                <div className="space-y-32">
                   {renderMatchInputs('s1', 'Semi 1')}
                   {renderMatchInputs('s2', 'Semi 2')}
                 </div>
               </div>
-              <div className="space-y-4 pt-48">
-                <h4 className="text-[10px] font-black text-[#C0C0C0] uppercase tracking-[0.2em] mb-4 text-center">Gran Finale</h4>
-                <div className="p-1 bg-white/5 border border-white/10 rounded-2xl shadow-2xl">
+              <div className="space-y-6 pt-64">
+                <h4 className="text-xs font-black text-[#D4AF37] uppercase tracking-[0.3em] mb-6 text-center border-b border-white/10 pb-2">Gran Finale</h4>
+                <div className="p-1.5 bg-yellow-500/5 border border-yellow-500/20 rounded-3xl shadow-2xl">
                   {renderMatchInputs('f', 'Finalissima')}
                 </div>
               </div>
@@ -343,11 +337,11 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
       </div>
 
       {/* Global Save Button */}
-      <div className="flex justify-center border-t border-white/5 pt-8">
+      <div className="flex justify-center border-t border-white/10 pt-8">
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className={`flex items-center gap-3 px-16 py-5 rounded-2xl font-black text-xl uppercase tracking-wider transition-all transform hover:scale-105 active:scale-95 shadow-2xl ${
+          className={`flex items-center gap-4 px-20 py-6 rounded-2xl font-black text-2xl uppercase tracking-wider transition-all transform hover:scale-105 active:scale-95 shadow-2xl ${
             isSaving 
               ? 'bg-gray-700 text-gray-400 cursor-not-allowed' 
               : showSuccess
@@ -355,7 +349,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                 : 'bg-yellow-500 text-black hover:bg-yellow-400 shadow-yellow-500/40'
           }`}
         >
-          <Save size={28} className={isSaving ? 'animate-spin' : ''} />
+          <Save size={32} className={isSaving ? 'animate-spin' : ''} />
           {isSaving ? 'Sincronizzazione...' : showSuccess ? 'Overlay Sincronizzato' : 'Sincronizza Overlay'}
         </button>
       </div>

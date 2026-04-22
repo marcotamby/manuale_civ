@@ -15,7 +15,7 @@
 
         /* Header - Current Match */
         #header { 
-            position: absolute; top: 0; width: 100%; height: 130px; 
+            position: absolute; top: 0; width: 100%; height: 140px; 
             display: flex; justify-content: center; align-items: center; 
             background: linear-gradient(to bottom, rgba(0,0,0,0.98), rgba(0,0,0,0.85)); 
             border-bottom: 3px solid var(--gold);
@@ -48,85 +48,85 @@
 
         /* TIMER - Electric Blue & Deep Navy */
         #timer-container { 
-            position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); 
+            position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); 
             display: none; flex-direction: column; align-items: center; gap: 10px; z-index: 100;
         }
         #timer-label {
-            color: #00f2ff; font-size: 14px; font-weight: 950; text-transform: uppercase; letter-spacing: 6px;
+            color: #00f2ff; font-size: 16px; font-weight: 950; text-transform: uppercase; letter-spacing: 6px;
             text-shadow: 0 0 20px rgba(0, 242, 255, 0.8);
         }
         #timer-display { 
-            color: #fff; font-size: 52px; font-weight: 950; font-variant-numeric: tabular-nums;
+            color: #fff; font-size: 56px; font-weight: 950; font-variant-numeric: tabular-nums;
             background: linear-gradient(180deg, #0a192f 0%, #000c1d 100%); 
-            padding: 10px 45px; border-radius: 24px; border: 4px solid #00f2ff; 
-            box-shadow: 0 0 40px rgba(0, 242, 255, 0.5), inset 0 0 25px rgba(0, 242, 255, 0.2);
+            padding: 10px 50px; border-radius: 24px; border: 4px solid #00f2ff; 
+            box-shadow: 0 0 45px rgba(0, 242, 255, 0.5), inset 0 0 25px rgba(0, 242, 255, 0.2);
             position: relative; overflow: hidden; letter-spacing: 2px;
         }
 
         /* BRACKET AREA */
         #bracket-container {
-            position: absolute; top: 185px; left: 50%; transform: translateX(-50%);
-            width: 1420px; height: 500px;
+            position: absolute; top: 220px; left: 50%; transform: translateX(-50%);
+            width: 1440px; height: 500px;
             display: flex; justify-content: space-between; align-items: stretch;
-            padding: 40px 45px;
-            background: rgba(10, 15, 28, 0.75);
-            backdrop-filter: blur(8px);
-            border-radius: 40px; border: 1px solid rgba(212, 175, 55, 0.15);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+            padding: 45px 50px;
+            background: rgba(10, 15, 28, 0.8);
+            backdrop-filter: blur(12px);
+            border-radius: 40px; border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: 0 35px 70px rgba(0,0,0,0.8);
         }
 
-        .bracket-round { flex: 1; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: center; }
+        .bracket-round { flex: 1; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: center; padding-top: 10px; }
         
         .round-label { 
             position: absolute; top: -55px; left: 50%; transform: translateX(-50%);
-            background: rgba(235, 235, 235, 0.98); color: #000; padding: 5px 20px; border-radius: 10px; 
-            font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: 4px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.6), 0 0 15px rgba(255, 255, 255, 0.3);
+            background: #fff; color: #000; padding: 6px 24px; border-radius: 12px; 
+            font-size: 13px; font-weight: 950; text-transform: uppercase; letter-spacing: 4px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.7), 0 0 20px rgba(255, 255, 255, 0.4);
             border: 2px solid #fff; white-space: nowrap; z-index: 10;
         }
 
         .matchup {
-            width: 280px; background: rgba(15, 23, 42, 0.98);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px;
-            overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.8);
-            position: relative; transition: all 0.4s ease;
+            width: 290px; background: rgba(15, 23, 42, 0.98);
+            border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px;
+            overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+            position: relative; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .matchup.active { border-color: var(--gold); box-shadow: 0 0 35px rgba(212, 175, 55, 0.3); transform: scale(1.03); }
+        .matchup.active { border-color: var(--gold); box-shadow: 0 0 40px rgba(212, 175, 55, 0.4); transform: scale(1.04); }
 
         .bracket-player { 
             display: flex; align-items: center; background: rgba(13, 17, 26, 0.98); 
-            height: 48px; width: 100%; position: relative; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            height: 52px; width: 100%; position: relative; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             transition: all 0.4s ease;
         }
         .bracket-player:last-child { border-bottom: none; }
         
         .bracket-civ-flag {
             position: absolute; inset: 0; background-size: cover; background-position: center;
-            opacity: 0.35; z-index: 1; transition: all 0.4s ease;
-            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 80%);
-            mask-image: linear-gradient(to right, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 80%);
+            opacity: 0.8; z-index: 1; transition: all 0.5s ease;
+            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 90%);
+            mask-image: linear-gradient(to right, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 90%);
         }
 
-        .bracket-player .name { position: relative; z-index: 2; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 900; padding-left: 18px; color: #fff; font-size: 15px; }
+        .bracket-player .name { position: relative; z-index: 2; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 900; padding-left: 20px; color: #fff; font-size: 16px; }
         
-        .bracket-player.winner { background: rgba(192, 192, 192, 0.3); border-color: rgba(192, 192, 192, 0.6); }
-        .bracket-player.winner .name { color: #fff; text-shadow: 0 0 15px rgba(255, 255, 255, 0.4); }
-        .bracket-player.winner::after { content: '🏆'; position: absolute; right: 14px; font-size: 16px; z-index: 3; filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.9)); }
-        .bracket-player.winner .bracket-civ-flag { opacity: 0.6; }
+        .bracket-player.winner { background: rgba(192, 192, 192, 0.35); border-color: rgba(192, 192, 192, 0.7); }
+        .bracket-player.winner .name { color: #fff; text-shadow: 0 0 15px rgba(255, 255, 255, 0.5); }
+        .bracket-player.winner::after { content: '🏆'; position: absolute; right: 16px; font-size: 18px; z-index: 3; filter: drop-shadow(0 0 10px rgba(212, 175, 55, 1)); }
+        .bracket-player.winner .bracket-civ-flag { opacity: 0.8; }
         
-        .bracket-player.loser { opacity: 0.65; filter: grayscale(0.4); }
-        .bracket-player.loser .bracket-civ-flag { opacity: 0.2; }
+        .bracket-player.loser { opacity: 0.6; filter: grayscale(0.5); }
+        .bracket-player.loser .bracket-civ-flag { opacity: 0.25; }
 
         .bracket-lines { position: absolute; inset: 0; pointer-events: none; z-index: 0; width: 100%; height: 100%; }
-        .bracket-line { stroke: rgba(255, 255, 255, 0.08); stroke-width: 2.5; fill: none; transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
-        .bracket-line.active { stroke: rgba(220, 220, 220, 0.95); stroke-width: 4.5; filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.5)); }
+        .bracket-line { stroke: rgba(255, 255, 255, 0.1); stroke-width: 3; fill: none; transition: all 0.7s ease; }
+        .bracket-line.active { stroke: rgba(220, 220, 220, 0.95); stroke-width: 5; filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.5)); }
 
         /* CASTERS */
-        #casters-container { position: absolute; bottom: 35px; width: 100%; display: flex; justify-content: space-between; padding: 0 60px; box-sizing: border-box; pointer-events: none; }
-        .caster-box { display: flex; flex-direction: column; align-items: center; gap: 10px; visibility: hidden; opacity: 0; transform: translateY(20px); transition: all 0.6s ease; }
+        #casters-container { position: absolute; bottom: 35px; width: 100%; display: flex; justify-content: space-between; padding: 0 65px; box-sizing: border-box; pointer-events: none; }
+        .caster-box { display: flex; flex-direction: column; align-items: center; gap: 12px; visibility: hidden; opacity: 0; transform: translateY(25px); transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
         .caster-box.active { visibility: visible; opacity: 1; transform: translateY(0); }
-        .webcam-frame { width: 360px; height: 200px; border: 3px solid var(--gold); background: rgba(0,0,0,0.5); border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); }
-        .caster-name { background: var(--gold); color: black; font-weight: 950; padding: 8px 30px; font-size: 20px; border-radius: 12px; text-transform: uppercase; min-width: 240px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.5); letter-spacing: 1px; }
+        .webcam-frame { width: 380px; height: 210px; border: 3px solid var(--gold); background: rgba(0,0,0,0.6); border-radius: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); }
+        .caster-name { background: var(--gold); color: black; font-weight: 950; padding: 10px 35px; font-size: 22px; border-radius: 14px; text-transform: uppercase; min-width: 260px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.6); letter-spacing: 1.5px; }
     </style>
 </head>
 <body>
@@ -141,7 +141,7 @@
     </div>
     
     <div id="bracket-container">
-        <svg class="bracket-lines" viewBox="0 0 1420 500">
+        <svg class="bracket-lines" viewBox="0 0 1440 500">
             <path id="line-q1" class="bracket-line" d="" />
             <path id="line-q2" class="bracket-line" d="" />
             <path id="line-q3" class="bracket-line" d="" />
@@ -209,12 +209,12 @@
         };
 
         const BRACKET_PATHS = {
-            q1: { n: [65, 130], p1: [41, 130], p2: [89, 130], x1: 375, x2: 565, xm: 470 },
-            q2: { n: [215, 178], p1: [191, 178], p2: [239, 178], x1: 375, x2: 565, xm: 470 },
-            q3: { n: [365, 430], p1: [341, 430], p2: [389, 430], x1: 375, x2: 565, xm: 470 },
-            q4: { n: [515, 478], p1: [491, 478], p2: [539, 478], x1: 375, x2: 565, xm: 470 },
-            s1: { n: [140, 275], p1: [116, 275], p2: [164, 275], x1: 855, x2: 1045, xm: 950 },
-            s2: { n: [440, 325], p1: [416, 325], p2: [464, 325], x1: 855, x2: 1045, xm: 950 }
+            q1: { n: [65, 130], p1: [41, 130], p2: [89, 130], x1: 395, x2: 575, xm: 485 },
+            q2: { n: [215, 178], p1: [191, 178], p2: [239, 178], x1: 395, x2: 575, xm: 485 },
+            q3: { n: [365, 430], p1: [341, 430], p2: [389, 430], x1: 395, x2: 575, xm: 485 },
+            q4: { n: [515, 478], p1: [491, 478], p2: [539, 478], x1: 395, x2: 575, xm: 485 },
+            s1: { n: [140, 275], p1: [116, 275], p2: [164, 275], x1: 865, x2: 1045, xm: 955 },
+            s2: { n: [440, 325], p1: [416, 325], p2: [464, 325], x1: 865, x2: 1045, xm: 955 }
         };
 
         const { createClient } = window.supabase;
@@ -292,10 +292,7 @@
                         const pathData = BRACKET_PATHS[rid];
                         const line = document.getElementById(`line-${rid}`);
                         if (pathData && line) {
-                            let yStart = pathData.n[0];
-                            if (winner === 1) yStart = pathData.p1[0];
-                            if (winner === 2) yStart = pathData.p2[0];
-                            const d = `M ${pathData.x1},${yStart} L ${pathData.xm},${yStart} L ${pathData.xm},${pathData.n[1]} L ${pathData.x2},${pathData.n[1]}`;
+                            const d = `M ${pathData.x1},${pathData.n[0]} L ${pathData.xm},${pathData.n[0]} L ${pathData.xm},${pathData.n[1]} L ${pathData.x2},${pathData.n[1]}`;
                             line.setAttribute('d', d);
                             line.classList.toggle('active', winner > 0);
                         }
