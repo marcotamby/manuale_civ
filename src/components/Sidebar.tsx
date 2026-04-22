@@ -78,9 +78,9 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
             <button
               onClick={() => onSelectPage('home')}
               title="Torna alla Home"
-              className="w-full aspect-square rounded-md glass flex items-center justify-center text-yellow-500 border border-[#D4AF37]/20 hover:border-yellow-400 hover:shadow-[0_0_15px_rgba(212,175,55,0.4)] transition-all group"
+              className="w-full aspect-square rounded-xl glass flex items-center justify-center text-yellow-500 border border-[#D4AF37]/20 hover:border-yellow-400 hover:shadow-[0_0_15px_rgba(212,175,55,0.4)] transition-all group"
             >
-              <HomeIcon size={24} />
+              <HomeIcon size={32} />
             </button>
           </div>
         )}
