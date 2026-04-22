@@ -229,7 +229,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
       <div className="flex flex-col items-center md:items-end justify-center flex-1 gap-2">
         {isAuthenticated ? (
           (isAdmin || isStreamer) ? (
-            <div className="flex flex-col items-end gap-2">
+            <div className="flex flex-col items-end gap-2 md:translate-y-2">
               <div className="flex items-center gap-3 md:gap-4 font-sans">
 
 
@@ -341,7 +341,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
             )}
           </div>
           ) : (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 md:translate-y-2">
               <button
                 onClick={() => {
                   (window as any).openProfileModal?.();
