@@ -627,51 +627,73 @@ export function TournamentsPage() {
 
                  {editForm.hasRegolamento && (
                    <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                      <div className="flex flex-wrap gap-2 mb-1 p-2 bg-black/40 rounded-xl border border-white/10 sticky top-0 z-20 backdrop-blur-md">
+                      <div className="flex flex-wrap gap-2 mb-1 p-2 bg-black/60 rounded-2xl border border-white/10 sticky top-0 z-20 backdrop-blur-md shadow-xl">
                          {/* Text Style Group */}
                          <div className="flex items-center gap-1 pr-2 border-r border-white/10">
-                           <button onClick={(e) => { e.preventDefault(); document.execCommand('bold', false); }} className="p-2 hover:bg-white/10 rounded-lg text-white font-bold" title="Grassetto">B</button>
-                           <button onClick={(e) => { e.preventDefault(); document.execCommand('italic', false); }} className="p-2 hover:bg-white/10 rounded-lg text-white italic" title="Corsivo">I</button>
-                           <button onClick={(e) => { e.preventDefault(); document.execCommand('underline', false); }} className="p-2 hover:bg-white/10 rounded-lg text-white underline" title="Sottolineato">U</button>
+                           <button 
+                             onMouseDown={(e) => { e.preventDefault(); document.execCommand('styleWithCSS', false, 'true'); document.execCommand('bold', false); }} 
+                             className="p-2 hover:bg-white/10 rounded-lg text-white font-bold transition-colors w-10 h-10 flex items-center justify-center" title="Grassetto"
+                           >
+                             B
+                           </button>
+                           <button 
+                             onMouseDown={(e) => { e.preventDefault(); document.execCommand('styleWithCSS', false, 'true'); document.execCommand('italic', false); }} 
+                             className="p-2 hover:bg-white/10 rounded-lg text-white italic transition-colors w-10 h-10 flex items-center justify-center" title="Corsivo"
+                           >
+                             I
+                           </button>
+                           <button 
+                             onMouseDown={(e) => { e.preventDefault(); document.execCommand('styleWithCSS', false, 'true'); document.execCommand('underline', false); }} 
+                             className="p-2 hover:bg-white/10 rounded-lg text-white underline transition-colors w-10 h-10 flex items-center justify-center" title="Sottolineato"
+                           >
+                             U
+                           </button>
                          </div>
 
                          {/* Alignment Group */}
                          <div className="flex items-center gap-1 px-2 border-r border-white/10">
-                           <button onClick={(e) => { e.preventDefault(); document.execCommand('justifyLeft', false); }} className="p-2 hover:bg-white/10 rounded-lg text-white" title="Allinea Sinistra"><AlignLeft size={16}/></button>
-                           <button onClick={(e) => { e.preventDefault(); document.execCommand('justifyCenter', false); }} className="p-2 hover:bg-white/10 rounded-lg text-white" title="Allinea Centro"><AlignCenter size={16}/></button>
-                           <button onClick={(e) => { e.preventDefault(); document.execCommand('justifyRight', false); }} className="p-2 hover:bg-white/10 rounded-lg text-white" title="Allinea Destra"><AlignRight size={16}/></button>
-                           <button onClick={(e) => { e.preventDefault(); document.execCommand('justifyFull', false); }} className="p-2 hover:bg-white/10 rounded-lg text-white" title="Giustifica"><AlignJustify size={16}/></button>
+                           <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('justifyLeft', false); }} className="p-2 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white transition-colors"><AlignLeft size={18}/></button>
+                           <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('justifyCenter', false); }} className="p-2 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white transition-colors"><AlignCenter size={18}/></button>
+                           <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('justifyRight', false); }} className="p-2 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white transition-colors"><AlignRight size={18}/></button>
+                           <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('justifyFull', false); }} className="p-2 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white transition-colors"><AlignJustify size={18}/></button>
                          </div>
 
-                         {/* Font Selection */}
-                         <div className="flex items-center gap-2 px-2 border-r border-white/10">
+                         {/* Font Selection - Premium Style */}
+                         <div className="flex items-center gap-2 px-2 border-r border-white/10 relative">
                            <select 
-                             onChange={(e) => { document.execCommand('fontName', false, e.target.value); }}
-                             className="bg-black/60 border border-white/10 rounded-lg text-[10px] p-1.5 text-white outline-none"
+                             onChange={(e) => { 
+                               document.execCommand('styleWithCSS', false, 'true');
+                               document.execCommand('fontName', false, e.target.value); 
+                             }}
+                             className="bg-white/5 border border-white/10 rounded-xl text-[10px] py-2 px-3 text-white outline-none focus:border-blue-500/50 cursor-pointer hover:bg-white/10 transition-all font-black uppercase tracking-widest appearance-none pr-8"
                            >
-                             <option value="Inter, sans-serif">Inter</option>
-                             <option value="Georgia, serif">Serif (Classico)</option>
-                             <option value="monospace">Monospace</option>
-                             <option value="system-ui">Modern</option>
-                             <option value="Garamond, serif">Elegant</option>
+                             <option value="Inter, sans-serif" className="bg-[#121620]">INTER (SANS)</option>
+                             <option value="'Playfair Display', serif" className="bg-[#121620]">CLASSIC (SERIF)</option>
+                             <option value="'Roboto Mono', monospace" className="bg-[#121620]">MONO</option>
+                             <option value="'Outfit', sans-serif" className="bg-[#121620]">MODERN</option>
+                             <option value="cursive" className="bg-[#121620]">ELEGANT</option>
                            </select>
+                           <ChevronDown size={12} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
                          </div>
 
                          {/* Heading/Format */}
                          <div className="flex items-center gap-1 px-2 border-r border-white/10">
-                           <button onClick={(e) => { e.preventDefault(); document.execCommand('formatBlock', false, 'H2'); }} className="p-2 hover:bg-white/10 rounded-lg text-white font-black text-[10px]" title="Titolo">H2</button>
-                           <button onClick={(e) => { e.preventDefault(); document.execCommand('formatBlock', false, 'P'); }} className="p-2 hover:bg-white/10 rounded-lg text-white font-black text-[10px]" title="Paragrafo">P</button>
+                           <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('formatBlock', false, 'H2'); }} className="p-2 hover:bg-white/10 rounded-lg text-white font-black text-xs px-3" title="Titolo">H2</button>
+                           <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('formatBlock', false, 'P'); }} className="p-2 hover:bg-white/10 rounded-lg text-white font-black text-xs px-3" title="Paragrafo">P</button>
                          </div>
 
                          {/* Emoji Popover */}
                          <div className="relative group/emoji">
-                           <button className="p-2 hover:bg-white/10 rounded-lg text-lg">😀</button>
-                           <div className="absolute top-full left-0 mt-2 p-2 bg-black/90 border border-white/10 rounded-xl hidden group-hover/emoji:grid grid-cols-5 gap-1 z-[100] shadow-2xl backdrop-blur-xl">
-                             {['🏆','🎮','⚔️','🏰','🎖️','🥇','🥈','🥉','📜','⚖️','📢','🔴','🟢','🔵','⭐'].map(emoji => (
+                           <button className="p-2 hover:bg-white/10 rounded-lg text-lg flex items-center justify-center w-10 h-10">😀</button>
+                           <div className="absolute bottom-full left-0 mb-2 p-3 bg-[#0d1117] border border-white/10 rounded-[1.5rem] hidden group-hover/emoji:grid grid-cols-5 gap-2 z-[100] shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-2 duration-300 border-b-blue-500/50">
+                             {['🏆','🎮','⚔️','🏰','🎖️','🥇','🥈','🥉','📜','⚖️','📢','🔴','🟢','🔵','⭐','🔥','⚡','💎','🛡️','👑'].map(emoji => (
                                <button 
                                  key={emoji}
-                                 onClick={(e) => { e.preventDefault(); document.execCommand('insertText', false, emoji); }}
-                                 className="p-2 hover:bg-white/20 rounded-lg text-lg transition-transform hover:scale-125"
+                                 onMouseDown={(e) => { 
+                                   e.preventDefault(); 
+                                   document.execCommand('insertText', false, emoji); 
+                                 }}
+                                 className="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-xl text-xl transition-all hover:scale-125"
                                >
                                  {emoji}
                                </button>
@@ -681,14 +703,14 @@ export function TournamentsPage() {
                       </div>
                       
                       <div 
+                        id="regulation-editor-root"
                         contentEditable
                         onInput={(e) => setEditForm({...editForm, regolamentoContent: e.currentTarget.innerHTML})}
                         onBlur={(e) => setEditForm({...editForm, regolamentoContent: e.currentTarget.innerHTML})}
                         dangerouslySetInnerHTML={{ __html: editForm.regolamentoContent }}
-                        className="w-full bg-black/40 border border-white/10 p-6 rounded-2xl text-white text-base outline-none focus:border-blue-500/50 transition-all min-h-[400px] prose prose-invert max-w-none prose-p:my-2 prose-h2:mt-6 prose-h2:mb-4 overflow-y-auto"
-                        style={{ fontFamily: 'Inter, sans-serif' }}
+                        className="w-full bg-black/40 border border-white/10 p-8 rounded-[2rem] text-white text-base outline-none focus:border-blue-500/40 transition-all min-h-[450px] prose prose-invert max-w-none prose-p:my-2 prose-h2:mt-8 prose-h2:mb-4 overflow-y-auto shadow-inner"
                       />
-                      <p className="text-[9px] text-gray-500 italic">Il testo verrà visualizzato esattamente come lo vedi qui sopra nella pagina dedicata.</p>
+                      <p className="text-[9px] text-gray-500 italic px-4">Modifica il testo direttamente sopra. Le modifiche vengono salvate in tempo reale nel modulo.</p>
                     </div>
                  )}
                </div>
