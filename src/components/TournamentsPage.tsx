@@ -298,9 +298,8 @@ export function TournamentsPage() {
       setTimeout(() => {
         setSaveStatus('idle');
         setShowEditModal(false);
+        loadTournaments();
       }, 3000);
-      
-      loadTournaments();
     } catch (err: any) {
       toast.error(`Errore: ${err.message}`);
       setSaveStatus('idle');
@@ -441,7 +440,7 @@ export function TournamentsPage() {
                         {t.config.hasRegolamento && (
                           <button 
                             onClick={() => navigate(`/tornei/${t.slug}/regolamento`)} 
-                            className="flex-grow h-full bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 rounded-2xl text-yellow-500 text-[10px] font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/reg shadow-lg active:scale-95"
+                            className="flex-grow h-full bg-blue-950/40 hover:bg-blue-900/60 border border-blue-500/30 rounded-2xl text-blue-400 text-[10px] font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/reg shadow-lg active:scale-95"
                           >
                             Regolamento <BookOpen size={14} className="group-hover/reg:scale-110 transition-transform" />
                           </button>
