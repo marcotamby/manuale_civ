@@ -25,6 +25,7 @@ import { TournamentsPage } from './components/TournamentsPage';
 import { TournamentDetail } from './components/TournamentDetail';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { usePresence } from './components/PresenceContext';
 
 function App() {
   const navigate = useNavigate();
@@ -77,7 +78,7 @@ function App() {
     }
   }, [location.pathname]);
 
-  const { favorites, isLoginModalOpen, closeLoginModal, isAuthenticated, isAdmin, isStreamer } = useAuth();
+  const { isAdmin, isAuthenticated, isStreamer, favorites, isLoginModalOpen, closeLoginModal } = useAuth();
   const { updateActivity } = usePresence();
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);

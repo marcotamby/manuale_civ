@@ -22,7 +22,7 @@ interface TopbarProps {
 export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps) {
   const { isAuthenticated, isAdmin, isSuperAdmin, isStreamer, user, logout, openLoginModal, favorites } = useAuth();
   const { civilizations } = useCivData();
-  const { activeAdmins: _activeAdmins } = usePresence();
+  const { activeAdmins: _activeAdmins, onlineUserCount, usersByPage } = usePresence();
   const [pendingCount, setPendingCount] = useState(0);
   const [pendingQaCount, setPendingQaCount] = useState(0);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -226,13 +226,10 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
       </Link>
 
       {/* Auth / Right side */}
-      <div className="flex flex-col items-center md:items-end justify-center flex-1 gap-2">
+      <div className="flex flex-col items-center md:items-end justify-center flex-1 gap-1">
         {isAuthenticated ? (
-          (isAdmin || isStreamer) ? (
-            <div className="flex flex-col items-end gap-2 md:translate-y-2">
-              <div className="flex items-center gap-3 md:gap-4 font-sans">
-
-
+          <div className="flex flex-col items-end gap-1.5 md:translate-y-1">
+            <div className="flex items-center gap-3 md:gap-4 font-sans">
               <button
                 onClick={() => {
                   (window as any).openProfileModal?.();
@@ -283,9 +280,9 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
               </button>
             </div>
 
-            {/* Presence Section */}
-            <div className="flex items-center gap-2 mt-1">
-              {/* Users Online - All authenticated users see this */}
+            {/* Presence Indicators (Stacked below buttons) */}
+            <div className="flex items-center gap-2">
+              {/* Users Online */}
               <div className="relative group z-[101]">
                 <div className="hidden md:flex items-center gap-2 px-2.5 py-1.5 bg-slate-500/10 rounded-full border border-slate-500/30 shadow-[0_0_10px_rgba(148,163,184,0.1)] shrink-0 whitespace-nowrap cursor-help transition-all group-hover:bg-slate-500/20 group-hover:border-slate-500/50">
                   <div className="relative flex h-1.5 w-1.5">
@@ -321,7 +318,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
                 </div>
               </div>
 
-              {/* Admin Live - Only admins see this */}
+              {/* Admin Live indicator */}
               {Object.keys(_activeAdmins).length > 0 && (isAdmin || isStreamer) && (
                 <div className="relative group z-[101]">
                   <div className="hidden md:flex items-center gap-2 px-2.5 py-1.5 bg-yellow-500/10 rounded-full border border-yellow-500/30 shadow-[0_0_10px_rgba(212,175,55,0.1)] shrink-0 whitespace-nowrap cursor-help transition-all group-hover:bg-yellow-500/20 group-hover:border-yellow-500/50">
@@ -349,7 +346,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
                           <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
                             <div className="w-8 h-8 rounded-full border border-yellow-500/20 overflow-hidden bg-yellow-500/5 shrink-0">
                               {admin.user.avatar ? (
-                                <img src={admin.user.avatar} alt={admin.user.name} className="w-full h-full object-cover" />
+                                <img src={admin.user.avatar || undefined} alt={admin.user.name || ''} className="w-full h-full object-cover" />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center">
                                   <User size={14} className="text-yellow-500/50" />
@@ -379,40 +376,6 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
               )}
             </div>
           </div>
-              <button
-                onClick={() => {
-                  (window as any).openProfileModal?.();
-                  (window as any).clearNotifications?.();
-                }}
-                className="relative flex items-center gap-2.5 group transition-all hover:scale-110 hover:-translate-y-1 duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
-                title="Il Tuo Profilo"
-              >
-                <div className="p-1 rounded-full bg-blue-600/10 border border-blue-500/30 text-blue-400 group-hover:bg-blue-600/20 group-hover:border-blue-500/50 transition-all overflow-hidden">
-                  {user?.avatar_url ? (
-                    <img src={user.avatar_url} alt="Avatar" className="w-8 h-8 object-cover rounded-full" />
-                  ) : user?.rank && user.rank !== 'Unranked' ? (
-                    <img src={RANK_ICONS[user.rank]} alt={user.rank} className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]" />
-                  ) : (
-                    <div className="w-8 h-8 flex items-center justify-center">
-                      <User size={20} />
-                    </div>
-                  )}
-                </div>
-                {notificationCount > 0 && (
-                  <span className="absolute -top-1 -left-1 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[9px] font-black text-white shadow-[0_0_10px_rgba(220,38,38,0.5)] group-hover:scale-110 transition-transform ring-2 ring-[#0d1424]">
-                    {notificationCount}
-                  </span>
-                )}
-                <span className="hidden md:block text-xs font-bold text-white/90 uppercase tracking-widest whitespace-nowrap">Il Tuo Profilo</span>
-              </button>
-              <button
-                onClick={() => setShowLogoutConfirm(true)}
-                className="text-xs text-gray-400 hover:text-white transition-colors border border-white/10 px-3 py-1.5 rounded hover:bg-white/5 font-sans tracking-wider uppercase"
-              >
-                Esci
-              </button>
-            </div>
-          )
         ) : (
           <button
             onClick={openLoginModal}

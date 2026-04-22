@@ -39,7 +39,7 @@ const getRankIcon = (rank: string | undefined) => {
 export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const { civilizations } = useCivData();
   const { isAdmin, isSuperAdmin, canManageCivs, canManageBuildorders, user, toggleFavorite, openLoginModal } = useAuth();
-  const { updateActivity, activeAdmins: _activeAdmins } = usePresence();
+  const { activeAdmins: _activeAdmins, usersByPage } = usePresence();
   const { tab } = useParams<{ tab?: string }>();
   const navigate = useNavigate();
 
