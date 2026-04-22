@@ -81,15 +81,18 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
 
   // 2. Global User Presence (privacy-focused)
   useEffect(() => {
-    // Only track authenticated users (as per request)
-    if (!isAuthenticated || !user?.email) {
-      setOnlineUserCount(0);
-      setUsersByPage({});
-      return;
+    // Track everyone (logged in or guests)
+    // Generate a session-persistent guest ID if not logged in
+    let guestId = sessionStorage.getItem('presence_guest_id');
+    if (!guestId) {
+      guestId = 'guest-' + Math.random().toString(36).substring(2, 9);
+      sessionStorage.setItem('presence_guest_id', guestId);
     }
 
+    const presenceKey = user?.email || guestId;
+
     const channel = supabase.channel('global-presence', {
-      config: { presence: { key: user.email } }
+      config: { presence: { key: presenceKey } }
     });
 
     channel
@@ -120,7 +123,7 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
       });
 
     return () => { channel.unsubscribe(); };
-  }, [isAuthenticated, user?.email, activity]);
+  }, [user?.email, activity]);
 
   const updateActivity = (newActivity: any) => {
     setActivity(newActivity);

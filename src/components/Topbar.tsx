@@ -228,7 +228,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
       {/* Auth / Right side */}
       <div className="flex flex-col items-center md:items-end justify-center flex-1 gap-1">
         {isAuthenticated ? (
-          <div className="flex flex-col items-end gap-1.5 md:translate-y-1">
+          <div className="flex flex-col items-end gap-4 md:translate-y-1">
             <div className="flex items-center gap-3 md:gap-4 font-sans">
               <button
                 onClick={() => {

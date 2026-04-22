@@ -86,14 +86,13 @@ function App() {
 
   // Track activity globally
   useEffect(() => {
-    if (!isAuthenticated) return;
-    
+    // Track everyone for global counts
     if (isCiv && selectedCiv) {
       updateActivity({ type: 'viewing', civId: selectedCiv });
     } else {
       updateActivity({ type: 'viewing', section: currentPage });
     }
-  }, [currentPage, selectedCiv, isAuthenticated]);
+  }, [currentPage, selectedCiv]);
 
   const prevPathRef = useRef(location.pathname);
   useEffect(() => {
