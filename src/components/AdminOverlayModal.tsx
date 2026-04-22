@@ -113,9 +113,9 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
     navigate(`/admin/overlays/${targetOverlayId}/${nextTab === 'dashboard' ? 'config' : 'preview'}`);
   };
 
-  const overlayDisplayName = (selectedOverlay && overlayNames[selectedOverlay.id]) || selectedOverlay?.name || '';
-  const overlayDisplayIcon = (selectedOverlay && overlayIcons[selectedOverlay.id]) || '';
-  const overlayDisplayDesc = (selectedOverlay && overlayDescriptions[selectedOverlay.id]) || selectedOverlay?.description || '';
+  const overlayDisplayName = (selectedOverlay && overlayNames[selectedOverlay.id]) ?? selectedOverlay?.name ?? '';
+  const overlayDisplayIcon = (selectedOverlay && overlayIcons[selectedOverlay.id]) ?? '';
+  const overlayDisplayDesc = (selectedOverlay && overlayDescriptions[selectedOverlay.id]) ?? selectedOverlay?.description ?? '';
 
   useEffect(() => {
     if (activeTab !== 'preview') return;
