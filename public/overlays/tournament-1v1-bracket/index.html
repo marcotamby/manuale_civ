@@ -46,7 +46,11 @@
             box-shadow: 0 40px 80px rgba(0,0,0,0.9);
         }
 
-        .bracket-round { flex: 1; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: center; }
+        .bracket-round { flex: 1; display: flex; flex-direction: column; position: relative; align-items: center; }
+        .round-quarters { justify-content: space-between; }
+        .round-semis { justify-content: space-around; }
+        .round-final { justify-content: center; }
+        
         .round-label { position: absolute; top: -55px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 6px 26px; border-radius: 12px; font-size: 14px; font-weight: 950; text-transform: uppercase; letter-spacing: 4px; box-shadow: 0 8px 25px rgba(0,0,0,0.7); border: 2px solid #fff; z-index: 10; }
 
         .matchup { width: 300px; background: rgba(15, 23, 42, 0.98); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 18px; overflow: hidden; box-shadow: 0 15px 45px rgba(0,0,0,0.95); position: relative; transition: all 0.4s ease; }
@@ -62,7 +66,7 @@
         .bracket-player.loser .bracket-civ-flag { opacity: 0.45; filter: none !important; }
 
         .bracket-lines { position: absolute; inset: 0; pointer-events: none; z-index: 0; width: 100%; height: 100%; }
-        .bracket-line { stroke: rgba(255, 255, 255, 0.15); stroke-width: 3.5; fill: none; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .bracket-line { stroke: rgba(255, 255, 255, 0.15); stroke-width: 3.5; fill: none; transition: all 0.8s ease; }
         .bracket-line.active { stroke: rgba(255, 255, 255, 0.9); stroke-width: 5.5; filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4)); }
 
         #casters-container { position: absolute; bottom: 35px; width: 100%; display: flex; justify-content: space-between; padding: 0 65px; box-sizing: border-box; pointer-events: none; }
@@ -93,19 +97,19 @@
             <path id="line-s2" class="bracket-line" d="" />
         </svg>
 
-        <div class="bracket-round">
+        <div class="bracket-round round-quarters">
             <div class="round-label">Quarti di Finale</div>
             <div id="q1" class="matchup"><div class="bracket-player"><div class="bracket-civ-flag"></div><span class="name">--</span></div><div class="bracket-player"><div class="bracket-civ-flag"></div><span class="name">--</span></div></div>
             <div id="q2" class="matchup"><div class="bracket-player"><div class="bracket-civ-flag"></div><span class="name">--</span></div><div class="bracket-player"><div class="bracket-civ-flag"></div><span class="name">--</span></div></div>
             <div id="q3" class="matchup"><div class="bracket-player"><div class="bracket-civ-flag"></div><span class="name">--</span></div><div class="bracket-player"><div class="bracket-civ-flag"></div><span class="name">--</span></div></div>
             <div id="q4" class="matchup"><div class="bracket-player"><div class="bracket-civ-flag"></div><span class="name">--</span></div><div class="bracket-player"><div class="bracket-civ-flag"></div><span class="name">--</span></div></div>
         </div>
-        <div class="bracket-round">
+        <div class="bracket-round round-semis">
             <div class="round-label">Semifinali</div>
             <div id="s1" class="matchup"><div class="bracket-player"><div class="bracket-civ-flag"></div><span class="name">--</span></div><div class="bracket-player"><div class="bracket-civ-flag"></div><span class="name">--</span></div></div>
             <div id="s2" class="matchup"><div class="bracket-player"><div class="bracket-civ-flag"></div><span class="name">--</span></div><div class="bracket-player"><div class="bracket-civ-flag"></div><span class="name">--</span></div></div>
         </div>
-        <div class="bracket-round">
+        <div class="bracket-round round-final">
             <div class="round-label">Gran Finale</div>
             <div id="f" class="matchup"><div class="bracket-player"><div class="bracket-civ-flag"></div><span class="name">--</span></div><div class="bracket-player"><div class="bracket-civ-flag"></div><span class="name">--</span></div></div>
         </div>
@@ -142,7 +146,7 @@
             'malians': { name: 'Maliesi', flag: 'Malians.webp' },
             'mongols': { name: 'Mongoli', flag: 'Mongols.webp' },
             'orderofthedragon': { name: 'Ordine del Dragone', flag: 'Order of the Dragon.webp' },
-            'ottomans': { name: 'Ottomani', flag: 'Ottomani.webp' },
+            'ottomans': { name: 'Ottomani', flag: 'Ottomans.webp' },
             'rus': { name: 'Rus', flag: 'Rus.webp' },
             'templar': { name: 'Templari', flag: 'Knights Templar.webp' },
             'zhuxi': { name: 'Eredità di Zhu Xi', flag: 'Zhu Xis Legacy.webp' },
@@ -204,18 +208,14 @@
                     const sRect = startMatch.getBoundingClientRect();
                     const eRect = endMatch.getBoundingClientRect();
 
-                    // Absolute coordinates relative to the container
                     const xStart = sRect.right - containerRect.left;
                     const yStart = (sRect.top + sRect.height / 2) - containerRect.top;
                     
                     const xEnd = eRect.left - containerRect.left;
                     const yBase = (eRect.top + eRect.height / 2) - containerRect.top;
                     
-                    // The next match has 2 players. Center is the division.
-                    // Top player center is 28px above, bottom is 28px below (56/2)
                     const yEnd = yBase + (config.slot === 0 ? -28 : 28);
-
-                    const xMid = xStart + 40; // Step out 40px
+                    const xMid = xStart + (xEnd - xStart) / 2;
                     
                     const d = `M ${xStart},${yStart} L ${xMid},${yStart} L ${xMid},${yEnd} L ${xEnd},${yEnd}`;
                     path.setAttribute('d', d);
@@ -265,7 +265,7 @@
                         if (line) line.classList.toggle('active', winner > 0);
                     }
                 });
-                setTimeout(updateLines, 100);
+                setTimeout(updateLines, 150);
             } catch (e) { console.error(e); }
 
             try {
