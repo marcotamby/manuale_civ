@@ -168,12 +168,26 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-[10px] text-gray-500 uppercase mb-1 block">Score</label>
-                    <input
-                      type="number"
-                      value={state.p1.score}
-                      onChange={(e) => setState({ ...state, p1: { ...state.p1, score: parseInt(e.target.value) || 0 } })}
-                      className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white text-center font-bold"
-                    />
+                    <div className="flex items-center bg-black/40 border border-white/10 rounded-lg overflow-hidden">
+                      <button 
+                        onClick={() => setState({ ...state, p1: { ...state.p1, score: Math.max(0, state.p1.score - 1) } })}
+                        className="p-2 hover:bg-white/5 text-gray-400"
+                      >
+                        <span className="text-lg font-bold">−</span>
+                      </button>
+                      <input
+                        type="number"
+                        value={state.p1.score}
+                        onChange={(e) => setState({ ...state, p1: { ...state.p1, score: parseInt(e.target.value) || 0 } })}
+                        className="w-full bg-transparent text-center text-sm text-white font-bold outline-none"
+                      />
+                      <button 
+                        onClick={() => setState({ ...state, p1: { ...state.p1, score: state.p1.score + 1 } })}
+                        className="p-2 hover:bg-white/5 text-gray-400"
+                      >
+                        <span className="text-lg font-bold">+</span>
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label className="text-[10px] text-gray-500 uppercase mb-1 block">Civiltà</label>
@@ -207,12 +221,26 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-[10px] text-gray-500 uppercase mb-1 block">Score</label>
-                    <input
-                      type="number"
-                      value={state.p2.score}
-                      onChange={(e) => setState({ ...state, p2: { ...state.p2, score: parseInt(e.target.value) || 0 } })}
-                      className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white text-center font-bold"
-                    />
+                    <div className="flex items-center bg-black/40 border border-white/10 rounded-lg overflow-hidden">
+                      <button 
+                        onClick={() => setState({ ...state, p2: { ...state.p2, score: Math.max(0, state.p2.score - 1) } })}
+                        className="p-2 hover:bg-white/5 text-gray-400"
+                      >
+                        <span className="text-lg font-bold">−</span>
+                      </button>
+                      <input
+                        type="number"
+                        value={state.p2.score}
+                        onChange={(e) => setState({ ...state, p2: { ...state.p2, score: parseInt(e.target.value) || 0 } })}
+                        className="w-full bg-transparent text-center text-sm text-white font-bold outline-none"
+                      />
+                      <button 
+                        onClick={() => setState({ ...state, p2: { ...state.p2, score: state.p2.score + 1 } })}
+                        className="p-2 hover:bg-white/5 text-gray-400"
+                      >
+                        <span className="text-lg font-bold">+</span>
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label className="text-[10px] text-gray-500 uppercase mb-1 block">Civiltà</label>
