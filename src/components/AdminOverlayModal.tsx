@@ -255,9 +255,9 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
               <div className="flex-1 overflow-y-auto elegant-scrollbar pr-2 space-y-3">
                 {OVERLAYS.map((ov) => {
                   const isSelected = selectedOverlay?.id === ov.id;
-                  const displayName = overlayNames[ov.id] || ov.name;
-                  const displayIcon = overlayIcons[ov.id] || '';
-                  const displayDesc = overlayDescriptions[ov.id] || ov.description;
+                  const displayName = overlayNames[ov.id] ?? ov.name;
+                  const displayIcon = overlayIcons[ov.id] ?? '';
+                  const displayDesc = overlayDescriptions[ov.id] ?? ov.description;
                 
                 return (
                   <button
@@ -335,7 +335,6 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                               value={editNameValue}
                               onChange={(e) => setEditNameValue(e.target.value)}
                               onKeyDown={(e) => e.key === 'Enter' && handleSaveName()}
-                              onBlur={handleCancelEditName}
                               className="bg-white/5 border border-blue-500/50 rounded-xl px-4 py-2 text-2xl font-black text-white uppercase tracking-tight focus:outline-none focus:ring-2 ring-blue-500/20 w-full max-w-xl"
                             />
                             <button onClick={handleSaveName} disabled={isSavingName} className="p-3 bg-green-600 text-white rounded-xl hover:bg-green-500 transition-all shadow-lg shadow-green-900/20">
@@ -361,7 +360,6 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                               value={editDescValue}
                               onChange={(e) => setEditDescValue(e.target.value)}
                               onKeyDown={(e) => e.key === 'Enter' && handleSaveDesc()}
-                              onBlur={handleCancelEditDesc}
                               className="bg-white/5 border border-blue-500/50 rounded-lg px-4 py-1.5 text-base text-white focus:outline-none focus:ring-2 ring-blue-500/20 w-full max-w-2xl"
                             />
                             <button onClick={handleSaveDesc} disabled={isSavingDesc} className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-500 transition-all">
