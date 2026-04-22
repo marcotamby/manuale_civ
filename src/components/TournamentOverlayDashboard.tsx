@@ -292,11 +292,17 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
               <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-8 space-y-4 shadow-xl">
                 <label className="text-[13px] font-black text-blue-400 uppercase tracking-widest opacity-70 mb-6 block">Casters Status</label>
                 <div className="space-y-4">{state.casters.map((c: any, idx: number) => (
-                  <div key={idx} className="flex items-center gap-4 bg-black/40 p-4 rounded-xl border border-white/5 hover:border-blue-500/20 transition-all group">
-                    <input type="text" value={c.name} onChange={(e) => { const nc = [...state.casters]; nc[idx].name = e.target.value; setState({...state, casters: nc}); }} placeholder={`Nome Caster ${idx+1}`} className="flex-1 bg-transparent text-base font-black text-white outline-none placeholder:text-gray-700" />
+                  <div key={idx} className="flex items-center gap-4 bg-black/40 p-4 rounded-xl border border-white/5 hover:border-blue-500/20 transition-all group overflow-hidden">
+                    <input 
+                      type="text" 
+                      value={c.name} 
+                      onChange={(e) => { const nc = [...state.casters]; nc[idx].name = e.target.value; setState({...state, casters: nc}); }} 
+                      placeholder={`Nome Caster ${idx+1}`} 
+                      className="flex-1 min-w-0 bg-transparent text-base font-black text-white outline-none placeholder:text-gray-700" 
+                    />
                     <div 
                       onClick={() => { const nc = [...state.casters]; nc[idx].active = !nc[idx].active; setState({...state, casters: nc}); }}
-                      className={`w-12 h-6 rounded-full relative cursor-pointer transition-all flex-shrink-0 mr-1 ${c.active ? 'bg-cyan-500 shadow-lg shadow-cyan-500/20' : 'bg-white/10'}`}
+                      className={`w-12 h-6 rounded-full relative cursor-pointer transition-all flex-shrink-0 ${c.active ? 'bg-cyan-500 shadow-lg shadow-cyan-500/20' : 'bg-white/10'}`}
                     >
                       <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${c.active ? 'left-7' : 'left-1'}`}></div>
                     </div>
@@ -315,15 +321,15 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                 {renderMatchInputs('q4', 'Match #04')}
               </div>
               <div className="flex flex-col justify-around py-20">
-                <h4 className="text-center text-[10px] font-black text-blue-400 uppercase tracking-[0.5em] pb-2 border-b border-blue-400/20 mb-4">Semifinali</h4>
+                <h4 className="text-center text-[10px] font-black text-blue-400 uppercase tracking-[0.5em] pb-2 border-b border-blue-400/20 mb-4">Semifinale</h4>
                 <div className="space-y-40">
-                  {renderMatchInputs('s1', 'Semi Nord')}
-                  {renderMatchInputs('s2', 'Semi Sud')}
+                  {renderMatchInputs('s1', 'semifinale #01')}
+                  {renderMatchInputs('s2', 'semifinale #02')}
                 </div>
               </div>
               <div className="flex flex-col justify-center">
-                <h4 className="text-center text-[11px] font-black text-yellow-500 uppercase tracking-[0.5em] pb-2 border-b border-yellow-500/20 mb-6">Gran Finale</h4>
-                {renderMatchInputs('f', 'Finalissima Oro')}
+                <h4 className="text-center text-[11px] font-black text-yellow-500 uppercase tracking-[0.5em] pb-2 border-b border-yellow-500/20 mb-6">Finale</h4>
+                {renderMatchInputs('f', 'Finale')}
               </div>
             </div>
             <div className="flex justify-center pt-12 border-t border-white/5"><SaveButton className="px-20 py-4" /></div>

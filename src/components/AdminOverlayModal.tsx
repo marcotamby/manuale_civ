@@ -319,9 +319,21 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                           <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></div>
                           ANTEPRIMA LIVE (1920x1080)
                         </div>
-                        <div className="absolute inset-0 flex items-center justify-center p-6">
+                        <div className="absolute inset-0 flex items-center justify-center p-6 overflow-hidden">
                           <div className="w-full h-full relative" ref={containerRef}>
-                            <iframe src={selectedOverlay.path} className="absolute top-0 left-0 border-none bg-transparent origin-top-left" style={{ width: '1920px', height: '1080px', transform: `scale(${previewScale})` }} title="Overlay Preview" />
+                            <iframe 
+                              src={selectedOverlay.path} 
+                              className="absolute border-none bg-transparent" 
+                              style={{ 
+                                width: '1920px', 
+                                height: '1080px', 
+                                left: '50%',
+                                top: '50%',
+                                transform: `translate(-50%, -50%) scale(${previewScale})`,
+                                transformOrigin: 'center center'
+                              }} 
+                              title="Overlay Preview" 
+                            />
                           </div>
                         </div>
                       </div>
