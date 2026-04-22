@@ -175,10 +175,10 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-[10px] text-gray-500 uppercase mb-1 block">Score</label>
-                    <div className="flex items-center bg-black/40 border border-white/10 rounded-lg overflow-hidden">
+                    <div className="flex items-center bg-black/40 border border-white/10 rounded-lg overflow-hidden h-[42px]">
                       <button 
                         onClick={() => setState({ ...state, p1: { ...state.p1, score: Math.max(0, state.p1.score - 1) } })}
-                        className="p-2 hover:bg-white/5 text-gray-400"
+                        className="h-full px-3 hover:bg-white/5 text-gray-400 transition-colors"
                       >
                         <span className="text-lg font-bold">−</span>
                       </button>
@@ -190,18 +190,18 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                       />
                       <button 
                         onClick={() => setState({ ...state, p1: { ...state.p1, score: state.p1.score + 1 } })}
-                        className="p-2 hover:bg-white/5 text-gray-400"
+                        className="h-full px-3 hover:bg-white/5 text-gray-400 transition-colors"
                       >
                         <span className="text-lg font-bold">+</span>
                       </button>
                     </div>
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <label className="text-[10px] text-gray-500 uppercase mb-1 block">Civiltà</label>
                     <select
                       value={state.p1.civId}
                       onChange={(e) => setState({ ...state, p1: { ...state.p1, civId: e.target.value } })}
-                      className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-yellow-500/50 outline-none transition-all cursor-pointer"
+                      className="w-full h-[42px] bg-black/40 border border-white/10 rounded-lg px-3 text-sm text-white focus:border-yellow-500/50 outline-none transition-all cursor-pointer"
                     >
                       <option value="" className="bg-slate-900 text-white">Nessuna</option>
                       {civilizationsData.map(c => <option key={c.id} value={c.id} className="bg-slate-900 text-white">{c.name}</option>)}
@@ -228,10 +228,10 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-[10px] text-gray-500 uppercase mb-1 block">Score</label>
-                    <div className="flex items-center bg-black/40 border border-white/10 rounded-lg overflow-hidden">
+                    <div className="flex items-center bg-black/40 border border-white/10 rounded-lg overflow-hidden h-[42px]">
                       <button 
                         onClick={() => setState({ ...state, p2: { ...state.p2, score: Math.max(0, state.p2.score - 1) } })}
-                        className="p-2 hover:bg-white/5 text-gray-400"
+                        className="h-full px-3 hover:bg-white/5 text-gray-400 transition-colors"
                       >
                         <span className="text-lg font-bold">−</span>
                       </button>
@@ -243,18 +243,18 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                       />
                       <button 
                         onClick={() => setState({ ...state, p2: { ...state.p2, score: state.p2.score + 1 } })}
-                        className="p-2 hover:bg-white/5 text-gray-400"
+                        className="h-full px-3 hover:bg-white/5 text-gray-400 transition-colors"
                       >
                         <span className="text-lg font-bold">+</span>
                       </button>
                     </div>
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <label className="text-[10px] text-gray-500 uppercase mb-1 block">Civiltà</label>
                     <select
                       value={state.p2.civId}
                       onChange={(e) => setState({ ...state, p2: { ...state.p2, civId: e.target.value } })}
-                      className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-yellow-500/50 outline-none transition-all cursor-pointer"
+                      className="w-full h-[42px] bg-black/40 border border-white/10 rounded-lg px-3 text-sm text-white focus:border-yellow-500/50 outline-none transition-all cursor-pointer"
                     >
                       <option value="" className="bg-slate-900 text-white">Nessuna</option>
                       {civilizationsData.map(c => <option key={c.id} value={c.id} className="bg-slate-900 text-white">{c.name}</option>)}
