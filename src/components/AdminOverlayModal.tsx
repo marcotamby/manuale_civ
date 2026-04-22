@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, ExternalLink, Copy, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft, Pencil, Check } from 'lucide-react';
 import { AoE4MatchDashboard } from './AoE4MatchDashboard';
+import { TournamentOverlayDashboard } from './TournamentOverlayDashboard';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
 import { overlayService } from '../services/overlayService';
@@ -41,6 +42,13 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
       name: 'AoE4 Match 3V3',
       description: 'Overlay professionale per Match 3V3 con mappe, casters e timer.',
       path: '/overlays/match-aoe4/index.html',
+      icon: Trophy
+    },
+    {
+      id: 'tournament-1v1-bracket',
+      name: 'Torneo 1V1 (Tabellone)',
+      description: 'Overlay 1V1 con tabellone progressivo a 8 partecipanti.',
+      path: '/overlays/tournament-1v1-bracket/index.html',
       icon: Trophy
     }
   ];
@@ -304,6 +312,10 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                     <div className="animate-in slide-in-from-bottom-4 fade-in duration-500">
                       {selectedOverlay.id === 'aoe4-match' ? (
                         <AoE4MatchDashboard 
+                          onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })}
+                        />
+                      ) : selectedOverlay.id === 'tournament-1v1-bracket' ? (
+                        <TournamentOverlayDashboard
                           onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })}
                         />
                       ) : (

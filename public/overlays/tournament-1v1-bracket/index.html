@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --gold: #d4af37; --gold-bright: #ffed4a; --red: #8b0000; --slate: #1e293b; }
+        * { font-family: 'Inter', sans-serif !important; margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            width: 1920px; height: 1080px; color: white; overflow: hidden;
+            background: transparent url('../background/background.png') no-repeat center center/cover;
+            margin: 0; padding: 0;
+        }
+
+        /* Header - Current Match */
+        #header { 
+            position: absolute; top: 0; width: 100%; height: 130px; 
+            display: flex; justify-content: center; align-items: center; 
+            background: linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.85)); 
+            border-bottom: 3px solid var(--gold);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
+        .player-box { width: 500px; text-align: center; position: relative; }
+        .player-name { font-size: 42px; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
+        .player-civ { font-size: 22px; font-weight: 700; color: var(--gold); text-transform: uppercase; margin-top: 4px; letter-spacing: 1px; }
+        
+        .score-box { 
+            font-size: 60px; font-weight: 900; background: var(--red); 
+            min-width: 90px; height: 90px; display: flex; items-center; justify-content: center;
+            border: 2px solid var(--gold); border-radius: 12px; margin: 0 30px;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.4);
+        }
+
+        /* Center Info */
+        .match-info { text-align: center; width: 300px; }
+        .map-name { font-size: 18px; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 5px; }
+        .vs-label { font-size: 12px; font-weight: 400; color: #888; text-transform: uppercase; letter-spacing: 8px; }
+
+        /* BRACKET AREA */
+        #bracket-container {
+            position: absolute; top: 200px; left: 50%; transform: translateX(-50%);
+            width: 1400px; height: 500px;
+            display: flex; justify-content: space-between; align-items: stretch;
+            padding: 20px;
+            background: rgba(0,0,0,0.4);
+            backdrop-blur: 5px;
+            border-radius: 30px;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .bracket-round { flex: 1; display: flex; flex-direction: column; justify-content: space-around; position: relative; }
+        .matchup {
+            width: 280px; background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px;
+            overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .matchup.active { border-color: var(--gold); box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); }
+
+        .bracket-player {
+            height: 45px; display: flex; align-items: center; padding: 0 15px;
+            font-size: 16px; font-weight: 700; color: #cbd5e1;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+        .bracket-player:last-child { border-bottom: none; }
+        .bracket-player.winner { color: var(--gold-bright); background: rgba(212, 175, 55, 0.1); }
+        .bracket-player.winner::after { content: '✓'; position: absolute; right: 15px; font-weight: 900; }
+        .bracket-player .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Connectors */
+        .connector { position: absolute; border-color: rgba(212, 175, 55, 0.3); border-style: solid; border-width: 0; }
+        
+        /* QUARTERS TO SEMIS */
+        .q-s-line { position: absolute; right: -40px; width: 40px; border-top-width: 2px; }
+        .q-s-join { position: absolute; right: -40px; width: 20px; border-right-width: 2px; }
+        
+        /* CASTERS */
+        #casters-container { position: absolute; bottom: 80px; width: 100%; display: flex; justify-content: space-between; padding: 0 80px; box-sizing: border-box; pointer-events: none; }
+        .caster-box { display: flex; flex-direction: column; align-items: center; gap: 10px; visibility: hidden; }
+        .caster-box.active { visibility: visible; }
+        .webcam-frame { width: 380px; height: 214px; border: 2px solid var(--gold); background: rgba(0,0,0,0.3); border-radius: 4px; }
+        .caster-name { background: var(--gold); color: black; font-weight: 800; padding: 8px 30px; font-size: 22px; border-radius: 12px; text-transform: uppercase; min-width: 240px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+
+        /* TIMER */
+        #timer-container {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.9); border: 2px solid var(--gold); border-radius: 12px;
+            padding: 12px 50px; display: none; align-items: center; justify-content: center;
+            min-width: 240px; box-shadow: 0 0 40px rgba(0,0,0,0.9);
+        }
+        #timer-display { font-size: 48px; font-weight: 900; color: var(--gold); letter-spacing: 3px; font-variant-numeric: tabular-nums; }
+
+        .round-label {
+            position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+            font-size: 14px; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 4px;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <div class="player-box">
+            <div id="p1-name" class="player-name">--</div>
+            <div id="p1-civ" class="player-civ">--</div>
+        </div>
+        <div class="score-box" id="p1-score">0</div>
+        <div class="match-info">
+            <div id="current-map" class="map-name">MAPPA DA DEFINIRE</div>
+            <div class="vs-label">VS</div>
+        </div>
+        <div class="score-box" id="p2-score">0</div>
+        <div class="player-box">
+            <div id="p2-name" class="player-name">--</div>
+            <div id="p2-civ" class="player-civ">--</div>
+        </div>
+    </div>
+    
+    <div id="bracket-container">
+        <!-- Quarter Finals -->
+        <div class="bracket-round">
+            <div class="round-label">Quarti di Finale</div>
+            <div id="q1" class="matchup">
+                <div class="bracket-player"><span class="name">--</span></div>
+                <div class="bracket-player"><span class="name">--</span></div>
+            </div>
+            <div id="q2" class="matchup">
+                <div class="bracket-player"><span class="name">--</span></div>
+                <div class="bracket-player"><span class="name">--</span></div>
+            </div>
+            <div id="q3" class="matchup">
+                <div class="bracket-player"><span class="name">--</span></div>
+                <div class="bracket-player"><span class="name">--</span></div>
+            </div>
+            <div id="q4" class="matchup">
+                <div class="bracket-player"><span class="name">--</span></div>
+                <div class="bracket-player"><span class="name">--</span></div>
+            </div>
+        </div>
+
+        <!-- Semi Finals -->
+        <div class="bracket-round">
+            <div class="round-label">Semifinali</div>
+            <div id="s1" class="matchup">
+                <div class="bracket-player"><span class="name">--</span></div>
+                <div class="bracket-player"><span class="name">--</span></div>
+            </div>
+            <div id="s2" class="matchup">
+                <div class="bracket-player"><span class="name">--</span></div>
+                <div class="bracket-player"><span class="name">--</span></div>
+            </div>
+        </div>
+
+        <!-- Grand Final -->
+        <div class="bracket-round">
+            <div class="round-label">Gran Finale</div>
+            <div id="f" class="matchup">
+                <div class="bracket-player winner"><span class="name">--</span></div>
+                <div class="bracket-player"><span class="name">--</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="casters-container">
+        <div id="cb-1" class="caster-box">
+            <div class="webcam-frame"></div>
+            <div id="c-1-name" class="caster-name"></div>
+        </div>
+        <div id="cb-2" class="caster-box">
+            <div class="webcam-frame"></div>
+            <div id="c-2-name" class="caster-name"></div>
+        </div>
+    </div>
+
+    <div id="timer-container">
+        <div id="timer-display">00:00</div>
+    </div>
+
+    <script>
+        const SUB_URL = "https://laliiuqjpxanhwhxajlm.supabase.co";
+        const SUB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhbGlpdXFqcHhhbmh3aHhhamxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjQ5MjEsImV4cCI6MjA4ODU0MDkyMX0.1xIE1MXy1JxgGzpP0Hitotz8o3aMwASV8NUr06bQjkA";
+        const OVERLAY_ID = "tournament-1v1-bracket";
+
+        const { createClient } = window.supabase;
+        const client = createClient(SUB_URL, SUB_KEY);
+        let lastState = null;
+        let timerInterval = null;
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return [m, s].map(v => v.toString().padStart(2, '0')).join(':');
+        }
+
+        function updateTimer() {
+            if (!lastState || !lastState.timer || !lastState.timer.active) {
+                document.getElementById('timer-container').style.display = 'none';
+                return;
+            }
+            document.getElementById('timer-container').style.display = 'flex';
+            const startTimestamp = lastState.timer.timestamp || Date.now();
+            const configSeconds = ((lastState.timer.min || 0) * 60) + (lastState.timer.sec || 0);
+            const elapsed = Math.floor((Date.now() - startTimestamp) / 1000);
+            let totalSeconds = configSeconds - elapsed;
+            if (totalSeconds < 0) totalSeconds = 0;
+            document.getElementById('timer-display').innerText = formatTime(totalSeconds);
+        }
+
+        function render(state) {
+            if (!state) return;
+            lastState = state;
+            console.log("Rendering tournament state:", state);
+
+            // Current Match
+            document.getElementById('p1-name').innerText = state.p1?.name || '--';
+            document.getElementById('p1-civ').innerText = state.p1?.civId || '--';
+            document.getElementById('p1-score').innerText = state.p1?.score ?? 0;
+            document.getElementById('p2-name').innerText = state.p2?.name || '--';
+            document.getElementById('p2-civ').innerText = state.p2?.civId || '--';
+            document.getElementById('p2-score').innerText = state.p2?.score ?? 0;
+            document.getElementById('current-map').innerText = state.map || 'MAPPA DA DEFINIRE';
+
+            // Bracket
+            const b = state.bracket || {};
+            const rounds = ['q1', 'q2', 'q3', 'q4', 's1', 's2', 'f'];
+            rounds.forEach(rid => {
+                const m = b[rid] || { p1: '', p2: '', w: 0 };
+                const el = document.getElementById(rid);
+                if (el) {
+                    const players = el.querySelectorAll('.bracket-player');
+                    players[0].querySelector('.name').innerText = m.p1 || '--';
+                    players[1].querySelector('.name').innerText = m.p2 || '--';
+                    players[0].classList.toggle('winner', m.w === 1);
+                    players[1].classList.toggle('winner', m.w === 2);
+                }
+            });
+
+            // Casters
+            (state.casters || []).forEach((c, i) => {
+                const box = document.getElementById(`cb-${i+1}`);
+                const name = document.getElementById(`c-${i+1}-name`);
+                if (box && name) {
+                    if (c.active && c.name) {
+                        name.innerText = c.name;
+                        box.classList.add('active');
+                    } else {
+                        box.classList.remove('active');
+                    }
+                }
+            });
+
+            updateTimer();
+        }
+
+        async function init() {
+            const { data } = await client.from('stream_overlays').select('state').eq('id', OVERLAY_ID).single();
+            if (data?.state) render(data.state);
+
+            client.channel('public:stream_overlays')
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stream_overlays', filter: `id=eq.${OVERLAY_ID}` }, payload => render(payload.new.state))
+                .subscribe();
+
+            setInterval(async () => {
+                const { data } = await client.from('stream_overlays').select('state').eq('id', OVERLAY_ID).single();
+                if (data?.state) render(data.state);
+            }, 5000);
+
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        init();
+    </script>
+</body>
+</html>

@@ -3,11 +3,15 @@ import { supabase } from '../lib/supabaseClient';
 
 
 export interface OverlayState {
-  t1: { name: string; score: number; players: string[]; active?: boolean };
-  t2: { name: string; score: number; players: string[]; active?: boolean };
-  maps: any[];
+  t1?: { name: string; score: number; players: string[]; active?: boolean };
+  t2?: { name: string; score: number; players: string[]; active?: boolean };
+  p1?: { name: string; score: number; civId: string };
+  p2?: { name: string; score: number; civId: string };
+  map?: string;
+  maps?: any[];
   timer: { active: boolean; min?: number; sec?: number; timestamp?: number; startTime?: number | null };
   casters: { active: boolean; name: string }[];
+  bracket?: any;
 }
 
 export const overlayService = {

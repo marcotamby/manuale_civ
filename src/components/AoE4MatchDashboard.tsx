@@ -23,7 +23,7 @@ const DEFAULT_STATE: OverlayState = {
 };
 
 export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
-  const [state, setState] = useState<OverlayState | null>(null);
+  const [state, setState] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isConfirmingReset, setIsConfirmingReset] = useState(false);
   const [showResetSuccess, setShowResetSuccess] = useState(false);
@@ -109,7 +109,7 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
     };
 
   const updateTeam = (team: 't1' | 't2', field: string, value: any) => {
-    setState(prev => {
+    setState((prev: any) => {
       if (!prev) return prev;
       return {
         ...prev,
@@ -119,9 +119,9 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
   };
 
   const updatePlayer = (team: 't1' | 't2', index: number, value: string) => {
-    setState(prev => {
+    setState((prev: any) => {
       if (!prev) return prev;
-      const players = [...prev[team].players];
+      const players = [...prev[team]!.players];
       players[index] = value;
       return {
         ...prev,
@@ -131,7 +131,7 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
   };
 
   const addMap = () => {
-    setState(prev => {
+    setState((prev: any) => {
       if (!prev) return prev;
       const newMap = {
         name: 'Dry Arabia',
@@ -140,23 +140,23 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
         t1civs: [],
         t2civs: []
       };
-      return { ...prev, maps: [...prev.maps, newMap] };
+      return { ...prev, maps: [...(prev.maps || []), newMap] };
     });
   };
 
   const updateMap = (index: number, field: string, value: any) => {
-    setState(prev => {
+    setState((prev: any) => {
       if (!prev) return prev;
-      const maps = [...prev.maps];
+      const maps = [...(prev.maps || [])];
       maps[index] = { ...maps[index], [field]: value };
       return { ...prev, maps };
     });
   };
 
   const toggleCiv = (mapIndex: number, team: 't1' | 't2', civId: string, civName: string) => {
-    setState(prev => {
+    setState((prev: any) => {
       if (!prev) return prev;
-      const maps = [...prev.maps];
+      const maps = [...(prev.maps || [])];
       const teamKey = team === 't1' ? 't1civs' : 't2civs';
       const currentCivs = maps[mapIndex][teamKey] || [];
       let newCivs = [...currentCivs];
@@ -188,6 +188,7 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
 
   if (!state) return <div className="p-8 text-center text-gray-500">Caricamento configurazione...</div>;
 
+  if (!state) return null;
   return (
     <div className="space-y-8 pb-12">
       {/* Universal Reset & Sync Quick Actions */}
@@ -244,7 +245,7 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
                   <label className="text-[10px] text-gray-500 uppercase mb-1 block">Nome Team</label>
                   <input
                     type="text"
-                    value={state[teamKey].name}
+                    value={state[teamKey]!.name}
                     placeholder={teamKey === 't1' ? 'Team A' : 'Team B'}
                     onChange={(e) => updateTeam(teamKey, 'name', e.target.value)}
                     className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-yellow-500/50 outline-none transition-colors placeholder:text-gray-600"
@@ -254,17 +255,17 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
                   <label className="text-[10px] text-gray-500 uppercase mb-1 block">Score</label>
                   <div className="flex items-center bg-black/40 border border-white/10 rounded-lg overflow-hidden">
                     <button 
-                      onClick={() => updateTeam(teamKey, 'score', Math.max(0, state[teamKey].score - 1))}
+                      onClick={() => updateTeam(teamKey, 'score', Math.max(0, state[teamKey]!.score - 1))}
                       className="p-2 hover:bg-white/5 text-gray-400"
                     ><Minus size={14} /></button>
                     <input
                       type="number"
-                      value={state[teamKey].score}
+                      value={state[teamKey]!.score}
                       onChange={(e) => updateTeam(teamKey, 'score', parseInt(e.target.value) || 0)}
                       className="w-full bg-transparent text-center text-sm text-white font-bold outline-none"
                     />
                     <button 
-                      onClick={() => updateTeam(teamKey, 'score', state[teamKey].score + 1)}
+                      onClick={() => updateTeam(teamKey, 'score', state[teamKey]!.score + 1)}
                       className="p-2 hover:bg-white/5 text-gray-400"
                     ><Plus size={14} /></button>
                   </div>
@@ -279,7 +280,7 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
                     <input
                       type="text"
                       placeholder={`Giocatore ${idx + 1}`}
-                      value={state[teamKey].players[idx] || ''}
+                      value={state[teamKey]!.players[idx] || ''}
                       onChange={(e) => updatePlayer(teamKey, idx, e.target.value)}
                       className="w-full bg-black/40 border border-white/10 rounded-lg pl-8 pr-3 py-2 text-sm text-white focus:border-yellow-500/50 outline-none transition-colors"
                     />
@@ -308,10 +309,10 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
         </div>
 
         <div className="space-y-6">
-          {state.maps.map((map, mIdx) => (
+          {state.maps!.map((map: any, mIdx: number) => (
             <div key={mIdx} className="bg-black/20 border border-white/5 rounded-2xl p-6 relative group/map">
               <button
-                onClick={() => setState(prev => prev ? ({ ...prev, maps: prev.maps.filter((_, i) => i !== mIdx) }) : prev)}
+                onClick={() => setState((prev: any) => prev ? ({ ...prev, maps: prev.maps!.filter((_: any, i: number) => i !== mIdx) }) : prev)}
                 className="absolute top-4 right-4 p-2 text-gray-600 hover:text-red-500 transition-colors opacity-0 group-hover/map:opacity-100"
               >
                 <Trash2 size={16} />
@@ -368,7 +369,7 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
                 <div className="col-span-2 grid grid-cols-2 gap-4">
                   {['t1', 't2'].map((team) => {
                     const tKey = team as 't1' | 't2';
-                    const currentMapState = state.maps[mIdx];
+                    const currentMapState = state.maps![mIdx];
                     const selectedCivs = currentMapState[tKey === 't1' ? 't1civs' : 't2civs'] || [];
                     
                     return (
@@ -422,13 +423,13 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
             CASTERS
           </label>
           <div className="space-y-4">
-            {state.casters.map((caster, cIdx) => (
+            {state.casters!.map((caster: any, cIdx: number) => (
               <div key={cIdx} className="flex items-center gap-4">
                 <input
                   type="checkbox"
                   checked={caster.active}
                   onChange={(e) => {
-                    setState(prev => {
+                    setState((prev: any) => {
                       if (!prev) return prev;
                       const casters = [...prev.casters];
                       casters[cIdx] = { ...casters[cIdx], active: e.target.checked };
@@ -443,7 +444,7 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
                     type="text"
                     value={caster.name}
                     onChange={(e) => {
-                      setState(prev => {
+                      setState((prev: any) => {
                         if (!prev) return prev;
                         const casters = [...prev.casters];
                         casters[cIdx] = { ...casters[cIdx], name: e.target.value };
@@ -468,7 +469,7 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
               <input
                 type="checkbox"
                 checked={state.timer.active}
-                onChange={(e) => setState(prev => prev ? ({ ...prev, timer: { ...prev.timer, active: e.target.checked, timestamp: Date.now() } }) : prev)}
+                onChange={(e) => setState((prev: any) => prev ? ({ ...prev, timer: { ...prev.timer, active: e.target.checked, timestamp: Date.now() } }) : prev)}
                 className="w-4 h-4 rounded border-white/10 bg-black/40 text-yellow-500 focus:ring-yellow-500"
               />
               <span className="text-sm text-gray-300 font-bold uppercase">Attiva Timer</span>
@@ -477,14 +478,14 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
               <input
                 type="number"
                 value={state.timer.min}
-                onChange={(e) => setState(prev => prev ? ({ ...prev, timer: { ...prev.timer, min: parseInt(e.target.value) || 0, timestamp: Date.now() } }) : prev)}
+                onChange={(e) => setState((prev: any) => prev ? ({ ...prev, timer: { ...prev.timer, min: parseInt(e.target.value) || 0, timestamp: Date.now() } }) : prev)}
                 className="w-16 bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-center text-sm text-white font-bold outline-none"
               />
               <span className="text-gray-500 font-bold">m</span>
               <input
                 type="number"
                 value={state.timer.sec}
-                onChange={(e) => setState(prev => prev ? ({ ...prev, timer: { ...prev.timer, sec: parseInt(e.target.value) || 0, timestamp: Date.now() } }) : prev)}
+                onChange={(e) => setState((prev: any) => prev ? ({ ...prev, timer: { ...prev.timer, sec: parseInt(e.target.value) || 0, timestamp: Date.now() } }) : prev)}
                 className="w-16 bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-center text-sm text-white font-bold outline-none"
               />
               <span className="text-gray-500 font-bold">s</span>
