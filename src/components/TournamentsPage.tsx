@@ -701,8 +701,8 @@ export function TournamentsPage() {
                           )}
                         >
                           {bracketErrorId === t.id ? (
-                            <span className="text-yellow-500 font-black animate-pulse text-[10px] tracking-tighter">
-                              TABELLONE NON DISPONIBILE
+                            <span className="text-red-400 font-black animate-pulse text-[10px] tracking-tight">
+                              NON DISPONIBILE
                             </span>
                           ) : (
                             <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
