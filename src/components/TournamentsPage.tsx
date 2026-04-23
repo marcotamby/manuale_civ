@@ -775,8 +775,21 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
         </div>
 
         <div className="flex items-center gap-1 px-2 border-r border-white/10">
-          <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('formatBlock', false, 'H2'); }} className="p-2 hover:bg-white/10 rounded-lg text-white font-black text-xs px-3" title="Titolo">H2</button>
-          <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('formatBlock', false, 'P'); }} className="p-2 hover:bg-white/10 rounded-lg text-white font-black text-xs px-3" title="Paragrafo">P</button>
+          <button 
+            onMouseDown={(e) => { 
+              e.preventDefault(); 
+              // Better H2 toggle
+              const selection = window.getSelection();
+              if (selection && selection.rangeCount > 0) {
+                document.execCommand('formatBlock', false, 'h2');
+              }
+              checkActiveStyles();
+            }} 
+            className="p-2 hover:bg-blue-500 hover:text-white rounded-lg text-white font-black text-xs px-4 transition-all" 
+            title="Titolo Grande"
+          >
+            TITOLO (H2)
+          </button>
         </div>
 
         <div className="relative group/emoji">
@@ -802,6 +815,29 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
         onMouseUp={checkActiveStyles}
         onKeyUp={checkActiveStyles}
         onFocus={checkActiveStyles}
+        onPaste={(e) => {
+          e.preventDefault();
+          const html = e.clipboardData.getData('text/html');
+          const text = e.clipboardData.getData('text/plain');
+          
+          if (html) {
+            // Intelligent HTML cleanup: keep structure but strip inline styles that break dark mode
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Remove all style attributes to prevent "black text on black background"
+            const allElements = doc.querySelectorAll('*');
+            allElements.forEach(el => {
+              el.removeAttribute('style');
+              el.removeAttribute('class'); // Remove external classes too
+            });
+            
+            document.execCommand('insertHTML', false, doc.body.innerHTML);
+          } else {
+            document.execCommand('insertText', false, text);
+          }
+          handleInput();
+        }}
         className="w-full bg-black/40 border border-white/10 p-8 rounded-[2rem] text-white text-base outline-none focus:border-blue-500/40 transition-all min-h-[450px] prose prose-invert max-w-none prose-p:my-2 prose-h2:mt-8 prose-h2:mb-4 overflow-y-auto shadow-inner text-left"
         style={{ textAlign: 'left' }}
       />
