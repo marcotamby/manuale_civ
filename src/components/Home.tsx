@@ -142,7 +142,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
         </div>
       </header>
 
-      <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-6 2xl:grid-cols-8 gap-3 md:gap-5 pb-10">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-8 gap-6 md:gap-8 pb-10">
         {filteredCivs.map(civ => {
           const isSelected = selectedForCompare.includes(civ.id);
           const isFavorite = favorites.includes(civ.id);
@@ -168,7 +168,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                   onLoad={(e) => {
                     (e.target as HTMLImageElement).classList.remove('opacity-0');
                   }}
-                  className={`w-full h-full object-cover transition-all duration-1000 opacity-0 ${!isUnselectable ? 'group-hover:scale-[1.3] group-hover:rotate-1' : ''}`}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 xl:group-hover:scale-105 2xl:group-hover:scale-125"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>';
                     (e.target as HTMLImageElement).classList.remove('opacity-0');
