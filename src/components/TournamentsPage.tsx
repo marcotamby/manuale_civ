@@ -80,6 +80,7 @@ export function TournamentsPage() {
             source: (db.source as 'startgg' | 'challonge') || 'challonge',
             organizer: db.organizer || 'Admin',
             directLink: db.direct_link || undefined,
+            externalUrl: db.direct_link || undefined,
             period: db.period || undefined,
             bannerUrl: db.banner_url || undefined,
             status: db.status || 'Concluso',
@@ -272,15 +273,22 @@ export function TournamentsPage() {
       if (!finalSlug) {
         // Generate slug for new tournament
         if (editForm.externalUrl) {
-          if (editForm.externalUrl.includes('start.gg/tournament/')) {
+          const url = editForm.externalUrl.toLowerCase();
+          if (url.includes('start.gg/tournament/')) {
             finalSlug = editForm.externalUrl.split('start.gg/tournament/')[1].split('/')[0];
-          } else if (editForm.externalUrl.includes('challonge.com/')) {
+          } else if (url.includes('challonge.com/')) {
             finalSlug = editForm.externalUrl.split('challonge.com/')[1].split('/')[0];
           }
         }
         
         if (!finalSlug) {
-          finalSlug = editForm.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+          if (!editForm.name) {
+            toast.error('Inserisci almeno il nome del torneo');
+            setIsSubmitting(false);
+            setSaveStatus('idle');
+            return;
+          }
+          finalSlug = editForm.name.toLowerCase().trim().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
         }
       }
 
@@ -307,7 +315,7 @@ export function TournamentsPage() {
         .single();
 
       let error;
-      if (existing) {
+      if (editingTournament) {
         // Update existing record
         const { error: updateError } = await supabase
           .from('tournaments')
@@ -345,9 +353,12 @@ export function TournamentsPage() {
         }
       }) : null);
 
+      toast.success('Torneo salvato con successo!');
+      loadTournaments();
       setTimeout(() => {
         setSaveStatus('idle');
-      }, 3000);
+        setShowEditModal(false);
+      }, 500);
     } catch (err: any) {
       toast.error(`Errore: ${err.message}`);
       setSaveStatus('idle');
