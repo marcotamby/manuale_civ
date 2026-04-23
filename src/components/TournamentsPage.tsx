@@ -613,13 +613,7 @@ export function TournamentsPage() {
                     
                     {/* Status Badges Overlay */}
                     <div className="absolute top-4 right-4 flex flex-col items-end gap-2 z-20">
-                      <div className="px-3 py-1 rounded-full bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 text-yellow-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg scale-90 md:scale-100">
-                        <span className="relative flex h-2 w-2">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
-                        </span>
-                        Informazioni Disponibili
-                      </div>
+
 
                        <div className={clsx(
                         "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest backdrop-blur-md border shadow-lg flex items-center gap-2",
@@ -762,10 +756,9 @@ export function TournamentsPage() {
         <div 
           className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md overflow-y-auto"
           onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              // Trigger the same logic as the X button
-              const closeBtn = document.getElementById('close-modal-btn');
-              if (closeBtn) closeBtn.click();
+            if (e.target === e.currentTarget && saveStatus === 'saved') {
+              setShowEditModal(false);
+              loadTournaments();
             }
           }}
         >
