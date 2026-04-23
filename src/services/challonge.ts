@@ -39,22 +39,22 @@ export interface ChallongeTournament {
 
 export async function fetchChallongeTournament(slug: string) {
   try {
-    // Challonge v2.1 vuole l'ID numerico. Cerchiamo il torneo nella lista per trovarlo.
-    const listResponse = await fetch(`/api/challonge?path=tournaments`);
-    if (!listResponse.ok) throw new Error('Failed to fetch tournaments list');
-    
-    const listData = await listResponse.json();
-    const tournament = listData.data.find((t: any) => t.attributes.url === slug || t.id === slug);
-    
-    if (!tournament) {
-      // Se non lo troviamo nella lista principale, proviamo a interrogarlo direttamente
-      // nel caso lo slug sia in realtà un ID
-      const directRes = await fetch(`/api/challonge?path=tournaments/${slug}`);
-      if (directRes.ok) return (await directRes.json()).data as ChallongeTournament;
-      throw new Error('Tournament not found in Challonge');
+    // Try to find by URL filter first (more efficient)
+    const listResponse = await fetch(`/api/challonge?path=tournaments&filter[url]=${slug}`);
+    if (listResponse.ok) {
+      const listData = await listResponse.json();
+      if (listData.data && listData.data.length > 0) {
+        return listData.data[0] as ChallongeTournament;
+      }
     }
     
-    return tournament as ChallongeTournament;
+    // Fallback: try direct ID access
+    const directRes = await fetch(`/api/challonge?path=tournaments/${slug}`);
+    if (directRes.ok) {
+      return (await directRes.json()).data as ChallongeTournament;
+    }
+    
+    throw new Error('Tournament not found in Challonge');
   } catch (error) {
     console.error('Error fetching Challonge tournament:', error);
     return null;
