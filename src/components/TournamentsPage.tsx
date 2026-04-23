@@ -298,7 +298,7 @@ export function TournamentsPage() {
       setSaveStatus('saved');
       
       // Update local state to reflect saved changes, so 'X' button logic knows we are synced
-      setEditingTournament(prev => prev ? ({
+      setEditingTournament((prev: any) => prev ? ({
         ...prev,
         name: editForm.name,
         status: editForm.status,
