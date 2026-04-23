@@ -26,6 +26,7 @@ interface TournamentConfig {
   regolamentoContent?: string;
   display_order?: number;
   created_at?: string;
+  id?: number;
 }
 
 const TOURNAMENTS: TournamentConfig[] = [
@@ -94,7 +95,8 @@ export function TournamentsPage() {
             hasRegolamento: db.has_regolamento || false,
             regolamentoContent: db.regolamento_content || '',
             display_order: db.display_order || 0,
-            created_at: db.created_at
+            created_at: db.created_at,
+            id: db.id
           };
           dbConfigs.push(configObj);
         });
@@ -344,16 +346,39 @@ export function TournamentsPage() {
       }
 
       const performUpsert = async (data: any) => {
-        const { error: upsertError } = await supabase
-          .from('tournaments')
-          .upsert(data);
+        let upsertError;
+        
+        if (editingTournament?.id) {
+          // Explicitly update by ID if we have it to avoid duplicates if slug changes
+          const { error } = await supabase
+            .from('tournaments')
+            .update(data)
+            .eq('id', editingTournament.id);
+          upsertError = error;
+        } else {
+          // New tournament or no ID, use upsert with slug conflict resolution
+          const { error } = await supabase
+            .from('tournaments')
+            .upsert(data, { onConflict: 'slug' });
+          upsertError = error;
+        }
 
         if (upsertError) {
           if (upsertError.message.includes('display_order')) {
             const { display_order, ...safeData } = data;
-            const { error: retryError } = await supabase
-              .from('tournaments')
-              .upsert(safeData);
+            let retryError;
+            if (editingTournament?.id) {
+              const { error } = await supabase
+                .from('tournaments')
+                .update(safeData)
+                .eq('id', editingTournament.id);
+              retryError = error;
+            } else {
+              const { error } = await supabase
+                .from('tournaments')
+                .upsert(safeData, { onConflict: 'slug' });
+              retryError = error;
+            }
             if (retryError) throw retryError;
           } else {
             throw upsertError;
