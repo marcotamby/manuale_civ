@@ -687,8 +687,18 @@ export function TournamentsPage() {
                           onClick={() => {
                             if (t.config.directLink) {
                               window.open(t.config.directLink, '_blank');
-                            } else {
+                            } else if (t.events?.length > 0 || (t.config.source === 'challonge' && !t.config.slug.startsWith('tb-'))) {
                               navigate(`/tornei/${t.slug}`);
+                            } else {
+                              toast.error('Tabellone non ancora disponibile', {
+                                icon: '⏳',
+                                style: {
+                                  borderRadius: '1rem',
+                                  background: '#1a1f2e',
+                                  color: '#fff',
+                                  border: '1px border-white/10'
+                                }
+                              });
                             }
                           }} 
                           className={clsx(
