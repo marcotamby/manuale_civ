@@ -217,7 +217,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                   onClick={(e) => {
                     e.stopPropagation();
                     if (!isAuthenticated) {
-                      openLoginModal();
+                      openLoginModal('Esegui l\'accesso per salvare le tue civiltà preferite e averle sempre a portata di mano!');
                       return;
                     }
                     toggleFavorite(civ.id);

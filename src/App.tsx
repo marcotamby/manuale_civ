@@ -79,7 +79,7 @@ function App() {
     }
   }, [location.pathname]);
 
-  const { isAdmin, isAuthenticated, isStreamer, favorites, isLoginModalOpen, closeLoginModal } = useAuth();
+  const { isAdmin, isAuthenticated, isStreamer, favorites, isLoginModalOpen, loginModalMessage, closeLoginModal } = useAuth();
   const { updateActivity } = usePresence();
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
@@ -310,7 +310,7 @@ function App() {
 
       <MobileFooter />
       <CookieBanner />
-      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
+      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} message={loginModalMessage} />
       <ProfileModal
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}

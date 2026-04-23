@@ -127,7 +127,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      openLoginModal();
+      openLoginModal('Esegui l\'accesso per proporre modifiche e aiutarci a migliorare il manuale!');
       return;
     }
 

@@ -12,9 +12,10 @@ import { jwtDecode } from 'jwt-decode';
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
+  message?: string | null;
 }
 
-export function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export function LoginModal({ isOpen, onClose, message }: LoginModalProps) {
   const { login } = useAuth();
   const [error, setError] = useState('');
 
@@ -47,7 +48,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
         <div className="flex flex-col gap-6">
           <p className="text-gray-400 text-center text-sm">
-            Esegui l'accesso con il tuo account Google per poter proporre modifiche e salvare le tue civiltà preferite.
+            {message || "Esegui l'accesso con il tuo account Google per poter proporre modifiche e salvare le tue civiltà preferite."}
           </p>
 
           <div className="flex justify-center my-4">

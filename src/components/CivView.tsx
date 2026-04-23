@@ -212,7 +212,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     if (!user) {
       setBoMessage({ id: boId, text: 'Accedi per votare questa strategia!' });
       setTimeout(() => setBoMessage(null), 4000);
-      openLoginModal();
+      openLoginModal('Accedi con il tuo account Google per votare questo Build Order e supportare i creatori!');
       return;
     }
 

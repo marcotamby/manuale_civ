@@ -22,7 +22,8 @@ interface AuthContextType {
   user: UserData | null;
   favorites: string[];
   isLoginModalOpen: boolean;
-  openLoginModal: () => void;
+  loginModalMessage: string | null;
+  openLoginModal: (message?: string) => void;
   closeLoginModal: () => void;
   login: (userData: UserData) => void;
   logout: () => void;
@@ -45,6 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserData | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [loginModalMessage, setLoginModalMessage] = useState<string | null>(null);
 
   const SUPER_ADMIN_EMAILS = ['marcotamby@gmail.com', 'marco.tamborrino.94@gmail.com'];
   const EDITOR_EMAILS = ['alessio.bella97@gmail.com', 'contattodisparta@gmail.com'];
@@ -352,7 +354,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const openLoginModal = () => setIsLoginModalOpen(true);
+  const openLoginModal = (message?: string) => {
+    setLoginModalMessage(message || null);
+    setIsLoginModalOpen(true);
+  };
   const closeLoginModal = () => setIsLoginModalOpen(false);
 
   return (
@@ -368,6 +373,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       favorites,
       isLoginModalOpen,
+      loginModalMessage,
       openLoginModal,
       closeLoginModal,
       login,
