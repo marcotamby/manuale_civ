@@ -616,10 +616,10 @@ export function TournamentsPage() {
 
 
                        <div className={clsx(
-                        "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest backdrop-blur-md border shadow-lg flex items-center gap-2",
-                        status === 'In corso' ? "bg-green-500/10 border-green-500/30 text-green-400" : 
-                        status === 'Programmato' ? "bg-blue-500/10 border-blue-500/30 text-blue-400" :
-                        "bg-red-500/10 border-red-500/30 text-red-400"
+                        "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center gap-2",
+                        status === 'In corso' ? "bg-green-500/20 border-green-500/40 text-green-400" : 
+                        status === 'Programmato' ? "bg-blue-500/20 border-blue-500/40 text-blue-400" :
+                        "bg-red-500/20 border-red-500/40 text-red-400"
                       )}>
                         {status === 'In corso' && <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block mr-0.5 animate-pulse" />}
                         {status === 'Concluso' && <span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block mr-0.5" />}
