@@ -131,7 +131,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
   }, [favorites, civilizations, isAuthenticated, user?.email, refreshTrigger]);
 
   return (
-    <div className="w-full bg-gradient-to-r from-[#0d1424] via-[#1a1c32] to-[#0d1424] border-b border-yellow-500/20 flex flex-col lg:grid lg:grid-cols-3 items-center px-4 py-4 lg:pl-14 lg:pr-14 lg:py-5 z-[100] shrink-0 gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative">
+    <div className="w-full bg-gradient-to-r from-[#0d1424] via-[#1a1c32] to-[#0d1424] border-b border-yellow-500/20 flex flex-col lg:grid lg:grid-cols-[1fr_auto_1fr] items-center px-4 py-4 lg:px-14 lg:py-5 z-[100] shrink-0 gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative">
 
       {/* Decorative top border glow effect */}
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent"></div>
@@ -139,7 +139,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
 
 
       {/* Left container for social links */}
-      <div className="flex flex-wrap lg:flex-nowrap items-center justify-center lg:justify-start gap-2 xl:gap-3 order-2 lg:order-1 w-full lg:w-auto">
+      <div className="flex flex-wrap lg:flex-nowrap items-center justify-center lg:justify-start gap-2 xl:gap-3 order-2 lg:order-1 min-w-0">
         <a
           href="https://discord.gg/8Tx2YdXrEu"
           target="_blank"
@@ -209,7 +209,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
       </Link>
 
       {/* Auth / Right side */}
-      <div className="flex items-center justify-center lg:justify-end order-3 w-full lg:w-auto">
+      <div className="flex items-center justify-center lg:justify-end order-3 min-w-0">
         {isAuthenticated ? (
           <div className="flex flex-col items-end gap-4 md:translate-y-1">
             <div className="flex items-center gap-3 md:gap-4 font-sans">

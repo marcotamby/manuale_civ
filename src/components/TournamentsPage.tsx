@@ -60,8 +60,8 @@ export function TournamentsPage() {
   
   const navigate = useNavigate();
 
-  const loadTournaments = useCallback(async () => {
-    setLoading(true);
+  const loadTournaments = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     setErrorDetails(null);
     try {
       const { data: dbTournaments, error: dbError } = await supabase
@@ -443,11 +443,9 @@ export function TournamentsPage() {
         }
       }) : null);
 
-      loadTournaments();
+      loadTournaments(true); // Silent refresh to avoid jump
       setTimeout(() => {
         setSaveStatus('idle');
-        setShowEditModal(false);
-        setIsRegEditorExpanded(false); // Reset for next time
       }, 2000);
     } catch (err: any) {
       toast.error(`Errore: ${err.message}`);
@@ -761,7 +759,16 @@ export function TournamentsPage() {
 
 
       {showEditModal && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md overflow-y-auto">
+        <div 
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md overflow-y-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              // Trigger the same logic as the X button
+              const closeBtn = document.getElementById('close-modal-btn');
+              if (closeBtn) closeBtn.click();
+            }
+          }}
+        >
           {confirmClose && (
             <div className="fixed inset-0 z-[120] flex items-start justify-center p-4 pt-32 bg-black/40 backdrop-blur-[2px] animate-in fade-in duration-300">
               <div className="bg-[#1a1f2e] border border-white/10 p-8 rounded-[2rem] max-w-sm text-center shadow-2xl scale-100 animate-in zoom-in-95">
@@ -799,6 +806,7 @@ export function TournamentsPage() {
               <div className="flex items-center gap-4">
                 {saveStatus === 'saving' && <Loader2 className="w-4 h-4 animate-spin text-yellow-500" />}
                 <X 
+                  id="close-modal-btn"
                   className="cursor-pointer text-gray-500 hover:text-white transition-colors" 
                   onClick={() => { 
                     const initialData = {
