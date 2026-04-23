@@ -518,211 +518,218 @@ export function TournamentsPage() {
 
       {showEditModal && editingTournament && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md overflow-y-auto">
-          <div className="bg-[#121620] border border-white/10 p-8 rounded-3xl w-full max-w-2xl my-auto shadow-2xl animate-in zoom-in-95 duration-300">
-             <div className="flex justify-between mb-8 text-slate-300">
-               <div className="flex items-center gap-2">
-                 <Edit2 size={24} className="text-blue-400"/>
-                 <h2 className="text-xl font-bold uppercase tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-200 to-slate-500">Modifica Torneo</h2>
-               </div>
-               <X 
-                  className="cursor-pointer text-gray-500 hover:text-white transition-colors" 
-                  onClick={() => { 
-                    const hasChanges = JSON.stringify(editForm) !== JSON.stringify({
-                      name: editingTournament.config.name || '',
-                      period: editingTournament.config.period || '',
-                      bannerUrl: editingTournament.config.bannerUrl || '',
-                      type: editingTournament.config.type || '1v1',
-                      status: editingTournament.status || 'Programmato',
-                      hasRegolamento: editingTournament.config.hasRegolamento || false,
-                      regolamentoContent: editingTournament.config.regolamentoContent || '',
-                      directLink: editingTournament.config.directLink || ''
-                    });
-
-                    if (!hasChanges) {
-                      setShowEditModal(false); 
-                      loadTournaments(); 
-                    } else {
-                      setConfirmClose(true);
-                    }
-                  }} 
-                />
-             </div>
-
-             <div className="relative">
-               {confirmClose && (
-                 <div className="absolute inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xl rounded-3xl animate-in fade-in duration-300 -m-8">
-                   <div className="bg-[#1a1f2e] border border-white/10 p-8 rounded-[2rem] max-w-sm text-center shadow-2xl scale-100 animate-in zoom-in-95">
-                     <AlertCircle size={48} className="mx-auto mb-4 text-yellow-500" />
-                     <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tighter">Attenzione!</h3>
-                     <p className="text-sm text-gray-400 mb-6">Hai delle modifiche non salvate. Sei sicuro di voler uscire e perdere tutto?</p>
-                     <div className="flex gap-3">
-                       <button 
-                         onClick={() => setConfirmClose(false)}
-                         className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all"
-                       >
-                         No, resta qui
-                       </button>
-                       <button 
-                         onClick={() => { setShowEditModal(false); setConfirmClose(false); loadTournaments(); }}
-                         className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all"
-                       >
-                         Sì, esci
-                       </button>
-                     </div>
-                   </div>
-                 </div>
-               )}
-            <div className="space-y-6">
-              <div className="space-y-1">
-                <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Titolo Personalizzato</label>
-                <input type="text" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} placeholder="Es: Torneo degli scudi d'oro" className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors" />
+          <div className="bg-[#121620] border border-white/10 p-8 rounded-3xl w-full max-w-2xl my-auto shadow-2xl animate-in zoom-in-95 duration-300 relative">
+            
+            {/* Header */}
+            <div className="flex justify-between items-center mb-8 text-slate-300">
+              <div className="flex items-center gap-2">
+                <Edit2 size={24} className="text-blue-400"/>
+                <h2 className="text-xl font-bold uppercase tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-200 to-slate-500">Modifica Torneo</h2>
               </div>
+              <X 
+                className="cursor-pointer text-gray-500 hover:text-white transition-colors" 
+                onClick={() => { 
+                  const hasChanges = JSON.stringify(editForm) !== JSON.stringify({
+                    name: editingTournament.config.name || '',
+                    period: editingTournament.config.period || '',
+                    bannerUrl: editingTournament.config.bannerUrl || '',
+                    type: editingTournament.config.type || '1v1',
+                    status: editingTournament.status || 'Programmato',
+                    hasRegolamento: editingTournament.config.hasRegolamento || false,
+                    regolamentoContent: editingTournament.config.regolamentoContent || '',
+                    directLink: editingTournament.config.directLink || ''
+                  });
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  if (!hasChanges) {
+                    setShowEditModal(false); 
+                    loadTournaments(); 
+                  } else {
+                    setConfirmClose(true);
+                  }
+                }} 
+              />
+            </div>
+
+            {/* Body */}
+            <div className="relative">
+              {confirmClose && (
+                <div className="absolute inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xl rounded-3xl animate-in fade-in duration-300 -m-8">
+                  <div className="bg-[#1a1f2e] border border-white/10 p-8 rounded-[2rem] max-w-sm text-center shadow-2xl scale-100 animate-in zoom-in-95">
+                    <AlertCircle size={48} className="mx-auto mb-4 text-yellow-500" />
+                    <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tighter">Attenzione!</h3>
+                    <p className="text-sm text-gray-400 mb-6">Hai delle modifiche non salvate. Sei sicuro di voler uscire e perdere tutto?</p>
+                    <div className="flex gap-3">
+                      <button 
+                        onClick={() => setConfirmClose(false)}
+                        className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all"
+                      >
+                        No, resta qui
+                      </button>
+                      <button 
+                        onClick={() => { setShowEditModal(false); setConfirmClose(false); loadTournaments(); }}
+                        className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all"
+                      >
+                        Sì, esci
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-6">
                 <div className="space-y-1">
-                  <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Tipologia</label>
-                  <div className="relative">
-                    <select 
-                      value={editForm.type} 
-                      onChange={e => setEditForm({...editForm, type: e.target.value})} 
-                      className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors appearance-none cursor-pointer"
+                  <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Titolo Personalizzato</label>
+                  <input type="text" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} placeholder="Es: Torneo degli scudi d'oro" className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors" />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Tipologia</label>
+                    <div className="relative">
+                      <select 
+                        value={editForm.type} 
+                        onChange={e => setEditForm({...editForm, type: e.target.value})} 
+                        className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors appearance-none cursor-pointer"
+                      >
+                        {['1v1', '2v2', '3v3', '4v4', 'FFA', 'Mod'].map(opt => (
+                          <option key={opt} value={opt} className="bg-[#121620]">{opt}</option>
+                        ))}
+                      </select>
+                      <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Organizzatore</label>
+                    <input type="text" value={editForm.organizer} onChange={e => setEditForm({...editForm, organizer: e.target.value})} className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors" />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Periodo</label>
+                  <input type="text" value={editForm.period} onChange={e => setEditForm({...editForm, period: e.target.value})} className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors" />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Banner Immagine</label>
+                  <div className="flex gap-2 items-stretch h-12">
+                    <div className="relative flex-1 h-full">
+                      <ImageIcon size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                      <input 
+                        type="text" 
+                        value={editForm.bannerUrl} 
+                        onChange={e => setEditForm({...editForm, bannerUrl: e.target.value})} 
+                        placeholder="Link immagine o carica file"
+                        className="w-full h-full bg-black/40 border border-white/10 px-3 pl-10 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors text-xs" 
+                      />
+                    </div>
+                    <label className={`cursor-pointer flex items-center justify-center rounded-xl border border-white/10 bg-black/40 hover:bg-white/5 transition-colors w-12 h-full shrink-0 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                      <input 
+                        type="file" 
+                        className="hidden" 
+                        accept="image/*"
+                        onChange={handleBannerUpload}
+                      />
+                      {isUploading ? (
+                        <Loader2 size={20} className="text-yellow-500 animate-spin" />
+                      ) : (
+                        <Upload size={20} className="text-gray-400" />
+                      )}
+                    </label>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Stato Torneo</label>
+                  <div className="flex gap-2 text-center">
+                    {['Programmato', 'In corso', 'Concluso'].map(s => (
+                      <button 
+                        key={s} 
+                        onClick={() => setEditForm({...editForm, status: s})} 
+                        className={clsx(
+                          "flex-grow py-3 rounded-xl border text-[10px] font-black uppercase transition-all tracking-wider", 
+                          editForm.status === s 
+                            ? s === 'In corso' ? "bg-green-500/10 border-green-500 text-green-400" :
+                              s === 'Programmato' ? "bg-blue-500/10 border-blue-500 text-blue-400" :
+                              "bg-red-500/10 border-red-500 text-red-400"
+                            : "bg-white/5 border-white/10 text-gray-500 hover:border-white/20"
+                        )}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-4 p-4 rounded-2xl bg-white/5 border border-white/10">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <BookOpen size={20} className="text-slate-400" />
+                      <div>
+                        <p className="text-xs font-bold text-white uppercase tracking-tight">Regolamento</p>
+                      </div>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer" 
+                        checked={editForm.hasRegolamento} 
+                        onChange={e => setEditForm({...editForm, hasRegolamento: e.target.checked})} 
+                      />
+                      <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-gray-400 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-slate-400 peer-checked:after:bg-white"></div>
+                    </label>
+                  </div>
+
+                  {editForm.hasRegolamento && (
+                    <WYSIWYGEditor 
+                      initialValue={editForm.regolamentoContent} 
+                      onChange={(html) => setEditForm({ ...editForm, regolamentoContent: html })} 
+                    />
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Podio Personalizzato</label>
+                    <button 
+                      onClick={() => {
+                        if (editForm.podium.length < 3) {
+                          setEditForm({...editForm, podium: [...editForm.podium, {placement: editForm.podium.length + 1, entrant: {name: ''}}]});
+                        }
+                      }} 
+                      className="text-yellow-500 text-[10px] font-black hover:underline" 
+                      hidden={editForm.podium.length >= 3}
                     >
-                      {['1v1', '2v2', '3v3', '4v4', 'FFA', 'Mod'].map(opt => (
-                        <option key={opt} value={opt} className="bg-[#121620]">{opt}</option>
-                      ))}
-                    </select>
-                    <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                      + AGGIUNGI RIGA
+                    </button>
                   </div>
+                  {editForm.podium.map((p, i) => (
+                    <div key={i} className="flex gap-2 items-center bg-black/20 p-3 rounded-2xl border border-white/5">
+                      <span className="text-base w-8 text-center">{['🥇','🥈','🥉'][i] || `${i+1}°`}</span>
+                      <input type="text" value={p.entrant?.name || ''} onChange={e => {
+                        const np = [...editForm.podium]; np[i] = {...p, entrant: {name: e.target.value}}; setEditForm({...editForm, podium: np});
+                      }} placeholder={`Nome ${i+1}° classificato`} className="flex-grow bg-transparent border-none text-white text-sm outline-none" />
+                      <button onClick={() => setEditForm({...editForm, podium: editForm.podium.filter((_, idx) => idx !== i)})} className="p-2 text-red-500/50 hover:text-red-500 transition-colors"><Trash2 size={16}/></button>
+                    </div>
+                  ))}
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Organizzatore</label>
-                  <input type="text" value={editForm.organizer} onChange={e => setEditForm({...editForm, organizer: e.target.value})} className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors" />
-                </div>
-              </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Periodo</label>
-                <input type="text" value={editForm.period} onChange={e => setEditForm({...editForm, period: e.target.value})} className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors" />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Banner Immagine</label>
-                <div className="flex gap-2 items-stretch h-12">
-                  <div className="relative flex-1 h-full">
-                    <ImageIcon size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
-                    <input 
-                      type="text" 
-                      value={editForm.bannerUrl} 
-                      onChange={e => setEditForm({...editForm, bannerUrl: e.target.value})} 
-                      placeholder="Link immagine o carica file"
-                      className="w-full h-full bg-black/40 border border-white/10 px-3 pl-10 rounded-xl text-white outline-none focus:border-yellow-500 transition-colors text-xs" 
-                    />
-                  </div>
-                  <label className={`cursor-pointer flex items-center justify-center rounded-xl border border-white/10 bg-black/40 hover:bg-white/5 transition-colors w-12 h-full shrink-0 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
-                    <input 
-                      type="file" 
-                      className="hidden" 
-                      accept="image/*"
-                      onChange={handleBannerUpload}
-                    />
-                    {isUploading ? (
-                      <Loader2 size={20} className="text-yellow-500 animate-spin" />
-                    ) : (
-                      <Upload size={20} className="text-gray-400" />
-                    )}
-                  </label>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Stato Torneo</label>
-                 <div className="flex gap-2 text-center">
-                   {['Programmato', 'In corso', 'Concluso'].map(s => (
-                     <button 
-                       key={s} 
-                       onClick={() => setEditForm({...editForm, status: s})} 
-                       className={clsx(
-                         "flex-grow py-3 rounded-xl border text-[10px] font-black uppercase transition-all tracking-wider", 
-                         editForm.status === s 
-                           ? s === 'In corso' ? "bg-green-500/10 border-green-500 text-green-400" :
-                             s === 'Programmato' ? "bg-blue-500/10 border-blue-500 text-blue-400" :
-                             "bg-red-500/10 border-red-500 text-red-400"
-                           : "bg-white/5 border-white/10 text-gray-500 hover:border-white/20"
-                       )}
-                     >
-                       {s}
-                     </button>
-                   ))}
-                 </div>
-               </div>
-
-               <div className="space-y-4 p-4 rounded-2xl bg-white/5 border border-white/10">
-                 <div className="flex items-center justify-between">
-                   <div className="flex items-center gap-3">
-                     <BookOpen size={20} className="text-slate-400" />
-                     <div>
-                       <p className="text-xs font-bold text-white uppercase tracking-tight">Regolamento</p>
-                     </div>
-                   </div>
-                   <label className="relative inline-flex items-center cursor-pointer">
-                     <input 
-                       type="checkbox" 
-                       className="sr-only peer" 
-                       checked={editForm.hasRegolamento} 
-                       onChange={e => setEditForm({...editForm, hasRegolamento: e.target.checked})} 
-                     />
-                     <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-gray-400 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-slate-400 peer-checked:after:bg-white"></div>
-                   </label>
-                 </div>
-
-                 {editForm.hasRegolamento && (
-                   <WYSIWYGEditor 
-                     initialValue={editForm.regolamentoContent} 
-                     onChange={(html) => setEditForm({ ...editForm, regolamentoContent: html })} 
-                   />
-                 )}
-               </div>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Podio Personalizzato</label>
+                <div className="flex gap-4 pt-6 border-t border-white/5">
                   <button 
-                    onClick={() => {
-                      if (editForm.podium.length < 3) {
-                        setEditForm({...editForm, podium: [...editForm.podium, {placement: editForm.podium.length + 1, entrant: {name: ''}}]});
-                      }
-                    }} 
-                    className="text-yellow-500 text-[10px] font-black hover:underline" 
-                    hidden={editForm.podium.length >= 3}
+                    onClick={handleUpdateTournament} 
+                    disabled={isSubmitting} 
+                    className={clsx(
+                      "flex-grow py-4 rounded-2xl flex items-center justify-center gap-3 transition-all text-xs font-black uppercase tracking-widest shadow-xl",
+                      saveStatus === 'saved' ? "bg-green-500 text-white" : "bg-gradient-to-b from-slate-100 to-slate-400 text-black hover:brightness-110"
+                    )}
                   >
-                    + AGGIUNGI RIGA
+                    {saveStatus === 'saving' ? <Loader2 className="animate-spin" size={18}/> : 
+                     saveStatus === 'saved' ? <CheckCircle2 size={18}/> : <Save size={18}/>} 
+                    {saveStatus === 'saving' ? 'SALVATAGGIO...' : 
+                     saveStatus === 'saved' ? 'SALVATO!' : 'SALVA MODIFICHE'}
                   </button>
+                  <button onClick={() => handleDeleteTournament(editingTournament.slug)} className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl hover:bg-red-500/20 transition-all shadow-lg"><Trash2 size={24}/></button>
                 </div>
-                {editForm.podium.map((p, i) => (
-                  <div key={i} className="flex gap-2 items-center bg-black/20 p-3 rounded-2xl border border-white/5">
-                    <span className="text-base w-8 text-center">{['🥇','🥈','🥉'][i] || `${i+1}°`}</span>
-                    <input type="text" value={p.entrant?.name || ''} onChange={e => {
-                      const np = [...editForm.podium]; np[i] = {...p, entrant: {name: e.target.value}}; setEditForm({...editForm, podium: np});
-                    }} placeholder={`Nome ${i+1}° classificato`} className="flex-grow bg-transparent border-none text-white text-sm outline-none" />
-                    <button onClick={() => setEditForm({...editForm, podium: editForm.podium.filter((_, idx) => idx !== i)})} className="p-2 text-red-500/50 hover:text-red-500 transition-colors"><Trash2 size={16}/></button>
-                  </div>
-                ))}
               </div>
-               <div className="flex gap-4 pt-6 border-t border-white/5">
-                 <button 
-                   onClick={handleUpdateTournament} 
-                   disabled={isSubmitting} 
-                   className={clsx(
-                     "flex-grow py-4 rounded-2xl flex items-center justify-center gap-3 transition-all text-xs font-black uppercase tracking-widest shadow-xl",
-                     saveStatus === 'saved' ? "bg-green-500 text-white" : "bg-gradient-to-b from-slate-100 to-slate-400 text-black hover:brightness-110"
-                   )}
-                 >
-                   {saveStatus === 'saving' ? <Loader2 className="animate-spin" size={18}/> : 
-                    saveStatus === 'saved' ? <CheckCircle2 size={18}/> : <Save size={18}/>} 
-                   {saveStatus === 'saving' ? 'SALVATAGGIO...' : 
-                    saveStatus === 'saved' ? 'SALVATO!' : 'SALVA MODIFICHE'}
-                 </button>
-                 <button onClick={() => handleDeleteTournament(editingTournament.slug)} className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl hover:bg-red-500/20 transition-all shadow-lg"><Trash2 size={24}/></button>
-               </div>
             </div>
           </div>
         </div>
@@ -747,18 +754,35 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
   }, []);
 
   const checkActiveStyles = () => {
+    if (typeof document === 'undefined') return;
     const block = document.queryCommandValue('formatBlock');
+    
+    // Fallback check for H2 if formatBlock is unreliable
+    let isH2 = block === 'h2' || block === 'H2';
+    if (!isH2) {
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        let node: Node | null = selection.anchorNode;
+        while (node && node !== editorRef.current) {
+          if (node.nodeName === 'H2') {
+            isH2 = true;
+            break;
+          }
+          node = node.parentNode;
+        }
+      }
+    }
+
     setActiveStyles({
-      // Headings are naturally bold, but we only want the button blue if there's explicit <b>/<strong>/style bold
-      bold: document.queryCommandState('bold') && !(block === 'h2' || block === 'H2'),
+      bold: document.queryCommandState('bold') && !isH2,
       italic: document.queryCommandState('italic'),
       underline: document.queryCommandState('underline'),
       alignLeft: document.queryCommandState('justifyLeft'),
       alignCenter: document.queryCommandState('justifyCenter'),
       alignRight: document.queryCommandState('justifyRight'),
       alignJustify: document.queryCommandState('justifyFull'),
-      font: document.queryCommandValue('fontName').replace(/['"]/g, '') || 'Inter',
-      h2: block === 'h2' || block === 'H2'
+      font: (document.queryCommandValue('fontName') || 'Inter').replace(/['"]/g, ''),
+      h2: isH2
     });
   };
 
@@ -832,10 +856,13 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
           <button 
             onMouseDown={(e) => { 
               e.preventDefault(); 
-              const isH2 = document.queryCommandValue('formatBlock') === 'h2' || document.queryCommandValue('formatBlock') === 'H2';
+              const isH2 = activeStyles.h2;
               document.execCommand('formatBlock', false, isH2 ? 'p' : 'h2');
-              checkActiveStyles();
-              handleInput();
+              // Aggressive check after change
+              setTimeout(() => {
+                checkActiveStyles();
+                handleInput();
+              }, 10);
             }} 
             className={clsx(
               "p-2 rounded-lg font-black text-[10px] px-4 transition-all uppercase tracking-tighter",
@@ -876,7 +903,6 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
           const text = e.clipboardData.getData('text/plain');
           
           if (html) {
-            // Super-Clean Whitelist Sanitizer
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             
@@ -888,26 +914,23 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
               const tag = el.tagName.toLowerCase();
               const innerHTML = Array.from(el.childNodes).map(sanitize).join('');
               
-              // Block tags we want to keep
-              if (tag === 'h2') return `<h2 style="font-weight: 800; font-size: 2rem; margin-top: 1.5rem; margin-bottom: 0.75rem; font-family: Outfit, sans-serif; line-height: 1.2; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; display: block;">${innerHTML}</h2>`;
-              if (tag === 'p') return `<p style="margin-top: 0.75rem; margin-bottom: 0.75rem; line-height: 1.6; display: block;">${innerHTML}</p>`;
-              if (tag === 'ul') return `<ul style="list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem;">${innerHTML}</ul>`;
-              if (tag === 'ol') return `<ol style="list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 1rem;">${innerHTML}</ol>`;
+              if (tag === 'h2') return `<h2>${innerHTML}</h2>`;
+              if (tag === 'p') return `<p>${innerHTML}</p>`;
+              if (tag === 'ul') return `<ul>${innerHTML}</ul>`;
+              if (tag === 'ol') return `<ol>${innerHTML}</ol>`;
               if (tag === 'li') return `<li>${innerHTML}</li>`;
               if (tag === 'br') return '<br>';
               
-              // Table support
-              if (tag === 'table') return `<table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem; border: 1px solid rgba(255,255,255,0.1);">${innerHTML}</table>`;
+              if (tag === 'table') return `<table>${innerHTML}</table>`;
               if (tag === 'tr') return `<tr>${innerHTML}</tr>`;
-              if (tag === 'td') return `<td style="border: 1px solid rgba(255,255,255,0.1); padding: 8px; text-align: left;">${innerHTML}</td>`;
-              if (tag === 'th') return `<th style="border: 1px solid rgba(255,255,255,0.1); padding: 8px; text-align: left; background: rgba(255,255,255,0.05); font-weight: bold;">${innerHTML}</th>`;
+              if (tag === 'td') return `<td>${innerHTML}</td>`;
+              if (tag === 'th') return `<th>${innerHTML}</th>`;
               
-              // Inline tags we want to keep
               let result = innerHTML;
               const style = el.style;
-              
-              // ONLY apply bold/italic to inline elements or if it's a semantic tag
               const isInline = ['span', 'b', 'strong', 'i', 'em', 'u', 'a'].includes(tag);
+              
+              // Only keep bold if it's explicitly set and NOT part of a parent that shouldn't be bold
               const isBold = ['b', 'strong'].includes(tag) || (isInline && (style.fontWeight === 'bold' || parseInt(style.fontWeight) >= 600));
               const isItalic = ['i', 'em'].includes(tag) || (isInline && style.fontStyle === 'italic');
               const isUnderline = tag === 'u' || (isInline && style.textDecoration.includes('underline'));
@@ -915,19 +938,14 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
               if (isBold) result = `<b>${result}</b>`;
               if (isItalic) result = `<i>${result}</i>`;
               if (isUnderline) result = `<u>${result}</u>`;
-              
               return result;
             };
 
             const cleanedHTML = Array.from(doc.body.childNodes).map(sanitize).join('');
             
-            // AGGRESSIVE RESET: Use removeFormat and force normal weight
-            // This clears any browser-level bold inheritance from the cursor context
+            // Clear current format to avoid inheriting bold from cursor
             document.execCommand('removeFormat', false);
-            
-            // Wrap in a container that explicitly kills any inherited bold
-            const finalHTML = `<div style="font-weight: 400 !important; color: white !important;">${cleanedHTML}</div>`;
-            document.execCommand('insertHTML', false, finalHTML);
+            document.execCommand('insertHTML', false, cleanedHTML);
           } else {
             document.execCommand('insertText', false, text);
           }
