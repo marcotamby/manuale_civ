@@ -57,6 +57,7 @@ export function TournamentsPage() {
   });
   const [isUploading, setIsUploading] = useState(false);
   const [isRegEditorExpanded, setIsRegEditorExpanded] = useState(false);
+  const [bracketErrorId, setBracketErrorId] = useState<string | null>(null);
   
   const navigate = useNavigate();
 
@@ -690,15 +691,8 @@ export function TournamentsPage() {
                             } else if (t.events?.length > 0 || (t.config.source === 'challonge' && !t.config.slug.startsWith('tb-'))) {
                               navigate(`/tornei/${t.slug}`);
                             } else {
-                              toast.error('Tabellone non ancora disponibile', {
-                                icon: '⏳',
-                                style: {
-                                  borderRadius: '1rem',
-                                  background: '#1a1f2e',
-                                  color: '#fff',
-                                  border: '1px border-white/10'
-                                }
-                              });
+                              setBracketErrorId(t.id);
+                              setTimeout(() => setBracketErrorId(null), 3000);
                             }
                           }} 
                           className={clsx(
@@ -707,6 +701,13 @@ export function TournamentsPage() {
                           )}
                         >
                           Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" />
+                          
+                          {/* In-card Error Message */}
+                          {bracketErrorId === t.id && (
+                            <div className="absolute inset-0 bg-[#1a1f2e] rounded-2xl flex items-center justify-center gap-2 text-yellow-500 font-bold text-[10px] animate-in fade-in zoom-in duration-300 z-50 border border-yellow-500/50">
+                              <Loader2 size={12} className="animate-spin" /> Tabellone non ancora disponibile
+                            </div>
+                          )}
                         </button>
                         {canManageTournaments && (
                           <div className="flex flex-col gap-1 h-full">
