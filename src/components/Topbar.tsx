@@ -174,6 +174,16 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
           <Trophy size={14} />
           <span className="hidden sm:inline">Tornei</span>
         </Link>
+        {(isAdmin || isStreamer) && user?.email !== 'alessio.bella97@gmail.com' && (
+          <button
+            onClick={onOpenAdminOverlay}
+            className="flex items-center gap-2 px-3 py-2 glass rounded-lg border border-fuchsia-500/30 text-fuchsia-400 hover:bg-fuchsia-500/20 transition-all text-[11px] xl:text-[13px] font-bold uppercase tracking-wider group active:scale-95 duration-300"
+            title="Gestione Overlay Stream"
+          >
+            <Monitor size={14} />
+            <span className="hidden sm:inline">Stream</span>
+          </button>
+        )}
       </div>
 
       {/* Center Title Area */}
