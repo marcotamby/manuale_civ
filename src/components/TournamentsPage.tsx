@@ -26,7 +26,7 @@ interface TournamentConfig {
   regolamentoContent?: string;
   display_order?: number;
   created_at?: string;
-  id?: number;
+  id?: string;
 }
 
 const TOURNAMENTS: TournamentConfig[] = [
@@ -41,6 +41,7 @@ export function TournamentsPage() {
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [confirmClose, setConfirmClose] = useState(false);
   const [editingTournament, setEditingTournament] = useState<any>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
@@ -423,12 +424,13 @@ export function TournamentsPage() {
     }
   };
 
-  const handleDeleteTournament = async (slug: string) => {
-    if (!window.confirm('Eliminare questo torneo dall\'indice?')) return;
+  const handleDeleteTournament = async (id: string) => {
     try {
-      const { error } = await supabase.from('tournaments').delete().eq('slug', slug);
+      const { error } = await supabase.from('tournaments').delete().eq('id', id);
       if (error) throw error;
       toast.success('Torneo rimosso.');
+      setShowDeleteConfirm(false);
+      setShowEditModal(false);
       loadTournaments();
     } catch (err: any) {
       toast.error(`Errore: ${err.message}`);
@@ -468,6 +470,7 @@ export function TournamentsPage() {
       };
 
       const ok1 = await moveUpsert({
+        id: current.id,
         slug: current.slug,
         display_order: newCurrentOrder,
         updated_at: new Date().toISOString()
@@ -476,6 +479,7 @@ export function TournamentsPage() {
       if (!ok1) return;
 
       const ok2 = await moveUpsert({
+        id: other.id,
         slug: other.slug,
         display_order: newOtherOrder,
         updated_at: new Date().toISOString()
@@ -959,8 +963,43 @@ export function TournamentsPage() {
                      saveStatus === 'saved' ? 'SALVATO!' : 
                      editingTournament ? 'SALVA MODIFICHE' : 'CREA TORNEO'}
                   </button>
-                  <button onClick={() => handleDeleteTournament(editingTournament.slug)} className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl hover:bg-red-500/20 transition-all shadow-lg"><Trash2 size={24}/></button>
+                  {editingTournament && (
+                    <button 
+                      onClick={() => setShowDeleteConfirm(true)} 
+                      className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl hover:bg-red-500/20 transition-all shadow-lg"
+                    >
+                      <Trash2 size={24}/>
+                    </button>
+                  )}
                 </div>
+
+                {showDeleteConfirm && (
+                  <div className="absolute inset-0 z-[130] flex items-center justify-center p-6 bg-[#0d1424]/90 backdrop-blur-sm rounded-[2.5rem] animate-in fade-in zoom-in-95 duration-200">
+                    <div className="text-center max-w-xs">
+                      <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-500/20">
+                        <Trash2 className="text-red-500" size={40} />
+                      </div>
+                      <h3 className="text-2xl font-sackers font-black text-white mb-3 uppercase tracking-tighter">Elimina Torneo</h3>
+                      <p className="text-gray-400 text-sm mb-8 leading-relaxed font-medium">
+                        Sei sicuro di voler rimuovere definitivamente questo torneo? L'azione non è reversibile.
+                      </p>
+                      <div className="flex flex-col gap-3">
+                        <button 
+                          onClick={() => handleDeleteTournament(editingTournament?.id || '')}
+                          className="w-full py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-red-900/20 transition-all active:scale-95"
+                        >
+                          Conferma Eliminazione
+                        </button>
+                        <button 
+                          onClick={() => setShowDeleteConfirm(false)}
+                          className="w-full py-4 bg-white/5 hover:bg-white/10 text-gray-400 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all"
+                        >
+                          Annulla
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
