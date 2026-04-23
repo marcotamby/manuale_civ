@@ -619,14 +619,14 @@ export function TournamentsPage() {
                         className={clsx(
                           "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center gap-2 transition-all",
                           status === 'In corso' ? "bg-green-500/40 border-green-500/60 text-green-400" : 
-                          status === 'Programmato' ? "bg-blue-500/40 border-blue-500/60 text-blue-400" :
+                          status === 'Programmato' ? "bg-slate-500/40 border-slate-300/60 text-slate-100" :
                           "bg-red-500/40 border-red-500/60 text-red-400"
                         )}
-                        style={{ textShadow: '0 0 4px rgba(0,0,0,1), 0 0 2px rgba(0,0,0,1)' }}
+                        style={{ textShadow: '0 0 3px rgba(255,255,255,0.5), 0 0 6px rgba(0,0,0,0.8)' }}
                       >
                         {status === 'In corso' && <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block mr-0.5 animate-pulse" />}
                         {status === 'Concluso' && <span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block mr-0.5" />}
-                        {status === 'Programmato' && <Calendar size={10} className="mr-0.5 text-blue-400" />}
+                        {status === 'Programmato' && <Calendar size={10} className="mr-0.5 text-slate-200" />}
                         {status}
                       </div>
                     </div>
