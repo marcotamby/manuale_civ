@@ -651,15 +651,17 @@ export function TournamentsPage() {
                       </div>
                     </div>
 
-                    {podium.length > 0 && (
-                      <div className="mb-6 p-4 rounded-2xl bg-white/[0.03] border border-white/5 shadow-inner">
-                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent mb-4"></div>
-                        <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-3 border-b border-white/5 pb-2">Risultati Finali</p>
-                        <div className="space-y-2 overflow-visible">
-                          {podium.slice(0, 3).map((s: any, idx: number) => (
-                            <div key={idx} className="flex justify-between text-sm items-center group/standing relative z-10">
-                              <div className="flex items-center gap-3">
-                                <span className="text-lg">{['🥇','🥈','🥉'][idx]}</span>
+                    <div className="mb-6 p-4 rounded-2xl bg-white/[0.03] border border-white/5 shadow-inner min-h-[145px] flex flex-col">
+                      <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent mb-4"></div>
+                      <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-3 border-b border-white/5 pb-2">Risultati Finali</p>
+                      <div className="space-y-2 overflow-visible flex-grow flex flex-col justify-center">
+                        {(podium.length > 0 ? podium.slice(0, 3) : [null, null, null]).map((s: any, idx: number) => (
+                          <div key={idx} className="flex justify-between text-sm items-center group/standing relative z-10">
+                            <div className="flex items-center gap-3">
+                              <span className={clsx("text-lg", !s && "opacity-20 grayscale")}>
+                                {['🥇','🥈','🥉'][idx]}
+                              </span>
+                              {s ? (
                                 <div className="relative group/players">
                                   <span className={clsx(
                                     "font-bold transition-colors truncate max-w-[140px]",
@@ -683,18 +685,21 @@ export function TournamentsPage() {
                                           </div>
                                         ))}
                                       </div>
-                                      {/* Tooltip Arrow */}
                                       <div className="absolute top-full left-6 -translate-y-px border-8 border-transparent border-t-[#1a1f2e]" />
                                     </div>
                                   )}
                                 </div>
-                              </div>
-                              <span className="text-white/40 font-black italic uppercase text-[9px] group-hover/standing:text-white/80 transition-colors">{idx === 0 ? 'WINNER' : `${idx+1}° PLACE`}</span>
+                              ) : (
+                                <span className="text-gray-600 italic text-[11px] font-medium tracking-tight">In attesa...</span>
+                              )}
                             </div>
-                          ))}
-                        </div>
+                            <span className="text-white/20 font-black italic uppercase text-[9px] group-hover/standing:text-white/40 transition-colors">
+                              {s ? (idx === 0 ? 'WINNER' : `${idx+1}° PLACE`) : '---'}
+                            </span>
+                          </div>
+                        ))}
                       </div>
-                    )}
+                    </div>
 
                     <div className="mt-auto flex items-center gap-2 pt-4 border-t border-white/5 h-16">
                         {t.config.hasRegolamento && (
