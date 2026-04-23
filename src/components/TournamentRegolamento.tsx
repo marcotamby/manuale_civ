@@ -101,14 +101,15 @@ export function TournamentRegolamento() {
       <div className="max-w-4xl mx-auto px-4 pb-24 -mt-20 relative z-10">
         <div className="glass rounded-[2rem] border border-white/10 overflow-hidden shadow-2xl">
           {/* Regulation Text */}
-          <div className="p-8 md:p-16 bg-[#0d1117]/50">
+          <div className="p-6 md:p-10 bg-[#0d1117]/50">
             <div className="prose prose-invert prose-slate max-w-none 
-              prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-4 prose-h2:mt-12 prose-h2:text-slate-200
+              prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-4 prose-h2:mt-8 first:prose-h2:mt-0 prose-h2:text-slate-200
               prose-p:text-gray-300 prose-p:leading-relaxed prose-p:text-lg
               prose-li:text-gray-300
               prose-strong:text-white
               prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
               font-sans
+              [&>*:first-child]:mt-0
             ">
               <div 
                 className="regulation-content"

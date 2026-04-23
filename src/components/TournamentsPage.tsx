@@ -296,6 +296,26 @@ export function TournamentsPage() {
       if (error) throw error;
       
       setSaveStatus('saved');
+      
+      // Update local state to reflect saved changes, so 'X' button logic knows we are synced
+      setEditingTournament(prev => prev ? ({
+        ...prev,
+        name: editForm.name,
+        status: editForm.status,
+        config: {
+          ...prev.config,
+          name: editForm.name,
+          organizer: editForm.organizer,
+          period: editForm.period,
+          bannerUrl: editForm.bannerUrl,
+          status: editForm.status,
+          type: editForm.type,
+          podium: editForm.podium,
+          hasRegolamento: editForm.hasRegolamento,
+          regolamentoContent: editForm.regolamentoContent
+        }
+      }) : null);
+
       setTimeout(() => {
         setSaveStatus('idle');
       }, 3000);
@@ -459,15 +479,15 @@ export function TournamentsPage() {
                               e.stopPropagation();
                               setEditingTournament(t);
                               setEditForm({
-                                organizer: t.config.organizer || '',
-                                period: t.config.period || '',
-                                bannerUrl: t.config.bannerUrl || '',
-                                status: t.config.status || 'Concluso',
-                                name: t.config.name || t.name || '',
-                                type: t.config.type || '1v1',
-                                podium: t.config.podium || (t.events?.[0]?.standings?.nodes || []),
-                                hasRegolamento: t.config.hasRegolamento || false,
-                                regolamentoContent: t.config.regolamentoContent || ''
+                                organizer: t.config?.organizer || '',
+                                period: t.config?.period || '',
+                                bannerUrl: t.config?.bannerUrl || '',
+                                status: t.config?.status || 'Concluso',
+                                name: t.config?.name || t.name || '',
+                                type: t.config?.type || '1v1',
+                                podium: t.config?.podium || (t.events?.[0]?.standings?.nodes || []),
+                                hasRegolamento: t.config?.hasRegolamento || false,
+                                regolamentoContent: t.config?.regolamentoContent || ''
                               });
                               setShowEditModal(true);
                             }} 
@@ -554,15 +574,15 @@ export function TournamentsPage() {
                 className="cursor-pointer text-gray-500 hover:text-white transition-colors" 
                 onClick={() => { 
                   const initialData = {
-                    name: editingTournament.config.name || editingTournament.name || '',
-                    organizer: editingTournament.config.organizer || '',
-                    period: editingTournament.config.period || '',
-                    bannerUrl: editingTournament.config.bannerUrl || '',
-                    type: editingTournament.config.type || '1v1',
-                    status: editingTournament.config.status || 'Concluso',
-                    hasRegolamento: editingTournament.config.hasRegolamento || false,
-                    regolamentoContent: editingTournament.config.regolamentoContent || '',
-                    podium: editingTournament.config.podium || (editingTournament.events?.[0]?.standings?.nodes || [])
+                    name: editingTournament.config?.name || editingTournament.name || '',
+                    organizer: editingTournament.config?.organizer || '',
+                    period: editingTournament.config?.period || '',
+                    bannerUrl: editingTournament.config?.bannerUrl || '',
+                    type: editingTournament.config?.type || '1v1',
+                    status: editingTournament.config?.status || 'Concluso',
+                    hasRegolamento: editingTournament.config?.hasRegolamento || false,
+                    regolamentoContent: editingTournament.config?.regolamentoContent || '',
+                    podium: editingTournament.config?.podium || (editingTournament.events?.[0]?.standings?.nodes || [])
                   };
 
                   const currentData = {
