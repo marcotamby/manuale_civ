@@ -179,9 +179,18 @@ export function TournamentsPage() {
                 }
               } as any;
           }
-          return null;
+
+          // Fallback for manual tournaments without links or sync
+          return {
+            id: config.id || config.slug,
+            name: config.name || `Torneo ${config.slug}`,
+            slug: config.slug,
+            images: [],
+            events: [],
+            config
+          } as any;
         } catch (e) {
-          return { id: config.id || config.slug, name: `Torneo ${config.slug}`, slug: config.slug, images: [], events: [], config } as any;
+          return { id: config.id || config.slug, name: config.name || `Torneo ${config.slug}`, slug: config.slug, images: [], events: [], config } as any;
         }
       }));
 
