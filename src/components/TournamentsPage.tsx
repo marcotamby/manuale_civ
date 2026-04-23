@@ -685,8 +685,8 @@ export function TournamentsPage() {
                         )}
                         <button 
                           onClick={() => {
-                            if (t.config.direct_link) {
-                              window.open(t.config.direct_link, '_blank');
+                            if (t.config.directLink) {
+                              window.open(t.config.directLink, '_blank');
                             } else {
                               navigate(`/tornei/${t.slug}`);
                             }
