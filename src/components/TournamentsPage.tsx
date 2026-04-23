@@ -463,15 +463,34 @@ export function TournamentsPage() {
     }
 
     try {
-      const moveUpsert = async (data: any) => {
-        // If ID is not a UUID, remove it from data to let Supabase use slug for upsert/onConflict
-        const { id, ...rest } = data;
-        const finalData = (id && id.length > 20) ? data : rest;
+      const moveUpsert = async (tournament: any, newOrder: number) => {
+        const config = tournament.config || {};
+        const data: any = {
+          slug: tournament.slug,
+          source: config.source || 'challonge',
+          name: config.name || tournament.name || tournament.slug,
+          organizer: config.organizer || 'Admin',
+          period: config.period || null,
+          banner_url: config.bannerUrl || null,
+          status: config.status || 'Concluso',
+          podium: config.podium || null,
+          type: config.type || '1v1',
+          has_regolamento: config.hasRegolamento || false,
+          regolamento_content: config.regolamentoContent || '',
+          direct_link: config.directLink || null,
+          display_order: newOrder,
+          updated_at: new Date().toISOString()
+        };
 
-        const { error } = await supabase.from('tournaments').upsert(finalData, { onConflict: 'slug' });
+        // If ID is a valid UUID, use it
+        if (config.id && config.id.length > 20) {
+          data.id = config.id;
+        }
+
+        const { error } = await supabase.from('tournaments').upsert(data, { onConflict: 'slug' });
         if (error) {
           if (error.message.includes('display_order')) {
-            toast.error('Errore: Devi prima attivare la colonna Ordinamento nel database (vedi file SQL fornito)');
+            toast.error('Errore: Devi prima attivare la colonna Ordinamento nel database');
             return false;
           }
           throw error;
@@ -479,29 +498,17 @@ export function TournamentsPage() {
         return true;
       };
 
-      const ok1 = await moveUpsert({
-        id: current.id,
-        slug: current.slug,
-        display_order: newCurrentOrder,
-        updated_at: new Date().toISOString()
-      });
-
+      const ok1 = await moveUpsert(current, newCurrentOrder);
       if (!ok1) return;
 
-      const ok2 = await moveUpsert({
-        id: other.id,
-        slug: other.slug,
-        display_order: newOtherOrder,
-        updated_at: new Date().toISOString()
-      });
-
+      const ok2 = await moveUpsert(other, newOtherOrder);
       if (!ok2) return;
 
       loadTournaments();
       toast.success('Ordine aggiornato');
     } catch (err: any) {
       toast.error('Errore durante l\'ordinamento');
-      console.error(err);
+      console.error('Reorder error:', err);
     }
   };
 
