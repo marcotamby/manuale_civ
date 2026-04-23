@@ -55,9 +55,9 @@ export async function fetchChallongeTournament(slug: string) {
     }
     
     throw new Error('Tournament not found in Challonge');
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching Challonge tournament:', error);
-    return null;
+    throw error;
   }
 }
 

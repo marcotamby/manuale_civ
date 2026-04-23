@@ -310,12 +310,11 @@ export function TournamentsPage() {
             externalUrl: url
           }));
           toast.success('Dati sincronizzati da Challonge!');
-        } else {
-          toast.error('Impossibile trovare il torneo su Challonge. Verifica lo slug o il link.');
         }
       }
     } catch (err: any) {
-      toast.error(`Errore durante la sincronizzazione: ${err.message}`);
+      console.error('Sync error:', err);
+      toast.error(`Errore sincronizzazione: ${err.message || 'Verifica il link o lo slug'}`);
     } finally {
       setIsSubmitting(false);
     }
