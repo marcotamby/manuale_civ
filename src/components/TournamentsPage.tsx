@@ -442,12 +442,11 @@ export function TournamentsPage() {
         }
       }) : null);
 
-      toast.success('Torneo salvato con successo!');
       loadTournaments();
       setTimeout(() => {
         setSaveStatus('idle');
         setShowEditModal(false);
-      }, 500);
+      }, 1500);
     } catch (err: any) {
       toast.error(`Errore: ${err.message}`);
       setSaveStatus('idle');
@@ -685,7 +684,13 @@ export function TournamentsPage() {
                           </button>
                         )}
                         <button 
-                          onClick={() => navigate(`/tornei/${t.slug}`)} 
+                          onClick={() => {
+                            if (t.config.direct_link) {
+                              window.open(t.config.direct_link, '_blank');
+                            } else {
+                              navigate(`/tornei/${t.slug}`);
+                            }
+                          }} 
                           className={clsx(
                             "flex-grow h-full bg-white/5 hover:bg-white/10 rounded-2xl text-white font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/det shadow-lg active:scale-95",
                             t.config.hasRegolamento ? "text-[10px]" : "text-xs"
@@ -1003,7 +1008,7 @@ export function TournamentsPage() {
                     disabled={isSubmitting} 
                     className={clsx(
                       "flex-grow py-4 rounded-2xl flex items-center justify-center gap-3 transition-all text-xs font-black uppercase tracking-widest shadow-xl",
-                      saveStatus === 'saved' ? "bg-green-500 text-white" : "bg-gradient-to-b from-slate-100 to-slate-400 text-black hover:brightness-110"
+                      saveStatus === 'saved' ? "bg-green-600 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]" : "bg-gradient-to-b from-slate-100 to-slate-400 text-black hover:brightness-110"
                     )}
                   >
                     {saveStatus === 'saving' ? <Loader2 className="animate-spin" size={18}/> : 

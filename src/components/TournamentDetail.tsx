@@ -85,6 +85,13 @@ export function TournamentDetail() {
     loadTournament();
   }, [slug]);
 
+  // Auto-redirect if direct link exists and no internal bracket is found
+  useEffect(() => {
+    if (!loading && !selectedPhase && tournament?.db?.direct_link) {
+      window.location.replace(tournament.db.direct_link);
+    }
+  }, [loading, selectedPhase, tournament]);
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
@@ -229,7 +236,7 @@ export function TournamentDetail() {
                     Tabellone <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
                   </button>
                 ) : (
-                  <p className="text-yellow-500/50 text-[10px] font-black uppercase tracking-widest">Link non configurato</p>
+                  <p className="text-yellow-500/50 text-[10px] font-black uppercase tracking-widest">Tabellone non ancora disponibile</p>
                 )}
               </div>
             </div>
