@@ -24,6 +24,8 @@ interface TournamentConfig {
   type?: string;
   hasRegolamento?: boolean;
   regolamentoContent?: string;
+  display_order?: number;
+  created_at?: string;
 }
 
 const TOURNAMENTS: TournamentConfig[] = [
@@ -46,12 +48,13 @@ export function TournamentsPage() {
     organizer: '',
     period: '',
     bannerUrl: '',
-    status: 'Concluso',
+    status: 'Programmato',
     name: '',
     type: '1v1',
     podium: [] as any[],
     hasRegolamento: false,
-    regolamentoContent: ''
+    regolamentoContent: '',
+    display_order: 0
   });
   const [isUploading, setIsUploading] = useState(false);
   
@@ -71,10 +74,11 @@ export function TournamentsPage() {
       // DEBUG CLOUD: Log raw DB data to help identify persistence issues
       console.log("DB Tournaments:", dbTournaments);
 
-      const allConfigs: TournamentConfig[] = [...TOURNAMENTS];
+      const staticConfigs: TournamentConfig[] = [...TOURNAMENTS];
+      const dbConfigs: TournamentConfig[] = [];
+
       if (dbTournaments) {
         dbTournaments.forEach(db => {
-          const existingIdx = allConfigs.findIndex(c => c.slug === db.slug);
           const configObj: TournamentConfig = {
             slug: db.slug,
             source: (db.source as 'startgg' | 'challonge') || 'challonge',
@@ -88,16 +92,33 @@ export function TournamentsPage() {
             name: db.name || undefined,
             type: db.type || '1v1',
             hasRegolamento: db.has_regolamento || false,
-            regolamentoContent: db.regolamento_content || ''
+            regolamentoContent: db.regolamento_content || '',
+            display_order: db.display_order || 0,
+            created_at: db.created_at
           };
-
-          if (existingIdx !== -1) {
-            allConfigs[existingIdx] = { ...allConfigs[existingIdx], ...configObj };
-          } else {
-            allConfigs.push(configObj);
-          }
+          dbConfigs.push(configObj);
         });
       }
+
+      // Combine and sort by display_order then by created_at DESC
+      const allConfigs = [...dbConfigs];
+      
+      // Add static ones if they aren't already in DB (by slug)
+      staticConfigs.forEach(sc => {
+        if (!allConfigs.some(ac => ac.slug === sc.slug)) {
+          allConfigs.push(sc);
+        }
+      });
+
+      // Sort: display_order first (higher first), then created_at (newer first)
+      allConfigs.sort((a, b) => {
+        if ((b.display_order || 0) !== (a.display_order || 0)) {
+          return (b.display_order || 0) - (a.display_order || 0);
+        }
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return dateB - dateA;
+      });
 
       const results = await Promise.all(allConfigs.map(async config => {
         try {
@@ -305,6 +326,7 @@ export function TournamentsPage() {
         has_regolamento: editForm.hasRegolamento,
         regolamento_content: editForm.regolamentoContent,
         direct_link: editForm.externalUrl || null,
+        display_order: editForm.display_order,
         updated_at: new Date().toISOString()
       };
 
@@ -606,7 +628,6 @@ export function TournamentsPage() {
               </div>
               <div className="flex items-center gap-4">
                 {saveStatus === 'saving' && <Loader2 className="w-4 h-4 animate-spin text-yellow-500" />}
-                {saveStatus === 'saved' && <span className="text-[10px] font-bold text-green-500 uppercase tracking-widest">Salvato!</span>}
                 <X 
                   className="cursor-pointer text-gray-500 hover:text-white transition-colors" 
                   onClick={() => { 
@@ -738,6 +759,17 @@ export function TournamentsPage() {
                 </div>
 
                 <div className="space-y-2">
+                  <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Priorità Visualizzazione (più alto = prima)</label>
+                  <input 
+                    type="number" 
+                    value={editForm.display_order} 
+                    onChange={e => setEditForm({...editForm, display_order: parseInt(e.target.value) || 0})}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-yellow-500 transition-colors"
+                    placeholder="0"
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Stato Torneo</label>
                   <div className="flex gap-2 text-center">
                     {['Programmato', 'In corso', 'Concluso'].map(s => (
@@ -824,7 +856,8 @@ export function TournamentsPage() {
                     {saveStatus === 'saving' ? <Loader2 className="animate-spin" size={18}/> : 
                      saveStatus === 'saved' ? <CheckCircle2 size={18}/> : <Save size={18}/>} 
                     {saveStatus === 'saving' ? 'SALVATAGGIO...' : 
-                     saveStatus === 'saved' ? 'SALVATO!' : 'SALVA MODIFICHE'}
+                     saveStatus === 'saved' ? 'SALVATO!' : 
+                     editingTournament ? 'SALVA MODIFICHE' : 'CREA TORNEO'}
                   </button>
                   <button onClick={() => handleDeleteTournament(editingTournament.slug)} className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl hover:bg-red-500/20 transition-all shadow-lg"><Trash2 size={24}/></button>
                 </div>

@@ -67,9 +67,9 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
 
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full bg-[var(--color-brand-dark)] select-none">
-      <header className="mb-8 flex flex-col gap-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-start gap-4">
-          <div className="hidden md:block">
+      <header className="mb-4 md:mb-8 flex flex-col gap-2 md:gap-4 shrink-0">
+        <div className="flex flex-col md:flex-row md:items-center justify-start gap-3 md:gap-4">
+          <div className="hidden lg:block">
             <CustomSelect
               options={[
                 { value: 'Tutte', label: 'Tutte le civiltà' },
@@ -152,11 +152,11 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
             <div
               key={civ.id}
               onClick={() => handleCardClick(civ.id)}
-              className={`group relative h-40 md:h-56 rounded-xl cursor-pointer overflow-hidden border transition-all duration-500 z-10 ${isSelected
+              className={`group relative h-36 md:h-52 rounded-xl cursor-pointer overflow-hidden border transition-all duration-500 z-10 ${isSelected
                 ? 'border-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.4)] scale-[0.98] z-20'
                 : isUnselectable
                   ? 'border-[#D4AF37]/5 opacity-40 grayscale-[0.3] cursor-not-allowed'
-                  : 'border-[#D4AF37]/30 hover:border-white/80 hover:shadow-[0_50px_100px_rgba(0,0,0,1)] hover:-translate-y-1 hover:scale-[1.25] hover:z-50 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]'
+                  : 'border-[#D4AF37]/30 hover:border-white/80 hover:shadow-[0_50px_100px_rgba(0,0,0,1)] hover:-translate-y-1 hover:scale-[1.15] lg:hover:scale-[1.25] hover:z-50 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]'
                 }`}
             >
               {/* Full Cover Flag Background */}
