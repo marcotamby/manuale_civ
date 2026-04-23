@@ -657,12 +657,34 @@ export function TournamentsPage() {
                             <div key={idx} className="flex justify-between text-sm items-center group/standing">
                               <div className="flex items-center gap-3">
                                 <span className="text-lg">{['🥇','🥈','🥉'][idx]}</span>
-                                <span className={clsx(
-                                  "font-bold transition-colors truncate max-w-[140px]",
-                                  idx === 0 ? "text-yellow-100" : "text-gray-400"
-                                )}>
-                                  {s.entrant?.name || '---'}
-                                </span>
+                                <div className="relative group/players">
+                                  <span className={clsx(
+                                    "font-bold transition-colors truncate max-w-[140px]",
+                                    idx === 0 ? "text-yellow-100" : "text-gray-400",
+                                    s.players && s.players.length > 0 && "cursor-help decoration-yellow-500/30 underline underline-offset-4 decoration-dotted"
+                                  )}>
+                                    {s.entrant?.name || '---'}
+                                  </span>
+                                  
+                                  {/* Players Tooltip on Hover */}
+                                  {s.players && s.players.length > 0 && (
+                                    <div className="absolute bottom-full left-0 mb-3 p-4 bg-[#1a1f2e]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] opacity-0 group-hover/players:opacity-100 pointer-events-none transition-all duration-300 translate-y-2 group-hover/players:translate-y-0 z-[100] min-w-[160px] border-b-yellow-500/50">
+                                      <p className="text-[9px] font-black text-yellow-500 uppercase tracking-[0.2em] mb-3 border-b border-white/5 pb-2 flex items-center gap-2">
+                                        <Users size={10} /> Componenti Team
+                                      </p>
+                                      <div className="space-y-1.5">
+                                        {s.players.map((player: string, pIdx: number) => (
+                                          <div key={pIdx} className="flex items-center gap-2 text-[11px] text-white/90 font-bold uppercase tracking-tight">
+                                            <div className="w-1 h-1 rounded-full bg-yellow-500/50" />
+                                            {player}
+                                          </div>
+                                        ))}
+                                      </div>
+                                      {/* Tooltip Arrow */}
+                                      <div className="absolute top-full left-6 -translate-y-px border-8 border-transparent border-t-[#1a1f2e]/95" />
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                               <span className="text-white/40 font-black italic uppercase text-[9px] group-hover/standing:text-white/80 transition-colors">{idx === 0 ? 'WINNER' : `${idx+1}° PLACE`}</span>
                             </div>
@@ -1022,12 +1044,36 @@ export function TournamentsPage() {
                     </button>
                   </div>
                   {editForm.podium.map((p, i) => (
-                    <div key={i} className="flex gap-2 items-center bg-black/20 p-3 rounded-2xl border border-white/5">
-                      <span className="text-base w-8 text-center">{['🥇','🥈','🥉'][i] || `${i+1}°`}</span>
-                      <input type="text" value={p.entrant?.name || ''} onChange={e => {
-                        const np = [...editForm.podium]; np[i] = {...p, entrant: {name: e.target.value}}; setEditForm({...editForm, podium: np});
-                      }} placeholder={`Nome ${i+1}° classificato`} className="flex-grow bg-transparent border-none text-white text-sm outline-none" />
-                      <button onClick={() => setEditForm({...editForm, podium: editForm.podium.filter((_, idx) => idx !== i)})} className="p-2 text-red-500/50 hover:text-red-500 transition-colors"><Trash2 size={16}/></button>
+                    <div key={i} className="bg-black/20 p-4 rounded-2xl border border-white/5 space-y-3">
+                      <div className="flex gap-3 items-center">
+                        <span className="text-base w-8 text-center">{['🥇','🥈','🥉'][i] || `${i+1}°`}</span>
+                        <div className="flex-grow space-y-1">
+                          <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Nome Team / Giocatore</label>
+                          <input type="text" value={p.entrant?.name || ''} onChange={e => {
+                            const np = [...editForm.podium]; np[i] = {...p, entrant: {name: e.target.value}}; setEditForm({...editForm, podium: np});
+                          }} placeholder="Inserisci nome..." className="w-full bg-white/5 border border-white/5 rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-yellow-500/30 transition-all" />
+                        </div>
+                        <button onClick={() => setEditForm({...editForm, podium: editForm.podium.filter((_, idx) => idx !== i)})} className="p-2 text-red-500/50 hover:text-red-500 transition-colors mt-4"><Trash2 size={16}/></button>
+                      </div>
+                      
+                      {/* Sub-players for Team Games */}
+                      <div className="ml-11 pr-2 space-y-1">
+                        <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-2">
+                          <Users size={10} /> Componenti Team (per 2v2, 3v3...)
+                        </label>
+                        <input 
+                          type="text" 
+                          value={p.players?.join(', ') || ''} 
+                          onChange={e => {
+                            const playerList = e.target.value.split(',').map(s => s.trim()).filter(s => s !== '');
+                            const np = [...editForm.podium]; 
+                            np[i] = { ...p, players: playerList }; 
+                            setEditForm({ ...editForm, podium: np });
+                          }} 
+                          placeholder="Esempio: Marco, Alessio, Luca (separati da virgola)" 
+                          className="w-full bg-white/5 border border-white/5 rounded-xl px-3 py-2 text-white/60 text-[11px] outline-none focus:border-yellow-500/20 transition-all italic" 
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
