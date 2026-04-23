@@ -825,35 +825,42 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
           const text = e.clipboardData.getData('text/plain');
           
           if (html) {
-            // Intelligent HTML cleanup
+            // Super-Clean Whitelist Sanitizer
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             
-            // 1. Convert common inline styles to semantic tags before stripping
-            doc.querySelectorAll('*').forEach(el => {
-              const style = (el as HTMLElement).style;
+            const sanitize = (node: Node): string => {
+              if (node.nodeType === Node.TEXT_NODE) return node.textContent || '';
+              if (node.nodeType !== Node.ELEMENT_NODE) return '';
               
-              if (style.fontWeight === 'bold' || parseInt(style.fontWeight) >= 600) {
-                const b = doc.createElement('b');
-                b.innerHTML = el.innerHTML;
-                el.innerHTML = '';
-                el.appendChild(b);
-              }
+              const el = node as HTMLElement;
+              const tag = el.tagName.toLowerCase();
+              const innerHTML = Array.from(el.childNodes).map(sanitize).join('');
               
-              if (style.fontStyle === 'italic') {
-                const i = doc.createElement('i');
-                i.innerHTML = el.innerHTML;
-                el.innerHTML = '';
-                el.appendChild(i);
-              }
+              // Block tags we want to keep
+              if (tag === 'h2') return `<h2 style="font-weight: 800; font-size: 2rem; margin-top: 1.5rem; margin-bottom: 0.75rem; font-family: Outfit, sans-serif; line-height: 1.2; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; display: block;">${innerHTML}</h2>`;
+              if (tag === 'p') return `<p style="margin-top: 0.75rem; margin-bottom: 0.75rem; line-height: 1.6; display: block;">${innerHTML}</p>`;
+              if (tag === 'ul') return `<ul style="list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem;">${innerHTML}</ul>`;
+              if (tag === 'ol') return `<ol style="list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 1rem;">${innerHTML}</ol>`;
+              if (tag === 'li') return `<li>${innerHTML}</li>`;
+              if (tag === 'br') return '<br>';
+              
+              // Inline tags we want to keep
+              let result = innerHTML;
+              const style = el.style;
+              const isBold = ['b', 'strong'].includes(tag) || style.fontWeight === 'bold' || parseInt(style.fontWeight) >= 600;
+              const isItalic = ['i', 'em'].includes(tag) || style.fontStyle === 'italic';
+              const isUnderline = tag === 'u' || style.textDecoration.includes('underline');
+              
+              if (isBold) result = `<b>${result}</b>`;
+              if (isItalic) result = `<i>${result}</i>`;
+              if (isUnderline) result = `<u>${result}</u>`;
+              
+              return result;
+            };
 
-              // 2. Remove problematic attributes but keep the structure
-              el.removeAttribute('style');
-              el.removeAttribute('class');
-              el.removeAttribute('id');
-            });
-            
-            document.execCommand('insertHTML', false, doc.body.innerHTML);
+            const cleanedHTML = Array.from(doc.body.childNodes).map(sanitize).join('');
+            document.execCommand('insertHTML', false, cleanedHTML);
           } else {
             document.execCommand('insertText', false, text);
           }
