@@ -191,15 +191,15 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
         to="/" 
         className="flex flex-col items-center justify-center text-center w-full order-1 lg:order-2 group cursor-pointer hover:opacity-95 transition-all py-1"
       >
-        <h2 className="text-[10px] md:text-[11px] font-bold text-slate-500 tracking-[0.5em] uppercase mb-0.5 whitespace-nowrap">
+        <h2 className="text-[12px] md:text-[14px] font-bold text-slate-500 tracking-[0.5em] uppercase mb-1 whitespace-nowrap">
           Age of Empires IV
         </h2>
         
-        <h1 className="text-xl md:text-2xl lg:text-2xl xl:text-4xl 2xl:text-5xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 drop-shadow-[0_4px_15px_rgba(255,255,255,0.15)] tracking-tight leading-tight px-2">
+        <h1 className="text-3xl md:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 drop-shadow-[0_4px_15px_rgba(255,255,255,0.15)] tracking-tight leading-tight px-2">
           Manuale delle Civiltà
         </h1>
 
-        <div className="w-32 md:w-48 h-[1px] bg-gradient-to-r from-transparent via-sky-500/20 to-transparent mt-3 mb-2 relative overflow-hidden">
+        <div className="w-40 md:w-64 h-[1px] bg-gradient-to-r from-transparent via-sky-500/20 to-transparent mt-3 mb-2 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-sky-400/60 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out"></div>
         </div>
         
