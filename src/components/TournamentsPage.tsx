@@ -520,7 +520,26 @@ export function TournamentsPage() {
           <div className="bg-[#121620] border border-white/10 p-8 rounded-3xl w-full max-w-2xl my-auto shadow-2xl animate-in zoom-in-95 duration-300">
              <div className="flex justify-between mb-8 text-slate-300">
                <div className="flex items-center gap-2"><Edit2 size={24} className="text-blue-400"/><h2 className="text-xl font-bold uppercase tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-200 to-slate-500">Modifica Torneo</h2></div>
-               <X className="cursor-pointer text-gray-500 hover:text-white transition-colors" onClick={() => { setShowEditModal(false); loadTournaments(); }} />
+               <X 
+                 className="cursor-pointer text-gray-500 hover:text-white transition-colors" 
+                 onClick={() => { 
+                   const hasChanges = JSON.stringify(editForm) !== JSON.stringify({
+                     name: editingTournament.config.name || '',
+                     period: editingTournament.config.period || '',
+                     bannerUrl: editingTournament.config.bannerUrl || '',
+                     type: editingTournament.config.type || '1v1',
+                     status: editingTournament.status || 'Programmato',
+                     hasRegolamento: editingTournament.config.hasRegolamento || false,
+                     regolamentoContent: editingTournament.config.regolamentoContent || '',
+                     directLink: editingTournament.config.directLink || ''
+                   });
+
+                   if (!hasChanges || window.confirm('Hai modifiche non salvate. Vuoi uscire senza salvare?')) {
+                     setShowEditModal(false); 
+                     loadTournaments(); 
+                   }
+                 }} 
+               />
              </div>
             <div className="space-y-6">
               <div className="space-y-1">
@@ -699,7 +718,8 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
   const checkActiveStyles = () => {
     const block = document.queryCommandValue('formatBlock');
     setActiveStyles({
-      bold: document.queryCommandState('bold'),
+      // Headings are naturally bold, but we only want the button blue if there's explicit <b>/<strong>/style bold
+      bold: document.queryCommandState('bold') && !(block === 'h2' || block === 'H2'),
       italic: document.queryCommandState('italic'),
       underline: document.queryCommandState('underline'),
       alignLeft: document.queryCommandState('justifyLeft'),
@@ -869,7 +889,16 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
             };
 
             const cleanedHTML = Array.from(doc.body.childNodes).map(sanitize).join('');
-            document.execCommand('insertHTML', false, cleanedHTML);
+            
+            // CRITICAL: Reset bold state before inserting to prevent "infecting" the paste with current cursor state
+            // If the cursor was in a bold area (or an H2), the browser might bold the entire insertion.
+            if (document.queryCommandState('bold')) {
+              document.execCommand('bold', false);
+            }
+            
+            // Wrap in a span that explicitly resets weight to normal to be 100% sure
+            const finalHTML = `<span style="font-weight: normal !important;">${cleanedHTML}</span>`;
+            document.execCommand('insertHTML', false, finalHTML);
           } else {
             document.execCommand('insertText', false, text);
           }
