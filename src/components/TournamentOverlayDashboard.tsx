@@ -151,8 +151,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
       const targetMatch = nextState.bracket[target];
       if (newWinner > 0) {
         const winnerName = newWinner === 1 ? match.p1 : match.p2;
-        const winnerCiv = newWinner === 1 ? match.p1Civ : match.p2Civ;
-        nextState.bracket[target] = { ...targetMatch, [`p${slot}`]: winnerName, [`p${slot}Civ`]: winnerCiv };
+        nextState.bracket[target] = { ...targetMatch, [`p${slot}`]: winnerName, [`p${slot}Civ`]: '' };
       } else {
         nextState.bracket[target] = { ...targetMatch, [`p${slot}`]: '', [`p${slot}Civ`]: '' };
       }
