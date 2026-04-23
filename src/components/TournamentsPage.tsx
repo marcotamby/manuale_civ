@@ -700,13 +700,12 @@ export function TournamentsPage() {
                             t.config.hasRegolamento ? "text-[10px]" : "text-xs"
                           )}
                         >
-                          Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" />
-                          
-                          {/* In-card Error Message */}
-                          {bracketErrorId === t.id && (
-                            <div className="absolute inset-0 bg-[#1a1f2e] rounded-2xl flex items-center justify-center gap-2 text-yellow-500 font-bold text-[10px] animate-in fade-in zoom-in duration-300 z-50 border border-yellow-500/50">
-                              <Loader2 size={12} className="animate-spin" /> Tabellone non ancora disponibile
-                            </div>
+                          {bracketErrorId === t.id ? (
+                            <span className="text-yellow-500 font-black animate-pulse text-[10px] tracking-tighter">
+                              TABELLONE NON DISPONIBILE
+                            </span>
+                          ) : (
+                            <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
                           )}
                         </button>
                         {canManageTournaments && (
