@@ -314,6 +314,13 @@ export function TournamentsPage() {
         .eq('slug', finalSlug)
         .single();
 
+      if (!editingTournament && existing) {
+        toast.error('Un torneo con questo URL o nome esiste già.');
+        setIsSubmitting(false);
+        setSaveStatus('idle');
+        return;
+      }
+
       let error;
       if (editingTournament) {
         // Update existing record
