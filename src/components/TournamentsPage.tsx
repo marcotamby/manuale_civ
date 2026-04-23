@@ -40,13 +40,27 @@ export function TournamentsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingTournament, setEditingTournament] = useState<any>(null);
-  const [activeStyles, setActiveStyles] = useState({ bold: false, italic: false, underline: false });
+  const [activeStyles, setActiveStyles] = useState({ 
+    bold: false, 
+    italic: false, 
+    underline: false,
+    alignLeft: false,
+    alignCenter: false,
+    alignRight: false,
+    alignJustify: false,
+    font: 'Inter'
+  });
 
   const checkActiveStyles = () => {
     setActiveStyles({
       bold: document.queryCommandState('bold'),
       italic: document.queryCommandState('italic'),
-      underline: document.queryCommandState('underline')
+      underline: document.queryCommandState('underline'),
+      alignLeft: document.queryCommandState('justifyLeft'),
+      alignCenter: document.queryCommandState('justifyCenter'),
+      alignRight: document.queryCommandState('justifyRight'),
+      alignJustify: document.queryCommandState('justifyFull'),
+      font: document.queryCommandValue('fontName').replace(/['"]/g, '') || 'Inter'
     });
   };
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
@@ -636,33 +650,32 @@ export function TournamentsPage() {
 
                  {editForm.hasRegolamento && (
                    <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                      <div className="flex flex-wrap gap-2 mb-1 p-2 bg-black/60 rounded-2xl border border-white/10 sticky top-0 z-20 backdrop-blur-md shadow-xl">
-                         <div className="flex items-center gap-1 pr-2 border-r border-white/10">
+                      <div className="flex flex-wrap gap-2 mb-1 p-2 bg-black/60 rounded-2xl border border-white/10 sticky top-0 z-20 backdrop-blur-md sh                          <div className="flex items-center gap-1 pr-2 border-r border-white/10">
                             <button 
-                              onMouseDown={(e) => { e.preventDefault(); document.execCommand('styleWithCSS', false, 'true'); document.execCommand('bold', false); checkActiveStyles(); }} 
+                              onMouseDown={(e) => { e.preventDefault(); document.execCommand('bold', false); checkActiveStyles(); }} 
                               className={clsx(
                                 "p-2 rounded-lg font-bold transition-colors w-10 h-10 flex items-center justify-center",
-                                activeStyles.bold ? "bg-blue-500/20 text-blue-400 border border-blue-500/30" : "hover:bg-white/10 text-white"
+                                activeStyles.bold ? "bg-blue-500/30 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.3)]" : "hover:bg-white/10 text-white"
                               )} 
                               title="Grassetto"
                             >
                               B
                             </button>
                             <button 
-                              onMouseDown={(e) => { e.preventDefault(); document.execCommand('styleWithCSS', false, 'true'); document.execCommand('italic', false); checkActiveStyles(); }} 
+                              onMouseDown={(e) => { e.preventDefault(); document.execCommand('italic', false); checkActiveStyles(); }} 
                               className={clsx(
                                 "p-2 rounded-lg italic transition-colors w-10 h-10 flex items-center justify-center",
-                                activeStyles.italic ? "bg-blue-500/20 text-blue-400 border border-blue-500/30" : "hover:bg-white/10 text-white"
+                                activeStyles.italic ? "bg-blue-500/30 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.3)]" : "hover:bg-white/10 text-white"
                               )} 
                               title="Corsivo"
                             >
                               I
                             </button>
                             <button 
-                              onMouseDown={(e) => { e.preventDefault(); document.execCommand('styleWithCSS', false, 'true'); document.execCommand('underline', false); checkActiveStyles(); }} 
+                              onMouseDown={(e) => { e.preventDefault(); document.execCommand('underline', false); checkActiveStyles(); }} 
                               className={clsx(
                                 "p-2 rounded-lg underline transition-colors w-10 h-10 flex items-center justify-center",
-                                activeStyles.underline ? "bg-blue-500/20 text-blue-400 border border-blue-500/30" : "hover:bg-white/10 text-white"
+                                activeStyles.underline ? "bg-blue-500/30 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.3)]" : "hover:bg-white/10 text-white"
                               )} 
                               title="Sottolineato"
                             >
@@ -670,55 +683,58 @@ export function TournamentsPage() {
                             </button>
                           </div>
 
-                         {/* Alignment Group */}
-                         <div className="flex items-center gap-1 px-2 border-r border-white/10">
-                           <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('justifyLeft', false); }} className="p-2 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white transition-colors"><AlignLeft size={18}/></button>
-                           <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('justifyCenter', false); }} className="p-2 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white transition-colors"><AlignCenter size={18}/></button>
-                           <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('justifyRight', false); }} className="p-2 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white transition-colors"><AlignRight size={18}/></button>
-                           <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('justifyFull', false); }} className="p-2 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white transition-colors"><AlignJustify size={18}/></button>
-                         </div>
+                          {/* Alignment Group */}
+                          <div className="flex items-center gap-1 px-2 border-r border-white/10">
+                            <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('justifyLeft', false); checkActiveStyles(); }} className={clsx("p-2 rounded-lg transition-colors", activeStyles.alignLeft ? "text-blue-400 bg-blue-500/20" : "text-slate-300 hover:text-white")}><AlignLeft size={18}/></button>
+                            <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('justifyCenter', false); checkActiveStyles(); }} className={clsx("p-2 rounded-lg transition-colors", activeStyles.alignCenter ? "text-blue-400 bg-blue-500/20" : "text-slate-300 hover:text-white")}><AlignCenter size={18}/></button>
+                            <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('justifyRight', false); checkActiveStyles(); }} className={clsx("p-2 rounded-lg transition-colors", activeStyles.alignRight ? "text-blue-400 bg-blue-500/20" : "text-slate-300 hover:text-white")}><AlignRight size={18}/></button>
+                            <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('justifyFull', false); checkActiveStyles(); }} className={clsx("p-2 rounded-lg transition-colors", activeStyles.alignJustify ? "text-blue-400 bg-blue-500/20" : "text-slate-300 hover:text-white")}><AlignJustify size={18}/></button>
+                          </div>
 
-                         {/* Font Selection */}
-                         <div className="flex items-center gap-2 px-2 border-r border-white/10 relative">
-                           <select 
-                             onChange={(e) => { 
-                               document.execCommand('styleWithCSS', false, 'true');
-                               document.execCommand('fontName', false, e.target.value); 
-                             }}
-                             className="bg-white/5 border border-white/10 rounded-xl text-[10px] py-2 px-3 text-white outline-none focus:border-blue-500/50 cursor-pointer hover:bg-white/10 transition-all font-black uppercase tracking-widest appearance-none pr-8"
-                           >
-                             <option value="Inter" className="bg-[#121620]">INTER</option>
-                             <option value="Playfair Display" className="bg-[#121620]">SERIF</option>
-                             <option value="Roboto Mono" className="bg-[#121620]">MONO</option>
-                             <option value="Outfit" className="bg-[#121620]">MODERN</option>
-                           </select>
-                           <ChevronDown size={12} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
-                         </div>
+                          {/* Font Selection */}
+                          <div className="flex items-center gap-2 px-2 border-r border-white/10 relative group/font">
+                            <select 
+                              value={activeStyles.font}
+                              onChange={(e) => { 
+                                document.execCommand('styleWithCSS', false, 'false');
+                                document.execCommand('fontName', false, e.target.value); 
+                                checkActiveStyles();
+                              }}
+                              className="bg-white/10 border border-white/20 rounded-xl text-[10px] py-2 px-3 text-white outline-none focus:border-blue-500/50 cursor-pointer hover:bg-white/20 transition-all font-black uppercase tracking-widest appearance-none pr-8 min-w-[120px]"
+                            >
+                              <option value="Inter" className="bg-[#121620]">INTER</option>
+                              <option value="serif" className="bg-[#121620]">SERIF</option>
+                              <option value="monospace" className="bg-[#121620]">MONO</option>
+                              <option value="sans-serif" className="bg-[#121620]">MODERN</option>
+                            </select>
+                            <ChevronDown size={12} className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-400 pointer-events-none group-hover/font:scale-110 transition-transform" />
+                          </div>
 
-                         {/* Heading/Format */}
-                         <div className="flex items-center gap-1 px-2 border-r border-white/10">
-                           <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('formatBlock', false, 'H2'); }} className="p-2 hover:bg-white/10 rounded-lg text-white font-black text-xs px-3" title="Titolo">H2</button>
-                           <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('formatBlock', false, 'P'); }} className="p-2 hover:bg-white/10 rounded-lg text-white font-black text-xs px-3" title="Paragrafo">P</button>
-                         </div>
+                          {/* Heading/Format */}
+                          <div className="flex items-center gap-1 px-2 border-r border-white/10">
+                            <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('formatBlock', false, 'H2'); }} className="p-2 hover:bg-white/10 rounded-lg text-white font-black text-xs px-3" title="Titolo">H2</button>
+                            <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('formatBlock', false, 'P'); }} className="p-2 hover:bg-white/10 rounded-lg text-white font-black text-xs px-3" title="Paragrafo">P</button>
+                          </div>
 
-                         {/* Emoji Popover */}
-                         <div className="relative group/emoji">
-                           <button className="p-2 hover:bg-white/10 rounded-lg text-lg flex items-center justify-center w-10 h-10">😀</button>
-                           <div className="absolute bottom-full left-0 mb-2 p-3 bg-[#0d1117] border border-white/10 rounded-[1.5rem] hidden group-hover/emoji:grid grid-cols-5 gap-2 z-[100] shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-2 duration-300 border-b-blue-500/50 w-64">
-                             {['🏆','🎮','⚔️','🏰','🎖️','🥇','🥈','🥉','📜','⚖️','📢','🔴','🟢','🔵','⭐','🔥','⚡','💎','🛡️','👑'].map(emoji => (
-                               <button 
-                                 key={emoji}
-                                 onMouseDown={(e) => { 
-                                   e.preventDefault(); 
-                                   document.execCommand('insertText', false, emoji); 
-                                 }}
-                                 className="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-xl text-xl transition-all hover:scale-125"
-                               >
-                                 {emoji}
-                               </button>
-                             ))}
+                          {/* Emoji Popover */}
+                          <div className="relative group/emoji">
+                             <button className="p-2 hover:bg-white/10 rounded-lg text-lg flex items-center justify-center w-10 h-10 transition-transform hover:scale-110 active:scale-95">😀</button>
+                             <div className="absolute bottom-full left-0 mb-4 p-4 bg-[#0d1117]/95 border border-white/10 rounded-[2rem] hidden group-hover/emoji:grid grid-cols-5 gap-3 z-[100] shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-3xl animate-in fade-in slide-in-from-bottom-4 duration-300 border-b-blue-500 w-[280px]">
+                               {['🏆','🎮','⚔️','🏰','🎖️','🥇','🥈','🥉','📜','⚖️','📢','🔴','🟢','🔵','⭐','🔥','⚡','💎','🛡️','👑'].map(emoji => (
+                                 <button 
+                                   key={emoji}
+                                   onMouseDown={(e) => { 
+                                     e.preventDefault(); 
+                                     document.execCommand('insertText', false, emoji); 
+                                     checkActiveStyles();
+                                   }}
+                                   className="w-10 h-10 flex items-center justify-center hover:bg-white/20 rounded-2xl text-2xl transition-all hover:scale-125 hover:rotate-6 active:scale-90"
+                                 >
+                                   {emoji}
+                                 </button>
+                               ))}
+                             </div>
                            </div>
-                         </div>
                       </div>
                       
                       <div 
