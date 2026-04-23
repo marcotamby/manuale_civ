@@ -9,7 +9,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function checkColumns() {
     const { data, error } = await supabase
-        .from('suggestions')
+        .from('tournaments')
         .select('*')
         .limit(1);
 
@@ -19,9 +19,9 @@ async function checkColumns() {
     }
 
     if (data && data.length > 0) {
-        console.log("Columns in suggestions table:", Object.keys(data[0]));
+        console.log("Columns in tournaments table:", Object.keys(data[0]));
     } else {
-        console.log("No data in suggestions table.");
+        console.log("No data in tournaments table.");
     }
 }
 

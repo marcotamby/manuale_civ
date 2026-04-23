@@ -131,7 +131,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
   }, [favorites, civilizations, isAuthenticated, user?.email, refreshTrigger]);
 
   return (
-    <div className="w-full bg-gradient-to-r from-[#0d1424] via-[#1a1c32] to-[#0d1424] border-b border-yellow-500/20 flex flex-col md:flex-row items-center justify-between px-4 py-4 md:pl-14 md:pr-[73px] md:py-5 z-[100] shrink-0 gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative">
+    <div className="w-full bg-gradient-to-r from-[#0d1424] via-[#1a1c32] to-[#0d1424] border-b border-yellow-500/20 flex flex-col lg:flex-row items-center justify-between px-4 py-4 lg:pl-14 lg:pr-[73px] lg:py-5 z-[100] shrink-0 gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative">
 
       {/* Decorative top border glow effect */}
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent"></div>
@@ -139,7 +139,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
 
 
       {/* Left container for social links on desktop */}
-      <div className="hidden md:flex flex-1 items-center justify-start gap-3">
+      <div className="hidden lg:flex flex-1 items-center justify-start gap-2 xl:gap-3">
         <a
           href="https://discord.gg/8Tx2YdXrEu"
           target="_blank"
@@ -180,7 +180,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
             (window as any).closeAllModals?.();
             (window as any).resetHomeFilters?.();
           }}
-          className="flex items-center gap-2.5 px-4 py-2.5 glass rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all text-[13px] font-bold uppercase tracking-wider group hover:scale-110 hover:-translate-y-1 duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
+          className="flex items-center gap-2 px-3 xl:px-4 py-2 glass rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all text-[11px] xl:text-[13px] font-bold uppercase tracking-wider group hover:scale-110 hover:-translate-y-1 duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
           title="Tornei Ufficiali"
         >
           <Trophy size={16} className="group-hover:scale-110 transition-transform" />
@@ -205,13 +205,13 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
           (window as any).closeAllModals?.();
           (window as any).resetHomeFilters?.();
         }}
-        className="flex flex-col items-center justify-center text-center w-full md:w-auto group cursor-pointer hover:opacity-95 transition-all py-1 px-8"
+        className="flex flex-col items-center justify-center text-center w-full lg:w-auto group cursor-pointer hover:opacity-95 transition-all py-1 px-4 xl:px-8"
       >
         <h2 className="text-[10px] md:text-[11px] font-bold text-slate-500 tracking-[0.5em] uppercase mb-0.5 whitespace-nowrap">
           Age of Empires IV
         </h2>
         
-        <h1 className="text-3xl md:text-5xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 drop-shadow-[0_4px_15px_rgba(255,255,255,0.15)] tracking-tight leading-tight px-2">
+        <h1 className="text-2xl md:text-3xl lg:text-4xl 2xl:text-5xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 drop-shadow-[0_4px_15px_rgba(255,255,255,0.15)] tracking-tight leading-tight px-2">
           Manuale delle Civiltà
         </h1>
 
@@ -226,7 +226,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
       </Link>
 
       {/* Auth / Right side */}
-      <div className="flex flex-col items-center md:items-end justify-center flex-1 gap-1">
+      <div className="flex flex-col items-center lg:items-end justify-center flex-1 gap-1">
         {isAuthenticated ? (
           <div className="flex flex-col items-end gap-4 md:translate-y-1">
             <div className="flex items-center gap-3 md:gap-4 font-sans">
