@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react';
 import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabaseClient';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament, fetchChallongeData, mapChallongeToUnified } from '../services/challonge';
 // I tipi vengono gestiti internamente come any per compatibilità Start.gg/Challonge
-import { Loader2, ArrowLeft, Trophy, Users, Shield } from 'lucide-react';
+import { Loader2, ArrowLeft, Trophy, Users, Shield, ArrowRight } from 'lucide-react';
 import { TournamentBracket } from './TournamentBracket';
 
 export function TournamentDetail() {
@@ -25,30 +26,54 @@ export function TournamentDetail() {
       setLoading(true);
       setDetailError(null);
       try {
-        if (source === 'challonge') {
-          const [tData, dData] = await Promise.all([
-            fetchChallongeTournament(slug),
-            fetchChallongeData(slug)
-          ]);
-          
-          if (tData && dData) {
-            const unifiedPhase = {
-              id: 'challonge-main',
-              name: 'Tabellone',
-              bracketType: tData.attributes.tournament_type === 'round robin' ? 'ROUND_ROBIN' : 'DOUBLE_ELIMINATION',
-              rounds: mapChallongeToUnified(dData.matches, dData.participants)
-            };
-            setTournament(tData);
-            setSelectedPhase(unifiedPhase);
-          }
-        } else {
-          const data = await fetchTournament(slug);
-          setTournament(data);
-          if (data && data.events.length > 0) {
-            const event1v1 = data.events.find(e => e.name.toLowerCase().includes('1v1')) || data.events[0];
-            if (event1v1.phases.length > 0) {
-              setSelectedPhase(event1v1.phases[0]);
+        // 1. Get metadata from our DB first
+        const { data: dbTournament } = await supabase
+          .from('tournaments')
+          .select('*')
+          .eq('slug', slug)
+          .single();
+
+        const activeSource = dbTournament?.source || source;
+
+        // 2. Try to fetch external data
+        try {
+          if (activeSource === 'challonge') {
+            const [tData, dData] = await Promise.all([
+              fetchChallongeTournament(slug),
+              fetchChallongeData(slug)
+            ]);
+            
+            if (tData && dData) {
+              const unifiedPhase = {
+                id: 'challonge-main',
+                name: 'Tabellone',
+                bracketType: tData.attributes.tournament_type === 'round robin' ? 'ROUND_ROBIN' : 'DOUBLE_ELIMINATION',
+                rounds: mapChallongeToUnified(dData.matches, dData.participants)
+              };
+              setTournament({ ...tData, db: dbTournament });
+              setSelectedPhase(unifiedPhase);
             }
+          } else {
+            const data = await fetchTournament(slug);
+            if (data) {
+              setTournament({ ...data, db: dbTournament });
+              if (data.events && data.events.length > 0) {
+                const event1v1 = data.events.find(e => e.name.toLowerCase().includes('1v1')) || data.events[0];
+                if (event1v1.phases && event1v1.phases.length > 0) {
+                  setSelectedPhase(event1v1.phases[0]);
+                }
+              }
+            } else if (dbTournament) {
+               // Fallback to DB info if Start.gg fails
+               setTournament({ name: dbTournament.name, db: dbTournament, events: [], images: [{ url: dbTournament.banner_url, type: 'banner' }] });
+            }
+          }
+        } catch (fetchErr) {
+          console.warn("External fetch failed, falling back to DB info:", fetchErr);
+          if (dbTournament) {
+            setTournament({ name: dbTournament.name, db: dbTournament, events: [], images: [{ url: dbTournament.banner_url, type: 'banner' }] });
+          } else {
+            throw fetchErr;
           }
         }
       } catch (err: any) {
@@ -126,7 +151,7 @@ export function TournamentDetail() {
               <h1 className="text-4xl md:text-6xl font-sackers font-black text-white uppercase tracking-tighter leading-none mb-4">
                 {source === 'challonge' ? tournament.attributes.name : tournament.name}
               </h1>
-              <div className="flex flex-wrap gap-6 text-gray-400 text-sm font-medium">
+              <div className="flex flex-wrap gap-6 text-gray-400 text-sm font-medium mb-8">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                   Concluso
@@ -140,6 +165,15 @@ export function TournamentDetail() {
                   {source === 'challonge' ? 'Tabellone' : (tournament.events?.find((e: any) => e.phases?.some((p: any) => p.id === selectedPhase?.id))?.name || tournament.events?.[0]?.name || 'Evento')}
                 </div>
               </div>
+
+              {tournament.db?.direct_link && (
+                <button 
+                  onClick={() => window.open(tournament.db.direct_link, '_blank')}
+                  className="flex items-center gap-3 px-10 py-4 bg-white/5 hover:bg-white/10 rounded-2xl text-white font-black uppercase text-[10px] tracking-[0.2em] transition-all border border-white/5 hover:border-white/20 active:scale-95 shadow-2xl group/external"
+                >
+                  Tabellone <ArrowRight size={16} className="group-hover/external:translate-x-1 transition-transform" />
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -173,8 +207,32 @@ export function TournamentDetail() {
         {selectedPhase ? (
           <TournamentBracket phase={selectedPhase} />
         ) : (
-          <div className="text-center py-20 text-gray-500 font-serif italic">
-            Seleziona una fase per vedere il tabellone
+          <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
+            <div className="glass p-12 rounded-[3rem] border border-white/10 max-w-lg w-full shadow-2xl relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+              
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-8 border border-white/10">
+                  <Trophy className="text-yellow-500/50" size={24} />
+                </div>
+                
+                <h3 className="text-xl font-bold text-white uppercase tracking-tighter mb-4">Informazioni Torneo</h3>
+                <p className="text-xs text-gray-400 mb-10 italic leading-relaxed px-6">
+                  Per visualizzare il tabellone completo e i match in tempo reale, visita la pagina ufficiale del torneo.
+                </p>
+                
+                {tournament.db?.direct_link ? (
+                  <button 
+                    onClick={() => window.open(tournament.db.direct_link, '_blank')}
+                    className="flex items-center justify-center gap-3 w-full py-5 bg-white/5 hover:bg-white/10 rounded-2xl text-white font-black uppercase text-xs tracking-wider transition-all border border-white/10 shadow-lg active:scale-95 group/btn"
+                  >
+                    Tabellone <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
+                  </button>
+                ) : (
+                  <p className="text-yellow-500/50 text-[10px] font-black uppercase tracking-widest">Link non configurato</p>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </main>

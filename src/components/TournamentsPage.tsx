@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
-import { Trophy, Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle } from 'lucide-react';
+import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
@@ -15,6 +15,7 @@ interface TournamentConfig {
   source: 'startgg' | 'challonge';
   organizer: string;
   directLink?: string;
+  externalUrl?: string;
   period?: string;
   bannerUrl?: string;
   status?: string;
@@ -31,18 +32,17 @@ const TOURNAMENTS: TournamentConfig[] = [
 ];
 
 export function TournamentsPage() {
-  const { canManageTournaments, user } = useAuth();
+  const { canManageTournaments } = useAuth();
   const [tournaments, setTournaments] = useState<(StartGGTournament & { config: TournamentConfig })[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newUrl, setNewUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [confirmClose, setConfirmClose] = useState(false);
   const [editingTournament, setEditingTournament] = useState<any>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [editForm, setEditForm] = useState({
+    externalUrl: '',
     organizer: '',
     period: '',
     bannerUrl: '',
@@ -175,42 +175,6 @@ export function TournamentsPage() {
     loadTournaments();
   }, [loadTournaments]);
 
-  const handleAddTournament = async () => {
-    const url = newUrl.trim();
-    if (!url) return;
-    setIsSubmitting(true);
-    try {
-      let source: 'startgg' | 'challonge' = 'challonge';
-      let slug = '';
-      if (url.includes('start.gg')) {
-        source = 'startgg';
-        const match = url.match(/\/(tournament|t)\/([^/]+)/);
-        if (match) slug = match[2];
-      } else if (url.includes('challonge.com')) {
-        const parts = url.split('/').map(p => p.trim()).filter(p => p && p !== 'it');
-        slug = parts[parts.length - 1];
-      } else if (url.includes('tourneybot.gg')) {
-        const match = url.match(/\/tourneys\/(\d+)/);
-        slug = match ? `tb-${match[1]}` : `tb-${Date.now()}`;
-      } else {
-        const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
-        slug = urlObj.pathname.split('/').filter(Boolean).pop() || `ext-${Date.now()}`;
-      }
-
-      const { error } = await supabase.from('tournaments').insert({
-        slug, source, organizer: user?.name || 'Admin', period: 'In corso', direct_link: url, type: '1v1'
-      });
-      if (error) throw error;
-      toast.success('Torneo aggiunto!');
-      setShowAddModal(false);
-      setNewUrl('');
-      loadTournaments();
-    } catch (err: any) {
-      toast.error(`Errore: ${err.message}`);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -250,21 +214,79 @@ export function TournamentsPage() {
     }
   };
 
+  const handleSyncFromUrl = async (url: string) => {
+    let slug = '';
+    let source = '';
+    
+    if (url.includes('start.gg/tournament/')) {
+      slug = url.split('start.gg/tournament/')[1].split('/')[0];
+      source = 'startgg';
+    } else if (url.includes('challonge.com/')) {
+      slug = url.split('challonge.com/')[1].split('/')[0];
+      source = 'challonge';
+    }
+
+    if (!slug) {
+      toast.error('URL non valido. Inserisci un link di start.gg o challonge.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      if (source === 'startgg') {
+        const data = await fetchTournament(slug);
+        if (data) {
+          setEditForm(prev => ({
+            ...prev,
+            name: data.name || prev.name,
+            bannerUrl: data.images?.find((img: any) => img.type === 'banner')?.url || prev.bannerUrl,
+            podium: data.events?.[0]?.standings?.nodes || prev.podium,
+            type: data.events?.[0]?.name?.includes('1v1') ? '1v1' : (data.events?.[0]?.name?.includes('2v2') ? '2v2' : 'Team'),
+            externalUrl: url
+          }));
+          toast.success('Dati sincronizzati da Start.gg!');
+        }
+      } else if (source === 'challonge') {
+        const data = await fetchChallongeTournament(slug);
+        if (data) {
+          setEditForm(prev => ({
+            ...prev,
+            name: data.attributes?.name || prev.name,
+            externalUrl: url
+          }));
+          toast.success('Dati sincronizzati da Challonge!');
+        }
+      }
+    } catch (err: any) {
+      toast.error(`Errore durante la sincronizzazione: ${err.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleUpdateTournament = async () => {
-    if (!editingTournament) return;
     setIsSubmitting(true);
     setSaveStatus('saving');
     try {
-      // First, check if the tournament already exists in the DB
-      const { data: existing } = await supabase
-        .from('tournaments')
-        .select('id')
-        .eq('slug', editingTournament.slug)
-        .single();
+      let finalSlug = editingTournament?.slug;
+      if (!finalSlug) {
+        // Generate slug for new tournament
+        if (editForm.externalUrl) {
+          if (editForm.externalUrl.includes('start.gg/tournament/')) {
+            finalSlug = editForm.externalUrl.split('start.gg/tournament/')[1].split('/')[0];
+          } else if (editForm.externalUrl.includes('challonge.com/')) {
+            finalSlug = editForm.externalUrl.split('challonge.com/')[1].split('/')[0];
+          }
+        }
+        
+        if (!finalSlug) {
+          finalSlug = editForm.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+        }
+      }
 
       const tournamentData = {
-        slug: editingTournament.slug,
-        source: editingTournament.config.source || 'challonge',
+        slug: finalSlug,
+        source: editForm.externalUrl.includes('challonge') ? 'challonge' : 'startgg',
         name: editForm.name,
         organizer: editForm.organizer,
         period: editForm.period,
@@ -274,8 +296,15 @@ export function TournamentsPage() {
         type: editForm.type,
         has_regolamento: editForm.hasRegolamento,
         regolamento_content: editForm.regolamentoContent,
+        direct_link: editForm.externalUrl || null,
         updated_at: new Date().toISOString()
       };
+
+      const { data: existing } = await supabase
+        .from('tournaments')
+        .select('id')
+        .eq('slug', finalSlug)
+        .single();
 
       let error;
       if (existing) {
@@ -360,7 +389,22 @@ export function TournamentsPage() {
 
         {canManageTournaments && (
           <button 
-            onClick={() => setShowAddModal(true)} 
+            onClick={() => {
+              setEditingTournament(null);
+              setEditForm({
+                externalUrl: '',
+                organizer: 'Manuale Civ',
+                period: '',
+                bannerUrl: '',
+                status: 'In corso',
+                name: '',
+                type: '1v1',
+                podium: [],
+                hasRegolamento: false,
+                regolamentoContent: ''
+              });
+              setShowEditModal(true);
+            }} 
             className="flex items-center gap-3 px-6 py-4 bg-gradient-to-b from-slate-100 to-gray-400 font-black text-black rounded-2xl hover:from-white hover:to-gray-300 transition-all hover:scale-[1.05] shadow-[0_0_20px_rgba(255,255,255,0.1)] uppercase text-xs tracking-widest active:scale-[0.98]"
           >
             <Plus size={20} strokeWidth={3} />
@@ -465,7 +509,7 @@ export function TournamentsPage() {
                           </button>
                         )}
                         <button 
-                          onClick={() => t.config.directLink ? window.open(t.config.directLink, '_blank') : navigate(`/tornei/${t.slug}`)} 
+                          onClick={() => navigate(`/tornei/${t.slug}`)} 
                           className={clsx(
                             "flex-grow h-full bg-white/5 hover:bg-white/10 rounded-2xl text-white font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/det shadow-lg active:scale-95",
                             t.config.hasRegolamento ? "text-[10px]" : "text-xs"
@@ -487,7 +531,8 @@ export function TournamentsPage() {
                                 type: t.config?.type || '1v1',
                                 podium: t.config?.podium || (t.events?.[0]?.standings?.nodes || []),
                                 hasRegolamento: t.config?.hasRegolamento || false,
-                                regolamentoContent: t.config?.regolamentoContent || ''
+                                regolamentoContent: t.config?.regolamentoContent || '',
+                                externalUrl: t.config?.externalUrl || ''
                               });
                               setShowEditModal(true);
                             }} 
@@ -504,39 +549,8 @@ export function TournamentsPage() {
         })}
       </div>
 
-      {showAddModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#121620] border border-white/10 p-8 rounded-3xl w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-300">
-            <div className="flex justify-between items-center mb-6 text-yellow-500">
-              <div className="flex items-center gap-2"><Trophy size={24} /><h2 className="text-xl font-bold uppercase tracking-tighter">Nuovo Torneo</h2></div>
-              <X className="cursor-pointer text-gray-500 hover:text-white transition-colors" onClick={() => setShowAddModal(false)} />
-            </div>
-            <div className="space-y-4">
-              <div className="relative">
-                <LinkIcon size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
-                <input 
-                  type="text" value={newUrl} onChange={e => setNewUrl(e.target.value)}
-                  placeholder="Link Start.gg o Challonge"
-                  className="w-full bg-black/40 border border-white/10 p-4 pl-12 rounded-xl text-white focus:border-yellow-500 outline-none transition-colors"
-                />
-              </div>
-              <div className="p-3 rounded-xl bg-yellow-500/5 border border-yellow-500/10 flex gap-3">
-                <CheckCircle2 size={16} className="text-yellow-500 shrink-0 mt-0.5" />
-                <p className="text-[10px] text-gray-400 leading-tight">Verranno estratti automaticamente banner e statistiche dal link fornito.</p>
-              </div>
-              <button 
-                onClick={handleAddTournament} 
-                disabled={isSubmitting} 
-                className="w-full py-4 bg-gradient-to-b from-slate-100 to-gray-400 text-black font-black rounded-xl active:scale-95 transition-all text-[10px] tracking-widest shadow-xl"
-              >
-                {isSubmitting ? 'ANALISI IN CORSO...' : 'CONFERMA INSERIMENTO'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {showEditModal && editingTournament && (
+      {showEditModal && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md overflow-y-auto">
           {confirmClose && (
             <div className="fixed inset-0 z-[120] flex items-start justify-center p-4 pt-32 bg-black/40 backdrop-blur-[2px] animate-in fade-in duration-300">
@@ -567,48 +581,82 @@ export function TournamentsPage() {
             {/* Header */}
             <div className="flex justify-between items-center mb-8 text-slate-300">
               <div className="flex items-center gap-2">
-                <Edit2 size={24} className="text-blue-400"/>
-                <h2 className="text-xl font-bold uppercase tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-200 to-slate-500">Modifica Torneo</h2>
+                <Settings size={18} className="text-yellow-500" />
+                <h2 className="text-xl font-black uppercase tracking-tighter text-white">
+                  {editingTournament ? 'Gestione Torneo' : 'Nuovo Torneo'}
+                </h2>
               </div>
-              <X 
-                className="cursor-pointer text-gray-500 hover:text-white transition-colors" 
-                onClick={() => { 
-                  const initialData = {
-                    name: editingTournament.config?.name || editingTournament.name || '',
-                    organizer: editingTournament.config?.organizer || '',
-                    period: editingTournament.config?.period || '',
-                    bannerUrl: editingTournament.config?.bannerUrl || '',
-                    type: editingTournament.config?.type || '1v1',
-                    status: editingTournament.config?.status || 'Concluso',
-                    hasRegolamento: editingTournament.config?.hasRegolamento || false,
-                    regolamentoContent: editingTournament.config?.regolamentoContent || '',
-                    podium: editingTournament.config?.podium || (editingTournament.events?.[0]?.standings?.nodes || [])
-                  };
+              <div className="flex items-center gap-4">
+                {saveStatus === 'saving' && <Loader2 className="w-4 h-4 animate-spin text-yellow-500" />}
+                {saveStatus === 'saved' && <span className="text-[10px] font-bold text-green-500 uppercase tracking-widest">Salvato!</span>}
+                <X 
+                  className="cursor-pointer text-gray-500 hover:text-white transition-colors" 
+                  onClick={() => { 
+                    const initialData = {
+                      name: editingTournament?.config?.name || editingTournament?.name || '',
+                      organizer: editingTournament?.config?.organizer || '',
+                      period: editingTournament?.config?.period || '',
+                      bannerUrl: editingTournament?.config?.bannerUrl || '',
+                      type: editingTournament?.config?.type || '1v1',
+                      status: editingTournament?.config?.status || 'Concluso',
+                      hasRegolamento: editingTournament?.config?.hasRegolamento || false,
+                      regolamentoContent: editingTournament?.config?.regolamentoContent || '',
+                      podium: editingTournament?.config?.podium || (editingTournament?.events?.[0]?.standings?.nodes || [])
+                    };
 
-                  const currentData = {
-                    name: editForm.name,
-                    organizer: editForm.organizer,
-                    period: editForm.period,
-                    bannerUrl: editForm.bannerUrl,
-                    type: editForm.type,
-                    status: editForm.status,
-                    hasRegolamento: editForm.hasRegolamento,
-                    regolamentoContent: editForm.regolamentoContent,
-                    podium: editForm.podium
-                  };
+                    const currentData = {
+                      name: editForm.name,
+                      organizer: editForm.organizer,
+                      period: editForm.period,
+                      bannerUrl: editForm.bannerUrl,
+                      type: editForm.type,
+                      status: editForm.status,
+                      hasRegolamento: editForm.hasRegolamento,
+                      regolamentoContent: editForm.regolamentoContent,
+                      podium: editForm.podium
+                    };
 
-                  if (JSON.stringify(initialData) === JSON.stringify(currentData)) {
-                    setShowEditModal(false); 
-                    loadTournaments(); 
-                  } else {
-                    setConfirmClose(true);
-                  }
-                }} 
-              />
+                    if (JSON.stringify(initialData) === JSON.stringify(currentData)) {
+                      setShowEditModal(false); 
+                      loadTournaments(); 
+                    } else {
+                      setConfirmClose(true);
+                    }
+                  }} 
+                />
+              </div>
             </div>
 
             {/* Body */}
             <div className="relative">
+              {/* URL Sync Section */}
+              <div className="mb-8 p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
+                <label className="block text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-3">Sincronizzazione Automatica</label>
+                <div className="flex gap-3">
+                  <div className="relative flex-1">
+                    <LinkIcon size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                    <input 
+                      type="text" 
+                      value={editForm.externalUrl}
+                      onChange={(e) => setEditForm({ ...editForm, externalUrl: e.target.value })}
+                      placeholder="Link Start.gg o Challonge..."
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 pl-12 text-white text-sm focus:border-yellow-500/50 outline-none transition-all"
+                    />
+                  </div>
+                  <button 
+                    onClick={() => handleSyncFromUrl(editForm.externalUrl)}
+                    disabled={isSubmitting || !editForm.externalUrl}
+                    className="px-6 bg-yellow-500 hover:bg-yellow-400 text-black rounded-xl font-black uppercase text-[10px] tracking-widest transition-all disabled:opacity-50 shadow-lg shadow-yellow-500/10"
+                  >
+                    {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : 'Sincronizza'}
+                  </button>
+                </div>
+                <p className="mt-3 text-[9px] text-gray-500 italic flex items-center gap-2">
+                  <AlertCircle size={10} />
+                  Inserisci il link del torneo per autocompilare Nome, Banner e Podio.
+                </p>
+              </div>
+
               <div className="space-y-6">
                 <div className="space-y-1">
                   <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Titolo Personalizzato</label>
@@ -790,7 +838,6 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
     if (typeof document === 'undefined') return;
     const block = document.queryCommandValue('formatBlock');
     
-    // Fallback check for H2 if formatBlock is unreliable
     let isH2 = block === 'h2' || block === 'H2';
     if (!isH2) {
       const selection = window.getSelection();
@@ -891,7 +938,6 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
               e.preventDefault(); 
               const isH2 = activeStyles.h2;
               document.execCommand('formatBlock', false, isH2 ? 'p' : 'h2');
-              // Aggressive check after change
               setTimeout(() => {
                 checkActiveStyles();
                 handleInput();
@@ -953,7 +999,6 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
               if (tag === 'ol') return `<ol>${innerHTML}</ol>`;
               if (tag === 'li') return `<li>${innerHTML}</li>`;
               if (tag === 'br') return '<br>';
-              
               if (tag === 'table') return `<table>${innerHTML}</table>`;
               if (tag === 'tr') return `<tr>${innerHTML}</tr>`;
               if (tag === 'td') return `<td>${innerHTML}</td>`;
@@ -962,8 +1007,6 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
               let result = innerHTML;
               const style = el.style;
               const isInline = ['span', 'b', 'strong', 'i', 'em', 'u', 'a'].includes(tag);
-              
-              // Only keep bold if it's explicitly set and NOT part of a parent that shouldn't be bold
               const isBold = ['b', 'strong'].includes(tag) || (isInline && (style.fontWeight === 'bold' || parseInt(style.fontWeight) >= 600));
               const isItalic = ['i', 'em'].includes(tag) || (isInline && style.fontStyle === 'italic');
               const isUnderline = tag === 'u' || (isInline && style.textDecoration.includes('underline'));
@@ -975,8 +1018,6 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
             };
 
             const cleanedHTML = Array.from(doc.body.childNodes).map(sanitize).join('');
-            
-            // Clear current format to avoid inheriting bold from cursor
             document.execCommand('removeFormat', false);
             document.execCommand('insertHTML', false, cleanedHTML);
           } else {
@@ -986,7 +1027,7 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
         }}
         className="w-full bg-black/40 border border-white/10 p-8 rounded-[2rem] text-white text-base outline-none focus:border-blue-500/40 transition-all min-h-[450px] overflow-y-auto shadow-inner text-left regulation-editor-content"
         style={{ textAlign: 'left' }}
-      />
+      ></div>
       <p className="text-[9px] text-gray-500 italic px-4">Modifica il testo sopra. Clicca sui tasti per applicare lo stile alla selezione.</p>
     </div>
   );
