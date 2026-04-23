@@ -139,7 +139,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
 
 
       {/* Left container for social links */}
-      <div className="flex flex-wrap lg:flex-nowrap items-center justify-center lg:justify-start gap-1.5 xl:gap-3 order-2 lg:order-1 min-w-0">
+      <div className="flex flex-wrap xl:flex-nowrap items-center justify-center lg:justify-start gap-1.5 xl:gap-3 order-2 lg:order-1 min-w-0">
         <a
           href="https://discord.gg/8Tx2YdXrEu"
           target="_blank"
