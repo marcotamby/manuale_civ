@@ -121,12 +121,14 @@ html, body, .elegant-scrollbar {
   z-index: 10;
 }
 
-/* Regulation Editor Content Styles */
-.regulation-editor-content {
+/* Regulation Editor and Frontend Content Styles */
+.regulation-editor-content,
+.regulation-content {
   font-weight: 400 !important;
 }
 
-.regulation-editor-content h2 {
+.regulation-editor-content h2,
+.regulation-content h2 {
   display: block;
   font-size: 2rem !important;
   font-weight: 800 !important;
@@ -139,7 +141,8 @@ html, body, .elegant-scrollbar {
   padding-bottom: 0.5rem;
 }
 
-.regulation-editor-content p {
+.regulation-editor-content p,
+.regulation-content p {
   margin-top: 0.75rem !important;
   margin-bottom: 0.75rem !important;
   line-height: 1.6 !important;
@@ -148,7 +151,9 @@ html, body, .elegant-scrollbar {
 }
 
 .regulation-editor-content b, 
-.regulation-editor-content strong {
+.regulation-editor-content strong,
+.regulation-content b,
+.regulation-content strong {
   font-weight: 700 !important;
 }
 

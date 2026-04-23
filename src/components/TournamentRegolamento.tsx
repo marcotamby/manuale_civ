@@ -103,11 +103,10 @@ export function TournamentRegolamento() {
           {/* Regulation Text */}
           <div className="p-8 md:p-16 bg-[#0d1117]/50">
             <div className="prose prose-invert prose-slate max-w-none 
-              prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tight
               prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-4 prose-h2:mt-12 prose-h2:text-slate-200
               prose-p:text-gray-300 prose-p:leading-relaxed prose-p:text-lg
               prose-li:text-gray-300
-              prose-strong:text-white prose-strong:font-black
+              prose-strong:text-white
               prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
               font-sans
             ">

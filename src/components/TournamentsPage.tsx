@@ -521,7 +521,7 @@ export function TournamentsPage() {
           <div className="bg-[#121620] border border-white/10 p-8 rounded-3xl w-full max-w-2xl my-auto shadow-2xl animate-in zoom-in-95 duration-300 relative overflow-hidden">
             
             {confirmClose && (
-              <div className="absolute inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xl animate-in fade-in duration-300">
+              <div className="absolute inset-0 z-[120] flex items-start justify-center p-4 pt-20 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
                 <div className="bg-[#1a1f2e] border border-white/10 p-8 rounded-[2rem] max-w-sm text-center shadow-2xl scale-100 animate-in zoom-in-95">
                   <AlertCircle size={48} className="mx-auto mb-4 text-yellow-500" />
                   <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tighter">Attenzione!</h3>
