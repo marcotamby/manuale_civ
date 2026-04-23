@@ -223,7 +223,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
           Per garantire la qualità dei contributi, ti chiediamo di effettuare l'accesso tramite Google per proporre modifiche.
         </p>
         <button
-          onClick={openLoginModal}
+          onClick={() => openLoginModal()}
           className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg transition-all"
         >
           Accedi con Google
