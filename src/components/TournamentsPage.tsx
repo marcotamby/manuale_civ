@@ -281,14 +281,37 @@ export function TournamentsPage() {
           toast.success('Dati sincronizzati da Start.gg!');
         }
       } else if (source === 'challonge') {
-        const data = await fetchChallongeTournament(slug);
+        const [data, detailData] = await Promise.all([
+          fetchChallongeTournament(slug),
+          fetchChallongeData(slug)
+        ]);
+        
         if (data) {
+          let podiumData = editForm.podium;
+          if (detailData?.participants) {
+            // Map participants with final_rank 1, 2, 3 to podium format
+            const winners = detailData.participants
+              .filter(p => p.attributes.final_rank && p.attributes.final_rank <= 3)
+              .sort((a, b) => (a.attributes.final_rank || 99) - (b.attributes.final_rank || 99))
+              .map(p => ({
+                entrant: { name: p.attributes.name },
+                placement: p.attributes.final_rank
+              }));
+            
+            if (winners.length > 0) {
+              podiumData = winners;
+            }
+          }
+
           setEditForm(prev => ({
             ...prev,
             name: data.attributes?.name || prev.name,
+            podium: podiumData,
             externalUrl: url
           }));
           toast.success('Dati sincronizzati da Challonge!');
+        } else {
+          toast.error('Impossibile trovare il torneo su Challonge. Verifica lo slug o il link.');
         }
       }
     } catch (err: any) {

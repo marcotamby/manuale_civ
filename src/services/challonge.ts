@@ -23,6 +23,7 @@ export interface ChallongeParticipant {
   attributes: {
     name: string;
     seed: number;
+    final_rank: number | null;
   };
 }
 
