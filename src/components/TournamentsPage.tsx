@@ -56,6 +56,7 @@ export function TournamentsPage() {
     display_order: 0
   });
   const [isUploading, setIsUploading] = useState(false);
+  const [isRegEditorExpanded, setIsRegEditorExpanded] = useState(false);
   
   const navigate = useNavigate();
 
@@ -446,7 +447,8 @@ export function TournamentsPage() {
       setTimeout(() => {
         setSaveStatus('idle');
         setShowEditModal(false);
-      }, 1500);
+        setIsRegEditorExpanded(false); // Reset for next time
+      }, 2000);
     } catch (err: any) {
       toast.error(`Errore: ${err.message}`);
       setSaveStatus('idle');
@@ -979,10 +981,25 @@ export function TournamentsPage() {
                   </div>
 
                   {editForm.hasRegolamento && (
-                    <WYSIWYGEditor 
-                      initialValue={editForm.regolamentoContent} 
-                      onChange={(html) => setEditForm({ ...editForm, regolamentoContent: html })} 
-                    />
+                    <div className="space-y-4">
+                      <button 
+                        type="button"
+                        onClick={() => setIsRegEditorExpanded(!isRegEditorExpanded)}
+                        className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 transition-all flex items-center justify-center gap-2"
+                      >
+                        {isRegEditorExpanded ? 'Riduci Editor' : 'Espandi Editor per Modificare'} 
+                        <ChevronDown size={14} className={clsx("transition-transform", isRegEditorExpanded && "rotate-180")} />
+                      </button>
+                      
+                      {isRegEditorExpanded && (
+                        <div className="animate-in fade-in zoom-in-95 duration-300">
+                          <WYSIWYGEditor 
+                            initialValue={editForm.regolamentoContent} 
+                            onChange={(html) => setEditForm({ ...editForm, regolamentoContent: html })} 
+                          />
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
 
@@ -1014,6 +1031,7 @@ export function TournamentsPage() {
 
                 <div className="flex gap-4 pt-6 border-t border-white/5">
                   <button 
+                    type="button"
                     onClick={handleUpdateTournament} 
                     disabled={isSubmitting} 
                     className={clsx(
@@ -1029,6 +1047,7 @@ export function TournamentsPage() {
                   </button>
                   {editingTournament && (
                     <button 
+                      type="button"
                       onClick={() => setShowDeleteConfirm(true)} 
                       className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl hover:bg-red-500/20 transition-all shadow-lg"
                     >
