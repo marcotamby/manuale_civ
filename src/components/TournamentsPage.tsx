@@ -650,7 +650,8 @@ export function TournamentsPage() {
 
                  {editForm.hasRegolamento && (
                    <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                      <div className="flex flex-wrap gap-2 mb-1 p-2 bg-black/60 rounded-2xl border border-white/10 sticky top-0 z-20 backdrop-blur-md sh                          <div className="flex items-center gap-1 pr-2 border-r border-white/10">
+                      <div className="flex flex-wrap gap-2 mb-1 p-2 bg-black/60 rounded-2xl border border-white/10 sticky top-0 z-20 backdrop-blur-md shadow-xl">
+                          <div className="flex items-center gap-1 pr-2 border-r border-white/10">
                             <button 
                               onMouseDown={(e) => { e.preventDefault(); document.execCommand('bold', false); checkActiveStyles(); }} 
                               className={clsx(
