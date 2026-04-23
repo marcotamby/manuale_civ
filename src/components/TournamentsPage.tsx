@@ -436,12 +436,13 @@ export function TournamentsPage() {
                 organizer: 'Manuale Civ',
                 period: '',
                 bannerUrl: '',
-                status: 'In corso',
+                status: 'Programmato',
                 name: '',
                 type: '1v1',
                 podium: [],
                 hasRegolamento: false,
-                regolamentoContent: ''
+                regolamentoContent: '',
+                display_order: 0
               });
               setShowEditModal(true);
             }} 
@@ -572,7 +573,8 @@ export function TournamentsPage() {
                                 podium: t.config?.podium || (t.events?.[0]?.standings?.nodes || []),
                                 hasRegolamento: t.config?.hasRegolamento || false,
                                 regolamentoContent: t.config?.regolamentoContent || '',
-                                externalUrl: t.config?.externalUrl || ''
+                                externalUrl: t.config?.externalUrl || '',
+                                display_order: t.config?.display_order || 0
                               });
                               setShowEditModal(true);
                             }} 
