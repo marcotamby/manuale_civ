@@ -29,10 +29,7 @@ interface TournamentConfig {
   id?: string;
 }
 
-const TOURNAMENTS: TournamentConfig[] = [
-  { slug: 'torneo-1v1-2026', source: 'startgg', organizer: 'marcotamby', period: 'Gennaio - Febbraio 2026' },
-  { slug: 'gyunrhoc', source: 'challonge', organizer: 'Kani', period: 'Marzo 2026' }
-];
+const TOURNAMENTS: TournamentConfig[] = [];
 
 export function TournamentsPage() {
   const { canManageTournaments } = useAuth();
