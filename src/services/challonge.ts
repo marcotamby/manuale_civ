@@ -39,19 +39,22 @@ export interface ChallongeTournament {
 
 export async function fetchChallongeTournament(slug: string) {
   try {
-    // Try to find by URL filter first (more efficient)
-    const listResponse = await fetch(`/api/challonge?path=tournaments&filter[url]=${slug}`);
-    if (listResponse.ok) {
-      const listData = await listResponse.json();
-      if (listData.data && listData.data.length > 0) {
-        return listData.data[0] as ChallongeTournament;
-      }
+    // Strategy 1: URL filter (standard v2.1)
+    const listRes = await fetch(`/api/challonge?path=tournaments&filter[url]=${slug}`);
+    if (listRes.ok) {
+      const data = await listRes.json();
+      if (data.data && data.data.length > 0) return data.data[0] as ChallongeTournament;
     }
-    
-    // Fallback: try direct ID access
+
+    // Strategy 2: Direct ID access
     const directRes = await fetch(`/api/challonge?path=tournaments/${slug}`);
-    if (directRes.ok) {
-      return (await directRes.json()).data as ChallongeTournament;
+    if (directRes.ok) return (await directRes.json()).data as ChallongeTournament;
+
+    // Strategy 3: Query search (if supported)
+    const queryRes = await fetch(`/api/challonge?path=tournaments&q=${slug}`);
+    if (queryRes.ok) {
+      const data = await queryRes.json();
+      if (data.data && data.data.length > 0) return data.data[0] as ChallongeTournament;
     }
     
     throw new Error('Tournament not found in Challonge');
