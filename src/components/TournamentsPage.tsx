@@ -357,7 +357,10 @@ export function TournamentsPage() {
         period: editForm.period,
         banner_url: editForm.bannerUrl,
         status: editForm.status,
-        podium: editForm.podium,
+        podium: editForm.podium.map(p => ({
+          ...p,
+          players: p.players ? p.players.filter((name: string) => name.trim() !== '') : []
+        })),
         type: editForm.type,
         has_regolamento: editForm.hasRegolamento,
         regolamento_content: editForm.regolamentoContent,
@@ -1065,7 +1068,7 @@ export function TournamentsPage() {
                           type="text" 
                           value={p.players?.join(', ') || ''} 
                           onChange={e => {
-                            const playerList = e.target.value.split(',').map(s => s.trim()).filter(s => s !== '');
+                            const playerList = e.target.value.split(',').map(s => s.trim());
                             const np = [...editForm.podium]; 
                             np[i] = { ...p, players: playerList }; 
                             setEditForm({ ...editForm, podium: np });
