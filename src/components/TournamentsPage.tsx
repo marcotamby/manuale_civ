@@ -127,7 +127,7 @@ export function TournamentsPage() {
         try {
           if (config.slug === 'gyunrhoc') {
             return {
-              id: 'gyunrhoc',
+              id: config.id || 'gyunrhoc',
               name: "Torneo degli scudi d'oro",
               slug: config.slug,
               images: [],
@@ -157,7 +157,7 @@ export function TournamentsPage() {
           if (tournamentData) {
             if (config.source === 'challonge') {
                return {
-                id: tournamentData.id || config.slug,
+                id: config.id || tournamentData.id || config.slug,
                 name: tournamentData.attributes?.name || `Torneo ${config.slug}`,
                 slug: config.slug,
                 images: [],
@@ -165,13 +165,13 @@ export function TournamentsPage() {
                 config: { ...config, directLink: config.directLink || `https://challonge.com/it/${config.slug}` }
               } as any;
             }
-            return { ...tournamentData, config };
+            return { ...tournamentData, config, id: config.id || tournamentData.id };
           }
 
           if (config.slug && (config.directLink || config.slug.startsWith('tb-'))) {
              const isTB = config.slug.startsWith('tb-');
              return {
-                id: config.slug,
+                id: config.id || config.slug,
                 name: isTB ? `Torneo TourneyBot #${config.slug.replace('tb-', '')}` : `Torneo ${config.slug.toUpperCase()}`,
                 slug: config.slug,
                 images: [],
@@ -184,7 +184,7 @@ export function TournamentsPage() {
           }
           return null;
         } catch (e) {
-          return { id: config.slug, name: `Torneo ${config.slug}`, slug: config.slug, images: [], events: [], config } as any;
+          return { id: config.id || config.slug, name: `Torneo ${config.slug}`, slug: config.slug, images: [], events: [], config } as any;
         }
       }));
 
@@ -348,16 +348,17 @@ export function TournamentsPage() {
 
       const performUpsert = async (data: any) => {
         let upsertError;
+        const currentId = editingTournament?.id;
         
-        if (editingTournament?.id) {
-          // Explicitly update by ID if we have it to avoid duplicates if slug changes
+        if (currentId && currentId.length > 20) {
+          // Explicitly update by UUID if we have it
           const { error } = await supabase
             .from('tournaments')
             .update(data)
-            .eq('id', editingTournament.id);
+            .eq('id', currentId);
           upsertError = error;
         } else {
-          // New tournament or no ID, use upsert with slug conflict resolution
+          // New tournament or no UUID, use upsert with slug conflict resolution
           const { error } = await supabase
             .from('tournaments')
             .upsert(data, { onConflict: 'slug' });
@@ -368,11 +369,11 @@ export function TournamentsPage() {
           if (upsertError.message.includes('display_order')) {
             const { display_order, ...safeData } = data;
             let retryError;
-            if (editingTournament?.id) {
+            if (currentId && currentId.length > 20) {
               const { error } = await supabase
                 .from('tournaments')
                 .update(safeData)
-                .eq('id', editingTournament.id);
+                .eq('id', currentId);
               retryError = error;
             } else {
               const { error } = await supabase
@@ -424,9 +425,14 @@ export function TournamentsPage() {
     }
   };
 
-  const handleDeleteTournament = async (id: string) => {
+  const handleDeleteTournament = async (id: string, slug: string) => {
     try {
-      const { error } = await supabase.from('tournaments').delete().eq('id', id);
+      // If ID looks like a UUID (length > 20), use it. Otherwise use slug.
+      const query = (id && id.length > 20) 
+        ? supabase.from('tournaments').delete().eq('id', id)
+        : supabase.from('tournaments').delete().eq('slug', slug);
+
+      const { error } = await query;
       if (error) throw error;
       toast.success('Torneo rimosso.');
       setShowDeleteConfirm(false);
@@ -458,7 +464,11 @@ export function TournamentsPage() {
 
     try {
       const moveUpsert = async (data: any) => {
-        const { error } = await supabase.from('tournaments').upsert(data);
+        // If ID is not a UUID, remove it from data to let Supabase use slug for upsert/onConflict
+        const { id, ...rest } = data;
+        const finalData = (id && id.length > 20) ? data : rest;
+
+        const { error } = await supabase.from('tournaments').upsert(finalData, { onConflict: 'slug' });
         if (error) {
           if (error.message.includes('display_order')) {
             toast.error('Errore: Devi prima attivare la colonna Ordinamento nel database (vedi file SQL fornito)');
@@ -491,6 +501,7 @@ export function TournamentsPage() {
       toast.success('Ordine aggiornato');
     } catch (err: any) {
       toast.error('Errore durante l\'ordinamento');
+      console.error(err);
     }
   };
 
@@ -985,7 +996,7 @@ export function TournamentsPage() {
                       </p>
                       <div className="flex flex-col gap-3">
                         <button 
-                          onClick={() => handleDeleteTournament(editingTournament?.id || '')}
+                          onClick={() => handleDeleteTournament(editingTournament?.id || '', editingTournament?.slug || '')}
                           className="w-full py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-red-900/20 transition-all active:scale-95"
                         >
                           Conferma Eliminazione
