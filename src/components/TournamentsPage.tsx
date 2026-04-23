@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
-import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings } from 'lucide-react';
+import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, ChevronUp, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
@@ -408,6 +408,8 @@ export function TournamentsPage() {
     } catch (err: any) {
       toast.error(`Errore: ${err.message}`);
     }
+  };
+
   const handleMoveTournament = async (index: number, direction: 'up' | 'down') => {
     const otherIndex = direction === 'up' ? index - 1 : index + 1;
     if (otherIndex < 0 || otherIndex >= tournaments.length) return;
@@ -517,7 +519,7 @@ export function TournamentsPage() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {tournaments.map(t => {
+        {tournaments.map((t, index) => {
           const banner = t.config.bannerUrl || t.images?.[0]?.url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop';
           const status = t.config.status || 'Concluso';
           const podium = t.config.podium || t.events?.[0]?.standings?.nodes || [];
