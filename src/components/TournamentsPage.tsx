@@ -845,12 +845,21 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
               if (tag === 'li') return `<li>${innerHTML}</li>`;
               if (tag === 'br') return '<br>';
               
+              // Table support
+              if (tag === 'table') return `<table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem; border: 1px solid rgba(255,255,255,0.1);">${innerHTML}</table>`;
+              if (tag === 'tr') return `<tr>${innerHTML}</tr>`;
+              if (tag === 'td') return `<td style="border: 1px solid rgba(255,255,255,0.1); padding: 8px; text-align: left;">${innerHTML}</td>`;
+              if (tag === 'th') return `<th style="border: 1px solid rgba(255,255,255,0.1); padding: 8px; text-align: left; background: rgba(255,255,255,0.05); font-weight: bold;">${innerHTML}</th>`;
+              
               // Inline tags we want to keep
               let result = innerHTML;
               const style = el.style;
-              const isBold = ['b', 'strong'].includes(tag) || style.fontWeight === 'bold' || parseInt(style.fontWeight) >= 600;
-              const isItalic = ['i', 'em'].includes(tag) || style.fontStyle === 'italic';
-              const isUnderline = tag === 'u' || style.textDecoration.includes('underline');
+              
+              // ONLY apply bold/italic to inline elements or if it's a semantic tag
+              const isInline = ['span', 'b', 'strong', 'i', 'em', 'u', 'a'].includes(tag);
+              const isBold = ['b', 'strong'].includes(tag) || (isInline && (style.fontWeight === 'bold' || parseInt(style.fontWeight) >= 600));
+              const isItalic = ['i', 'em'].includes(tag) || (isInline && style.fontStyle === 'italic');
+              const isUnderline = tag === 'u' || (isInline && style.textDecoration.includes('underline'));
               
               if (isBold) result = `<b>${result}</b>`;
               if (isItalic) result = `<i>${result}</i>`;
