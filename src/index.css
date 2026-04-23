@@ -122,6 +122,10 @@ html, body, .elegant-scrollbar {
 }
 
 /* Regulation Editor Content Styles */
+.regulation-editor-content {
+  font-weight: 400 !important;
+}
+
 .regulation-editor-content h2 {
   display: block;
   font-size: 2rem !important;
@@ -140,6 +144,12 @@ html, body, .elegant-scrollbar {
   margin-bottom: 0.75rem !important;
   line-height: 1.6 !important;
   display: block;
+  font-weight: 400 !important;
+}
+
+.regulation-editor-content b, 
+.regulation-editor-content strong {
+  font-weight: 700 !important;
 }
 
 .regulation-editor-content ul {

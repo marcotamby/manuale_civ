@@ -39,6 +39,7 @@ export function TournamentsPage() {
   const [newUrl, setNewUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
   const [editingTournament, setEditingTournament] = useState<any>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [editForm, setEditForm] = useState({
@@ -518,29 +519,58 @@ export function TournamentsPage() {
       {showEditModal && editingTournament && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md overflow-y-auto">
           <div className="bg-[#121620] border border-white/10 p-8 rounded-3xl w-full max-w-2xl my-auto shadow-2xl animate-in zoom-in-95 duration-300">
-             <div className="flex justify-between mb-8 text-slate-300">
-               <div className="flex items-center gap-2"><Edit2 size={24} className="text-blue-400"/><h2 className="text-xl font-bold uppercase tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-200 to-slate-500">Modifica Torneo</h2></div>
+               <div className="flex items-center gap-2">
+                 <Edit2 size={24} className="text-blue-400"/>
+                 <h2 className="text-xl font-bold uppercase tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-200 to-slate-500">Modifica Torneo</h2>
+               </div>
                <X 
-                 className="cursor-pointer text-gray-500 hover:text-white transition-colors" 
-                 onClick={() => { 
-                   const hasChanges = JSON.stringify(editForm) !== JSON.stringify({
-                     name: editingTournament.config.name || '',
-                     period: editingTournament.config.period || '',
-                     bannerUrl: editingTournament.config.bannerUrl || '',
-                     type: editingTournament.config.type || '1v1',
-                     status: editingTournament.status || 'Programmato',
-                     hasRegolamento: editingTournament.config.hasRegolamento || false,
-                     regolamentoContent: editingTournament.config.regolamentoContent || '',
-                     directLink: editingTournament.config.directLink || ''
-                   });
+                  className="cursor-pointer text-gray-500 hover:text-white transition-colors" 
+                  onClick={() => { 
+                    const hasChanges = JSON.stringify(editForm) !== JSON.stringify({
+                      name: editingTournament.config.name || '',
+                      period: editingTournament.config.period || '',
+                      bannerUrl: editingTournament.config.bannerUrl || '',
+                      type: editingTournament.config.type || '1v1',
+                      status: editingTournament.status || 'Programmato',
+                      hasRegolamento: editingTournament.config.hasRegolamento || false,
+                      regolamentoContent: editingTournament.config.regolamentoContent || '',
+                      directLink: editingTournament.config.directLink || ''
+                    });
 
-                   if (!hasChanges || window.confirm('Hai modifiche non salvate. Vuoi uscire senza salvare?')) {
-                     setShowEditModal(false); 
-                     loadTournaments(); 
-                   }
-                 }} 
-               />
+                    if (!hasChanges) {
+                      setShowEditModal(false); 
+                      loadTournaments(); 
+                    } else {
+                      setConfirmClose(true);
+                    }
+                  }} 
+                />
              </div>
+
+             <div className="relative">
+               {confirmClose && (
+                 <div className="absolute inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xl rounded-3xl animate-in fade-in duration-300 -m-8">
+                   <div className="bg-[#1a1f2e] border border-white/10 p-8 rounded-[2rem] max-w-sm text-center shadow-2xl scale-100 animate-in zoom-in-95">
+                     <AlertCircle size={48} className="mx-auto mb-4 text-yellow-500" />
+                     <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tighter">Attenzione!</h3>
+                     <p className="text-sm text-gray-400 mb-6">Hai delle modifiche non salvate. Sei sicuro di voler uscire e perdere tutto?</p>
+                     <div className="flex gap-3">
+                       <button 
+                         onClick={() => setConfirmClose(false)}
+                         className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all"
+                       >
+                         No, resta qui
+                       </button>
+                       <button 
+                         onClick={() => { setShowEditModal(false); setConfirmClose(false); loadTournaments(); }}
+                         className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all"
+                       >
+                         Sì, esci
+                       </button>
+                     </div>
+                   </div>
+                 </div>
+               )}
             <div className="space-y-6">
               <div className="space-y-1">
                 <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Titolo Personalizzato</label>
@@ -890,14 +920,12 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
 
             const cleanedHTML = Array.from(doc.body.childNodes).map(sanitize).join('');
             
-            // CRITICAL: Reset bold state before inserting to prevent "infecting" the paste with current cursor state
-            // If the cursor was in a bold area (or an H2), the browser might bold the entire insertion.
-            if (document.queryCommandState('bold')) {
-              document.execCommand('bold', false);
-            }
+            // AGGRESSIVE RESET: Use removeFormat and force normal weight
+            // This clears any browser-level bold inheritance from the cursor context
+            document.execCommand('removeFormat', false);
             
-            // Wrap in a span that explicitly resets weight to normal to be 100% sure
-            const finalHTML = `<span style="font-weight: normal !important;">${cleanedHTML}</span>`;
+            // Wrap in a container that explicitly kills any inherited bold
+            const finalHTML = `<div style="font-weight: 400 !important; color: white !important;">${cleanedHTML}</div>`;
             document.execCommand('insertHTML', false, finalHTML);
           } else {
             document.execCommand('insertText', false, text);
