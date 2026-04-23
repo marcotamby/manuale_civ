@@ -842,7 +842,7 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
           }
           handleInput();
         }}
-        className="w-full bg-black/40 border border-white/10 p-8 rounded-[2rem] text-white text-base outline-none focus:border-blue-500/40 transition-all min-h-[450px] prose prose-invert max-w-none prose-p:my-2 prose-h2:mt-8 prose-h2:mb-4 overflow-y-auto shadow-inner text-left"
+        className="w-full bg-black/40 border border-white/10 p-8 rounded-[2rem] text-white text-base outline-none focus:border-blue-500/40 transition-all min-h-[450px] overflow-y-auto shadow-inner text-left regulation-editor-content"
         style={{ textAlign: 'left' }}
       />
       <p className="text-[9px] text-gray-500 italic px-4">Modifica il testo sopra. Clicca sui tasti per applicare lo stile alla selezione.</p>
