@@ -519,6 +519,7 @@ export function TournamentsPage() {
       {showEditModal && editingTournament && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md overflow-y-auto">
           <div className="bg-[#121620] border border-white/10 p-8 rounded-3xl w-full max-w-2xl my-auto shadow-2xl animate-in zoom-in-95 duration-300">
+             <div className="flex justify-between mb-8 text-slate-300">
                <div className="flex items-center gap-2">
                  <Edit2 size={24} className="text-blue-400"/>
                  <h2 className="text-xl font-bold uppercase tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-200 to-slate-500">Modifica Torneo</h2>
