@@ -248,18 +248,21 @@ export function TournamentsPage() {
   const handleSyncFromUrl = async (url: string) => {
     let slug = '';
     let source = '';
+    const cleanUrl = url.trim().toLowerCase();
     
-    if (url.includes('start.gg/tournament/')) {
-      slug = url.split('start.gg/tournament/')[1].split('/')[0];
+    if (cleanUrl.includes('start.gg/tournament/')) {
+      const parts = cleanUrl.split('start.gg/tournament/')[1].split('/');
+      slug = parts[0];
       source = 'startgg';
-    } else if (url.includes('challonge.com/')) {
-      slug = url.split('challonge.com/')[1].split('/')[0];
+    } else if (cleanUrl.includes('challonge.com/')) {
+      const parts = cleanUrl.split('challonge.com/')[1].split('/');
+      // If it's challonge.com/it/slug, parts[0] is 'it', parts[1] is slug
+      slug = (parts[0].length === 2 && parts.length > 1) ? parts[1] : parts[0];
       source = 'challonge';
-    }
-
-    if (!slug) {
-      toast.error('URL non valido. Inserisci un link di start.gg o challonge.');
-      return;
+    } else if (cleanUrl && !cleanUrl.includes('.')) {
+      // Fallback: treat as bare slug
+      slug = cleanUrl;
+      source = 'challonge'; // Default to challonge for bare slugs
     }
 
     setIsSubmitting(true);
