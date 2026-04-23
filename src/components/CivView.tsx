@@ -1117,9 +1117,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                  </span>
                               </div>
                            </div>
-                           <p className="text-[10px] text-gray-600 italic leading-snug">
-                             Questo build order è stato proposto dalla community e verificato dai nostri esperti.
-                           </p>
                         </div>
 
                         {/* Video / Source */}
