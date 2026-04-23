@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
-import { fetchChallongeTournament } from '../services/challonge';
+import { fetchChallongeTournament, fetchChallongeData } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
 import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, ChevronUp, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -291,9 +291,9 @@ export function TournamentsPage() {
           if (detailData?.participants) {
             // Map participants with final_rank 1, 2, 3 to podium format
             const winners = detailData.participants
-              .filter(p => p.attributes.final_rank && p.attributes.final_rank <= 3)
-              .sort((a, b) => (a.attributes.final_rank || 99) - (b.attributes.final_rank || 99))
-              .map(p => ({
+              .filter((p: any) => p.attributes.final_rank && p.attributes.final_rank <= 3)
+              .sort((a: any, b: any) => (a.attributes.final_rank || 99) - (b.attributes.final_rank || 99))
+              .map((p: any) => ({
                 entrant: { name: p.attributes.name },
                 placement: p.attributes.final_rank
               }));
