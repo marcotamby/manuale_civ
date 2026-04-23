@@ -66,7 +66,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
   }, []);
 
   return (
-    <div className="flex-1 p-4 md:p-6 lg:p-8 select-none">
+    <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 h-full bg-[var(--color-brand-dark)] select-none">
       <header className="mb-4 md:mb-8 flex flex-col gap-2 md:gap-4 shrink-0">
         <div className="flex flex-col md:flex-row md:items-center justify-start gap-3 md:gap-4">
           <div className="hidden lg:block">
