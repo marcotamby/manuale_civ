@@ -343,23 +343,25 @@ export function TournamentsPage() {
         return;
       }
 
-      let error;
-      if (editingTournament) {
-        // Update existing record
-        const { error: updateError } = await supabase
+      const performUpsert = async (data: any) => {
+        const { error: upsertError } = await supabase
           .from('tournaments')
-          .update(tournamentData)
-          .eq('slug', editingTournament.slug);
-        error = updateError;
-      } else {
-        // Insert new record
-        const { error: insertError } = await supabase
-          .from('tournaments')
-          .insert(tournamentData);
-        error = insertError;
-      }
-      
-      if (error) throw error;
+          .upsert(data);
+
+        if (upsertError) {
+          if (upsertError.message.includes('display_order')) {
+            const { display_order, ...safeData } = data;
+            const { error: retryError } = await supabase
+              .from('tournaments')
+              .upsert(safeData);
+            if (retryError) throw retryError;
+          } else {
+            throw upsertError;
+          }
+        }
+      };
+
+      await performUpsert(tournamentData);
       
       setSaveStatus('saved');
       
@@ -405,6 +407,59 @@ export function TournamentsPage() {
       loadTournaments();
     } catch (err: any) {
       toast.error(`Errore: ${err.message}`);
+    }
+  const handleMoveTournament = async (index: number, direction: 'up' | 'down') => {
+    const otherIndex = direction === 'up' ? index - 1 : index + 1;
+    if (otherIndex < 0 || otherIndex >= tournaments.length) return;
+
+    const current = tournaments[index];
+    const other = tournaments[otherIndex];
+
+    // Swap or adjust display_order
+    let newCurrentOrder = (other.config?.display_order || 0);
+    let newOtherOrder = (current.config?.display_order || 0);
+
+    if (newCurrentOrder === newOtherOrder) {
+      if (direction === 'up') {
+        newCurrentOrder = newOtherOrder + 1;
+      } else {
+        newOtherOrder = newCurrentOrder + 1;
+      }
+    }
+
+    try {
+      const moveUpsert = async (data: any) => {
+        const { error } = await supabase.from('tournaments').upsert(data);
+        if (error) {
+          if (error.message.includes('display_order')) {
+            toast.error('Errore: Devi prima attivare la colonna Ordinamento nel database (vedi file SQL fornito)');
+            return false;
+          }
+          throw error;
+        }
+        return true;
+      };
+
+      const ok1 = await moveUpsert({
+        slug: current.slug,
+        display_order: newCurrentOrder,
+        updated_at: new Date().toISOString()
+      });
+
+      if (!ok1) return;
+
+      const ok2 = await moveUpsert({
+        slug: other.slug,
+        display_order: newOtherOrder,
+        updated_at: new Date().toISOString()
+      });
+
+      if (!ok2) return;
+
+      loadTournaments();
+      toast.success('Ordine aggiornato');
+    } catch (err: any) {
+      toast.error('Errore durante l\'ordinamento');
     }
   };
 
@@ -558,6 +613,22 @@ export function TournamentsPage() {
                         >
                           Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" />
                         </button>
+                        {canManageTournaments && (
+                          <div className="flex flex-col gap-1 h-full">
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); handleMoveTournament(index, 'up'); }}
+                              className="w-8 flex-1 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all flex items-center justify-center border border-white/5"
+                            >
+                              <ChevronUp size={14} />
+                            </button>
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); handleMoveTournament(index, 'down'); }}
+                              className="w-8 flex-1 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all flex items-center justify-center border border-white/5"
+                            >
+                              <ChevronDown size={14} />
+                            </button>
+                          </div>
+                        )}
                         {canManageTournaments && (
                           <button 
                             onClick={(e) => {
