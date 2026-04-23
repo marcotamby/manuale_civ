@@ -825,15 +825,32 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
           const text = e.clipboardData.getData('text/plain');
           
           if (html) {
-            // Intelligent HTML cleanup: keep structure but strip inline styles that break dark mode
+            // Intelligent HTML cleanup
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             
-            // Remove all style attributes to prevent "black text on black background"
-            const allElements = doc.querySelectorAll('*');
-            allElements.forEach(el => {
+            // 1. Convert common inline styles to semantic tags before stripping
+            doc.querySelectorAll('*').forEach(el => {
+              const style = (el as HTMLElement).style;
+              
+              if (style.fontWeight === 'bold' || parseInt(style.fontWeight) >= 600) {
+                const b = doc.createElement('b');
+                b.innerHTML = el.innerHTML;
+                el.innerHTML = '';
+                el.appendChild(b);
+              }
+              
+              if (style.fontStyle === 'italic') {
+                const i = doc.createElement('i');
+                i.innerHTML = el.innerHTML;
+                el.innerHTML = '';
+                el.appendChild(i);
+              }
+
+              // 2. Remove problematic attributes but keep the structure
               el.removeAttribute('style');
-              el.removeAttribute('class'); // Remove external classes too
+              el.removeAttribute('class');
+              el.removeAttribute('id');
             });
             
             document.execCommand('insertHTML', false, doc.body.innerHTML);
