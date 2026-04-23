@@ -686,7 +686,8 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
   const [activeStyles, setActiveStyles] = useState({ 
     bold: false, italic: false, underline: false,
     alignLeft: false, alignCenter: false, alignRight: false, alignJustify: false,
-    font: 'Inter'
+    font: 'Inter',
+    h2: false
   });
 
   useEffect(() => {
@@ -696,6 +697,7 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
   }, []);
 
   const checkActiveStyles = () => {
+    const block = document.queryCommandValue('formatBlock');
     setActiveStyles({
       bold: document.queryCommandState('bold'),
       italic: document.queryCommandState('italic'),
@@ -704,7 +706,8 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
       alignCenter: document.queryCommandState('justifyCenter'),
       alignRight: document.queryCommandState('justifyRight'),
       alignJustify: document.queryCommandState('justifyFull'),
-      font: document.queryCommandValue('fontName').replace(/['"]/g, '') || 'Inter'
+      font: document.queryCommandValue('fontName').replace(/['"]/g, '') || 'Inter',
+      h2: block === 'h2' || block === 'H2'
     });
   };
 
@@ -778,17 +781,18 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
           <button 
             onMouseDown={(e) => { 
               e.preventDefault(); 
-              // Better H2 toggle
-              const selection = window.getSelection();
-              if (selection && selection.rangeCount > 0) {
-                document.execCommand('formatBlock', false, 'h2');
-              }
+              const isH2 = document.queryCommandValue('formatBlock') === 'h2' || document.queryCommandValue('formatBlock') === 'H2';
+              document.execCommand('formatBlock', false, isH2 ? 'p' : 'h2');
               checkActiveStyles();
+              handleInput();
             }} 
-            className="p-2 hover:bg-blue-500 hover:text-white rounded-lg text-white font-black text-xs px-4 transition-all" 
+            className={clsx(
+              "p-2 rounded-lg font-black text-[10px] px-4 transition-all uppercase tracking-tighter",
+              activeStyles.h2 ? "bg-blue-500 text-white shadow-lg scale-110" : "hover:bg-white/10 text-white"
+            )} 
             title="Titolo Grande"
           >
-            TITOLO (H2)
+            TITOLO H2
           </button>
         </div>
 
