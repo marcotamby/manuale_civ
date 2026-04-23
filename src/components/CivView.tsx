@@ -182,6 +182,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const [answerText, setAnswerText] = useState('');
   const [qaMessage, setQaMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
   const [boVotes, setBoVotes] = useState<Record<string, { up: number, down: number, userVote: number | null }>>({});
+  const [boMessage, setBoMessage] = useState<{ id: string, text: string } | null>(null);
 
   const fetchVotes = async () => {
     if (!civ?.buildOrders || civ.buildOrders.length === 0) return;
@@ -209,6 +210,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
   const handleVote = async (boId: string, value: number) => {
     if (!user) {
+      setBoMessage({ id: boId, text: 'Accedi per votare questa strategia!' });
+      setTimeout(() => setBoMessage(null), 4000);
       openLoginModal();
       return;
     }
@@ -925,6 +928,12 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                            </div>
 
                            {/* Row 2: Voting Centered */}
+                           {boMessage && boMessage.id === bo.id && (
+                              <div className="text-[10px] font-bold text-center text-yellow-500 bg-yellow-500/10 py-2 rounded-lg border border-yellow-500/20 animate-in zoom-in-95 duration-200">
+                                {boMessage.text}
+                              </div>
+                            )}
+
                            <div className="flex items-center justify-center gap-8 py-2 bg-black/20 rounded-xl border border-white/5">
                               <button 
                                 onClick={(e) => { e.stopPropagation(); handleVote(bo.id, 1); }}
@@ -1144,6 +1153,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         {/* Votes / Feedback */}
                         <div className="bg-white/5 rounded-3xl border border-white/5 p-4 space-y-3">
                            <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Feedback Community</h4>
+                           {boMessage && boMessage.id === selectedBO.id && (
+                             <div className="text-[10px] font-bold text-center text-yellow-500 bg-yellow-500/10 py-3 rounded-xl border border-yellow-500/20 animate-in slide-in-from-top-2 duration-300">
+                               {boMessage.text}
+                             </div>
+                           )}
                            <div className="flex items-center justify-between gap-3">
                               <button 
                                 onClick={(e) => { e.stopPropagation(); handleVote(selectedBO.id, 1); }}
