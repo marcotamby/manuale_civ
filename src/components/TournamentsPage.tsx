@@ -622,7 +622,7 @@ export function TournamentsPage() {
                           status === 'Programmato' ? "bg-blue-500/40 text-blue-400" :
                           "bg-red-500/40 text-red-400"
                         )}
-                        style={{ textShadow: '1px 1px 0 #c0c0c0, -1px -1px 0 #c0c0c0, 1px -1px 0 #c0c0c0, -1px 1px 0 #c0c0c0' }}
+                        style={{ textShadow: '0 0 1px #c0c0c0' }}
                       >
                         {status === 'In corso' && <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block mr-0.5 animate-pulse" />}
                         {status === 'Concluso' && <span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block mr-0.5" />}
