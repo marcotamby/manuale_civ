@@ -107,6 +107,15 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
 
         {isOpen && (
           <div className={`absolute z-[100] ${isSm ? 'right-0' : 'left-0'} mt-2 bg-[#0d111a] border border-white/20 rounded-2xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-150 min-w-[200px]`}>
+             <div 
+               onClick={() => { onChange(''); setIsOpen(false); }}
+               className="flex items-center gap-4 px-4 py-3 hover:bg-blue-600/10 transition-all cursor-pointer group border-b border-white/5"
+             >
+                <div className="w-10 h-7 rounded overflow-hidden border border-white/10 flex items-center justify-center bg-black/40 group-hover:border-blue-500/30 transition-all">
+                  <span className="text-gray-400 font-black">-</span>
+                </div>
+                <span className="text-xs font-black text-gray-400 group-hover:text-white uppercase tracking-widest">NESSUNA CIVILTA' (-)</span>
+             </div>
              {civilizationsData.map(civ => (
                <div 
                  key={civ.id}
