@@ -922,9 +922,12 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                      <UserCircle size={18} className="text-gray-600" />
                                    )}
                                  </div>
-                                 <span className="text-[11px] font-bold text-blue-400 uppercase tracking-tighter truncate flex-1">
-                                   {bo.author_nickname || 'Anonimo'}
-                                 </span>
+                                 <span 
+                                    className="text-[11px] font-bold text-blue-400 uppercase tracking-tighter truncate flex-1 cursor-help"
+                                    title={bo.author_nickname || 'Anonimo'}
+                                  >
+                                    {bo.author_nickname || 'Anonimo'}
+                                  </span>
                                </div>
                               
                               <span className="text-[9px] md:text-[10px] font-black text-yellow-500 uppercase tracking-wider bg-yellow-500/10 px-3 py-2 rounded-xl border border-yellow-500/20 hover:bg-yellow-500 hover:text-black transition-all shadow-lg whitespace-nowrap shrink-0">

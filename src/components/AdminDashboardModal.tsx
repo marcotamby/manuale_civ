@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, Trophy, BookOpen, Zap, Edit2, Check } from 'lucide-react';
+import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, Trophy, BookOpen, Zap, Edit2, Check, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
@@ -212,6 +212,26 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     } catch (err: any) {
       console.error('Error updating user role:', err);
       setToast({ isVisible: true, message: 'Errore aggiornamento', type: 'error' });
+    }
+  };
+
+  const handleDeleteUser = async (email: string) => {
+    if (!isSuperAdmin) return;
+    if (!confirm(`Sei sicuro di voler eliminare l'utente ${email}? Questa azione è irreversibile.`)) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('email', email);
+
+      if (error) throw error;
+
+      setUsers(prev => prev.filter(u => u.email !== email));
+      setToast({ isVisible: true, message: 'Utente eliminato correttamente', type: 'success' });
+    } catch (err: any) {
+      console.error('Error deleting user:', err);
+      setToast({ isVisible: true, message: 'Errore durante l\'eliminazione', type: 'error' });
     }
   };
 
@@ -934,7 +954,19 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                 >
                                   <Radio size={16} />
                                 </button>
-                              </div>
+                                 {isSuperAdmin && (
+                                  <>
+                                    <div className="w-px h-4 bg-white/10 mx-1" />
+                                    <button
+                                      onClick={() => handleDeleteUser(u.email)}
+                                      className="w-9 h-9 flex items-center justify-center rounded-lg bg-red-500/10 text-red-500/50 hover:text-red-500 hover:bg-red-500/20 transition-all"
+                                      title="Elimina Utente"
+                                    >
+                                      <Trash2 size={16} />
+                                    </button>
+                                  </>
+                                 )}
+                               </div>
                             </div>
                           </div>
                         ))}
