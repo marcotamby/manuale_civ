@@ -628,23 +628,34 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <div className="flex flex-col gap-2 mt-3">
                 {/* Admin Presence indicators */}
                 {Object.values(_activeAdmins).some(a => a.user?.email !== user?.email && a.activity?.civId === civId) && (
-                  <div className="flex -space-x-2 overflow-hidden items-center">
-                    {Object.values(_activeAdmins)
-                      .filter(admin => admin.user?.email !== user?.email && admin.activity?.civId === civId)
-                      .map((admin, idx) => (
-                        <div
-                          key={idx}
-                          className="inline-block h-6 w-6 rounded-full ring-2 ring-[var(--color-brand-dark)] bg-yellow-500/10 flex items-center justify-center overflow-hidden"
-                          title={`${admin.user.name} sta guardando questa civiltà`}
-                        >
-                          {admin.user.avatar ? (
-                            <img src={admin.user.avatar} alt="" className="h-full w-full object-cover" />
-                          ) : (
-                            <span className="text-[10px] font-bold text-yellow-500">{admin.user.name?.charAt(0)}</span>
-                          )}
-                        </div>
-                      ))}
-                    <span className="ml-4 text-[10px] text-gray-500 font-medium italic">
+                  <div className="flex items-center gap-3 animate-in fade-in slide-in-from-left-4 duration-500">
+                    <div className="flex -space-x-3 overflow-hidden items-center py-1">
+                      {Object.values(_activeAdmins)
+                        .filter(admin => admin.user?.email !== user?.email && admin.activity?.civId === civId)
+                        .map((admin, idx) => (
+                          <div
+                            key={idx}
+                            className="relative group/admin"
+                            title={`${admin.user.name} (Staff) è online qui`}
+                          >
+                            <div className="h-8 w-8 rounded-full ring-2 ring-yellow-500/40 bg-yellow-500/10 flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(234,179,8,0.2)] transition-transform hover:scale-110 hover:z-10">
+                              {admin.user.avatar ? (
+                                <img src={admin.user.avatar} alt="" className="h-full w-full object-cover" />
+                              ) : (
+                                <span className="text-[14px] font-black text-yellow-500 uppercase leading-none flex items-center justify-center">
+                                  {admin.user.name?.charAt(0)}
+                                </span>
+                              )}
+                            </div>
+                            {/* Live Pulse Dot */}
+                            <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-yellow-500 border border-[var(--color-brand-dark)]"></span>
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+                    <span className="text-[10px] text-yellow-500/70 font-bold uppercase tracking-[0.15em] animate-pulse">
                       Staff online in questa sezione
                     </span>
                   </div>
