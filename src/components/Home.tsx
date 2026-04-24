@@ -191,15 +191,15 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                 </div>
               )}
 
-              {/* Build Order Shortcut Indicator (DESKTOP HOVER) */}
-              {isBOMode && !isCompareMode && (
-                 <div className="absolute inset-0 bg-cyan-900/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30">
-                    <div className="bg-[#00f3ff] text-black px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] shadow-[0_0_25px_rgba(0,243,255,0.6)] border border-cyan-200 flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                       <Zap size={14} fill="black" />
-                       Build Orders
-                    </div>
-                 </div>
-              )}
+               {/* Build Order Shortcut Indicator (DESKTOP HOVER) */}
+               {isBOMode && !isCompareMode && (
+                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30">
+                     <div className="bg-gradient-to-br from-cyan-500/90 to-blue-600/90 backdrop-blur-md text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] shadow-[0_8px_25px_rgba(0,0,0,0.4),0_0_15px_rgba(6,182,212,0.3)] border border-white/20 flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                        <Zap size={14} fill="white" className="text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]" />
+                        Build Orders
+                     </div>
+                  </div>
+               )}
 
               {/* Content Top Left: Difficulty (Desktop Only) */}
               {!isCompareMode && (
