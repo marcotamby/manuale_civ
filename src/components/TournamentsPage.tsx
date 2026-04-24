@@ -849,9 +849,9 @@ export function TournamentsPage() {
                 <button 
                   onClick={handleUpdateTournament}
                   disabled={isSubmitting}
-                  className="px-4 py-2 bg-gradient-to-b from-slate-200 to-slate-400 text-black rounded-xl text-[9px] font-black uppercase tracking-[0.15em] hover:brightness-110 transition-all flex items-center gap-2 shadow-lg shadow-white/5"
+                  className="px-6 py-2.5 bg-gradient-to-b from-slate-200 to-slate-400 text-black rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:brightness-110 transition-all flex items-center gap-2 shadow-xl shadow-white/5"
                 >
-                  {saveStatus === 'saving' ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
+                  {saveStatus === 'saving' ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                   Salva
                 </button>
                 <div className="w-px h-6 bg-white/10 mx-1"></div>
@@ -1090,13 +1090,13 @@ export function TournamentsPage() {
                                 np[i] = { ...p, placement: parseInt(e.target.value) };
                                 setEditForm({ ...editForm, podium: np });
                               }}
-                              className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white text-xs outline-none focus:border-yellow-500 transition-all appearance-none cursor-pointer"
+                              className="w-full bg-white/5 border border-white/10 h-12 px-4 rounded-xl text-white text-sm outline-none focus:border-yellow-500 transition-all appearance-none cursor-pointer"
                             >
                               <option value={1} className="bg-[#121620]">🥇 1° Posto</option>
                               <option value={2} className="bg-[#121620]">🥈 2° Posto</option>
                               <option value={3} className="bg-[#121620]">🥉 3° Posto</option>
                             </select>
-                            <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                            <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
                           </div>
                         </div>
                         
@@ -1109,17 +1109,17 @@ export function TournamentsPage() {
                               const np = [...editForm.podium]; np[i] = {...p, entrant: {name: e.target.value}}; setEditForm({...editForm, podium: np});
                             }} 
                             placeholder="Inserisci nome..." 
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-yellow-500/30 transition-all" 
+                            className="w-full bg-white/5 border border-white/10 rounded-xl h-12 px-4 text-white text-sm outline-none focus:border-yellow-500/30 transition-all" 
                           />
                         </div>
 
-                        <div className="h-[74px] flex items-end pb-0.5">
+                        <div className="h-[76px] flex items-end pb-0">
                           <button 
                             onClick={() => setEditForm({...editForm, podium: editForm.podium.filter((_, idx) => idx !== i)})} 
-                            className="w-11 h-11 flex items-center justify-center text-red-500/30 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all border border-transparent hover:border-red-500/20"
+                            className="w-12 h-12 flex items-center justify-center text-red-500/30 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all border border-transparent hover:border-red-500/20"
                             title="Rimuovi riga"
                           >
-                            <Trash2 size={18}/>
+                            <Trash2 size={20}/>
                           </button>
                         </div>
                       </div>
