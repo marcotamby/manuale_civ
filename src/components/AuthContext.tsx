@@ -48,15 +48,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loginModalMessage, setLoginModalMessage] = useState<string | null>(null);
 
-  const SUPER_ADMIN_EMAILS = ['marcotamby@gmail.com', 'marco.tamborrino.94@gmail.com'];
+  const SUPER_ADMIN_EMAILS = ['marco.tamborrino.94@gmail.com'];
   const EDITOR_EMAILS = ['alessio.bella97@gmail.com', 'contattodisparta@gmail.com'];
   const STREAMER_EMAILS = ['cani.vincenzo@gmail.com', 'dadduedo@gmail.com', 'djalfredoneservice@gmail.com', 'contattodisparta@gmail.com'];
 
   const checkRoles = (userData: any) => {
     const email = userData.email?.toLowerCase();
-    const name = userData.name?.toLowerCase();
     
-    const isSA = (email && SUPER_ADMIN_EMAILS.includes(email)) || name === 'admin' || userData.role === 'admin';
+    const isSA = email && SUPER_ADMIN_EMAILS.includes(email);
     const isEd = userData.role === 'admin' || userData.role === 'editor' || (email && EDITOR_EMAILS.includes(email));
     const isStr = userData.is_streamer || (email && STREAMER_EMAILS.includes(email));
     
@@ -103,7 +102,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (isLocalhost) {
       console.log('🛡️ Local development detected: Admin bypass active.');
       setIsAdmin(true);
-      setIsSuperAdmin(true);
       setIsAuthenticated(true);
       const email = 'admin@localhost';
       const devUser = {
