@@ -56,30 +56,30 @@ export function MobileFooter() {
           href="https://www.twitch.tv/aoeitalia" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-[9px] font-bold text-gray-500 hover:text-purple-700 transition-all"
+          className="flex items-center gap-1.5 text-[9px] font-black text-[#a970ff] drop-shadow-[0_0_8px_rgba(169,112,255,0.3)] transition-all"
         >
           <Twitch size={14} />
-          <span>Twitch <span className="opacity-30">Aoeit</span></span>
+          <span>Twitch <span className="text-white/40 font-bold italic">Aoeit</span></span>
         </a>
 
         <a 
           href="https://www.youtube.com/@marcotamby_aoe" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-[9px] font-bold text-gray-500 hover:text-red-800 transition-all"
+          className="flex items-center gap-1.5 text-[9px] font-black text-[#ff4e4e] drop-shadow-[0_0_8px_rgba(255,78,78,0.3)] transition-all"
         >
           <Youtube size={14} />
-          <span>YT <span className="opacity-30">Marco</span></span>
+          <span>YT <span className="text-white/40 font-bold italic">Marco</span></span>
         </a>
 
         <a 
           href="https://www.youtube.com/@AoeItalia" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-[9px] font-bold text-gray-500 hover:text-red-800 transition-all"
+          className="flex items-center gap-1.5 text-[9px] font-black text-[#ff4e4e] drop-shadow-[0_0_8px_rgba(255,78,78,0.3)] transition-all"
         >
           <Youtube size={14} />
-          <span>YT <span className="opacity-30">Aoeit</span></span>
+          <span>YT <span className="text-white/40 font-bold italic">Aoeit</span></span>
         </a>
       </div>
 
