@@ -655,49 +655,59 @@ export function TournamentsPage() {
                       <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent mb-4"></div>
                       <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-3 border-b border-white/5 pb-2">Risultati Finali</p>
                       <div className="space-y-2 overflow-visible flex-grow flex flex-col justify-center">
-                        {(podium.length > 0 ? podium.slice(0, 3) : [null, null, null]).map((s: any, idx: number) => (
-                          <div key={idx} className="flex justify-between text-sm items-center group/standing relative z-10">
-                            <div className="flex items-center gap-3">
-                              <span className={clsx("text-lg", !s && "opacity-20 grayscale")}>
-                                {['🥇','🥈','🥉'][idx]}
-                              </span>
-                              {s ? (
-                                <div className="relative group/players">
-                                  <span className={clsx(
-                                    "font-bold transition-colors truncate max-w-[140px]",
-                                    idx === 0 ? "text-yellow-100" : "text-gray-400",
-                                    s.players && s.players.length > 0 && "cursor-help decoration-yellow-500/30 underline underline-offset-8 decoration-dotted"
-                                  )}>
-                                    {s.entrant?.name || '---'}
-                                  </span>
-                                  
-                                  {/* Players Tooltip on Hover */}
-                                  {s.players && s.players.length > 0 && (
-                                    <div className="absolute bottom-full left-0 mb-4 p-4 bg-[#1a1f2e] backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-0 group-hover/players:opacity-100 pointer-events-none transition-all duration-300 translate-y-2 group-hover/players:translate-y-0 z-[100] min-w-[180px] border-b-yellow-500/50">
-                                      <p className="text-[9px] font-black text-yellow-500 uppercase tracking-[0.2em] mb-3 border-b border-white/10 pb-2 flex items-center gap-2">
-                                        <Users size={10} /> Componenti Team
-                                      </p>
-                                      <div className="space-y-2">
-                                        {s.players.map((player: string, pIdx: number) => (
-                                          <div key={pIdx} className="flex items-center gap-2 text-[11px] text-white font-bold uppercase tracking-tight">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
-                                            {player}
+                        {[1, 2, 3].map((placement, idx) => {
+                          const entries = podium.filter((s: any) => (s.placement === placement || s.rank === placement));
+                          const hasData = entries.length > 0;
+                          
+                          return (
+                            <div key={idx} className="flex justify-between text-sm items-center group/standing relative z-10">
+                              <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <span className={clsx("text-lg flex-shrink-0", !hasData && "opacity-20 grayscale")}>
+                                  {['🥇','🥈','🥉'][idx]}
+                                </span>
+                                {hasData ? (
+                                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 flex-1 min-w-0 group/players">
+                                    {entries.map((s, sIdx) => (
+                                      <div key={sIdx} className="relative flex items-center min-w-0">
+                                        <span className={clsx(
+                                          "font-bold transition-colors truncate",
+                                          idx === 0 ? "text-yellow-100" : "text-gray-400",
+                                          s.players && s.players.length > 0 && "cursor-help decoration-yellow-500/30 underline underline-offset-8 decoration-dotted"
+                                        )}>
+                                          {s.entrant?.name || '---'}
+                                        </span>
+                                        {sIdx < entries.length - 1 && <span className="text-gray-600 font-black ml-1 mr-1">&</span>}
+                                        
+                                        {/* Players Tooltip */}
+                                        {s.players && s.players.length > 0 && (
+                                          <div className="absolute bottom-full left-0 mb-4 p-4 bg-[#1a1f2e] backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-0 group-hover/players:opacity-100 pointer-events-none transition-all duration-300 translate-y-2 group-hover/players:translate-y-0 z-[100] min-w-[180px] border-b-yellow-500/50">
+                                            <p className="text-[9px] font-black text-yellow-500 uppercase tracking-[0.2em] mb-3 border-b border-white/10 pb-2 flex items-center gap-2">
+                                              <Users size={10} /> Componenti Team
+                                            </p>
+                                            <div className="space-y-2">
+                                              {s.players.map((player: string, pIdx: number) => (
+                                                <div key={pIdx} className="flex items-center gap-2 text-[11px] text-white font-bold uppercase tracking-tight">
+                                                  <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
+                                                  {player}
+                                                </div>
+                                              ))}
+                                            </div>
+                                            <div className="absolute top-full left-6 -translate-y-px border-8 border-transparent border-t-[#1a1f2e]" />
                                           </div>
-                                        ))}
+                                        )}
                                       </div>
-                                      <div className="absolute top-full left-6 -translate-y-px border-8 border-transparent border-t-[#1a1f2e]" />
-                                    </div>
-                                  )}
-                                </div>
-                              ) : (
-                                <span className="text-gray-600 italic text-[11px] font-medium tracking-tight">In attesa...</span>
-                              )}
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <span className="text-gray-600 italic text-[11px] font-medium tracking-tight">In attesa...</span>
+                                )}
+                              </div>
+                              <span className="text-white/20 font-black italic uppercase text-[9px] group-hover/standing:text-white/40 transition-colors flex-shrink-0 ml-2">
+                                {hasData ? (idx === 0 ? 'WINNER' : `${idx+1}° PLACE`) : '---'}
+                              </span>
                             </div>
-                            <span className="text-white/20 font-black italic uppercase text-[9px] group-hover/standing:text-white/40 transition-colors">
-                              {s ? (idx === 0 ? 'WINNER' : `${idx+1}° PLACE`) : '---'}
-                            </span>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
 

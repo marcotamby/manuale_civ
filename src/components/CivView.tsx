@@ -971,8 +971,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   }`}>
                     <Plus size={40} className={(isAdmin || canManageBuildorders) ? 'text-slate-300' : 'text-yellow-500'} />
                   </div>
-                  <h3 className={`text-2xl font-black mb-3 ${(isAdmin || canManageBuildorders) ? 'text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400' : 'text-white'}`}>
-                    {(isAdmin || canManageBuildorders) ? 'Aggiungi Build Order' : 'Proponi Build Order'}
+                  <h3 className={`text-2xl font-black mb-3 ${(isAdmin || canManageBuildorders) ? 'text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400' : 'text-white'} flex flex-col leading-[1.1]`}>
+                    <span>{(isAdmin || canManageBuildorders) ? 'Aggiungi' : 'Proponi'}</span>
+                    <span>Build Order</span>
                   </h3>
                   <p className="text-sm md:text-base text-gray-500 px-8 max-w-[280px]">
                     {(isAdmin || canManageBuildorders) ? 'Inserisci ufficialmente una nuova strategia.' : 'Aiuta la community con una nuova strategia.'}
