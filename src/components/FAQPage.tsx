@@ -446,7 +446,7 @@ export function FAQPage() {
                                 next[sIdx].items[iIdx].icon_name = e.target.value;
                                 setSections(next);
                               }}
-                              className="bg-black/50 border border-white/10 rounded-lg px-1 py-1 text-xs text-blue-400"
+                              className="bg-black/50 border border-white/10 rounded-lg px-2 py-1 text-sm text-blue-400 focus:border-blue-400 focus:outline-none transition-all"
                             >
                               {['Layers', 'Zap', 'Heart', 'GitPullRequest', 'Users', 'Shield', 'PlayCircle', 'BookOpen', 'Sword', 'Info', 'HelpCircle'].map(icon => (
                                 <option key={icon} value={icon}>{icon}</option>
@@ -459,7 +459,7 @@ export function FAQPage() {
                                 next[sIdx].items[iIdx].label = e.target.value;
                                 setSections(next);
                               }}
-                              className="flex-1 bg-black/50 border border-white/10 rounded-lg px-3 py-1 text-sm font-bold text-white"
+                              className="flex-1 bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-base font-bold text-white focus:border-blue-400 focus:outline-none transition-all"
                             />
                           </div>
                           <textarea 
@@ -469,7 +469,7 @@ export function FAQPage() {
                               next[sIdx].items[iIdx].description = e.target.value;
                               setSections(next);
                             }}
-                            className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-gray-400 h-24 resize-none"
+                            className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-sm text-gray-300 h-32 resize-none focus:border-blue-400 focus:outline-none transition-all leading-relaxed"
                           />
                         </div>
                       ) : (
