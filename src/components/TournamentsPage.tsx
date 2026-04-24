@@ -636,7 +636,10 @@ export function TournamentsPage() {
 
                 <div className="p-6 flex flex-col flex-grow bg-[#121620] relative z-10 -mt-px">
                     <span className="text-xs font-bold text-yellow-500/50 uppercase mb-1 tracking-widest">Organizzato da {t.config.organizer}</span>
-                    <h3 className="text-2xl font-black text-white mb-4 line-clamp-1 group-hover:text-yellow-400 transition-colors uppercase tracking-tight">
+                    <h3 
+                      className="text-2xl font-black text-white mb-4 line-clamp-1 group-hover:text-yellow-400 transition-colors uppercase tracking-tight"
+                      title={t.config.name || t.name}
+                    >
                       {t.config.name || t.name}
                     </h3>
                     
@@ -1061,11 +1064,10 @@ export function TournamentsPage() {
                     >
                       + AGGIUNGI RIGA
                     </button>
-                  </div>
-                  {editForm.podium.map((p, i) => (
-                    <div key={i} className="bg-black/20 p-4 rounded-2xl border border-white/5 space-y-3">
-                      <div className="flex gap-3 items-center">
-                        <div className="w-24 shrink-0 space-y-1">
+                              {editForm.podium.map((p, i) => (
+                    <div key={i} className="bg-black/20 p-5 rounded-2xl border border-white/5 space-y-4 relative group/podiumrow">
+                      <div className="flex gap-4 items-end">
+                        <div className="w-32 shrink-0 space-y-1.5">
                           <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Posizione</label>
                           <div className="relative">
                             <select 
@@ -1075,7 +1077,7 @@ export function TournamentsPage() {
                                 np[i] = { ...p, placement: parseInt(e.target.value) };
                                 setEditForm({ ...editForm, podium: np });
                               }}
-                              className="w-full bg-white/5 border border-white/10 p-2 rounded-xl text-white text-xs outline-none focus:border-yellow-500 transition-all appearance-none cursor-pointer"
+                              className="w-full bg-white/5 border border-white/10 p-2.5 rounded-xl text-white text-xs outline-none focus:border-yellow-500 transition-all appearance-none cursor-pointer"
                             >
                               <option value={1} className="bg-[#121620]">🥇 1° Posto</option>
                               <option value={2} className="bg-[#121620]">🥈 2° Posto</option>
@@ -1084,17 +1086,31 @@ export function TournamentsPage() {
                             <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
                           </div>
                         </div>
-                        <div className="flex-grow space-y-1">
+                        
+                        <div className="flex-grow space-y-1.5">
                           <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Nome Team / Giocatore</label>
-                          <input type="text" value={p.entrant?.name || ''} onChange={e => {
-                            const np = [...editForm.podium]; np[i] = {...p, entrant: {name: e.target.value}}; setEditForm({...editForm, podium: np});
-                          }} placeholder="Inserisci nome..." className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-yellow-500/30 transition-all" />
+                          <input 
+                            type="text" 
+                            value={p.entrant?.name || ''} 
+                            onChange={e => {
+                              const np = [...editForm.podium]; np[i] = {...p, entrant: {name: e.target.value}}; setEditForm({...editForm, podium: np});
+                            }} 
+                            placeholder="Inserisci nome..." 
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-yellow-500/30 transition-all" 
+                          />
                         </div>
-                        <button onClick={() => setEditForm({...editForm, podium: editForm.podium.filter((_, idx) => idx !== i)})} className="p-2 text-red-500/50 hover:text-red-500 transition-colors mt-4"><Trash2 size={16}/></button>
+
+                        <button 
+                          onClick={() => setEditForm({...editForm, podium: editForm.podium.filter((_, idx) => idx !== i)})} 
+                          className="w-10 h-10 flex items-center justify-center text-red-500/30 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all border border-transparent hover:border-red-500/20"
+                          title="Rimuovi riga"
+                        >
+                          <Trash2 size={18}/>
+                        </button>
                       </div>
                       
                       {/* Sub-players for Team Games */}
-                      <div className="ml-11 pr-2 space-y-1">
+                      <div className="space-y-1.5 pt-2 border-t border-white/5">
                         <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-2">
                           <Users size={10} /> Componenti Team (per 2v2, 3v3...)
                         </label>
@@ -1108,7 +1124,7 @@ export function TournamentsPage() {
                             setEditForm({ ...editForm, podium: np });
                           }} 
                           placeholder="Esempio: Marco, Alessio, Luca (separati da virgola)" 
-                          className="w-full bg-white/5 border border-white/5 rounded-xl px-3 py-2 text-white/60 text-[11px] outline-none focus:border-yellow-500/20 transition-all italic" 
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white/60 text-[11px] outline-none focus:border-yellow-500/20 transition-all italic" 
                         />
                       </div>
                     </div>
