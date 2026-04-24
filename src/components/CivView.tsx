@@ -7,7 +7,7 @@ import { usePresence } from './PresenceContext';
 import type { Unit } from '../data/aoe4Data';
 import { UnitGrid } from './UnitGrid';
 import { MatchupsTable } from './MatchupsTable';
-import { Shield, Sword, Zap, Map, BarChart2, Edit, ChevronDown, ChevronUp, Play, ChevronRight, MessageSquare, Send, UserCircle, CheckCircle, XCircle, X, Loader2, Trash2, AlertTriangle, Plus, ExternalLink, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Shield, Sword, Zap, Map, BarChart2, Pencil, ChevronDown, ChevronUp, Play, ChevronRight, MessageSquare, Send, UserCircle, CheckCircle, XCircle, X, Loader2, Trash2, AlertTriangle, Plus, ExternalLink, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { ResourceText } from './ResourceText';
 import { SocialProofPopup } from './SocialProofPopup';
@@ -607,18 +607,18 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   {civ.difficulty}
                 </span>
                 {(canManageCivs || canManageBuildorders) && (
-                  <div className="flex gap-2 items-center bg-yellow-500/10 px-3 py-1.5 rounded-lg border border-yellow-500/40 shadow-[0_0_15px_rgba(234,179,8,0.1)]">
+                  <div className="flex gap-2 items-center bg-slate-500/10 px-3 py-1.5 rounded-lg border border-slate-500/40 shadow-[0_0_15px_rgba(148,163,184,0.1)]">
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-black text-yellow-500 uppercase tracking-widest leading-none mb-1">
+                      <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none mb-1">
                         {isSuperAdmin ? 'MODALITÀ ADMIN' : 'MODALITÀ EDITOR'}
                       </span>
-                      <span className="text-[8px] text-yellow-500/60 font-medium leading-none">{user?.email}</span>
+                      <span className="text-[8px] text-slate-500 font-medium leading-none">{user?.email}</span>
                     </div>
                     <button
                       onClick={() => (window as any).openCivEditor?.()}
-                      className="ml-2 px-3 py-1.5 bg-yellow-600 hover:bg-yellow-500 text-black text-[10px] font-black rounded uppercase transition-all active:scale-95 flex items-center gap-1 shadow-lg border border-yellow-400/50"
+                      className="ml-2 px-3 py-1.5 bg-gradient-to-r from-slate-600 to-slate-400 hover:from-slate-500 hover:to-slate-300 text-black text-[10px] font-black rounded uppercase transition-all active:scale-95 flex items-center gap-1 shadow-lg border border-slate-300/50"
                     >
-                      <Edit size={12} fill="black" /> Modifica
+                      <Pencil size={12} fill="black" /> Modifica
                     </button>
                   </div>
                 )}
@@ -629,33 +629,43 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 {/* Admin Presence indicators */}
                 {Object.values(_activeAdmins).some(a => a.user?.email !== user?.email && a.activity?.civId === civId) && (
                   <div className="flex items-center gap-3 animate-in fade-in slide-in-from-left-4 duration-500">
-                    <div className="flex -space-x-3 overflow-hidden items-center py-1">
+                    <div className="flex -space-x-3 items-center py-2 px-1">
                       {Object.values(_activeAdmins)
                         .filter(admin => admin.user?.email !== user?.email && admin.activity?.civId === civId)
                         .map((admin, idx) => (
                           <div
                             key={idx}
-                            className="relative group/admin"
-                            title={`${admin.user.name} (Staff) è online qui`}
+                            className="relative group/admin z-0 hover:z-10"
                           >
-                            <div className="h-8 w-8 rounded-full ring-2 ring-yellow-500/40 bg-yellow-500/10 flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(234,179,8,0.2)] transition-transform hover:scale-110 hover:z-10">
+                            <div className="h-9 w-9 rounded-full ring-2 ring-slate-400/50 bg-gradient-to-br from-slate-700/80 to-slate-900/80 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(148,163,184,0.15)] transition-all duration-300 group-hover/admin:scale-110 group-hover/admin:ring-slate-300">
                               {admin.user.avatar ? (
                                 <img src={admin.user.avatar} alt="" className="h-full w-full object-cover" />
                               ) : (
-                                <span className="text-[14px] font-black text-yellow-500 uppercase leading-none flex items-center justify-center">
+                                <span className="text-[15px] font-black text-slate-100 uppercase leading-none flex items-center justify-center translate-y-[0.5px]">
                                   {admin.user.name?.charAt(0)}
                                 </span>
                               )}
                             </div>
-                            {/* Live Pulse Dot */}
-                            <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-yellow-500 border border-[var(--color-brand-dark)]"></span>
+                            
+                            {/* Live Pulse Dot - Silver version */}
+                            <span className="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-300 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-3 w-3 bg-slate-100 border-2 border-[#1a1c23]"></span>
                             </span>
+
+                            {/* Custom Premium Tooltip */}
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-1.5 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-lg opacity-0 group-hover/admin:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/admin:scale-100 origin-bottom z-50">
+                              <div className="flex flex-col items-center">
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Staff Online</span>
+                                <span className="text-xs font-bold text-white">{admin.user.name}</span>
+                              </div>
+                              {/* Tooltip Arrow */}
+                              <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-800/95"></div>
+                            </div>
                           </div>
                         ))}
                     </div>
-                    <span className="text-[10px] text-yellow-500/70 font-bold uppercase tracking-[0.15em] animate-pulse">
+                    <span className="text-[9px] text-slate-400 font-black uppercase tracking-[0.25em] animate-pulse">
                       Staff online in questa sezione
                     </span>
                   </div>
@@ -720,10 +730,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 {canManageCivs && (
                   <button
                     onClick={() => (window as any).openCivEditor?.('bonuses')}
-                    className="p-1.5 bg-yellow-500 hover:bg-yellow-400 rounded-lg transition-all text-black border border-yellow-400 flex items-center gap-1 shadow-[0_0_10px_rgba(234,179,8,0.3)] group/btn"
+                    className="p-1.5 bg-gradient-to-r from-slate-600 to-slate-400 hover:from-slate-500 hover:to-slate-300 rounded-lg transition-all text-black border border-slate-300/50 flex items-center gap-1 shadow-lg group/btn"
                     title="Modifica Bonus"
                   >
-                    <Edit size={12} fill="black" className="group-hover/btn:scale-110 transition-transform" />
+                    <Pencil size={12} fill="black" className="group-hover/btn:scale-110 transition-transform" />
                     <span className="text-[10px] font-bold uppercase pr-1">Modifica</span>
                   </button>
                 )}
@@ -745,10 +755,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 {canManageCivs && (
                   <button
                     onClick={() => (window as any).openCivEditor?.('strengths')}
-                    className="p-1.5 bg-yellow-500 hover:bg-yellow-400 rounded-lg transition-all text-black border border-yellow-400 flex items-center gap-1 shadow-[0_0_10px_rgba(234,179,8,0.3)] group/btn"
+                    className="p-1.5 bg-gradient-to-r from-slate-600 to-slate-400 hover:from-slate-500 hover:to-slate-300 rounded-lg transition-all text-black border border-slate-300/50 flex items-center gap-1 shadow-lg group/btn"
                     title="Modifica Punti di Forza"
                   >
-                    <Edit size={12} fill="black" className="group-hover/btn:scale-110 transition-transform" />
+                    <Pencil size={12} fill="black" className="group-hover/btn:scale-110 transition-transform" />
                     <span className="text-[10px] font-bold uppercase pr-1">Modifica</span>
                   </button>
                 )}
@@ -778,10 +788,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 {isAdmin && (
                   <button
                     onClick={() => (window as any).openCivEditor?.('weaknesses')}
-                    className="p-1.5 bg-yellow-500 hover:bg-yellow-400 rounded-lg transition-all text-black border border-yellow-400 flex items-center gap-1 shadow-[0_0_10px_rgba(234,179,8,0.3)] group/btn"
+                    className="p-1.5 bg-gradient-to-r from-slate-600 to-slate-400 hover:from-slate-500 hover:to-slate-300 rounded-lg transition-all text-black border border-slate-300/50 flex items-center gap-1 shadow-lg group/btn"
                     title="Modifica Punti Deboli"
                   >
-                    <Edit size={12} fill="black" className="group-hover/btn:scale-110 transition-transform" />
+                    <Pencil size={12} fill="black" className="group-hover/btn:scale-110 transition-transform" />
                     <span className="text-[10px] font-bold uppercase pr-1">Modifica</span>
                   </button>
                 )}
