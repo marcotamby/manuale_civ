@@ -671,24 +671,29 @@ export function TournamentsPage() {
                                 {hasData ? (
                                   <div className="flex items-center gap-x-1.5 flex-1 min-w-0 group/players">
                                     {entries.map((s, sIdx) => (
-                                      <div key={sIdx} className="relative flex items-center min-w-0 flex-shrink-1">
-                                        <span 
-                                          className={clsx(
-                                            "font-bold transition-colors truncate",
-                                            idx === 0 ? "text-yellow-100" : "text-gray-400",
-                                            s.players && s.players.length > 0 && "cursor-help decoration-yellow-500/30 underline underline-offset-8 decoration-dotted"
-                                          )}
-                                          onMouseEnter={(e) => {
-                                            const el = e.currentTarget;
-                                            if (el.scrollWidth > el.clientWidth) {
-                                              el.title = s.entrant?.name || '';
-                                            } else {
-                                              el.title = "";
-                                            }
-                                          }}
-                                        >
-                                          {s.entrant?.name || '---'}
-                                        </span>
+                                        <div className="relative group/name min-w-0 flex-shrink-1">
+                                          <span 
+                                            className={clsx(
+                                              "font-bold transition-colors truncate block cursor-help",
+                                              idx === 0 ? "text-yellow-100" : "text-gray-400",
+                                              s.players && s.players.length > 0 && "decoration-yellow-500/30 underline underline-offset-8 decoration-dotted"
+                                            )}
+                                          >
+                                            {s.entrant?.name || '---'}
+                                          </span>
+
+                                          {/* Premium Name Tooltip (appears if name is long) */}
+                                          <div className="absolute bottom-full left-0 mb-3 px-3 py-1.5 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-lg opacity-0 group-hover/name:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/name:scale-100 origin-bottom-left z-50">
+                                            <div className="flex flex-col items-center">
+                                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+                                                {idx === 0 ? '🏆 Campione' : idx === 1 ? '🥈 Finalista' : '🥉 3° Classificato'}
+                                              </span>
+                                              <span className="text-xs font-bold text-white">{s.entrant?.name || '---'}</span>
+                                            </div>
+                                            {/* Tooltip Arrow */}
+                                            <div className="absolute top-full left-4 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-800/95"></div>
+                                          </div>
+                                        </div>
                                         {sIdx < entries.length - 1 && <span className="text-gray-600 font-black flex-shrink-0">&</span>}
                                         
                                         {/* Players Tooltip */}
