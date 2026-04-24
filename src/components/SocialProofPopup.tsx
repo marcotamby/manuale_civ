@@ -79,11 +79,13 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
           </div>
           
           <div className="flex-1 min-w-0 pr-2 sm:pr-0 sm:w-full">
-            <div className="relative h-4 mb-1 flex items-center justify-center">
+            <div className="flex items-center justify-center gap-2 mb-1.5">
+              {/* Spacer to balance the icon on the right and keep text centered */}
+              <div className="hidden sm:block w-5"></div>
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Community</span>
-              <div className="hidden sm:flex items-center gap-1.5 absolute right-0">
-                <div className="h-1 w-1 rounded-full bg-blue-600/50"></div>
-                <Users size={10} className="text-blue-500/50" />
+              <div className="flex items-center gap-1 text-slate-400/80">
+                <div className="h-1 w-1 rounded-full bg-slate-500"></div>
+                <Users size={10} />
               </div>
             </div>
             
