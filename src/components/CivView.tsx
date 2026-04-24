@@ -750,7 +750,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
             <section>
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <ChevronUp className="text-green-400" size={20} />
+                <ChevronUp className="text-emerald-400" size={20} />
                 Punti di Forza
                 {canManageCivs && (
                   <button
@@ -763,27 +763,33 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   </button>
                 )}
               </h2>
-              <div className="glass p-5 rounded-xl border border-green-500/20 text-gray-300 text-sm leading-relaxed select-text">
-                <ul className="space-y-3 list-disc list-inside">
+              <div className="glass p-6 rounded-2xl border border-emerald-500/10 bg-emerald-500/[0.02] text-gray-300 text-sm leading-relaxed select-text">
+                <div className="space-y-4">
                   {civ.strengths && civ.strengths.length > 0 ? (
                     civ.strengths.map((str, idx) => (
-                      <li key={idx}><strong className="text-green-400">{str}</strong></li>
+                      <div key={idx} className="flex items-start gap-3 group/item">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)] mt-1.5 shrink-0 group-hover/item:scale-125 transition-transform" />
+                        <span className="text-slate-200/90 group-hover/item:text-white transition-colors">{str}</span>
+                      </div>
                     ))
                   ) : (
-                    <>
+                    <div className="space-y-4">
                       {civ.uniqueUnits.length > 0 && (
-                        <li>Accesso a unità uniche: <strong className="text-green-400">{civ.uniqueUnits.map(u => u.name).join(', ')}</strong></li>
+                        <div className="flex items-start gap-3">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)] mt-1.5 shrink-0" />
+                          <span className="text-slate-200/90">Accesso a unità uniche: <strong className="text-emerald-400/80 font-bold">{civ.uniqueUnits.map(u => u.name).join(', ')}</strong></span>
+                        </div>
                       )}
-                      <li className="text-gray-400 italic">Vedi sezione Unità & Landmarks per i dettagli specifici.</li>
-                    </>
+                      <p className="text-gray-500 italic text-[11px] pl-4.5">Vedi sezione Unità & Landmarks per i dettagli specifici.</p>
+                    </div>
                   )}
-                </ul>
+                </div>
               </div>
             </section>
 
             <section>
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <ChevronDown className="text-red-400" size={20} />
+                <ChevronDown className="text-rose-400" size={20} />
                 Punti Deboli
                 {isAdmin && (
                   <button
@@ -796,16 +802,19 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   </button>
                 )}
               </h2>
-              <div className="glass p-5 rounded-xl border border-red-500/20 text-gray-300 text-sm leading-relaxed select-text">
-                {civ.weaknesses && civ.weaknesses.length > 0 ? (
-                  <ul className="space-y-3 list-disc list-inside">
-                    {civ.weaknesses.map((wk, idx) => (
-                      <li key={idx}><strong className="text-red-400">{wk}</strong></li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-gray-400 italic">I punti deboli specifici saranno aggiunti dalla community tramite "Proponi Modifica".</p>
-                )}
+              <div className="glass p-6 rounded-2xl border border-rose-500/10 bg-rose-500/[0.02] text-gray-300 text-sm leading-relaxed select-text">
+                <div className="space-y-4">
+                  {civ.weaknesses && civ.weaknesses.length > 0 ? (
+                    civ.weaknesses.map((weak, idx) => (
+                      <div key={idx} className="flex items-start gap-3 group/item">
+                        <div className="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.4)] mt-1.5 shrink-0 group-hover/item:scale-125 transition-transform" />
+                        <span className="text-slate-200/90 group-hover/item:text-white transition-colors">{weak}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-500 italic text-center py-2">Nessun punto debole registrato.</p>
+                  )}
+                </div>
               </div>
             </section>
           </div>
