@@ -38,7 +38,7 @@ export function DesktopFooter() {
             className="flex items-center gap-2 text-[13px] font-bold text-white/70 hover:text-red-500 transition-all group"
           >
             <Youtube size={16} className="group-hover:scale-110 transition-transform" />
-            <span>YouTube <span className="text-white/20 font-medium">marcomtaby</span></span>
+            <span>YouTube <span className="text-white/20 font-medium">marcotamby</span></span>
           </a>
 
           <a 
