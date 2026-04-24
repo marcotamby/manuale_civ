@@ -1,3 +1,4 @@
+// Deployment trigger: 2026-04-24 10:15
 import { useState, useEffect } from 'react';
 import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, Trophy, BookOpen, Zap, Edit2, Check, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
