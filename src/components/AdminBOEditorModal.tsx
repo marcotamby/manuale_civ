@@ -452,16 +452,16 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                   onDragEnd={handleDragEnd}
                   className={`group relative bg-white/5 border rounded-2xl p-6 transition-all animate-in slide-in-from-top-4 duration-300 flex items-start gap-4 ${
                     draggedStepIndex === idx 
-                      ? 'border-dashed border-cyan-500 bg-cyan-500/10 shadow-[0_0_40px_rgba(6,182,212,0.3)] scale-[0.98] rotate-1' 
+                      ? 'border-dashed border-cyan-500 bg-cyan-500/10 shadow-[0_0_40px_rgba(6,182,212,0.3)] scale-[0.98]' 
                       : droppedIndex === idx
                         ? 'border-green-500 bg-green-500/5 shadow-[0_0_20px_rgba(34,197,94,0.2)] scale-[1.01]'
                         : 'border-white/10 hover:border-cyan-500/30'
                   }`}
                 >
                   {draggedStepIndex === idx && (
-                    <div className="absolute inset-0 bg-cyan-500/10 backdrop-blur-[2px] rounded-2xl flex items-center justify-center z-20 pointer-events-none">
+                    <div className="absolute inset-0 bg-cyan-500/5 rounded-2xl flex items-center justify-center z-20 pointer-events-none">
                       <div className="bg-cyan-500 text-black px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl flex items-center gap-2">
-                        <MoveVertical size={14} className="animate-bounce" />
+                        <MoveVertical size={14} />
                         Spostamento in corso...
                       </div>
                     </div>
