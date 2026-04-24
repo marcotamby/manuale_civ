@@ -669,9 +669,9 @@ export function TournamentsPage() {
                                   {['🥇','🥈','🥉'][idx]}
                                 </span>
                                 {hasData ? (
-                                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 flex-1 min-w-0 group/players">
+                                  <div className="flex items-center gap-x-1.5 flex-1 min-w-0 group/players">
                                     {entries.map((s, sIdx) => (
-                                      <div key={sIdx} className="relative flex items-center min-w-0">
+                                      <div key={sIdx} className="relative flex items-center min-w-0 flex-shrink-1">
                                         <span className={clsx(
                                           "font-bold transition-colors truncate",
                                           idx === 0 ? "text-yellow-100" : "text-gray-400",
@@ -679,7 +679,7 @@ export function TournamentsPage() {
                                         )}>
                                           {s.entrant?.name || '---'}
                                         </span>
-                                        {sIdx < entries.length - 1 && <span className="text-gray-600 font-black ml-1 mr-1">&</span>}
+                                        {sIdx < entries.length - 1 && <span className="text-gray-600 font-black flex-shrink-0">&</span>}
                                         
                                         {/* Players Tooltip */}
                                         {s.players && s.players.length > 0 && (
@@ -1064,7 +1064,8 @@ export function TournamentsPage() {
                     >
                       + AGGIUNGI RIGA
                     </button>
-                              {editForm.podium.map((p, i) => (
+                  </div>
+                  {editForm.podium.map((p, i) => (
                     <div key={i} className="bg-black/20 p-5 rounded-2xl border border-white/5 space-y-4 relative group/podiumrow">
                       <div className="flex gap-4 items-end">
                         <div className="w-32 shrink-0 space-y-1.5">
