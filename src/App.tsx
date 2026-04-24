@@ -22,6 +22,7 @@ import { AdminOverlayModal } from './components/AdminOverlayModal';
 import { PrivacyPage } from './components/PrivacyPage';
 import { FAQPage } from './components/FAQPage';
 import { MobileFooter } from './components/MobileFooter';
+import { DesktopFooter } from './components/DesktopFooter';
 import { TournamentsPage } from './components/TournamentsPage';
 import { TournamentDetail } from './components/TournamentDetail';
 import { TournamentRegolamento } from './components/TournamentRegolamento';
@@ -318,6 +319,7 @@ function App() {
         />
       )}
 
+      <DesktopFooter />
       <MobileFooter />
       <CookieBanner />
       <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} message={loginModalMessage} />
