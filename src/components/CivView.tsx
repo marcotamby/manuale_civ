@@ -170,7 +170,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     { id: 'matchups', label: 'Matchups', icon: <BarChart2 size={16} /> },
     { id: 'video', label: 'Video Guide', icon: <Play size={16} /> },
     { id: 'domande', label: 'Domande', icon: <MessageSquare size={16} /> },
-    { id: 'proponi', label: 'Proponi Modifica', icon: <Edit size={16} /> },
+    { id: 'proponi', label: 'Proponi Modifica', icon: <Pencil size={16} /> },
   ];
 
   // Q&A State
@@ -875,7 +875,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                           className="absolute top-3 right-3 z-[20] p-2 bg-black/60 hover:bg-white text-white hover:text-black rounded-lg border border-white/20 transition-all shadow-xl"
                           title="Modifica Build Order"
                         >
-                          <Edit size={14} />
+                          <Pencil size={14} />
                         </button>
                       )}
                       {/* Banner */}
@@ -1072,7 +1072,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                           }}
                           className="p-2 bg-white/10 hover:bg-white text-white hover:text-black rounded-full backdrop-blur-md border border-white/10 transition-all flex items-center gap-2 px-4 shadow-lg"
                         >
-                          <Edit size={18} />
+                          <Pencil size={18} />
                           <span className="text-xs font-black uppercase tracking-widest">Modifica</span>
                         </button>
                       )}
@@ -1560,7 +1560,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         {activeTab === 'proponi' && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <Edit className="text-yellow-500" size={24} />
+              <Pencil className="text-slate-400" size={24} />
               Proponi una modifica
             </h2>
             <EditSuggestionForm civName={civ.name} />
