@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, X, Loader2, Play, Map, Plus, Trash2, CheckCircle, Clock, Zap, ChevronUp, ChevronDown, Info, Cog, Edit, AlertTriangle, Upload, MousePointer2, MoveVertical } from 'lucide-react';
+import { X, Save, Plus, Trash2, Edit, Zap, Info, Map, Play, AlertTriangle, ChevronUp, ChevronDown, Cog, Loader2, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { YouTubePickerModal } from './YouTubePickerModal';
 import { Toast } from './Toast';
@@ -32,7 +32,6 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
     message: '',
     type: 'success'
   });
-  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
 
 
   // Refs for scrolling
@@ -122,11 +121,6 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
     a.activity?.civId === civ.id
   ) : [];
 
-  const getYoutubeId = (url: string) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
-  };
 
   if (!isOpen) return null;
 
@@ -247,7 +241,6 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
     }
     setEditedGlobalUnits(newArr);
   };
-
   return (
     <div className="fixed inset-0 z-[5000] flex items-center justify-center p-2 md:p-4 bg-black/80 backdrop-blur-md shadow-2xl overflow-y-auto">
       <div className="bg-[#1a1c23] border border-purple-500/50 rounded-2xl w-full max-w-5xl h-fit max-h-none md:max-h-[90vh] my-auto overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.2)] flex flex-col animate-in fade-in zoom-in duration-200">
@@ -455,7 +448,6 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
             )}
 
             <div className={`grid grid-cols-1 ${!initialSection ? 'lg:grid-cols-2' : ''} gap-8`}>
-
               {/* Unità Uniche */}
               <div ref={sectionRefs.units} className="bg-black/30 border border-blue-500/30 rounded-xl p-4">
                 <div className="flex justify-between items-center mb-4">
@@ -497,7 +489,6 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                 </div>
               </div>
 
-
               {/* Landmarks */}
               <div ref={sectionRefs.landmarks} className="bg-black/30 border border-purple-500/30 rounded-xl p-4">
                 <div className="flex justify-between items-center mb-4">
@@ -525,8 +516,10 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                   ))}
                   {(!editedCiv.landmarks || editedCiv.landmarks.length === 0) && <p className="text-gray-500 text-sm italic text-center py-4">Nessun landmark</p>}
                 </div>
-                {/* Build Orders */}
-              <div ref={sectionRefs.buildorders} className="bg-black/30 border border-yellow-500/30 rounded-xl p-4">
+              </div>
+
+              {/* Build Orders */}
+              <div ref={sectionRefs.buildorders} className="bg-black/30 border border-yellow-500/30 rounded-xl p-4 lg:col-span-2">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="font-bold text-yellow-400 flex items-center gap-2"><Map size={18} /> Build Orders</h4>
                   <button 
@@ -537,7 +530,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                   </button>
                 </div>
                 <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                  {(editedCiv.build_orders || editedCiv.buildOrders || []).map((bo: any, idx: number) => (
+                  {(editedCiv.buildOrders || []).map((bo: any, idx: number) => (
                     <div key={idx} id={`admin-bo-${bo.id}`} className="bg-white/5 border border-white/10 rounded-xl p-3 flex items-center justify-between group hover:border-yellow-500/30 transition-all">
                       <div className="flex items-center gap-3">
                          <div className="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
@@ -559,9 +552,9 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                         <button
                           onClick={() => {
                             if (window.confirm('Sei sicuro di voler eliminare questo Build Order?')) {
-                              const newBOs = [...(editedCiv.build_orders || editedCiv.buildOrders || [])];
+                              const newBOs = [...(editedCiv.buildOrders || [])];
                               newBOs.splice(idx, 1);
-                              setEditedCiv({ ...editedCiv, build_orders: newBOs });
+                              setEditedCiv({ ...editedCiv, buildOrders: newBOs });
                             }
                           }}
                           className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg border border-red-500/30 transition-all"
@@ -572,7 +565,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                       </div>
                     </div>
                   ))}
-                  {(!editedCiv.build_orders || (editedCiv.build_orders || []).length === 0) && (editedCiv.buildOrders?.length === 0 || !editedCiv.buildOrders) && (
+                  {(!editedCiv.buildOrders || editedCiv.buildOrders.length === 0) && (
                     <div className="text-center py-8 border-2 border-dashed border-white/5 rounded-xl">
                        <Map size={24} className="text-gray-700 mx-auto mb-2 opacity-20" />
                        <p className="text-gray-600 text-[10px] font-bold uppercase tracking-widest">Nessun Build Order presente</p>
@@ -581,44 +574,40 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                 </div>
               </div>
             </div>
-              </div>
+          </div>
 
-            </div>
-
-            {/* Global Units section added at the end of Structured Data */}
-            <div ref={sectionRefs.global} className="mt-8 pt-6 border-t border-yellow-500/20">
-              <h4 className="font-bold text-gray-400 flex items-center gap-2 mb-4"><span className="text-xl">🌍</span> Unità Comuni (Comuni a tutte le Civ)</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar p-1">
-                {editedGlobalUnits.map((gu: any, idx: number) => (
-                  <div key={gu.id} className={`bg-black/40 border border-gray-700/50 rounded-xl p-4 transition-all duration-500 ${initialId === gu.id ? 'ring-2 ring-yellow-500 bg-yellow-500/10' : ''}`}>
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-sm font-bold text-white">{gu.name}</span>
-                      <span className="text-[10px] text-gray-500 uppercase">{gu.id}</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 mb-2">
-                       <input type="text" value={gu.imageId || ''} onChange={e => updateGlobalUnit(idx, 'imageId', e.target.value)} placeholder="Image URL o ID" className="bg-gray-800 text-blue-300 text-[10px] rounded px-2 py-1 border border-gray-600 w-full" />
-                       <div className="grid grid-cols-5 gap-1">
-                          <input type="number" min="1" max="4" value={gu.age} onChange={e => updateGlobalUnit(idx, 'age', e.target.value)} title="Age" className="bg-gray-800 text-white text-xs rounded px-1 py-1 text-center border border-gray-600" />
-                          <input type="number" value={gu.stats?.attack || 0} onChange={e => updateGlobalUnit(idx, 'attack', e.target.value)} title="Attack" className="bg-gray-800 text-red-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
-                          <input type="number" value={gu.stats?.armor || 0} onChange={e => updateGlobalUnit(idx, 'armor', e.target.value)} title="Armor" className="bg-gray-800 text-gray-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
-                          <input type="number" value={gu.stats?.health || 0} onChange={e => updateGlobalUnit(idx, 'health', e.target.value)} title="Health" className="bg-gray-800 text-green-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
-                          <input type="number" step="0.1" value={gu.stats?.speed || 0} onChange={e => updateGlobalUnit(idx, 'speed', e.target.value)} title="Speed" className="bg-gray-800 text-blue-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 mb-2">
-                      <textarea value={gu.strengths?.join('\n') || ''} onChange={e => updateGlobalUnit(idx, 'strengths', e.target.value)} placeholder="Forti contro" rows={2} className="bg-gray-800 text-green-300 text-[10px] rounded px-2 py-1 border border-gray-600 w-full resize-none" />
-                      <textarea value={gu.weaknesses?.join('\n') || ''} onChange={e => updateGlobalUnit(idx, 'weaknesses', e.target.value)} placeholder="Deboli contro" rows={2} className="bg-gray-800 text-red-300 text-[10px] rounded px-2 py-1 border border-gray-600 w-full resize-none" />
-                    </div>
-                    <textarea value={gu.description} onChange={e => updateGlobalUnit(idx, 'description', e.target.value)} placeholder="Descrizione" rows={2} className="bg-gray-800 text-white text-[10px] rounded px-2 py-1 border border-gray-600 w-full resize-none" />
+          {/* Global Units section added at the end of Structured Data */}
+          <div ref={sectionRefs.global} className="mt-8 pt-6 border-t border-yellow-500/20">
+            <h4 className="font-bold text-gray-400 flex items-center gap-2 mb-4"><span className="text-xl">🌍</span> Unità Comuni (Comuni a tutte le Civ)</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar p-1">
+              {editedGlobalUnits.map((gu: any, idx: number) => (
+                <div key={gu.id} className={`bg-black/40 border border-gray-700/50 rounded-xl p-4 transition-all duration-500 ${initialId === gu.id ? 'ring-2 ring-yellow-500 bg-yellow-500/10' : ''}`}>
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-sm font-bold text-white">{gu.name}</span>
+                    <span className="text-[10px] text-gray-500 uppercase">{gu.id}</span>
                   </div>
-                ))}
-              </div>
+                  <div className="grid grid-cols-2 gap-2 mb-2">
+                     <input type="text" value={gu.imageId || ''} onChange={e => updateGlobalUnit(idx, 'imageId', e.target.value)} placeholder="Image URL o ID" className="bg-gray-800 text-blue-300 text-[10px] rounded px-2 py-1 border border-gray-600 w-full" />
+                     <div className="grid grid-cols-5 gap-1">
+                        <input type="number" min="1" max="4" value={gu.age} onChange={e => updateGlobalUnit(idx, 'age', e.target.value)} title="Age" className="bg-gray-800 text-white text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                        <input type="number" value={gu.stats?.attack || 0} onChange={e => updateGlobalUnit(idx, 'attack', e.target.value)} title="Attack" className="bg-gray-800 text-red-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                        <input type="number" value={gu.stats?.armor || 0} onChange={e => updateGlobalUnit(idx, 'armor', e.target.value)} title="Armor" className="bg-gray-800 text-gray-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                        <input type="number" value={gu.stats?.health || 0} onChange={e => updateGlobalUnit(idx, 'health', e.target.value)} title="Health" className="bg-gray-800 text-green-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                        <input type="number" step="0.1" value={gu.stats?.speed || 0} onChange={e => updateGlobalUnit(idx, 'speed', e.target.value)} title="Speed" className="bg-gray-800 text-blue-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                      </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mb-2">
+                    <textarea value={gu.strengths?.join('\n') || ''} onChange={e => updateGlobalUnit(idx, 'strengths', e.target.value)} placeholder="Forti contro" rows={2} className="bg-gray-800 text-green-300 text-[10px] rounded px-2 py-1 border border-gray-600 w-full resize-none" />
+                    <textarea value={gu.weaknesses?.join('\n') || ''} onChange={e => updateGlobalUnit(idx, 'weaknesses', e.target.value)} placeholder="Deboli contro" rows={2} className="bg-gray-800 text-red-300 text-[10px] rounded px-2 py-1 border border-gray-600 w-full resize-none" />
+                  </div>
+                  <textarea value={gu.description} onChange={e => updateGlobalUnit(idx, 'description', e.target.value)} placeholder="Descrizione" rows={2} className="bg-gray-800 text-white text-[10px] rounded px-2 py-1 border border-gray-600 w-full resize-none" />
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
         <div className="p-6 border-t border-purple-500/20 bg-black/40 flex justify-center items-center gap-4">
-
           <button
             onClick={handleSave}
             disabled={isSaving || isSaveSuccess}
@@ -631,7 +620,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
             {isSaving ? (
               <Loader2 size={18} className="animate-spin" />
             ) : isSaveSuccess ? (
-              <CheckCircle size={18} className="animate-in zoom-in duration-300" />
+              <CheckCircle2 size={18} className="animate-in zoom-in duration-300" />
             ) : (
               <Save size={18} />
             )}

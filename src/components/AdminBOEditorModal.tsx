@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { Save, X, Loader2, Play, Map, Plus, Trash2, CheckCircle, Clock, Zap, Upload, MousePointer2, MoveVertical, Shield, User, Star, Type, Youtube } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Save, X, Loader2, Play, Map, Plus, Clock, Zap, Upload, MousePointer2, MoveVertical, Shield, User, Star, Type, Youtube } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { usePresence } from './PresenceContext';
@@ -213,7 +213,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                     {[1, 2, 3].map(d => (
                       <button
                         key={d}
-                        onClick={() => setEditedBO(prev => ({ ...prev, difficulty: d }))}
+                        onClick={() => setEditedBO(prev => ({ ...prev, difficulty: d as 1 | 2 | 3 }))}
                         className={`flex-1 py-3 rounded-xl border-2 transition-all font-black text-sm uppercase tracking-tighter ${
                           editedBO.difficulty === d
                             ? 'bg-cyan-500 border-cyan-400 text-black shadow-[0_0_20px_rgba(6,182,212,0.4)]'
@@ -455,7 +455,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                     <div className="md:col-span-12">
                       <label className="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Note / Dettagli</label>
                       <textarea
-                        value={step.note || step.notes || ''}
+                        value={step.note || ''}
                         onChange={e => {
                           const newSteps = [...editedBO.steps];
                           newSteps[idx].note = e.target.value;

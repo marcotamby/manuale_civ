@@ -57,6 +57,7 @@ export interface BuildOrder {
   author_avatar?: string;
   banner_url?: string;
   banner_position?: number;
+  map?: string;
 }
 
 export interface Civilization {

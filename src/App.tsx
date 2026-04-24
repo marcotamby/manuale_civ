@@ -50,7 +50,6 @@ function App() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isAdminOverlayOpen, setIsAdminOverlayOpen] = useState(false);
   const [isCivEditorOpen, setIsCivEditorOpen] = useState(false);
-  const [civEditorTarget, setCivEditorTarget] = useState<{ section?: string; id?: string }>({});
   const [isBOEditorOpen, setIsBOEditorOpen] = useState(false);
   const [boEditorTarget, setBOEditorTarget] = useState<{ civId: string; index: number | null }>({ civId: '', index: null });
 
@@ -59,8 +58,7 @@ function App() {
     if (typeof window === 'undefined') return;
 
     (window as any).openProfileModal = () => setIsProfileModalOpen(true);
-    (window as any).openCivEditor = (section?: string, id?: string) => {
-      setCivEditorTarget({ section, id });
+    (window as any).openCivEditor = () => {
       setIsCivEditorOpen(true);
     };
     (window as any).openBOEditor = (civId: string, index: number | null) => {

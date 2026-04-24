@@ -1,10 +1,15 @@
 
-with open(r'c:\Users\marco\OneDrive\Desktop\manualeciv\src\components\TournamentsPage.tsx', 'r', encoding='utf-8') as f:
-    lines = f.readlines()
+import sys
 
-div_count = 0
-for i, line in enumerate(lines):
-    div_count += line.count('<div')
-    div_count -= line.count('</div')
-    if i > 500 and i < 750:
-        print(f"{i+1}: {div_count} | {line.strip()}")
+def count_divs(filename):
+    with open(filename, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    open_divs = content.count('<div')
+    close_divs = content.count('</div')
+    
+    print(f"Open <div: {open_divs}")
+    print(f"Close </div: {close_divs}")
+
+if __name__ == "__main__":
+    count_divs(sys.argv[1])
