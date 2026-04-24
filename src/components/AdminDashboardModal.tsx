@@ -1110,10 +1110,12 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
             <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
               <AlertTriangle className="text-red-500" size={32} />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Conferma Eliminazione</h3>
+            <h3 className="text-xl font-bold text-white mb-2">
+              {deleteConfirm.type === 'user' ? 'Rimuovi dallo Staff' : 'Conferma Eliminazione'}
+            </h3>
             <p className="text-sm text-gray-400 mb-8 leading-relaxed">
               {deleteConfirm.type === 'user' 
-                ? `Sei sicuro di voler eliminare definitivamente l'utente ${deleteConfirm.item}? Questa azione è irreversibile.`
+                ? `Sei sicuro di voler rimuovere l'utente ${deleteConfirm.item} dallo staff? Perderà ogni permesso di gestione.`
                 : `Sei sicuro di voler eliminare definitivamente questa ${deleteConfirm.type === 'question' ? 'domanda' : 'risposta'}?`}
             </p>
 
@@ -1137,7 +1139,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                 }}
                 className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl transition-all font-bold text-xs uppercase shadow-lg shadow-red-600/20"
               >
-                Elimina Ora
+                {deleteConfirm.type === 'user' ? 'Rimuovi Ora' : 'Elimina Ora'}
               </button>
             </div>
           </div>
