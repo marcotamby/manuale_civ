@@ -222,18 +222,33 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
   const executeDeleteUser = async (email: string) => {
     try {
+      // Instead of hard delete which might fail due to RLS or foreign keys,
+      // we reset all roles and permissions. This removes them from the "Staff" list.
       const { error } = await supabase
         .from('profiles')
-        .delete()
+        .update({ 
+          role: null,
+          is_streamer: false,
+          can_manage_tournaments: false,
+          can_manage_civs: false,
+          can_manage_buildorders: false
+        })
         .eq('email', email);
 
       if (error) throw error;
 
-      setUsers(prev => prev.filter(u => u.email !== email));
-      setToast({ isVisible: true, message: 'Utente eliminato correttamente', type: 'success' });
+      setUsers(prev => prev.map(u => u.email === email ? { 
+        ...u, 
+        role: null, 
+        is_streamer: false,
+        can_manage_tournaments: false,
+        can_manage_civs: false,
+        can_manage_buildorders: false
+      } : u));
+      setToast({ isVisible: true, message: 'Utente rimosso dai permessi', type: 'success' });
     } catch (err: any) {
-      console.error('Error deleting user:', err);
-      setToast({ isVisible: true, message: 'Errore durante l\'eliminazione', type: 'error' });
+      console.error('Error removing user:', err);
+      setToast({ isVisible: true, message: 'Errore durante la rimozione', type: 'error' });
     }
   };
 
