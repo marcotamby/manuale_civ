@@ -265,7 +265,7 @@ export function FAQPage() {
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center bg-[#0d1424]">
-        <Loader2 className="animate-spin text-yellow-500" size={40} />
+        <Loader2 className="animate-spin text-blue-400" size={40} />
       </div>
     );
   }
@@ -276,7 +276,7 @@ export function FAQPage() {
         <div className="flex justify-between items-center mb-8">
           <button 
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-yellow-500 hover:text-yellow-400 transition-all hover:translate-x-[-4px]"
+            className="flex items-center gap-2 text-blue-400 hover:text-cyan-300 transition-all hover:translate-x-[-4px]"
           >
             <ArrowLeft size={20} />
             <span className="font-sans font-bold uppercase text-xs tracking-widest">Torna alla Dashboard</span>
@@ -298,7 +298,7 @@ export function FAQPage() {
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 text-xs font-bold uppercase tracking-wider shadow-lg disabled:opacity-50 ${
                       isSaveSuccess 
                         ? 'bg-[#00ff9f] text-[#0d1424] shadow-[0_0_25px_rgba(0,255,159,0.8)] scale-110 animate-[pulse_1s_infinite]' 
-                        : 'bg-green-600 text-white hover:bg-green-500 shadow-green-600/20'
+                        : 'bg-blue-600 text-white hover:bg-blue-500 shadow-blue-600/20'
                     }`}
                   >
                     {saveLoading ? <Loader2 className="animate-spin" size={16} /> : isSaveSuccess ? <CheckCircle size={16} className="animate-in zoom-in" /> : <Save size={16} />}
@@ -308,7 +308,7 @@ export function FAQPage() {
               ) : (
                 <button 
                   onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-yellow-600/20 text-yellow-500 border border-yellow-500/30 rounded-lg hover:bg-yellow-600/30 transition-all text-xs font-bold uppercase tracking-wider"
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-lg hover:bg-blue-600/30 transition-all text-xs font-bold uppercase tracking-wider"
                 >
                   <Edit3 size={16} /> Modifica FAQ
                 </button>
@@ -317,13 +317,13 @@ export function FAQPage() {
           )}
         </div>
 
-        <header className="mb-12 border-b border-[#D4AF37]/20 pb-8">
+        <header className="mb-12 border-b border-blue-500/20 pb-8">
           <div className="flex items-center gap-4 mb-4">
-            <div className="p-3 bg-yellow-500/10 rounded-2xl border border-yellow-500/20">
-              <HelpCircle size={32} className="text-yellow-500" />
+            <div className="p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20">
+              <HelpCircle size={32} className="text-blue-400" />
             </div>
             <div>
-              <h1 className="text-4xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-amber-500 tracking-tight">
+              <h1 className="text-4xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-500 tracking-tight">
                 Domande Frequenti
               </h1>
               <p className="text-gray-400 mt-1 font-serif italic">Tutto quello che c'è da sapere sul Manuale delle Civiltà</p>
@@ -335,25 +335,25 @@ export function FAQPage() {
           {isEditing ? (
             <div className="space-y-4 relative z-10">
               <div className="flex items-center gap-3">
-                <Info className="text-yellow-500" />
+                <Info className="text-blue-400" />
                 <input 
                   value={intro.title}
                   onChange={(e) => setIntro({ ...intro, title: e.target.value })}
-                  className="flex-1 bg-black/50 border border-yellow-500/30 rounded-lg px-4 py-2 text-2xl font-bold text-white"
+                  className="flex-1 bg-black/50 border border-blue-500/30 rounded-lg px-4 py-2 text-2xl font-bold text-white"
                   placeholder="Titolo Intro"
                 />
               </div>
               <textarea 
                 value={intro.content}
                 onChange={(e) => setIntro({ ...intro, content: e.target.value })}
-                className="w-full bg-black/50 border border-yellow-500/30 rounded-lg px-4 py-3 text-lg leading-relaxed text-gray-300 h-40 resize-none"
+                className="w-full bg-black/50 border border-blue-500/30 rounded-lg px-4 py-3 text-lg leading-relaxed text-gray-300 h-40 resize-none"
                 placeholder="Contenuto Intro"
               />
             </div>
           ) : (
             <>
               <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <Info className="text-yellow-500" />
+                <Info className="text-blue-400" />
                 {intro.title}
               </h2>
               <p className="text-lg leading-relaxed text-gray-300">
@@ -392,7 +392,7 @@ export function FAQPage() {
                       next[sIdx].title = e.target.value;
                       setSections(next);
                     }}
-                    className="flex-1 bg-black/50 border border-yellow-500/30 rounded-lg px-4 py-2 text-xl font-bold text-white"
+                    className="flex-1 bg-black/50 border border-blue-500/30 rounded-lg px-4 py-2 text-xl font-bold text-white"
                   />
                   <select 
                     value={section.icon_name}
@@ -401,7 +401,7 @@ export function FAQPage() {
                       next[sIdx].icon_name = e.target.value;
                       setSections(next);
                     }}
-                    className="bg-black/50 border border-yellow-500/30 rounded-lg px-2 py-2 text-yellow-500"
+                    className="bg-black/50 border border-blue-500/30 rounded-lg px-2 py-2 text-blue-400"
                   >
                     {['Layers', 'Zap', 'Heart', 'GitPullRequest', 'Users', 'Shield', 'PlayCircle', 'BookOpen', 'Sword', 'Info', 'HelpCircle'].map(icon => (
                       <option key={icon} value={icon}>{icon}</option>
@@ -409,8 +409,8 @@ export function FAQPage() {
                   </select>
                 </div>
               ) : (
-                <h2 className="text-xl font-sackers font-bold text-yellow-500/80 tracking-widest flex items-center gap-3 border-b border-white/5 pb-2">
-                  <IconComponent name={section.icon_name} className="text-yellow-500" />
+                <h2 className="text-xl font-sackers font-bold text-blue-400/80 tracking-widest flex items-center gap-3 border-b border-white/5 pb-2">
+                  <IconComponent name={section.icon_name} className="text-blue-400" />
                   {section.title}
                 </h2>
               )}
@@ -422,7 +422,7 @@ export function FAQPage() {
                     <div 
                       key={iIdx} 
                       onClick={() => !isEditing && toggleItem(sIdx, iIdx)}
-                      className={`glass p-5 rounded-2xl border border-white/5 hover:border-yellow-500/30 transition-all group relative ${!isEditing ? 'cursor-pointer md:cursor-default' : ''} ${!isEditing && isExpanded ? 'border-yellow-500/30' : ''}`}
+                      className={`glass p-5 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-all group relative ${!isEditing ? 'cursor-pointer md:cursor-default' : ''} ${!isEditing && isExpanded ? 'border-blue-500/30' : ''}`}
                     >
                       {isEditing && (
                         <button 
@@ -446,7 +446,7 @@ export function FAQPage() {
                                 next[sIdx].items[iIdx].icon_name = e.target.value;
                                 setSections(next);
                               }}
-                              className="bg-black/50 border border-white/10 rounded-lg px-1 py-1 text-xs text-yellow-500"
+                              className="bg-black/50 border border-white/10 rounded-lg px-1 py-1 text-xs text-blue-400"
                             >
                               {['Layers', 'Zap', 'Heart', 'GitPullRequest', 'Users', 'Shield', 'PlayCircle', 'BookOpen', 'Sword', 'Info', 'HelpCircle'].map(icon => (
                                 <option key={icon} value={icon}>{icon}</option>
@@ -476,13 +476,13 @@ export function FAQPage() {
                         <>
                           <div className="flex items-center justify-between gap-3 mb-3">
                             <div className="flex items-center gap-3">
-                              <div className="p-2 bg-white/5 rounded-lg group-hover:bg-yellow-500/10 transition-colors text-yellow-500 shrink-0">
+                              <div className="p-2 bg-white/5 rounded-lg group-hover:bg-blue-500/10 transition-colors text-blue-400 shrink-0">
                                  <IconComponent name={item.icon_name} />
                               </div>
                               <h3 className="font-bold text-white tracking-wide">{item.label}</h3>
                             </div>
                             <div className="md:hidden">
-                              {isExpanded ? <ChevronUp size={16} className="text-yellow-500" /> : <ChevronDown size={16} className="text-gray-500" />}
+                              {isExpanded ? <ChevronUp size={16} className="text-blue-400" /> : <ChevronDown size={16} className="text-gray-500" />}
                             </div>
                           </div>
                           <div className={`overflow-hidden transition-all duration-300 md:block ${isExpanded ? 'max-h-96 opacity-100 mt-3' : 'max-h-0 opacity-0 md:max-h-96 md:opacity-100'}`}>
@@ -499,10 +499,10 @@ export function FAQPage() {
                 {isEditing && (
                   <button 
                     onClick={() => handleAddField(sIdx)}
-                    className="flex flex-col items-center justify-center p-5 rounded-2xl border-2 border-dashed border-white/10 hover:border-yellow-500/50 hover:bg-yellow-500/5 transition-all group"
+                    className="flex flex-col items-center justify-center p-5 rounded-2xl border-2 border-dashed border-white/10 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group"
                   >
-                    <Plus className="text-gray-500 group-hover:text-yellow-500 transition-colors mb-2" />
-                    <span className="text-xs font-bold text-gray-500 group-hover:text-yellow-500 uppercase">Aggiungi Elemento</span>
+                    <Plus className="text-gray-500 group-hover:text-blue-400 transition-colors mb-2" />
+                    <span className="text-xs font-bold text-gray-500 group-hover:text-blue-400 uppercase">Aggiungi Elemento</span>
                   </button>
                 )}
               </div>
@@ -512,10 +512,10 @@ export function FAQPage() {
           {isEditing && (
             <button 
               onClick={handleAddSection}
-              className="w-full flex items-center justify-center gap-3 p-6 rounded-3xl border-2 border-dashed border-yellow-500/20 hover:border-yellow-500/50 hover:bg-yellow-500/5 transition-all group"
+              className="w-full flex items-center justify-center gap-3 p-6 rounded-3xl border-2 border-dashed border-blue-500/20 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group"
             >
-              <Plus className="text-yellow-500 group-hover:scale-125 transition-transform" />
-              <span className="font-sackers font-bold text-yellow-500/80 tracking-widest uppercase">Aggiungi Sezione</span>
+              <Plus className="text-blue-400 group-hover:scale-125 transition-transform" />
+              <span className="font-sackers font-bold text-blue-400/80 tracking-widest uppercase">Aggiungi Sezione</span>
             </button>
           )}
         </div>
@@ -527,7 +527,7 @@ export function FAQPage() {
           <div className="flex justify-center gap-4">
             <button 
               onClick={() => navigate('/privacy')}
-              className="text-xs text-gray-600 hover:text-yellow-500 transition-colors font-medium uppercase tracking-widest"
+              className="text-xs text-gray-600 hover:text-blue-400 transition-colors font-medium uppercase tracking-widest"
             >
               Privacy & Cookie Policy
             </button>
