@@ -58,6 +58,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [savedSuccess, setSavedSuccess] = useState<string | null>(null);
   const [addSuccess, setAddSuccess] = useState(false);
   const [recentlyAddedEmails, setRecentlyAddedEmails] = useState<Set<string>>(new Set());
+  const [inlineToast, setInlineToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const getYoutubeId = (url: string) => {
     if (!url) return null;
@@ -153,18 +154,21 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     if (!newUemail.trim() || !isSuperAdmin) return;
     try {
       const email = newUemail.trim().toLowerCase();
+      // We set role: 'editor' as a baseline so they appear in the staff list persistently
       const { error } = await supabase
         .from('profiles')
-        .upsert({ email }, { onConflict: 'email' });
+        .upsert({ email, role: 'editor' }, { onConflict: 'email' });
 
       if (error) throw error;
 
       setAddSuccess(true);
+      setInlineToast({ message: 'Utente aggiunto allo staff', type: 'success' });
       setTimeout(() => {
         setAddSuccess(false);
         setIsAddingUser(false);
         setNewUemail('');
-      }, 1500);
+        setInlineToast(null);
+      }, 3000);
 
       setRecentlyAddedEmails(prev => new Set(prev).add(email));
       await fetchUsers(true);
@@ -245,10 +249,12 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
         can_manage_civs: false,
         can_manage_buildorders: false
       } : u));
-      setToast({ isVisible: true, message: 'Utente rimosso dai permessi', type: 'success' });
+      setInlineToast({ message: 'Utente rimosso dallo staff', type: 'success' });
+      setTimeout(() => setInlineToast(null), 3000);
     } catch (err: any) {
       console.error('Error removing user:', err);
-      setToast({ isVisible: true, message: 'Errore durante la rimozione', type: 'error' });
+      setInlineToast({ message: 'Errore durante la rimozione', type: 'error' });
+      setTimeout(() => setInlineToast(null), 3000);
     }
   };
 
@@ -824,6 +830,16 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
             {/* Users List */}
             <div className="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar">
+              {inlineToast && (
+                <div className={`mb-4 p-3 rounded-xl border flex items-center gap-2 animate-in slide-in-from-top duration-300 ${
+                  inlineToast.type === 'success' 
+                    ? 'bg-green-500/10 border-green-500/20 text-green-400' 
+                    : 'bg-red-500/10 border-red-500/20 text-red-400'
+                }`}>
+                  {inlineToast.type === 'success' ? <CheckCircle size={16} /> : <AlertTriangle size={16} />}
+                  <span className="text-xs font-bold uppercase">{inlineToast.message}</span>
+                </div>
+              )}
               {userLoading ? (
                 <div className="flex flex-col items-center justify-center h-60">
                   <Loader2 size={32} className="animate-spin text-blue-500 mb-2" />
