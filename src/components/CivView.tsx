@@ -984,7 +984,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                     <span>Build Order</span>
                   </h3>
                   <p className="text-sm md:text-base text-gray-500 px-4 max-w-[280px] font-medium leading-relaxed">
-                    {(isAdmin || canManageBuildorders) ? 'Inserisci ufficialmente una nuova strategia.' : 'Aiuta la community con una nuova strategia.'}
+                    {(isAdmin || canManageBuildorders) ? 'Inserisci ufficialmente una nuova strategia.' : 'Proponi per primo un build order per questa civiltà!'}
                   </p>
                 </div>
               </div>
@@ -992,7 +992,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl mx-auto">
                 <div 
                   onClick={() => (isAdmin || canManageBuildorders) ? (window as any).openBOEditor?.(civId, null) : navigate(`/civ/${civId}/proponi?section=build_order`)}
-                  className={`glass flex flex-col items-center justify-center p-8 rounded-2xl border border-dashed transition-all group cursor-pointer text-center h-full min-h-[440px] ${
+                  className={`glass flex flex-col items-center justify-center p-8 rounded-3xl border border-dashed transition-all group cursor-pointer text-center h-full min-h-[440px] ${
                     (isAdmin || canManageBuildorders)
                       ? 'border-slate-400/30 hover:border-slate-200/60 hover:bg-slate-400/5 shadow-[0_0_30px_rgba(148,163,184,0.1)]'
                       : 'border-yellow-500/20 hover:border-yellow-500/40 hover:bg-yellow-500/5 shadow-[0_0_30px_rgba(234,179,8,0.05)]'
@@ -1003,17 +1003,13 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   }`}>
                     <Plus size={40} className={(isAdmin || canManageBuildorders) ? 'text-slate-300' : 'text-yellow-500'} />
                   </div>
-                  <div className="space-y-3">
-                    <h3 className={`text-2xl font-black uppercase tracking-tighter leading-none ${(isAdmin || canManageBuildorders) ? 'text-slate-200' : 'text-white'} flex flex-col`}>
-                      <span>{(isAdmin || canManageBuildorders) ? 'Aggiungi' : 'Proponi'}</span>
-                      <span>Build Order</span>
-                    </h3>
-                    <p className="text-sm text-gray-500 px-4 max-w-[280px] font-medium leading-relaxed">
-                      {(isAdmin || canManageBuildorders) 
-                        ? 'Inserisci ufficialmente una nuova strategia.' 
-                        : 'Proponi per primo un build order per questa civiltà!'}
-                    </p>
-                  </div>
+                  <h3 className={`text-2xl font-black mb-3 uppercase tracking-tighter leading-[1.1] ${(isAdmin || canManageBuildorders) ? 'text-slate-200' : 'text-white'} flex flex-col`}>
+                    <span>{(isAdmin || canManageBuildorders) ? 'Aggiungi' : 'Proponi'}</span>
+                    <span>Build Order</span>
+                  </h3>
+                  <p className="text-sm md:text-base text-gray-500 px-4 max-w-[280px] font-medium leading-relaxed">
+                    {(isAdmin || canManageBuildorders) ? 'Inserisci ufficialmente una nuova strategia.' : 'Proponi per primo un build order per questa civiltà!'}
+                  </p>
                 </div>
               </div>
             )}

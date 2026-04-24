@@ -281,6 +281,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsSuperAdmin(false);
     setIsEditor(false);
     setIsStreamer(false);
+    setCanManageTournaments(false);
+    setCanManageCivs(false);
+    setCanManageBuildorders(false);
     setUser(null);
     setFavorites([]); // Clear favorites state on logout
     localStorage.removeItem('auth_user');
