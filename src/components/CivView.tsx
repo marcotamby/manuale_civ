@@ -554,7 +554,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   if (!civ) return <div className="text-gray-400 p-8">Civiltà non trovata.</div>;
 
   return (
-    <div className="flex-1 overflow-y-auto overflow-x-hidden w-full civ-view-container">
+    <div className="flex-1 overflow-y-auto w-full civ-view-container">
       {/* Unified Cinematic Top Section (Header + Navbar) */}
       <div className="relative bg-[var(--color-brand-dark)]">
         {/* Unified Cinematic Fading Flag Background - Spans both Header and Navbar */}
@@ -654,13 +654,13 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                             </span>
 
                             {/* Custom Premium Tooltip */}
-                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-1.5 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-lg opacity-0 group-hover/admin:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/admin:scale-100 origin-bottom z-50">
+                            <div className="absolute bottom-full left-0 mb-3 px-3 py-1.5 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-lg opacity-0 group-hover/admin:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/admin:scale-100 origin-bottom-left z-50">
                               <div className="flex flex-col items-center">
                                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Staff Online</span>
                                 <span className="text-xs font-bold text-white">{admin.user.name}</span>
                               </div>
                               {/* Tooltip Arrow */}
-                              <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-800/95"></div>
+                              <div className="absolute top-full left-4 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-800/95"></div>
                             </div>
                           </div>
                         ))}
