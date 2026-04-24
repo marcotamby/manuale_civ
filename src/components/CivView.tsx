@@ -847,13 +847,26 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
             {civ.buildOrders && civ.buildOrders.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl mx-auto">
-                {civ.buildOrders.map((bo) => {
+                {civ.buildOrders.map((bo, idx) => {
                   return (
                     <div
                       key={bo.id}
-                      className="glass flex flex-col rounded-2xl border border-white/5 overflow-hidden transition-all group hover:border-yellow-500/30 hover:shadow-[0_0_30px_rgba(234,179,8,0.1)] cursor-pointer"
+                      className="glass flex flex-col rounded-2xl border border-white/5 overflow-hidden transition-all group hover:border-yellow-500/30 hover:shadow-[0_0_30px_rgba(234,179,8,0.1)] cursor-pointer relative group/card"
                       onClick={() => setSearchParams({ bo: bo.id }, { replace: true })}
                     >
+                      {/* Admin Edit Button */}
+                      {(isAdmin || canManageBuildorders) && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            (window as any).openBOEditor?.(civId, idx);
+                          }}
+                          className="absolute top-4 right-4 z-[20] p-2 bg-black/60 hover:bg-slate-200 hover:text-black text-slate-300 rounded-xl border border-white/10 transition-all opacity-0 group-hover/card:opacity-100 shadow-xl"
+                          title="Modifica Build Order"
+                        >
+                          <Edit size={16} />
+                        </button>
+                      )}
                       {/* Banner */}
                       <div className="relative h-40 w-full overflow-hidden bg-black/40">
                         {bo.banner_url ? (
@@ -959,7 +972,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
                 {/* Proposal / Addition card */}
                 <div 
-                  onClick={() => (isAdmin || canManageBuildorders) ? (window as any).openCivEditor?.('buildorders') : navigate(`/civ/${civId}/proponi?section=build_order`)}
+                  onClick={() => (isAdmin || canManageBuildorders) ? (window as any).openBOEditor?.(civId, null) : navigate(`/civ/${civId}/proponi?section=build_order`)}
                   className={`glass flex flex-col items-center justify-center p-8 rounded-2xl border border-dashed transition-all group cursor-pointer text-center h-full min-h-[250px] ${
                     (isAdmin || canManageBuildorders) 
                       ? 'border-slate-400/30 hover:border-slate-200/60 hover:bg-slate-400/5 shadow-[0_0_20px_rgba(148,163,184,0.1)]' 
@@ -988,7 +1001,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 <h3 className="text-xl font-bold text-white mb-2">Build Orders in arrivo</h3>
                 <p className="text-sm text-gray-500 max-w-sm">I build order per questa civiltà saranno aggiunti presto dai contributori della community.</p>
                 <button
-                  onClick={() => (isAdmin || canManageBuildorders) ? (window as any).openCivEditor?.('buildorders') : navigate(`/civ/${civId}/proponi?section=build_order`)}
+                  onClick={() => (isAdmin || canManageBuildorders) ? (window as any).openBOEditor?.(civId, null) : navigate(`/civ/${civId}/proponi?section=build_order`)}
                   className={`mt-6 px-10 py-4 border rounded-2xl text-base font-extrabold transition-all shadow-lg hover:scale-105 active:scale-95 ${
                     (isAdmin || canManageBuildorders)
                       ? 'bg-slate-400/10 hover:bg-slate-400/20 border-slate-400/40 text-slate-300 shadow-[0_0_20px_rgba(148,163,184,0.1)]'

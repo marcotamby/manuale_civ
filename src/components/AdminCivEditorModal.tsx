@@ -33,33 +33,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
     type: 'success'
   });
   const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
-  const [dragState, setDragState] = useState<{ idx: number; startY: number; startPos: number } | null>(null);
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!dragState) return;
-      const deltaY = e.clientY - dragState.startY;
-      const containerHeight = 120; // Approx height of preview
-      const deltaPercent = (deltaY / containerHeight) * 100;
-      let newPos = Math.max(0, Math.min(100, dragState.startPos - (deltaPercent * 0.5))); // 0.5 sensitivity
-      updateArrayField('buildOrders', dragState.idx, 'banner_position', Math.round(newPos));
-    };
-
-    const handleMouseUp = () => setDragState(null);
-
-    if (dragState) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-    }
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [dragState]);
-
-  const startDrag = (e: React.MouseEvent, idx: number, currentPos: number) => {
-    setDragState({ idx, startY: e.clientY, startPos: currentPos });
-  };
 
   // Refs for scrolling
   const sectionRefs = {
@@ -227,7 +201,6 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
       return { ...prev, passiveBonuses: newBonuses };
     });
   };
-
   const updateArrayField = <T extends keyof Civilization>(field: T, index: number, key: string | { [key: string]: any }, value?: any) => {
     setEditedCiv(prev => {
       const newArr = [...(prev[field] as any[])];
@@ -235,21 +208,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
       if (typeof key === 'object') {
         newArr[index] = { ...newArr[index], ...key };
       } else {
-        if (key === 'steps' && field === 'buildOrders') {
-          newArr[index] = { ...newArr[index], steps: value };
-        } else if (key === 'updateStep' && field === 'buildOrders') {
-          const { stepIndex, stepField, stepValue } = value;
-          const steps = [...(newArr[index].steps || [])];
-          steps[stepIndex] = { ...steps[stepIndex], [stepField === 'notes' ? 'note' : stepField]: stepValue };
-          newArr[index] = { ...newArr[index], steps };
-        } else if (key === 'addStep' && field === 'buildOrders') {
-          const steps = [...(newArr[index].steps || []), { time: '', action: '', note: '' }];
-          newArr[index] = { ...newArr[index], steps };
-        } else if (key === 'removeStep' && field === 'buildOrders') {
-          const steps = [...(newArr[index].steps || [])];
-          steps.splice(value, 1);
-          newArr[index] = { ...newArr[index], steps };
-        } else if (['attack', 'armor', 'speed', 'health'].includes(key)) {
+        if (['attack', 'armor', 'speed', 'health'].includes(key)) {
           newArr[index] = {
             ...newArr[index],
             stats: { ...(newArr[index].stats || {}), [key]: Number(value) }
@@ -262,45 +221,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
       return { ...prev, [field]: newArr };
     });
   };
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, boIdx: number) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
 
-    // Check size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setToast({ isVisible: true, message: 'Immagine troppo grande (max 5MB)', type: 'error' });
-      return;
-    }
-
-    setUploadingIdx(boIdx);
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${editedCiv.id}-${Date.now()}-${boIdx}.${fileExt}`;
-      const filePath = `build-orders/${fileName}`;
-
-      // Upload to 'civilizations' bucket
-      const { error: uploadError } = await supabase.storage
-        .from('civilizations')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('civilizations')
-        .getPublicUrl(filePath);
-
-      updateArrayField('buildOrders', boIdx, 'banner_url', publicUrl);
-      setToast({ isVisible: true, message: 'Immagine caricata con successo!', type: 'success' });
-    } catch (error: any) {
-      console.error('Error uploading image:', error);
-      setToast({ isVisible: true, message: `Errore: ${error.message}`, type: 'error' });
-    } finally {
-      setUploadingIdx(null);
-    }
-  };
 
   const removeFromArray = <T extends keyof Civilization>(field: T, index: number) => {
     const newArr = [...(editedCiv[field] as any[])];
@@ -604,279 +525,62 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                   ))}
                   {(!editedCiv.landmarks || editedCiv.landmarks.length === 0) && <p className="text-gray-500 text-sm italic text-center py-4">Nessun landmark</p>}
                 </div>
-              </div>
-
-              {/* Build Orders */}
+                {/* Build Orders */}
               <div ref={sectionRefs.buildorders} className="bg-black/30 border border-yellow-500/30 rounded-xl p-4">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="font-bold text-yellow-400 flex items-center gap-2"><Map size={18} /> Build Orders</h4>
-                  <button onClick={() => addToArray('buildOrders', { id: `bo-${Date.now()}`, title: '', difficulty: 2, description: '', steps: [], banner_url: '', banner_position: 50 })} className="text-xs bg-yellow-600 hover:bg-yellow-500 text-white px-2 py-1 rounded flex items-center gap-1">
-                    <Plus size={14} /> Aggiungi
+                  <button 
+                    onClick={() => (window as any).openBOEditor?.(editedCiv.id, null)} 
+                    className="text-xs bg-yellow-600 hover:bg-yellow-500 text-white px-3 py-1.5 rounded-lg flex items-center gap-1 font-bold shadow-lg shadow-yellow-600/20 transition-all"
+                  >
+                    <Plus size={14} /> Aggiungi Nuovo
                   </button>
                 </div>
-                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                  {(editedCiv.buildOrders || []).map((bo: any, idx: number) => (
-                    <div key={idx} id={`admin-bo-${bo.id}`} className="bg-black/50 border border-gray-700 rounded-lg p-3 relative group transition-all">
-                      <button onClick={() => removeFromArray('buildOrders', idx)} className="absolute top-2 right-2 text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                        <Trash2 size={16} />
-                      </button>
-                      <div className="grid grid-cols-4 gap-2 mb-2 pr-6">
-                        <input 
-                          type="text" 
-                          value={bo.title === 'Nuovo Build Order' ? '' : bo.title} 
-                          onChange={e => updateArrayField('buildOrders', idx, 'title', e.target.value)} 
-                          placeholder="Titolo" 
-                          className="col-span-3 bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600" 
-                        />
-                        <select
-                          value={bo.difficulty || 2}
-                          onChange={e => updateArrayField('buildOrders', idx, 'difficulty', Number(e.target.value))}
-                          className="bg-gray-800 text-white text-xs rounded px-1 py-1 border border-gray-600 focus:border-yellow-500 outline-none"
-                        >
-                          <option value={1}>⭐ (Easy)</option>
-                          <option value={2}>⭐⭐ (Medium)</option>
-                          <option value={3}>⭐⭐⭐ (Hard)</option>
-                        </select>
+                <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                  {(editedCiv.build_orders || editedCiv.buildOrders || []).map((bo: any, idx: number) => (
+                    <div key={idx} id={`admin-bo-${bo.id}`} className="bg-white/5 border border-white/10 rounded-xl p-3 flex items-center justify-between group hover:border-yellow-500/30 transition-all">
+                      <div className="flex items-center gap-3">
+                         <div className="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
+                            <Zap size={14} className="text-yellow-500" />
+                         </div>
+                         <div>
+                            <span className="text-sm font-bold text-white block leading-tight">{bo.title || 'Senza Titolo'}</span>
+                            <span className="text-[10px] text-gray-500 uppercase font-black tracking-widest">{bo.difficulty === 1 ? 'Facile' : bo.difficulty === 3 ? 'Difficile' : 'Medio'}</span>
+                         </div>
                       </div>
-                      <div className="mb-2">
-                        <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block text-yellow-500">Immagine Banner (JPG/PNG)</label>
-                        <div className="flex gap-2">
-                          <input 
-                            type="text" 
-                            value={bo.banner_url || ''} 
-                            onChange={e => updateArrayField('buildOrders', idx, 'banner_url', e.target.value)} 
-                            placeholder="Inserisci link immagine o carica file..." 
-                            className="flex-1 bg-gray-800 text-blue-300 text-[10px] rounded px-2 py-1.5 border border-gray-600 focus:border-yellow-500 outline-none" 
-                          />
-                          <label className={`cursor-pointer flex items-center justify-center p-1.5 rounded border border-gray-600 bg-gray-800 hover:bg-gray-700 transition-colors w-9 h-full shrink-0 ${uploadingIdx === idx ? 'opacity-50 pointer-events-none' : ''}`}>
-                             <input 
-                               type="file" 
-                               className="hidden" 
-                               accept="image/*"
-                               onChange={(e) => handleFileUpload(e, idx)}
-                             />
-                             {uploadingIdx === idx ? (
-                               <Loader2 size={16} className="text-yellow-500 animate-spin" />
-                             ) : (
-                               <Upload size={16} className="text-gray-400 group-hover:text-yellow-500" />
-                             )}
-                          </label>
-                        </div>
-                        {uploadingIdx === idx && (
-                          <div className="mt-2 bg-yellow-500/10 border border-dashed border-yellow-500/30 rounded-lg p-3 flex flex-col items-center gap-2 animate-pulse">
-                            <Loader2 size={24} className="text-yellow-500 animate-spin" />
-                            <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest">Caricamento in corso...</span>
-                          </div>
-                        )}
-
-                        {bo.banner_url && (
-                          <div className="space-y-2 mt-2">
-                              <label className="text-[9px] text-gray-500 uppercase font-black flex items-center gap-1.5">
-                                <MoveVertical size={12} className="text-yellow-500" /> 
-                                Inquadratura Build Order 
-                                <span className="text-[8px] normal-case font-medium text-gray-600 ml-1">(Trascina l'immagine)</span>
-                              </label>
-                            <div 
-                              className={`relative w-full aspect-[4/1] rounded-b-lg overflow-hidden border-2 transition-all duration-300 group/preview cursor-move ${dragState ? 'border-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.3)]' : 'border-gray-700/50'}`}
-                              onMouseDown={(e) => startDrag(e, idx, bo.banner_position ?? 50)}
-                            >
-                              <img 
-                                src={bo.banner_url} 
-                                alt="Preview" 
-                                className="w-full h-full object-cover transition-all duration-300 pointer-events-none select-none" 
-                                style={{ objectPosition: `50% ${bo.banner_position ?? 50}%` }}
-                              />
-                              
-                              {/* Overlay Indicators */}
-                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 pointer-events-none">
-                                <div className="bg-yellow-500/90 text-black px-2 py-1 rounded text-[10px] font-black uppercase flex items-center gap-1">
-                                  <MousePointer2 size={10} /> Trascina per inquadrare
-                                </div>
-                              </div>
-
-                              <div className="absolute top-2 right-2 flex gap-1">
-                                <button 
-                                  onClick={(e) => { e.stopPropagation(); updateArrayField('buildOrders', idx, 'banner_url', ''); }}
-                                  className="p-1 px-2 bg-red-600 text-[10px] font-bold text-white rounded uppercase flex items-center gap-1 shadow-xl pointer-events-auto hover:bg-red-500 transition-colors"
-                                >
-                                  <Trash2 size={10} />
-                                </button>
-                              </div>
-
-                              {/* Highlight Area visualization */}
-                              <div className="absolute inset-x-0 h-[100%] border-y-2 border-dashed border-white/20 pointer-events-none" />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      <div className="mb-2">
-                        <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block text-blue-400">Descrizione / Strategia</label>
-                        <textarea
-                          value={bo.description || ''}
-                          onChange={e => updateArrayField('buildOrders', idx, 'description', e.target.value)}
-                          placeholder="Descrizione obbligatoria della strategia..."
-                          rows={3}
-                          className="w-full bg-gray-900 border border-blue-500/20 rounded px-3 py-2 text-sm text-gray-200 focus:border-blue-500 outline-none h-24"
-                        />
-                      </div>
-
-                      {/* Steps (Structured handling) */}
-                      <div className="mt-4 space-y-3">
-                        <div className="flex items-center mb-1">
-                          <label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Passaggi Strategia</label>
-                        </div>
-
-                        <div className="space-y-2">
-                          {(bo.steps || []).map((step: any, sIdx: number) => (
-                            <div key={sIdx} className="bg-black/40 p-2 rounded border border-gray-700/50 group/step relative">
-                              <button
-                                onClick={() => updateArrayField('buildOrders', idx, 'removeStep', sIdx)}
-                                className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover/step:opacity-100 transition-opacity z-10"
-                              >
-                                <X size={10} />
-                              </button>
-
-                              <div className="grid grid-cols-12 gap-2">
-                                <div className="col-span-3">
-                                  <div className="relative flex items-center">
-                                    <Clock size={10} className="absolute left-2 text-gray-500" />
-                                    <input
-                                      type="text"
-                                      placeholder="00:00"
-                                      value={step.time || ''}
-                                      onChange={(e) => updateArrayField('buildOrders', idx, 'updateStep', { stepIndex: sIdx, stepField: 'time', stepValue: e.target.value })}
-                                      className="w-full bg-gray-900 border border-gray-700/50 rounded pl-7 pr-1 py-2 text-sm text-yellow-300 focus:border-blue-500 outline-none font-mono"
-                                    />
-                                  </div>
-                                </div>
-                                <div className="col-span-9">
-                                  <textarea
-                                    placeholder="Azione..."
-                                    value={step.action || ''}
-                                    onChange={(e) => updateArrayField('buildOrders', idx, 'updateStep', { stepIndex: sIdx, stepField: 'action', stepValue: e.target.value })}
-                                    rows={1}
-                                    className="w-full bg-gray-900 border border-gray-700/50 rounded px-2 py-2 text-sm text-white focus:border-blue-500 outline-none font-bold resize-y"
-                                  />
-                                </div>
-                                <div className="col-span-12">
-                                  <div className="relative">
-                                    <textarea
-                                      value={step.note || ''}
-                                      onChange={e => {
-                                        const newSteps = [...bo.steps];
-                                        newSteps[sIdx].note = e.target.value;
-                                        updateArrayField('buildOrders', idx, 'steps', newSteps);
-                                      }}
-                                      placeholder="Note aggiuntive..."
-                                      className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-2 text-[11px] text-gray-400 italic h-16 resize-y"
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-
-                          {(!bo.steps || bo.steps.length === 0) && (
-                            <p className="text-[10px] text-gray-500 italic text-center py-2 border border-dashed border-gray-700 rounded">Nessun passaggio definito</p>
-                          )}
-                        </div>
+                      <div className="flex items-center gap-2">
                         <button
-                          type="button"
-                          onClick={() => updateArrayField('buildOrders', idx, 'addStep', null)}
-                          className="mt-2 flex items-center gap-1 text-[10px] bg-blue-600/20 text-blue-400 px-2 py-1 rounded border border-blue-500/30 hover:bg-blue-600/40 transition-all font-bold"
+                          onClick={() => (window as any).openBOEditor?.(editedCiv.id, idx)}
+                          className="p-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg border border-blue-500/30 transition-all"
+                          title="Modifica"
                         >
-                          <Plus size={10} /> Aggiungi Step
+                          <Edit size={14} />
                         </button>
-                      </div>
-
-                      <div className="mt-6 pt-4 border-t border-gray-700/50 space-y-4">
-                        <div>
-                          <label className="text-[10px] text-gray-500 uppercase font-bold mb-2 block text-yellow-500">Fonte / Link YouTube</label>
-                          <input
-                            type="text"
-                            value={bo.source || ''}
-                            onChange={e => updateArrayField('buildOrders', idx, 'source', e.target.value)}
-                            placeholder="https://www.youtube.com/watch?v=..."
-                            className="w-full bg-gray-800 text-yellow-400 text-sm rounded px-3 py-2 border border-gray-600 focus:border-yellow-500 outline-none"
-                          />
-                          {bo.source && getYoutubeId(bo.source) && (
-                            <div className="mt-2 relative aspect-video w-48 rounded-lg overflow-hidden border border-white/10 group">
-                              <img
-                                src={`https://img.youtube.com/vi/${getYoutubeId(bo.source)}/mqdefault.jpg`}
-                                alt="Preview"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
-                                <Play size={24} className="text-white fill-white shadow-lg shadow-black/50" />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div>
-                            <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block text-blue-400">Nickname Autore</label>
-                            <input
-                              type="text"
-                              value={bo.author_nickname || ''}
-                              onChange={e => updateArrayField('buildOrders', idx, 'author_nickname', e.target.value)}
-                              placeholder="marcotamby"
-                              className="w-full bg-gray-800 text-white text-sm rounded px-3 py-2 border border-gray-600 focus:border-blue-500 outline-none"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block text-blue-400">Rank Autore</label>
-                            <input
-                              type="text"
-                              value={bo.author_rank || ''}
-                              onChange={e => updateArrayField('buildOrders', idx, 'author_rank', e.target.value)}
-                              placeholder="Silver III"
-                              className="w-full bg-gray-800 text-white text-sm rounded px-3 py-2 border border-gray-600 focus:border-blue-500 outline-none"
-                            />
-                          </div>
-                          <div className="flex items-end">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (!user?.nickname) {
-                                  setToast({
-                                    isVisible: true,
-                                    message: 'Completa il tuo profilo admin con un nickname per firmare il contenuto',
-                                    type: 'error'
-                                  });
-                                } else {
-                                  const alreadySigned = bo.author_nickname === user.nickname;
-                                  updateArrayField('buildOrders', idx, {
-                                    author_nickname: alreadySigned ? '' : user.nickname,
-                                    author_rank: alreadySigned ? '' : user.rank
-                                  });
-                                }
-                              }}
-                              className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-all text-xs font-bold uppercase tracking-tight h-[38px] ${
-                                bo.author_nickname === user?.nickname 
-                                  ? 'bg-yellow-500 text-black border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.4)]' 
-                                  : 'bg-black/40 text-yellow-500 border-yellow-500/30 hover:bg-yellow-500/20'
-                              }`}
-                            >
-                              {bo.author_nickname === user?.nickname ? (
-                                <>
-                                  <CheckCircle size={14} fill="black" />
-                                  <span>Firmato da te</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Edit size={14} />
-                                  <span>Firma come {user?.nickname?.split(' ')[0] || 'Me'}</span>
-                                </>
-                              )}
-                            </button>
-                          </div>
-                        </div>
+                        <button
+                          onClick={() => {
+                            if (window.confirm('Sei sicuro di voler eliminare questo Build Order?')) {
+                              const newBOs = [...(editedCiv.build_orders || editedCiv.buildOrders || [])];
+                              newBOs.splice(idx, 1);
+                              setEditedCiv({ ...editedCiv, build_orders: newBOs });
+                            }
+                          }}
+                          className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg border border-red-500/30 transition-all"
+                          title="Elimina"
+                        >
+                          <Trash2 size={14} />
+                        </button>
                       </div>
                     </div>
                   ))}
-                  {(!editedCiv.buildOrders || editedCiv.buildOrders.length === 0) && <p className="text-gray-500 text-sm italic text-center py-4">Nessun build order</p>}
+                  {(!editedCiv.build_orders || (editedCiv.build_orders || []).length === 0) && (editedCiv.buildOrders?.length === 0 || !editedCiv.buildOrders) && (
+                    <div className="text-center py-8 border-2 border-dashed border-white/5 rounded-xl">
+                       <Map size={24} className="text-gray-700 mx-auto mb-2 opacity-20" />
+                       <p className="text-gray-600 text-[10px] font-bold uppercase tracking-widest">Nessun Build Order presente</p>
+                    </div>
+                  )}
                 </div>
+              </div>
+            </div>
               </div>
 
             </div>

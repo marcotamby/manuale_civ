@@ -7,6 +7,7 @@ import { Topbar } from './components/Topbar';
 import { UnitDetailModal } from './components/UnitDetailModal';
 import { Home } from './components/Home';
 import { CivView } from './components/CivView';
+import { AdminBOEditorModal } from './components/AdminBOEditorModal';
 import { CompareView } from './components/CompareView';
 import { CookieBanner } from './components/CookieBanner';
 import { useCivData } from './components/CivContext';
@@ -50,6 +51,8 @@ function App() {
   const [isAdminOverlayOpen, setIsAdminOverlayOpen] = useState(false);
   const [isCivEditorOpen, setIsCivEditorOpen] = useState(false);
   const [civEditorTarget, setCivEditorTarget] = useState<{ section?: string; id?: string }>({});
+  const [isBOEditorOpen, setIsBOEditorOpen] = useState(false);
+  const [boEditorTarget, setBOEditorTarget] = useState<{ civId: string; index: number | null }>({ civId: '', index: null });
 
   // Expose methods via window in a controlled way inside useEffect
   useEffect(() => {
@@ -60,12 +63,17 @@ function App() {
       setCivEditorTarget({ section, id });
       setIsCivEditorOpen(true);
     };
+    (window as any).openBOEditor = (civId: string, index: number | null) => {
+      setBOEditorTarget({ civId, index });
+      setIsBOEditorOpen(true);
+    };
     (window as any).openAdminOverlay = () => navigate('/admin/overlays');
     (window as any).closeAllModals = () => {
       setIsProfileModalOpen(false);
       setIsAdminDashboardOpen(false);
       setIsAdminOverlayOpen(false);
       setIsCivEditorOpen(false);
+      setIsBOEditorOpen(false);
       setIsSidebarOpen(false);
       if (location.pathname.startsWith('/admin/overlays')) navigate('/');
     };
@@ -337,22 +345,32 @@ function App() {
         />
       )}
 
-      {civilizationsData.length > 0 && isCivEditorOpen && (
+      {isCivEditorOpen && civilizationsData.find(c => c.id === selectedCiv) && (
         <AdminCivEditorModal
-          civ={civilizationsData.find(c => c.id === selectedCiv) || civilizationsData[0]}
+          civ={civilizationsData.find(c => c.id === selectedCiv)!}
           isOpen={isCivEditorOpen}
-          onClose={() => {
-            setIsCivEditorOpen(false);
-            setCivEditorTarget({});
-          }}
-          initialSection={civEditorTarget.section}
-          initialId={civEditorTarget.id}
+          onClose={() => setIsCivEditorOpen(false)}
           onSave={(updatedCiv, updatedGlobalUnits) => {
             if (updateCivLocally) updateCivLocally(updatedCiv);
             if (updateGlobalUnitLocally && updatedGlobalUnits) {
               updatedGlobalUnits.forEach(gu => updateGlobalUnitLocally(gu));
             }
             refreshCivs();
+          }}
+        />
+      )}
+
+      {isBOEditorOpen && civilizationsData.find(c => c.id === boEditorTarget.civId) && (
+        <AdminBOEditorModal
+          civ={civilizationsData.find(c => c.id === boEditorTarget.civId)!}
+          isOpen={isBOEditorOpen}
+          boIndex={boEditorTarget.index}
+          onClose={() => setIsBOEditorOpen(false)}
+          onSave={(updatedBOs) => {
+            const civ = civilizationsData.find(c => c.id === boEditorTarget.civId);
+            if (civ) {
+              updateCivLocally({ ...civ, buildOrders: updatedBOs });
+            }
           }}
         />
       )}
