@@ -79,7 +79,7 @@ export function MobileFooter() {
           className="flex items-center gap-1 text-[9px] font-black text-[#ff4e4e] drop-shadow-[0_0_8px_rgba(255,78,78,0.3)] transition-all"
         >
           <Youtube size={13} />
-          <span>YT <span className="text-white/40 font-bold italic">Marco</span></span>
+          <span>YT <span className="text-white/40 font-bold italic">marcomtaby</span></span>
         </a>
       </div>
 
