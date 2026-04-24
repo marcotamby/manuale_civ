@@ -193,8 +193,8 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
 
                {/* Build Order Shortcut Indicator (DESKTOP HOVER) */}
                {isBOMode && !isCompareMode && (
-                  <div className="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30">
-                     <div className="bg-gradient-to-r from-cyan-400/60 to-cyan-500/20 backdrop-blur-md text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] shadow-[0_0_25px_rgba(34,211,238,0.2)] border border-cyan-400/60 flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                  <div className="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-30 pointer-events-none">
+                     <div className="bg-gradient-to-r from-cyan-400/60 to-cyan-500/20 backdrop-blur-md text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] shadow-[0_0_25px_rgba(34,211,238,0.2)] border border-cyan-400/60 flex items-center gap-2 transform scale-95 group-hover:scale-100 transition-transform duration-200">
                         <Zap size={14} fill="white" className="text-white drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
                         Build Orders
                      </div>
