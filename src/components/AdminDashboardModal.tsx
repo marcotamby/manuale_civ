@@ -56,6 +56,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [tempNickname, setTempNickname] = useState('');
   const [isSavingNickname, setIsSavingNickname] = useState<string | null>(null);
   const [savedSuccess, setSavedSuccess] = useState<string | null>(null);
+  const [recentlyAddedEmails, setRecentlyAddedEmails] = useState<Set<string>>(new Set());
 
   const getYoutubeId = (url: string) => {
     if (!url) return null;
@@ -161,6 +162,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
       setNewUemail('');
       setIsAddingUser(false);
+      setRecentlyAddedEmails(prev => new Set(prev).add(email));
       await fetchUsers();
       setToast({ isVisible: true, message: 'Email aggiunta alla lista', type: 'success' });
     } catch (err: any) {
@@ -811,9 +813,16 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                             'cani.vincenzo@gmail.com', 'dadduedo@gmail.com', 'djalfredoneservice@gmail.com'
                           ];
 
-                          // If no search, only show "Staff" (role editor/admin, is_streamer, or hardcoded fallback)
+                          // If no search, show staff OR recently added emails
                           if (!userSearch) {
-                            return u.role === 'editor' || u.role === 'admin' || u.is_streamer === true || (email && hardcodedStaff.includes(email));
+                            return u.role === 'editor' || 
+                                   u.role === 'admin' || 
+                                   u.is_streamer === true || 
+                                   u.can_manage_tournaments === true ||
+                                   u.can_manage_civs === true ||
+                                   u.can_manage_buildorders === true ||
+                                   recentlyAddedEmails.has(email || '') ||
+                                   (email && hardcodedStaff.includes(email));
                           }
                           return matchSearch;
                         })

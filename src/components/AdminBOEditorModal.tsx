@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, X, Loader2, Play, Map, Plus, Clock, Zap, Upload, MousePointer2, MoveVertical, Shield, User, Star, Type, Youtube } from 'lucide-react';
+import { Save, X, Loader2, Play, Map, Plus, Clock, Zap, Upload, MousePointer2, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { usePresence } from './PresenceContext';
@@ -31,6 +31,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     map: ''
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [dragState, setDragState] = useState<{ startY: number; startPos: number } | null>(null);
 
@@ -119,9 +120,12 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
 
       if (error) throw error;
 
-      toast.success(boIndex !== null ? "Build Order aggiornato!" : "Build Order aggiunto!");
-      onSave(currentBOs);
-      onClose();
+      setShowSuccess(true);
+      setTimeout(() => {
+        onSave(currentBOs);
+        onClose();
+        setShowSuccess(false);
+      }, 1000);
     } catch (err: any) {
       console.error('Error saving Build Order:', err);
       toast.error(`Errore: ${err.message || 'Salvataggio fallito'}`);
@@ -494,11 +498,11 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
           </button>
           <button
             onClick={handleSave}
-            disabled={isSaving}
-            className={`px-10 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(6,182,212,0.3)] hover:shadow-[0_15px_40px_rgba(6,182,212,0.4)] hover:-translate-y-0.5 transition-all flex items-center gap-3 ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={isSaving || showSuccess}
+            className={`px-10 py-4 ${showSuccess ? 'bg-green-600' : 'bg-gradient-to-r from-cyan-600 to-blue-600'} text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-3 ${isSaving || showSuccess ? 'opacity-80 cursor-not-allowed' : ''}`}
           >
-            {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-            {isSaving ? 'Salvataggio...' : 'Pubblica Build Order'}
+            {isSaving ? <Loader2 size={18} className="animate-spin" /> : showSuccess ? <CheckCircle2 size={18} /> : <Save size={18} />}
+            {isSaving ? 'Salvataggio...' : showSuccess ? (boIndex !== null ? 'Salvato!' : 'Pubblicato!') : (boIndex !== null ? 'Salva Build Order' : 'Pubblica Build Order')}
           </button>
         </div>
 

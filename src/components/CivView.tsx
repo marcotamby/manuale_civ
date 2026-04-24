@@ -831,16 +831,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <h2 className="text-2xl font-bold text-white mb-1 flex items-center gap-2">
                 <Map className="text-yellow-500" size={24} />
                 Build Orders
-                {isAdmin && (
-                  <button
-                    onClick={() => (window as any).openCivEditor?.('buildorders')}
-                    className="p-1.5 bg-yellow-500/20 hover:bg-yellow-500/40 rounded-lg transition-all text-yellow-500 border border-yellow-500/30 flex items-center gap-1 shadow-sm group/btn"
-                    title="Modifica Build Orders"
-                  >
-                    <Edit size={12} className="group-hover/btn:scale-110 transition-transform" />
-                    <span className="text-[10px] font-bold uppercase pr-1">Edit</span>
-                  </button>
-                )}
               </h2>
               <p className="text-sm text-gray-400">Strategie ottimizzate per dominare la partita.</p>
             </div>
@@ -854,17 +844,17 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                       className="glass flex flex-col rounded-2xl border border-white/5 overflow-hidden transition-all group hover:border-yellow-500/30 hover:shadow-[0_0_30px_rgba(234,179,8,0.1)] cursor-pointer relative group/card"
                       onClick={() => setSearchParams({ bo: bo.id }, { replace: true })}
                     >
-                      {/* Admin Edit Button */}
+                      {/* Admin Edit Button (Subtle Pencil) */}
                       {(isAdmin || canManageBuildorders) && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             (window as any).openBOEditor?.(civId, idx);
                           }}
-                          className="absolute top-4 right-4 z-[20] p-2 bg-black/60 hover:bg-slate-200 hover:text-black text-slate-300 rounded-xl border border-white/10 transition-all opacity-0 group-hover/card:opacity-100 shadow-xl"
+                          className="absolute top-3 right-3 z-[20] p-2 bg-black/40 hover:bg-white text-white/40 hover:text-black rounded-lg border border-white/10 transition-all shadow-xl group-hover:border-white/20"
                           title="Modifica Build Order"
                         >
-                          <Edit size={16} />
+                          <Edit size={14} />
                         </button>
                       )}
                       {/* Banner */}
@@ -1050,10 +1040,13 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                       {canManageBuildorders && (
                         <button 
                           onClick={() => {
-                            setSearchParams({}, { replace: true });
-                            (window as any).openCivEditor?.('buildorders', selectedBO.id);
+                            const currentIdx = civ.buildOrders?.findIndex(b => b.id === selectedBO.id);
+                            if (currentIdx !== undefined && currentIdx !== -1) {
+                              setSearchParams({}, { replace: true });
+                              (window as any).openBOEditor?.(civId, currentIdx);
+                            }
                           }}
-                          className="p-2 bg-yellow-500/80 hover:bg-yellow-500 text-black rounded-full backdrop-blur-md border border-white/10 transition-all flex items-center gap-2 px-4 shadow-lg shadow-yellow-500/20"
+                          className="p-2 bg-white/10 hover:bg-white text-white hover:text-black rounded-full backdrop-blur-md border border-white/10 transition-all flex items-center gap-2 px-4 shadow-lg"
                         >
                           <Edit size={18} />
                           <span className="text-xs font-black uppercase tracking-widest">Modifica</span>
@@ -1131,21 +1124,20 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
                       {/* Sidebar */}
                       <div className="space-y-8">
-                        {/* Map Info (New) */}
+                        {/* Map Info (Silver design) */}
                         {selectedBO.map && (
-                          <div className="bg-yellow-500/5 rounded-3xl border border-yellow-500/20 p-6 space-y-4">
-                            <h4 className="text-[10px] font-black text-yellow-500 uppercase tracking-widest flex items-center gap-2">
+                          <div className="bg-white/[0.03] rounded-2xl border border-white/10 p-5 space-y-3">
+                            <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
                               <Map size={12} /> Mappa Consigliata
                             </h4>
                             <div className="flex items-center gap-3">
-                               <div className="w-12 h-12 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center">
-                                  <Map size={24} className="text-yellow-500" />
+                               <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
+                                  <Map size={18} className="text-gray-400" />
                                </div>
                                <div>
-                                  <span className="text-lg font-black text-white block leading-tight uppercase tracking-tighter">
+                                  <span className="text-base font-black text-white block leading-tight uppercase tracking-tight">
                                     {selectedBO.map}
                                   </span>
-                                  <span className="text-[10px] text-gray-500 font-bold uppercase">Mappa Ottimale</span>
                                </div>
                             </div>
                           </div>
