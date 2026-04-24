@@ -607,7 +607,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   {civ.difficulty}
                 </span>
                 {(canManageCivs || canManageBuildorders) && (
-                  <div className="flex gap-2 items-center bg-slate-500/10 px-3 py-1.5 rounded-lg border border-slate-500/40 shadow-[0_0_15px_rgba(148,163,184,0.1)]">
+                  <div className="flex gap-2 items-center bg-slate-500/10 px-3 py-1.5 rounded-lg border border-slate-400/60 shadow-[0_0_15px_rgba(148,163,184,0.1)]">
                     <div className="flex flex-col">
                       <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none mb-1">
                         {isSuperAdmin ? 'MODALITÀ ADMIN' : 'MODALITÀ EDITOR'}
