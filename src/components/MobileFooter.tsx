@@ -10,7 +10,7 @@ export function MobileFooter() {
   const isFaq = location.pathname === '/faq';
 
   return (
-    <footer className="md:hidden fixed bottom-0 left-0 right-0 z-40 px-4 py-4 bg-[#0d1424]/95 backdrop-blur-xl border-t border-yellow-500/20 shadow-[0_-8px_30px_rgba(0,0,0,0.6)] flex flex-col gap-4">
+    <footer className="md:hidden fixed bottom-0 left-0 right-0 z-40 px-4 py-2.5 bg-[#0d1424]/95 backdrop-blur-xl border-t border-yellow-500/20 shadow-[0_-8px_30px_rgba(0,0,0,0.6)] flex flex-col gap-2.5">
       {/* Primary Actions Row */}
       <div className="flex items-center justify-around w-full">
         <Link
