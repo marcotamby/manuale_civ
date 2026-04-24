@@ -73,23 +73,25 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
           <X size={22} className="sm:w-5.5 sm:h-5.5" />
         </button>
 
-        <div className="flex items-center sm:flex-col gap-2 sm:gap-4 pr-10 sm:pr-0">
-          <div className="w-9 h-9 sm:w-14 sm:h-14 rounded-full bg-blue-500/10 border border-blue-400/20 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(37,99,235,0.1)]">
+        <div className="flex items-center sm:flex-col gap-3 sm:gap-4 pr-10 sm:pr-0">
+          <div className="w-9 h-9 sm:w-14 sm:h-14 rounded-full bg-blue-500/10 border border-blue-400/20 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(37,99,235,0.1)] relative sm:static">
             <Heart size={20} className="text-blue-300 fill-blue-300/10 group-hover:scale-110 transition-transform sm:w-7 sm:h-7" />
           </div>
           
-          <div className="flex-1 min-w-0 pr-2 sm:pr-0 sm:text-center">
-            <div className="flex items-center sm:justify-center gap-1.5 mb-1">
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Community</span>
-              <div className="h-1 w-1 rounded-full bg-blue-600/50"></div>
-              <Users size={10} className="text-blue-500/50" />
+          <div className="flex-1 min-w-0 pr-2 sm:pr-0 sm:w-full">
+            <div className="relative h-4 mb-1 flex items-center justify-center">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Community</span>
+              <div className="hidden sm:flex items-center gap-1.5 absolute right-0">
+                <div className="h-1 w-1 rounded-full bg-blue-600/50"></div>
+                <Users size={10} className="text-blue-500/50" />
+              </div>
             </div>
             
-            <p className="text-[11px] sm:text-sm text-gray-200 leading-tight">
-              <span className="font-bold text-white text-base sm:block sm:text-lg">
+            <div className="sm:text-center space-y-0.5">
+              <p className="text-white font-bold text-base sm:text-lg leading-none">
                 {favoriteCount} {favoriteCount === 1 ? 'persona' : 'persone'}
-              </span> 
-              <span className="sm:text-[11px] text-gray-400 font-medium">
+              </p>
+              <p className="text-[11px] sm:text-[11px] text-gray-400 font-medium leading-tight">
                 {favoriteCount === 1 ? ' ha scelto ' : ' hanno scelto '}
                 {(() => {
                   const n = civName.toLowerCase();
@@ -98,17 +100,17 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
                   }
                   return 'i ';
                 })()}
-              </span>
-              <span className="text-blue-200 font-bold sm:text-[11px]">{civName}</span>! 
-            </p>
+                <span className="text-blue-200 font-bold">{civName}</span>! 
+              </p>
+            </div>
           </div>
 
           <button
             onClick={handleFollow}
-            className="flex items-center gap-1 sm:gap-2 px-2.5 sm:px-5 py-1.5 sm:py-2.5 bg-blue-700/20 hover:bg-blue-700/40 border border-blue-500/30 rounded-xl text-[10px] sm:text-xs font-black text-blue-200 transition-all active:scale-95 shrink-0 shadow-sm sm:w-full justify-center mt-2 sm:mt-0"
+            className="relative flex items-center justify-center px-2.5 sm:px-5 py-1.5 sm:py-2.5 bg-blue-700/20 hover:bg-blue-700/40 border border-blue-500/30 rounded-xl text-[10px] sm:text-xs font-black text-blue-200 transition-all active:scale-95 shrink-0 shadow-sm sm:w-full mt-2 sm:mt-0 overflow-hidden"
           >
-            <Bell size={12} className="shrink-0" />
-            <span>SEGUI QUESTA CIV!</span>
+            <Bell size={12} className="shrink-0 sm:absolute sm:left-3" />
+            <span className="sm:w-full text-center">SEGUI QUESTA CIV!</span>
           </button>
         </div>
       </div>
