@@ -968,43 +968,60 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 {/* Proposal / Addition card */}
                 <div 
                   onClick={() => (isAdmin || canManageBuildorders) ? (window as any).openBOEditor?.(civId, null) : navigate(`/civ/${civId}/proponi?section=build_order`)}
-                  className={`glass flex flex-col items-center justify-center p-8 rounded-2xl border border-dashed transition-all group cursor-pointer text-center h-full min-h-[250px] ${
+                  className={`glass flex flex-col items-center justify-center p-8 rounded-3xl border border-dashed transition-all group cursor-pointer text-center h-full min-h-[300px] ${
                     (isAdmin || canManageBuildorders) 
-                      ? 'border-slate-400/30 hover:border-slate-200/60 hover:bg-slate-400/5 shadow-[0_0_20px_rgba(148,163,184,0.1)]' 
-                      : 'border-white/10 hover:border-yellow-500/40 hover:bg-yellow-500/5'
+                      ? 'border-slate-400/30 hover:border-slate-200/60 hover:bg-slate-400/5 shadow-[0_0_30px_rgba(148,163,184,0.1)]' 
+                      : 'border-yellow-500/20 hover:border-yellow-500/40 hover:bg-yellow-500/5 shadow-[0_0_30px_rgba(234,179,8,0.05)]'
                   }`}
                 >
                   <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 border group-hover:scale-110 transition-transform ${
-                    (isAdmin || canManageBuildorders) ? 'bg-slate-400/10 border-slate-400/30 shadow-[0_0_20px_rgba(148,163,184,0.3)]' : 'bg-yellow-500/10 border-yellow-500/20'
+                    (isAdmin || canManageBuildorders) ? 'bg-slate-400/10 border-slate-400/30 shadow-[0_0_20px_rgba(148,163,184,0.2)]' : 'bg-yellow-500/10 border-yellow-500/20 shadow-[0_0_20px_rgba(234,179,8,0.1)]'
                   }`}>
                     <Plus size={40} className={(isAdmin || canManageBuildorders) ? 'text-slate-300' : 'text-yellow-500'} />
                   </div>
-                  <h3 className={`text-2xl font-black mb-3 ${(isAdmin || canManageBuildorders) ? 'text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400' : 'text-white'} flex flex-col leading-[1.1]`}>
+                  <h3 className={`text-2xl font-black mb-3 uppercase tracking-tighter leading-[1.1] ${(isAdmin || canManageBuildorders) ? 'text-slate-200' : 'text-white'} flex flex-col`}>
                     <span>{(isAdmin || canManageBuildorders) ? 'Aggiungi' : 'Proponi'}</span>
                     <span>Build Order</span>
                   </h3>
-                  <p className="text-sm md:text-base text-gray-500 px-8 max-w-[280px]">
+                  <p className="text-sm md:text-base text-gray-500 px-4 max-w-[280px] font-medium leading-relaxed">
                     {(isAdmin || canManageBuildorders) ? 'Inserisci ufficialmente una nuova strategia.' : 'Aiuta la community con una nuova strategia.'}
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="glass p-10 rounded-3xl border border-yellow-500/20 text-center flex flex-col items-center">
-                <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mb-4 border border-yellow-500/20">
-                  <Map size={32} className="text-yellow-500" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">Build Orders in arrivo</h3>
-                <p className="text-sm text-gray-500 max-w-sm">I build order per questa civiltà saranno aggiunti presto dai contributori della community.</p>
-                <button
+              <div className="flex justify-center w-full py-8">
+                <div 
                   onClick={() => (isAdmin || canManageBuildorders) ? (window as any).openBOEditor?.(civId, null) : navigate(`/civ/${civId}/proponi?section=build_order`)}
-                  className={`mt-6 px-10 py-4 border rounded-2xl text-base font-extrabold transition-all shadow-lg hover:scale-105 active:scale-95 ${
+                  className={`glass flex flex-col items-center justify-center p-12 rounded-[2.5rem] border border-dashed transition-all group cursor-pointer text-center w-full max-w-sm min-h-[400px] ${
                     (isAdmin || canManageBuildorders)
-                      ? 'bg-slate-400/10 hover:bg-slate-400/20 border-slate-400/40 text-slate-300 shadow-[0_0_20px_rgba(148,163,184,0.1)]'
-                      : 'bg-yellow-600/10 hover:bg-yellow-600/20 border-yellow-500/40 text-yellow-500'
+                      ? 'border-slate-400/30 hover:border-slate-200/60 hover:bg-slate-400/5 shadow-[0_0_50px_rgba(148,163,184,0.15)]'
+                      : 'border-yellow-500/20 hover:border-yellow-500/40 hover:bg-yellow-500/5 shadow-[0_0_50px_rgba(234,179,8,0.1)]'
                   }`}
                 >
-                  {(isAdmin || canManageBuildorders) ? 'Aggiungi un Build Order →' : 'Proponi un Build Order →'}
-                </button>
+                  <div className={`w-24 h-24 rounded-full flex items-center justify-center mb-8 border transition-transform group-hover:scale-110 ${
+                    (isAdmin || canManageBuildorders) ? 'bg-slate-400/10 border-slate-400/30 shadow-[0_0_30px_rgba(148,163,184,0.2)]' : 'bg-yellow-500/10 border-yellow-500/20 shadow-[0_0_30px_rgba(234,179,8,0.1)]'
+                  }`}>
+                    <Plus size={48} className={(isAdmin || canManageBuildorders) ? 'text-slate-300' : 'text-yellow-500'} />
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className={`text-3xl font-black uppercase tracking-tighter leading-none ${(isAdmin || canManageBuildorders) ? 'text-slate-200' : 'text-white'} flex flex-col`}>
+                      <span>{(isAdmin || canManageBuildorders) ? 'Aggiungi' : 'Proponi'}</span>
+                      <span>Build Order</span>
+                    </h3>
+                    <p className="text-base text-gray-500 px-6 max-w-[320px] font-medium leading-relaxed">
+                      {(isAdmin || canManageBuildorders) 
+                        ? 'Inserisci ufficialmente una nuova strategia.' 
+                        : 'Proponi per primo un build order per questa civiltà!'}
+                    </p>
+                  </div>
+                  <div className={`mt-10 px-10 py-4 rounded-2xl text-sm font-black uppercase transition-all border shadow-xl ${
+                    (isAdmin || canManageBuildorders)
+                      ? 'bg-slate-400/10 border-slate-400/40 text-slate-300 group-hover:bg-slate-400/20'
+                      : 'bg-yellow-600/10 border-yellow-500/40 text-yellow-500 group-hover:bg-yellow-600/20'
+                  }`}>
+                    {(isAdmin || canManageBuildorders) ? 'Inizia Ora →' : 'Proponi →'}
+                  </div>
+                </div>
               </div>
             )}
 
