@@ -12,7 +12,7 @@ const DEFAULT_STATE = {
   p1: { name: '', score: 0, civId: '' },
   p2: { name: '', score: 0, civId: '' },
   map: 'Dry Arabia',
-  timer: { active: false, min: 10, sec: 0, timestamp: Date.now() },
+  timer: { active: false, min: 5, sec: 0, timestamp: Date.now() },
   casters: [
     { name: '', active: false },
     { name: '', active: false }
