@@ -1051,12 +1051,13 @@ export function TournamentsPage() {
                     <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Podio Personalizzato</label>
                     <button 
                       onClick={() => {
-                        if (editForm.podium.length < 3) {
-                          setEditForm({...editForm, podium: [...editForm.podium, {placement: editForm.podium.length + 1, entrant: {name: ''}}]});
+                        if (editForm.podium.length < 4) {
+                          const nextPlacement = Math.min(3, editForm.podium.length + 1);
+                          setEditForm({...editForm, podium: [...editForm.podium, {placement: nextPlacement, entrant: {name: ''}}]});
                         }
                       }} 
                       className="text-yellow-500 text-[10px] font-black hover:underline" 
-                      hidden={editForm.podium.length >= 3}
+                      hidden={editForm.podium.length >= 4}
                     >
                       + AGGIUNGI RIGA
                     </button>
@@ -1064,12 +1065,30 @@ export function TournamentsPage() {
                   {editForm.podium.map((p, i) => (
                     <div key={i} className="bg-black/20 p-4 rounded-2xl border border-white/5 space-y-3">
                       <div className="flex gap-3 items-center">
-                        <span className="text-base w-8 text-center">{['🥇','🥈','🥉'][i] || `${i+1}°`}</span>
+                        <div className="w-24 shrink-0 space-y-1">
+                          <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Posizione</label>
+                          <div className="relative">
+                            <select 
+                              value={p.placement || (i + 1)} 
+                              onChange={e => {
+                                const np = [...editForm.podium];
+                                np[i] = { ...p, placement: parseInt(e.target.value) };
+                                setEditForm({ ...editForm, podium: np });
+                              }}
+                              className="w-full bg-white/5 border border-white/10 p-2 rounded-xl text-white text-xs outline-none focus:border-yellow-500 transition-all appearance-none cursor-pointer"
+                            >
+                              <option value={1} className="bg-[#121620]">🥇 1° Posto</option>
+                              <option value={2} className="bg-[#121620]">🥈 2° Posto</option>
+                              <option value={3} className="bg-[#121620]">🥉 3° Posto</option>
+                            </select>
+                            <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                          </div>
+                        </div>
                         <div className="flex-grow space-y-1">
                           <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Nome Team / Giocatore</label>
                           <input type="text" value={p.entrant?.name || ''} onChange={e => {
                             const np = [...editForm.podium]; np[i] = {...p, entrant: {name: e.target.value}}; setEditForm({...editForm, podium: np});
-                          }} placeholder="Inserisci nome..." className="w-full bg-white/5 border border-white/5 rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-yellow-500/30 transition-all" />
+                          }} placeholder="Inserisci nome..." className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-yellow-500/30 transition-all" />
                         </div>
                         <button onClick={() => setEditForm({...editForm, podium: editForm.podium.filter((_, idx) => idx !== i)})} className="p-2 text-red-500/50 hover:text-red-500 transition-colors mt-4"><Trash2 size={16}/></button>
                       </div>
