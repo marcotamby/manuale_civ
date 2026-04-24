@@ -284,81 +284,8 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
             </div>
           )}
 
-          {(!initialSection || initialSection === 'bonuses') && (
-            <div ref={sectionRefs.bonuses} className="bg-black/30 border border-yellow-500/20 rounded-xl p-5 space-y-4">
-              <label className="block text-sm font-bold text-yellow-500 uppercase tracking-widest mb-1 flex items-center gap-2">
-                <Zap size={16} /> Bonus
-              </label>
-              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                {editedCiv.passiveBonuses.map((bonus: string, idx: number) => (
-                  <div key={idx} className="flex gap-2">
-                    <textarea
-                      value={bonus}
-                      onChange={e => handleBonusChange(idx, e.target.value)}
-                      rows={2}
-                      placeholder="Nuovo Bonus..."
-                      className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-yellow-500 transition-colors"
-                    />
-                    <button
-                      onClick={() => {
-                        const nb = [...editedCiv.passiveBonuses];
-                        nb.splice(idx, 1);
-                        setEditedCiv({ ...editedCiv, passiveBonuses: nb });
-                      }}
-                      className="p-2 h-fit bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/40 transition-colors"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <button
-                onClick={() => setEditedCiv({ ...editedCiv, passiveBonuses: [...editedCiv.passiveBonuses, ''] })}
-                className="w-full py-2 bg-yellow-500/10 border border-dashed border-yellow-500/30 text-yellow-500/70 rounded-lg hover:bg-yellow-500/20 hover:text-yellow-500 transition-all text-xs font-bold mt-2"
-              >
-                + Aggiungi Bonus
-              </button>
-            </div>
-          )}
-
-          {(!initialSection || initialSection === 'strengths') && (
-            <div ref={sectionRefs.strengths} className="bg-black/30 border border-green-500/20 rounded-xl p-5">
-              <label className="block text-sm font-bold text-green-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                <ChevronUp size={16} /> Punti di Forza
-              </label>
-              <textarea
-                value={editedCiv.strengths?.join('\n') || ''}
-                onChange={e => {
-                  const values = e.target.value.split('\n');
-                  setEditedCiv({ ...editedCiv, strengths: values });
-                }}
-                rows={4}
-                placeholder="Inserisci un punto di forza per riga..."
-                className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-green-500 transition-colors resize-y text-sm"
-              />
-            </div>
-          )}
-
-          {(!initialSection || initialSection === 'weaknesses') && (
-            <div ref={sectionRefs.weaknesses} className="bg-black/30 border border-red-500/20 rounded-xl p-5">
-              <label className="block text-sm font-bold text-red-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                <ChevronDown size={16} /> Punti Deboli
-              </label>
-              <textarea
-                value={editedCiv.weaknesses?.join('\n') || ''}
-                onChange={e => {
-                  const values = e.target.value.split('\n');
-                  setEditedCiv({ ...editedCiv, weaknesses: values });
-                }}
-                rows={4}
-                placeholder="Inserisci un punto debole per riga..."
-                className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-red-500 transition-colors resize-y text-sm"
-              />
-            </div>
-          )}
-
           {!initialSection && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-white/5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-white/5">
               <div className="space-y-4">
                 <div>
                   <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
@@ -432,10 +359,79 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                   />
                 </div>
               </div>
-              <div className="bg-yellow-500/5 rounded-xl border border-yellow-500/10 p-5 flex flex-col items-center justify-center text-center">
-                 <Edit size={32} className="text-yellow-500/30 mb-3" />
-                 <p className="text-xs text-gray-400 max-w-[200px]">Utilizza i tasti di modifica sulle singole unità per un editing più preciso e focalizzato.</p>
+            </div>
+          )}
+
+          {(!initialSection || initialSection === 'bonuses') && (
+            <div ref={sectionRefs.bonuses} className="bg-black/30 border border-yellow-500/20 rounded-xl p-5 space-y-4">
+              <label className="block text-sm font-bold text-yellow-500 uppercase tracking-widest mb-1 flex items-center gap-2">
+                <Zap size={16} /> Bonus
+              </label>
+              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                {editedCiv.passiveBonuses.map((bonus: string, idx: number) => (
+                  <div key={idx} className="flex gap-2">
+                    <textarea
+                      value={bonus}
+                      onChange={e => handleBonusChange(idx, e.target.value)}
+                      rows={2}
+                      placeholder="Nuovo Bonus..."
+                      className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-yellow-500 transition-colors"
+                    />
+                    <button
+                      onClick={() => {
+                        const nb = [...editedCiv.passiveBonuses];
+                        nb.splice(idx, 1);
+                        setEditedCiv({ ...editedCiv, passiveBonuses: nb });
+                      }}
+                      className="p-2 h-fit bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/40 transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
               </div>
+              <button
+                onClick={() => setEditedCiv({ ...editedCiv, passiveBonuses: [...editedCiv.passiveBonuses, ''] })}
+                className="w-full py-2 bg-yellow-500/10 border border-dashed border-yellow-500/30 text-yellow-500/70 rounded-lg hover:bg-yellow-500/20 hover:text-yellow-500 transition-all text-xs font-bold mt-2"
+              >
+                + Aggiungi Bonus
+              </button>
+            </div>
+          )}
+
+          {(!initialSection || initialSection === 'strengths') && (
+            <div ref={sectionRefs.strengths} className="bg-black/30 border border-green-500/20 rounded-xl p-5">
+              <label className="block text-sm font-bold text-green-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <ChevronUp size={16} /> Punti di Forza
+              </label>
+              <textarea
+                value={editedCiv.strengths?.join('\n') || ''}
+                onChange={e => {
+                  const values = e.target.value.split('\n');
+                  setEditedCiv({ ...editedCiv, strengths: values });
+                }}
+                rows={4}
+                placeholder="Inserisci un punto di forza per riga..."
+                className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-green-500 transition-colors resize-y text-sm"
+              />
+            </div>
+          )}
+
+          {(!initialSection || initialSection === 'weaknesses') && (
+            <div ref={sectionRefs.weaknesses} className="bg-black/30 border border-red-500/20 rounded-xl p-5">
+              <label className="block text-sm font-bold text-red-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <ChevronDown size={16} /> Punti Deboli
+              </label>
+              <textarea
+                value={editedCiv.weaknesses?.join('\n') || ''}
+                onChange={e => {
+                  const values = e.target.value.split('\n');
+                  setEditedCiv({ ...editedCiv, weaknesses: values });
+                }}
+                rows={4}
+                placeholder="Inserisci un punto debole per riga..."
+                className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-red-500 transition-colors resize-y text-sm"
+              />
             </div>
           )}
 

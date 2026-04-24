@@ -883,10 +883,18 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         )}
                         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#1a1c23] via-[#1a1c23]/60 to-transparent" />
                         <div className="absolute inset-0 bg-black/10" />
-                        <div className="absolute bottom-4 left-5 flex gap-1.5 drop-shadow-2xl">
-                          {Array.from({ length: 3 }).map((_, i) => (
-                            <span key={i} className={`text-lg filter ${i < bo.difficulty ? 'text-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.8)]' : 'text-white/30'}`}>⭐</span>
-                          ))}
+                        <div className="absolute bottom-4 left-5 flex items-center justify-between right-5 drop-shadow-2xl">
+                          <div className="flex gap-1.5">
+                            {Array.from({ length: 3 }).map((_, i) => (
+                              <span key={i} className={`text-lg filter ${i < bo.difficulty ? 'text-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.8)]' : 'text-white/30'}`}>⭐</span>
+                            ))}
+                          </div>
+                          {bo.map && (
+                            <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg border border-white/10 text-[10px] font-bold text-white uppercase tracking-tighter">
+                              <Map size={10} className="text-yellow-500" />
+                              {bo.map}
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -1123,6 +1131,26 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
                       {/* Sidebar */}
                       <div className="space-y-8">
+                        {/* Map Info (New) */}
+                        {selectedBO.map && (
+                          <div className="bg-yellow-500/5 rounded-3xl border border-yellow-500/20 p-6 space-y-4">
+                            <h4 className="text-[10px] font-black text-yellow-500 uppercase tracking-widest flex items-center gap-2">
+                              <Map size={12} /> Mappa Consigliata
+                            </h4>
+                            <div className="flex items-center gap-3">
+                               <div className="w-12 h-12 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center">
+                                  <Map size={24} className="text-yellow-500" />
+                               </div>
+                               <div>
+                                  <span className="text-lg font-black text-white block leading-tight uppercase tracking-tighter">
+                                    {selectedBO.map}
+                                  </span>
+                                  <span className="text-[10px] text-gray-500 font-bold uppercase">Mappa Ottimale</span>
+                               </div>
+                            </div>
+                          </div>
+                        )}
+
                         {/* Author Info */}
                         <div className="bg-white/5 rounded-3xl border border-white/5 p-6 space-y-4">
                            <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Informazioni Autore</h4>
