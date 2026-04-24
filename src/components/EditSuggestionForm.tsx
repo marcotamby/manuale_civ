@@ -62,15 +62,18 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
     { time: '', action: '', note: '' }
   ]);
 
+  const [draggedStepIndex, setDraggedStepIndex] = useState<number | null>(null);
+  const [droppedIndex, setDroppedIndex] = useState<number | null>(null);
+
   const moveStep = (fromIndex: number, toIndex: number) => {
     if (toIndex < 0 || toIndex >= boSteps.length) return;
     const newSteps = [...boSteps];
     const [movedStep] = newSteps.splice(fromIndex, 1);
     newSteps.splice(toIndex, 0, movedStep);
     setBoSteps(newSteps);
+    setDroppedIndex(toIndex);
+    setTimeout(() => setDroppedIndex(null), 800);
   };
-
-  const [draggedStepIndex, setDraggedStepIndex] = useState<number | null>(null);
 
   const handleDragStart = (index: number) => {
     setDraggedStepIndex(index);
@@ -490,7 +493,13 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                   onDragStart={() => handleDragStart(index)}
                   onDragOver={(e) => handleDragOver(e, index)}
                   onDragEnd={handleDragEnd}
-                  className={`flex items-start gap-4 p-4 bg-white/5 rounded-xl border transition-all group relative ${draggedStepIndex === index ? 'opacity-30 border-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.2)]' : 'border-white/10 hover:border-blue-500/30'}`}
+                  className={`flex items-start gap-4 p-4 bg-white/5 rounded-xl border transition-all group relative ${
+                    draggedStepIndex === index 
+                      ? 'opacity-30 border-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.2)]' 
+                      : droppedIndex === index
+                        ? 'border-green-500 bg-green-500/5 shadow-[0_0_20px_rgba(34,197,94,0.2)] scale-[1.01]'
+                        : 'border-white/10 hover:border-blue-500/30'
+                  }`}
                 >
                   {/* Drag Handle & Reorder Buttons */}
                   <div className="flex flex-col items-center gap-1 mt-1">

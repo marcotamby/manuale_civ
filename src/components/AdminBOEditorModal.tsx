@@ -165,15 +165,18 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     }
   };
 
+  const [draggedStepIndex, setDraggedStepIndex] = useState<number | null>(null);
+  const [droppedIndex, setDroppedIndex] = useState<number | null>(null);
+
   const moveStep = (fromIndex: number, toIndex: number) => {
     if (toIndex < 0 || toIndex >= editedBO.steps.length) return;
     const newSteps = [...editedBO.steps];
     const [movedStep] = newSteps.splice(fromIndex, 1);
     newSteps.splice(toIndex, 0, movedStep);
     setEditedBO(prev => ({ ...prev, steps: newSteps }));
+    setDroppedIndex(toIndex);
+    setTimeout(() => setDroppedIndex(null), 1000);
   };
-
-  const [draggedStepIndex, setDraggedStepIndex] = useState<number | null>(null);
 
   const handleDragStart = (index: number) => {
     setDraggedStepIndex(index);
@@ -447,7 +450,13 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                   onDragStart={() => handleDragStart(idx)}
                   onDragOver={(e) => handleDragOver(e, idx)}
                   onDragEnd={handleDragEnd}
-                  className={`group relative bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-cyan-500/30 transition-all animate-in slide-in-from-top-4 duration-300 flex items-start gap-4 ${draggedStepIndex === idx ? 'opacity-30 border-cyan-500 shadow-[0_0_30px_rgba(6,182,212,0.2)]' : ''}`}
+                  className={`group relative bg-white/5 border rounded-2xl p-6 transition-all animate-in slide-in-from-top-4 duration-300 flex items-start gap-4 ${
+                    draggedStepIndex === idx 
+                      ? 'opacity-30 border-cyan-500 shadow-[0_0_30px_rgba(6,182,212,0.2)]' 
+                      : droppedIndex === idx
+                        ? 'border-green-500 bg-green-500/5 shadow-[0_0_20px_rgba(34,197,94,0.2)] scale-[1.01]'
+                        : 'border-white/10 hover:border-cyan-500/30'
+                  }`}
                 >
                   {/* Drag Handle & Reorder Buttons */}
                   <div className="flex flex-col items-center gap-1 mt-1">
