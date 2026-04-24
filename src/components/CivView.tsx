@@ -966,15 +966,15 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                       : 'border-white/10 hover:border-yellow-500/40 hover:bg-yellow-500/5'
                   }`}
                 >
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 border group-hover:scale-110 transition-transform ${
-                    (isAdmin || canManageBuildorders) ? 'bg-slate-400/10 border-slate-400/30 shadow-[0_0_15px_rgba(148,163,184,0.2)]' : 'bg-yellow-500/10 border-yellow-500/20'
+                  <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 border group-hover:scale-110 transition-transform ${
+                    (isAdmin || canManageBuildorders) ? 'bg-slate-400/10 border-slate-400/30 shadow-[0_0_20px_rgba(148,163,184,0.3)]' : 'bg-yellow-500/10 border-yellow-500/20'
                   }`}>
-                    <Plus size={24} className={(isAdmin || canManageBuildorders) ? 'text-slate-300' : 'text-yellow-500'} />
+                    <Plus size={40} className={(isAdmin || canManageBuildorders) ? 'text-slate-300' : 'text-yellow-500'} />
                   </div>
-                  <h3 className={`text-base font-bold mb-2 ${(isAdmin || canManageBuildorders) ? 'text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400' : 'text-white'}`}>
+                  <h3 className={`text-2xl font-black mb-3 ${(isAdmin || canManageBuildorders) ? 'text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400' : 'text-white'}`}>
                     {(isAdmin || canManageBuildorders) ? 'Aggiungi Build Order' : 'Proponi Build Order'}
                   </h3>
-                  <p className="text-xs text-gray-500 px-4">
+                  <p className="text-sm md:text-base text-gray-500 px-8 max-w-[280px]">
                     {(isAdmin || canManageBuildorders) ? 'Inserisci ufficialmente una nuova strategia.' : 'Aiuta la community con una nuova strategia.'}
                   </p>
                 </div>
