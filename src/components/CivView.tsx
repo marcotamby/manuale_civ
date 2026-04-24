@@ -554,7 +554,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   if (!civ) return <div className="text-gray-400 p-8">Civiltà non trovata.</div>;
 
   return (
-    <div className="flex-1 overflow-y-auto w-full civ-view-container">
+    <div className="flex-1 overflow-y-auto overflow-x-hidden w-full civ-view-container">
       {/* Unified Cinematic Top Section (Header + Navbar) */}
       <div className="relative bg-[var(--color-brand-dark)]">
         {/* Unified Cinematic Fading Flag Background - Spans both Header and Navbar */}
