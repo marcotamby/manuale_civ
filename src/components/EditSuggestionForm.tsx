@@ -276,7 +276,13 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
               setBoSteps([{ time: '', action: '', note: '' }]);
             }}
             required
-            className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors [&>option]:bg-[#1a1c23] [&>option]:text-white"
+            className="w-full bg-black/40 border border-gray-600 rounded-lg pl-4 pr-10 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors [&>option]:bg-[#1a1c23] [&>option]:text-white appearance-none"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255,255,255,0.5)' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right 1rem center',
+              backgroundSize: '1.2em'
+            }}
           >
             <option value="">Seleziona sezione...</option>
             <option value="caratteristiche">Descrizione</option>
@@ -366,7 +372,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                   onChange={(e) => setBannerUrl(e.target.value)}
                   className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-blue-300 focus:outline-none focus:border-blue-500 transition-colors"
                 />
-                <label className={`cursor-pointer flex items-center justify-center p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors w-12 h-full shrink-0 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                <label className={`cursor-pointer flex items-center justify-center rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors w-12 shrink-0 m-0 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
                    <input 
                      type="file" 
                      className="hidden" 
