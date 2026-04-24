@@ -957,16 +957,26 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   );
                 })}
 
-                {/* Proposal card */}
+                {/* Proposal / Addition card */}
                 <div 
-                  onClick={() => navigate(`/civ/${civId}/proponi?section=build_order`)}
-                  className="glass flex flex-col items-center justify-center p-8 rounded-2xl border border-dashed border-white/10 hover:border-yellow-500/40 hover:bg-yellow-500/5 transition-all group cursor-pointer text-center h-full min-h-[250px]"
+                  onClick={() => (isAdmin || canManageBuildorders) ? (window as any).openCivEditor?.('buildorders') : navigate(`/civ/${civId}/proponi?section=build_order`)}
+                  className={`glass flex flex-col items-center justify-center p-8 rounded-2xl border border-dashed transition-all group cursor-pointer text-center h-full min-h-[250px] ${
+                    (isAdmin || canManageBuildorders) 
+                      ? 'border-slate-400/30 hover:border-slate-200/60 hover:bg-slate-400/5 shadow-[0_0_20px_rgba(148,163,184,0.1)]' 
+                      : 'border-white/10 hover:border-yellow-500/40 hover:bg-yellow-500/5'
+                  }`}
                 >
-                  <div className="w-12 h-12 bg-yellow-500/10 rounded-full flex items-center justify-center mb-4 border border-yellow-500/20 group-hover:scale-110 transition-transform">
-                    <Plus size={24} className="text-yellow-500" />
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 border group-hover:scale-110 transition-transform ${
+                    (isAdmin || canManageBuildorders) ? 'bg-slate-400/10 border-slate-400/30 shadow-[0_0_15px_rgba(148,163,184,0.2)]' : 'bg-yellow-500/10 border-yellow-500/20'
+                  }`}>
+                    <Plus size={24} className={(isAdmin || canManageBuildorders) ? 'text-slate-300' : 'text-yellow-500'} />
                   </div>
-                  <h3 className="text-base font-bold text-white mb-2">Proponi Build Order</h3>
-                  <p className="text-xs text-gray-500 px-4">Aiuta la community con una nuova strategia.</p>
+                  <h3 className={`text-base font-bold mb-2 ${(isAdmin || canManageBuildorders) ? 'text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400' : 'text-white'}`}>
+                    {(isAdmin || canManageBuildorders) ? 'Aggiungi Build Order' : 'Proponi Build Order'}
+                  </h3>
+                  <p className="text-xs text-gray-500 px-4">
+                    {(isAdmin || canManageBuildorders) ? 'Inserisci ufficialmente una nuova strategia.' : 'Aiuta la community con una nuova strategia.'}
+                  </p>
                 </div>
               </div>
             ) : (
@@ -977,10 +987,14 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 <h3 className="text-xl font-bold text-white mb-2">Build Orders in arrivo</h3>
                 <p className="text-sm text-gray-500 max-w-sm">I build order per questa civiltà saranno aggiunti presto dai contributori della community.</p>
                 <button
-                  onClick={() => navigate(`/civ/${civId}/proponi?section=build_order`)}
-                  className="mt-6 px-10 py-4 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/40 rounded-2xl text-base text-yellow-500 font-extrabold transition-all shadow-lg hover:scale-105 active:scale-95"
+                  onClick={() => (isAdmin || canManageBuildorders) ? (window as any).openCivEditor?.('buildorders') : navigate(`/civ/${civId}/proponi?section=build_order`)}
+                  className={`mt-6 px-10 py-4 border rounded-2xl text-base font-extrabold transition-all shadow-lg hover:scale-105 active:scale-95 ${
+                    (isAdmin || canManageBuildorders)
+                      ? 'bg-slate-400/10 hover:bg-slate-400/20 border-slate-400/40 text-slate-300 shadow-[0_0_20px_rgba(148,163,184,0.1)]'
+                      : 'bg-yellow-600/10 hover:bg-yellow-600/20 border-yellow-500/40 text-yellow-500'
+                  }`}
                 >
-                  Proponi un Build Order →
+                  {(isAdmin || canManageBuildorders) ? 'Aggiungi un Build Order →' : 'Proponi un Build Order →'}
                 </button>
               </div>
             )}
