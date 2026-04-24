@@ -678,7 +678,14 @@ export function TournamentsPage() {
                                             idx === 0 ? "text-yellow-100" : "text-gray-400",
                                             s.players && s.players.length > 0 && "cursor-help decoration-yellow-500/30 underline underline-offset-8 decoration-dotted"
                                           )}
-                                          title={s.entrant?.name}
+                                          onMouseEnter={(e) => {
+                                            const el = e.currentTarget;
+                                            if (el.scrollWidth > el.clientWidth) {
+                                              el.title = s.entrant?.name || '';
+                                            } else {
+                                              el.title = "";
+                                            }
+                                          }}
                                         >
                                           {s.entrant?.name || '---'}
                                         </span>
