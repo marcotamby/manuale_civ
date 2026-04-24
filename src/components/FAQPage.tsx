@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   HelpCircle, Info, Layers, Zap, Heart, GitPullRequest, ArrowLeft, 
-  Users, Shield, PlayCircle, BookOpen, Sword, Edit3, Save, Plus, Trash2, X, ChevronUp, ChevronDown, Loader2, CheckCircle
+  Users, Shield, PlayCircle, BookOpen, Sword, Edit3, Save, Plus, Trash2, X, ChevronUp, ChevronDown, Loader2, CheckCircle, Trophy
 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
@@ -93,7 +93,7 @@ const STATIC_SECTIONS: FAQSection[] = [
 
 const IconComponent = ({ name, size = 18, className = "" }: { name: string, size?: number, className?: string }) => {
   const icons: Record<string, any> = {
-    Layers, Zap, Heart, GitPullRequest, Users, Shield, PlayCircle, BookOpen, Sword, Info, HelpCircle
+    Layers, Zap, Heart, GitPullRequest, Users, Shield, PlayCircle, BookOpen, Sword, Info, HelpCircle, Trophy
   };
   const Icon = icons[name] || HelpCircle;
   return <Icon size={size} className={className} />;
