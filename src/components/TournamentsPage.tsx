@@ -672,11 +672,14 @@ export function TournamentsPage() {
                                   <div className="flex items-center gap-x-1.5 flex-1 min-w-0 group/players">
                                     {entries.map((s, sIdx) => (
                                       <div key={sIdx} className="relative flex items-center min-w-0 flex-shrink-1">
-                                        <span className={clsx(
-                                          "font-bold transition-colors truncate",
-                                          idx === 0 ? "text-yellow-100" : "text-gray-400",
-                                          s.players && s.players.length > 0 && "cursor-help decoration-yellow-500/30 underline underline-offset-8 decoration-dotted"
-                                        )}>
+                                        <span 
+                                          className={clsx(
+                                            "font-bold transition-colors truncate",
+                                            idx === 0 ? "text-yellow-100" : "text-gray-400",
+                                            s.players && s.players.length > 0 && "cursor-help decoration-yellow-500/30 underline underline-offset-8 decoration-dotted"
+                                          )}
+                                          title={s.entrant?.name}
+                                        >
                                           {s.entrant?.name || '---'}
                                         </span>
                                         {sIdx < entries.length - 1 && <span className="text-gray-600 font-black flex-shrink-0">&</span>}
@@ -843,6 +846,15 @@ export function TournamentsPage() {
               </div>
               <div className="flex items-center gap-4">
                 {saveStatus === 'saving' && <Loader2 className="w-4 h-4 animate-spin text-yellow-500" />}
+                <button 
+                  onClick={handleUpdateTournament}
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-gradient-to-b from-slate-200 to-slate-400 text-black rounded-xl text-[9px] font-black uppercase tracking-[0.15em] hover:brightness-110 transition-all flex items-center gap-2 shadow-lg shadow-white/5"
+                >
+                  {saveStatus === 'saving' ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
+                  Salva
+                </button>
+                <div className="w-px h-6 bg-white/10 mx-1"></div>
                 <X 
                   id="close-modal-btn"
                   className="cursor-pointer text-gray-500 hover:text-white transition-colors" 
@@ -1067,9 +1079,9 @@ export function TournamentsPage() {
                   </div>
                   {editForm.podium.map((p, i) => (
                     <div key={i} className="bg-black/20 p-5 rounded-2xl border border-white/5 space-y-4 relative group/podiumrow">
-                      <div className="flex gap-4 items-end">
-                        <div className="w-32 shrink-0 space-y-1.5">
-                          <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Posizione</label>
+                      <div className="flex gap-4 items-start">
+                        <div className="w-32 shrink-0 space-y-2">
+                          <label className="text-[9px] text-gray-500 font-black uppercase tracking-widest ml-1 opacity-60">Posizione</label>
                           <div className="relative">
                             <select 
                               value={p.placement || (i + 1)} 
@@ -1078,7 +1090,7 @@ export function TournamentsPage() {
                                 np[i] = { ...p, placement: parseInt(e.target.value) };
                                 setEditForm({ ...editForm, podium: np });
                               }}
-                              className="w-full bg-white/5 border border-white/10 p-2.5 rounded-xl text-white text-xs outline-none focus:border-yellow-500 transition-all appearance-none cursor-pointer"
+                              className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white text-xs outline-none focus:border-yellow-500 transition-all appearance-none cursor-pointer"
                             >
                               <option value={1} className="bg-[#121620]">🥇 1° Posto</option>
                               <option value={2} className="bg-[#121620]">🥈 2° Posto</option>
@@ -1088,8 +1100,8 @@ export function TournamentsPage() {
                           </div>
                         </div>
                         
-                        <div className="flex-grow space-y-1.5">
-                          <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Nome Team / Giocatore</label>
+                        <div className="flex-grow space-y-2">
+                          <label className="text-[9px] text-gray-500 font-black uppercase tracking-widest ml-1 opacity-60">Nome Team / Giocatore</label>
                           <input 
                             type="text" 
                             value={p.entrant?.name || ''} 
@@ -1097,37 +1109,41 @@ export function TournamentsPage() {
                               const np = [...editForm.podium]; np[i] = {...p, entrant: {name: e.target.value}}; setEditForm({...editForm, podium: np});
                             }} 
                             placeholder="Inserisci nome..." 
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-yellow-500/30 transition-all" 
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-yellow-500/30 transition-all" 
                           />
                         </div>
 
-                        <button 
-                          onClick={() => setEditForm({...editForm, podium: editForm.podium.filter((_, idx) => idx !== i)})} 
-                          className="w-10 h-10 flex items-center justify-center text-red-500/30 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all border border-transparent hover:border-red-500/20"
-                          title="Rimuovi riga"
-                        >
-                          <Trash2 size={18}/>
-                        </button>
+                        <div className="h-[74px] flex items-end pb-0.5">
+                          <button 
+                            onClick={() => setEditForm({...editForm, podium: editForm.podium.filter((_, idx) => idx !== i)})} 
+                            className="w-11 h-11 flex items-center justify-center text-red-500/30 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all border border-transparent hover:border-red-500/20"
+                            title="Rimuovi riga"
+                          >
+                            <Trash2 size={18}/>
+                          </button>
+                        </div>
                       </div>
                       
                       {/* Sub-players for Team Games */}
-                      <div className="space-y-1.5 pt-2 border-t border-white/5">
-                        <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-2">
-                          <Users size={10} /> Componenti Team (per 2v2, 3v3...)
-                        </label>
-                        <input 
-                          type="text" 
-                          value={p.players?.join(', ') || ''} 
-                          onChange={e => {
-                            const playerList = e.target.value.split(',').map(s => s.trim());
-                            const np = [...editForm.podium]; 
-                            np[i] = { ...p, players: playerList }; 
-                            setEditForm({ ...editForm, podium: np });
-                          }} 
-                          placeholder="Esempio: Marco, Alessio, Luca (separati da virgola)" 
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white/60 text-[11px] outline-none focus:border-yellow-500/20 transition-all italic" 
-                        />
-                      </div>
+                      {['2v2', '3v3', '4v4', 'Mod'].includes(editForm.type) && (
+                        <div className="space-y-1.5 pt-4 border-t border-white/5">
+                          <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-2">
+                            <Users size={10} /> Componenti Team (per {editForm.type})
+                          </label>
+                          <input 
+                            type="text" 
+                            value={p.players?.join(', ') || ''} 
+                            onChange={e => {
+                              const playerList = e.target.value.split(',').map(s => s.trim());
+                              const np = [...editForm.podium]; 
+                              np[i] = { ...p, players: playerList }; 
+                              setEditForm({ ...editForm, podium: np });
+                            }} 
+                            placeholder="Esempio: Marco, Alessio, Luca (separati da virgola)" 
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white/60 text-[11px] outline-none focus:border-yellow-500/20 transition-all italic" 
+                          />
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
