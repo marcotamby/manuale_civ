@@ -63,16 +63,6 @@ export function MobileFooter() {
         </a>
 
         <a 
-          href="https://www.youtube.com/@marcotamby_aoe" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="flex items-center gap-1 text-[9px] font-black text-[#ff4e4e] drop-shadow-[0_0_8px_rgba(255,78,78,0.3)] transition-all"
-        >
-          <Youtube size={13} />
-          <span>YT <span className="text-white/40 font-bold italic">Marco</span></span>
-        </a>
-
-        <a 
           href="https://www.youtube.com/@AoeItalia" 
           target="_blank" 
           rel="noopener noreferrer"
@@ -80,6 +70,16 @@ export function MobileFooter() {
         >
           <Youtube size={13} />
           <span>YT <span className="text-white/40 font-bold italic">Aoeitalia</span></span>
+        </a>
+
+        <a 
+          href="https://www.youtube.com/@marcotamby_aoe" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="flex items-center gap-1 text-[9px] font-black text-[#ff4e4e] drop-shadow-[0_0_8px_rgba(255,78,78,0.3)] transition-all"
+        >
+          <Youtube size={13} />
+          <span>YT <span className="text-white/40 font-bold italic">Marco</span></span>
         </a>
       </div>
 
