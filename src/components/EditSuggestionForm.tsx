@@ -363,19 +363,19 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                     onClick={() => setDifficulty(num)}
                     className={`flex-1 py-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-1.5 group relative overflow-hidden ${
                       difficulty === num 
-                        ? 'bg-cyan-500 border-cyan-400 text-black shadow-[0_0_20px_rgba(6,182,212,0.3)]' 
+                        ? 'bg-cyan-500/10 border-cyan-500 shadow-[0_0_25px_rgba(6,182,212,0.15)]' 
                         : 'bg-white/5 border-white/10 text-gray-500 hover:border-white/20'
                     }`}
                   >
                     {difficulty === num && (
-                      <div className="absolute inset-0 bg-gradient-to-b from-cyan-400/20 to-transparent animate-pulse" />
+                      <div className="absolute inset-0 bg-gradient-to-b from-cyan-400/10 to-transparent" />
                     )}
                     <div className="flex gap-0.5 z-10">
                       {Array.from({ length: num }).map((_, i) => (
-                        <span key={i} className={`text-xs ${difficulty === num ? 'text-black drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]' : 'text-gray-600'}`}>⭐</span>
+                        <span key={i} className={`text-xs ${difficulty === num ? 'text-cyan-400 drop-shadow-[0_0_5px_rgba(6,182,212,0.5)]' : 'text-gray-600'}`}>⭐</span>
                       ))}
                     </div>
-                    <span className={`text-[9px] font-black uppercase tracking-widest z-10 ${difficulty === num ? 'text-black' : 'text-gray-500 group-hover:text-gray-400'}`}>
+                    <span className={`text-[9px] font-black uppercase tracking-widest z-10 ${difficulty === num ? 'text-cyan-400' : 'text-gray-500 group-hover:text-gray-400'}`}>
                       {num === 1 ? 'Facile' : num === 2 ? 'Media' : 'Difficile'}
                     </span>
                   </button>
