@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
-import { Trash2, Plus, User, CheckCircle, XCircle, X, Upload, Loader2, MousePointer2, MoveVertical, Map } from 'lucide-react';
+import { Trash2, Plus, User, CheckCircle, XCircle, X, Upload, Loader2, MousePointer2, MoveVertical, Map, ChevronUp, ChevronDown } from 'lucide-react';
 import type { ToastType } from './Toast';
 
 interface SuggestionFormProps {
@@ -61,6 +61,31 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
   const [boSteps, setBoSteps] = useState<{ time: string; action: string; note: string }[]>([
     { time: '', action: '', note: '' }
   ]);
+
+  const moveStep = (fromIndex: number, toIndex: number) => {
+    if (toIndex < 0 || toIndex >= boSteps.length) return;
+    const newSteps = [...boSteps];
+    const [movedStep] = newSteps.splice(fromIndex, 1);
+    newSteps.splice(toIndex, 0, movedStep);
+    setBoSteps(newSteps);
+  };
+
+  const [draggedStepIndex, setDraggedStepIndex] = useState<number | null>(null);
+
+  const handleDragStart = (index: number) => {
+    setDraggedStepIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedStepIndex === null || draggedStepIndex === index) return;
+    moveStep(draggedStepIndex, index);
+    setDraggedStepIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedStepIndex(null);
+  };
 
   const addStep = () => setBoSteps([...boSteps, { time: '', action: '', note: '' }]);
   const removeStep = (index: number) => setBoSteps(boSteps.filter((_, i) => i !== index));
@@ -459,40 +484,72 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
             <div className="space-y-2">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Passaggi</label>
               {boSteps.map((step, index) => (
-                <div key={index} className="flex flex-col gap-2 p-4 bg-white/5 rounded-xl border border-white/10 group relative">
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="0:00"
-                      value={step.time}
-                      onChange={(e) => updateStep(index, 'time', e.target.value)}
-                      className="w-28 bg-black/40 border border-white/10 rounded-lg px-3 py-3 text-base text-yellow-400 focus:outline-none focus:border-blue-500 transition-colors font-mono"
-                    />
-                    <div className="flex-1">
+                <div 
+                  key={index} 
+                  draggable
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDragEnd={handleDragEnd}
+                  className={`flex items-start gap-4 p-4 bg-white/5 rounded-xl border transition-all group relative ${draggedStepIndex === index ? 'opacity-30 border-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.2)]' : 'border-white/10 hover:border-blue-500/30'}`}
+                >
+                  {/* Drag Handle & Reorder Buttons */}
+                  <div className="flex flex-col items-center gap-1 mt-1">
+                    <button
+                      type="button"
+                      onClick={() => moveStep(index, index - 1)}
+                      disabled={index === 0}
+                      className="p-1 text-gray-600 hover:text-blue-400 disabled:opacity-0 transition-colors"
+                    >
+                      <ChevronUp size={20} />
+                    </button>
+                    <div className="cursor-grab active:cursor-grabbing p-1 text-gray-700 hover:text-blue-400 transition-colors">
+                      <MoveVertical size={18} />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => moveStep(index, index + 1)}
+                      disabled={index === boSteps.length - 1}
+                      className="p-1 text-gray-600 hover:text-blue-400 disabled:opacity-0 transition-colors"
+                    >
+                      <ChevronDown size={20} />
+                    </button>
+                  </div>
+
+                  <div className="flex-1 space-y-2">
+                    <div className="flex gap-2">
                       <input
                         type="text"
-                        value={step.action}
-                        onChange={(e) => updateStep(index, 'action', e.target.value)}
-                        placeholder="Azione (es. 6 a cibo)"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:border-yellow-500/50 outline-none transition-all font-bold text-sm"
+                        placeholder="0:00"
+                        value={step.time}
+                        onChange={(e) => updateStep(index, 'time', e.target.value)}
+                        className="w-24 bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-yellow-400 focus:outline-none focus:border-blue-500 transition-colors font-mono text-center"
                       />
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={step.action}
+                          onChange={(e) => updateStep(index, 'action', e.target.value)}
+                          placeholder="Azione (es. 6 a cibo)"
+                          className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white placeholder:text-gray-600 focus:border-blue-500 outline-none transition-all font-bold text-sm"
+                        />
+                      </div>
+                      {boSteps.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeStep(index)}
+                          className="p-2 text-gray-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                        >
+                          <Trash2 size={20} />
+                        </button>
+                      )}
                     </div>
-                    {boSteps.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeStep(index)}
-                        className="p-2 text-gray-500 hover:text-red-400 transition-colors"
-                      >
-                        <Trash2 size={24} />
-                      </button>
-                    )}
+                    <textarea
+                      placeholder="Note aggiuntive"
+                      value={step.note}
+                      onChange={(e) => updateStep(index, 'note', e.target.value)}
+                      className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-white placeholder:text-gray-600 focus:border-blue-500 outline-none transition-all italic text-xs h-16 resize-none"
+                    />
                   </div>
-                  <textarea
-                    placeholder="Note aggiuntive"
-                    value={step.note}
-                    onChange={(e) => updateStep(index, 'note', e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:border-yellow-500/50 outline-none transition-all italic text-xs h-20 resize-none"
-                  />
                 </div>
               ))}
               <button

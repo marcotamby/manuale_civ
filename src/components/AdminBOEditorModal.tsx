@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, X, Loader2, Play, Map, Plus, Clock, Zap, Upload, MousePointer2, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2 } from 'lucide-react';
+import { Save, X, Loader2, Play, Map, Plus, Clock, Zap, Upload, MousePointer2, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2, ChevronUp, ChevronDown } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { usePresence } from './PresenceContext';
@@ -163,6 +163,31 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     } finally {
       setUploading(false);
     }
+  };
+
+  const moveStep = (fromIndex: number, toIndex: number) => {
+    if (toIndex < 0 || toIndex >= editedBO.steps.length) return;
+    const newSteps = [...editedBO.steps];
+    const [movedStep] = newSteps.splice(fromIndex, 1);
+    newSteps.splice(toIndex, 0, movedStep);
+    setEditedBO(prev => ({ ...prev, steps: newSteps }));
+  };
+
+  const [draggedStepIndex, setDraggedStepIndex] = useState<number | null>(null);
+
+  const handleDragStart = (index: number) => {
+    setDraggedStepIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedStepIndex === null || draggedStepIndex === index) return;
+    moveStep(draggedStepIndex, index);
+    setDraggedStepIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedStepIndex(null);
   };
 
   if (!isOpen) return null;
@@ -416,58 +441,88 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
 
             <div className="space-y-4">
               {(editedBO.steps || []).map((step, idx) => (
-                <div key={idx} className="group relative bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-cyan-500/30 transition-all animate-in slide-in-from-top-4 duration-300">
-                  <button
-                    onClick={() => {
-                      const newSteps = [...editedBO.steps];
-                      newSteps.splice(idx, 1);
-                      setEditedBO(prev => ({ ...prev, steps: newSteps }));
-                    }}
-                    className="absolute -top-3 -right-3 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:scale-110 shadow-lg z-10"
-                  >
-                    <X size={16} />
-                  </button>
+                <div 
+                  key={idx} 
+                  draggable
+                  onDragStart={() => handleDragStart(idx)}
+                  onDragOver={(e) => handleDragOver(e, idx)}
+                  onDragEnd={handleDragEnd}
+                  className={`group relative bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-cyan-500/30 transition-all animate-in slide-in-from-top-4 duration-300 flex items-start gap-4 ${draggedStepIndex === idx ? 'opacity-30 border-cyan-500 shadow-[0_0_30px_rgba(6,182,212,0.2)]' : ''}`}
+                >
+                  {/* Drag Handle & Reorder Buttons */}
+                  <div className="flex flex-col items-center gap-1 mt-1">
+                    <button
+                      onClick={() => moveStep(idx, idx - 1)}
+                      disabled={idx === 0}
+                      className="p-1 text-gray-600 hover:text-cyan-400 disabled:opacity-0 transition-colors"
+                    >
+                      <ChevronUp size={20} />
+                    </button>
+                    <div className="cursor-grab active:cursor-grabbing p-1 text-gray-700 hover:text-cyan-400 transition-colors">
+                      <MoveVertical size={18} />
+                    </div>
+                    <button
+                      onClick={() => moveStep(idx, idx + 1)}
+                      disabled={idx === editedBO.steps.length - 1}
+                      className="p-1 text-gray-600 hover:text-cyan-400 disabled:opacity-0 transition-colors"
+                    >
+                      <ChevronDown size={20} />
+                    </button>
+                  </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                    <div className="md:col-span-2">
-                       <label className="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Tempo</label>
-                       <input
-                        type="text"
-                        value={step.time}
-                        onChange={e => {
-                          const newSteps = [...editedBO.steps];
-                          newSteps[idx].time = e.target.value;
-                          setEditedBO(prev => ({ ...prev, steps: newSteps }));
-                        }}
-                        className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-2.5 text-center font-mono text-cyan-400 font-bold focus:border-cyan-500 outline-none"
-                      />
-                    </div>
-                    <div className="md:col-span-10">
-                      <label className="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Azione Principalle</label>
-                      <input
-                        type="text"
-                        value={step.action}
-                        onChange={e => {
-                          const newSteps = [...editedBO.steps];
-                          newSteps[idx].action = e.target.value;
-                          setEditedBO(prev => ({ ...prev, steps: newSteps }));
-                        }}
-                        placeholder="Cosa fare in questo momento..."
-                        className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white font-bold focus:border-cyan-500 outline-none"
-                      />
-                    </div>
-                    <div className="md:col-span-12">
-                      <label className="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Note / Dettagli</label>
-                      <textarea
-                        value={step.note || ''}
-                        onChange={e => {
-                          const newSteps = [...editedBO.steps];
-                          newSteps[idx].note = e.target.value;
-                          setEditedBO(prev => ({ ...prev, steps: newSteps }));
-                        }}
-                        placeholder="Dettagli extra (es. numero villaggi sull'oro)..."
-                        className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-xs text-gray-400 italic focus:border-cyan-500 outline-none resize-y min-h-[60px]"
-                      />
+                  <div className="flex-1">
+                    <button
+                      onClick={() => {
+                        const newSteps = [...editedBO.steps];
+                        newSteps.splice(idx, 1);
+                        setEditedBO(prev => ({ ...prev, steps: newSteps }));
+                      }}
+                      className="absolute -top-3 -right-3 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:scale-110 shadow-lg z-10"
+                    >
+                      <X size={16} />
+                    </button>
+
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                      <div className="md:col-span-2">
+                         <label className="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Tempo</label>
+                         <input
+                          type="text"
+                          value={step.time}
+                          onChange={e => {
+                            const newSteps = [...editedBO.steps];
+                            newSteps[idx].time = e.target.value;
+                            setEditedBO(prev => ({ ...prev, steps: newSteps }));
+                          }}
+                          className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-2.5 text-center font-mono text-cyan-400 font-bold focus:border-cyan-500 outline-none"
+                        />
+                      </div>
+                      <div className="md:col-span-10">
+                        <label className="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Azione Principalle</label>
+                        <input
+                          type="text"
+                          value={step.action}
+                          onChange={e => {
+                            const newSteps = [...editedBO.steps];
+                            newSteps[idx].action = e.target.value;
+                            setEditedBO(prev => ({ ...prev, steps: newSteps }));
+                          }}
+                          placeholder="Cosa fare in questo momento..."
+                          className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white font-bold focus:border-cyan-500 outline-none"
+                        />
+                      </div>
+                      <div className="md:col-span-12">
+                        <label className="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Note / Dettagli</label>
+                        <textarea
+                          value={step.note || ''}
+                          onChange={e => {
+                            const newSteps = [...editedBO.steps];
+                            newSteps[idx].note = e.target.value;
+                            setEditedBO(prev => ({ ...prev, steps: newSteps }));
+                          }}
+                          placeholder="Dettagli extra (es. numero villaggi sull'oro)..."
+                          className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-xs text-gray-400 italic focus:border-cyan-500 outline-none resize-y min-h-[60px]"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
