@@ -248,19 +248,22 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
           {[civ1, civ2].map(civ => (
             <section key={`strengths-${civ!.id}`} className="space-y-4 h-full">
               <h3 className="text-[10px] md:text-sm font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                <ChevronUp size={16} className="text-green-400" />
+                <ChevronUp size={16} className="text-emerald-400" />
                 Punti di Forza
               </h3>
-              <div className="glass p-4 rounded-xl border border-green-500/20 text-gray-300 text-[11px] md:text-sm leading-relaxed">
-                <ul className="space-y-2 list-disc list-inside">
+              <div className="glass p-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.03] shadow-[0_0_15px_rgba(16,185,129,0.05)] text-gray-300 text-[11px] md:text-sm leading-relaxed">
+                <div className="space-y-3">
                   {civ!.strengths && civ!.strengths.length > 0 ? (
                     civ!.strengths.map((str, idx) => (
-                      <li key={idx}><strong className="text-green-400">{str}</strong></li>
+                      <div key={idx} className="flex items-start gap-2.5 group/item">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)] mt-1.5 shrink-0 group-hover/item:scale-125 transition-transform" />
+                        <span className="text-slate-200/90 group-hover/item:text-white transition-colors">{str}</span>
+                      </div>
                     ))
                   ) : (
-                    <li className="text-gray-500 italic">Dati non disponibili.</li>
+                    <p className="text-gray-500 italic text-xs pl-4">Dati non disponibili.</p>
                   )}
-                </ul>
+                </div>
               </div>
             </section>
           ))}
@@ -271,19 +274,22 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
           {[civ1, civ2].map(civ => (
             <section key={`weaknesses-${civ!.id}`} className="space-y-4 h-full">
               <h3 className="text-[10px] md:text-sm font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                <ChevronDown size={16} className="text-red-400" />
+                <ChevronDown size={16} className="text-rose-400" />
                 Punti Deboli
               </h3>
-              <div className="glass p-4 rounded-xl border border-red-500/20 text-gray-300 text-[11px] md:text-sm leading-relaxed">
-                {civ!.weaknesses && civ!.weaknesses.length > 0 ? (
-                  <ul className="space-y-2 list-disc list-inside">
-                    {civ!.weaknesses.map((wk, idx) => (
-                      <li key={idx}><strong className="text-red-400">{wk}</strong></li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-gray-500 italic px-2">Dati non disponibili.</p>
-                )}
+              <div className="glass p-5 rounded-2xl border border-rose-500/30 bg-rose-500/[0.03] shadow-[0_0_15px_rgba(244,63,94,0.05)] text-gray-300 text-[11px] md:text-sm leading-relaxed">
+                <div className="space-y-3">
+                  {civ!.weaknesses && civ!.weaknesses.length > 0 ? (
+                    civ!.weaknesses.map((wk, idx) => (
+                      <div key={idx} className="flex items-start gap-2.5 group/item">
+                        <div className="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.4)] mt-1.5 shrink-0 group-hover/item:scale-125 transition-transform" />
+                        <span className="text-slate-200/90 group-hover/item:text-white transition-colors">{wk}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-500 italic text-xs pl-4">Dati non disponibili.</p>
+                  )}
+                </div>
               </div>
             </section>
           ))}
