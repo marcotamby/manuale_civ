@@ -60,8 +60,8 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
   if (!isVisible || favoriteCount === null || favoriteCount < 1) return null;
 
   return (
-    <div className="fixed bottom-[90px] sm:bottom-24 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-4 z-50 animate-in slide-in-from-bottom-10 sm:slide-in-from-right-10 fade-in duration-700 w-[calc(100%-48px)] sm:w-56">
-      <div className="glass-premium p-2.5 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-slate-400/30 shadow-[0_10px_50px_rgba(0,0,0,0.6),0_0_20px_rgba(30,58,138,0.1)] relative overflow-hidden group">
+    <div className="fixed bottom-[90px] sm:bottom-24 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-4 z-50 animate-in slide-in-from-bottom-10 sm:slide-in-from-right-10 fade-in duration-700 w-[calc(100%-48px)] sm:w-72">
+      <div className="glass-premium p-2.5 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border border-slate-400/30 shadow-[0_10px_50px_rgba(0,0,0,0.6),0_0_20px_rgba(30,58,138,0.1)] relative overflow-hidden group">
         {/* Decorative background glows */}
         <div className="absolute top-0 right-0 w-20 h-20 bg-blue-600/10 blur-3xl rounded-full -mr-10 -mt-10 animate-pulse"></div>
         
@@ -85,10 +85,10 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
             
             <div className="sm:text-center">
               <p className="text-white font-bold text-sm sm:text-lg leading-tight">
-                {favoriteCount} {favoriteCount === 1 ? 'persona' : 'persone'}
+                {favoriteCount} {favoriteCount === 1 ? 'persona ha scelto' : 'persone hanno scelto'}
               </p>
-              <p className="text-[10px] text-gray-400 font-medium leading-tight">
-                scelgono <span className="text-blue-200 font-bold">{civName}</span>! 
+              <p className="text-[10px] sm:text-xs text-gray-400 font-medium leading-tight mt-0.5 sm:mt-1.5">
+                gli <span className="text-blue-200 font-bold">{civName}</span>! 
               </p>
             </div>
           </div>
