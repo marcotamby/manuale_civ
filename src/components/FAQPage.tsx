@@ -148,13 +148,13 @@ function SortableFAQItem({ item, sIdx, iIdx, isEditing, isExpanded, onToggle, on
       ref={setNodeRef}
       style={style}
       {...(isEditing ? { ...attributes, ...listeners } : {})}
-      className={`glass p-5 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-all group relative ${!isEditing ? 'cursor-pointer md:cursor-default' : ''} ${!isEditing && isExpanded ? 'border-blue-500/30' : ''} ${isDragging ? 'shadow-[0_0_20px_rgba(59,130,246,0.3)]' : ''}`}
+      className={`glass p-5 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-all group relative ${!isEditing ? 'cursor-pointer md:cursor-default' : ''} ${!isEditing && isExpanded ? 'border-blue-500/30' : ''} ${isDragging ? 'shadow-[0_0_25px_rgba(59,130,246,0.4)] z-50' : ''}`}
       onClick={() => !isEditing && onToggle()}
     >
       {isEditing && (
         <>
           <div 
-            className="absolute left-2 top-2 p-1 text-blue-400/50 group-hover:text-blue-400 cursor-grab active:cursor-grabbing z-20 transition-colors shadow-[0_0_10px_rgba(96,165,250,0.2)]"
+            className="absolute left-3 top-3 p-1 text-blue-400/50 group-hover:text-blue-400 cursor-grab active:cursor-grabbing z-20 transition-colors"
             title="Trascina qualsiasi punto del box per spostare"
           >
             <GripVertical size={18} className="drop-shadow-[0_0_5px_rgba(96,165,250,0.5)]" />
@@ -164,7 +164,7 @@ function SortableFAQItem({ item, sIdx, iIdx, isEditing, isExpanded, onToggle, on
               e.stopPropagation();
               onRemove();
             }}
-            className="absolute -top-2 -right-2 p-1.5 bg-red-600 rounded-full text-white shadow-lg z-30 hover:scale-110 transition-transform hover:bg-red-500"
+            className="absolute -top-2 -right-2 p-1.5 bg-red-600 rounded-full text-white shadow-lg z-30 hover:scale-110 transition-transform hover:bg-red-500 border border-white/10"
           >
             <X size={12} />
           </button>
@@ -172,27 +172,32 @@ function SortableFAQItem({ item, sIdx, iIdx, isEditing, isExpanded, onToggle, on
       )}
       
       {isEditing ? (
-        <div className="space-y-3 pt-4">
-          <div className="flex gap-2">
-            <select 
-              value={item.icon_name}
-              onChange={(e) => onUpdate('icon_name', e.target.value)}
-              className="bg-black/50 border border-white/10 rounded-lg pl-3 pr-8 py-1 text-sm text-blue-400 focus:border-blue-400 focus:outline-none transition-all"
-            >
-              {['Layers', 'Zap', 'Heart', 'GitPullRequest', 'Users', 'Shield', 'PlayCircle', 'BookOpen', 'Sword', 'Info', 'HelpCircle'].map(icon => (
-                <option key={icon} value={icon}>{icon}</option>
-              ))}
-            </select>
+        <div className="space-y-4 pt-6">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative min-w-[120px]">
+              <select 
+                value={item.icon_name}
+                onChange={(e) => onUpdate('icon_name', e.target.value)}
+                className="w-full appearance-none bg-black/50 border border-white/10 rounded-lg pl-3 pr-10 py-2 text-sm text-blue-400 focus:border-blue-400 focus:outline-none transition-all cursor-pointer"
+              >
+                {['Layers', 'Zap', 'Heart', 'GitPullRequest', 'Users', 'Shield', 'PlayCircle', 'BookOpen', 'Sword', 'Info', 'HelpCircle'].map(icon => (
+                  <option key={icon} value={icon} className="bg-[#0d1424] text-white">{icon}</option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-400 pointer-events-none" />
+            </div>
             <input 
               value={item.label}
               onChange={(e) => onUpdate('label', e.target.value)}
               className="flex-1 bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-base font-bold text-white focus:border-blue-400 focus:outline-none transition-all"
+              placeholder="Titolo elemento"
             />
           </div>
           <textarea 
             value={item.description}
             onChange={(e) => onUpdate('description', e.target.value)}
             className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-sm text-gray-300 h-32 resize-none focus:border-blue-400 focus:outline-none transition-all leading-relaxed"
+            placeholder="Descrizione dell'elemento..."
           />
         </div>
       ) : (
@@ -472,7 +477,7 @@ export function FAQPage() {
           </div>
         </header>
 
-        <section className="mb-12 glass p-8 rounded-3xl border border-white/5 relative overflow-hidden group">
+        <section className="mb-12 glass p-6 md:p-8 rounded-3xl border border-white/5 relative group">
           {isEditing ? (
             <div className="space-y-4 relative z-10">
               <div className="relative">
@@ -504,7 +509,7 @@ export function FAQPage() {
           )}
         </section>
 
-        <div className="space-y-12">
+        <div className="space-y-12 pb-12">
           {sections.map((section, sIdx) => (
             <div key={sIdx} className="space-y-6 relative group/section">
               {isEditing && (
@@ -525,7 +530,7 @@ export function FAQPage() {
               )}
 
               {isEditing ? (
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <input 
                     value={section.title}
                     onChange={(e) => {
@@ -533,21 +538,24 @@ export function FAQPage() {
                       next[sIdx].title = e.target.value;
                       setSections(next);
                     }}
-                    className="flex-1 bg-black/50 border border-blue-500/30 rounded-lg px-4 py-2 text-xl font-bold text-white"
+                    className="flex-1 bg-black/50 border border-blue-500/30 rounded-lg px-4 py-2 text-xl font-bold text-white focus:border-blue-400 focus:outline-none"
                   />
-                  <select 
-                    value={section.icon_name}
-                    onChange={(e) => {
-                      const next = [...sections];
-                      next[sIdx].icon_name = e.target.value;
-                      setSections(next);
-                    }}
-                    className="bg-black/50 border border-blue-500/30 rounded-lg pl-3 pr-8 py-2 text-blue-400 focus:border-blue-400 focus:outline-none transition-all"
-                  >
-                    {['Layers', 'Zap', 'Heart', 'GitPullRequest', 'Users', 'Shield', 'PlayCircle', 'BookOpen', 'Sword', 'Info', 'HelpCircle'].map(icon => (
-                      <option key={icon} value={icon}>{icon}</option>
-                    ))}
-                  </select>
+                  <div className="relative min-w-[150px]">
+                    <select 
+                      value={section.icon_name}
+                      onChange={(e) => {
+                        const next = [...sections];
+                        next[sIdx].icon_name = e.target.value;
+                        setSections(next);
+                      }}
+                      className="w-full appearance-none bg-black/50 border border-blue-500/30 rounded-lg pl-4 pr-10 py-2 text-blue-400 focus:border-blue-400 focus:outline-none transition-all cursor-pointer"
+                    >
+                      {['Layers', 'Zap', 'Heart', 'GitPullRequest', 'Users', 'Shield', 'PlayCircle', 'BookOpen', 'Sword', 'Info', 'HelpCircle'].map(icon => (
+                        <option key={icon} value={icon} className="bg-[#0d1424] text-white">{icon}</option>
+                      ))}
+                    </select>
+                    <ChevronDown size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-400 pointer-events-none" />
+                  </div>
                 </div>
               ) : (
                 <h2 className="text-xl font-sackers font-bold text-blue-400/80 tracking-widest flex items-center gap-3 border-b border-white/5 pb-2">
