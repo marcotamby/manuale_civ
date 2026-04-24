@@ -334,19 +334,19 @@ export function FAQPage() {
         <section className="mb-12 glass p-8 rounded-3xl border border-white/5 relative overflow-hidden group">
           {isEditing ? (
             <div className="space-y-4 relative z-10">
-              <div className="flex items-center gap-3">
-                <Info className="text-blue-400" />
+              <div className="relative">
+                <Info size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-400 pointer-events-none" />
                 <input 
                   value={intro.title}
                   onChange={(e) => setIntro({ ...intro, title: e.target.value })}
-                  className="flex-1 bg-black/50 border border-blue-500/30 rounded-lg px-4 py-2 text-2xl font-bold text-white"
+                  className="w-full bg-black/50 border border-blue-500/30 rounded-lg pl-12 pr-4 py-3 text-2xl font-bold text-white transition-all focus:border-blue-400 focus:outline-none"
                   placeholder="Titolo Intro"
                 />
               </div>
               <textarea 
                 value={intro.content}
                 onChange={(e) => setIntro({ ...intro, content: e.target.value })}
-                className="w-full bg-black/50 border border-blue-500/30 rounded-lg px-4 py-3 text-lg leading-relaxed text-gray-300 h-40 resize-none"
+                className="w-full bg-black/50 border border-blue-500/30 rounded-lg px-4 py-3 text-lg leading-relaxed text-gray-300 h-40 resize-none transition-all focus:border-blue-400 focus:outline-none"
                 placeholder="Contenuto Intro"
               />
             </div>
