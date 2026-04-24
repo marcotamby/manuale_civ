@@ -989,37 +989,30 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 </div>
               </div>
             ) : (
-              <div className="flex justify-center w-full py-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl mx-auto">
                 <div 
                   onClick={() => (isAdmin || canManageBuildorders) ? (window as any).openBOEditor?.(civId, null) : navigate(`/civ/${civId}/proponi?section=build_order`)}
-                  className={`glass flex flex-col items-center justify-center p-12 rounded-[2.5rem] border border-dashed transition-all group cursor-pointer text-center w-full max-w-sm min-h-[400px] ${
+                  className={`glass flex flex-col items-center justify-center p-8 rounded-2xl border border-dashed transition-all group cursor-pointer text-center h-full min-h-[300px] ${
                     (isAdmin || canManageBuildorders)
-                      ? 'border-slate-400/30 hover:border-slate-200/60 hover:bg-slate-400/5 shadow-[0_0_50px_rgba(148,163,184,0.15)]'
-                      : 'border-yellow-500/20 hover:border-yellow-500/40 hover:bg-yellow-500/5 shadow-[0_0_50px_rgba(234,179,8,0.1)]'
+                      ? 'border-slate-400/30 hover:border-slate-200/60 hover:bg-slate-400/5 shadow-[0_0_30px_rgba(148,163,184,0.1)]'
+                      : 'border-yellow-500/20 hover:border-yellow-500/40 hover:bg-yellow-500/5 shadow-[0_0_30px_rgba(234,179,8,0.05)]'
                   }`}
                 >
-                  <div className={`w-24 h-24 rounded-full flex items-center justify-center mb-8 border transition-transform group-hover:scale-110 ${
-                    (isAdmin || canManageBuildorders) ? 'bg-slate-400/10 border-slate-400/30 shadow-[0_0_30px_rgba(148,163,184,0.2)]' : 'bg-yellow-500/10 border-yellow-500/20 shadow-[0_0_30px_rgba(234,179,8,0.1)]'
+                  <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 border transition-transform group-hover:scale-110 ${
+                    (isAdmin || canManageBuildorders) ? 'bg-slate-400/10 border-slate-400/30 shadow-[0_0_20px_rgba(148,163,184,0.2)]' : 'bg-yellow-500/10 border-yellow-500/20 shadow-[0_0_20px_rgba(234,179,8,0.1)]'
                   }`}>
-                    <Plus size={48} className={(isAdmin || canManageBuildorders) ? 'text-slate-300' : 'text-yellow-500'} />
+                    <Plus size={40} className={(isAdmin || canManageBuildorders) ? 'text-slate-300' : 'text-yellow-500'} />
                   </div>
-                  <div className="space-y-4">
-                    <h3 className={`text-3xl font-black uppercase tracking-tighter leading-none ${(isAdmin || canManageBuildorders) ? 'text-slate-200' : 'text-white'} flex flex-col`}>
+                  <div className="space-y-3">
+                    <h3 className={`text-2xl font-black uppercase tracking-tighter leading-none ${(isAdmin || canManageBuildorders) ? 'text-slate-200' : 'text-white'} flex flex-col`}>
                       <span>{(isAdmin || canManageBuildorders) ? 'Aggiungi' : 'Proponi'}</span>
                       <span>Build Order</span>
                     </h3>
-                    <p className="text-base text-gray-500 px-6 max-w-[320px] font-medium leading-relaxed">
+                    <p className="text-sm text-gray-500 px-4 max-w-[280px] font-medium leading-relaxed">
                       {(isAdmin || canManageBuildorders) 
                         ? 'Inserisci ufficialmente una nuova strategia.' 
                         : 'Proponi per primo un build order per questa civiltà!'}
                     </p>
-                  </div>
-                  <div className={`mt-10 px-10 py-4 rounded-2xl text-sm font-black uppercase transition-all border shadow-xl ${
-                    (isAdmin || canManageBuildorders)
-                      ? 'bg-slate-400/10 border-slate-400/40 text-slate-300 group-hover:bg-slate-400/20'
-                      : 'bg-yellow-600/10 border-yellow-500/40 text-yellow-500 group-hover:bg-yellow-600/20'
-                  }`}>
-                    {(isAdmin || canManageBuildorders) ? 'Inizia Ora →' : 'Proponi →'}
                   </div>
                 </div>
               </div>
