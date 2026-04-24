@@ -198,6 +198,9 @@
 
         function updateTimer() {
             const container = document.getElementById('timer-container');
+            const label = document.getElementById('timer-label');
+            const display = document.getElementById('timer-display');
+
             if (!lastState || !lastState.timer || !lastState.timer.active) {
                 container.style.display = 'none';
                 return;
@@ -206,8 +209,18 @@
             const elapsed = Math.floor((Date.now() - (lastState.timer.timestamp || Date.now())) / 1000);
             const total = ((lastState.timer.min || 0) * 60) + (lastState.timer.sec || 0);
             let remaining = total - elapsed;
-            if (remaining < 0) remaining = 0;
-            document.getElementById('timer-display').innerText = formatTime(remaining);
+            
+            if (remaining <= 0) {
+                label.style.display = 'none';
+                display.innerText = "IL GAME STA PER INIZIARE!";
+                display.style.fontSize = "32px";
+                display.style.padding = "15px 50px";
+            } else {
+                label.style.display = 'block';
+                display.innerText = formatTime(remaining);
+                display.style.fontSize = "48px";
+                display.style.padding = "8px 45px";
+            }
         }
 
         function updateLines() {

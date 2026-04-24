@@ -27,3 +27,5 @@ dist-ssr
 scripts/*.json
 backups/*_backup_*.json
 !backups/*_latest.json
+
+.vercel
