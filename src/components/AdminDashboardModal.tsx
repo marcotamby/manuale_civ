@@ -30,7 +30,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const { refreshCivs } = useCivData();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; type: 'question' | 'answer'; item: any } | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; type: 'question' | 'answer' | 'user'; item: any } | null>(null);
   const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
     isVisible: false,
     message: '',
@@ -215,10 +215,12 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     }
   };
 
-  const handleDeleteUser = async (email: string) => {
+  const handleDeleteUser = (email: string) => {
     if (!isSuperAdmin) return;
-    if (!confirm(`Sei sicuro di voler eliminare l'utente ${email}? Questa azione è irreversibile.`)) return;
+    setDeleteConfirm({ id: email, type: 'user', item: email });
+  };
 
+  const executeDeleteUser = async (email: string) => {
     try {
       const { error } = await supabase
         .from('profiles')
@@ -1095,7 +1097,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
             </div>
             <h3 className="text-xl font-bold text-white mb-2">Conferma Eliminazione</h3>
             <p className="text-sm text-gray-400 mb-8 leading-relaxed">
-              Sei sicuro di voler eliminare definitivamente questa {deleteConfirm.type === 'question' ? 'domanda' : 'risposta'}?
+              {deleteConfirm.type === 'user' 
+                ? `Sei sicuro di voler eliminare definitivamente l'utente ${deleteConfirm.item}? Questa azione è irreversibile.`
+                : `Sei sicuro di voler eliminare definitivamente questa ${deleteConfirm.type === 'question' ? 'domanda' : 'risposta'}?`}
             </p>
 
             <div className="flex gap-3">
@@ -1110,7 +1114,11 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                   const item = deleteConfirm.item;
                   const type = deleteConfirm.type;
                   setDeleteConfirm(null);
-                  handleUpdateQAStatus(item, type, 'deleted');
+                  if (type === 'user') {
+                    executeDeleteUser(item);
+                  } else {
+                    handleUpdateQAStatus(item, type, 'deleted');
+                  }
                 }}
                 className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl transition-all font-bold text-xs uppercase shadow-lg shadow-red-600/20"
               >
