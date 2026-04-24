@@ -763,7 +763,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   </button>
                 )}
               </h2>
-              <div className="glass p-6 rounded-2xl border border-emerald-500/10 bg-emerald-500/[0.02] text-gray-300 text-sm leading-relaxed select-text">
+              <div className="glass p-6 rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.03] shadow-[0_0_15px_rgba(16,185,129,0.05)] text-gray-300 text-sm leading-relaxed select-text">
                 <div className="space-y-4">
                   {civ.strengths && civ.strengths.length > 0 ? (
                     civ.strengths.map((str, idx) => (
@@ -802,7 +802,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   </button>
                 )}
               </h2>
-              <div className="glass p-6 rounded-2xl border border-rose-500/10 bg-rose-500/[0.02] text-gray-300 text-sm leading-relaxed select-text">
+              <div className="glass p-6 rounded-2xl border border-rose-500/30 bg-rose-500/[0.03] shadow-[0_0_15px_rgba(244,63,94,0.05)] text-gray-300 text-sm leading-relaxed select-text">
                 <div className="space-y-4">
                   {civ.weaknesses && civ.weaknesses.length > 0 ? (
                     civ.weaknesses.map((weak, idx) => (
