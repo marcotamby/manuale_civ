@@ -177,7 +177,7 @@ function SortableFAQItem({ item, sIdx, iIdx, isEditing, isExpanded, onToggle, on
             <select 
               value={item.icon_name}
               onChange={(e) => onUpdate('icon_name', e.target.value)}
-              className="bg-black/50 border border-white/10 rounded-lg px-2 py-1 text-sm text-blue-400 focus:border-blue-400 focus:outline-none transition-all"
+              className="bg-black/50 border border-white/10 rounded-lg pl-3 pr-8 py-1 text-sm text-blue-400 focus:border-blue-400 focus:outline-none transition-all"
             >
               {['Layers', 'Zap', 'Heart', 'GitPullRequest', 'Users', 'Shield', 'PlayCircle', 'BookOpen', 'Sword', 'Info', 'HelpCircle'].map(icon => (
                 <option key={icon} value={icon}>{icon}</option>
@@ -542,7 +542,7 @@ export function FAQPage() {
                       next[sIdx].icon_name = e.target.value;
                       setSections(next);
                     }}
-                    className="bg-black/50 border border-blue-500/30 rounded-lg px-2 py-2 text-blue-400"
+                    className="bg-black/50 border border-blue-500/30 rounded-lg pl-3 pr-8 py-2 text-blue-400 focus:border-blue-400 focus:outline-none transition-all"
                   >
                     {['Layers', 'Zap', 'Heart', 'GitPullRequest', 'Users', 'Shield', 'PlayCircle', 'BookOpen', 'Sword', 'Info', 'HelpCircle'].map(icon => (
                       <option key={icon} value={icon}>{icon}</option>
