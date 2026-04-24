@@ -671,8 +671,8 @@ export function TournamentsPage() {
                                 {hasData ? (
                                   <div className="flex items-center gap-x-1.5 flex-1 min-w-0 group/players">
                                     {entries.map((s, sIdx) => (
-                                      <div key={sIdx} className="relative flex items-center min-w-0 flex-shrink-1">
-                                        <div className="relative group/name min-w-0 flex-shrink-1">
+                                      <div key={sIdx} className="relative flex items-center min-w-0 flex-shrink-1 group/name">
+                                        <div className="relative min-w-0 flex-shrink-1">
                                           <span 
                                             className={clsx(
                                               "font-bold transition-colors truncate block cursor-help",
@@ -683,37 +683,35 @@ export function TournamentsPage() {
                                             {s.entrant?.name || '---'}
                                           </span>
 
-                                          {/* Premium Name Tooltip (appears if name is long) */}
-                                          <div className="absolute bottom-full left-0 mb-3 px-3 py-1.5 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-lg opacity-0 group-hover/name:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/name:scale-100 origin-bottom-left z-50">
-                                            <div className="flex flex-col items-center">
-                                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+                                          {/* Premium Tooltip (Combined for Name and Players) */}
+                                          <div className="absolute bottom-full left-0 mb-3 p-4 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-2xl opacity-0 group-hover/name:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/name:scale-100 origin-bottom-left z-50 min-w-[180px]">
+                                            <div className="flex flex-col">
+                                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 border-b border-white/5 pb-1">
                                                 {idx === 0 ? '🏆 Campione' : idx === 1 ? '🥈 Finalista' : '🥉 3° Classificato'}
                                               </span>
-                                              <span className="text-xs font-bold text-white">{s.entrant?.name || '---'}</span>
+                                              <span className="text-sm font-bold text-white mb-2">{s.entrant?.name || '---'}</span>
+                                              
+                                              {s.players && s.players.length > 0 && (
+                                                <div className="mt-1 pt-2 border-t border-white/10">
+                                                  <p className="text-[9px] font-black text-yellow-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                                                    <Users size={10} /> Componenti Team
+                                                  </p>
+                                                  <div className="space-y-1.5">
+                                                    {s.players.map((player: string, pIdx: number) => (
+                                                      <div key={pIdx} className="flex items-center gap-2 text-[11px] text-white/80 font-bold uppercase tracking-tight">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
+                                                        {player}
+                                                      </div>
+                                                    ))}
+                                                  </div>
+                                                </div>
+                                              )}
                                             </div>
                                             {/* Tooltip Arrow */}
                                             <div className="absolute top-full left-4 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-800/95"></div>
                                           </div>
                                         </div>
                                         {sIdx < entries.length - 1 && <span className="text-gray-600 font-black flex-shrink-0 mx-1">&</span>}
-                                        
-                                        {/* Players Tooltip */}
-                                        {s.players && s.players.length > 0 && (
-                                          <div className="absolute bottom-full left-0 mb-4 p-4 bg-[#1a1f2e] backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-0 group-hover/name:opacity-100 pointer-events-none transition-all duration-300 translate-y-2 group-hover/name:translate-y-0 z-[100] min-w-[180px] border-b-yellow-500/50">
-                                            <p className="text-[9px] font-black text-yellow-500 uppercase tracking-[0.2em] mb-3 border-b border-white/10 pb-2 flex items-center gap-2">
-                                              <Users size={10} /> Componenti Team
-                                            </p>
-                                            <div className="space-y-2">
-                                              {s.players.map((player: string, pIdx: number) => (
-                                                <div key={pIdx} className="flex items-center gap-2 text-[11px] text-white font-bold uppercase tracking-tight">
-                                                  <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
-                                                  {player}
-                                                </div>
-                                              ))}
-                                            </div>
-                                            <div className="absolute top-full left-6 -translate-y-px border-8 border-transparent border-t-[#1a1f2e]" />
-                                          </div>
-                                        )}
                                       </div>
                                     ))}
                                   </div>
