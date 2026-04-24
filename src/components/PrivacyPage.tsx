@@ -48,21 +48,37 @@ export function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-yellow-500 mb-3">4. Cookie Tecnici</h2>
+            <h2 className="text-xl font-bold text-yellow-500 mb-3">4. Cookie e Tecnologie di Storage</h2>
             <p>
-              Il sito utilizza esclusivamente **cookie tecnici** necessari al funzionamento del sistema di autenticazione e per memorizzare le tue preferenze locali (come il consenso ai cookie). Non utilizziamo cookie di profilazione o di tracciamento di terze parti (come Google Analytics o Facebook Pixel).
+              Il sito utilizza esclusivamente tecnologie necessarie al funzionamento e al miglioramento dell'esperienza utente:
             </p>
+            <ul className="list-disc ml-6 mt-2 space-y-1">
+              <li><strong>Cookie Tecnici:</strong> Necessari per gestire l'autenticazione (Google OAuth) e memorizzare il tuo consenso alla privacy.</li>
+              <li><strong>Session Storage:</strong> Utilizziamo lo storage temporaneo del browser per funzioni di sessione, come evitare la ricomparsa di popup già chiusi o gestire l'ID temporaneo del contatore presenze. Questi dati vengono eliminati automaticamente alla chiusura della scheda o del browser.</li>
+            </ul>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-yellow-500 mb-3">5. Sicurezza e Conservazione</h2>
+            <h2 className="text-xl font-bold text-yellow-500 mb-3">5. Contatore Presenze in Tempo Reale</h2>
+            <p>
+              Per mostrare la vitalità della community, utilizziamo <strong>Supabase Presence</strong>. Questa tecnologia permette di contare quanti utenti sono online e su quali sezioni del sito si trovano.
+            </p>
+            <ul className="list-disc ml-6 mt-2 space-y-1">
+              <li><strong>Visitatori:</strong> Il tracciamento è totalmente anonimo e basato su un identificativo casuale generato all'accesso.</li>
+              <li><strong>Utenti Autenticati:</strong> Per i membri dello staff, la presenza permette il coordinamento in tempo reale sulle modifiche alle civiltà.</li>
+              <li><strong>Controllo:</strong> Se scegli di "Rifiutare gli Opzionali" nel banner dei cookie, non verrai incluso nel conteggio globale delle presenze.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold text-yellow-500 mb-3">6. Sicurezza e Conservazione</h2>
             <p>
               I tuoi dati sono conservati in modo sicuro tramite la piattaforma **Supabase**, che utilizza crittografia avanzata. Le tue password non vengono mai salvate sui nostri server poiché l'autenticazione è gestita esternamente da Google.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-yellow-500 mb-3">6. I Tuoi Diritti</h2>
+            <h2 className="text-xl font-bold text-yellow-500 mb-3">7. I Tuoi Diritti</h2>
             <p>In ogni momento puoi:</p>
             <ul className="list-disc ml-6 mt-2 space-y-1">
               <li>Richiedere la cancellazione totale dei tuoi dati e del tuo account inviando una mail all'amministratore.</li>
@@ -73,7 +89,7 @@ export function PrivacyPage() {
 
           <section className="pt-8 border-t border-[#D4AF37]/20">
             <p className="text-xs text-gray-500 italic">
-              Ultimo aggiornamento: 9 Marzo 2026. ManualeCiv è un progetto amatoriale dedicato alla community di Age of Empires IV.
+              Ultimo aggiornamento: 24 Aprile 2026. ManualeCiv è un progetto amatoriale dedicato alla community di Age of Empires IV.
             </p>
           </section>
         </div>

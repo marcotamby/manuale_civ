@@ -79,76 +79,83 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
     return () => { channel.unsubscribe(); };
   }, [isAuthenticated, isAdmin, isStreamer, user?.email, activity]);
 
-  // 2. Global User Presence (privacy-focused)
-  useEffect(() => {
-    let timeoutId: any;
-    let channel: any;
-
-    // We delay the presence connection by 2 seconds to allow 
-    // the main data fetch (civilizations) to complete first.
-    // This helps bypass some corporate firewall "burst" blocks.
-    timeoutId = setTimeout(() => {
-      try {
-        let guestId = 'guest-temp';
+    // 2. Global User Presence (privacy-focused)
+    useEffect(() => {
+      let timeoutId: any;
+      let channel: any;
+  
+      const consent = localStorage.getItem('cookieConsent');
+      // If user declined cookies, we don't track them in the global counter
+      if (consent === 'declined') {
+        setOnlineUserCount(0);
+        return;
+      }
+  
+      // We delay the presence connection by 2 seconds to allow 
+      // the main data fetch (civilizations) to complete first.
+      // This helps bypass some corporate firewall "burst" blocks.
+      timeoutId = setTimeout(() => {
         try {
-          guestId = sessionStorage.getItem('presence_guest_id') || '';
-          if (!guestId) {
-            guestId = 'guest-' + Math.random().toString(36).substring(2, 9);
-            sessionStorage.setItem('presence_guest_id', guestId);
+          let guestId = 'guest-temp';
+          try {
+            guestId = sessionStorage.getItem('presence_guest_id') || '';
+            if (!guestId) {
+              guestId = 'guest-' + Math.random().toString(36).substring(2, 9);
+              sessionStorage.setItem('presence_guest_id', guestId);
+            }
+          } catch (e) {
+            console.warn('sessionStorage not available, using temporary guest ID');
           }
-        } catch (e) {
-          console.warn('sessionStorage not available, using temporary guest ID');
-        }
-
-        const presenceKey = user?.email || guestId;
-
-        channel = supabase.channel('global-presence', {
-          config: { presence: { key: presenceKey } }
-        });
-
-        channel
-          .on('presence', { event: 'sync' }, () => {
-            const state = channel.presenceState();
-            const keys = Object.keys(state);
-            setOnlineUserCount(keys.length);
-
-            const distribution: Record<string, number> = {};
-            keys.forEach(key => {
-              const p = state[key] as any[];
-              if (p.length > 0 && p[0].page) {
-                const page = p[0].page;
-                distribution[page] = (distribution[page] || 0) + 1;
+  
+          const presenceKey = user?.email || guestId;
+  
+          channel = supabase.channel('global-presence', {
+            config: { presence: { key: presenceKey } }
+          });
+  
+          channel
+            .on('presence', { event: 'sync' }, () => {
+              const state = channel.presenceState();
+              const keys = Object.keys(state);
+              setOnlineUserCount(keys.length);
+  
+              const distribution: Record<string, number> = {};
+              keys.forEach(key => {
+                const p = state[key] as any[];
+                if (p.length > 0 && p[0].page) {
+                  const page = p[0].page;
+                  distribution[page] = (distribution[page] || 0) + 1;
+                }
+              });
+              setUsersByPage(distribution);
+            })
+            .subscribe(async (status: string) => {
+              if (status === 'CHANNEL_ERROR') {
+                console.warn('Connessione al counter bloccata dalla rete (probabile firewall aziendale).');
+                return;
+              }
+              
+              if (status === 'SUBSCRIBED') {
+                try {
+                  await channel.track({
+                    page: activity.civId || activity.section || 'home',
+                    active: true
+                  });
+                } catch (err) {
+                  console.error('Error tracking presence:', err);
+                }
               }
             });
-            setUsersByPage(distribution);
-          })
-          .subscribe(async (status: string) => {
-            if (status === 'CHANNEL_ERROR') {
-              console.warn('Connessione al counter bloccata dalla rete (probabile firewall aziendale).');
-              return;
-            }
-            
-            if (status === 'SUBSCRIBED') {
-              try {
-                await channel.track({
-                  page: activity.civId || activity.section || 'home',
-                  active: true
-                });
-              } catch (err) {
-                console.error('Error tracking presence:', err);
-              }
-            }
-          });
-      } catch (err) {
-        console.error('Failed to initialize presence channel:', err);
-      }
-    }, 2000);
-
-    return () => { 
-      clearTimeout(timeoutId);
-      if (channel) channel.unsubscribe(); 
-    };
-  }, [user?.email, activity]);
+        } catch (err) {
+          console.error('Failed to initialize presence channel:', err);
+        }
+      }, 2000);
+  
+      return () => { 
+        clearTimeout(timeoutId);
+        if (channel) channel.unsubscribe(); 
+      };
+    }, [user?.email, activity]);
 
   const updateActivity = (newActivity: any) => {
     setActivity(newActivity);
