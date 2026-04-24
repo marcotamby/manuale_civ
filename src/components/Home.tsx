@@ -92,11 +92,11 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                   if (isCompareMode) setIsCompareMode(false);
                 }}
                 className={`flex-1 flex items-center justify-center gap-1.5 px-3 md:px-4 h-full rounded-lg text-xs sm:text-sm font-bold transition-all ${isBOMode
-                  ? 'bg-[#00f3ff] text-black shadow-[0_0_15px_rgba(0,243,255,0.4)]'
+                  ? 'bg-gradient-to-r from-cyan-400/80 to-cyan-600/60 text-white shadow-[0_0_20px_rgba(34,211,238,0.3)] border border-cyan-400/50'
                   : 'text-gray-400 hover:text-gray-200'
                   }`}
               >
-                <Zap size={14} fill={isBOMode ? 'black' : 'none'} />
+                <Zap size={14} fill={isBOMode ? 'white' : 'none'} className={isBOMode ? 'drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]' : ''} />
                 <span className="whitespace-nowrap">Build Orders</span>
               </button>
             </div>
