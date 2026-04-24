@@ -266,12 +266,12 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
 
   return (
     <div className="max-w-2xl">
-      <div className="flex items-center gap-2 mb-6 text-xs font-black text-green-400 uppercase tracking-[0.2em] bg-green-500/5 px-4 py-2.5 rounded-xl border border-green-500/20 w-fit shadow-[0_0_20px_rgba(34,197,94,0.05)]">
-        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+      <div className="flex items-center gap-2 mb-6 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] bg-cyan-500/10 px-4 py-2.5 rounded-xl border border-cyan-500/30 w-fit shadow-[0_0_20px_rgba(6,182,212,0.1)]">
+        <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.5)]" />
         Loggato come <span className="text-white ml-1">{user?.name}</span>
       </div>
 
-      <p className="text-gray-400 text-[13px] font-medium leading-relaxed mb-8 border-l-2 border-yellow-500/30 pl-4">
+      <p className="text-gray-400 text-[13px] font-medium leading-relaxed mb-8 border-l-2 border-cyan-500/30 pl-4">
         Hai informazioni più accurate su questa civiltà? Proponi una modifica e il nostro team la esaminerà con cura.
       </p>
 
@@ -292,7 +292,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
           </div>
         )}
         <div className="space-y-2">
-          <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Sezione da modificare</label>
+          <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Sezione da modificare</label>
           <div className="relative group">
             <select
               value={section}
@@ -305,9 +305,9 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                 setBoSteps([{ time: '', action: '', note: '' }]);
               }}
               required
-              className="w-full bg-[#16171d]/60 backdrop-blur-md border border-white/10 rounded-xl pl-4 pr-10 py-3.5 text-sm text-white focus:outline-none focus:border-yellow-500/50 focus:shadow-[0_0_30px_rgba(234,179,8,0.1)] transition-all [&>option]:bg-[#1a1c23] [&>option]:text-white appearance-none cursor-pointer"
+              className="w-full bg-white/5 backdrop-blur-md border-2 border-white/10 rounded-xl pl-4 pr-10 py-3.5 text-sm text-white focus:outline-none focus:border-cyan-500/50 focus:shadow-[0_0_30px_rgba(6,182,212,0.1)] transition-all [&>option]:bg-[#1a1c23] [&>option]:text-white appearance-none cursor-pointer"
               style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255,255,255,0.3)' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(6,182,212,0.6)' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'right 1.25rem center',
                 backgroundSize: '1em'
@@ -321,18 +321,18 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
               <option value="build_order">Nuovo Build Order</option>
               <option value="altro">Altre Modifiche</option>
             </select>
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"></div>
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"></div>
           </div>
         </div>
 
         {section !== 'build_order' && section !== '' && (
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Descrizione Modifica</label>
+            <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Descrizione Modifica</label>
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
               rows={6}
-              className="w-full bg-[#16171d]/60 backdrop-blur-md border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-yellow-500/50 transition-all resize-y placeholder:text-gray-600 leading-relaxed shadow-inner"
+              className="w-full bg-white/5 backdrop-blur-md border-2 border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-cyan-500/50 transition-all resize-y placeholder:text-white/20 leading-relaxed shadow-inner"
               placeholder="Descrivi dettagliatamente la modifica che proponi. Se possibile, cita le fonti..."
               required
             />
@@ -342,40 +342,40 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
         {section === 'build_order' && (
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Titolo Build Order</label>
+              <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Titolo Build Order</label>
               <input
                 type="text"
                 placeholder="es. Fast Castle into Knights"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-[#16171d]/60 backdrop-blur-md border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-blue-500/50 focus:shadow-[0_0_30px_rgba(59,130,246,0.1)] transition-all placeholder:text-gray-600"
+                className="w-full bg-white/5 backdrop-blur-md border-2 border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-cyan-500/50 focus:shadow-[0_0_30px_rgba(6,182,212,0.1)] transition-all placeholder:text-white/20"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Difficoltà Strategia</label>
+              <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Difficoltà Strategia</label>
               <div className="flex gap-3">
                 {[1, 2, 3].map((num) => (
                   <button
                     key={num}
                     type="button"
                     onClick={() => setDifficulty(num)}
-                    className={`flex-1 py-3 rounded-2xl border transition-all flex flex-col items-center gap-1.5 group relative overflow-hidden ${
+                    className={`flex-1 py-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-1.5 group relative overflow-hidden ${
                       difficulty === num 
-                        ? 'bg-yellow-500/10 border-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.15)]' 
-                        : 'bg-[#16171d]/60 border-white/10 text-gray-500 hover:border-white/20'
+                        ? 'bg-cyan-500 border-cyan-400 text-black shadow-[0_0_20px_rgba(6,182,212,0.3)]' 
+                        : 'bg-white/5 border-white/10 text-gray-500 hover:border-white/20'
                     }`}
                   >
                     {difficulty === num && (
-                      <div className="absolute inset-0 bg-gradient-to-b from-yellow-500/5 to-transparent animate-pulse" />
+                      <div className="absolute inset-0 bg-gradient-to-b from-cyan-400/20 to-transparent animate-pulse" />
                     )}
                     <div className="flex gap-0.5 z-10">
                       {Array.from({ length: num }).map((_, i) => (
-                        <span key={i} className={`text-xs ${difficulty === num ? 'text-yellow-500 drop-shadow-[0_0_5px_rgba(234,179,8,0.5)]' : 'text-gray-600'}`}>⭐</span>
+                        <span key={i} className={`text-xs ${difficulty === num ? 'text-black drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]' : 'text-gray-600'}`}>⭐</span>
                       ))}
                     </div>
-                    <span className={`text-[9px] font-black uppercase tracking-widest z-10 ${difficulty === num ? 'text-yellow-500' : 'text-gray-500 group-hover:text-gray-400'}`}>
+                    <span className={`text-[9px] font-black uppercase tracking-widest z-10 ${difficulty === num ? 'text-black' : 'text-gray-500 group-hover:text-gray-400'}`}>
                       {num === 1 ? 'Facile' : num === 2 ? 'Media' : 'Difficile'}
                     </span>
                   </button>
@@ -384,27 +384,27 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
-                <Map size={12} className="text-yellow-500" /> Mappa Consigliata
+              <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                <Map size={14} className="text-cyan-400" /> Mappa Consigliata
               </label>
               <input
                 type="text"
                 placeholder="es. Arabia, Isole, Qualsiasi..."
                 value={map}
                 onChange={(e) => setMap(e.target.value)}
-                className="w-full bg-[#16171d]/60 backdrop-blur-md border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-blue-500/50 focus:shadow-[0_0_30px_rgba(59,130,246,0.1)] transition-all placeholder:text-gray-600"
+                className="w-full bg-white/5 backdrop-blur-md border-2 border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-cyan-500/50 focus:shadow-[0_0_30px_rgba(6,182,212,0.1)] transition-all placeholder:text-white/20"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Immagine Banner (JPG/PNG)</label>
+              <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Immagine Banner (JPG/PNG)</label>
               <div className="flex items-stretch gap-2">
                 <input
                   type="text"
                   placeholder="Incolla link o usa il tasto a destra per caricare..."
                   value={bannerUrl}
                   onChange={(e) => setBannerUrl(e.target.value)}
-                  className="flex-1 bg-[#16171d]/60 backdrop-blur-md border border-white/10 rounded-xl px-4 py-3.5 text-xs text-blue-300 focus:outline-none focus:border-blue-500/50 transition-all placeholder:text-gray-600"
+                  className="flex-1 bg-white/5 backdrop-blur-md border-2 border-white/10 rounded-xl px-4 py-3.5 text-xs text-cyan-200 focus:outline-none focus:border-cyan-500/50 transition-all placeholder:text-white/20"
                 />
                 <label className={`cursor-pointer flex items-center justify-center rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all w-14 shrink-0 m-0 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
                    <input 
@@ -480,18 +480,18 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Introduzione Strategia</label>
+              <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Introduzione Strategia</label>
               <textarea
                 placeholder="Descrivi brevemente gli obiettivi di questa build..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full bg-[#16171d]/60 backdrop-blur-md border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-yellow-500/50 transition-all resize-y h-28 placeholder:text-gray-600"
+                className="w-full bg-white/5 backdrop-blur-md border-2 border-white/10 rounded-xl px-6 py-4 text-white focus:outline-none focus:border-cyan-500/50 transition-all resize-y h-32 placeholder:text-white/20"
                 required
               />
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Passaggi della Strategia</label>
+              <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Passaggi della Strategia</label>
               {boSteps.map((step, index) => (
                 <div 
                   key={index} 
@@ -499,17 +499,17 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                   onDragStart={() => handleDragStart(index)}
                   onDragOver={(e) => handleDragOver(e, index)}
                   onDragEnd={handleDragEnd}
-                  className={`flex items-start gap-4 p-4 bg-[#16171d]/40 backdrop-blur-sm rounded-2xl border transition-all group relative ${
+                  className={`flex items-center gap-4 p-5 bg-white/5 backdrop-blur-sm rounded-2xl border-2 transition-all group relative ${
                     draggedStepIndex === index 
-                      ? 'border-dashed border-blue-500/50 bg-blue-500/5 shadow-[0_0_40px_rgba(59,130,246,0.1)]' 
+                      ? 'border-dashed border-cyan-500 bg-cyan-500/10 shadow-[0_0_40px_rgba(6,182,212,0.2)]' 
                       : droppedIndex === index
                         ? 'border-green-500/50 bg-green-500/5 shadow-[0_0_20px_rgba(34,197,94,0.1)] scale-[1.01]'
-                        : 'border-white/5 hover:border-white/10 hover:bg-[#16171d]/60'
+                        : 'border-white/10 hover:border-cyan-500/30 hover:bg-white/10'
                   }`}
                 >
                   {draggedStepIndex === index && (
-                    <div className="absolute inset-0 bg-blue-500/5 rounded-2xl flex items-center justify-center z-20 pointer-events-none">
-                      <div className="bg-blue-600 text-white px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-[0.2em] shadow-2xl flex items-center gap-2 border border-blue-400/30">
+                    <div className="absolute inset-0 bg-cyan-500/5 rounded-2xl flex items-center justify-center z-20 pointer-events-none">
+                      <div className="bg-cyan-500 text-black px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-[0.2em] shadow-2xl flex items-center gap-2 border border-cyan-400/30">
                         <MoveVertical size={14} />
                         Spostamento...
                       </div>
@@ -517,23 +517,23 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                   )}
 
                   {/* Drag Handle & Reorder Buttons */}
-                  <div className="flex flex-col items-center gap-1.5 mt-1 bg-black/20 p-1.5 rounded-lg border border-white/5">
+                  <div className="flex flex-col items-center gap-1.5 self-stretch justify-center bg-black/40 px-2 py-3 rounded-xl border border-white/5">
                     <button
                       type="button"
                       onClick={() => moveStep(index, index - 1)}
                       disabled={index === 0}
-                      className="p-1 text-gray-600 hover:text-blue-400 disabled:opacity-20 transition-all active:scale-90"
+                      className="p-1 text-gray-500 hover:text-cyan-400 disabled:opacity-0 transition-all active:scale-90"
                     >
                       <ChevronUp size={18} />
                     </button>
-                    <div className="cursor-grab active:cursor-grabbing p-1 text-gray-700 hover:text-blue-500 transition-colors">
+                    <div className="cursor-grab active:cursor-grabbing p-1 text-cyan-400/60 hover:text-cyan-400 transition-colors">
                       <MoveVertical size={16} />
                     </div>
                     <button
                       type="button"
                       onClick={() => moveStep(index, index + 1)}
                       disabled={index === boSteps.length - 1}
-                      className="p-1 text-gray-600 hover:text-blue-400 disabled:opacity-20 transition-all active:scale-90"
+                      className="p-1 text-gray-500 hover:text-cyan-400 disabled:opacity-0 transition-all active:scale-90"
                     >
                       <ChevronDown size={18} />
                     </button>
@@ -547,7 +547,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                           placeholder="0:00"
                           value={step.time}
                           onChange={(e) => updateStep(index, 'time', e.target.value)}
-                          className="w-20 bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-yellow-400 focus:outline-none focus:border-yellow-500/50 transition-all font-mono text-center shadow-inner"
+                          className="w-20 bg-black/60 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-cyan-400 focus:outline-none focus:border-cyan-500 font-mono text-center shadow-inner placeholder:text-cyan-900"
                         />
                       </div>
                       <div className="flex-1">
@@ -556,14 +556,14 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                           value={step.action}
                           onChange={(e) => updateStep(index, 'action', e.target.value)}
                           placeholder="Azione principale..."
-                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-700 focus:border-blue-500/50 outline-none transition-all font-bold text-sm shadow-inner"
+                          className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder:text-white/20 focus:border-cyan-500 outline-none transition-all font-bold text-sm shadow-inner"
                         />
                       </div>
                       {boSteps.length > 1 && (
                         <button
                           type="button"
                           onClick={() => removeStep(index)}
-                          className="p-2.5 text-gray-600 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all opacity-0 group-hover:opacity-100 active:scale-90"
+                          className="p-2.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all opacity-0 group-hover:opacity-100 active:scale-90"
                         >
                           <Trash2 size={18} />
                         </button>
@@ -573,7 +573,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                       placeholder="Dettagli e note aggiuntive..."
                       value={step.note}
                       onChange={(e) => updateStep(index, 'note', e.target.value)}
-                      className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-white placeholder:text-gray-700 focus:border-blue-500/30 outline-none transition-all italic text-[11px] h-16 resize-none shadow-inner leading-relaxed"
+                      className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-white placeholder:text-white/10 focus:border-cyan-500 outline-none transition-all italic text-[11px] h-16 resize-none shadow-inner leading-relaxed"
                     />
                   </div>
                 </div>
@@ -630,12 +630,12 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
         {section !== '' && (
           <div className="space-y-6 pt-2">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Fonte / Video (opzionale)</label>
+              <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Fonte / Video (opzionale)</label>
               <input
                 type="text"
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
-                className="w-full bg-[#16171d]/60 backdrop-blur-md border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-all placeholder:text-gray-600"
+                className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-cyan-500/50 transition-all placeholder:text-white/20"
                 placeholder={section === 'build_order' ? "Link YouTube o guida esterna..." : "es. AoE4 World, Pro Player, Patch Notes..."}
               />
             </div>
@@ -643,7 +643,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full sm:w-auto sm:px-10 py-4 bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-600 hover:to-blue-500 disabled:from-blue-900 disabled:to-blue-900 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-black uppercase tracking-[0.2em] text-xs shadow-[0_4px_25px_rgba(37,99,235,0.3)] hover:shadow-[0_4px_35px_rgba(37,99,235,0.4)] transition-all mt-2 flex items-center justify-center gap-3 active:scale-[0.98] group"
+              className="w-full sm:w-auto sm:px-10 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-gray-800 disabled:to-gray-900 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-black uppercase tracking-[0.2em] text-xs shadow-[0_4px_25px_rgba(6,182,212,0.2)] hover:shadow-[0_4px_35px_rgba(6,182,212,0.3)] transition-all mt-2 flex items-center justify-center gap-3 active:scale-[0.98] group"
             >
               {isSubmitting ? (
                 <>
