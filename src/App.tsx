@@ -145,8 +145,12 @@ function App() {
   };
 
   const handleSelectCiv = (civId: string, tab?: string) => {
-    if (tab) {
-      navigate(`/civ/${civId}/${tab}`);
+    // Check if we are currently on a civ page and have a tab
+    const currentTab = location.pathname.startsWith('/civ/') ? location.pathname.split('/')[3] : undefined;
+    const activeTab = tab || currentTab;
+
+    if (activeTab) {
+      navigate(`/civ/${civId}/${activeTab}`);
     } else {
       navigate(`/civ/${civId}`);
     }
