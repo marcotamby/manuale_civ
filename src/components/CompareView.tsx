@@ -251,7 +251,7 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
                 <ChevronUp size={16} className="text-emerald-400" />
                 Punti di Forza
               </h3>
-              <div className="glass p-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.03] shadow-[0_0_15px_rgba(16,185,129,0.05)] text-gray-300 text-[11px] md:text-sm leading-relaxed">
+              <div className="bg-slate-900/40 backdrop-blur-md p-5 rounded-2xl border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.05)] text-gray-300 text-[11px] md:text-sm leading-relaxed">
                 <div className="space-y-3">
                   {civ!.strengths && civ!.strengths.length > 0 ? (
                     civ!.strengths.map((str, idx) => (
@@ -277,7 +277,7 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
                 <ChevronDown size={16} className="text-rose-400" />
                 Punti Deboli
               </h3>
-              <div className="glass p-5 rounded-2xl border border-rose-500/30 bg-rose-500/[0.03] shadow-[0_0_15px_rgba(244,63,94,0.05)] text-gray-300 text-[11px] md:text-sm leading-relaxed">
+              <div className="bg-slate-900/40 backdrop-blur-md p-5 rounded-2xl border border-rose-500/30 shadow-[0_0_15px_rgba(244,63,94,0.05)] text-gray-300 text-[11px] md:text-sm leading-relaxed">
                 <div className="space-y-3">
                   {civ!.weaknesses && civ!.weaknesses.length > 0 ? (
                     civ!.weaknesses.map((wk, idx) => (
