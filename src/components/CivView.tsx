@@ -879,12 +879,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                               <span key={i} className={`text-lg filter ${i < bo.difficulty ? 'text-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.8)]' : 'text-white/30'}`}>⭐</span>
                             ))}
                           </div>
-                          {bo.map && (
-                            <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg border border-white/10 text-[10px] font-bold text-white uppercase tracking-tighter">
-                              <Map size={10} className="text-yellow-500" />
-                              {bo.map}
-                            </div>
-                          )}
                         </div>
                       </div>
 

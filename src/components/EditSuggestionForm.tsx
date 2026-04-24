@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
-import { Trash2, Plus, User, CheckCircle, XCircle, X, Upload, Loader2, MousePointer2, MoveVertical } from 'lucide-react';
+import { Trash2, Plus, User, CheckCircle, XCircle, X, Upload, Loader2, MousePointer2, MoveVertical, Map } from 'lucide-react';
 import type { ToastType } from './Toast';
 
 interface SuggestionFormProps {
@@ -21,6 +21,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
   const [difficulty, setDifficulty] = useState<number>(2);
   const [bannerUrl, setBannerUrl] = useState('');
   const [bannerPosition, setBannerPosition] = useState<number>(50);
+  const [map, setMap] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
     isVisible: false,
@@ -86,6 +87,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
     setDifficulty(2);
     setBannerUrl('');
     setBannerPosition(50);
+    setMap('');
     setIsSigned(false);
   }, [user?.email]);
 
@@ -161,7 +163,8 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
           banner_url: bannerUrl,
           banner_position: bannerPosition,
           steps: boSteps,
-          source: source
+          source: source,
+          map: map
         };
         submissionText = JSON.stringify(boData);
       } else {
@@ -199,6 +202,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
       setBoSteps([{ time: '', action: '', note: '' }]); // Reset build order steps
       setDifficulty(2);
       setBannerUrl('');
+      setMap('');
       setIsSigned(false);
     } catch (err: any) {
       console.error('Error submitting suggestion:', err);
@@ -337,6 +341,19 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                <Map size={12} className="text-yellow-500" /> Mappa Consigliata
+              </label>
+              <input
+                type="text"
+                placeholder="es. Arabia, Isole, ecc."
+                value={map}
+                onChange={(e) => setMap(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
+              />
             </div>
 
             <div className="space-y-2">
