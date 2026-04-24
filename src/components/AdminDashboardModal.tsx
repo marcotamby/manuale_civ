@@ -263,8 +263,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     }
   };
 
-  const handleUpdateStatus = async (sugg: Suggestion, newStatus: 'implemented' | 'rejected', reason?: string) => {
-    if (!isSuperAdmin) return;
+   const handleUpdateStatus = async (sugg: Suggestion, newStatus: 'implemented' | 'rejected', reason?: string) => {
+    const canManage = (sugg.section === 'build_order' && canManageBuildorders) || (sugg.section !== 'build_order' && canManageCivs);
+    if (!isSuperAdmin && !canManage) return;
     try {
       if (newStatus === 'implemented') {
         const { data: currentCiv, error: fetchError } = await supabase
@@ -368,6 +369,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       if (newStatus === 'implemented') {
         refreshCivs();
       }
+      
+      // Refresh the notification count in the Topbar immediately
+      (window as any).refreshNotificationCount?.();
     } catch (err: any) {
       console.error('Error updating suggestion:', err);
       setToast({
@@ -410,6 +414,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       } else {
         setAnswers(prev => prev.filter(a => a.id !== item.id));
       }
+
+      // Refresh the notification count in the Topbar immediately
+      (window as any).refreshNotificationCount?.();
     } catch (err: any) {
       console.error(`Error updating ${type} status:`, err);
       setToast({ isVisible: true, message: 'Errore nell\'operazione', type: 'error' });

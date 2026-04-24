@@ -30,8 +30,8 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
 
   const fetchPendingCount = async () => {
     try {
-      // Fetch suggestions count (only if superadmin)
-      if (isSuperAdmin) {
+      // Fetch suggestions count (for all admins who can manage content)
+      if (isAdmin) {
         const { count, error } = await supabase
           .from('suggestions')
           .select('*', { count: 'exact', head: true })
@@ -62,9 +62,9 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
     if (isAuthenticated && isAdmin) {
       fetchPendingCount();
 
-      // Real-time subscription to suggestions (superadmin only)
+      // Real-time subscription to suggestions (all admins)
       let suggestionChannel: any;
-      if (isSuperAdmin) {
+      if (isAdmin) {
         suggestionChannel = supabase
           .channel('suggestions-count')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'suggestions' }, () => fetchPendingCount())
