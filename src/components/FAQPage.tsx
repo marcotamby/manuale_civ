@@ -1,9 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  HelpCircle, Info, Layers, Zap, Heart, GitPullRequest, ArrowLeft, 
-  Users, Shield, PlayCircle, BookOpen, Sword, Edit3, Save, Plus, Trash2, X, ChevronUp, ChevronDown, Loader2, CheckCircle, Trophy
+  Users, Shield, PlayCircle, BookOpen, Sword, Edit3, Save, Plus, Trash2, X, ChevronUp, ChevronDown, Loader2, CheckCircle, Trophy, GripVertical
 } from 'lucide-react';
+import {
+  DndContext, 
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToFirstScrollableAncestor } from '@dnd-kit/modifiers';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { Toast } from './Toast';
@@ -99,6 +113,111 @@ const IconComponent = ({ name, size = 18, className = "" }: { name: string, size
   return <Icon size={size} className={className} />;
 };
 
+interface SortableItemProps {
+  item: FAQItem;
+  sIdx: number;
+  iIdx: number;
+  isEditing: boolean;
+  isExpanded: boolean;
+  onToggle: () => void;
+  onRemove: () => void;
+  onUpdate: (field: keyof FAQItem, value: any) => void;
+}
+
+function SortableFAQItem({ item, sIdx, iIdx, isEditing, isExpanded, onToggle, onRemove, onUpdate }: SortableItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: `${sIdx}-${item.id || iIdx}` });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : 'auto',
+    opacity: isDragging ? 0.6 : 1,
+  };
+
+  return (
+    <div 
+      ref={setNodeRef}
+      style={style}
+      className={`glass p-5 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-all group relative ${!isEditing ? 'cursor-pointer md:cursor-default' : ''} ${!isEditing && isExpanded ? 'border-blue-500/30' : ''} ${isDragging ? 'shadow-[0_0_20px_rgba(59,130,246,0.3)]' : ''}`}
+      onClick={() => !isEditing && onToggle()}
+    >
+      {isEditing && (
+        <>
+          <div 
+            {...attributes} 
+            {...listeners}
+            className="absolute left-2 top-2 p-1 text-gray-600 hover:text-blue-400 cursor-grab active:cursor-grabbing z-20"
+            title="Trascina per spostare"
+          >
+            <GripVertical size={16} />
+          </div>
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+            className="absolute -top-2 -right-2 p-1.5 bg-red-600 rounded-full text-white shadow-lg z-20 hover:scale-110 transition-transform hover:bg-red-500"
+          >
+            <X size={12} />
+          </button>
+        </>
+      )}
+      
+      {isEditing ? (
+        <div className="space-y-3 pt-4">
+          <div className="flex gap-2">
+            <select 
+              value={item.icon_name}
+              onChange={(e) => onUpdate('icon_name', e.target.value)}
+              className="bg-black/50 border border-white/10 rounded-lg px-2 py-1 text-sm text-blue-400 focus:border-blue-400 focus:outline-none transition-all"
+            >
+              {['Layers', 'Zap', 'Heart', 'GitPullRequest', 'Users', 'Shield', 'PlayCircle', 'BookOpen', 'Sword', 'Info', 'HelpCircle'].map(icon => (
+                <option key={icon} value={icon}>{icon}</option>
+              ))}
+            </select>
+            <input 
+              value={item.label}
+              onChange={(e) => onUpdate('label', e.target.value)}
+              className="flex-1 bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-base font-bold text-white focus:border-blue-400 focus:outline-none transition-all"
+            />
+          </div>
+          <textarea 
+            value={item.description}
+            onChange={(e) => onUpdate('description', e.target.value)}
+            className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-sm text-gray-300 h-32 resize-none focus:border-blue-400 focus:outline-none transition-all leading-relaxed"
+          />
+        </div>
+      ) : (
+        <>
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/5 rounded-lg group-hover:bg-blue-500/10 transition-colors text-blue-400 shrink-0">
+                 <IconComponent name={item.icon_name} />
+              </div>
+              <h3 className="font-bold text-white tracking-wide">{item.label}</h3>
+            </div>
+            <div className="md:hidden">
+              {isExpanded ? <ChevronUp size={16} className="text-blue-400" /> : <ChevronDown size={16} className="text-gray-500" />}
+            </div>
+          </div>
+          <div className={`overflow-hidden transition-all duration-300 md:block ${isExpanded ? 'max-h-96 opacity-100 mt-3' : 'max-h-0 opacity-0 md:max-h-96 md:opacity-100'}`}>
+            <p className="text-sm text-gray-400 leading-relaxed border-t border-white/5 pt-3 md:border-0 md:pt-0">
+              {item.description}
+            </p>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export function FAQPage() {
   const navigate = useNavigate();
   const { isSuperAdmin } = useAuth();
@@ -114,6 +233,14 @@ export function FAQPage() {
     message: '',
     type: 'success'
   });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
 
   const toggleItem = (sIdx: number, iIdx: number) => {
     if (window.innerWidth >= 768) return; // Don't toggle on desktop
@@ -177,6 +304,7 @@ export function FAQPage() {
   const handleAddField = (sectionIdx: number) => {
     const newSections = [...sections];
     newSections[sectionIdx].items.push({
+      id: crypto.randomUUID(), // Ensure unique ID for dnd-kit
       label: "Nuovo Elemento",
       description: "Descrizione...",
       icon_name: "Info",
@@ -262,6 +390,18 @@ export function FAQPage() {
     }
   };
 
+  const handleDragEnd = (event: DragEndEvent, sectionIdx: number) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = sections[sectionIdx].items.findIndex(i => `${sectionIdx}-${i.id || sections[sectionIdx].items.indexOf(i)}` === active.id);
+    const newIndex = sections[sectionIdx].items.findIndex(i => `${sectionIdx}-${i.id || sections[sectionIdx].items.indexOf(i)}` === over.id);
+
+    const newSections = [...sections];
+    newSections[sectionIdx].items = arrayMove(newSections[sectionIdx].items, oldIndex, newIndex);
+    setSections(newSections);
+  };
+
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center bg-[#0d1424]">
@@ -279,7 +419,7 @@ export function FAQPage() {
             className="flex items-center gap-2 text-blue-400 hover:text-cyan-300 transition-all hover:translate-x-[-4px]"
           >
             <ArrowLeft size={20} />
-            <span className="font-sans font-bold uppercase text-xs tracking-widest">Torna alla Dashboard</span>
+            <span className="font-sans font-bold uppercase text-xs tracking-widest">Torna alla Home</span>
           </button>
 
           {isSuperAdmin && (
@@ -415,97 +555,47 @@ export function FAQPage() {
                 </h2>
               )}
 
-              <div className="grid md:grid-cols-2 gap-4">
-                {section.items.map((item, iIdx) => {
-                  const isExpanded = expandedItems[`${sIdx}-${iIdx}`];
-                  return (
-                    <div 
-                      key={iIdx} 
-                      onClick={() => !isEditing && toggleItem(sIdx, iIdx)}
-                      className={`glass p-5 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-all group relative ${!isEditing ? 'cursor-pointer md:cursor-default' : ''} ${!isEditing && isExpanded ? 'border-blue-500/30' : ''}`}
-                    >
-                      {isEditing && (
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemoveItem(sIdx, iIdx);
-                          }}
-                          className="absolute -top-2 -right-2 p-1 bg-red-600 rounded-full text-white shadow-lg z-10 hover:scale-110 transition-transform"
-                        >
-                          <X size={12} />
-                        </button>
-                      )}
-                      
-                      {isEditing ? (
-                        <div className="space-y-3">
-                          <div className="flex gap-2">
-                            <select 
-                              value={item.icon_name}
-                              onChange={(e) => {
-                                const next = [...sections];
-                                next[sIdx].items[iIdx].icon_name = e.target.value;
-                                setSections(next);
-                              }}
-                              className="bg-black/50 border border-white/10 rounded-lg px-2 py-1 text-sm text-blue-400 focus:border-blue-400 focus:outline-none transition-all"
-                            >
-                              {['Layers', 'Zap', 'Heart', 'GitPullRequest', 'Users', 'Shield', 'PlayCircle', 'BookOpen', 'Sword', 'Info', 'HelpCircle'].map(icon => (
-                                <option key={icon} value={icon}>{icon}</option>
-                              ))}
-                            </select>
-                            <input 
-                              value={item.label}
-                              onChange={(e) => {
-                                const next = [...sections];
-                                next[sIdx].items[iIdx].label = e.target.value;
-                                setSections(next);
-                              }}
-                              className="flex-1 bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-base font-bold text-white focus:border-blue-400 focus:outline-none transition-all"
-                            />
-                          </div>
-                          <textarea 
-                            value={item.description}
-                            onChange={(e) => {
-                              const next = [...sections];
-                              next[sIdx].items[iIdx].description = e.target.value;
-                              setSections(next);
-                            }}
-                            className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-sm text-gray-300 h-32 resize-none focus:border-blue-400 focus:outline-none transition-all leading-relaxed"
-                          />
-                        </div>
-                      ) : (
-                        <>
-                          <div className="flex items-center justify-between gap-3 mb-3">
-                            <div className="flex items-center gap-3">
-                              <div className="p-2 bg-white/5 rounded-lg group-hover:bg-blue-500/10 transition-colors text-blue-400 shrink-0">
-                                 <IconComponent name={item.icon_name} />
-                              </div>
-                              <h3 className="font-bold text-white tracking-wide">{item.label}</h3>
-                            </div>
-                            <div className="md:hidden">
-                              {isExpanded ? <ChevronUp size={16} className="text-blue-400" /> : <ChevronDown size={16} className="text-gray-500" />}
-                            </div>
-                          </div>
-                          <div className={`overflow-hidden transition-all duration-300 md:block ${isExpanded ? 'max-h-96 opacity-100 mt-3' : 'max-h-0 opacity-0 md:max-h-96 md:opacity-100'}`}>
-                            <p className="text-sm text-gray-400 leading-relaxed border-t border-white/5 pt-3 md:border-0 md:pt-0">
-                              {item.description}
-                            </p>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  );
-                })}
-
-                {isEditing && (
-                  <button 
-                    onClick={() => handleAddField(sIdx)}
-                    className="flex flex-col items-center justify-center p-5 rounded-2xl border-2 border-dashed border-white/10 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group"
+              <DndContext 
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={(e) => handleDragEnd(e, sIdx)}
+                modifiers={[restrictToFirstScrollableAncestor]}
+              >
+                <div className="grid md:grid-cols-2 gap-4">
+                  <SortableContext 
+                    items={section.items.map((item, iIdx) => `${sIdx}-${item.id || iIdx}`)}
+                    strategy={rectSortingStrategy}
                   >
-                    <Plus className="text-gray-500 group-hover:text-blue-400 transition-colors mb-2" />
-                    <span className="text-xs font-bold text-gray-500 group-hover:text-blue-400 uppercase">Aggiungi Elemento</span>
-                  </button>
-                )}
-              </div>
+                    {section.items.map((item, iIdx) => (
+                      <SortableFAQItem 
+                        key={`${sIdx}-${item.id || iIdx}`}
+                        item={item}
+                        sIdx={sIdx}
+                        iIdx={iIdx}
+                        isEditing={isEditing}
+                        isExpanded={expandedItems[`${sIdx}-${iIdx}`]}
+                        onToggle={() => toggleItem(sIdx, iIdx)}
+                        onRemove={() => handleRemoveItem(sIdx, iIdx)}
+                        onUpdate={(field, value) => {
+                          const next = [...sections];
+                          next[sIdx].items[iIdx] = { ...next[sIdx].items[iIdx], [field]: value };
+                          setSections(next);
+                        }}
+                      />
+                    ))}
+                  </SortableContext>
+
+                  {isEditing && (
+                    <button 
+                      onClick={() => handleAddField(sIdx)}
+                      className="flex flex-col items-center justify-center p-5 rounded-2xl border-2 border-dashed border-white/10 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group"
+                    >
+                      <Plus className="text-gray-500 group-hover:text-blue-400 transition-colors mb-2" />
+                      <span className="text-xs font-bold text-gray-500 group-hover:text-blue-400 uppercase">Aggiungi Elemento</span>
+                    </button>
+                  )}
+                </div>
+              </DndContext>
             </div>
           ))}
 
