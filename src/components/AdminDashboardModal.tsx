@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, Trophy, BookOpen, Zap, Edit2 } from 'lucide-react';
+import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, Trophy, BookOpen, Zap, Edit2, Check } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
@@ -56,6 +56,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [tempNickname, setTempNickname] = useState('');
   const [isSavingNickname, setIsSavingNickname] = useState<string | null>(null);
   const [savedSuccess, setSavedSuccess] = useState<string | null>(null);
+  const [addSuccess, setAddSuccess] = useState(false);
   const [recentlyAddedEmails, setRecentlyAddedEmails] = useState<Set<string>>(new Set());
 
   const getYoutubeId = (url: string) => {
@@ -128,10 +129,10 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     }
   };
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (silent = false) => {
     if (!isSuperAdmin) return;
     try {
-      setUserLoading(true);
+      if (!silent) setUserLoading(true);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -151,25 +152,27 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const handleAddUser = async () => {
     if (!newUemail.trim() || !isSuperAdmin) return;
     try {
-      setUserLoading(true);
       const email = newUemail.trim().toLowerCase();
-
       const { error } = await supabase
         .from('profiles')
         .upsert({ email }, { onConflict: 'email' });
 
       if (error) throw error;
 
-      setNewUemail('');
-      setIsAddingUser(false);
+      setAddSuccess(true);
+      setTimeout(() => {
+        setAddSuccess(false);
+        setIsAddingUser(false);
+        setNewUemail('');
+      }, 1500);
+
       setRecentlyAddedEmails(prev => new Set(prev).add(email));
-      await fetchUsers();
-      setToast({ isVisible: true, message: 'Email aggiunta alla lista', type: 'success' });
+      await fetchUsers(true);
     } catch (err: any) {
       console.error('Error adding user:', err);
       setToast({ isVisible: true, message: 'Errore durante l\'aggiunta', type: 'error' });
     } finally {
-      setUserLoading(false);
+      // Done
     }
   };
 
@@ -186,7 +189,6 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       setUsers(prev => prev.map(u => u.email === email ? { ...u, nickname } : u));
       setEditingNickname(null);
       setSavedSuccess(email);
-      setToast({ isVisible: true, message: 'Nickname aggiornato!', type: 'success' });
       setTimeout(() => setSavedSuccess(null), 3000);
     } catch (err: any) {
       console.error('Error updating nickname:', err);
@@ -751,10 +753,11 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                       />
                       <button
                         onClick={handleAddUser}
-                        disabled={!newUemail.trim()}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs uppercase disabled:opacity-50"
+                        disabled={!newUemail.trim() || addSuccess}
+                        className={`px-4 py-2 ${addSuccess ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-500'} text-white rounded-xl font-bold text-xs uppercase disabled:opacity-50 transition-all flex items-center gap-2`}
                       >
-                        Aggiungi
+                        {addSuccess ? <Check size={14} /> : null}
+                        {addSuccess ? 'Aggiunto' : 'Aggiungi'}
                       </button>
                       <button
                         onClick={() => { setIsAddingUser(false); setNewUemail(''); }}
@@ -855,7 +858,11 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                         onBlur={() => { if (!isSavingNickname) setEditingNickname(null); }}
                                       />
                                       <button
-                                        onClick={() => handleUpdateNickname(u.email, tempNickname)}
+                                        type="button"
+                                        onMouseDown={(e) => {
+                                          e.preventDefault();
+                                          handleUpdateNickname(u.email, tempNickname);
+                                        }}
                                         disabled={isSavingNickname === u.email}
                                         className="text-green-500 hover:text-green-400 disabled:opacity-50"
                                       >

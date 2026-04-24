@@ -851,7 +851,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                             e.stopPropagation();
                             (window as any).openBOEditor?.(civId, idx);
                           }}
-                          className="absolute top-3 right-3 z-[20] p-2 bg-black/40 hover:bg-white text-white/40 hover:text-black rounded-lg border border-white/10 transition-all shadow-xl group-hover:border-white/20"
+                          className="absolute top-3 right-3 z-[20] p-2 bg-black/60 hover:bg-white text-white hover:text-black rounded-lg border border-white/20 transition-all shadow-xl"
                           title="Modifica Build Order"
                         >
                           <Edit size={14} />
