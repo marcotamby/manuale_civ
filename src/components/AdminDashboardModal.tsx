@@ -59,6 +59,8 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [addSuccess, setAddSuccess] = useState(false);
   const [recentlyAddedEmails, setRecentlyAddedEmails] = useState<Set<string>>(new Set());
   const [inlineToast, setInlineToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteSuccess, setDeleteSuccess] = useState(false);
 
   const getYoutubeId = (url: string) => {
     if (!url) return null;
@@ -154,10 +156,11 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     if (!newUemail.trim() || !isSuperAdmin) return;
     try {
       const email = newUemail.trim().toLowerCase();
-      // We set role: 'editor' as a baseline so they appear in the staff list persistently
+      // We set role: 'staff' as a baseline so they appear in the staff list persistently
+      // This role grants NO permissions in AuthContext but keeps them in this list.
       const { error } = await supabase
         .from('profiles')
-        .upsert({ email, role: 'editor' }, { onConflict: 'email' });
+        .upsert({ email, role: 'staff' }, { onConflict: 'email' });
 
       if (error) throw error;
 
@@ -204,14 +207,23 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
   const handleToggleUserRole = async (userEmail: string, field: string, value: any) => {
     try {
+      const user = users.find(u => u.email === userEmail);
+      const updates: any = { [field]: value };
+      
+      // If we are granting a permission and the user has no functional role, 
+      // upgrade them to 'editor' so they can actually access the admin dashboard.
+      if (value === true && (!user?.role || user?.role === 'staff') && field !== 'is_streamer') {
+        updates.role = 'editor';
+      }
+
       const { error } = await supabase
         .from('profiles')
-        .update({ [field]: value })
+        .update(updates)
         .eq('email', userEmail);
 
       if (error) throw error;
 
-      setUsers(prev => prev.map(u => u.email === userEmail ? { ...u, [field]: value } : u));
+      setUsers(prev => prev.map(u => u.email === userEmail ? { ...u, ...updates } : u));
       setToast({ isVisible: true, message: 'Permessi aggiornati', type: 'success' });
     } catch (err: any) {
       console.error('Error updating user role:', err);
@@ -225,9 +237,8 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   };
 
   const executeDeleteUser = async (email: string) => {
+    setIsDeleting(true);
     try {
-      // Instead of hard delete which might fail due to RLS or foreign keys,
-      // we reset all roles and permissions. This removes them from the "Staff" list.
       const { error } = await supabase
         .from('profiles')
         .update({ 
@@ -241,18 +252,18 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
       if (error) throw error;
 
-      setUsers(prev => prev.map(u => u.email === email ? { 
-        ...u, 
-        role: null, 
-        is_streamer: false,
-        can_manage_tournaments: false,
-        can_manage_civs: false,
-        can_manage_buildorders: false
-      } : u));
-      setInlineToast({ message: 'Utente rimosso dallo staff', type: 'success' });
-      setTimeout(() => setInlineToast(null), 3000);
+      setDeleteSuccess(true);
+      // Immediate disappearance from the list
+      setUsers(prev => prev.filter(u => u.email !== email));
+      
+      setTimeout(() => {
+        setDeleteConfirm(null);
+        setDeleteSuccess(false);
+        setIsDeleting(false);
+      }, 1500);
     } catch (err: any) {
       console.error('Error removing user:', err);
+      setIsDeleting(false);
       setInlineToast({ message: 'Errore durante la rimozione', type: 'error' });
       setTimeout(() => setInlineToast(null), 3000);
     }
@@ -873,6 +884,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                           if (!userSearch) {
                             return u.role === 'editor' || 
                                    u.role === 'admin' || 
+                                   u.role === 'staff' || 
                                    u.is_streamer === true || 
                                    u.can_manage_tournaments === true ||
                                    u.can_manage_civs === true ||
@@ -938,6 +950,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                     </div>
                                   )}
                                   {u.role === 'admin' && <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded font-black uppercase">Owner</span>}
+                                  {u.role === 'editor' && <span className="text-[9px] px-1.5 py-0.5 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded font-black uppercase">Editor</span>}
                                 </div>
                                 <span className="text-xs md:text-sm text-gray-500 truncate block">{u.email}</span>
                                 <div className="flex items-center gap-2 mt-0.5">
@@ -1122,42 +1135,56 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       {/* Custom Deletion Confirmation Modal */}
       {deleteConfirm && (
         <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-[#1a1c23] border border-red-500/30 p-8 rounded-3xl max-w-sm w-full shadow-2xl animate-in zoom-in duration-300 text-center">
-            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
-              <AlertTriangle className="text-red-500" size={32} />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">
-              {deleteConfirm.type === 'user' ? 'Rimuovi dallo Staff' : 'Conferma Eliminazione'}
-            </h3>
-            <p className="text-sm text-gray-400 mb-8 leading-relaxed">
-              {deleteConfirm.type === 'user' 
-                ? `Sei sicuro di voler rimuovere l'utente ${deleteConfirm.item} dallo staff? Perderà ogni permesso di gestione.`
-                : `Sei sicuro di voler eliminare definitivamente questa ${deleteConfirm.type === 'question' ? 'domanda' : 'risposta'}?`}
-            </p>
+          <div className={`bg-[#1a1c23] border p-8 rounded-3xl max-w-sm w-full shadow-2xl animate-in zoom-in duration-300 text-center transition-colors ${deleteSuccess ? 'border-green-500/30' : 'border-red-500/30'}`}>
+            {deleteSuccess ? (
+              <div className="py-4 animate-in zoom-in duration-300">
+                <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/20">
+                  <CheckCircle className="text-green-500" size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Rimosso con Successo</h3>
+                <p className="text-sm text-gray-400">L'azione è stata completata correttamente.</p>
+              </div>
+            ) : (
+              <>
+                <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
+                  <AlertTriangle className="text-red-500" size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">
+                  {deleteConfirm.type === 'user' ? 'Rimuovi dallo Staff' : 'Conferma Eliminazione'}
+                </h3>
+                <p className="text-sm text-gray-400 mb-8 leading-relaxed">
+                  {deleteConfirm.type === 'user' 
+                    ? `Sei sicuro di voler rimuovere l'utente ${deleteConfirm.item} dallo staff? Perderà ogni permesso di gestione.`
+                    : `Sei sicuro di voler eliminare definitivamente questa ${deleteConfirm.type === 'question' ? 'domanda' : 'risposta'}?`}
+                </p>
 
-            <div className="flex gap-3">
-              <button
-                onClick={() => setDeleteConfirm(null)}
-                className="flex-1 px-4 py-2.5 border border-white/10 text-gray-400 rounded-xl hover:bg-white/5 transition-colors font-bold text-xs uppercase"
-              >
-                Annulla
-              </button>
-              <button
-                onClick={async () => {
-                  const item = deleteConfirm.item;
-                  const type = deleteConfirm.type;
-                  setDeleteConfirm(null);
-                  if (type === 'user') {
-                    executeDeleteUser(item);
-                  } else {
-                    handleUpdateQAStatus(item, type, 'deleted');
-                  }
-                }}
-                className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl transition-all font-bold text-xs uppercase shadow-lg shadow-red-600/20"
-              >
-                {deleteConfirm.type === 'user' ? 'Rimuovi Ora' : 'Elimina Ora'}
-              </button>
-            </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setDeleteConfirm(null)}
+                    disabled={isDeleting}
+                    className="flex-1 px-4 py-2.5 border border-white/10 text-gray-400 rounded-xl hover:bg-white/5 transition-colors font-bold text-xs uppercase disabled:opacity-50"
+                  >
+                    Annulla
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const item = deleteConfirm.item;
+                      const type = deleteConfirm.type;
+                      if (type === 'user') {
+                        executeDeleteUser(item);
+                      } else {
+                        setDeleteConfirm(null);
+                        handleUpdateQAStatus(item, type, 'deleted');
+                      }
+                    }}
+                    disabled={isDeleting}
+                    className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl transition-all font-bold text-xs uppercase shadow-lg shadow-red-600/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {isDeleting ? <Loader2 size={14} className="animate-spin" /> : (deleteConfirm.type === 'user' ? 'Rimuovi Ora' : 'Elimina Ora')}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
