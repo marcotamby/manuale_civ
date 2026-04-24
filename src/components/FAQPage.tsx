@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { 
+  HelpCircle, Info, Layers, Zap, Heart, GitPullRequest, ArrowLeft, 
   Users, Shield, PlayCircle, BookOpen, Sword, Edit3, Save, Plus, Trash2, X, ChevronUp, ChevronDown, Loader2, CheckCircle, Trophy, GripVertical
 } from 'lucide-react';
 import {
@@ -8,7 +10,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent
+  type DragEndEvent
 } from '@dnd-kit/core';
 import {
   arrayMove,
