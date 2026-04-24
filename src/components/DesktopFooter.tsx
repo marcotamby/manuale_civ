@@ -18,7 +18,7 @@ export function DesktopFooter() {
             className="flex items-center gap-2 text-[13px] font-bold text-white/70 hover:text-purple-400 transition-all group"
           >
             <Twitch size={16} className="group-hover:scale-110 transition-transform" />
-            <span>Twitch <span className="text-white/30 font-medium">Aoeitalia</span></span>
+            <span>Twitch <span className="text-white/20 font-medium">Aoeitalia</span></span>
           </a>
 
           <a 
@@ -28,7 +28,7 @@ export function DesktopFooter() {
             className="flex items-center gap-2 text-[13px] font-bold text-white/70 hover:text-red-500 transition-all group"
           >
             <Youtube size={16} className="group-hover:scale-110 transition-transform" />
-            <span>YouTube <span className="text-white/30 font-medium">Marcotamby</span></span>
+            <span>YouTube <span className="text-white/20 font-medium">Marcotamby</span></span>
           </a>
 
           <a 
@@ -38,7 +38,7 @@ export function DesktopFooter() {
             className="flex items-center gap-2 text-[13px] font-bold text-white/70 hover:text-red-500 transition-all group"
           >
             <Youtube size={16} className="group-hover:scale-110 transition-transform" />
-            <span>YouTube <span className="text-white/30 font-medium">Aoeitalia</span></span>
+            <span>YouTube <span className="text-white/20 font-medium">Aoeitalia</span></span>
           </a>
         </div>
       </div>
