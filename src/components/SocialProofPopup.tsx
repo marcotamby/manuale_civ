@@ -68,12 +68,12 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
         
         <button 
           onClick={handleDismiss}
-          className="absolute top-1 right-1 p-1.5 text-gray-500 hover:text-white transition-colors z-10 sm:top-3 sm:right-3"
+          className="absolute top-1 right-1 p-1.5 text-gray-500 hover:text-white transition-colors z-20 sm:top-3.5 sm:right-3.5"
         >
-          <X size={18} className="sm:w-4.5 sm:h-4.5" />
+          <X size={22} className="sm:w-5.5 sm:h-5.5" />
         </button>
 
-        <div className="flex items-center sm:flex-col gap-2 sm:gap-4 pr-8 sm:pr-0">
+        <div className="flex items-center sm:flex-col gap-2 sm:gap-4 pr-10 sm:pr-0">
           <div className="w-9 h-9 sm:w-14 sm:h-14 rounded-full bg-blue-500/10 border border-blue-400/20 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(37,99,235,0.1)]">
             <Heart size={20} className="text-blue-300 fill-blue-300/10 group-hover:scale-110 transition-transform sm:w-7 sm:h-7" />
           </div>
@@ -86,8 +86,19 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
             </div>
             
             <p className="text-[11px] sm:text-sm text-gray-200 leading-tight">
-              <span className="font-bold text-white text-base sm:block sm:text-lg">{favoriteCount} {favoriteCount === 1 ? 'utente' : 'utenti'}</span> 
-              <span className="sm:text-[11px] text-gray-400 font-medium">hanno scelto i </span>
+              <span className="font-bold text-white text-base sm:block sm:text-lg">
+                {favoriteCount} {favoriteCount === 1 ? 'persona' : 'persone'}
+              </span> 
+              <span className="sm:text-[11px] text-gray-400 font-medium">
+                {favoriteCount === 1 ? ' ha scelto ' : ' hanno scelto '}
+                {(() => {
+                  const n = civName.toLowerCase();
+                  if (/^[aeiou]/.test(n) || n.startsWith('z') || n.startsWith('ps') || n.startsWith('gn') || (n.startsWith('s') && !/^[aeiou]/.test(n[1]))) {
+                    return 'gli ';
+                  }
+                  return 'i ';
+                })()}
+              </span>
               <span className="text-blue-200 font-bold sm:text-[11px]">{civName}</span>! 
             </p>
           </div>
