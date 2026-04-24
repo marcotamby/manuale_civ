@@ -495,12 +495,20 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                   onDragEnd={handleDragEnd}
                   className={`flex items-start gap-4 p-4 bg-white/5 rounded-xl border transition-all group relative ${
                     draggedStepIndex === index 
-                      ? 'opacity-30 border-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.2)]' 
+                      ? 'border-dashed border-blue-500 bg-blue-500/10 shadow-[0_0_40px_rgba(59,130,246,0.3)] scale-[0.98] rotate-1' 
                       : droppedIndex === index
                         ? 'border-green-500 bg-green-500/5 shadow-[0_0_20px_rgba(34,197,94,0.2)] scale-[1.01]'
                         : 'border-white/10 hover:border-blue-500/30'
                   }`}
                 >
+                  {draggedStepIndex === index && (
+                    <div className="absolute inset-0 bg-blue-500/10 backdrop-blur-[2px] rounded-xl flex items-center justify-center z-20 pointer-events-none">
+                      <div className="bg-blue-600 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl flex items-center gap-2 border border-blue-400/50">
+                        <MoveVertical size={14} className="animate-bounce" />
+                        Spostamento...
+                      </div>
+                    </div>
+                  )}
                   {/* Drag Handle & Reorder Buttons */}
                   <div className="flex flex-col items-center gap-1 mt-1">
                     <button
