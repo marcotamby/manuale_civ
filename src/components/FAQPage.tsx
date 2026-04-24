@@ -147,25 +147,24 @@ function SortableFAQItem({ item, sIdx, iIdx, isEditing, isExpanded, onToggle, on
     <div 
       ref={setNodeRef}
       style={style}
+      {...(isEditing ? { ...attributes, ...listeners } : {})}
       className={`glass p-5 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-all group relative ${!isEditing ? 'cursor-pointer md:cursor-default' : ''} ${!isEditing && isExpanded ? 'border-blue-500/30' : ''} ${isDragging ? 'shadow-[0_0_20px_rgba(59,130,246,0.3)]' : ''}`}
       onClick={() => !isEditing && onToggle()}
     >
       {isEditing && (
         <>
           <div 
-            {...attributes} 
-            {...listeners}
-            className="absolute left-2 top-2 p-1 text-gray-600 hover:text-blue-400 cursor-grab active:cursor-grabbing z-20"
-            title="Trascina per spostare"
+            className="absolute left-2 top-2 p-1 text-blue-400/50 group-hover:text-blue-400 cursor-grab active:cursor-grabbing z-20 transition-colors shadow-[0_0_10px_rgba(96,165,250,0.2)]"
+            title="Trascina qualsiasi punto del box per spostare"
           >
-            <GripVertical size={16} />
+            <GripVertical size={18} className="drop-shadow-[0_0_5px_rgba(96,165,250,0.5)]" />
           </div>
           <button 
             onClick={(e) => {
               e.stopPropagation();
               onRemove();
             }}
-            className="absolute -top-2 -right-2 p-1.5 bg-red-600 rounded-full text-white shadow-lg z-20 hover:scale-110 transition-transform hover:bg-red-500"
+            className="absolute -top-2 -right-2 p-1.5 bg-red-600 rounded-full text-white shadow-lg z-30 hover:scale-110 transition-transform hover:bg-red-500"
           >
             <X size={12} />
           </button>
