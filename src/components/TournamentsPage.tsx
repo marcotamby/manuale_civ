@@ -671,6 +671,7 @@ export function TournamentsPage() {
                                 {hasData ? (
                                   <div className="flex items-center gap-x-1.5 flex-1 min-w-0 group/players">
                                     {entries.map((s, sIdx) => (
+                                      <div key={sIdx} className="relative flex items-center min-w-0 flex-shrink-1">
                                         <div className="relative group/name min-w-0 flex-shrink-1">
                                           <span 
                                             className={clsx(
@@ -694,11 +695,11 @@ export function TournamentsPage() {
                                             <div className="absolute top-full left-4 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-800/95"></div>
                                           </div>
                                         </div>
-                                        {sIdx < entries.length - 1 && <span className="text-gray-600 font-black flex-shrink-0">&</span>}
+                                        {sIdx < entries.length - 1 && <span className="text-gray-600 font-black flex-shrink-0 mx-1">&</span>}
                                         
                                         {/* Players Tooltip */}
                                         {s.players && s.players.length > 0 && (
-                                          <div className="absolute bottom-full left-0 mb-4 p-4 bg-[#1a1f2e] backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-0 group-hover/players:opacity-100 pointer-events-none transition-all duration-300 translate-y-2 group-hover/players:translate-y-0 z-[100] min-w-[180px] border-b-yellow-500/50">
+                                          <div className="absolute bottom-full left-0 mb-4 p-4 bg-[#1a1f2e] backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-0 group-hover/name:opacity-100 pointer-events-none transition-all duration-300 translate-y-2 group-hover/name:translate-y-0 z-[100] min-w-[180px] border-b-yellow-500/50">
                                             <p className="text-[9px] font-black text-yellow-500 uppercase tracking-[0.2em] mb-3 border-b border-white/10 pb-2 flex items-center gap-2">
                                               <Users size={10} /> Componenti Team
                                             </p>
