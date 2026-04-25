@@ -1189,7 +1189,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
                         {/* Author Info */}
                         <div className="bg-white/5 rounded-3xl border border-white/5 p-6 space-y-4">
-                           <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Autore</h4>
+                           <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                             <User size={12} /> Autore
+                           </h4>
                            <div className="flex items-center gap-4">
                               <div className="w-16 h-16 rounded-2xl bg-[#0f1115] border border-blue-500/20 flex items-center justify-center overflow-hidden">
                                  {selectedBO.author_avatar ? (
@@ -1241,7 +1243,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
                         {/* Votes / Feedback */}
                         <div className="bg-white/5 rounded-3xl border border-white/5 p-4 space-y-3">
-                           <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Feedback Community</h4>
+                           <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                             <MessageSquare size={12} /> Feedback Community
+                           </h4>
                            {boMessage && boMessage.id === selectedBO.id && (
                              <div className="text-[10px] font-bold text-center text-yellow-500 bg-yellow-500/10 py-3 rounded-xl border border-yellow-500/20 animate-in slide-in-from-top-2 duration-300">
                                {boMessage.text}
