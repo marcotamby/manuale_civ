@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament, fetchChallongeData } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
-import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, ChevronUp, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings } from 'lucide-react';
+import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, ChevronUp, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
@@ -1228,7 +1228,8 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
     bold: false, italic: false, underline: false,
     alignLeft: false, alignCenter: false, alignRight: false, alignJustify: false,
     font: 'Inter',
-    h2: false
+    h2: false,
+    link: false
   });
 
   useEffect(() => {
@@ -1265,8 +1266,38 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
       alignRight: document.queryCommandState('justifyRight'),
       alignJustify: document.queryCommandState('justifyFull'),
       font: (document.queryCommandValue('fontName') || 'Inter').replace(/['"]/g, ''),
-      h2: isH2
+      h2: isH2,
+      link: document.queryCommandState('createLink')
     });
+  };
+
+  const handleAddLink = (asButton: boolean = false) => {
+    const url = prompt("Inserisci l'URL (es: https://google.com):");
+    if (!url) return;
+    
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0 || selection.toString().length === 0) {
+      const text = prompt("Testo da visualizzare:", asButton ? "CLICCA QUI" : "Link");
+      if (!text) return;
+      
+      const html = asButton 
+        ? `<a href="${url}" target="_blank" class="premium-link-button">${text}</a>`
+        : `<a href="${url}" target="_blank">${text}</a>`;
+      document.execCommand('insertHTML', false, html);
+    } else {
+      if (asButton) {
+        const text = selection.toString();
+        document.execCommand('insertHTML', false, `<a href="${url}" target="_blank" class="premium-link-button">${text}</a>`);
+      } else {
+        document.execCommand('createLink', false, url);
+        // Ensure it opens in new tab
+        const anchor = selection.anchorNode?.parentElement;
+        if (anchor && anchor.tagName === 'A') {
+          anchor.setAttribute('target', '_blank');
+        }
+      }
+    }
+    handleInput();
   };
 
   const handleInput = () => {
@@ -1316,6 +1347,29 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
               <tool.icon size={18}/>
             </button>
           ))}
+        </div>
+
+        <div className="flex items-center gap-1 px-2 border-r border-white/10">
+          <button 
+            type="button"
+            onMouseDown={(e) => { e.preventDefault(); handleAddLink(false); }} 
+            className={clsx(
+              "p-2 rounded-lg transition-all",
+              activeStyles.link ? "bg-blue-500 text-white shadow-lg scale-110" : "text-slate-300 hover:text-white hover:bg-white/10"
+            )}
+            title="Inserisci Link"
+          >
+            <LinkIcon size={18}/>
+          </button>
+          <button 
+            type="button"
+            onMouseDown={(e) => { e.preventDefault(); handleAddLink(true); }} 
+            className="p-2 px-3 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[10px] font-black uppercase tracking-tighter hover:brightness-110 transition-all shadow-lg flex items-center gap-1.5"
+            title="Inserisci Bottone Premium"
+          >
+            <ExternalLink size={14}/>
+            BOTTONE
+          </button>
         </div>
 
         <div className="flex items-center gap-2 px-2 border-r border-white/10 relative group/font">

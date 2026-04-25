@@ -168,3 +168,65 @@ html, body, .elegant-scrollbar {
   margin-left: 1.5rem;
   margin-bottom: 1rem;
 }
+
+/* Premium Link and Button Styles */
+.regulation-editor-content a,
+.regulation-content a {
+  color: #60a5fa !important;
+  text-decoration: underline !important;
+  text-underline-offset: 4px;
+  transition: all 0.2s;
+}
+
+.regulation-editor-content a:hover,
+.regulation-content a:hover {
+  color: #93c5fd !important;
+  text-shadow: 0 0 8px rgba(96, 165, 250, 0.4);
+}
+
+.premium-link-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0.75rem 1.75rem !important;
+  background: linear-gradient(135deg, #1e40af 0%, #0ea5e9 50%, #e2e8f0 100%) !important;
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.15em !important;
+  border-radius: 1.25rem !important;
+  text-decoration: none !important;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  box-shadow: 0 10px 20px -5px rgba(30, 64, 175, 0.5), 0 0 15px rgba(14, 165, 233, 0.3) !important;
+  font-size: 0.7rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  margin: 1rem 0.5rem !important;
+  cursor: pointer !important;
+  position: relative !important;
+  overflow: hidden !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+}
+
+.premium-link-button:hover {
+  transform: translateY(-4px) scale(1.05) !important;
+  box-shadow: 0 15px 30px -5px rgba(30, 64, 175, 0.6), 0 0 25px rgba(14, 165, 233, 0.5) !important;
+  filter: brightness(1.1) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.premium-link-button::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+  transform: rotate(45deg);
+  transition: 0.5s;
+  pointer-events: none;
+}
+
+.premium-link-button:hover::after {
+  left: 100%;
+}
