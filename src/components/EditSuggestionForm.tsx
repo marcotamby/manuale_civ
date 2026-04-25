@@ -284,7 +284,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
     <div className="max-w-2xl">
       <div className="flex items-center gap-2 mb-6 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] bg-cyan-500/10 px-4 py-2.5 rounded-xl border border-cyan-500/30 w-fit shadow-[0_0_20px_rgba(6,182,212,0.1)]">
         <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.5)]" />
-        Loggato come <span className="text-white ml-1">{user?.name}</span>
+        Loggato come <span className="text-white ml-1">{user?.nickname || user?.name}</span>
       </div>
 
       <p className="text-gray-400 text-[13px] font-medium leading-relaxed mb-8 border-l-2 border-cyan-500/30 pl-4">
