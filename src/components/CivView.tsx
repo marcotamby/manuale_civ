@@ -1223,7 +1223,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                   alt="Tutorial Preview" 
                                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                 />
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all">
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/20 md:bg-black/40 md:group-hover:bg-black/20 transition-all">
                                   <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center shadow-xl shadow-black/50 group-hover:scale-110 transition-transform">
                                     <Play size={24} className="text-white fill-white ml-1" />
                                   </div>
