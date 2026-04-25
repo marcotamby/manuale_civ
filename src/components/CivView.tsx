@@ -265,54 +265,61 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     try {
       setQaLoading(true);
       
-      // We'll fetch questions and their answers separately or in one simplified query 
-      // to avoid join-related rows being hidden.
-      const { data, error } = await supabase
+      // Step 1: Fetch questions for this civ
+      const { data: qData, error: qError } = await supabase
         .from('questions')
-        .select(`
-          *,
-          profile:profiles(avatar_url),
-          answers:answers(
-            *,
-            profile:profiles(avatar_url)
-          )
-        `)
+        .select('*, profile:profiles(avatar_url)')
         .ilike('civ_id', civId)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (qError) throw qError;
 
-      // JS Filtering to ensure visibility rules are applied correctly
-      const filteredData = (data || []).filter(q => {
-        const isStaff = isAdmin || canManageCivs || canManageBuildorders;
+      // Step 2: Fetch all answers for these questions
+      const questionIds = (qData || []).map(q => q.id);
+      let aData: any[] = [];
+      
+      if (questionIds.length > 0) {
+        const { data: ansData, error: aError } = await supabase
+          .from('answers')
+          .select('*, profile:profiles(avatar_url)')
+          .in('question_id', questionIds);
+        
+        if (aError) throw aError;
+        aData = ansData || [];
+      }
+
+      const userEmail = user?.email?.toLowerCase();
+      const isStaff = isAdmin || canManageCivs || canManageBuildorders;
+
+      // JS Filtering and Threading
+      const threadedQuestions = (qData || []).filter(q => {
         if (isStaff) return true;
         if (q.status === 'approved') return true;
-        if (user?.email && q.user_id === user.email) return true;
+        if (userEmail && q.user_id?.toLowerCase() === userEmail) return true;
         return false;
       }).map(q => {
-        // For answers, we only show approved ones, UNLESS it's our own answer or we are staff
-        const isStaff = isAdmin || canManageCivs || canManageBuildorders;
-        const allAnswers = (q.answers || [])
-          .filter((a: any) => isStaff || a.status === 'approved' || (user?.email && a.user_id === user.email))
-          .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        // Filter and sort answers for this question
+        const qAnswers = aData.filter(a => a.question_id === q.id)
+          .filter(a => isStaff || a.status === 'approved' || (userEmail && a.user_id?.toLowerCase() === userEmail))
+          .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
 
-        // Helper to find children
-        const getThread = (parentId: string | null): any[] => {
-          return allAnswers
-            .filter((a: any) => a.parent_id === parentId)
-            .map((a: any) => ({
+        // Recursive thread builder
+        const buildThread = (parentId: string | null): any[] => {
+          return qAnswers
+            .filter(a => a.parent_id === parentId)
+            .map(a => ({
               ...a,
-              replies: getThread(a.id)
+              replies: buildThread(a.id)
             }));
         };
 
         return {
           ...q,
-          answers: getThread(null)
+          answers: buildThread(null)
         };
       });
 
-      setQuestions(filteredData);
+      setQuestions(threadedQuestions);
     } catch (err) {
       console.error('Error fetching Q&A:', err);
     } finally {
