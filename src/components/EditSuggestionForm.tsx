@@ -4,7 +4,8 @@ import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { Trash2, Plus, User, CheckCircle, XCircle, X, Upload, Loader2, MousePointer2, MoveVertical, Map, ChevronUp, ChevronDown, CheckCircle2 } from 'lucide-react';
 import type { ToastType } from './Toast';
-import { CATEGORY_MAPS, AOE4_MAPS as ALL_MAPS } from './AdminBOEditorModal';
+import { CATEGORY_MAPS } from './AdminBOEditorModal';
+import { AOE4_MAPS as ALL_MAPS } from '../data/aoe4Maps';
 
 interface SuggestionFormProps {
   civName: string;
@@ -447,9 +448,9 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
 
                     <div className="max-h-64 overflow-y-auto custom-scrollbar">
                       {/* Categories (only if no search or matching) */}
-                      {(!mapSearch || CATEGORY_MAPS.some(c => c.toLowerCase().includes(mapSearch.toLowerCase()))) && (
+                      {(!mapSearch || CATEGORY_MAPS.some((c: string) => c.toLowerCase().includes(mapSearch.toLowerCase()))) && (
                         <div className="p-1">
-                           {CATEGORY_MAPS.filter(c => !mapSearch || c.toLowerCase().includes(mapSearch.toLowerCase())).map((mapName) => (
+                           {CATEGORY_MAPS.filter((c: string) => !mapSearch || c.toLowerCase().includes(mapSearch.toLowerCase())).map((mapName: string) => (
                             <button
                               key={mapName}
                               type="button"
@@ -472,7 +473,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                       )}
 
                       {/* All Maps */}
-                      {ALL_MAPS.filter(m => !mapSearch || m.toLowerCase().includes(mapSearch.toLowerCase())).map((mapName) => (
+                      {ALL_MAPS.filter((m: string) => !mapSearch || m.toLowerCase().includes(mapSearch.toLowerCase())).map((mapName: string) => (
                         <button
                           key={mapName}
                           type="button"
@@ -491,7 +492,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                         </button>
                       ))}
 
-                      {mapSearch && !ALL_MAPS.some(m => m.toLowerCase().includes(mapSearch.toLowerCase())) && !CATEGORY_MAPS.some(c => c.toLowerCase().includes(mapSearch.toLowerCase())) && (
+                      {mapSearch && !ALL_MAPS.some((m: string) => m.toLowerCase().includes(mapSearch.toLowerCase())) && !CATEGORY_MAPS.some((c: string) => c.toLowerCase().includes(mapSearch.toLowerCase())) && (
                         <div className="p-4 text-center">
                            <p className="text-[10px] text-gray-500 uppercase font-bold mb-2">Nessuna mappa trovata</p>
                            <button 

@@ -942,7 +942,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         <div className="flex flex-col mt-auto pt-4 border-t border-white/5 gap-4">
                            {/* Row 1: Author & Button */}
                            <div className="flex items-center justify-between gap-3 flex-nowrap">
-                               <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
+                               <div className="flex items-center gap-2 flex-1 min-w-0">
                                  <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20 shrink-0 overflow-hidden">
                                    {bo.author_avatar ? (
                                      <img src={bo.author_avatar} alt="" className="w-full h-full object-cover" />
