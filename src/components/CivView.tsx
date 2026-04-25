@@ -177,7 +177,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const [questions, setQuestions] = useState<any[]>([]);
   const [qaLoading, setQaLoading] = useState(false);
   const [isSubmittingQA, setIsSubmittingQA] = useState(false);
-  const [qaSubmissionSuccess, setQaSubmissionSuccess] = useState(false);
+  const [ansSubmissionSuccess, setAnsSubmissionSuccess] = useState<string | null>(null);
+  const [isSubmittingAns, setIsSubmittingAns] = useState<string | null>(null);
   const [questionText, setQuestionText] = useState('');
   const [expandedBOs, setExpandedBOs] = useState<Set<string>>(new Set());
   const [replyTo, setReplyTo] = useState<{ questionId: string, parentId?: string } | null>(null);
@@ -268,7 +269,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       if (!civId) return;
 
       // Step 1: Fetch questions for this civ (using both ID and Name to be safe)
-      // We remove the join 'profile:profiles(avatar_url)' which might be failing
       let query = supabase
         .from('questions')
         .select('*')
@@ -330,7 +330,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
 
         // Recursive thread builder
-        const buildThread = (parentId: string | null): any[] => {
+        const buildThread = (parentId: string | null, parentNick: string | null = null): any[] => {
           return qAnswers
             .filter(a => a.parent_id === parentId)
             .map(a => {
@@ -338,7 +338,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               return {
                 ...a,
                 profile: aProfile,
-                replies: buildThread(a.id)
+                replyToNickname: parentNick,
+                replies: buildThread(a.id, a.user_nickname)
               };
             });
         };
@@ -394,13 +395,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     setQaMessage(null);
   }, [user?.email]);
 
-  // Removed the old useEffect for fetching Q&A, now handled by the subscription useEffect
-  // useEffect(() => {
-  //   if (activeTab === 'domande') {
-  //     fetchQA();
-  //   }
-  // }, [activeTab, civId]);
-
   const validateProfile = () => {
     if (!user?.nickname || !user?.rank || user.rank === 'Unranked') {
       setQaMessage({ 
@@ -436,6 +430,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       if (error) throw error;
       
       setQuestionText('');
+      
       setQaSubmissionSuccess(true);
       
       const msg = isAutoApproved 
@@ -444,12 +439,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       
       setQaMessage({ text: msg, type: 'success' });
       
-      // Auto-approval refresh with a small safety delay
       setTimeout(() => {
         fetchQA();
       }, 1000);
 
-      // Reset button state after 3 seconds
       setTimeout(() => {
         setQaSubmissionSuccess(false);
         setQaMessage(null);
@@ -468,18 +461,15 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     if (!validateProfile()) return;
     if (!answerText.trim()) return;
 
+    setIsSubmittingAns(parentId || questionId);
+
     try {
-      // Auto-approval logic:
-      // 1. If admin/editor -> approved
-      // 2. If the user already has an approved message in this specific question thread -> approved
       let targetStatus = 'pending';
-      
       const isAutoApproved = isAdmin || canManageCivs || canManageBuildorders;
 
       if (isAutoApproved) {
         targetStatus = 'approved';
       } else {
-        // Check if user has any approved activity in this question
         const { data: existingApproved } = await supabase
           .from('answers')
           .select('id')
@@ -516,6 +506,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       if (error) throw error;
       setAnswerText('');
       setReplyTo(null);
+      setAnsSubmissionSuccess(parentId || questionId);
       
       const msg = targetStatus === 'approved' 
         ? 'Risposta pubblicata!' 
@@ -523,9 +514,13 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         
       setQaMessage({ text: msg, type: 'success' });
       if (targetStatus === 'approved') fetchQA();
+      
+      setTimeout(() => setAnsSubmissionSuccess(null), 3000);
     } catch (err) {
       console.error('Error submitting answer:', err);
-      setQaMessage({ text: 'Errore durante l\'invio della risposta.', type: 'error' });
+      setQaMessage({ text: 'Errore durante l\'invio della risposta', type: 'error' });
+    } finally {
+      setIsSubmittingAns(null);
     }
   };
 
@@ -534,8 +529,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     if (!answers || answers.length === 0) return null;
 
     return answers.map((a: any) => (
-      <div key={a.id} className={`${depth > 0 ? 'ml-6 border-l border-white/10 pl-5' : ''} space-y-4`}>
-        <div className="bg-white/[0.02] p-5 rounded-2xl border border-white/5 group/a backdrop-blur-sm relative transition-all hover:bg-white/[0.04]">
+      <div key={a.id} className="space-y-4">
+        <div className="bg-white/[0.02] p-5 rounded-2xl border border-white/5 group/a backdrop-blur-sm relative transition-all hover:bg-white/[0.04] shadow-sm">
           <div className="flex items-start gap-4">
             <div className="shrink-0">
               <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
@@ -563,7 +558,12 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   </button>
                 )}
               </div>
-              <p className="text-gray-300 text-sm leading-relaxed select-text font-medium">{a.answer_text}</p>
+              <p className="text-gray-300 text-sm leading-relaxed select-text font-medium">
+                {a.replyToNickname && (
+                  <span className="text-blue-500/80 font-bold mr-2 select-none italic">@{a.replyToNickname}</span>
+                )}
+                {a.answer_text}
+              </p>
               
               <div className="flex justify-end pt-3">
                  <button 
@@ -592,18 +592,36 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   <textarea
                     value={answerText}
                     onChange={(e) => setAnswerText(e.target.value)}
-                    placeholder="Scrivi una risposta..."
+                    placeholder={`Rispondi a ${a.user_nickname}...`}
                     className="w-full bg-black/60 border border-blue-500/20 rounded-2xl px-5 py-4 text-white placeholder:text-gray-600 focus:border-blue-500/50 outline-none transition-all text-sm min-h-[100px] resize-y shadow-inner"
                     autoFocus
                   />
                   <div className="flex justify-end">
                     <button
                       onClick={() => handleAnswerSubmit(questionId, a.id)}
-                      disabled={!answerText.trim()}
-                      className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 active:scale-95 border border-white/10"
+                      disabled={!answerText.trim() || isSubmittingAns === a.id}
+                      className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg border border-white/10 active:scale-95 ${
+                        ansSubmissionSuccess === a.id
+                          ? 'bg-green-600 text-white shadow-green-600/20'
+                          : 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-blue-600/20'
+                      }`}
                     >
-                      <Send size={12} />
-                      Pubblica Risposta
+                      {isSubmittingAns === a.id ? (
+                        <>
+                          <Loader2 size={12} className="animate-spin" />
+                          Inviando...
+                        </>
+                      ) : ansSubmissionSuccess === a.id ? (
+                        <>
+                          <CheckCircle size={12} />
+                          Inviata!
+                        </>
+                      ) : (
+                        <>
+                          <Send size={12} />
+                          Invia Risposta
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -1498,7 +1516,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             )}
 
             {/* Question Submission Box */}
-            {/* Question Submission Box */}
             {user ? (
                <div className="bg-gradient-to-br from-blue-900/40 via-[#0f1423] to-cyan-900/20 p-8 rounded-3xl border border-blue-500/30 shadow-[0_0_50px_rgba(37,99,235,0.15)] relative overflow-hidden group">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] pointer-events-none" />
@@ -1523,23 +1540,22 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                       <p className="text-[10px] text-blue-400/70 uppercase font-black tracking-[0.2em]">{user.rank || 'Unranked'}</p>
                     </div>
                   </div>
-                  <form onSubmit={handleQuestionSubmit} className="space-y-6 relative z-10">
-                    <div className="relative group/input">
+                  <form onSubmit={handleQuestionSubmit} className="flex flex-col relative z-10">
+                    <div className="relative group/input flex-1 mb-4">
                       <textarea
                         value={questionText}
                         onChange={(e) => setQuestionText(e.target.value)}
                         placeholder="Fai una domanda relativa a questa civiltà. Sii specifico per ricevere risposte dettagliate!"
-                        className="w-full bg-black/40 border border-blue-500/20 rounded-2xl px-6 py-5 text-white placeholder:text-gray-600 focus:border-blue-500/50 focus:bg-black/60 outline-none transition-all text-base min-h-[120px] resize-y shadow-inner"
+                        className="w-full bg-black/40 border border-blue-500/20 rounded-2xl px-6 py-5 text-white placeholder:text-gray-600 focus:border-blue-500/50 focus:bg-black/60 outline-none transition-all text-base min-h-[180px] resize-y shadow-inner"
                       />
                       <div className="absolute top-4 right-4 text-blue-500/20 group-focus-within/input:text-blue-500/40 transition-colors">
                         <MessageSquare size={20} />
                       </div>
                     </div>
-                    <div className="flex justify-end items-center">
+                    <div className="flex justify-end items-center py-2">
                       <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider max-w-[250px]">
-                        {/* Remosso testo su richiesta */}
                       </p>
-                      <button
+                        <button
                         type="submit"
                         disabled={!questionText.trim() || isSubmittingQA || qaSubmissionSuccess}
                         className={`flex items-center gap-3 px-8 py-3.5 rounded-2xl text-xs font-black uppercase transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl border border-white/10 ${
@@ -1660,19 +1676,37 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                               <div className="flex justify-end">
                                 <button
                                   onClick={() => handleAnswerSubmit(q.id)}
-                                  disabled={!answerText.trim()}
-                                  className="flex items-center gap-3 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-[0_10px_25px_rgba(37,99,235,0.3)] hover:shadow-[0_15px_35px_rgba(37,99,235,0.5)] border border-white/10 active:scale-95"
+                                  disabled={!answerText.trim() || isSubmittingAns === q.id}
+                                  className={`flex items-center gap-3 px-8 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-xl border border-white/10 active:scale-95 ${
+                                    ansSubmissionSuccess === q.id
+                                      ? 'bg-green-600 text-white shadow-green-500/20'
+                                      : 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-[0_10px_25px_rgba(37,99,235,0.3)] hover:shadow-[0_15px_35px_rgba(37,99,235,0.5)]'
+                                  }`}
                                 >
-                                  <Send size={16} />
-                                  Pubblica Risposta
+                                  {isSubmittingAns === q.id ? (
+                                    <>
+                                      <Loader2 size={16} className="animate-spin" />
+                                      Inviando...
+                                    </>
+                                  ) : ansSubmissionSuccess === q.id ? (
+                                    <>
+                                      <CheckCircle size={16} />
+                                      Inviata!
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Send size={16} />
+                                      Invia Risposta
+                                    </>
+                                  )}
                                 </button>
                               </div>
                            </div>
                         )}
                      </div>
 
-                     {/* Answers List (Recursive Threading) */}
-                     <div className="ml-8 md:ml-20 space-y-4">
+                     {/* Answers List (Recursive Threading - Now flattened on the same plane) */}
+                     <div className="ml-4 md:ml-20 space-y-4">
                         {renderAnswers(q.answers, q.id)}
                      </div>
                   </div>
