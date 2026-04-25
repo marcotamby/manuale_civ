@@ -188,7 +188,7 @@ html, body, .elegant-scrollbar {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 0.75rem 1.75rem !important;
+  padding: 1rem 2rem !important;
   background: linear-gradient(135deg, #1e40af 0%, #0ea5e9 50%, #e2e8f0 100%) !important;
   color: #ffffff !important;
   font-weight: 900 !important;
@@ -198,20 +198,30 @@ html, body, .elegant-scrollbar {
   text-decoration: none !important;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
   box-shadow: 0 10px 20px -5px rgba(30, 64, 175, 0.5), 0 0 15px rgba(14, 165, 233, 0.3) !important;
-  font-size: 0.7rem !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  margin: 1rem 0.5rem !important;
+  font-size: 0.85rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  margin: 1.5rem 0.5rem !important;
   cursor: pointer !important;
   position: relative !important;
   overflow: hidden !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5) !important;
+  line-height: 1 !important;
+}
+
+/* Explicit override for link styles when it's a premium button */
+.regulation-editor-content a.premium-link-button,
+.regulation-content a.premium-link-button {
+  color: #ffffff !important;
+  text-decoration: none !important;
+  border-bottom: none !important;
 }
 
 .premium-link-button:hover {
   transform: translateY(-4px) scale(1.05) !important;
   box-shadow: 0 15px 30px -5px rgba(30, 64, 175, 0.6), 0 0 25px rgba(14, 165, 233, 0.5) !important;
-  filter: brightness(1.1) !important;
-  border-color: rgba(255, 255, 255, 0.6) !important;
+  filter: brightness(1.2) !important;
+  border-color: rgba(255, 255, 255, 0.8) !important;
+  color: #ffffff !important;
 }
 
 .premium-link-button::after {
