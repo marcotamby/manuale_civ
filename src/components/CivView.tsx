@@ -1199,7 +1199,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                  ) : selectedBO.author_rank && getRankIcon(selectedBO.author_rank) ? (
                                    <img src={getRankIcon(selectedBO.author_rank) || ''} alt={selectedBO.author_rank} className="w-full h-full object-contain p-2" />
                                  ) : (
-                                   <UserCircle size={40} className="text-gray-800" />
+                                   <UserCircle size={32} className="text-gray-800" />
                                  )}
                               </div>
                               <div className="flex flex-col">
