@@ -724,12 +724,12 @@ export function TournamentsPage() {
                                           </span>
 
                                           {/* Premium Tooltip (Combined for Name and Players) */}
-                                          <div className="absolute bottom-full left-0 mb-3 p-4 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-2xl opacity-0 group-hover/name:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/name:scale-100 origin-bottom-left z-50 min-w-[180px]">
+                                          <div className="absolute bottom-full left-0 mb-3 px-4 py-2.5 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-2xl opacity-0 group-hover/name:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/name:scale-100 origin-bottom-left z-50">
                                             <div className="flex flex-col">
                                               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 border-b border-white/5 pb-1">
                                                 {idx === 0 ? '🏆 Campione' : idx === 1 ? '🥈 Finalista' : '🥉 3° Classificato'}
                                               </span>
-                                              <span className="text-sm font-bold text-white mb-2">{s.entrant?.name || '---'}</span>
+                                              <span className={clsx("text-sm font-bold text-white", s.players && s.players.length > 0 ? "mb-2" : "mb-0")}>{s.entrant?.name || '---'}</span>
                                               
                                               {s.players && s.players.length > 0 && (
                                                 <div className="mt-1 pt-2 border-t border-white/10">

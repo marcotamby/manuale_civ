@@ -958,10 +958,12 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                     </span>
                                     
                                     {/* Premium Author Tooltip */}
-                                    <div className="absolute bottom-full left-0 mb-3 px-3 py-1.5 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-lg opacity-0 group-hover/author:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/author:scale-100 origin-bottom-left z-50">
-                                      <div className="flex flex-col items-center">
-                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Autore Strategia</span>
-                                        <span className="text-xs font-bold text-white">{bo.author_nickname || 'Anonimo'}</span>
+                                    <div className="absolute bottom-full left-0 mb-3 px-4 py-2.5 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-2xl opacity-0 group-hover/author:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/author:scale-100 origin-bottom-left z-50">
+                                      <div className="flex flex-col">
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 border-b border-white/5 pb-1">
+                                          Autore Strategia
+                                        </span>
+                                        <span className="text-sm font-bold text-white uppercase">{bo.author_nickname || 'Anonimo'}</span>
                                       </div>
                                       {/* Tooltip Arrow */}
                                       <div className="absolute top-full left-4 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-800/95"></div>
