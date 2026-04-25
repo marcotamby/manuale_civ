@@ -20,7 +20,7 @@ const RESOURCES: ResourceMapping[] = [
     {
         keywords: ['oro', 'gold'],
         icon: 'https://static.aoe4world.com/vite/assets/gold-5ea2b4ea.png',
-        color: 'text-yellow-400'
+        color: 'text-yellow-300 drop-shadow-[0_0_3px_rgba(253,224,71,0.3)]'
     },
     {
         keywords: ['pietra', 'stone'],
