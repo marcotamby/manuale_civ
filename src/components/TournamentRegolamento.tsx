@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
-import { Loader2, ArrowLeft, BookOpen, Shield } from 'lucide-react';
+import { Loader2, ArrowLeft, BookOpen, Shield, Edit2, Save, X } from 'lucide-react';
+import { useAuth } from './AuthContext';
+import { toast } from 'react-hot-toast';
+import { WYSIWYGEditor } from './WYSIWYGEditor';
 
 export function TournamentRegolamento() {
   const { slug } = useParams<{ slug: string }>();
@@ -9,6 +12,9 @@ export function TournamentRegolamento() {
   const [tournament, setTournament] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState('');
+  const { canManageTournaments } = useAuth();
 
   useEffect(() => {
     async function loadTournament() {
@@ -29,6 +35,7 @@ export function TournamentRegolamento() {
         }
 
         setTournament(data);
+        setEditedContent(data.regolamento_content || '');
       } catch (err: any) {
         console.error("Error loading regulation:", err);
         setError(err.message || "Errore nel caricamento del regolamento.");
@@ -38,6 +45,24 @@ export function TournamentRegolamento() {
     }
     loadTournament();
   }, [slug]);
+
+  const handleSave = async () => {
+    if (!slug) return;
+    try {
+      const { error: updateError } = await supabase
+        .from('tournaments')
+        .update({ regolamento_content: editedContent })
+        .eq('slug', slug);
+
+      if (updateError) throw updateError;
+      
+      setTournament({ ...tournament, regolamento_content: editedContent });
+      setIsEditing(false);
+      toast.success("Regolamento salvato con successo!");
+    } catch (err: any) {
+      toast.error("Errore nel salvataggio: " + err.message);
+    }
+  };
 
   if (loading) {
     return (
@@ -99,29 +124,73 @@ export function TournamentRegolamento() {
 
       {/* Content Section */}
       <div className="max-w-4xl mx-auto px-4 pb-24 -mt-20 relative z-10">
-        <div className="glass rounded-[2rem] border border-white/10 overflow-hidden shadow-2xl">
+        <div className="glass rounded-[2rem] border border-white/10 overflow-hidden shadow-2xl relative">
+          {/* Quick Edit Button */}
+          {canManageTournaments && !isEditing && (
+            <button 
+              onClick={() => setIsEditing(true)}
+              className="absolute top-6 right-6 p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-yellow-500 hover:text-yellow-400 transition-all z-20 shadow-xl group"
+              title="Modifica rapida regolamento"
+            >
+              <Edit2 size={18} className="transition-transform group-hover:scale-110" />
+            </button>
+          )}
+
+          {/* Edit Mode Header */}
+          {isEditing && (
+            <div className="p-4 px-6 bg-yellow-500/10 border-b border-yellow-500/20 flex items-center justify-between z-20 relative">
+              <div className="flex items-center gap-2 text-yellow-500 font-black uppercase text-[10px] tracking-widest">
+                <Edit2 size={14} />
+                Modalità Modifica Rapida
+              </div>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setIsEditing(false)}
+                  className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white font-bold uppercase text-[9px] tracking-widest transition-all flex items-center gap-2"
+                >
+                  <X size={12} />
+                  Annulla
+                </button>
+                <button 
+                  onClick={handleSave}
+                  className="px-6 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-black uppercase text-[9px] tracking-widest transition-all rounded-xl shadow-lg shadow-yellow-500/20 flex items-center gap-2"
+                >
+                  <Save size={12} />
+                  Salva Modifiche
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Regulation Text */}
           <div className="p-6 md:p-10 bg-[#0d1117]/50">
-            <div className="prose prose-invert prose-slate max-w-none 
-              prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-4 prose-h2:mt-8 first:prose-h2:mt-0 prose-h2:text-slate-200
-              prose-p:text-gray-300 prose-p:leading-relaxed prose-p:text-lg
-              prose-li:text-gray-300
-              prose-strong:text-white
-              prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
-              font-sans
-              [&>*:first-child]:mt-0
-            ">
-              <div 
-                className="regulation-content"
-                dangerouslySetInnerHTML={{ 
-                  __html: tournament.regolamento_content 
-                    ? (tournament.regolamento_content.includes('<') 
-                        ? tournament.regolamento_content 
-                        : tournament.regolamento_content.replace(/\n/g, '<br/>'))
-                    : '' 
-                }} 
+            {isEditing ? (
+              <WYSIWYGEditor 
+                initialValue={editedContent}
+                onChange={setEditedContent}
               />
-            </div>
+            ) : (
+              <div className="prose prose-invert prose-slate max-w-none 
+                prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-4 prose-h2:mt-8 first:prose-h2:mt-0 prose-h2:text-slate-200
+                prose-p:text-gray-300 prose-p:leading-relaxed prose-p:text-lg
+                prose-li:text-gray-300
+                prose-strong:text-white
+                prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
+                font-sans
+                [&>*:first-child]:mt-0
+              ">
+                <div 
+                  className="regulation-content"
+                  dangerouslySetInnerHTML={{ 
+                    __html: tournament.regolamento_content 
+                      ? (tournament.regolamento_content.includes('<') 
+                          ? tournament.regolamento_content 
+                          : tournament.regolamento_content.replace(/\n/g, '<br/>'))
+                      : '' 
+                  }} 
+                />
+              </div>
+            )}
           </div>
 
           {/* Minimal Footer */}
