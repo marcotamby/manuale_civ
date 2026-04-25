@@ -1113,14 +1113,14 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                              {selectedBO.difficulty === 1 ? 'Facile' : selectedBO.difficulty === 2 ? 'Media' : 'Difficile'}
                           </span>
                        </div>
-                       <h2 className="text-2xl md:text-4xl font-black text-white uppercase tracking-tighter drop-shadow-lg leading-tight">
+                       <h2 className="text-2xl md:text-4xl font-black text-white uppercase tracking-tighter drop-shadow-lg leading-tight mt-2">
                          {selectedBO.title}
                        </h2>
                     </div>
                   </div>
 
                   {/* Body Content */}
-                  <div className="flex-1 overflow-y-auto p-6 md:p-10 space-y-10 custom-scrollbar">
+                  <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 custom-scrollbar">
                     
                     {/* Intro / Description */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -1167,12 +1167,12 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                       </div>
 
                       {/* Sidebar */}
-                      <div className="space-y-8">
+                      <div className="space-y-6 lg:pt-10">
                         {/* Map Info (Silver design) */}
                         {selectedBO.map && (
-                          <div className="bg-white/[0.03] rounded-2xl border border-white/10 p-5 space-y-3">
-                             <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                               <Map size={12} className="text-cyan-500" /> Mappe Consigliate
+                          <div className="bg-white/[0.03] rounded-2xl border border-white/10 p-4 space-y-3">
+                             <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                               Mappe Consigliate
                              </h4>
                              <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-lg bg-cyan-500/5 border border-cyan-500/20 flex items-center justify-center">
@@ -1188,7 +1188,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         )}
 
                         {/* Author Info */}
-                        <div className="bg-white/5 rounded-3xl border border-white/5 p-6 space-y-4">
+                        <div className="bg-white/5 rounded-3xl border border-white/5 py-3 px-4 space-y-3">
                            <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
                              <User size={12} /> Autore
                            </h4>
@@ -1215,7 +1215,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
                         {/* Video / Source */}
                         {selectedBO.source && (
-                          <div className="bg-white/5 rounded-3xl border border-white/5 p-6 space-y-4">
+                          <div className="bg-white/5 rounded-3xl border border-white/5 py-3 px-4 space-y-3">
                             <h4 className="text-[10px] font-black text-red-500 uppercase tracking-widest">Video Tutorial</h4>
                             {getYoutubeId(selectedBO.source) ? (
                               <div className="relative aspect-video rounded-2xl overflow-hidden border border-white/10 group cursor-pointer"
@@ -1242,7 +1242,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         )}
 
                         {/* Votes / Feedback */}
-                        <div className="bg-white/5 rounded-3xl border border-white/5 p-4 space-y-3">
+                        <div className="bg-white/5 rounded-3xl border border-white/5 py-3 px-4 space-y-3">
                            <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
                              <MessageSquare size={12} /> Feedback Community
                            </h4>
