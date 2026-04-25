@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, X, Loader2, Play, Map, Plus, Clock, Zap, Upload, MousePointer2, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2, ChevronUp, ChevronDown } from 'lucide-react';
+import { Save, X, Loader2, Play, Map, Plus, Clock, Zap, Upload, MousePointer2, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2, ChevronUp, ChevronDown, AlertTriangle } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { usePresence } from './PresenceContext';
@@ -46,6 +46,8 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
   const [dragState, setDragState] = useState<{ startX: number; startY: number; startPosX: number; startPosY: number } | null>(null);
   const [isMapDropdownOpen, setIsMapDropdownOpen] = useState(false);
   const [mapSearch, setMapSearch] = useState('');
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const initialDataRef = useRef<string>('');
   const mapDropdownRef = useRef<HTMLDivElement>(null);
 
   // Sync state when opening
@@ -69,6 +71,23 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
           map: ''
         });
       }
+      // Set initial data after a short delay to ensure editedBO is populated
+      setTimeout(() => {
+        initialDataRef.current = JSON.stringify(boIndex !== null && civ.buildOrders?.[boIndex] ? { ...civ.buildOrders[boIndex] } : {
+          id: editedBO.id,
+          title: '',
+          difficulty: 2,
+          description: '',
+          steps: [],
+          banner_url: '',
+          banner_position: 50,
+          banner_position_x: 50,
+          author_nickname: user?.nickname || '',
+          author_rank: user?.rank || '',
+          source: '',
+          map: ''
+        });
+      }, 0);
       updateActivity({ 
         type: 'editing', 
         civId: civ.id, 
@@ -128,6 +147,15 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
       startPosX: currentPosX, 
       startPosY: currentPosY 
     });
+  };
+
+  const handleClose = () => {
+    const currentData = JSON.stringify(editedBO);
+    if (currentData !== initialDataRef.current) {
+      setShowExitConfirm(true);
+    } else {
+      onClose();
+    }
   };
 
   const getYoutubeId = (url: string) => {
@@ -252,7 +280,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
               <p className="text-xs text-cyan-400/60 font-bold uppercase tracking-widest">{civ.name}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2.5 bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 rounded-2xl transition-all border border-white/5 hover:border-red-500/30">
+          <button onClick={handleClose} className="p-2.5 bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 rounded-2xl transition-all border border-white/5 hover:border-red-500/30">
             <X size={24} />
           </button>
         </div>
@@ -733,6 +761,37 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
           </button>
         </div>
 
+        {/* Exit Confirmation Modal */}
+        {showExitConfirm && (
+          <div className="absolute inset-0 z-[7000] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+            <div className="bg-[#1a1c23] border border-red-500/30 rounded-3xl p-8 max-w-md w-full shadow-[0_0_50px_rgba(239,68,68,0.2)] animate-in zoom-in-95 duration-200">
+              <div className="w-16 h-16 rounded-2xl bg-red-500/20 flex items-center justify-center border border-red-500/30 mb-6 mx-auto">
+                <AlertTriangle className="text-red-400" size={32} />
+              </div>
+              <h3 className="text-xl font-black text-white text-center mb-2 uppercase tracking-tight">Modifiche non salvate</h3>
+              <p className="text-gray-400 text-center mb-8 text-sm">
+                Ci sono modifiche non salvate. Sei sicuro di voler uscire? I progressi andranno perduti.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <button 
+                  onClick={() => setShowExitConfirm(false)}
+                  className="py-3.5 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-bold transition-all border border-white/10 text-sm"
+                >
+                  Continua Modifica
+                </button>
+                <button 
+                  onClick={() => {
+                    setShowExitConfirm(false);
+                    onClose();
+                  }}
+                  className="py-3.5 bg-red-600 hover:bg-red-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-red-600/20 text-sm uppercase tracking-widest"
+                >
+                  Esci
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

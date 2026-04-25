@@ -7,7 +7,7 @@ import { usePresence } from './PresenceContext';
 import type { Unit } from '../data/aoe4Data';
 import { UnitGrid } from './UnitGrid';
 import { MatchupsTable } from './MatchupsTable';
-import { Shield, Sword, Zap, Map, BarChart2, Pencil, ChevronDown, ChevronUp, Play, ChevronRight, MessageSquare, Send, UserCircle, CheckCircle, XCircle, X, Loader2, Trash2, AlertTriangle, Plus, ExternalLink, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Shield, Sword, Zap, Map, BarChart2, Pencil, ChevronDown, ChevronUp, Play, ChevronRight, MessageSquare, Send, UserCircle, CheckCircle, XCircle, X, Loader2, Trash2, AlertTriangle, Plus, ExternalLink, ThumbsUp, ThumbsDown, User } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { ResourceText } from './ResourceText';
 import { SocialProofPopup } from './SocialProofPopup';
@@ -1171,19 +1171,19 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         {/* Map Info (Silver design) */}
                         {selectedBO.map && (
                           <div className="bg-white/[0.03] rounded-2xl border border-white/10 p-5 space-y-3">
-                            <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                              <Map size={12} /> Mappe Consigliate
-                            </h4>
-                            <div className="flex items-center gap-3">
-                               <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
-                                  <Map size={18} className="text-gray-400" />
-                               </div>
-                               <div>
-                                  <span className="text-sm font-bold text-gray-200 block leading-snug tracking-tight">
-                                    {selectedBO.map}
-                                  </span>
-                               </div>
-                            </div>
+                             <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                               <Map size={12} className="text-cyan-500" /> Mappe Consigliate
+                             </h4>
+                             <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-cyan-500/5 border border-cyan-500/20 flex items-center justify-center">
+                                   <Map size={18} className="text-cyan-500" />
+                                </div>
+                                <div>
+                                   <span className="text-sm font-medium text-cyan-400 block leading-snug tracking-tight">
+                                     {selectedBO.map}
+                                   </span>
+                                </div>
+                             </div>
                           </div>
                         )}
 
