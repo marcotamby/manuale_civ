@@ -3,14 +3,14 @@ import { Youtube, Twitch, ExternalLink } from 'lucide-react';
 export function DesktopFooter() {
   return (
     <footer className="hidden md:flex items-center justify-between px-8 py-4 border-t border-white/10 bg-[#16171d] z-50">
-      <div className="flex items-center gap-8">
-        <p className="text-[12px] font-black text-cyan-400 uppercase tracking-[0.2em] select-none">
+      <div className="flex items-center gap-4 lg:gap-8 flex-nowrap shrink-0">
+        <p className="text-[12px] font-black text-cyan-400 uppercase tracking-[0.2em] select-none whitespace-nowrap">
           Social & Community
         </p>
         
-        <div className="h-5 w-[1px] bg-white/20" />
+        <div className="h-5 w-[1px] bg-white/20 shrink-0" />
 
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-4 lg:gap-8 flex-nowrap">
           <a 
             href="https://www.twitch.tv/aoeitalia" 
             target="_blank" 
