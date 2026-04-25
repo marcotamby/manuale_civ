@@ -265,37 +265,35 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     try {
       setQaLoading(true);
       
-      // We want to see approved questions, OR questions I personally wrote (even if pending)
-      let query = supabase
+      // We'll fetch questions and their answers separately or in one simplified query 
+      // to avoid join-related rows being hidden.
+      const { data, error } = await supabase
         .from('questions')
         .select(`
           *,
-          profile:profiles!questions_user_id_fkey(avatar_url),
+          profile:profiles(avatar_url),
           answers:answers(
             *,
-            profile:profiles!answers_user_id_fkey(avatar_url)
+            profile:profiles(avatar_url)
           )
         `)
-        .eq('civ_id', civId);
-
-      // Staff sees everything. Users see approved OR their own questions.
-      if (isAdmin || canManageCivs || canManageBuildorders) {
-        // No extra filter, see all for this civ
-      } else if (user?.email) {
-        query = query.or(`status.eq.approved,user_id.eq."${user.email}"`);
-      } else {
-        query = query.eq('status', 'approved');
-      }
-
-      const { data, error } = await query.order('created_at', { ascending: false });
+        .ilike('civ_id', civId)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      // Build threaded structure
-      const filteredData = data.map(q => {
-        // For answers, we only show approved ones, UNLESS it's our own answer
+      // JS Filtering to ensure visibility rules are applied correctly
+      const filteredData = (data || []).filter(q => {
+        const isStaff = isAdmin || canManageCivs || canManageBuildorders;
+        if (isStaff) return true;
+        if (q.status === 'approved') return true;
+        if (user?.email && q.user_id === user.email) return true;
+        return false;
+      }).map(q => {
+        // For answers, we only show approved ones, UNLESS it's our own answer or we are staff
+        const isStaff = isAdmin || canManageCivs || canManageBuildorders;
         const allAnswers = (q.answers || [])
-          .filter((a: any) => a.status === 'approved' || (user?.email && a.user_id === user.email))
+          .filter((a: any) => isStaff || a.status === 'approved' || (user?.email && a.user_id === user.email))
           .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
 
         // Helper to find children
@@ -411,7 +409,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       // Auto-approval refresh with a small safety delay
       setTimeout(() => {
         fetchQA();
-      }, 500);
+      }, 1000);
 
       // Reset button state after 3 seconds
       setTimeout(() => {
