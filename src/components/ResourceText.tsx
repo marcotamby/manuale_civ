@@ -15,7 +15,7 @@ const RESOURCES: ResourceMapping[] = [
     {
         keywords: ['legno', 'wood'],
         icon: 'https://static.aoe4world.com/vite/assets/wood-9297bc89.png',
-        color: 'text-green-400'
+        color: 'text-orange-300'
     },
     {
         keywords: ['oro', 'gold'],
