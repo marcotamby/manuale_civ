@@ -43,7 +43,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [dragState, setDragState] = useState<{ startY: number; startPos: number } | null>(null);
+  const [dragState, setDragState] = useState<{ startX: number; startY: number; startPosX: number; startPosY: number } | null>(null);
   const [isMapDropdownOpen, setIsMapDropdownOpen] = useState(false);
   const [mapSearch, setMapSearch] = useState('');
   const mapDropdownRef = useRef<HTMLDivElement>(null);
@@ -62,6 +62,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
           steps: [],
           banner_url: '',
           banner_position: 50,
+          banner_position_x: 50,
           author_nickname: user?.nickname || '',
           author_rank: user?.rank || '',
           source: '',
@@ -80,11 +81,21 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!dragState) return;
+      const deltaX = e.clientX - dragState.startX;
       const deltaY = e.clientY - dragState.startY;
+      const containerWidth = 400; // Approx width of preview
       const containerHeight = 120; // Approx height of preview
-      const deltaPercent = (deltaY / containerHeight) * 100;
-      let newPos = Math.max(0, Math.min(100, dragState.startPos - (deltaPercent * 0.5)));
-      setEditedBO(prev => ({ ...prev, banner_position: Math.round(newPos) }));
+      const deltaPercentX = (deltaX / containerWidth) * 100;
+      const deltaPercentY = (deltaY / containerHeight) * 100;
+      
+      let newPosX = Math.max(0, Math.min(100, dragState.startPosX - (deltaPercentX * 0.5)));
+      let newPosY = Math.max(0, Math.min(100, dragState.startPosY - (deltaPercentY * 0.5)));
+      
+      setEditedBO(prev => ({ 
+        ...prev, 
+        banner_position_x: Math.round(newPosX),
+        banner_position: Math.round(newPosY) 
+      }));
     };
 
     const handleMouseUp = () => setDragState(null);
@@ -110,8 +121,13 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const startDrag = (e: React.MouseEvent, currentPos: number) => {
-    setDragState({ startY: e.clientY, startPos: currentPos });
+  const startDrag = (e: React.MouseEvent, currentPosX: number, currentPosY: number) => {
+    setDragState({ 
+      startX: e.clientX, 
+      startY: e.clientY, 
+      startPosX: currentPosX, 
+      startPosY: currentPosY 
+    });
   };
 
   const getYoutubeId = (url: string) => {
@@ -414,7 +430,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
             <div className="lg:col-span-4 space-y-6">
                <div>
                   <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">
-                    <User size={14} /> Strategist (Autore)
+                    <User size={14} /> Autore
                   </label>
                   <div className="bg-white/5 border-2 border-white/10 rounded-2xl p-4 space-y-4">
                     <div className="space-y-3">
@@ -451,7 +467,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
           {/* Banner Section */}
           <div className="bg-white/5 border border-white/10 rounded-3xl p-6 space-y-6">
             <label className="flex items-center gap-2 text-[10px] font-black text-yellow-500 uppercase tracking-[0.2em]">
-              <Upload size={14} /> Visual Design & Banner
+              <Upload size={14} /> Immagine di Copertina
             </label>
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
               <div className="md:col-span-5 space-y-4">
@@ -481,7 +497,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                     ) : (
                       <>
                         <Upload className="text-yellow-500" size={24} />
-                        <span className="text-xs font-black text-yellow-500 uppercase tracking-widest">Carica File Locale</span>
+                        <span className="text-xs font-black text-yellow-500 uppercase tracking-widest">Carica copertina</span>
                       </>
                     )}
                   </label>
@@ -492,17 +508,17 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                   <div className="space-y-3">
                     <div 
                       className="relative w-full aspect-[21/6] rounded-2xl overflow-hidden border-2 border-white/20 cursor-move group shadow-2xl"
-                      onMouseDown={(e) => startDrag(e, editedBO.banner_position ?? 50)}
+                      onMouseDown={(e) => startDrag(e, editedBO.banner_position_x ?? 50, editedBO.banner_position ?? 50)}
                     >
                       <img
                         src={editedBO.banner_url}
                         alt="Preview"
                         className="w-full h-full object-cover select-none pointer-events-none"
-                        style={{ objectPosition: `50% ${editedBO.banner_position ?? 50}%` }}
+                        style={{ objectPosition: `${editedBO.banner_position_x ?? 50}% ${editedBO.banner_position ?? 50}%` }}
                       />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 pointer-events-none">
                         <div className="bg-yellow-500 text-black px-3 py-1.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2 shadow-xl">
-                          <MousePointer2 size={12} /> Trascina verticalmente per inquadrare
+                          <MousePointer2 size={12} /> Trascina per inquadrare
                         </div>
                       </div>
                     </div>

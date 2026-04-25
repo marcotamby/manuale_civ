@@ -894,7 +894,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                             src={bo.banner_url} 
                             alt={bo.title} 
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                            style={{ objectPosition: (bo.banner_position !== undefined) ? `50% ${bo.banner_position}%` : 'center center' }}
+                            style={{ objectPosition: `${bo.banner_position_x ?? 50}% ${bo.banner_position ?? 50}%` }}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
@@ -1071,7 +1071,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         src={selectedBO.banner_url} 
                         alt="" 
                         className="w-full h-full object-cover" 
-                        style={{ objectPosition: (selectedBO.banner_position !== undefined) ? `50% ${selectedBO.banner_position}%` : 'center center' }}
+                        style={{ objectPosition: `${selectedBO.banner_position_x ?? 50}% ${selectedBO.banner_position ?? 50}%` }}
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-[#1a1c23] to-black flex items-center justify-center">
@@ -1189,7 +1189,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
                         {/* Author Info */}
                         <div className="bg-white/5 rounded-3xl border border-white/5 p-6 space-y-4">
-                           <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Informazioni Autore</h4>
+                           <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Autore</h4>
                            <div className="flex items-center gap-4">
                               <div className="w-16 h-16 rounded-2xl bg-[#0f1115] border border-blue-500/20 flex items-center justify-center overflow-hidden">
                                  {selectedBO.author_avatar ? (
