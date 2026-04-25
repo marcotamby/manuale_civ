@@ -1172,14 +1172,14 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         {selectedBO.map && (
                           <div className="bg-white/[0.03] rounded-2xl border border-white/10 p-5 space-y-3">
                             <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                              <Map size={12} /> Mappa Consigliata
+                              <Map size={12} /> Mappe Consigliate
                             </h4>
                             <div className="flex items-center gap-3">
                                <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
                                   <Map size={18} className="text-gray-400" />
                                </div>
                                <div>
-                                  <span className="text-base font-black text-white block leading-tight uppercase tracking-tight">
+                                  <span className="text-sm font-bold text-gray-200 block leading-snug tracking-tight">
                                     {selectedBO.map}
                                   </span>
                                </div>
