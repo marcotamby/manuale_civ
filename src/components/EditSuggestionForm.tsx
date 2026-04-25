@@ -528,7 +528,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Immagine Banner (JPG/PNG)</label>
+              <label className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Immagine di Copertina (JPG/PNG)</label>
               <div className="flex items-stretch gap-2">
                 <input
                   type="text"
