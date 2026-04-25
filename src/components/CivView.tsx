@@ -264,7 +264,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const fetchQA = async () => {
     try {
       setQaLoading(true);
-      const { data, error } = await supabase
+      
+      // We want to see approved questions, OR questions I personally wrote (even if pending)
+      let query = supabase
         .from('questions')
         .select(`
           *,
@@ -274,16 +276,23 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             profile:profiles!answers_user_id_fkey(avatar_url)
           )
         `)
-        .eq('civ_id', civId)
-        .eq('status', 'approved')
-        .order('created_at', { ascending: false });
+        .eq('civ_id', civId);
+
+      if (user?.email) {
+        query = query.or(`status.eq.approved,user_id.eq.${user.email}`);
+      } else {
+        query = query.eq('status', 'approved');
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) throw error;
 
       // Build threaded structure
       const filteredData = data.map(q => {
+        // For answers, we only show approved ones, UNLESS it's our own answer
         const allAnswers = (q.answers || [])
-          .filter((a: any) => a.status === 'approved')
+          .filter((a: any) => a.status === 'approved' || (user?.email && a.user_id === user.email))
           .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
 
         // Helper to find children
@@ -396,16 +405,16 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       
       setQaMessage({ text: msg, type: 'success' });
       
-      // Auto-approval refresh
-      if (isAutoApproved) {
-        await fetchQA();
-      }
+      // Auto-approval refresh with a small safety delay
+      setTimeout(() => {
+        fetchQA();
+      }, 500);
 
-      // Reset button state after a delay
+      // Reset button state after 3 seconds
       setTimeout(() => {
         setQaSubmissionSuccess(false);
         setQaMessage(null);
-      }, 5000);
+      }, 3000);
 
     } catch (err) {
       console.error('Error submitting question:', err);
@@ -490,7 +499,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         <div className="bg-white/[0.02] p-5 rounded-2xl border border-white/5 group/a backdrop-blur-sm relative transition-all hover:bg-white/[0.04]">
           <div className="flex items-start gap-4">
             <div className="shrink-0">
-              <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center border border-white/10 overflow-hidden shadow-lg">
+              <div className="w-10 h-10 rounded-xl bg-[#0a0a0a] flex items-center justify-center overflow-hidden border-none shadow-none">
                 {a.profile?.avatar_url ? (
                   <img src={a.profile.avatar_url} alt="" className="w-full h-full object-cover" />
                 ) : a.user_rank && getRankIcon(a.user_rank) ? (
@@ -1456,7 +1465,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] pointer-events-none" />
                   <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/5 blur-[100px] pointer-events-none" />
                       <div className="flex items-center gap-4 mb-6">
-                    <div className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center border border-white/10 overflow-hidden shadow-2xl">
+                    <div className="w-14 h-14 rounded-2xl bg-[#0a0a0a] flex items-center justify-center overflow-hidden border-none shadow-none">
                         {user.avatar_url ? (
                           <img src={user.avatar_url} alt="You" className="w-full h-full object-cover" />
                         ) : user.rank && getRankIcon(user.rank) ? (
@@ -1550,7 +1559,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                          
                          <div className="flex items-start gap-5 mb-5">
                            <div className="shrink-0">
-                              <div className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center border border-white/10 overflow-hidden shadow-inner">
+                              <div className="w-14 h-14 rounded-2xl bg-[#0a0a0a] flex items-center justify-center overflow-hidden border-none shadow-none">
                                 {q.profile?.avatar_url ? (
                                   <img src={q.profile.avatar_url} alt="" className="w-full h-full object-cover" />
                                 ) : q.user_rank && getRankIcon(q.user_rank) ? (
