@@ -59,6 +59,7 @@ export function TournamentsPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [isRegEditorExpanded, setIsRegEditorExpanded] = useState(false);
   const [bracketErrorId, setBracketErrorId] = useState<string | null>(null);
+  const regSectionRef = useRef<HTMLDivElement>(null);
   
   const navigate = useNavigate();
 
@@ -231,11 +232,18 @@ export function TournamentsPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const editSlug = params.get('edit');
+    const target = params.get('target');
     if (editSlug && tournaments.length > 0) {
       const t = tournaments.find(tour => tour.slug === editSlug);
       if (t) {
         openEditModal(t);
         window.history.replaceState({}, '', window.location.pathname);
+
+        if (target === 'regolamento') {
+          setTimeout(() => {
+            regSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 500);
+        }
       }
     }
   }, [tournaments, openEditModal]);
@@ -1062,7 +1070,7 @@ export function TournamentsPage() {
                   </div>
                 </div>
 
-                <div className="space-y-4 p-4 rounded-2xl bg-white/5 border border-white/10">
+                <div className="space-y-4 p-4 rounded-2xl bg-white/5 border border-white/10" ref={regSectionRef}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <BookOpen size={20} className="text-slate-400" />
@@ -1133,7 +1141,7 @@ export function TournamentsPage() {
                                 np[i] = { ...p, placement: parseInt(e.target.value) };
                                 setEditForm({ ...editForm, podium: np });
                               }}
-                              className="w-full bg-white/5 border border-white/10 h-12 px-4 rounded-xl text-white text-sm outline-none focus:border-yellow-500 transition-all appearance-none cursor-pointer"
+                              className="w-full bg-white/5 border border-white/10 h-12 px-4 rounded-xl text-white text-base font-bold outline-none focus:border-yellow-500 transition-all appearance-none cursor-pointer"
                             >
                               <option value={1} className="bg-[#121620]">🥇 1° Posto</option>
                               <option value={2} className="bg-[#121620]">🥈 2° Posto</option>
@@ -1152,7 +1160,7 @@ export function TournamentsPage() {
                               const np = [...editForm.podium]; np[i] = {...p, entrant: {name: e.target.value}}; setEditForm({...editForm, podium: np});
                             }} 
                             placeholder="Inserisci nome..." 
-                            className="w-full bg-white/5 border border-white/10 rounded-xl h-12 px-4 text-white text-sm outline-none focus:border-yellow-500/30 transition-all" 
+                            className="w-full h-12 bg-white/5 border border-white/10 px-4 rounded-xl text-white text-base font-bold outline-none focus:border-yellow-500 transition-colors" 
                           />
                         </div>
 
@@ -1256,6 +1264,7 @@ export function TournamentsPage() {
 
 function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onChange: (html: string) => void }) {
   const editorRef = useRef<HTMLDivElement>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [activeStyles, setActiveStyles] = useState({ 
     bold: false, italic: false, underline: false,
     alignLeft: false, alignCenter: false, alignRight: false, alignJustify: false,
@@ -1445,20 +1454,36 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
           </button>
         </div>
 
-        <div className="relative group/emoji">
-          <button type="button" className="p-2 hover:bg-white/10 rounded-lg text-lg flex items-center justify-center w-10 h-10 transition-transform hover:scale-110 active:scale-95">😀</button>
-          <div className="absolute bottom-full left-0 mb-4 p-4 bg-[#0d1117]/95 border border-white/10 rounded-[2rem] hidden group-hover/emoji:grid grid-cols-5 gap-3 z-[100] shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-3xl animate-in fade-in slide-in-from-bottom-4 duration-300 border-b-blue-500 w-[280px]">
-            {['🏆','🎮','⚔️','🏰','🎖️','🥇','🥈','🥉','📜','⚖️','📢','🔴','🟢','🔵','⭐','🔥','⚡','💎','🛡️','👑'].map(emoji => (
-              <button 
-                key={emoji}
-                type="button"
-                onMouseDown={(e) => { e.preventDefault(); document.execCommand('insertText', false, emoji); handleInput(); }}
-                className="w-10 h-10 flex items-center justify-center hover:bg-white/20 rounded-2xl text-2xl transition-all hover:scale-125"
-              >
-                {emoji}
-              </button>
-            ))}
-          </div>
+        <div className="relative">
+          <button 
+            type="button" 
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            className={clsx(
+              "p-2 rounded-lg text-lg flex items-center justify-center w-10 h-10 transition-transform hover:scale-110 active:scale-95",
+              showEmojiPicker ? "bg-white/20" : "hover:bg-white/10"
+            )}
+          >
+            😀
+          </button>
+          {showEmojiPicker && (
+            <div className="absolute bottom-full left-0 mb-4 p-4 bg-[#0d1117] border border-white/10 rounded-[2rem] grid grid-cols-5 gap-3 z-[100] shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-3xl animate-in fade-in slide-in-from-bottom-4 duration-300 border-b-blue-500 w-[280px]">
+              {['🏆','🎮','⚔️','🏰','🎖️','🥇','🥈','🥉','📜','⚖️','📢','🔴','🟢','🔵','⭐','🔥','⚡','💎','🛡️','👑'].map(emoji => (
+                <button 
+                  key={emoji}
+                  type="button"
+                  onMouseDown={(e) => { 
+                    e.preventDefault(); 
+                    document.execCommand('insertText', false, emoji); 
+                    handleInput();
+                    setShowEmojiPicker(false);
+                  }}
+                  className="w-10 h-10 flex items-center justify-center hover:bg-white/20 rounded-2xl text-2xl transition-all hover:scale-125"
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       

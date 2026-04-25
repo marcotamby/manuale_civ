@@ -105,7 +105,7 @@ export function TournamentRegolamento() {
           {/* Quick Edit Button - Shortcut to TournamentsPage */}
           {canManageTournaments && (
             <button 
-              onClick={() => navigate(`/tornei?edit=${tournament.slug}`)}
+              onClick={() => navigate(`/tornei?edit=${tournament.slug}&target=regolamento`)}
               className="absolute top-6 right-6 p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-yellow-500 hover:text-yellow-400 transition-all z-20 shadow-xl group"
               title="Modifica regolamento"
             >
