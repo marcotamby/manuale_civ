@@ -176,6 +176,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   // Q&A State
   const [questions, setQuestions] = useState<any[]>([]);
   const [qaLoading, setQaLoading] = useState(false);
+  const [isSubmittingQA, setIsSubmittingQA] = useState(false);
+  const [qaSubmissionSuccess, setQaSubmissionSuccess] = useState(false);
   const [questionText, setQuestionText] = useState('');
   const [expandedBOs, setExpandedBOs] = useState<Set<string>>(new Set());
   const [replyTo, setReplyTo] = useState<{ questionId: string, parentId?: string } | null>(null);
@@ -304,8 +306,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     } catch (err) {
       console.error('Error fetching Q&A:', err);
     } finally {
-      setQaLoading(true); // Small delay to prevent layout shift
-      setTimeout(() => setQaLoading(false), 200);
+      setQaLoading(false);
     }
   };
 
@@ -365,11 +366,12 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
   const handleQuestionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || isSubmittingQA) return;
     if (!validateProfile()) return;
     if (!questionText.trim()) return;
 
     try {
+      setIsSubmittingQA(true);
       const isAutoApproved = isAdmin || canManageCivs || canManageBuildorders;
       
       const { error } = await supabase
@@ -384,17 +386,32 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         }]);
 
       if (error) throw error;
+      
       setQuestionText('');
+      setQaSubmissionSuccess(true);
       
       const msg = isAutoApproved 
         ? 'Domanda pubblicata!' 
-        : 'La tua domanda è in fase di approvazione da parte degli amministratori';
+        : 'La tua domanda è stata inviata e verrà presto approvata dagli admin del sito';
       
       setQaMessage({ text: msg, type: 'success' });
-      if (isAutoApproved) fetchQA();
+      
+      // Auto-approval refresh
+      if (isAutoApproved) {
+        await fetchQA();
+      }
+
+      // Reset button state after a delay
+      setTimeout(() => {
+        setQaSubmissionSuccess(false);
+        setQaMessage(null);
+      }, 5000);
+
     } catch (err) {
       console.error('Error submitting question:', err);
       setQaMessage({ text: 'Errore durante l\'invio della domanda.', type: 'error' });
+    } finally {
+      setIsSubmittingQA(false);
     }
   };
 
@@ -473,7 +490,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         <div className="bg-white/[0.02] p-5 rounded-2xl border border-white/5 group/a backdrop-blur-sm relative transition-all hover:bg-white/[0.04]">
           <div className="flex items-start gap-4">
             <div className="shrink-0">
-              <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 overflow-hidden shadow-lg">
+              <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center border border-white/10 overflow-hidden shadow-lg">
                 {a.profile?.avatar_url ? (
                   <img src={a.profile.avatar_url} alt="" className="w-full h-full object-cover" />
                 ) : a.user_rank && getRankIcon(a.user_rank) ? (
@@ -1438,10 +1455,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                <div className="bg-gradient-to-br from-blue-900/40 via-[#0f1423] to-cyan-900/20 p-8 rounded-3xl border border-blue-500/30 shadow-[0_0_50px_rgba(37,99,235,0.15)] relative overflow-hidden group">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] pointer-events-none" />
                   <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/5 blur-[100px] pointer-events-none" />
-                  
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 p-0.5 shadow-lg shadow-blue-500/20">
-                      <div className="w-full h-full rounded-[14px] bg-[#0f1423] flex items-center justify-center overflow-hidden">
+                      <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center border border-white/10 overflow-hidden shadow-2xl">
                         {user.avatar_url ? (
                           <img src={user.avatar_url} alt="You" className="w-full h-full object-cover" />
                         ) : user.rank && getRankIcon(user.rank) ? (
@@ -1449,7 +1464,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         ) : (
                           <UserCircle size={32} className="text-blue-400" />
                         )}
-                      </div>
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
@@ -1479,11 +1493,29 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                       </p>
                       <button
                         type="submit"
-                        disabled={!questionText.trim()}
-                        className="flex items-center gap-3 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-2xl text-xs font-black uppercase transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_10px_25px_rgba(37,99,235,0.3)] hover:shadow-[0_15px_35px_rgba(37,99,235,0.5)] border border-white/10"
+                        disabled={!questionText.trim() || isSubmittingQA || qaSubmissionSuccess}
+                        className={`flex items-center gap-3 px-8 py-3.5 rounded-2xl text-xs font-black uppercase transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl border border-white/10 ${
+                          qaSubmissionSuccess 
+                            ? 'bg-green-600 text-white shadow-green-500/20' 
+                            : 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-blue-500/30'
+                        }`}
                       >
-                        <Send size={16} />
-                        Invia Domanda
+                        {isSubmittingQA ? (
+                          <>
+                            <Loader2 size={16} className="animate-spin" />
+                            Inviando...
+                          </>
+                        ) : qaSubmissionSuccess ? (
+                          <>
+                            <CheckCircle size={16} />
+                            Inviata!
+                          </>
+                        ) : (
+                          <>
+                            <Send size={16} />
+                            Invia Domanda
+                          </>
+                        )}
                       </button>
                     </div>
                   </form>
@@ -1518,7 +1550,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                          
                          <div className="flex items-start gap-5 mb-5">
                            <div className="shrink-0">
-                              <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 overflow-hidden shadow-inner">
+                              <div className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center border border-white/10 overflow-hidden shadow-inner">
                                 {q.profile?.avatar_url ? (
                                   <img src={q.profile.avatar_url} alt="" className="w-full h-full object-cover" />
                                 ) : q.user_rank && getRankIcon(q.user_rank) ? (
