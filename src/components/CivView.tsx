@@ -279,7 +279,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         .eq('civ_id', civId);
 
       if (user?.email) {
-        query = query.or(`status.eq.approved,user_id.eq.${user.email}`);
+        // We use double quotes for the email to handle special characters in the PostgREST 'or' filter
+        query = query.or(`status.eq.approved,user_id.eq."${user.email}"`);
       } else {
         query = query.eq('status', 'approved');
       }
@@ -499,9 +500,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         <div className="bg-white/[0.02] p-5 rounded-2xl border border-white/5 group/a backdrop-blur-sm relative transition-all hover:bg-white/[0.04]">
           <div className="flex items-start gap-4">
             <div className="shrink-0">
-              <div className="w-10 h-10 rounded-xl bg-[#0a0a0a] flex items-center justify-center overflow-hidden border-none shadow-none">
+              <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
                 {a.profile?.avatar_url ? (
-                  <img src={a.profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                  <img src={a.profile.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
                 ) : a.user_rank && getRankIcon(a.user_rank) ? (
                   <img src={getRankIcon(a.user_rank) || ''} alt={a.user_rank} className="w-6 h-6 object-contain" />
                 ) : (
@@ -1465,9 +1466,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] pointer-events-none" />
                   <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/5 blur-[100px] pointer-events-none" />
                       <div className="flex items-center gap-4 mb-6">
-                    <div className="w-14 h-14 rounded-2xl bg-[#0a0a0a] flex items-center justify-center overflow-hidden border-none shadow-none">
+                    <div className="w-14 h-14 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
                         {user.avatar_url ? (
-                          <img src={user.avatar_url} alt="You" className="w-full h-full object-cover" />
+                          <img src={user.avatar_url} alt="You" className="w-full h-full object-cover rounded-full" />
                         ) : user.rank && getRankIcon(user.rank) ? (
                           <img src={getRankIcon(user.rank) || ''} alt={user.rank} className="w-8 h-8 object-contain" />
                         ) : (
@@ -1496,9 +1497,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         <MessageSquare size={20} />
                       </div>
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-end items-center">
                       <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider max-w-[250px]">
-                        {isAdmin || canManageCivs || canManageBuildorders ? 'Pubblicazione immediata attiva' : 'La community risponderà a breve'}
+                        {/* Remosso testo su richiesta */}
                       </p>
                       <button
                         type="submit"
@@ -1559,9 +1560,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                          
                          <div className="flex items-start gap-5 mb-5">
                            <div className="shrink-0">
-                              <div className="w-14 h-14 rounded-2xl bg-[#0a0a0a] flex items-center justify-center overflow-hidden border-none shadow-none">
+                              <div className="w-14 h-14 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
                                 {q.profile?.avatar_url ? (
-                                  <img src={q.profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                                  <img src={q.profile.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
                                 ) : q.user_rank && getRankIcon(q.user_rank) ? (
                                   <img src={getRankIcon(q.user_rank) || ''} alt={q.user_rank} className="w-9 h-9 object-contain" />
                                 ) : (
