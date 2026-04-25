@@ -278,8 +278,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         `)
         .eq('civ_id', civId);
 
-      if (user?.email) {
-        // We use double quotes for the email to handle special characters in the PostgREST 'or' filter
+      // Staff sees everything. Users see approved OR their own questions.
+      if (isAdmin || canManageCivs || canManageBuildorders) {
+        // No extra filter, see all for this civ
+      } else if (user?.email) {
         query = query.or(`status.eq.approved,user_id.eq."${user.email}"`);
       } else {
         query = query.eq('status', 'approved');
