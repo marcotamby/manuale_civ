@@ -5,6 +5,7 @@ import { useAuth } from './AuthContext';
 import { usePresence } from './PresenceContext';
 import type { BuildOrder, Civilization } from '../data/aoe4Data';
 import { toast } from 'react-hot-toast';
+import { AOE4_MAPS as ALL_MAPS } from '../data/aoe4Maps';
 
 interface AdminBOEditorModalProps {
   civ: Civilization;
@@ -14,42 +15,13 @@ interface AdminBOEditorModalProps {
   boIndex: number | null; // null for new, number for edit
 }
 
-export const AOE4_MAPS = [
+export const CATEGORY_MAPS = [
   "Qualsiasi",
   "Tutte le mappe",
   "Open Maps",
   "Closed Maps",
   "Land Maps",
-  "Water Maps",
-  "Arabia",
-  "Arena",
-  "Cliffside",
-  "Rocky River",
-  "Golden Heights",
-  "High View",
-  "Lipany",
-  "Marshland",
-  "The Pit",
-  "Water Pit",
-  "Canal",
-  "Hill and Dale",
-  "French Pass",
-  "King of the Hill",
-  "Boulder Bay",
-  "Danube River",
-  "Archipelago",
-  "Continental",
-  "Altai",
-  "Confluence",
-  "Himeyama",
-  "Golden Pit",
-  "Fortitude",
-  "Gorge",
-  "Migration",
-  "Volcanic Island",
-  "Turtle Ridge",
-  "Four Lakes",
-  "Hidden Valley"
+  "Water Maps"
 ];
 
 export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: AdminBOEditorModalProps) {
@@ -73,6 +45,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
   const [uploading, setUploading] = useState(false);
   const [dragState, setDragState] = useState<{ startY: number; startPos: number } | null>(null);
   const [isMapDropdownOpen, setIsMapDropdownOpen] = useState(false);
+  const [mapSearch, setMapSearch] = useState('');
   const mapDropdownRef = useRef<HTMLDivElement>(null);
 
   // Sync state when opening
@@ -315,7 +288,10 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                   <div className="relative" ref={mapDropdownRef}>
                     <button
                       type="button"
-                      onClick={() => setIsMapDropdownOpen(!isMapDropdownOpen)}
+                      onClick={() => {
+                        setIsMapDropdownOpen(!isMapDropdownOpen);
+                        if (!isMapDropdownOpen) setMapSearch('');
+                      }}
                       className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 text-white focus:border-cyan-500/50 outline-none transition-all flex items-center justify-between group hover:bg-white/10"
                     >
                       <span className={editedBO.map ? 'text-white font-bold' : 'text-white/20'}>
@@ -325,9 +301,61 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                     </button>
 
                     {isMapDropdownOpen && (
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1c23] border border-cyan-500/30 rounded-xl overflow-hidden z-[7000] shadow-[0_10px_40px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1c23] border border-cyan-500/30 rounded-xl overflow-hidden z-[7000] shadow-[0_10px_40px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 duration-200 flex flex-col">
+                        {/* Search Input inside Dropdown */}
+                        <div className="p-3 bg-black/40 border-b border-white/5">
+                          <div className="relative">
+                            <input 
+                              type="text"
+                              placeholder="Cerca mappa..."
+                              autoFocus
+                              className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-3 py-2 text-xs text-white focus:border-cyan-500/50 outline-none placeholder:text-white/20"
+                              value={mapSearch}
+                              onChange={(e) => setMapSearch(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  if (mapSearch.trim()) {
+                                    setEditedBO(prev => ({ ...prev, map: mapSearch }));
+                                    setIsMapDropdownOpen(false);
+                                  }
+                                }
+                              }}
+                            />
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20">
+                              <Map size={14} />
+                            </div>
+                          </div>
+                        </div>
+
                         <div className="max-h-64 overflow-y-auto custom-scrollbar">
-                          {AOE4_MAPS.map((mapName) => (
+                          {/* Categories (only if no search or matching) */}
+                          {(!mapSearch || CATEGORY_MAPS.some(c => c.toLowerCase().includes(mapSearch.toLowerCase()))) && (
+                            <div className="p-1">
+                               {CATEGORY_MAPS.filter(c => !mapSearch || c.toLowerCase().includes(mapSearch.toLowerCase())).map((mapName) => (
+                                <button
+                                  key={mapName}
+                                  type="button"
+                                  onClick={() => {
+                                    setEditedBO(prev => ({ ...prev, map: mapName }));
+                                    setIsMapDropdownOpen(false);
+                                  }}
+                                  className={`w-full px-3 py-2 text-[11px] text-left transition-colors flex items-center justify-between rounded-lg ${
+                                    editedBO.map === mapName 
+                                      ? 'bg-cyan-500/20 text-cyan-400 font-black' 
+                                      : 'text-cyan-400/60 hover:bg-white/5 hover:text-cyan-400'
+                                  }`}
+                                >
+                                  {mapName}
+                                  {editedBO.map === mapName && <CheckCircle2 size={12} className="text-cyan-500" />}
+                                </button>
+                              ))}
+                              <div className="h-px bg-white/5 my-1" />
+                            </div>
+                          )}
+
+                          {/* All Maps */}
+                          {ALL_MAPS.filter(m => !mapSearch || m.toLowerCase().includes(mapSearch.toLowerCase())).map((mapName) => (
                             <button
                               key={mapName}
                               type="button"
@@ -335,7 +363,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                                 setEditedBO(prev => ({ ...prev, map: mapName }));
                                 setIsMapDropdownOpen(false);
                               }}
-                              className={`w-full px-4 py-3 text-sm text-left transition-colors flex items-center justify-between group/item ${
+                              className={`w-full px-4 py-2.5 text-sm text-left transition-colors flex items-center justify-between group/item ${
                                 editedBO.map === mapName 
                                   ? 'bg-cyan-500/20 text-cyan-400 font-black' 
                                   : 'text-gray-400 hover:bg-white/5 hover:text-white'
@@ -345,25 +373,21 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                               {editedBO.map === mapName && <CheckCircle2 size={14} className="text-cyan-500" />}
                             </button>
                           ))}
-                        </div>
-                        {/* Custom Input Option */}
-                        <div className="p-3 border-t border-white/5 bg-black/40">
-                          <input 
-                            type="text"
-                            placeholder="Altra mappa..."
-                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500/50 outline-none"
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
-                                setEditedBO(prev => ({ ...prev, map: (e.target as HTMLInputElement).value }));
-                                setIsMapDropdownOpen(false);
-                              }
-                            }}
-                            onChange={(e) => {
-                              setEditedBO(prev => ({ ...prev, map: e.target.value }));
-                            }}
-                            value={AOE4_MAPS.includes(editedBO.map || '') ? '' : (editedBO.map || '')}
-                          />
+
+                          {mapSearch && !ALL_MAPS.some(m => m.toLowerCase().includes(mapSearch.toLowerCase())) && !CATEGORY_MAPS.some(c => c.toLowerCase().includes(mapSearch.toLowerCase())) && (
+                            <div className="p-4 text-center">
+                               <p className="text-[10px] text-gray-500 uppercase font-bold mb-2">Nessuna mappa trovata</p>
+                               <button 
+                                 onClick={() => {
+                                   setEditedBO(prev => ({ ...prev, map: mapSearch }));
+                                   setIsMapDropdownOpen(false);
+                                 }}
+                                 className="text-xs font-black text-cyan-400 hover:text-cyan-300 flex items-center justify-center gap-2 w-full"
+                               >
+                                 Usa "{mapSearch}" <CheckCircle2 size={12} />
+                               </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
