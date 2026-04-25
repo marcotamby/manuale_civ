@@ -308,7 +308,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
           </div>
         )}
         <div className="space-y-2">
-          <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Sezione da modificare</label>
+          <label className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Sezione da modificare</label>
           <div className="relative group">
             <select
               value={section}
@@ -343,7 +343,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
 
         {section !== 'build_order' && section !== '' && (
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Descrizione Modifica</label>
+            <label className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Descrizione Modifica</label>
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
@@ -358,7 +358,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
         {section === 'build_order' && (
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Titolo Build Order</label>
+              <label className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Titolo Build Order</label>
               <input
                 type="text"
                 placeholder="es. Fast Castle into Knights"
@@ -370,7 +370,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Difficoltà Strategia</label>
+              <label className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Difficoltà Strategia</label>
               <div className="flex gap-3">
                 {[1, 2, 3].map((num) => (
                   <button
@@ -391,7 +391,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                         <span key={i} className={`text-xs ${difficulty === num ? 'text-cyan-400 drop-shadow-[0_0_5px_rgba(6,182,212,0.5)]' : 'text-gray-600'}`}>⭐</span>
                       ))}
                     </div>
-                    <span className={`text-[9px] font-black uppercase tracking-widest z-10 ${difficulty === num ? 'text-cyan-400' : 'text-gray-500 group-hover:text-gray-400'}`}>
+                    <span className={`text-[11px] font-black uppercase tracking-widest z-10 ${difficulty === num ? 'text-cyan-400' : 'text-gray-500 group-hover:text-gray-400'}`}>
                       {num === 1 ? 'Facile' : num === 2 ? 'Media' : 'Difficile'}
                     </span>
                   </button>
@@ -400,8 +400,8 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
-                <Map size={14} className="text-cyan-400" /> Mappa Consigliata
+              <label className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                <Map size={14} className="text-cyan-400" /> Mappe Consigliate
               </label>
               <div className="relative" ref={mapDropdownRef}>
                 <button
@@ -611,7 +611,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Introduzione Strategia</label>
+              <label className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Descrizione e Strategia Generale</label>
               <textarea
                 placeholder="Descrivi brevemente gli obiettivi di questa build..."
                 value={description}
@@ -622,7 +622,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Passaggi della Strategia</label>
+              <label className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Build Order Steps</label>
               {boSteps.map((step, index) => (
                 <div 
                   key={index} 
@@ -761,7 +761,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
         {section !== '' && (
           <div className="space-y-6 pt-2">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Fonte / Video (opzionale)</label>
+              <label className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">Fonti della Modifica (opzionale)</label>
               <input
                 type="text"
                 value={source}

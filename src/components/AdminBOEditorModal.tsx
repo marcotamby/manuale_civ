@@ -248,7 +248,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-8 space-y-6">
               <div>
-                <label className="flex items-center gap-2 text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">
+                <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">
                   <Type size={14} /> Titolo del Build Order
                 </label>
                 <input
@@ -262,7 +262,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="flex items-center gap-2 text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">
+                  <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">
                     <Star size={14} /> Difficoltà
                   </label>
                   <div className="flex gap-2">
@@ -282,8 +282,8 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                   </div>
                 </div>
                 <div>
-                  <label className="flex items-center gap-2 text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">
-                    <Map size={14} /> Mappa Consigliata
+                  <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">
+                    <Map size={14} /> Mappe Consigliate
                   </label>
                   <div className="relative" ref={mapDropdownRef}>
                     <button
@@ -413,7 +413,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
 
             <div className="lg:col-span-4 space-y-6">
                <div>
-                  <label className="flex items-center gap-2 text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">
+                  <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">
                     <User size={14} /> Strategist (Autore)
                   </label>
                   <div className="bg-white/5 border-2 border-white/10 rounded-2xl p-4 space-y-4">
@@ -523,8 +523,8 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
 
           {/* Description */}
           <div>
-            <label className="flex items-center gap-2 text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">
-              <Zap size={14} /> Descrizione e Strategia Generale
+            <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-4">
+              <Zap size={14} className="animate-pulse" /> Descrizione e Strategia Generale
             </label>
             <textarea
               value={editedBO.description}
