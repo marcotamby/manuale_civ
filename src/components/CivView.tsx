@@ -434,11 +434,12 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       
       setQaSubmissionSuccess(true);
       
-      const msg = isAutoApproved 
-        ? 'Domanda pubblicata!' 
-        : 'La tua domanda è stata inviata e verrà presto approvata dagli admin del sito';
-      
-      setQaMessage({ text: msg, type: 'success' });
+      if (!isAutoApproved) {
+        setQaMessage({ 
+          text: 'La tua domanda è stata inviata e verrà presto approvata dagli admin del sito', 
+          type: 'success' 
+        });
+      }
       
       setTimeout(() => {
         fetchQA();
@@ -509,14 +510,19 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       setReplyTo(null);
       setAnsSubmissionSuccess(parentId || questionId);
       
-      const msg = targetStatus === 'approved' 
-        ? 'Risposta pubblicata!' 
-        : 'La tua risposta è in fase di approvazione';
-        
-      setQaMessage({ text: msg, type: 'success' });
+      if (targetStatus !== 'approved') {
+        setQaMessage({ 
+          text: 'La tua risposta è stata inviata e verrà presto approvata dagli admin del sito', 
+          type: 'success' 
+        });
+      }
+      
       if (targetStatus === 'approved') fetchQA();
       
-      setTimeout(() => setAnsSubmissionSuccess(null), 3000);
+      setTimeout(() => {
+        setAnsSubmissionSuccess(null);
+        setQaMessage(null);
+      }, 3000);
     } catch (err) {
       console.error('Error submitting answer:', err);
       setQaMessage({ text: 'Errore durante l\'invio della risposta', type: 'error' });
@@ -615,7 +621,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                       ) : ansSubmissionSuccess === a.id ? (
                         <>
                           <CheckCircle size={12} />
-                          Inviata!
+                          Risposta Inviata!
                         </>
                       ) : (
                         <>
@@ -1573,7 +1579,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         ) : qaSubmissionSuccess ? (
                           <>
                             <CheckCircle size={16} />
-                            Inviata!
+                            Domanda Inviata!
                           </>
                         ) : (
                           <>
@@ -1692,7 +1698,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                   ) : ansSubmissionSuccess === q.id ? (
                                     <>
                                       <CheckCircle size={16} />
-                                      Inviata!
+                                      Risposta Inviata!
                                     </>
                                   ) : (
                                     <>
