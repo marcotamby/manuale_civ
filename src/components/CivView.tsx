@@ -177,6 +177,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const [questions, setQuestions] = useState<any[]>([]);
   const [qaLoading, setQaLoading] = useState(false);
   const [isSubmittingQA, setIsSubmittingQA] = useState(false);
+  const [qaSubmissionSuccess, setQaSubmissionSuccess] = useState(false);
   const [ansSubmissionSuccess, setAnsSubmissionSuccess] = useState<string | null>(null);
   const [isSubmittingAns, setIsSubmittingAns] = useState<string | null>(null);
   const [questionText, setQuestionText] = useState('');
