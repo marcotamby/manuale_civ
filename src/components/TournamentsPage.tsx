@@ -241,7 +241,7 @@ export function TournamentsPage() {
 
         if (target === 'regolamento') {
           setTimeout(() => {
-            regSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            regSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }, 500);
         }
       }
@@ -1114,7 +1114,7 @@ export function TournamentsPage() {
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Podio Personalizzato</label>
+                    <label className="text-[11px] text-yellow-500/80 font-black uppercase tracking-widest ml-1">Podio del Torneo</label>
                     <button 
                       onClick={() => {
                         if (editForm.podium.length < 4) {
@@ -1130,8 +1130,8 @@ export function TournamentsPage() {
                   </div>
                   {editForm.podium.map((p, i) => (
                     <div key={i} className="bg-black/20 p-5 rounded-2xl border border-white/5 space-y-4 relative group/podiumrow">
-                      <div className="flex gap-4 items-start">
-                        <div className="w-32 shrink-0 space-y-2">
+                    <div className="flex gap-4 items-start w-full">
+                      <div className="w-40 shrink-0 space-y-2">
                           <label className="text-[9px] text-gray-500 font-black uppercase tracking-widest ml-1 opacity-60">Posizione</label>
                           <div className="relative">
                             <select 
@@ -1151,27 +1151,26 @@ export function TournamentsPage() {
                           </div>
                         </div>
                         
-                        <div className="flex-grow space-y-2">
+                        <div className="flex-grow space-y-2 relative">
                           <label className="text-[9px] text-gray-500 font-black uppercase tracking-widest ml-1 opacity-60">Nome Team / Giocatore</label>
-                          <input 
-                            type="text" 
-                            value={p.entrant?.name || ''} 
-                            onChange={e => {
-                              const np = [...editForm.podium]; np[i] = {...p, entrant: {name: e.target.value}}; setEditForm({...editForm, podium: np});
-                            }} 
-                            placeholder="Inserisci nome..." 
-                            className="w-full h-12 bg-white/5 border border-white/10 px-4 rounded-xl text-white text-base font-bold outline-none focus:border-yellow-500 transition-colors" 
-                          />
-                        </div>
-
-                        <div className="h-[76px] flex items-end pb-0">
-                          <button 
-                            onClick={() => setEditForm({...editForm, podium: editForm.podium.filter((_, idx) => idx !== i)})} 
-                            className="w-12 h-12 flex items-center justify-center text-red-500/30 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all border border-transparent hover:border-red-500/20"
-                            title="Rimuovi riga"
-                          >
-                            <Trash2 size={20}/>
-                          </button>
+                          <div className="relative">
+                            <input 
+                              type="text" 
+                              value={p.entrant?.name || ''} 
+                              onChange={e => {
+                                const np = [...editForm.podium]; np[i] = {...p, entrant: {name: e.target.value}}; setEditForm({...editForm, podium: np});
+                              }} 
+                              placeholder="Inserisci nome..." 
+                              className="w-full h-12 bg-white/5 border border-white/10 px-4 pr-14 rounded-xl text-white text-base font-bold outline-none focus:border-yellow-500 transition-colors" 
+                            />
+                            <button 
+                              onClick={() => setEditForm({...editForm, podium: editForm.podium.filter((_, idx) => idx !== i)})} 
+                              className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-red-500/30 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                              title="Rimuovi riga"
+                            >
+                              <Trash2 size={18}/>
+                            </button>
+                          </div>
                         </div>
                       </div>
                       
