@@ -1053,12 +1053,20 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                             <span className="text-[10px] text-gray-500">({q.user_rank})</span>
                           </div>
                           <p className="text-gray-200 text-sm">{q.question_text}</p>
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 mt-4 pt-4 border-t border-white/5">
                             {canManageCivs && (
                               <>
-                                <button onClick={() => handleUpdateQAStatus(q, 'question', 'approved')} className="p-2 bg-green-500/10 text-green-500 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-all" title="Approva"><CheckCircle size={18} /></button>
-                                <button onClick={() => handleUpdateQAStatus(q, 'question', 'rejected')} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all" title="Rifiuta"><XCircle size={18} /></button>
-                                <button onClick={() => setDeleteConfirm({ id: q.id, type: 'question', item: q })} className="p-2 bg-gray-500/10 text-gray-500 rounded-lg border border-gray-500/20 hover:bg-red-500/20 hover:text-red-500 transition-all" title="Elimina"><Inbox size={18} /></button>
+                                <button onClick={() => handleUpdateQAStatus(q, 'question', 'approved')} className="flex items-center gap-2 px-4 py-2 bg-green-500/10 text-green-500 rounded-xl border border-green-500/20 hover:bg-green-500/20 transition-all text-xs font-bold uppercase" title="Approva">
+                                  <CheckCircle size={18} />
+                                  <span>Approva</span>
+                                </button>
+                                <button onClick={() => handleUpdateQAStatus(q, 'question', 'rejected')} className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-xl border border-red-500/20 hover:bg-red-500/20 transition-all text-xs font-bold uppercase" title="Rifiuta">
+                                  <XCircle size={18} />
+                                  <span>Rifiuta</span>
+                                </button>
+                                <button onClick={() => setDeleteConfirm({ id: q.id, type: 'question', item: q })} className="flex items-center gap-2 px-4 py-2 bg-gray-500/10 text-gray-500 rounded-xl border border-gray-500/20 hover:bg-red-500/20 hover:text-red-500 transition-all text-xs font-bold uppercase ml-auto" title="Elimina">
+                                  <Inbox size={18} />
+                                </button>
                               </>
                             )}
                           </div>
@@ -1093,15 +1101,24 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                             <span className="text-[10px] text-gray-500">({a.user_rank})</span>
                           </div>
                           <p className="text-gray-200 text-sm">{a.answer_text}</p>
-                        </div>
-                        <div className="flex gap-2">
-                          {canManageCivs && (
-                            <>
-                              <button onClick={() => handleUpdateQAStatus(a, 'answer', 'approved')} className="p-2 bg-green-500/10 text-green-500 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-all" title="Approva"><CheckCircle size={18} /></button>
-                              <button onClick={() => handleUpdateQAStatus(a, 'answer', 'rejected')} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all" title="Rifiuta"><XCircle size={18} /></button>
-                              <button onClick={() => setDeleteConfirm({ id: a.id, type: 'answer', item: a })} className="p-2 bg-gray-500/10 text-gray-500 rounded-lg border border-gray-500/20 hover:bg-red-500/20 hover:text-red-500 transition-all" title="Elimina"><Inbox size={18} /></button>
-                            </>
-                          )}
+                          
+                          <div className="flex gap-2 mt-4 pt-4 border-t border-white/5">
+                            {canManageCivs && (
+                              <>
+                                <button onClick={() => handleUpdateQAStatus(a, 'answer', 'approved')} className="flex items-center gap-2 px-4 py-2 bg-green-500/10 text-green-500 rounded-xl border border-green-500/20 hover:bg-green-500/20 transition-all text-xs font-bold uppercase" title="Approva">
+                                  <CheckCircle size={18} />
+                                  <span>Approva</span>
+                                </button>
+                                <button onClick={() => handleUpdateQAStatus(a, 'answer', 'rejected')} className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-xl border border-red-500/20 hover:bg-red-500/20 transition-all text-xs font-bold uppercase" title="Rifiuta">
+                                  <XCircle size={18} />
+                                  <span>Rifiuta</span>
+                                </button>
+                                <button onClick={() => setDeleteConfirm({ id: a.id, type: 'answer', item: a })} className="flex items-center gap-2 px-4 py-2 bg-gray-500/10 text-gray-500 rounded-xl border border-gray-500/20 hover:bg-red-500/20 hover:text-red-500 transition-all text-xs font-bold uppercase ml-auto" title="Elimina">
+                                  <Inbox size={18} />
+                                </button>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>

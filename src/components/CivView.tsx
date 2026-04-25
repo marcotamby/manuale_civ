@@ -370,6 +370,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     if (!questionText.trim()) return;
 
     try {
+      const isAutoApproved = isAdmin || canManageCivs || canManageBuildorders;
+      
       const { error } = await supabase
         .from('questions')
         .insert([{
@@ -378,18 +380,18 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           user_nickname: user.nickname,
           user_rank: user.rank,
           question_text: questionText.trim(),
-          status: 'pending'
+          status: isAutoApproved ? 'approved' : 'pending'
         }]);
 
       if (error) throw error;
       setQuestionText('');
       
-      const msg = isAdmin 
+      const msg = isAutoApproved 
         ? 'Domanda pubblicata!' 
         : 'La tua domanda è in fase di approvazione da parte degli amministratori';
       
       setQaMessage({ text: msg, type: 'success' });
-      if (isAdmin) fetchQA();
+      if (isAutoApproved) fetchQA();
     } catch (err) {
       console.error('Error submitting question:', err);
       setQaMessage({ text: 'Errore durante l\'invio della domanda.', type: 'error' });
@@ -403,11 +405,13 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
     try {
       // Auto-approval logic:
-      // 1. If admin -> approved
+      // 1. If admin/editor -> approved
       // 2. If the user already has an approved message in this specific question thread -> approved
       let targetStatus = 'pending';
       
-      if (isAdmin) {
+      const isAutoApproved = isAdmin || canManageCivs || canManageBuildorders;
+
+      if (isAutoApproved) {
         targetStatus = 'approved';
       } else {
         // Check if user has any approved activity in this question
@@ -426,7 +430,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           .eq('user_id', user.email)
           .eq('status', 'approved')
           .limit(1);
-
+ 
         if ((existingApproved && existingApproved.length > 0) || (existingQApproved && existingQApproved.length > 0)) {
           targetStatus = 'approved';
         }
@@ -465,38 +469,38 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     if (!answers || answers.length === 0) return null;
 
     return answers.map((a: any) => (
-      <div key={a.id} className={`${depth > 0 ? 'ml-6 border-l border-white/5 pl-4' : ''} space-y-3`}>
-        <div className="glass p-4 rounded-xl border border-white/5 bg-white/[0.01] group/a">
-          <div className="flex items-start gap-3">
+      <div key={a.id} className={`${depth > 0 ? 'ml-6 border-l border-white/10 pl-5' : ''} space-y-4`}>
+        <div className="bg-white/[0.02] p-5 rounded-2xl border border-white/5 group/a backdrop-blur-sm relative transition-all hover:bg-white/[0.04]">
+          <div className="flex items-start gap-4">
             <div className="shrink-0">
-              <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20 overflow-hidden">
+              <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 overflow-hidden shadow-lg">
                 {a.profile?.avatar_url ? (
                   <img src={a.profile.avatar_url} alt="" className="w-full h-full object-cover" />
                 ) : a.user_rank && getRankIcon(a.user_rank) ? (
-                  <img src={getRankIcon(a.user_rank) || ''} alt={a.user_rank} className="w-5 h-5 object-contain" />
+                  <img src={getRankIcon(a.user_rank) || ''} alt={a.user_rank} className="w-6 h-6 object-contain" />
                 ) : (
-                  <UserCircle size={18} className="text-gray-600" />
+                  <UserCircle size={20} className="text-gray-600" />
                 )}
               </div>
             </div>
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-bold text-blue-400 uppercase tracking-tight select-text">{a.user_nickname}</span>
-                <span className="text-[9px] text-gray-500 font-bold px-1 py-0.5 bg-white/5 rounded border border-white/5 uppercase select-none">{a.user_rank}</span>
-                <span className="text-[9px] text-gray-600 select-none">{new Date(a.created_at).toLocaleDateString('it-IT')}</span>
+              <div className="flex items-center gap-2.5 mb-2">
+                <span className="text-sm font-black text-blue-400 uppercase tracking-tight select-text">{a.user_nickname}</span>
+                <span className="text-[9px] text-gray-400 font-black px-2 py-0.5 bg-white/5 rounded-full border border-white/5 uppercase select-none tracking-widest">{a.user_rank}</span>
+                <span className="text-[9px] text-gray-600 font-bold select-none uppercase tracking-widest">{new Date(a.created_at).toLocaleDateString('it-IT')}</span>
                 {isAdmin && (
                   <button 
                     onClick={() => handleDeleteQA(a.id, 'answer')}
-                    className="ml-auto opacity-0 group-hover/a:opacity-100 p-1 text-red-500 hover:bg-red-500/10 rounded transition-all"
+                    className="ml-auto opacity-0 group-hover/a:opacity-100 p-1.5 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
                     title="Elimina risposta"
                   >
-                    <Trash2 size={12} />
+                    <Trash2 size={14} />
                   </button>
                 )}
               </div>
-              <p className="text-gray-300 text-sm leading-relaxed select-text">{a.answer_text}</p>
+              <p className="text-gray-300 text-sm leading-relaxed select-text font-medium">{a.answer_text}</p>
               
-              <div className="flex justify-end pt-2">
+              <div className="flex justify-end pt-3">
                  <button 
                    onClick={() => {
                      if (replyTo && replyTo.parentId === a.id) {
@@ -506,10 +510,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                        setAnswerText('');
                      }
                    }}
-                   className={`flex items-center gap-1.5 px-3 py-1 rounded text-[10px] font-bold transition-all ${
+                   className={`flex items-center gap-2 px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                      replyTo && replyTo.parentId === a.id 
-                       ? 'bg-white/10 text-white' 
-                       : 'text-gray-500 hover:text-white hover:bg-white/5'
+                       ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' 
+                       : 'text-gray-500 hover:text-blue-400 hover:bg-blue-500/10'
                    }`}
                  >
                    <MessageSquare size={12} />
@@ -519,22 +523,22 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
               {/* Nested Reply Input */}
               {replyTo && replyTo.parentId === a.id && (
-                <div className="mt-3 pt-3 border-t border-white/5 space-y-2 animate-in fade-in slide-in-from-top-1 duration-200 outline-none">
+                <div className="mt-4 pt-4 border-t border-white/5 space-y-3 animate-in fade-in slide-in-from-top-1 duration-300 outline-none">
                   <textarea
                     value={answerText}
                     onChange={(e) => setAnswerText(e.target.value)}
                     placeholder="Scrivi una risposta..."
-                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white placeholder:text-gray-600 focus:border-blue-500/50 outline-none transition-all text-xs min-h-[60px] resize-y"
+                    className="w-full bg-black/60 border border-blue-500/20 rounded-2xl px-5 py-4 text-white placeholder:text-gray-600 focus:border-blue-500/50 outline-none transition-all text-sm min-h-[100px] resize-y shadow-inner"
                     autoFocus
                   />
                   <div className="flex justify-end">
                     <button
                       onClick={() => handleAnswerSubmit(questionId, a.id)}
                       disabled={!answerText.trim()}
-                      className="flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-md text-[10px] font-bold uppercase transition-all"
+                      className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 active:scale-95 border border-white/10"
                     >
-                      <Send size={10} />
-                      Rispondi
+                      <Send size={12} />
+                      Pubblica Risposta
                     </button>
                   </div>
                 </div>
@@ -543,7 +547,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           </div>
         </div>
         {a.replies && a.replies.length > 0 && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {renderAnswers(a.replies, questionId, depth + 1)}
           </div>
         )}
@@ -1429,48 +1433,70 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             )}
 
             {/* Question Submission Box */}
+            {/* Question Submission Box */}
             {user ? (
-               <div className="glass p-6 rounded-2xl border border-white/5 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20 overflow-hidden">
-                      {user.avatar_url ? (
-                        <img src={user.avatar_url} alt="You" className="w-full h-full object-cover" />
-                      ) : user.rank && getRankIcon(user.rank) ? (
-                        <img src={getRankIcon(user.rank) || ''} alt={user.rank} className="w-6 h-6 object-contain" />
-                      ) : (
-                        <UserCircle size={24} className="text-gray-500" />
-                      )}
+               <div className="bg-gradient-to-br from-blue-900/40 via-[#0f1423] to-cyan-900/20 p-8 rounded-3xl border border-blue-500/30 shadow-[0_0_50px_rgba(37,99,235,0.15)] relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/5 blur-[100px] pointer-events-none" />
+                  
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 p-0.5 shadow-lg shadow-blue-500/20">
+                      <div className="w-full h-full rounded-[14px] bg-[#0f1423] flex items-center justify-center overflow-hidden">
+                        {user.avatar_url ? (
+                          <img src={user.avatar_url} alt="You" className="w-full h-full object-cover" />
+                        ) : user.rank && getRankIcon(user.rank) ? (
+                          <img src={getRankIcon(user.rank) || ''} alt={user.rank} className="w-8 h-8 object-contain" />
+                        ) : (
+                          <UserCircle size={32} className="text-blue-400" />
+                        )}
+                      </div>
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-white">{user.nickname || user.name || 'Il Tuo Profilo'}</p>
-                      <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest">{user.rank || 'Unranked'}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-lg font-black text-white uppercase tracking-tight">{user.nickname || user.name || 'Il Tuo Profilo'}</p>
+                        {(isAdmin || canManageCivs || canManageBuildorders) && (
+                          <span className="text-[9px] px-2 py-0.5 bg-blue-500 text-white font-black rounded-full uppercase tracking-widest shadow-lg shadow-blue-500/40">Staff</span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-blue-400/70 uppercase font-black tracking-[0.2em]">{user.rank || 'Unranked'}</p>
                     </div>
                   </div>
-                  <form onSubmit={handleQuestionSubmit} className="space-y-4">
-                    <textarea
-                      value={questionText}
-                      onChange={(e) => setQuestionText(e.target.value)}
-                      placeholder="Fai una domanda relativa a questa civiltà. Sii il più specifico possibile, così che i giocatori più esperti possano risponderti in maniera dettagliata e darti una mano!"
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:border-yellow-500/50 outline-none transition-all text-sm min-h-[100px] resize-y"
-                    />
-                    <div className="flex justify-end">
+                  <form onSubmit={handleQuestionSubmit} className="space-y-6 relative z-10">
+                    <div className="relative group/input">
+                      <textarea
+                        value={questionText}
+                        onChange={(e) => setQuestionText(e.target.value)}
+                        placeholder="Fai una domanda relativa a questa civiltà. Sii specifico per ricevere risposte dettagliate!"
+                        className="w-full bg-black/40 border border-blue-500/20 rounded-2xl px-6 py-5 text-white placeholder:text-gray-600 focus:border-blue-500/50 focus:bg-black/60 outline-none transition-all text-base min-h-[120px] resize-y shadow-inner"
+                      />
+                      <div className="absolute top-4 right-4 text-blue-500/20 group-focus-within/input:text-blue-500/40 transition-colors">
+                        <MessageSquare size={20} />
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider max-w-[250px]">
+                        {isAdmin || canManageCivs || canManageBuildorders ? 'Pubblicazione immediata attiva' : 'La community risponderà a breve'}
+                      </p>
                       <button
                         type="submit"
                         disabled={!questionText.trim()}
-                        className="flex items-center gap-2 px-6 py-2.5 bg-yellow-600 hover:bg-yellow-500 text-black rounded-xl text-xs font-black uppercase transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-yellow-600/20"
+                        className="flex items-center gap-3 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-2xl text-xs font-black uppercase transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_10px_25px_rgba(37,99,235,0.3)] hover:shadow-[0_15px_35px_rgba(37,99,235,0.5)] border border-white/10"
                       >
-                        <Send size={14} />
+                        <Send size={16} />
                         Invia Domanda
                       </button>
                     </div>
                   </form>
                </div>
             ) : (
-              <div className="glass p-8 rounded-2xl border border-white/5 text-center">
-                <p className="text-gray-400 text-sm mb-4">Accedi per fare una domanda o rispondere alla community.</p>
+              <div className="bg-[#0f1423] p-10 rounded-3xl border border-white/5 text-center shadow-2xl">
+                <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-blue-500/20">
+                   <UserCircle size={32} className="text-blue-400" />
+                </div>
+                <p className="text-gray-300 text-base mb-6 font-medium">Accedi per partecipare alla discussione e aiutare la community.</p>
                 <button 
                   onClick={() => openLoginModal()}
-                  className="px-8 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold uppercase transition-all"
+                  className="px-10 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-2xl text-xs font-black uppercase transition-all shadow-xl shadow-blue-600/20 hover:scale-105 active:scale-95 border border-white/10"
                 >
                   Accedi Ora
                 </button>
@@ -1487,35 +1513,37 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 questions.map((q) => (
                   <div key={q.id} className="space-y-4">
                       {/* Question Card */}
-                      <div className="glass p-6 rounded-2xl border border-white/10 relative overflow-hidden group/q outline-none select-none">
-                         <div className="flex items-start gap-4 mb-4">
-                           <div className="shrink-0 flex flex-col items-center gap-1">
-                              <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20 overflow-hidden">
+                      <div className="bg-gradient-to-r from-white/[0.03] to-white/[0.01] p-7 rounded-3xl border border-white/10 relative overflow-hidden group/q shadow-xl backdrop-blur-sm">
+                         <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-600 to-cyan-500 opacity-30" />
+                         
+                         <div className="flex items-start gap-5 mb-5">
+                           <div className="shrink-0">
+                              <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 overflow-hidden shadow-inner">
                                 {q.profile?.avatar_url ? (
                                   <img src={q.profile.avatar_url} alt="" className="w-full h-full object-cover" />
                                 ) : q.user_rank && getRankIcon(q.user_rank) ? (
-                                  <img src={getRankIcon(q.user_rank) || ''} alt={q.user_rank} className="w-8 h-8 object-contain" />
+                                  <img src={getRankIcon(q.user_rank) || ''} alt={q.user_rank} className="w-9 h-9 object-contain" />
                                 ) : (
-                                  <UserCircle size={28} className="text-gray-600" />
+                                  <UserCircle size={32} className="text-gray-700" />
                                 )}
                               </div>
                            </div>
                            <div className="flex-1">
-                               <div className="flex items-center gap-2 mb-1">
-                                <span className="text-sm font-black text-yellow-500 uppercase tracking-tight select-text">{q.user_nickname}</span>
-                                <span className="text-[10px] text-gray-500 font-bold px-1.5 py-0.5 bg-white/5 rounded border border-white/5 uppercase select-none">{q.user_rank}</span>
-                                <span className="text-[10px] text-gray-600 select-none">{new Date(q.created_at).toLocaleDateString('it-IT')}</span>
+                               <div className="flex items-center gap-3 mb-2">
+                                <span className="text-base font-black text-white uppercase tracking-tight select-text">{q.user_nickname}</span>
+                                <span className="text-[10px] text-blue-400 font-black px-2.5 py-0.5 bg-blue-500/10 rounded-full border border-blue-500/20 uppercase select-none tracking-widest">{q.user_rank}</span>
+                                <span className="text-[10px] text-gray-500 font-bold select-none uppercase tracking-widest">{new Date(q.created_at).toLocaleDateString('it-IT')}</span>
                                 {canManageCivs && (
                                   <button 
                                     onClick={() => handleDeleteQA(q.id, 'question')}
-                                    className="ml-auto opacity-0 group-hover/q:opacity-100 p-1.5 text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                                    className="ml-auto opacity-0 group-hover/q:opacity-100 p-2 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
                                     title="Elimina domanda"
                                   >
-                                    <Trash2 size={14} />
+                                    <Trash2 size={16} />
                                   </button>
                                 )}
                               </div>
-                              <p className="text-white text-base leading-relaxed select-text">{q.question_text}</p>
+                              <p className="text-gray-200 text-lg leading-relaxed select-text font-medium">{q.question_text}</p>
                            </div>
                          </div>
                                   <div className="flex justify-end pt-2 border-t border-white/5">
@@ -1541,21 +1569,21 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
                         {/* Answer Input (Root) */}
                         {replyTo && replyTo.questionId === q.id && !replyTo.parentId && (
-                           <div className="mt-4 pt-4 border-t border-white/5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300 outline-none">
+                           <div className="mt-6 pt-6 border-t border-white/10 space-y-4 animate-in fade-in slide-in-from-top-3 duration-300 outline-none">
                               <textarea
                                 value={answerText}
                                 onChange={(e) => setAnswerText(e.target.value)}
-                                placeholder="Scrivi la tua risposta..."
-                                className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:border-blue-500/50 outline-none transition-all text-sm min-h-[80px] resize-y"
+                                placeholder="Condividi la tua esperienza con la community..."
+                                className="w-full bg-black/60 border border-blue-500/20 rounded-2xl px-6 py-5 text-white placeholder:text-gray-600 focus:border-blue-500/50 focus:bg-black/80 outline-none transition-all text-base min-h-[120px] resize-y shadow-inner"
                                 autoFocus
                               />
                               <div className="flex justify-end">
                                 <button
                                   onClick={() => handleAnswerSubmit(q.id)}
                                   disabled={!answerText.trim()}
-                                  className="flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold uppercase transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50"
+                                  className="flex items-center gap-3 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-[0_10px_25px_rgba(37,99,235,0.3)] hover:shadow-[0_15px_35px_rgba(37,99,235,0.5)] border border-white/10 active:scale-95"
                                 >
-                                  <Send size={12} />
+                                  <Send size={16} />
                                   Pubblica Risposta
                                 </button>
                               </div>
@@ -1564,18 +1592,19 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                      </div>
 
                      {/* Answers List (Recursive Threading) */}
-                     <div className="ml-6 md:ml-12 space-y-3">
+                     <div className="ml-8 md:ml-20 space-y-4">
                         {renderAnswers(q.answers, q.id)}
                      </div>
                   </div>
                 ))
               ) : (
-                <div className="glass p-12 rounded-3xl border border-white/5 text-center flex flex-col items-center">
-                  <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
-                    <MessageSquare size={32} className="text-gray-700" />
+                <div className="bg-[#0f1423] p-20 rounded-[40px] border border-white/5 text-center flex flex-col items-center shadow-2xl relative overflow-hidden">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-blue-500/5 blur-[100px] pointer-events-none" />
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-600/20 to-cyan-500/20 rounded-3xl flex items-center justify-center mb-8 border border-blue-500/20 shadow-xl shadow-blue-900/10">
+                    <MessageSquare size={40} className="text-blue-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-500 mb-2">Ancora nessuna domanda</h3>
-                  <p className="text-sm text-gray-600 max-w-sm">Sii il primo a rompere il ghiaccio! Fai una domanda su questa civiltà.</p>
+                  <h3 className="text-2xl font-black text-white mb-3 uppercase tracking-tight">Ancora nessuna domanda</h3>
+                  <p className="text-gray-500 max-w-sm text-base leading-relaxed">Sii il primo a rompere il ghiaccio! Fai una domanda su questa civiltà e aiuta la community a crescere.</p>
                 </div>
               )}
             </div>
