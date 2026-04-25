@@ -59,6 +59,8 @@ export function TournamentsPage() {
   });
   const [isUploading, setIsUploading] = useState(false);
   const [isRegEditorExpanded, setIsRegEditorExpanded] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'synced'>('idle');
   const [bracketErrorId, setBracketErrorId] = useState<string | null>(null);
   const regSectionRef = useRef<HTMLDivElement>(null);
   
@@ -308,7 +310,8 @@ export function TournamentsPage() {
       source = 'challonge'; // Default to challonge for bare slugs
     }
 
-    setIsSubmitting(true);
+    setIsSyncing(true);
+    setSyncStatus('idle');
     try {
       if (source === 'startgg') {
         const data = await fetchTournament(slug);
@@ -321,7 +324,8 @@ export function TournamentsPage() {
             type: data.events?.[0]?.name?.includes('1v1') ? '1v1' : (data.events?.[0]?.name?.includes('2v2') ? '2v2' : 'Team'),
             externalUrl: url
           }));
-          toast.success('Dati sincronizzati da Start.gg!');
+          setSyncStatus('synced');
+          setTimeout(() => setSyncStatus('idle'), 3000);
         }
       } else if (source === 'challonge') {
         const [data, detailData] = await Promise.all([
@@ -352,14 +356,15 @@ export function TournamentsPage() {
             podium: podiumData,
             externalUrl: url
           }));
-          toast.success('Dati sincronizzati da Challonge!');
+          setSyncStatus('synced');
+          setTimeout(() => setSyncStatus('idle'), 3000);
         }
       }
     } catch (err: any) {
       console.error('Sync error:', err);
       toast.error(`Errore sincronizzazione: ${err.message || 'Verifica il link o lo slug'}`);
     } finally {
-      setIsSubmitting(false);
+      setIsSyncing(false);
     }
   };
 
@@ -973,10 +978,14 @@ export function TournamentsPage() {
                   </div>
                   <button 
                     onClick={() => handleSyncFromUrl(editForm.externalUrl)}
-                    disabled={isSubmitting || !editForm.externalUrl}
-                    className="px-6 bg-yellow-500 hover:bg-yellow-400 text-black rounded-xl font-black uppercase text-[10px] tracking-widest transition-all disabled:opacity-50 shadow-lg shadow-yellow-500/10"
+                    disabled={isSyncing || !editForm.externalUrl}
+                    className={clsx(
+                      "px-6 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all disabled:opacity-50 shadow-lg",
+                      syncStatus === 'synced' ? "bg-green-600 text-white shadow-green-900/20" : "bg-yellow-500 hover:bg-yellow-400 text-black shadow-yellow-500/10"
+                    )}
                   >
-                    {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : 'Sincronizza'}
+                    {isSyncing ? <Loader2 size={14} className="animate-spin" /> : 
+                     syncStatus === 'synced' ? 'Sincronizzato!' : 'Sincronizza'}
                   </button>
                 </div>
                 <p className="mt-3 text-[9px] text-gray-500 italic flex items-center gap-2">
