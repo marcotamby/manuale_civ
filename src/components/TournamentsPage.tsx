@@ -43,6 +43,7 @@ export function TournamentsPage() {
   const [confirmClose, setConfirmClose] = useState(false);
   const [editingTournament, setEditingTournament] = useState<any>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [saveTrigger, setSaveTrigger] = useState<'top' | 'bottom' | null>(null);
   const [editForm, setEditForm] = useState({
     externalUrl: '',
     organizer: '',
@@ -362,7 +363,8 @@ export function TournamentsPage() {
     }
   };
 
-  const handleUpdateTournament = async () => {
+  const handleUpdateTournament = async (trigger: 'top' | 'bottom' = 'bottom') => {
+    setSaveTrigger(trigger);
     setIsSubmitting(true);
     setSaveStatus('saving');
     try {
@@ -490,10 +492,12 @@ export function TournamentsPage() {
       loadTournaments(true); // Silent refresh to avoid jump
       setTimeout(() => {
         setSaveStatus('idle');
+        setSaveTrigger(null);
       }, 2000);
     } catch (err: any) {
       toast.error(`Errore: ${err.message}`);
       setSaveStatus('idle');
+      setSaveTrigger(null);
     } finally {
       setIsSubmitting(false);
     }
@@ -898,12 +902,18 @@ export function TournamentsPage() {
               <div className="flex items-center gap-4">
                 {saveStatus === 'saving' && <Loader2 className="w-4 h-4 animate-spin text-yellow-500" />}
                 <button 
-                  onClick={handleUpdateTournament}
+                  onClick={() => handleUpdateTournament('top')}
                   disabled={isSubmitting}
-                  className="px-6 py-2.5 bg-gradient-to-b from-slate-200 to-slate-400 text-black rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:brightness-110 transition-all flex items-center gap-2 shadow-xl shadow-white/5"
+                  className={clsx(
+                    "px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 shadow-xl shadow-white/5",
+                    saveStatus === 'saved' && saveTrigger === 'top'
+                      ? "bg-green-600 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]"
+                      : "bg-gradient-to-b from-slate-200 to-slate-400 text-black hover:brightness-110"
+                  )}
                 >
-                  {saveStatus === 'saving' ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                  Salva
+                  {saveStatus === 'saving' && saveTrigger === 'top' ? <Loader2 size={14} className="animate-spin" /> : 
+                   saveStatus === 'saved' && saveTrigger === 'top' ? <CheckCircle2 size={14} /> : <Save size={14} />}
+                  {saveStatus === 'saved' && saveTrigger === 'top' ? 'Salvato!' : 'Salva'}
                 </button>
                 <div className="w-px h-6 bg-white/10 mx-1"></div>
                 <X 
@@ -1201,17 +1211,17 @@ export function TournamentsPage() {
                 <div className="flex gap-4 pt-6 border-t border-white/5">
                   <button 
                     type="button"
-                    onClick={handleUpdateTournament} 
+                    onClick={() => handleUpdateTournament('bottom')} 
                     disabled={isSubmitting} 
                     className={clsx(
                       "flex-grow py-4 rounded-2xl flex items-center justify-center gap-3 transition-all text-xs font-black uppercase tracking-widest shadow-xl",
-                      saveStatus === 'saved' ? "bg-green-600 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]" : "bg-gradient-to-b from-slate-100 to-slate-400 text-black hover:brightness-110"
+                      saveStatus === 'saved' && saveTrigger === 'bottom' ? "bg-green-600 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]" : "bg-gradient-to-b from-slate-100 to-slate-400 text-black hover:brightness-110"
                     )}
                   >
-                    {saveStatus === 'saving' ? <Loader2 className="animate-spin" size={18}/> : 
-                     saveStatus === 'saved' ? <CheckCircle2 size={18}/> : <Save size={18}/>} 
-                    {saveStatus === 'saving' ? 'SALVATAGGIO...' : 
-                     saveStatus === 'saved' ? 'SALVATO!' : 
+                    {saveStatus === 'saving' && saveTrigger === 'bottom' ? <Loader2 className="animate-spin" size={18}/> : 
+                     saveStatus === 'saved' && saveTrigger === 'bottom' ? <CheckCircle2 size={18}/> : <Save size={18}/>} 
+                    {saveStatus === 'saving' && saveTrigger === 'bottom' ? 'SALVATAGGIO...' : 
+                     saveStatus === 'saved' && saveTrigger === 'bottom' ? 'SALVATO!' : 
                      editingTournament ? 'SALVA MODIFICHE' : 'CREA TORNEO'}
                   </button>
                   {editingTournament && (
