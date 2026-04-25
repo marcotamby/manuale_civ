@@ -17,10 +17,15 @@ export function TournamentRegolamento() {
       if (!slug) return;
       setLoading(true);
       try {
+        // Handle Start.gg slugs that might be split by the router
+        const fullSlug = window.location.pathname.includes('/tournament/') 
+          ? `tournament/${slug}` 
+          : slug;
+
         const { data, error: dbError } = await supabase
           .from('tournaments')
           .select('*')
-          .eq('slug', slug)
+          .eq('slug', fullSlug)
           .single();
 
         if (dbError) throw dbError;

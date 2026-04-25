@@ -300,6 +300,7 @@ function App() {
                 <Route path="/tornei/:slug" element={<TournamentDetail />} />
                 <Route path="/tornei/:slug/regolamento" element={<TournamentRegolamento />} />
                 <Route path="/tornei/tournament/:slug" element={<TournamentDetail />} />
+                <Route path="/tornei/tournament/:slug/regolamento" element={<TournamentRegolamento />} />
                 <Route path="/admin/overlays" element={<Home onSelectCiv={handleSelectCiv} onCompareCivs={handleCompare} />} />
                 <Route path="/admin/overlays/:overlayId" element={<Home onSelectCiv={handleSelectCiv} onCompareCivs={handleCompare} />} />
                 <Route path="/admin/overlays/:overlayId/:tab" element={<Home onSelectCiv={handleSelectCiv} onCompareCivs={handleCompare} />} />
