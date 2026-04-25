@@ -10,7 +10,7 @@ const RESOURCES: ResourceMapping[] = [
     {
         keywords: ['cibo', 'food', 'carne'],
         icon: 'https://static.aoe4world.com/vite/assets/food-532c79c4.png',
-        color: 'text-red-400'
+        color: 'text-rose-400'
     },
     {
         keywords: ['legno', 'wood'],
