@@ -750,7 +750,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
             <section>
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <ChevronUp className="text-emerald-400" size={20} />
+                <ChevronUp className="text-emerald-400 cursor-default pointer-events-none" size={20} />
                 Punti di Forza
                 {canManageCivs && (
                   <button
@@ -789,7 +789,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
             <section>
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <ChevronDown className="text-rose-400" size={20} />
+                <ChevronDown className="text-rose-400 cursor-default pointer-events-none" size={20} />
                 Punti Deboli
                 {isAdmin && (
                   <button
