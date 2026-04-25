@@ -265,12 +265,22 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     try {
       setQaLoading(true);
       
-      // Step 1: Fetch questions for this civ
-      const { data: qData, error: qError } = await supabase
+      if (!civId) return;
+
+      // Step 1: Fetch questions for this civ (using both ID and Name to be safe)
+      // We remove the join 'profile:profiles(avatar_url)' which might be failing
+      let query = supabase
         .from('questions')
-        .select('*, profile:profiles(avatar_url)')
-        .ilike('civ_id', civId)
+        .select('*')
         .order('created_at', { ascending: false });
+
+      if (civ?.name) {
+        query = query.or(`civ_id.ilike.${civId},civ_id.ilike.${civ.name}`);
+      } else {
+        query = query.ilike('civ_id', civId);
+      }
+
+      const { data: qData, error: qError } = await query;
 
       if (qError) throw qError;
 
@@ -281,23 +291,39 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       if (questionIds.length > 0) {
         const { data: ansData, error: aError } = await supabase
           .from('answers')
-          .select('*, profile:profiles(avatar_url)')
+          .select('*')
           .in('question_id', questionIds);
         
         if (aError) throw aError;
         aData = ansData || [];
       }
 
+      // Step 3: Fetch profiles for all users involved (questions + answers)
+      const userEmails = new Set<string>();
+      (qData || []).forEach(q => { if (q.user_id) userEmails.add(q.user_id.toLowerCase()); });
+      (aData || []).forEach(a => { if (a.user_id) userEmails.add(a.user_id.toLowerCase()); });
+
+      let profiles: any[] = [];
+      if (userEmails.size > 0) {
+        const { data: profData } = await supabase
+          .from('profiles')
+          .select('email, avatar_url')
+          .in('email', Array.from(userEmails));
+        profiles = profData || [];
+      }
+
       const userEmail = user?.email?.toLowerCase();
       const isStaff = isAdmin || canManageCivs || canManageBuildorders;
 
-      // JS Filtering and Threading
+      // JS Filtering, Threading and Profile mapping
       const threadedQuestions = (qData || []).filter(q => {
         if (isStaff) return true;
         if (q.status === 'approved') return true;
         if (userEmail && q.user_id?.toLowerCase() === userEmail) return true;
         return false;
       }).map(q => {
+        const qProfile = profiles.find(p => p.email?.toLowerCase() === q.user_id?.toLowerCase());
+        
         // Filter and sort answers for this question
         const qAnswers = aData.filter(a => a.question_id === q.id)
           .filter(a => isStaff || a.status === 'approved' || (userEmail && a.user_id?.toLowerCase() === userEmail))
@@ -307,14 +333,19 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         const buildThread = (parentId: string | null): any[] => {
           return qAnswers
             .filter(a => a.parent_id === parentId)
-            .map(a => ({
-              ...a,
-              replies: buildThread(a.id)
-            }));
+            .map(a => {
+              const aProfile = profiles.find(p => p.email?.toLowerCase() === a.user_id?.toLowerCase());
+              return {
+                ...a,
+                profile: aProfile,
+                replies: buildThread(a.id)
+              };
+            });
         };
 
         return {
           ...q,
+          profile: qProfile,
           answers: buildThread(null)
         };
       });
