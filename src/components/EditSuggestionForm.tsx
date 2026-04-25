@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
-import { Trash2, Plus, User, CheckCircle, XCircle, X, Upload, Loader2, MousePointer2, MoveVertical, Map, ChevronUp, ChevronDown } from 'lucide-react';
+import { Trash2, Plus, User, CheckCircle, XCircle, X, Upload, Loader2, MousePointer2, MoveVertical, Map, ChevronUp, ChevronDown, CheckCircle2 } from 'lucide-react';
 import type { ToastType } from './Toast';
+import { AOE4_MAPS } from './AdminBOEditorModal';
 
 interface SuggestionFormProps {
   civName: string;
@@ -30,6 +31,8 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
   });
   const [isUploading, setIsUploading] = useState(false);
   const [dragState, setDragState] = useState<{ startY: number; startPos: number } | null>(null);
+  const [isMapDropdownOpen, setIsMapDropdownOpen] = useState(false);
+  const mapDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -52,6 +55,17 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
       window.removeEventListener('mouseup', handleMouseUp);
     };
   }, [dragState]);
+
+  // Handle Click Outside for Map Dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (mapDropdownRef.current && !mapDropdownRef.current.contains(event.target as Node)) {
+        setIsMapDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const startDrag = (e: React.MouseEvent, currentPos: number) => {
     setDragState({ startY: e.clientY, startPos: currentPos });
@@ -387,13 +401,62 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
               <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
                 <Map size={14} className="text-cyan-400" /> Mappa Consigliata
               </label>
-              <input
-                type="text"
-                placeholder="es. Arabia, Isole, Qualsiasi..."
-                value={map}
-                onChange={(e) => setMap(e.target.value)}
-                className="w-full bg-white/5 backdrop-blur-md border-2 border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-cyan-500/50 focus:shadow-[0_0_30px_rgba(6,182,212,0.1)] transition-all placeholder:text-white/20"
-              />
+              <div className="relative" ref={mapDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsMapDropdownOpen(!isMapDropdownOpen)}
+                  className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:border-cyan-500/50 outline-none transition-all flex items-center justify-between group hover:bg-white/10 shadow-inner"
+                >
+                  <span className={map ? 'text-white font-bold' : 'text-white/20'}>
+                    {map || 'Seleziona una mappa...'}
+                  </span>
+                  <ChevronDown size={18} className={`text-cyan-500 transition-transform duration-300 ${isMapDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isMapDropdownOpen && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1c23] border border-cyan-500/30 rounded-xl overflow-hidden z-[7000] shadow-[0_10px_40px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="max-h-64 overflow-y-auto custom-scrollbar">
+                      {AOE4_MAPS.map((mapName) => (
+                        <button
+                          key={mapName}
+                          type="button"
+                          onClick={() => {
+                            setMap(mapName);
+                            setIsMapDropdownOpen(false);
+                          }}
+                          className={`w-full px-4 py-3 text-sm text-left transition-colors flex items-center justify-between group/item ${
+                            map === mapName 
+                              ? 'bg-cyan-500/20 text-cyan-400 font-black' 
+                              : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                          }`}
+                        >
+                          {mapName}
+                          {map === mapName && <CheckCircle2 size={14} className="text-cyan-500" />}
+                        </button>
+                      ))}
+                    </div>
+                    {/* Custom Input Option */}
+                    <div className="p-3 border-t border-white/5 bg-black/40">
+                      <input 
+                        type="text"
+                        placeholder="Altra mappa..."
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500/50 outline-none"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            setMap((e.target as HTMLInputElement).value);
+                            setIsMapDropdownOpen(false);
+                          }
+                        }}
+                        onChange={(e) => {
+                          setMap(e.target.value);
+                        }}
+                        value={AOE4_MAPS.includes(map || '') ? '' : (map || '')}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">
