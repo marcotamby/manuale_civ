@@ -316,8 +316,12 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                                 if (e.key === 'Enter') {
                                   e.preventDefault();
                                   if (mapSearch.trim()) {
-                                    setEditedBO(prev => ({ ...prev, map: mapSearch }));
-                                    setIsMapDropdownOpen(false);
+                                    const currentMaps = editedBO.map ? editedBO.map.split(', ').map(m => m.trim()) : [];
+                                    const newMaps = currentMaps.includes(mapSearch) 
+                                      ? currentMaps.filter(m => m !== mapSearch)
+                                      : [...currentMaps, mapSearch];
+                                    setEditedBO(prev => ({ ...prev, map: newMaps.join(', ') }));
+                                    setMapSearch('');
                                   }
                                 }
                               }}
@@ -332,22 +336,26 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                           {/* Categories (only if no search or matching) */}
                           {(!mapSearch || CATEGORY_MAPS.some(c => c.toLowerCase().includes(mapSearch.toLowerCase()))) && (
                             <div className="p-1">
-                               {CATEGORY_MAPS.filter(c => !mapSearch || c.toLowerCase().includes(mapSearch.toLowerCase())).map((mapName) => (
+                               {CATEGORY_MAPS.filter((c: string) => !mapSearch || c.toLowerCase().includes(mapSearch.toLowerCase())).map((mapName) => (
                                 <button
                                   key={mapName}
                                   type="button"
                                   onClick={() => {
-                                    setEditedBO(prev => ({ ...prev, map: mapName }));
-                                    setIsMapDropdownOpen(false);
+                                    const currentMaps = editedBO.map ? editedBO.map.split(', ').map(m => m.trim()) : [];
+                                    const isSelected = currentMaps.includes(mapName);
+                                    const newMaps = isSelected 
+                                      ? currentMaps.filter(m => m !== mapName)
+                                      : [...currentMaps, mapName];
+                                    setEditedBO(prev => ({ ...prev, map: newMaps.join(', ') }));
                                   }}
-                                  className={`w-full px-3 py-2 text-[11px] text-left transition-colors flex items-center justify-between rounded-lg ${
-                                    editedBO.map === mapName 
+                                  className={`w-full px-4 py-2.5 text-sm text-left transition-colors flex items-center justify-between group/item ${
+                                    editedBO.map?.split(', ').includes(mapName)
                                       ? 'bg-cyan-500/20 text-cyan-400 font-black' 
-                                      : 'text-cyan-400/60 hover:bg-white/5 hover:text-cyan-400'
+                                      : 'text-cyan-300 hover:bg-white/5 hover:text-cyan-200'
                                   }`}
                                 >
                                   {mapName}
-                                  {editedBO.map === mapName && <CheckCircle2 size={12} className="text-cyan-500" />}
+                                  {editedBO.map?.split(', ').includes(mapName) && <CheckCircle2 size={14} className="text-cyan-500" />}
                                 </button>
                               ))}
                               <div className="h-px bg-white/5 my-1" />
@@ -355,22 +363,26 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                           )}
 
                           {/* All Maps */}
-                          {ALL_MAPS.filter(m => !mapSearch || m.toLowerCase().includes(mapSearch.toLowerCase())).map((mapName) => (
+                          {ALL_MAPS.filter((m: string) => !mapSearch || m.toLowerCase().includes(mapSearch.toLowerCase())).map((mapName) => (
                             <button
                               key={mapName}
                               type="button"
                               onClick={() => {
-                                setEditedBO(prev => ({ ...prev, map: mapName }));
-                                setIsMapDropdownOpen(false);
+                                const currentMaps = editedBO.map ? editedBO.map.split(', ').map(m => m.trim()) : [];
+                                const isSelected = currentMaps.includes(mapName);
+                                const newMaps = isSelected 
+                                  ? currentMaps.filter(m => m !== mapName)
+                                  : [...currentMaps, mapName];
+                                setEditedBO(prev => ({ ...prev, map: newMaps.join(', ') }));
                               }}
                               className={`w-full px-4 py-2.5 text-sm text-left transition-colors flex items-center justify-between group/item ${
-                                editedBO.map === mapName 
+                                editedBO.map?.split(', ').includes(mapName)
                                   ? 'bg-cyan-500/20 text-cyan-400 font-black' 
                                   : 'text-gray-400 hover:bg-white/5 hover:text-white'
                               }`}
                             >
                               {mapName}
-                              {editedBO.map === mapName && <CheckCircle2 size={14} className="text-cyan-500" />}
+                              {editedBO.map?.split(', ').includes(mapName) && <CheckCircle2 size={14} className="text-cyan-500" />}
                             </button>
                           ))}
 
@@ -379,8 +391,11 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                                <p className="text-[10px] text-gray-500 uppercase font-bold mb-2">Nessuna mappa trovata</p>
                                <button 
                                  onClick={() => {
-                                   setEditedBO(prev => ({ ...prev, map: mapSearch }));
-                                   setIsMapDropdownOpen(false);
+                                   const currentMaps = editedBO.map ? editedBO.map.split(', ').map(m => m.trim()) : [];
+                                   if (!currentMaps.includes(mapSearch)) {
+                                     setEditedBO(prev => ({ ...prev, map: [...currentMaps, mapSearch].join(', ') }));
+                                   }
+                                   setMapSearch('');
                                  }}
                                  className="text-xs font-black text-cyan-400 hover:text-cyan-300 flex items-center justify-center gap-2 w-full"
                                >

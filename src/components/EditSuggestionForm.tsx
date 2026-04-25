@@ -434,8 +434,12 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                             if (e.key === 'Enter') {
                               e.preventDefault();
                               if (mapSearch.trim()) {
-                                setMap(mapSearch);
-                                setIsMapDropdownOpen(false);
+                                const currentMaps = map ? map.split(', ').map(m => m.trim()) : [];
+                                const newMaps = currentMaps.includes(mapSearch) 
+                                  ? currentMaps.filter(m => m !== mapSearch)
+                                  : [...currentMaps, mapSearch];
+                                setMap(newMaps.join(', '));
+                                setMapSearch('');
                               }
                             }
                           }}
@@ -450,22 +454,26 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                       {/* Categories (only if no search or matching) */}
                       {(!mapSearch || CATEGORY_MAPS.some((c: string) => c.toLowerCase().includes(mapSearch.toLowerCase()))) && (
                         <div className="p-1">
-                           {CATEGORY_MAPS.filter((c: string) => !mapSearch || c.toLowerCase().includes(mapSearch.toLowerCase())).map((mapName: string) => (
+                           {CATEGORY_MAPS.filter((c: string) => !mapSearch || c.toLowerCase().includes(mapSearch.toLowerCase())).map((mapName) => (
                             <button
                               key={mapName}
                               type="button"
                               onClick={() => {
-                                setMap(mapName);
-                                setIsMapDropdownOpen(false);
+                                const currentMaps = map ? map.split(', ').map(m => m.trim()) : [];
+                                const isSelected = currentMaps.includes(mapName);
+                                const newMaps = isSelected 
+                                  ? currentMaps.filter(m => m !== mapName)
+                                  : [...currentMaps, mapName];
+                                setMap(newMaps.join(', '));
                               }}
-                              className={`w-full px-3 py-2 text-[11px] text-left transition-colors flex items-center justify-between rounded-lg ${
-                                map === mapName 
+                              className={`w-full px-4 py-2.5 text-sm text-left transition-colors flex items-center justify-between group/item ${
+                                map?.split(', ').includes(mapName)
                                   ? 'bg-cyan-500/20 text-cyan-400 font-black' 
-                                  : 'text-cyan-400/60 hover:bg-white/5 hover:text-cyan-400'
+                                  : 'text-cyan-300 hover:bg-white/5 hover:text-cyan-200'
                               }`}
                             >
                               {mapName}
-                              {map === mapName && <CheckCircle2 size={12} className="text-cyan-500" />}
+                              {map?.split(', ').includes(mapName) && <CheckCircle2 size={14} className="text-cyan-500" />}
                             </button>
                           ))}
                           <div className="h-px bg-white/5 my-1" />
@@ -478,17 +486,21 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                           key={mapName}
                           type="button"
                           onClick={() => {
-                            setMap(mapName);
-                            setIsMapDropdownOpen(false);
+                            const currentMaps = map ? map.split(', ').map(m => m.trim()) : [];
+                            const isSelected = currentMaps.includes(mapName);
+                            const newMaps = isSelected 
+                              ? currentMaps.filter(m => m !== mapName)
+                              : [...currentMaps, mapName];
+                            setMap(newMaps.join(', '));
                           }}
                           className={`w-full px-4 py-2.5 text-sm text-left transition-colors flex items-center justify-between group/item ${
-                            map === mapName 
+                            map?.split(', ').includes(mapName)
                               ? 'bg-cyan-500/20 text-cyan-400 font-black' 
                               : 'text-gray-400 hover:bg-white/5 hover:text-white'
                           }`}
                         >
                           {mapName}
-                          {map === mapName && <CheckCircle2 size={14} className="text-cyan-500" />}
+                          {map?.split(', ').includes(mapName) && <CheckCircle2 size={14} className="text-cyan-500" />}
                         </button>
                       ))}
 
@@ -497,8 +509,11 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                            <p className="text-[10px] text-gray-500 uppercase font-bold mb-2">Nessuna mappa trovata</p>
                            <button 
                              onClick={() => {
-                               setMap(mapSearch);
-                               setIsMapDropdownOpen(false);
+                               const currentMaps = map ? map.split(', ').map(m => m.trim()) : [];
+                               if (!currentMaps.includes(mapSearch)) {
+                                 setMap([...currentMaps, mapSearch].join(', '));
+                               }
+                               setMapSearch('');
                              }}
                              className="text-xs font-black text-cyan-400 hover:text-cyan-300 flex items-center justify-center gap-2 w-full"
                            >
