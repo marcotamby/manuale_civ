@@ -166,7 +166,7 @@ export function TournamentsPage() {
                 config: { ...config, directLink: config.directLink || `https://challonge.com/it/${config.slug}` }
               } as any;
             }
-            return { ...tournamentData, config, id: config.id || tournamentData.id };
+            return { ...tournamentData, config, slug: config.slug, id: config.id || tournamentData.id };
           }
 
           if (config.slug && (config.directLink || config.slug.startsWith('tb-'))) {
