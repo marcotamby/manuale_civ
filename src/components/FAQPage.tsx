@@ -469,12 +469,13 @@ export function FAQPage() {
               <HelpCircle size={32} className="text-blue-400" />
             </div>
             <div className="relative p-6 md:p-8 flex-1">
-              {/* Torn paper effect background */}
+              {/* Torn paper effect background - Blended version */}
               <div 
-                className="absolute inset-0 bg-black/60 backdrop-blur-xl -z-10" 
+                className="absolute inset-0 bg-black/40 backdrop-blur-lg -z-10" 
                 style={{ 
-                  clipPath: 'polygon(0% 1%, 98% 0%, 100% 25%, 99% 50%, 100% 75%, 98% 100%, 1% 99%, 0% 50%)',
-                  border: '1px solid rgba(255,255,255,0.05)'
+                  clipPath: 'polygon(1% 4%, 20% 0%, 45% 4%, 75% 0%, 98% 3%, 100% 30%, 97% 55%, 100% 85%, 98% 100%, 70% 96%, 40% 100%, 15% 97%, 0% 100%, 2% 70%, 0% 40%, 3% 15%)',
+                  maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 95%)',
+                  WebkitMaskImage: 'radial-gradient(ellipse at center, black 30%, transparent 95%)'
                 }} 
               />
               <h1 className="text-4xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-500 tracking-tight drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]">

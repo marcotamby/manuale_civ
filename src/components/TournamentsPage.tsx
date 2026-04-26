@@ -605,12 +605,13 @@ export function TournamentsPage() {
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-700 relative z-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
         <div className="relative p-6 md:p-10">
-          {/* Torn paper effect background */}
+          {/* Torn paper effect background - Blended version */}
           <div 
-            className="absolute inset-0 bg-black/60 backdrop-blur-xl -z-10" 
+            className="absolute inset-0 bg-black/40 backdrop-blur-lg -z-10" 
             style={{ 
-              clipPath: 'polygon(0.5% 2%, 98.5% 0%, 100% 30%, 99% 65%, 99.5% 98%, 1.5% 100%, 0% 50%)',
-              border: '1px solid rgba(255,255,255,0.05)'
+              clipPath: 'polygon(2% 5%, 15% 0%, 35% 5%, 60% 0%, 85% 5%, 98% 0%, 100% 25%, 97% 50%, 100% 75%, 98% 100%, 75% 95%, 50% 100%, 25% 95%, 2% 100%, 0% 75%, 3% 50%, 0% 25%)',
+              maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 95%)',
+              WebkitMaskImage: 'radial-gradient(ellipse at center, black 30%, transparent 95%)'
             }} 
           />
           <h1 className="text-3xl md:text-5xl font-inter font-black text-transparent bg-clip-text bg-gradient-to-b from-slate-200 via-gray-400 to-slate-500 mb-4 uppercase tracking-tighter drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">
