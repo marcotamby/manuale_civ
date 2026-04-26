@@ -137,15 +137,14 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
       <div 
         className="absolute inset-0 z-0 pointer-events-none"
         style={{ 
-          backgroundImage: `url('/header-bg.png')`,
-          backgroundSize: 'auto 100%',
-          backgroundPosition: 'center',
+          backgroundImage: `linear-gradient(to right, #0d1424 0%, rgba(13, 20, 36, 0) 25%, rgba(13, 20, 36, 0) 75%, #0d1424 100%), url('/header-bg.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 35%', // Slightly offset to show better part of the image
           backgroundRepeat: 'no-repeat',
-          maskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
-          WebkitMaskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
-          opacity: 0.5
+          opacity: 0.7
         }}
       ></div>
+
 
       {/* Decorative top border glow effect */}
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent z-10"></div>
