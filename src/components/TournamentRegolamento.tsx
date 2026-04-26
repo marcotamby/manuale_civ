@@ -73,6 +73,7 @@ export function TournamentRegolamento() {
     );
   }
 
+  return (
     <div className="min-h-screen bg-transparent text-gray-200 py-12 md:py-16">
       {/* Torn Paper Header matching the new style */}
       <div className="max-w-4xl mx-auto px-4 mb-12">
