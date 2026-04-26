@@ -104,7 +104,7 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
                   onSelectPage('civ');
                 }}
                 title={civ.name}
-                className="w-full aspect-square shrink-0 relative overflow-hidden transition-all duration-300 hover:z-10 group mb-2 last:mb-0 rounded-md border border-transparent hover:border-yellow-500/50 hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] hover-pulse md:hover:scale-115 md:hover:-translate-y-1 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
+                className="w-full aspect-square shrink-0 relative overflow-hidden transition-all duration-300 hover:z-10 group mb-2 last:mb-0 rounded-md border border-transparent hover:border-white/30 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] md:hover:scale-115 md:hover:-translate-y-1 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
               >
                 <img 
                   src={civ.flag} 
@@ -133,10 +133,10 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
                   onSelectPage('civ');
                   if (window.innerWidth < 768) onClose();
                 }}
-                className={`group relative w-full aspect-square shrink-0 flex flex-col items-center justify-center transition-all duration-500 overflow-hidden mb-2.5 last:mb-0 rounded-md border hover-pulse md:hover:scale-115 md:hover:-translate-y-1 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]
+                className={`group relative w-full aspect-square shrink-0 flex flex-col items-center justify-center transition-all duration-500 overflow-hidden mb-2.5 last:mb-0 rounded-md border md:hover:scale-115 md:hover:-translate-y-1 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]
                   ${selectedCiv === civ.id 
-                    ? 'z-20 scale-105 shadow-[0_0_25px_rgba(212,175,55,0.4)] border-yellow-400 ring-1 ring-yellow-400/50' 
-                    : 'z-0 border-transparent hover:border-yellow-500/40 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)]'
+                    ? 'z-20 scale-105 shadow-[0_0_25px_rgba(255,255,255,0.1)] border-white/40 ring-1 ring-white/20' 
+                    : 'z-0 border-transparent hover:border-white/30 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]'
                   }
                 `}
               >
