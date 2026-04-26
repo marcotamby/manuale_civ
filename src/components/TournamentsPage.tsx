@@ -605,14 +605,13 @@ export function TournamentsPage() {
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-700 relative z-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
         <div className="relative p-6 md:p-10">
-          {/* Authentic High-Density Torn Paper Effect */}
+          {/* Organic 'Torn Book Page' Effect */}
           <div className="absolute inset-0 -z-10 pointer-events-none">
             <div 
               className="absolute inset-0 bg-black/60 backdrop-blur-xl" 
               style={{ 
-                clipPath: 'polygon(0% 12%, 5% 2%, 10% 15%, 15% 5%, 22% 20%, 28% 8%, 35% 18%, 42% 2%, 50% 15%, 58% 5%, 65% 22%, 72% 8%, 80% 15%, 88% 2%, 95% 12%, 100% 30%, 98% 50%, 100% 70%, 97% 90%, 100% 100%, 88% 95%, 75% 100%, 62% 92%, 50% 100%, 38% 95%, 25% 100%, 12% 92%, 0% 100%, 3% 75%, 0% 50%, 4% 25%)',
-                maskImage: 'radial-gradient(ellipse at center, black 60%, transparent 100%)',
-                WebkitMaskImage: 'radial-gradient(ellipse at center, black 60%, transparent 100%)'
+                clipPath: 'polygon(1% 5%, 15% 1%, 45% 4%, 75% 0%, 98% 4%, 100% 30%, 97% 65%, 100% 98%, 75% 95%, 45% 100%, 15% 94%, 0% 99%, 3% 50%)',
+                backgroundImage: 'radial-gradient(circle at 30% 50%, rgba(255,255,255,0.02) 0%, transparent 60%)',
               }} 
             />
           </div>

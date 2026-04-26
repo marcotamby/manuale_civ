@@ -463,32 +463,31 @@ export function FAQPage() {
           )}
         </div>
 
-        <header className="mb-10 border-b border-blue-500/20 pb-6 relative group">
-          {/* Authentic High-Density Torn Paper Effect */}
+        <div className="mb-12 relative group">
+          {/* Organic 'Torn Book Page' Effect */}
           <div className="absolute inset-0 -z-10 pointer-events-none">
             <div 
               className="absolute inset-0 bg-black/60 backdrop-blur-xl" 
               style={{ 
-                clipPath: 'polygon(0% 15%, 5% 5%, 12% 18%, 18% 2%, 25% 15%, 32% 0%, 40% 20%, 48% 5%, 55% 18%, 62% 2%, 70% 15%, 78% 0%, 85% 20%, 92% 5%, 100% 25%, 98% 45%, 100% 65%, 97% 85%, 100% 100%, 85% 95%, 72% 100%, 60% 92%, 48% 100%, 35% 95%, 22% 100%, 10% 92%, 0% 100%, 2% 75%, 0% 50%, 3% 25%)',
-                maskImage: 'radial-gradient(ellipse at center, black 60%, transparent 100%)',
-                WebkitMaskImage: 'radial-gradient(ellipse at center, black 60%, transparent 100%)'
+                clipPath: 'polygon(0% 2%, 15% 0%, 45% 3%, 75% 1%, 99% 2%, 97% 35%, 100% 65%, 98% 99%, 75% 97%, 45% 100%, 15% 96%, 0% 98%, 2% 50%)',
+                backgroundImage: 'radial-gradient(circle at 30% 50%, rgba(255,255,255,0.02) 0%, transparent 60%)',
               }} 
             />
           </div>
 
-          <div className="flex items-center gap-6 p-6 md:p-8">
-            <div className="p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20 shrink-0">
-              <HelpCircle size={32} className="text-blue-400" />
+          <div className="flex items-center gap-4 p-6 md:p-8">
+            <div className="p-2.5 bg-blue-500/10 rounded-2xl border border-blue-500/20 shrink-0">
+              <HelpCircle size={28} className="text-blue-400" />
             </div>
             
             <div className="flex-1">
               <h1 className="text-3xl md:text-4xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-500 tracking-tight drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]">
                 Domande Frequenti
               </h1>
-              <p className="text-gray-400 mt-1 font-serif italic text-sm md:text-base">Tutto quello che c'è da sapere sul Manuale delle Civiltà</p>
+              <p className="text-gray-400 mt-0.5 font-serif italic text-sm md:text-base">Tutto quello che c'è da sapere sul Manuale delle Civiltà</p>
             </div>
           </div>
-        </header>
+        </div>
 
         <section className="mb-12 glass p-6 md:p-8 rounded-3xl border border-white/5 relative group">
           {isEditing ? (
