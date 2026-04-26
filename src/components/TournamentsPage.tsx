@@ -695,12 +695,21 @@ export function TournamentsPage() {
 
                 <div className="p-6 flex flex-col flex-grow bg-[#121620] relative z-10 -mt-px">
                     <span className="text-xs font-bold text-yellow-500/50 uppercase mb-1 tracking-widest">Organizzato da {t.config.organizer}</span>
-                    <h3 
-                      className="text-2xl font-black text-white mb-4 line-clamp-1 group-hover:text-yellow-400 transition-colors uppercase tracking-tight"
-                      title={t.config.name || t.name}
-                    >
-                      {t.config.name || t.name}
-                    </h3>
+                    <div className="relative group/title">
+                      <h3 className="text-2xl font-black text-white mb-4 line-clamp-1 group-hover/title:text-yellow-400 transition-colors uppercase tracking-tight">
+                        {t.config.name || t.name}
+                      </h3>
+                      
+                      {/* Premium Title Tooltip */}
+                      <div className="absolute bottom-full left-0 mb-4 px-4 py-3 bg-slate-900/95 backdrop-blur-xl border border-yellow-500/30 rounded-2xl opacity-0 group-hover/title:opacity-100 transition-all duration-300 pointer-events-none z-[100] shadow-2xl scale-95 group-hover/title:scale-100 origin-bottom-left min-w-[240px] max-w-[320px]">
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-black text-yellow-500/60 uppercase tracking-[0.2em] mb-2 border-b border-white/5 pb-1">Dettagli Torneo</span>
+                          <span className="text-sm font-bold text-white leading-relaxed">{t.config.name || t.name}</span>
+                        </div>
+                        {/* Tooltip Arrow */}
+                        <div className="absolute top-full left-6 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900/95"></div>
+                      </div>
+                    </div>
                     
                     <div className="flex flex-col gap-3 mb-6 text-gray-300 text-sm font-medium">
                       <div className="flex items-center gap-3">
