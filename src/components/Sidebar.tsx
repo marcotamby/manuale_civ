@@ -60,7 +60,7 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
       <aside 
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className={`w-20 md:w-32 h-full flex flex-col items-center py-6 md:px-3 glass border-r border-[#D4AF37]/20 transition-transform duration-300 overflow-y-auto overflow-x-hidden no-scrollbar fixed md:static z-30
+        className={`w-20 md:w-32 h-full flex flex-col items-center py-6 md:px-3 lg:bg-transparent glass border-r border-[#D4AF37]/20 transition-transform duration-300 overflow-y-auto overflow-x-hidden no-scrollbar fixed md:static z-30
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
         {/* Mobile Toggle Button (only when open to close it, or we rely on App.tsx topbar to open it) */}
