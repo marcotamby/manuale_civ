@@ -221,7 +221,7 @@ function App() {
               url('/header-bg.png')
             `,
             backgroundSize: 'cover',
-            backgroundPosition: isCiv ? 'center 10%' : 'center 20%',
+            backgroundPosition: 'center 20%',
             opacity: isCiv ? 0.4 : 0.6,
             maskImage: `linear-gradient(to bottom, black ${isCiv ? '30%' : '85%'}, transparent 100%)`,
             WebkitMaskImage: `linear-gradient(to bottom, black ${isCiv ? '30%' : '85%'}, transparent 100%)`
