@@ -602,7 +602,10 @@ export function TournamentsPage() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-700 relative z-10">
+    <div className={clsx(
+      "max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-700 relative",
+      showEditModal ? "z-[150]" : "z-10"
+    )}>
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
         <div className="relative p-6 md:p-10">
           {/* Organic 'Torn Book Page' Effect */}
