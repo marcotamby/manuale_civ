@@ -605,23 +605,14 @@ export function TournamentsPage() {
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-700 relative z-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
         <div className="relative p-6 md:p-10">
-          {/* Authentic Layered Torn Paper Effect */}
+          {/* Authentic High-Density Torn Paper Effect */}
           <div className="absolute inset-0 -z-10 pointer-events-none">
-            {/* Base Layer */}
             <div 
-              className="absolute inset-0 bg-black/40 backdrop-blur-md" 
+              className="absolute inset-0 bg-black/60 backdrop-blur-xl" 
               style={{ 
-                clipPath: 'polygon(1% 12%, 8% 2%, 22% 8%, 35% 1%, 52% 10%, 68% 3%, 82% 12%, 95% 5%, 100% 28%, 96% 45%, 100% 68%, 95% 92%, 88% 100%, 72% 94%, 55% 98%, 38% 92%, 22% 100%, 8% 94%, 0% 100%, 4% 72%, 0% 48%, 5% 25%)',
-                maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 98%)',
-                WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 98%)'
-              }} 
-            />
-            {/* Top Scrap Layer */}
-            <div 
-              className="absolute inset-0 bg-white/5" 
-              style={{ 
-                clipPath: 'polygon(5% 15%, 25% 10%, 45% 18%, 65% 12%, 85% 20%, 95% 40%, 80% 60%, 90% 85%, 60% 75%, 30% 90%, 10% 70%, 15% 40%)',
-                opacity: 0.3
+                clipPath: 'polygon(0% 12%, 5% 2%, 10% 15%, 15% 5%, 22% 20%, 28% 8%, 35% 18%, 42% 2%, 50% 15%, 58% 5%, 65% 22%, 72% 8%, 80% 15%, 88% 2%, 95% 12%, 100% 30%, 98% 50%, 100% 70%, 97% 90%, 100% 100%, 88% 95%, 75% 100%, 62% 92%, 50% 100%, 38% 95%, 25% 100%, 12% 92%, 0% 100%, 3% 75%, 0% 50%, 4% 25%)',
+                maskImage: 'radial-gradient(ellipse at center, black 60%, transparent 100%)',
+                WebkitMaskImage: 'radial-gradient(ellipse at center, black 60%, transparent 100%)'
               }} 
             />
           </div>

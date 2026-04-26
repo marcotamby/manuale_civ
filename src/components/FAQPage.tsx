@@ -463,35 +463,26 @@ export function FAQPage() {
           )}
         </div>
 
-        <header className="mb-12 border-b border-blue-500/20 pb-8">
-          <div className="relative flex items-center gap-6 p-6 md:p-8 rounded-2xl overflow-hidden">
-            {/* Authentic Layered Torn Paper Effect */}
-            <div className="absolute inset-0 -z-10 pointer-events-none">
-              {/* Base Layer */}
-              <div 
-                className="absolute inset-0 bg-black/40 backdrop-blur-md" 
-                style={{ 
-                  clipPath: 'polygon(0% 5%, 12% 0%, 28% 6%, 45% 1%, 62% 8%, 78% 2%, 92% 10%, 100% 5%, 98% 35%, 100% 65%, 97% 92%, 85% 100%, 65% 95%, 45% 100%, 25% 94%, 5% 100%, 0% 70%, 3% 40%, 0% 15%)',
-                  maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 98%)',
-                  WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 98%)'
-                }} 
-              />
-              {/* Top Scrap Layer */}
-              <div 
-                className="absolute inset-0 bg-white/5" 
-                style={{ 
-                  clipPath: 'polygon(10% 20%, 30% 15%, 50% 25%, 70% 18%, 90% 28%, 95% 50%, 85% 75%, 65% 65%, 40% 80%, 15% 60%, 20% 35%)',
-                  opacity: 0.25
-                }} 
-              />
-            </div>
+        <header className="mb-10 border-b border-blue-500/20 pb-6 relative group">
+          {/* Authentic High-Density Torn Paper Effect */}
+          <div className="absolute inset-0 -z-10 pointer-events-none">
+            <div 
+              className="absolute inset-0 bg-black/60 backdrop-blur-xl" 
+              style={{ 
+                clipPath: 'polygon(0% 15%, 5% 5%, 12% 18%, 18% 2%, 25% 15%, 32% 0%, 40% 20%, 48% 5%, 55% 18%, 62% 2%, 70% 15%, 78% 0%, 85% 20%, 92% 5%, 100% 25%, 98% 45%, 100% 65%, 97% 85%, 100% 100%, 85% 95%, 72% 100%, 60% 92%, 48% 100%, 35% 95%, 22% 100%, 10% 92%, 0% 100%, 2% 75%, 0% 50%, 3% 25%)',
+                maskImage: 'radial-gradient(ellipse at center, black 60%, transparent 100%)',
+                WebkitMaskImage: 'radial-gradient(ellipse at center, black 60%, transparent 100%)'
+              }} 
+            />
+          </div>
 
+          <div className="flex items-center gap-6 p-6 md:p-8">
             <div className="p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20 shrink-0">
               <HelpCircle size={32} className="text-blue-400" />
             </div>
             
             <div className="flex-1">
-              <h1 className="text-4xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-500 tracking-tight drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]">
+              <h1 className="text-3xl md:text-4xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-500 tracking-tight drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]">
                 Domande Frequenti
               </h1>
               <p className="text-gray-400 mt-1 font-serif italic text-sm md:text-base">Tutto quello che c'è da sapere sul Manuale delle Civiltà</p>
