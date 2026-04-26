@@ -41,7 +41,6 @@ function App() {
   const selectedCivMatch = location.pathname.match(/^\/civ\/([^/]+)/);
   const selectedCivId = selectedCivMatch ? selectedCivMatch[1] : '';
   const { civilizations: civilizationsData, loading, error, refreshCivs, updateCivLocally, updateGlobalUnitLocally } = useCivData();
-  const activeCiv = civilizationsData.find(c => c.id === selectedCivId);
 
   const isFaq = location.pathname === '/faq';
   const isTournaments = location.pathname.includes('/tornei');
@@ -203,7 +202,6 @@ function App() {
     >
       <Topbar
         isHome={isHome}
-        civFlag={activeCiv?.flag}
         searchQuery=""
         setSearchQuery={() => { }}
         activeFilter="Tutte"
@@ -213,7 +211,7 @@ function App() {
       />
 
       {/* Global Homepage Extended Background - Desktop Only */}
-      {isHome && (
+      { (isHome || isTournaments || isFaq) && (
         <div 
           className="fixed top-0 left-0 right-0 h-[800px] z-0 pointer-events-none hidden lg:block"
           style={{ 
@@ -234,7 +232,7 @@ function App() {
       <div className="flex-1 flex flex-row overflow-hidden relative">
         {(currentPage !== 'home' || isSidebarOpen) && (
           <Sidebar
-            selectedCiv={selectedCiv}
+            selectedCiv={selectedCivId}
             onSelectCiv={handleSelectCiv}
             onSelectPage={(page) => {
               if (page === 'home') navigate('/');
