@@ -131,20 +131,30 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
   }, [favorites, civilizations, isAuthenticated, user?.email, refreshTrigger]);
 
   return (
-    <div 
-      className="w-full border-b border-yellow-500/20 flex flex-col lg:grid lg:grid-cols-[1fr_auto_1fr] items-center px-4 py-2.5 md:px-14 md:py-4 lg:py-5 z-[100] shrink-0 gap-3 md:gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative bg-cover bg-center bg-no-repeat"
-      style={{ 
-        backgroundImage: `linear-gradient(to right, rgba(13, 20, 36, 0.9), rgba(26, 28, 50, 0.8), rgba(13, 20, 36, 0.9)), url('/header-bg.png')` 
-      }}
-    >
+    <div className="w-full bg-gradient-to-r from-[#0d1424] via-[#1a1c32] to-[#0d1424] border-b border-yellow-500/20 flex flex-col lg:grid lg:grid-cols-[1fr_auto_1fr] items-center px-4 py-2.5 md:px-14 md:py-4 lg:py-5 z-[100] shrink-0 gap-3 md:gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative overflow-hidden">
+      
+      {/* Background Image Layer with Fade-out edges */}
+      <div 
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{ 
+          backgroundImage: `url('/header-bg.png')`,
+          backgroundSize: 'auto 100%',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          maskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
+          opacity: 0.5
+        }}
+      ></div>
 
       {/* Decorative top border glow effect */}
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent"></div>
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent z-10"></div>
+
 
 
 
       {/* Left container for social links */}
-      <div className="hidden md:flex flex-wrap 2xl:flex-nowrap items-center justify-center lg:justify-start gap-1.5 2xl:gap-3 order-2 lg:order-1 min-w-0 w-full lg:max-w-[380px] 2xl:max-w-none">
+      <div className="hidden md:flex flex-wrap 2xl:flex-nowrap items-center justify-center lg:justify-start gap-1.5 2xl:gap-3 order-2 lg:order-1 min-w-0 w-full lg:max-w-[380px] 2xl:max-w-none relative z-10">
         <a
           href="https://discord.gg/8Tx2YdXrEu"
           target="_blank"
@@ -194,7 +204,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
       {/* Center Title Area */}
       <Link 
         to="/" 
-        className="flex flex-col items-center justify-center text-center w-full order-1 lg:order-2 group cursor-pointer hover:opacity-95 transition-all py-1 px-4"
+        className="flex flex-col items-center justify-center text-center w-full order-1 lg:order-2 group cursor-pointer hover:opacity-95 transition-all py-1 px-4 relative z-10"
       >
         <h2 className="text-[10px] md:text-[14px] font-bold text-slate-500 tracking-[0.5em] uppercase mb-1 whitespace-nowrap">
           Age of Empires IV
@@ -214,7 +224,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
       </Link>
 
       {/* Auth / Right side */}
-      <div className="flex items-center justify-center lg:justify-end order-3 min-w-0">
+      <div className="flex items-center justify-center lg:justify-end order-3 min-w-0 relative z-10">
         {isAuthenticated ? (
           <div className="flex flex-col items-end gap-4 md:translate-y-1">
             <div className="flex items-center gap-3 md:gap-4 font-sans">
