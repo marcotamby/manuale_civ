@@ -74,18 +74,21 @@ export function TournamentRegolamento() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent text-gray-200 py-12 md:py-16">
-      {/* Torn Paper Header matching the new style */}
-      <div className="max-w-4xl mx-auto px-4 mb-12">
+    <div className="min-h-screen bg-transparent text-gray-200 pt-6 pb-12 md:pt-10 md:pb-16">
+      {/* Back Button - Moved to far left for better layout */}
+      <div className="max-w-6xl mx-auto px-4 mb-6">
         <button 
           onClick={() => navigate('/tornei')}
-          className="flex items-center gap-2 px-4 py-2 mb-8 glass rounded-xl text-gray-400 hover:text-white transition-all group text-[10px] font-bold uppercase tracking-widest border border-white/5 hover:border-white/20"
+          className="flex items-center gap-2 px-4 py-2 glass rounded-xl text-gray-400 hover:text-white transition-all group text-[10px] font-bold uppercase tracking-widest border border-white/5 hover:border-white/20 w-fit"
         >
           <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1" />
           Torna ai Tornei
         </button>
+      </div>
 
-        <div className="relative group p-8 md:p-12 overflow-hidden">
+      <div className="max-w-4xl mx-auto px-4">
+        {/* Torn Paper Header matching the new style */}
+        <div className="relative group p-6 md:p-8 overflow-hidden mb-8">
           {/* Organic 'Torn Book Page' Effect */}
           <div className="absolute inset-0 -z-10 pointer-events-none">
             <div 
@@ -98,8 +101,8 @@ export function TournamentRegolamento() {
           </div>
 
           <div className="flex flex-col items-center text-center">
-            <div className="flex items-center gap-3 text-yellow-500/80 mb-4">
-              <BookOpen size={20} />
+            <div className="flex items-center gap-3 text-yellow-500/80 mb-2">
+              <BookOpen size={18} />
               <span className="text-[10px] font-black uppercase tracking-[0.4em]">Regolamento Ufficiale</span>
             </div>
             <h1 className="text-3xl md:text-5xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400 tracking-tighter leading-tight drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">
@@ -107,10 +110,9 @@ export function TournamentRegolamento() {
             </h1>
           </div>
         </div>
-      </div>
 
-      {/* Content Section */}
-      <div className="max-w-4xl mx-auto px-4 pb-24 relative z-10">
+        {/* Content Section */}
+        <div className="relative z-10 pb-24">
         <div className="glass rounded-[2rem] border border-white/10 overflow-hidden shadow-2xl relative">
           {/* Quick Edit Button - Shortcut to TournamentsPage */}
           {canManageTournaments && (
