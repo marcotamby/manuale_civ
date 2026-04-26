@@ -185,6 +185,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const [replyTo, setReplyTo] = useState<{ questionId: string, parentId?: string } | null>(null);
   const [answerText, setAnswerText] = useState('');
   const [qaMessage, setQaMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
+  const [qaMessageClosing, setQaMessageClosing] = useState(false);
   const [boVotes, setBoVotes] = useState<Record<string, { up: number, down: number, userVote: number | null }>>({});
   const [boMessage, setBoMessage] = useState<{ id: string, text: string } | null>(null);
 
@@ -394,6 +395,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     setAnswerText('');
     setReplyTo(null);
     setQaMessage(null);
+    setQaMessageClosing(false);
   }, [user?.email]);
 
   const validateProfile = () => {
@@ -446,9 +448,13 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       }, 1000);
 
       setTimeout(() => {
-        setQaSubmissionSuccess(false);
-        setQaMessage(null);
-      }, 3000);
+        setQaMessageClosing(true);
+        setTimeout(() => {
+          setQaSubmissionSuccess(false);
+          setQaMessage(null);
+          setQaMessageClosing(false);
+        }, 1000);
+      }, 7000);
 
     } catch (err) {
       console.error('Error submitting question:', err);
@@ -520,9 +526,13 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       if (targetStatus === 'approved') fetchQA();
       
       setTimeout(() => {
-        setAnsSubmissionSuccess(null);
-        setQaMessage(null);
-      }, 3000);
+        setQaMessageClosing(true);
+        setTimeout(() => {
+          setAnsSubmissionSuccess(null);
+          setQaMessage(null);
+          setQaMessageClosing(false);
+        }, 1000);
+      }, 7000);
     } catch (err) {
       console.error('Error submitting answer:', err);
       setQaMessage({ text: 'Errore durante l\'invio della risposta', type: 'error' });
@@ -1499,10 +1509,12 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
             {/* Success/Error Message */}
             {qaMessage && (
-              <div className={`p-4 rounded-xl border flex items-center justify-between animate-in zoom-in duration-300 ${
+              <div className={`p-4 rounded-xl border flex items-center justify-between transition-all duration-1000 ${
+                qaMessageClosing ? 'opacity-0 -translate-y-2' : 'animate-in zoom-in duration-300 opacity-100 translate-y-0'
+              } ${
                 qaMessage.type === 'success' 
-                  ? 'bg-green-500/10 border-green-500/30 text-green-400' 
-                  : 'bg-red-500/10 border-red-500/30 text-red-400'
+                  ? 'bg-green-500/10 border-green-500/30 text-green-400 shadow-[0_0_20px_rgba(34,197,94,0.1)]' 
+                  : 'bg-red-500/10 border-red-500/30 text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.1)]'
               }`}>
                 <div className="flex items-center gap-3">
                   {qaMessage.type === 'success' ? <CheckCircle size={20} /> : <XCircle size={20} />}
