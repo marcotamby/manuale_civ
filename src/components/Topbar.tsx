@@ -18,9 +18,10 @@ interface TopbarProps {
   onOpenAdminDashboard?: () => void;
   onOpenAdminOverlay?: () => void;
   isHome?: boolean;
+  civFlag?: string;
 }
 
-export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: TopbarProps) {
+export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome, civFlag }: TopbarProps) {
   const { isAuthenticated, isAdmin, isSuperAdmin, isStreamer, user, logout, openLoginModal, favorites } = useAuth();
   const { civilizations } = useCivData();
   const { activeAdmins: _activeAdmins, onlineUserCount, usersByPage } = usePresence();
@@ -132,19 +133,29 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
   }, [favorites, civilizations, isAuthenticated, user?.email, refreshTrigger]);
 
   return (
-    <div className={`w-full ${isHome ? 'lg:bg-transparent lg:border-b-0 lg:shadow-none' : 'bg-gradient-to-r from-[#0d1424] via-[#1a1c32] to-[#0d1424] border-b border-yellow-500/20 shadow-[0_4px_20px_rgba(0,0,0,0.5)]'} flex flex-col lg:grid lg:grid-cols-[1fr_auto_1fr] items-center px-4 py-2.5 md:px-14 md:py-4 lg:py-5 z-[100] shrink-0 gap-3 md:gap-4 relative`}>
+    <div className={`w-full ${isHome ? 'lg:bg-transparent lg:border-b-0 lg:shadow-none' : 'bg-[#0d1424]/80 backdrop-blur-md border-b border-yellow-500/20 shadow-[0_4px_20px_rgba(0,0,0,0.5)]'} flex flex-col lg:grid lg:grid-cols-[1fr_auto_1fr] items-center px-4 py-2.5 md:px-14 md:py-4 lg:py-5 z-[100] shrink-0 gap-3 md:gap-4 relative`}>
       
-      {/* Background Image Layer with Fade-out edges */}
-      <div 
-        className={`absolute inset-0 z-0 pointer-events-none ${isHome ? 'lg:hidden' : ''}`}
-        style={{ 
-          backgroundImage: `linear-gradient(to right, #0d1424 0%, rgba(13, 20, 36, 0) 25%, rgba(13, 20, 36, 0) 75%, #0d1424 100%), url('/header-bg.png')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center 35%', // Slightly offset to show better part of the image
-          backgroundRepeat: 'no-repeat',
-          opacity: 0.7
-        }}
-      ></div>
+      {/* Dynamic Background Layer for Internal Pages */}
+      {!isHome && (
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          {civFlag ? (
+            <>
+              <img src={civFlag} alt="" className="w-full h-full object-cover blur-2xl opacity-20 scale-150" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0d1424] via-transparent to-[#0d1424] opacity-60" />
+            </>
+          ) : (
+            <div 
+              className="absolute inset-0"
+              style={{ 
+                backgroundImage: `linear-gradient(to right, #0d1424 0%, rgba(13, 20, 36, 0) 25%, rgba(13, 20, 36, 0) 75%, #0d1424 100%), url('/header-bg.png')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center 35%',
+                opacity: 0.15 // Very subtle for other pages to avoid "squashed" feel
+              }}
+            ></div>
+          )}
+        </div>
+      )}
 
 
       {/* Decorative top border glow effect */}

@@ -39,7 +39,9 @@ function App() {
   const isCiv = location.pathname.startsWith('/civ/');
 
   const selectedCivMatch = location.pathname.match(/^\/civ\/([^/]+)/);
-  const selectedCiv = selectedCivMatch ? selectedCivMatch[1] : '';
+  const selectedCivId = selectedCivMatch ? selectedCivMatch[1] : '';
+  const { civilizations: civilizationsData, loading, error, refreshCivs, updateCivLocally, updateGlobalUnitLocally } = useCivData();
+  const activeCiv = civilizationsData.find(c => c.id === selectedCivId);
 
   const isFaq = location.pathname === '/faq';
   const isTournaments = location.pathname.includes('/tornei');
@@ -93,17 +95,16 @@ function App() {
   const { updateActivity } = usePresence();
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
-  const { civilizations: civilizationsData, loading, error, refreshCivs, updateCivLocally, updateGlobalUnitLocally } = useCivData();
 
   // Track activity globally
   useEffect(() => {
     // Track everyone for global counts
-    if (isCiv && selectedCiv) {
-      updateActivity({ type: 'viewing', civId: selectedCiv });
+    if (isCiv && selectedCivId) {
+      updateActivity({ type: 'viewing', civId: selectedCivId });
     } else {
       updateActivity({ type: 'viewing', section: currentPage });
     }
-  }, [currentPage, selectedCiv]);
+  }, [currentPage, selectedCivId]);
 
   const prevPathRef = useRef(location.pathname);
   useEffect(() => {
@@ -172,7 +173,7 @@ function App() {
     navigate('/compare');
   };
 
-  const civIndex = civilizationsData.findIndex((c) => c.id === selectedCiv);
+  const civIndex = civilizationsData.findIndex((c) => c.id === selectedCivId);
   const prevCiv = civilizationsData.length > 0 ? civilizationsData[(civIndex - 1 + civilizationsData.length) % civilizationsData.length] : null;
   const nextCiv = civilizationsData.length > 0 ? civilizationsData[(civIndex + 1) % civilizationsData.length] : null;
 
@@ -202,6 +203,7 @@ function App() {
     >
       <Topbar
         isHome={isHome}
+        civFlag={activeCiv?.flag}
         searchQuery=""
         setSearchQuery={() => { }}
         activeFilter="Tutte"
@@ -311,8 +313,8 @@ function App() {
             <div className="flex-1 overflow-y-auto overflow-x-hidden w-full main-content-area elegant-scrollbar md:md-content-padding pb-20 md:pb-0">
               <Routes>
                 <Route path="/" element={<Home onSelectCiv={handleSelectCiv} onCompareCivs={handleCompare} />} />
-                <Route path="/civ/:civId" element={<CivView civId={selectedCiv} onSelectUnit={setSelectedUnit} />} />
-                <Route path="/civ/:civId/:tab" element={<CivView civId={selectedCiv} onSelectUnit={setSelectedUnit} />} />
+                <Route path="/civ/:civId" element={<CivView civId={selectedCivId} onSelectUnit={setSelectedUnit} />} />
+                <Route path="/civ/:civId/:tab" element={<CivView civId={selectedCivId} onSelectUnit={setSelectedUnit} />} />
                 <Route path="/compare" element={<CompareView civIds={compareIds} onClose={() => navigate('/')} />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/faq" element={<FAQPage />} />
@@ -369,9 +371,9 @@ function App() {
         />
       )}
 
-      {isCivEditorOpen && civilizationsData.find(c => c.id === selectedCiv) && (
+      {isCivEditorOpen && civilizationsData.find(c => c.id === selectedCivId) && (
         <AdminCivEditorModal
-          civ={civilizationsData.find(c => c.id === selectedCiv)!}
+          civ={civilizationsData.find(c => c.id === selectedCivId)!}
           isOpen={isCivEditorOpen}
           initialSection={civEditorConfig.section}
           initialId={civEditorConfig.id}
