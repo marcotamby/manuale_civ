@@ -154,6 +154,7 @@ export function TournamentRegolamento() {
             <p className="text-[9px] text-gray-600 font-medium uppercase tracking-[0.2em]">Fine Regolamento</p>
           </div>
         </div>
+        </div>
       </div>
     </div>
   );
