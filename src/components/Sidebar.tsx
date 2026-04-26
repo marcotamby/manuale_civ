@@ -60,7 +60,7 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
       <aside 
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className={`w-20 md:w-32 h-full flex flex-col items-center py-6 md:px-3 lg:bg-transparent glass border-none transition-transform duration-300 overflow-y-auto overflow-x-hidden no-scrollbar fixed md:static z-30
+        className={`w-20 md:w-32 h-full flex flex-col items-center py-6 md:px-3 lg:bg-transparent bg-black/20 backdrop-blur-md border-none transition-transform duration-300 overflow-y-auto overflow-x-hidden no-scrollbar fixed md:static z-30
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
         {/* Mobile Toggle Button (only when open to close it, or we rely on App.tsx topbar to open it) */}
@@ -78,7 +78,7 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
             <button
               onClick={() => onSelectPage('home')}
               title="Torna alla Home"
-              className="w-full aspect-square rounded-xl glass flex items-center justify-center text-yellow-500 border border-white/10 hover:border-yellow-400 hover:shadow-[0_0_15px_rgba(212,175,55,0.4)] transition-all group"
+              className="w-full aspect-square rounded-xl bg-white/5 backdrop-blur-sm flex items-center justify-center text-yellow-500 border border-white/10 hover:border-white/30 hover:bg-white/10 transition-all group"
             >
               <HomeIcon size={32} />
             </button>
