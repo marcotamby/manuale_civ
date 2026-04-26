@@ -605,7 +605,7 @@ export function TournamentsPage() {
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-700 relative z-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
         <div>
-          <h1 className="text-3xl md:text-5xl font-inter font-black text-transparent bg-clip-text bg-gradient-to-b from-slate-200 via-gray-400 to-slate-500 mb-4 uppercase tracking-tighter">
+          <h1 className="text-3xl md:text-5xl font-inter font-black text-transparent bg-clip-text bg-gradient-to-b from-slate-200 via-gray-400 to-slate-500 mb-4 uppercase tracking-tighter drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">
             Tornei Aoeitalia
           </h1>
           <p className="text-gray-400 font-serif italic text-base md:text-lg max-w-2xl">

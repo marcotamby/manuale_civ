@@ -148,7 +148,7 @@ function SortableFAQItem({ item, sIdx, iIdx, isEditing, isExpanded, onToggle, on
       ref={setNodeRef}
       style={style}
       {...(isEditing ? { ...attributes, ...listeners } : {})}
-      className={`glass p-5 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-all group relative ${!isEditing ? 'cursor-pointer md:cursor-default' : ''} ${!isEditing && isExpanded ? 'border-blue-500/30' : ''} ${isDragging ? 'shadow-[0_0_25px_rgba(59,130,246,0.4)] z-50' : ''}`}
+      className={`bg-black/50 backdrop-blur-md p-5 rounded-2xl border border-white/10 hover:border-blue-500/40 transition-all group relative ${!isEditing ? 'cursor-pointer md:cursor-default' : ''} ${!isEditing && isExpanded ? 'border-blue-500/40 bg-black/70' : ''} ${isDragging ? 'shadow-[0_0_25px_rgba(59,130,246,0.4)] z-50' : ''}`}
       onClick={() => !isEditing && onToggle()}
     >
       {isEditing && (
@@ -469,7 +469,7 @@ export function FAQPage() {
               <HelpCircle size={32} className="text-blue-400" />
             </div>
             <div>
-              <h1 className="text-4xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-500 tracking-tight">
+              <h1 className="text-4xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-500 tracking-tight drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]">
                 Domande Frequenti
               </h1>
               <p className="text-gray-400 mt-1 font-serif italic">Tutto quello che c'è da sapere sul Manuale delle Civiltà</p>
