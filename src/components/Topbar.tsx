@@ -17,9 +17,10 @@ interface TopbarProps {
   setActiveFilter: (f: FilterType) => void;
   onOpenAdminDashboard?: () => void;
   onOpenAdminOverlay?: () => void;
+  isHome?: boolean;
 }
 
-export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps) {
+export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: TopbarProps) {
   const { isAuthenticated, isAdmin, isSuperAdmin, isStreamer, user, logout, openLoginModal, favorites } = useAuth();
   const { civilizations } = useCivData();
   const { activeAdmins: _activeAdmins, onlineUserCount, usersByPage } = usePresence();
@@ -131,11 +132,11 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay }: TopbarProps
   }, [favorites, civilizations, isAuthenticated, user?.email, refreshTrigger]);
 
   return (
-    <div className="w-full bg-gradient-to-r from-[#0d1424] via-[#1a1c32] to-[#0d1424] border-b border-yellow-500/20 flex flex-col lg:grid lg:grid-cols-[1fr_auto_1fr] items-center px-4 py-2.5 md:px-14 md:py-4 lg:py-5 z-[100] shrink-0 gap-3 md:gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative overflow-hidden">
+    <div className={`w-full ${isHome ? 'lg:bg-transparent lg:border-b-0 lg:shadow-none' : 'bg-gradient-to-r from-[#0d1424] via-[#1a1c32] to-[#0d1424] border-b border-yellow-500/20 shadow-[0_4px_20px_rgba(0,0,0,0.5)]'} flex flex-col lg:grid lg:grid-cols-[1fr_auto_1fr] items-center px-4 py-2.5 md:px-14 md:py-4 lg:py-5 z-[100] shrink-0 gap-3 md:gap-4 relative`}>
       
       {/* Background Image Layer with Fade-out edges */}
       <div 
-        className="absolute inset-0 z-0 pointer-events-none"
+        className={`absolute inset-0 z-0 pointer-events-none ${isHome ? 'lg:hidden' : ''}`}
         style={{ 
           backgroundImage: `linear-gradient(to right, #0d1424 0%, rgba(13, 20, 36, 0) 25%, rgba(13, 20, 36, 0) 75%, #0d1424 100%), url('/header-bg.png')`,
           backgroundSize: 'cover',

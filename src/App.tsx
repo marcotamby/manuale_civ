@@ -201,6 +201,7 @@ function App() {
       onTouchEnd={handleTouchEnd}
     >
       <Topbar
+        isHome={isHome}
         searchQuery=""
         setSearchQuery={() => { }}
         activeFilter="Tutte"
@@ -208,6 +209,25 @@ function App() {
         onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
         onOpenAdminOverlay={() => navigate('/admin/overlays')}
       />
+
+      {/* Global Homepage Extended Background - Desktop Only */}
+      {isHome && (
+        <div 
+          className="fixed top-0 left-0 right-0 h-[800px] z-0 pointer-events-none hidden lg:block"
+          style={{ 
+            backgroundImage: `
+              linear-gradient(to bottom, transparent 0%, transparent 40%, #0a0a0b 100%),
+              linear-gradient(to right, #0a0a0b 0%, rgba(10, 10, 11, 0) 15%, rgba(10, 10, 11, 0) 85%, #0a0a0b 100%),
+              url('/header-bg.png')
+            `,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 20%',
+            opacity: 0.6,
+            maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)'
+          }}
+        ></div>
+      )}
 
       <div className="flex-1 flex flex-row overflow-hidden relative">
         {(currentPage !== 'home' || isSidebarOpen) && (
