@@ -668,8 +668,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             alt="" 
             className="h-full w-full object-cover object-center md:object-left opacity-[0.5] md:opacity-[0.6]"
             style={{
-              maskImage: 'linear-gradient(to right, black 0%, black 40%, transparent 90%), linear-gradient(to bottom, transparent 0%, black 15%)',
-              WebkitMaskImage: 'linear-gradient(to right, black 0%, black 40%, transparent 90%), linear-gradient(to bottom, transparent 0%, black 15%)',
+              maskImage: 'linear-gradient(to right, black 0%, black 40%, transparent 90%), linear-gradient(to bottom, transparent 0%, black 25%)',
+              WebkitMaskImage: 'linear-gradient(to right, black 0%, black 40%, transparent 90%), linear-gradient(to bottom, transparent 0%, black 25%)',
               maskComposite: 'intersect',
               WebkitMaskComposite: 'source-in'
             }}
@@ -685,8 +685,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             borderTop: `2px solid ${themeColor}80`,
             borderRight: `2px solid ${themeColor}80`,
             boxShadow: `inset -20px 20px 40px -20px ${themeColor}26`,
-            maskImage: 'linear-gradient(to left, black, transparent), linear-gradient(to bottom, black, transparent)',
-            WebkitMaskImage: 'linear-gradient(to left, black, transparent), linear-gradient(to bottom, black, transparent)',
+            maskImage: 'linear-gradient(to left, black 20%, transparent 100%), linear-gradient(to bottom, black 20%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to left, black 20%, transparent 100%), linear-gradient(to bottom, black 20%, transparent 100%)',
             maskComposite: 'intersect',
             WebkitMaskComposite: 'source-in'
           }}
