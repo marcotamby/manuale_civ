@@ -468,7 +468,15 @@ export function FAQPage() {
             <div className="p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20">
               <HelpCircle size={32} className="text-blue-400" />
             </div>
-            <div>
+            <div className="relative p-6 md:p-8 flex-1">
+              {/* Torn paper effect background */}
+              <div 
+                className="absolute inset-0 bg-black/60 backdrop-blur-xl -z-10" 
+                style={{ 
+                  clipPath: 'polygon(0% 1%, 98% 0%, 100% 25%, 99% 50%, 100% 75%, 98% 100%, 1% 99%, 0% 50%)',
+                  border: '1px solid rgba(255,255,255,0.05)'
+                }} 
+              />
               <h1 className="text-4xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-500 tracking-tight drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]">
                 Domande Frequenti
               </h1>
