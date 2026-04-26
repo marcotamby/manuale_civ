@@ -213,7 +213,7 @@ function App() {
       {/* Global Homepage Extended Background - Desktop Only */}
       { (isHome || isTournaments || isFaq || isCiv) && (
         <div 
-          className={`fixed top-0 left-0 right-0 z-0 pointer-events-none hidden lg:block ${isCiv ? 'h-[400px]' : 'h-[800px]'}`}
+          className="fixed top-0 left-0 right-0 h-[800px] z-0 pointer-events-none hidden lg:block"
           style={{ 
             backgroundImage: `
               linear-gradient(to bottom, transparent 0%, ${isCiv ? 'transparent 10%, #0a0a0b 50%' : 'transparent 40%, #0a0a0b 100%'}),

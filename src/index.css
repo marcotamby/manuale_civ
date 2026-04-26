@@ -76,7 +76,7 @@ html, body, .elegant-scrollbar {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.4));
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.2));
   border-radius: 10px;
 }
 
