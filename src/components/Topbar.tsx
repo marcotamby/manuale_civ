@@ -263,7 +263,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
               {isAdmin && (
                 <button
                   onClick={onOpenAdminDashboard}
-                  className="relative text-[12px] md:text-sm text-yellow-500 hover:text-white transition-all border border-yellow-500/20 px-4 py-2.5 rounded-lg hover:bg-yellow-500/10 font-bold tracking-widest uppercase flex items-center gap-2 shrink-0 hover:scale-110 hover:-translate-y-1 duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
+                  className="relative text-[12px] md:text-sm text-yellow-500 hover:text-white transition-all border border-yellow-500/40 px-4 py-2.5 rounded-lg bg-black/40 hover:bg-yellow-500/20 font-bold tracking-widest uppercase flex items-center gap-2 shrink-0 hover:scale-110 hover:-translate-y-1 duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]"
                 >
                   Pannello
                   {(pendingCount + pendingQaCount) > 0 && (
@@ -276,7 +276,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
 
               <button
                 onClick={() => setShowLogoutConfirm(true)}
-                className="text-[12px] md:text-sm text-gray-400 hover:text-white transition-colors border border-white/10 px-4 py-2.5 rounded-lg hover:bg-white/5 font-bold tracking-widest uppercase shrink-0"
+                className="text-[12px] md:text-sm text-gray-300 hover:text-white transition-colors border border-white/30 px-4 py-2.5 rounded-lg bg-black/40 hover:bg-white/10 font-bold tracking-widest uppercase shrink-0"
               >
                 Esci
               </button>

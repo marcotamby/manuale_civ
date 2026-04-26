@@ -73,39 +73,43 @@ export function TournamentRegolamento() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-[#0a0a0b] text-gray-200">
-      {/* Premium Header */}
-      <div className="relative h-[300px] md:h-[400px] overflow-hidden">
-        <img 
-          src={tournament.banner_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop'} 
-          className="w-full h-full object-cover opacity-30 blur-sm scale-110" 
-          alt="Tournament Banner"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0b] via-[#0a0a0b]/80 to-transparent"></div>
-        
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-          <div className="flex items-center gap-3 text-yellow-500/80 mb-2">
-            <BookOpen size={16} />
-            <span className="text-[9px] font-black uppercase tracking-[0.3em]">Regolamento Ufficiale</span>
-          </div>
-          <h1 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter leading-tight mb-4">
-            {tournament.name || tournament.slug}
-          </h1>
-          <div className="h-1 w-16 bg-yellow-500/30 rounded-full"></div>
-        </div>
-
+    <div className="min-h-screen bg-transparent text-gray-200 py-12 md:py-16">
+      {/* Torn Paper Header matching the new style */}
+      <div className="max-w-4xl mx-auto px-4 mb-12">
         <button 
           onClick={() => navigate('/tornei')}
-          className="absolute top-8 left-8 flex items-center gap-2 px-4 py-2 glass rounded-xl text-gray-400 hover:text-white transition-all group text-[10px] font-bold uppercase tracking-widest border border-white/5 hover:border-white/20"
+          className="flex items-center gap-2 px-4 py-2 mb-8 glass rounded-xl text-gray-400 hover:text-white transition-all group text-[10px] font-bold uppercase tracking-widest border border-white/5 hover:border-white/20"
         >
           <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1" />
-          Indietro
+          Torna ai Tornei
         </button>
+
+        <div className="relative group p-8 md:p-12 overflow-hidden">
+          {/* Organic 'Torn Book Page' Effect */}
+          <div className="absolute inset-0 -z-10 pointer-events-none">
+            <div 
+              className="absolute inset-0 bg-black/60 backdrop-blur-xl" 
+              style={{ 
+                clipPath: 'polygon(0% 2%, 15% 0%, 45% 3%, 75% 1%, 99% 2%, 97% 35%, 100% 65%, 98% 99%, 75% 97%, 45% 100%, 15% 96%, 0% 98%, 2% 50%)',
+                backgroundImage: 'radial-gradient(circle at 30% 50%, rgba(255,255,255,0.02) 0%, transparent 60%)',
+              }} 
+            />
+          </div>
+
+          <div className="flex flex-col items-center text-center">
+            <div className="flex items-center gap-3 text-yellow-500/80 mb-4">
+              <BookOpen size={20} />
+              <span className="text-[10px] font-black uppercase tracking-[0.4em]">Regolamento Ufficiale</span>
+            </div>
+            <h1 className="text-3xl md:text-5xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400 tracking-tighter leading-tight drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+              {tournament.name || tournament.slug}
+            </h1>
+          </div>
+        </div>
       </div>
 
       {/* Content Section */}
-      <div className="max-w-4xl mx-auto px-4 pb-24 -mt-20 relative z-10">
+      <div className="max-w-4xl mx-auto px-4 pb-24 relative z-10">
         <div className="glass rounded-[2rem] border border-white/10 overflow-hidden shadow-2xl relative">
           {/* Quick Edit Button - Shortcut to TournamentsPage */}
           {canManageTournaments && (
