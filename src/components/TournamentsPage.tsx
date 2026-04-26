@@ -62,6 +62,7 @@ export function TournamentsPage() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'synced'>('idle');
   const [bracketErrorId, setBracketErrorId] = useState<string | null>(null);
+  const [returnPath, setReturnPath] = useState<string | null>(null);
   const regSectionRef = useRef<HTMLDivElement>(null);
   
   const navigate = useNavigate();
@@ -239,6 +240,9 @@ export function TournamentsPage() {
     if (editSlug && tournaments.length > 0) {
       const t = tournaments.find(tour => tour.slug === editSlug);
       if (t) {
+        if (target === 'regolamento') {
+          setReturnPath(`/tornei/${t.slug}/regolamento`);
+        }
         openEditModal(t);
         window.history.replaceState({}, '', window.location.pathname);
 
@@ -250,6 +254,17 @@ export function TournamentsPage() {
       }
     }
   }, [tournaments, openEditModal]);
+
+  const closeModal = useCallback(() => {
+    setShowEditModal(false);
+    setConfirmClose(false);
+    if (returnPath) {
+      navigate(returnPath);
+      setReturnPath(null);
+    } else {
+      loadTournaments();
+    }
+  }, [returnPath, navigate, loadTournaments]);
 
 
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -887,8 +902,7 @@ export function TournamentsPage() {
           className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md overflow-y-auto"
           onClick={(e) => {
             if (e.target === e.currentTarget && saveStatus === 'saved') {
-              setShowEditModal(false);
-              loadTournaments();
+              closeModal();
             }
           }}
         >
@@ -906,7 +920,7 @@ export function TournamentsPage() {
                     No, resta qui
                   </button>
                   <button 
-                    onClick={() => { setShowEditModal(false); setConfirmClose(false); loadTournaments(); }}
+                    onClick={closeModal}
                     className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all"
                   >
                     Sì, esci
@@ -972,8 +986,7 @@ export function TournamentsPage() {
                     };
 
                     if (JSON.stringify(initialData) === JSON.stringify(currentData)) {
-                      setShowEditModal(false); 
-                      loadTournaments(); 
+                      closeModal();
                     } else {
                       setConfirmClose(true);
                     }
