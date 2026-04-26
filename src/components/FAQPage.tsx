@@ -410,14 +410,14 @@ export function FAQPage() {
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center bg-[#0d1424]">
+      <div className="flex h-full items-center justify-center lg:bg-transparent bg-[#0d1424]">
         <Loader2 className="animate-spin text-blue-400" size={40} />
       </div>
     );
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full bg-[#0d1424] text-gray-300 elegant-scrollbar">
+    <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full lg:bg-transparent bg-[#0d1424] text-gray-300 elegant-scrollbar relative z-10">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <button 
