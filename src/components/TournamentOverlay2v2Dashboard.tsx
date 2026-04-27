@@ -34,7 +34,6 @@ function generatePhases(count: number) {
   const phases = [];
   const roundNames = ['FINALE', 'SEMIFINALE', 'QUARTI DI FINALE', 'OTTAVI DI FINALE', 'SEDICESIMI DI FINALE'];
   
-  let matchesCount = 1;
   let roundsNeeded = Math.ceil(Math.log2(count));
   
   for (let i = 0; i < roundsNeeded; i++) {
