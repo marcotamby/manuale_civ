@@ -35,7 +35,7 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
         if (!error && count !== null) {
           setFavoriteCount(count);
           // Show popup after a delay
-          const timer = setTimeout(() => setIsVisible(true), 3000);
+          const timer = setTimeout(() => setIsVisible(true), 5000);
           return () => clearTimeout(timer);
         }
       } catch (err) {
