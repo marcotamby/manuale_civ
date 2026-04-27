@@ -123,7 +123,9 @@
             background-size: cover; 
             background-position: center; 
             image-rendering: -webkit-optimize-contrast;
-            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
+            transform: translateZ(0);
+            filter: brightness(1.1) contrast(1.1);
+            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 10%, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%);
         }
 
         .team-score-box {
@@ -198,12 +200,14 @@
                 'tughlaq': 'Tughlaq Dynasty'
             };
             const name = mapping[id.toLowerCase()] || id;
-            return `/civs/${name}.png`;
+            return `/civs/${name}.webp`;
         }
 
         function updateLines(state) {
             const svg = document.getElementById('bracket-svg');
-            const containerRect = document.getElementById('bracket-container').getBoundingClientRect();
+            const container = document.getElementById('bracket-container');
+            const containerRect = container.getBoundingClientRect();
+            const scale = 0.86; // Current CSS scale
             svg.innerHTML = '';
 
             const phases = state.bracket.phases || [];
@@ -219,11 +223,11 @@
                         const sRect = startMatchEl.getBoundingClientRect();
                         const eRect = endMatchEl.getBoundingClientRect();
                         
-                        const xStart = sRect.right - containerRect.left;
-                        const yStart = (sRect.top + sRect.height / 2) - containerRect.top;
+                        const xStart = (sRect.right - containerRect.left) / scale;
+                        const yStart = ((sRect.top + sRect.height / 2) - containerRect.top) / scale;
                         
-                        const xEnd = eRect.left - containerRect.left;
-                        const yBase = (eRect.top + eRect.height / 2) - containerRect.top;
+                        const xEnd = (eRect.left - containerRect.left) / scale;
+                        const yBase = ((eRect.top + eRect.height / 2) - containerRect.top) / scale;
                         
                         const slot = mIdx % 2 === 0 ? 0 : 1;
                         const yEnd = yBase + (slot === 0 ? -36 : 36);
