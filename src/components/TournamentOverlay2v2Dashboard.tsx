@@ -531,7 +531,11 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                         <input 
                           type="text" 
                           value={match.t1} 
-                          onChange={(e) => { const np = [...state.bracket.phases]; np[pIdx].matches[mIdx].t1 = e.target.value; setState({...state, bracket: {...state.bracket, phases: np}}); }}
+                          onChange={(e) => {
+                            const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
+                            newPhases[pIdx].matches[mIdx].t1 = e.target.value;
+                            setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
+                          }}
                           placeholder="TEAM 1"
                           className="flex-1 bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-[11px] text-white font-black uppercase outline-none focus:border-blue-500/30"
                         />
@@ -552,21 +556,33 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                         <input 
                           type="text" 
                           value={match.t1Players[0]} 
-                          onChange={(e) => { const np = [...state.bracket.phases]; np[pIdx].matches[mIdx].t1Players[0] = e.target.value; setState({...state, bracket: {...state.bracket, phases: np}}); }}
+                          onChange={(e) => {
+                            const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
+                            newPhases[pIdx].matches[mIdx].t1Players[0] = e.target.value;
+                            setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
+                          }}
                           placeholder="P1"
                           className="flex-1 bg-black/20 border border-white/5 rounded-md px-2 py-1 text-[9px] text-gray-400 font-bold uppercase outline-none"
                         />
                         <input 
                           type="text" 
                           value={match.t1Players[1]} 
-                          onChange={(e) => { const np = [...state.bracket.phases]; np[pIdx].matches[mIdx].t1Players[1] = e.target.value; setState({...state, bracket: {...state.bracket, phases: np}}); }}
+                          onChange={(e) => {
+                            const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
+                            newPhases[pIdx].matches[mIdx].t1Players[1] = e.target.value;
+                            setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
+                          }}
                           placeholder="P2"
                           className="flex-1 bg-black/20 border border-white/5 rounded-md px-2 py-1 text-[9px] text-gray-400 font-bold uppercase outline-none"
                         />
                       </div>
                       <MultiCivSelect 
                         values={match.t1Civs} 
-                        onChange={(vals) => { const np = [...state.bracket.phases]; np[pIdx].matches[mIdx].t1Civs = vals; setState({...state, bracket: {...state.bracket, phases: np}}); }}
+                        onChange={(vals) => {
+                          const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
+                          newPhases[pIdx].matches[mIdx].t1Civs = vals;
+                          setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
+                        }}
                         max={6}
                         label="Civ Giocate"
                       />
@@ -584,7 +600,11 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                         <input 
                           type="text" 
                           value={match.t2} 
-                          onChange={(e) => { const np = [...state.bracket.phases]; np[pIdx].matches[mIdx].t2 = e.target.value; setState({...state, bracket: {...state.bracket, phases: np}}); }}
+                          onChange={(e) => {
+                            const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
+                            newPhases[pIdx].matches[mIdx].t2 = e.target.value;
+                            setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
+                          }}
                           placeholder="TEAM 2"
                           className="flex-1 bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-[11px] text-white font-black uppercase outline-none focus:border-blue-500/30"
                         />
@@ -605,21 +625,33 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                         <input 
                           type="text" 
                           value={match.t2Players[0]} 
-                          onChange={(e) => { const np = [...state.bracket.phases]; np[pIdx].matches[mIdx].t2Players[0] = e.target.value; setState({...state, bracket: {...state.bracket, phases: np}}); }}
+                          onChange={(e) => {
+                            const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
+                            newPhases[pIdx].matches[mIdx].t2Players[0] = e.target.value;
+                            setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
+                          }}
                           placeholder="P1"
                           className="flex-1 bg-black/20 border border-white/5 rounded-md px-2 py-1 text-[9px] text-gray-400 font-bold uppercase outline-none"
                         />
                         <input 
                           type="text" 
                           value={match.t2Players[1]} 
-                          onChange={(e) => { const np = [...state.bracket.phases]; np[pIdx].matches[mIdx].t2Players[1] = e.target.value; setState({...state, bracket: {...state.bracket, phases: np}}); }}
+                          onChange={(e) => {
+                            const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
+                            newPhases[pIdx].matches[mIdx].t2Players[1] = e.target.value;
+                            setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
+                          }}
                           placeholder="P2"
                           className="flex-1 bg-black/20 border border-white/5 rounded-md px-2 py-1 text-[9px] text-gray-400 font-bold uppercase outline-none"
                         />
                       </div>
                       <MultiCivSelect 
                         values={match.t2Civs} 
-                        onChange={(vals) => { const np = [...state.bracket.phases]; np[pIdx].matches[mIdx].t2Civs = vals; setState({...state, bracket: {...state.bracket, phases: np}}); }}
+                        onChange={(vals) => {
+                          const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
+                          newPhases[pIdx].matches[mIdx].t2Civs = vals;
+                          setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
+                        }}
                         max={6}
                         label="Civ Giocate"
                       />
