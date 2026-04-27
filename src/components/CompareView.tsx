@@ -138,13 +138,12 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
               {/* Massive High Quality Background Flag */}
               <div className="absolute inset-0 pointer-events-none">
                 <div 
-                  className="absolute inset-0 bg-cover bg-center opacity-40 scale-110 group-hover:scale-105 transition-transform duration-1000"
+                  className="absolute inset-0 bg-cover bg-center opacity-70 scale-110 group-hover:scale-105 transition-transform duration-1000"
                   style={{ backgroundImage: `url(${civ!.flag})` }}
                 />
                 {/* Elegant Fading Overlays */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-brand-dark)] via-[var(--color-brand-dark)]/40 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-brand-dark)]/20 via-transparent to-transparent" />
-                <div className="absolute inset-0 bg-black/20" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-brand-dark)] via-[var(--color-brand-dark)]/20 to-transparent" />
+                <div className="absolute inset-0 bg-black/10" />
               </div>
 
               {/* Glowing Aura */}
