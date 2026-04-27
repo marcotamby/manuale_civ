@@ -66,7 +66,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   // Robust fallback for theme colors
   const THEME_COLORS: Record<string, string> = {
     abbasid: "#1f2937",
-    ayyubids: "#059669",
+    ayyubids: "#eab308",
     delhi: "#10b981",
     byzantines: "#8b5cf6",
     chinese: "#ef4444",
@@ -74,18 +74,18 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     french: "#3b82f6",
     goldenhorde: "#f59e0b",
     hre: "#fbbf24",
-    japanese: "#e11d48",
+    japanese: "#e2e8f0",
     jeannedarc: "#3b82f6",
-    lancaster: "#ef4444",
-    macedonian: "#8b5cf6",
+    lancaster: "#2563eb",
+    macedonian: "#991b1b",
     malians: "#ef4444",
     mongols: "#06b6d4",
     orderofthedragon: "#fbbf24",
     ottomans: "#dc2626",
     rus: "#b91c1c",
-    sengoku: "#e11d48",
+    sengoku: "#e2e8f0",
     templar: "#dc2626",
-    tughlaq: "#0d9488",
+    tughlaq: "#94a3b8",
     zhuxi: "#16a34a"
   };
 
