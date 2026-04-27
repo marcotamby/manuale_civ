@@ -527,19 +527,19 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                <label className="text-[8px] font-black text-gray-500 uppercase tracking-widest px-1">Casters</label>
                <div className="flex items-center gap-2">
                  {state.casters.map((c: any, idx: number) => (
-                   <div key={idx} className="flex items-center gap-2 p-1.5 bg-black/40 rounded-xl border border-white/10">
+                   <div key={idx} className="flex items-center gap-3 bg-black/60 rounded-xl border border-white/10 px-4 py-2 focus-within:border-blue-500/50 transition-colors">
                      <input 
                        type="text" 
                        value={c.name} 
                        onChange={(e) => { const nc = [...state.casters]; nc[idx].name = e.target.value; setState({...state, casters: nc}); }} 
                        placeholder={`Caster ${idx+1}`} 
-                       className="w-24 bg-transparent text-[10px] font-bold text-white outline-none px-2" 
+                       className="w-28 bg-transparent text-xs text-white font-black uppercase tracking-widest outline-none placeholder:text-gray-600" 
                      />
                      <button 
                        onClick={() => { const nc = [...state.casters]; nc[idx].active = !nc[idx].active; setState({...state, casters: nc}); }}
-                       className={`w-8 h-4 rounded-full relative transition-all flex-shrink-0 ${c.active ? 'bg-blue-600' : 'bg-white/10'}`}
+                       className={`w-9 h-5 rounded-full relative transition-all flex-shrink-0 ${c.active ? 'bg-blue-600' : 'bg-white/10'}`}
                      >
-                       <div className={`absolute top-[2px] w-3 h-3 bg-white rounded-full transition-all ${c.active ? 'left-[18px]' : 'left-[2px]'}`} />
+                       <div className={`absolute top-[2px] w-4 h-4 bg-white rounded-full transition-all ${c.active ? 'left-[18px]' : 'left-[2px]'}`} />
                      </button>
                    </div>
                  ))}
