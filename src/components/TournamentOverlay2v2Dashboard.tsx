@@ -25,22 +25,37 @@ const DEFAULT_STATE = {
   ],
   bracket: {
     title: 'TABELLONE TORNEO 2V2',
-    phases: [
-      { 
-        name: 'QUARTI DI FINALE', 
-        matches: Array(4).fill(null).map((_, i) => ({ id: `q${i+1}`, t1: '', t2: '', t1Players: ['', ''], t2Players: ['', ''], t1Civs: [], t2Civs: [], w: 0 }))
-      },
-      { 
-        name: 'SEMIFINALE', 
-        matches: Array(2).fill(null).map((_, i) => ({ id: `s${i+1}`, t1: '', t2: '', t1Players: ['', ''], t2Players: ['', ''], t1Civs: [], t2Civs: [], w: 0 }))
-      },
-      { 
-        name: 'FINALE', 
-        matches: [{ id: 'f', t1: '', t2: '', t1Players: ['', ''], t2Players: ['', ''], t1Civs: [], t2Civs: [], w: 0 }]
-      }
-    ]
+    teamCount: 8,
+    phases: generatePhases(8)
   }
 };
+
+function generatePhases(count: number) {
+  const phases = [];
+  const roundNames = ['FINALE', 'SEMIFINALE', 'QUARTI DI FINALE', 'OTTAVI DI FINALE', 'SEDICESIMI DI FINALE'];
+  
+  let matchesCount = 1;
+  let roundsNeeded = Math.ceil(Math.log2(count));
+  
+  for (let i = 0; i < roundsNeeded; i++) {
+    const roundMatches = [];
+    for (let j = 0; j < Math.pow(2, i); j++) {
+      roundMatches.push({
+        id: `r${i}-${j}`,
+        t1: '', t2: '', 
+        t1Players: ['', ''], t2Players: ['', ''], 
+        t1Civs: [], t2Civs: [], 
+        w: 0,
+        t1Bye: false, t2Bye: false
+      });
+    }
+    phases.unshift({
+      name: roundNames[i] || `ROUND ${roundsNeeded - i}`,
+      matches: roundMatches
+    });
+  }
+  return phases;
+}
 
 export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: TournamentOverlay2v2DashboardProps) {
   const [state, setState] = useState<any>(DEFAULT_STATE);
@@ -205,23 +220,63 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
     const newWinner = match.w === winner ? 0 : winner;
     match.w = newWinner;
 
+    // Reset potential byes if manually setting winner
+    if (winner === 1) match.t2Bye = false;
+    if (winner === 2) match.t1Bye = false;
+
     // Propagation logic
-    if (phaseIdx < newPhases.length - 1) {
-      const nextPhase = newPhases[phaseIdx + 1];
+    propagateWinner(newPhases, phaseIdx, matchIdx);
+    setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
+  };
+
+  const toggleBye = (phaseIdx: number, matchIdx: number, teamIdx: number) => {
+    const newPhases = [...state.bracket.phases];
+    const match = newPhases[phaseIdx].matches[matchIdx];
+    
+    if (teamIdx === 1) {
+      match.t1Bye = !match.t1Bye;
+      if (match.t1Bye) { match.t2Bye = false; match.w = 1; }
+      else if (match.w === 1) match.w = 0;
+    } else {
+      match.t2Bye = !match.t2Bye;
+      if (match.t2Bye) { match.t1Bye = false; match.w = 2; }
+      else if (match.w === 2) match.w = 0;
+    }
+
+    propagateWinner(newPhases, phaseIdx, matchIdx);
+    setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
+  };
+
+  const propagateWinner = (phases: any[], phaseIdx: number, matchIdx: number) => {
+    if (phaseIdx < phases.length - 1) {
+      const match = phases[phaseIdx].matches[matchIdx];
+      const nextPhase = phases[phaseIdx + 1];
       const nextMatchIdx = Math.floor(matchIdx / 2);
       const slot = matchIdx % 2 === 0 ? 't1' : 't2';
       const playerSlot = matchIdx % 2 === 0 ? 't1Players' : 't2Players';
       
-      if (newWinner > 0) {
-        nextPhase.matches[nextMatchIdx][slot] = newWinner === 1 ? match.t1 : match.t2;
-        nextPhase.matches[nextMatchIdx][playerSlot] = newWinner === 1 ? match.t1Players : match.t2Players;
+      if (match.w > 0) {
+        nextPhase.matches[nextMatchIdx][slot] = match.w === 1 ? match.t1 : match.t2;
+        nextPhase.matches[nextMatchIdx][playerSlot] = match.w === 1 ? match.t1Players : match.t2Players;
       } else {
         nextPhase.matches[nextMatchIdx][slot] = '';
         nextPhase.matches[nextMatchIdx][playerSlot] = ['', ''];
       }
+      // Recursive propagation for further rounds
+      propagateWinner(phases, phaseIdx + 1, nextMatchIdx);
     }
-    
-    setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
+  };
+
+  const updateTeamCount = (count: number) => {
+    if (!window.confirm("Cambiare il numero di team resetterà il tabellone. Continuare?")) return;
+    setState({
+      ...state,
+      bracket: {
+        ...state.bracket,
+        teamCount: count,
+        phases: generatePhases(count)
+      }
+    });
   };
 
   const renderMatchTab = () => (
@@ -415,18 +470,39 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
   const renderBracketTab = () => (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-8 space-y-6 shadow-2xl">
-        <div className="flex items-center justify-between border-b border-white/5 pb-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between border-b border-white/5 pb-6 gap-6">
           <div className="space-y-1">
             <h4 className="text-[12px] font-black text-blue-400 uppercase tracking-[0.2em]">Configurazione Tabellone</h4>
             <p className="text-[10px] text-gray-500 font-medium">Gestisci i team e la progressione del torneo</p>
           </div>
-          <input 
-            type="text" 
-            value={state.bracket.title}
-            onChange={(e) => setState({...state, bracket: {...state.bracket, title: e.target.value}})}
-            placeholder="TITOLO TABELLONE"
-            className="bg-black/60 border border-white/10 rounded-xl px-6 py-3 text-sm text-white font-black uppercase tracking-widest w-full max-w-md outline-none focus:border-blue-500/50"
-          />
+          
+          <div className="flex flex-wrap items-center gap-4">
+             <div className="flex flex-col gap-1.5">
+               <label className="text-[8px] font-black text-gray-500 uppercase tracking-widest px-1">Numero Team</label>
+               <div className="flex bg-black/40 rounded-xl p-1 border border-white/10">
+                 {[4, 8, 16, 32].map(c => (
+                   <button 
+                     key={c}
+                     onClick={() => updateTeamCount(c)}
+                     className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${state.bracket.teamCount === c ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
+                   >
+                     {c}
+                   </button>
+                 ))}
+               </div>
+             </div>
+
+             <div className="flex flex-col gap-1.5">
+               <label className="text-[8px] font-black text-gray-500 uppercase tracking-widest px-1">Titolo Overlay</label>
+               <input 
+                type="text" 
+                value={state.bracket.title}
+                onChange={(e) => setState({...state, bracket: {...state.bracket, title: e.target.value}})}
+                placeholder="TITOLO TABELLONE"
+                className="bg-black/60 border border-white/10 rounded-xl px-6 py-2.5 text-xs text-white font-black uppercase tracking-widest w-full lg:w-64 outline-none focus:border-blue-500/50"
+              />
+             </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -455,6 +531,12 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                           className={`w-7 h-7 rounded-lg flex items-center justify-center text-[9px] font-black transition-all ${match.w === 1 ? 'bg-blue-600 text-white' : 'bg-white/5 text-gray-700 hover:text-white'}`}
                         >
                           W
+                        </button>
+                        <button 
+                          onClick={() => toggleBye(pIdx, mIdx, 1)}
+                          className={`px-2 py-1 rounded-lg text-[8px] font-black transition-all border ${match.t1Bye ? 'bg-yellow-600 border-yellow-400 text-white' : 'bg-white/5 border-white/5 text-gray-700 hover:text-yellow-500'}`}
+                        >
+                          BYE
                         </button>
                       </div>
                       <div className="flex gap-2">
@@ -502,6 +584,12 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                           className={`w-7 h-7 rounded-lg flex items-center justify-center text-[9px] font-black transition-all ${match.w === 2 ? 'bg-red-600 text-white' : 'bg-white/5 text-gray-700 hover:text-white'}`}
                         >
                           W
+                        </button>
+                        <button 
+                          onClick={() => toggleBye(pIdx, mIdx, 2)}
+                          className={`px-2 py-1 rounded-lg text-[8px] font-black transition-all border ${match.t2Bye ? 'bg-yellow-600 border-yellow-400 text-white' : 'bg-white/5 border-white/5 text-gray-700 hover:text-yellow-500'}`}
+                        >
+                          BYE
                         </button>
                       </div>
                       <div className="flex gap-2">

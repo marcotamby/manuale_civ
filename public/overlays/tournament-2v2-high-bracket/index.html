@@ -36,7 +36,7 @@
 
         .phase-column {
             display: flex; flex-direction: column; justify-content: space-around;
-            width: 480px; gap: 20px;
+            flex: 1; gap: 20px; padding: 0 10px;
         }
 
         .phase-label { 
@@ -59,6 +59,8 @@
         .team-row:last-child { border-bottom: none; }
         .team-row.winner { background: rgba(212, 175, 55, 0.15); }
         .team-row.winner::after { content: '🏆'; position: absolute; right: 20px; font-size: 32px; filter: drop-shadow(0 0 10px var(--gold)); }
+        
+        .bye-badge { background: var(--gold); color: black; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 4px; margin-left: 10px; vertical-align: middle; }
         
         .team-info { flex: 1; display: flex; flex-direction: column; }
         .team-name { font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; line-height: 1.1; }
@@ -122,10 +124,13 @@
                 (phase.matches || []).forEach((match, mIdx) => {
                     const card = document.createElement('div');
                     card.className = 'match-card';
-                    const renderTeam = (teamName, players, civs, isWinner) => `
+                    const renderTeam = (teamName, players, civs, isWinner, hasBye) => `
                         <div class="team-row ${isWinner ? 'winner' : ''}">
                             <div class="team-info">
-                                <div class="team-name">${teamName || '--'}</div>
+                                <div class="team-name">
+                                    ${teamName || '--'}
+                                    ${hasBye ? '<span class="bye-badge">BYE</span>' : ''}
+                                </div>
                                 <div class="team-players">${(players || []).join(' & ') || '-- & --'}</div>
                                 <div class="team-civs">
                                     ${(civs || []).map(c => `<div class="civ-flag" style="background-image: url('${getCivFlagUrl(c)}')"></div>`).join('')}
@@ -134,8 +139,8 @@
                         </div>
                     `;
                     card.innerHTML = `
-                        ${renderTeam(match.t1, match.t1Players, match.t1Civs, match.w === 1)}
-                        ${renderTeam(match.t2, match.t2Players, match.t2Civs, match.w === 2)}
+                        ${renderTeam(match.t1, match.t1Players, match.t1Civs, match.w === 1, match.t1Bye)}
+                        ${renderTeam(match.t2, match.t2Players, match.t2Civs, match.w === 2, match.t2Bye)}
                     `;
                     column.appendChild(card);
                 });
