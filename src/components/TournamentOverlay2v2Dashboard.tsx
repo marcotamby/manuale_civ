@@ -519,8 +519,31 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                 value={state.bracket.title}
                 onChange={(e) => setState({...state, bracket: {...state.bracket, title: e.target.value}})}
                 placeholder="TITOLO TABELLONE"
-                className="bg-black/60 border border-white/10 rounded-xl px-6 py-2.5 text-xs text-white font-black uppercase tracking-widest w-full lg:w-64 outline-none focus:border-blue-500/50"
+                className="bg-black/60 border border-white/10 rounded-xl px-6 py-2 text-xs text-white font-black uppercase tracking-widest w-full lg:w-64 outline-none focus:border-blue-500/50"
               />
+             </div>
+
+             <div className="flex flex-col gap-1.5">
+               <label className="text-[8px] font-black text-gray-500 uppercase tracking-widest px-1">Casters</label>
+               <div className="flex items-center gap-2">
+                 {state.casters.map((c: any, idx: number) => (
+                   <div key={idx} className="flex items-center gap-2 p-1.5 bg-black/40 rounded-xl border border-white/10">
+                     <input 
+                       type="text" 
+                       value={c.name} 
+                       onChange={(e) => { const nc = [...state.casters]; nc[idx].name = e.target.value; setState({...state, casters: nc}); }} 
+                       placeholder={`Caster ${idx+1}`} 
+                       className="w-24 bg-transparent text-[10px] font-bold text-white outline-none px-2" 
+                     />
+                     <button 
+                       onClick={() => { const nc = [...state.casters]; nc[idx].active = !nc[idx].active; setState({...state, casters: nc}); }}
+                       className={`w-8 h-4 rounded-full relative transition-all flex-shrink-0 ${c.active ? 'bg-blue-600' : 'bg-white/10'}`}
+                     >
+                       <div className={`absolute top-[2px] w-3 h-3 bg-white rounded-full transition-all ${c.active ? 'left-[18px]' : 'left-[2px]'}`} />
+                     </button>
+                   </div>
+                 ))}
+               </div>
              </div>
           </div>
         </div>
