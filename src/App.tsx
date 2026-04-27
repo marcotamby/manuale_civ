@@ -213,18 +213,21 @@ function App() {
       {/* Global Homepage Extended Background - Desktop Only */}
       { (isHome || isTournaments || isFaq || isCiv) && (
         <div 
-          className={`fixed top-0 left-0 right-0 h-[500px] md:h-[600px] lg:h-[800px] z-0 pointer-events-none ${isCiv ? 'hidden md:block' : 'block'}`}
+          className={`fixed top-0 left-0 right-0 h-[280px] md:h-[600px] lg:h-[800px] z-0 pointer-events-none ${isCiv ? 'hidden md:block' : 'block'}`}
           style={{ 
             backgroundImage: `
-              linear-gradient(to bottom, transparent 0%, ${isCiv ? 'transparent 15%, #0a0a0b 50%' : 'transparent 30%, #0a0a0b 100%'}),
-              linear-gradient(to right, #0a0a0b 0%, rgba(10, 10, 11, 0) 15%, rgba(10, 10, 11, 0) 85%, #0a0a0b 100%),
+              linear-gradient(to bottom, transparent 0%, ${isCiv ? 'transparent 15%, #0a0a0b 50%' : 'transparent 60%, #0a0a0b 100%'}),
+              linear-gradient(to right, #0a0a0b 0%, rgba(10, 10, 11, 0) 10%, rgba(10, 10, 11, 0) 90%, #0a0a0b 100%),
               url('/header-bg.png')
             `,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center 20%',
+            backgroundSize: window.innerWidth < 768 ? 'contain' : 'cover',
+            backgroundPosition: 'top center',
+            backgroundRepeat: 'no-repeat',
             opacity: isCiv ? 0.4 : 0.4, // Reduced from 0.6 to 0.4 for mobile-friendly brightness
-            maskImage: `linear-gradient(to bottom, black ${isCiv ? '10%' : '20%'}, transparent ${isCiv ? '60%' : '95%'})`,
-            WebkitMaskImage: `linear-gradient(to bottom, black ${isCiv ? '10%' : '20%'}, transparent ${isCiv ? '60%' : '95%'})`
+            maskImage: `linear-gradient(to bottom, black 50%, transparent 100%), linear-gradient(to right, transparent, black 15%, black 85%, transparent)`,
+            WebkitMaskImage: `linear-gradient(to bottom, black 50%, transparent 100%), linear-gradient(to right, transparent, black 15%, black 85%, transparent)`,
+            maskComposite: 'intersect',
+            WebkitMaskComposite: 'source-in'
           }}
         ></div>
       )}
