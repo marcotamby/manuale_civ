@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, Timer as TimerIcon, Map as MapIcon, RefreshCcw, Plus, Minus, X, ChevronDown, Users, ShieldAlert, Target, Trophy, Ban } from 'lucide-react';
+import { Save, Timer as TimerIcon, Map as MapIcon, RefreshCcw, Plus, Minus, X, ChevronDown, Users, ShieldAlert, Target } from 'lucide-react';
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
 import { overlayService } from '../services/overlayService';
@@ -254,6 +254,16 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
     }
 
     propagateWinner(newPhases, phaseIdx, matchIdx);
+    setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
+  };
+
+  const updateBracketPlayer = (pIdx: number, mIdx: number, team: number, pSubIdx: number, val: string) => {
+    const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
+    if (team === 1) {
+      newPhases[pIdx].matches[mIdx].t1Players[pSubIdx] = val;
+    } else {
+      newPhases[pIdx].matches[mIdx].t2Players[pSubIdx] = val;
+    }
     setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
   };
 
