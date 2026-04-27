@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament, fetchChallongeData } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
-import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, ChevronUp, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink } from 'lucide-react';
+import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, ChevronUp, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink, MoveVertical } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
@@ -19,6 +19,8 @@ interface TournamentConfig {
   externalUrl?: string;
   period?: string;
   bannerUrl?: string;
+  bannerPositionX?: number;
+  bannerPositionY?: number;
   status?: string;
   podium?: any[];
   name?: string;
@@ -55,9 +57,12 @@ export function TournamentsPage() {
     podium: [] as any[],
     hasRegolamento: false,
     regolamentoContent: '',
-    display_order: 0
+    display_order: 0,
+    bannerPositionX: 50,
+    bannerPositionY: 50
   });
   const [isUploading, setIsUploading] = useState(false);
+  const [dragState, setDragState] = useState<{ startX: number; startY: number; startPosX: number; startPosY: number } | null>(null);
   const [isRegEditorExpanded, setIsRegEditorExpanded] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'synced'>('idle');
@@ -101,6 +106,8 @@ export function TournamentsPage() {
             hasRegolamento: db.has_regolamento || false,
             regolamentoContent: db.regolamento_content || '',
             display_order: db.display_order || 0,
+            bannerPositionX: db.banner_position_x || 50,
+            bannerPositionY: db.banner_position_y || 50,
             created_at: db.created_at,
             id: db.id
           };
@@ -227,7 +234,9 @@ export function TournamentsPage() {
       hasRegolamento: t.config?.hasRegolamento || false,
       regolamentoContent: t.config?.regolamentoContent || '',
       externalUrl: t.config?.externalUrl || '',
-      display_order: t.config?.display_order || 0
+      display_order: t.config?.display_order || 0,
+      bannerPositionX: t.config?.bannerPositionX || 50,
+      bannerPositionY: t.config?.bannerPositionY || 50
     });
     setShowEditModal(true);
     setIsRegEditorExpanded(true);
@@ -428,6 +437,8 @@ export function TournamentsPage() {
         regolamento_content: editForm.regolamentoContent,
         direct_link: editForm.externalUrl || null,
         display_order: editForm.display_order,
+        banner_position_x: editForm.bannerPositionX,
+        banner_position_y: editForm.bannerPositionY,
         updated_at: new Date().toISOString()
       };
 
@@ -505,7 +516,9 @@ export function TournamentsPage() {
           type: editForm.type,
           podium: editForm.podium,
           hasRegolamento: editForm.hasRegolamento,
-          regolamentoContent: editForm.regolamentoContent
+          regolamentoContent: editForm.regolamentoContent,
+          bannerPositionX: editForm.bannerPositionX,
+          bannerPositionY: editForm.bannerPositionY
         }
       }) : null);
 
@@ -610,6 +623,50 @@ export function TournamentsPage() {
     }
   };
 
+  // Banner Drag Logic
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!dragState) return;
+      const deltaX = e.clientX - dragState.startX;
+      const deltaY = e.clientY - dragState.startY;
+      
+      // Use similar scale as BO editor
+      const containerWidth = 600; 
+      const containerHeight = 170; 
+      const deltaPercentX = (deltaX / containerWidth) * 100;
+      const deltaPercentY = (deltaY / containerHeight) * 100;
+      
+      let newPosX = Math.max(0, Math.min(100, dragState.startPosX - (deltaPercentX * 0.5)));
+      let newPosY = Math.max(0, Math.min(100, dragState.startPosY - (deltaPercentY * 0.5)));
+      
+      setEditForm(prev => ({ 
+        ...prev, 
+        bannerPositionX: Math.round(newPosX),
+        bannerPositionY: Math.round(newPosY) 
+      }));
+    };
+
+    const handleMouseUp = () => setDragState(null);
+
+    if (dragState) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [dragState]);
+
+  const startDrag = (e: React.MouseEvent, currentPosX: number, currentPosY: number) => {
+    setDragState({ 
+      startX: e.clientX, 
+      startY: e.clientY, 
+      startPosX: currentPosX, 
+      startPosY: currentPosY 
+    });
+  };
+
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
       <Loader2 className="w-12 h-12 text-blue-400 animate-spin" />
@@ -657,7 +714,9 @@ export function TournamentsPage() {
                 podium: [],
                 hasRegolamento: false,
                 regolamentoContent: '',
-                display_order: 0
+                display_order: 0,
+                bannerPositionX: 50,
+                bannerPositionY: 50
               });
               setShowEditModal(true);
             }} 
@@ -688,7 +747,12 @@ export function TournamentsPage() {
                 className="glass rounded-3xl overflow-hidden border border-white/5 flex flex-col transition-all duration-500 hover:border-white/80 hover:shadow-[0_30px_60px_rgba(0,0,0,0.8)] hover:-translate-y-1 hover:scale-[1.05] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] [backface-visibility:hidden] [transform-style:preserve-3d]"
               >
                 <div className="h-48 relative overflow-hidden cursor-pointer" onClick={() => t.config.directLink ? window.open(t.config.directLink, '_blank') : navigate(`/tornei/${t.slug}`)}>
-                    <img src={banner} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt={t.name} />
+                    <img 
+                      src={banner} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
+                      alt={t.name} 
+                      style={{ objectPosition: `${t.config?.bannerPositionX || 50}% ${t.config?.bannerPositionY || 50}%` }}
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0d1424] to-transparent" />
                     
                     {/* Status Badges Overlay */}
@@ -879,9 +943,12 @@ export function TournamentsPage() {
                                 hasRegolamento: t.config?.hasRegolamento || false,
                                 regolamentoContent: t.config?.regolamentoContent || '',
                                 externalUrl: t.config?.externalUrl || '',
-                                display_order: t.config?.display_order || 0
+                                display_order: t.config?.display_order || 0,
+                                bannerPositionX: t.config?.bannerPositionX || 50,
+                                bannerPositionY: t.config?.bannerPositionY || 50
                               });
                               setShowEditModal(true);
+                              setIsRegEditorExpanded(true);
                             }} 
                             className="w-14 h-full bg-white/5 hover:bg-white/10 rounded-2xl text-blue-400 transition-all border border-white/5 hover:border-blue-500/30 active:scale-95 shadow-lg flex items-center justify-center shrink-0"
                           >
@@ -970,7 +1037,9 @@ export function TournamentsPage() {
                       status: editingTournament?.config?.status || 'Concluso',
                       hasRegolamento: editingTournament?.config?.hasRegolamento || false,
                       regolamentoContent: editingTournament?.config?.regolamentoContent || '',
-                      podium: editingTournament?.config?.podium || (editingTournament?.events?.[0]?.standings?.nodes || [])
+                      podium: editingTournament?.config?.podium || (editingTournament?.events?.[0]?.standings?.nodes || []),
+                      bannerPositionX: editingTournament?.config?.bannerPositionX || 50,
+                      bannerPositionY: editingTournament?.config?.bannerPositionY || 50
                     };
 
                     const currentData = {
@@ -982,7 +1051,9 @@ export function TournamentsPage() {
                       status: editForm.status,
                       hasRegolamento: editForm.hasRegolamento,
                       regolamentoContent: editForm.regolamentoContent,
-                      podium: editForm.podium
+                      podium: editForm.podium,
+                      bannerPositionX: editForm.bannerPositionX,
+                      bannerPositionY: editForm.bannerPositionY
                     };
 
                     if (JSON.stringify(initialData) === JSON.stringify(currentData)) {
@@ -1090,6 +1161,28 @@ export function TournamentsPage() {
                     </label>
                   </div>
                 </div>
+
+                {editForm.bannerUrl && (
+                  <div className="space-y-3">
+                    <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Anteprima e Posizionamento (Trascina l'immagine)</label>
+                    <div 
+                      className="relative w-full aspect-[21/6] rounded-2xl overflow-hidden border-2 border-white/10 cursor-move group shadow-xl"
+                      onMouseDown={(e) => startDrag(e, editForm.bannerPositionX || 50, editForm.bannerPositionY || 50)}
+                    >
+                      <img
+                        src={editForm.bannerUrl}
+                        alt="Preview"
+                        className="w-full h-full object-cover select-none pointer-events-none"
+                        style={{ objectPosition: `${editForm.bannerPositionX || 50}% ${editForm.bannerPositionY || 50}%` }}
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 pointer-events-none">
+                        <div className="bg-yellow-500 text-black px-3 py-1.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2 shadow-xl">
+                          <MoveVertical size={12} /> Trascina per inquadrare
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Priorità Visualizzazione (più alto = prima)</label>

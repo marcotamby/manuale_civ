@@ -175,7 +175,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                   }}
                 />
                 {/* Cinematic Vignette Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-90" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-70" />
               </div>
 
               {/* Selection Indicator */}
