@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { 
+            --gold: #d4af37; 
+            --gold-bright: #ffed4a; 
+            --red: #8b0000; 
+            --blue: #0044ff;
+            --bg-dark: rgba(10, 15, 28, 0.9);
+            --accent: #00f2ff;
+        }
+        * { font-family: 'Outfit', 'Inter', sans-serif !important; margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            width: 1920px; height: 1080px; color: white; overflow: hidden;
+            background: transparent;
+        }
+
+        #header { 
+            position: absolute; top: 0; width: 100%; height: 160px; 
+            display: flex; justify-content: center; align-items: stretch; 
+            background: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 100%); 
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 10px 50px rgba(0,0,0,0.9);
+            z-index: 100;
+        }
+
+        .team-section { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 0 60px; position: relative; }
+        .team-left { align-items: flex-start; text-align: left; }
+        .team-right { align-items: flex-end; text-align: right; }
+
+        .team-name { font-size: 42px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: #fff; line-height: 1; }
+        .player-names { font-size: 18px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 4px; margin-top: 4px; opacity: 0.8; }
+
+        .score-center { width: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .score-row { display: flex; align-items: center; gap: 30px; }
+        .score-box { font-size: 72px; font-weight: 950; background: var(--red); width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; border: 3px solid var(--gold); border-radius: 16px; box-shadow: 0 0 40px rgba(139, 0, 0, 0.5); }
+        .vs-box { font-size: 24px; font-weight: 900; color: #555; letter-spacing: 8px; }
+        .bo-label { margin-top: 10px; font-size: 12px; font-weight: 900; color: #aaa; text-transform: uppercase; letter-spacing: 6px; }
+
+        .draft-civs { display: flex; gap: 8px; margin-top: 15px; }
+        .draft-flag { width: 40px; height: 24px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); filter: grayscale(1) opacity(0.5); background-size: cover; background-position: center; }
+        .draft-flag.active { filter: none; opacity: 1; border-color: var(--gold); }
+
+        .bans-container { position: absolute; bottom: 15px; display: flex; gap: 10px; }
+        .team-left .bans-container { left: 60px; }
+        .team-right .bans-container { right: 60px; }
+        .ban-flag { width: 32px; height: 20px; border-radius: 3px; border: 1px solid rgba(255,0,0,0.5); filter: grayscale(0.5) sepia(0.5) hue-rotate(-50deg); background-size: cover; }
+        .ban-label { font-size: 9px; font-weight: 900; color: #ff4444; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 2px; }
+
+        /* Maps Section */
+        #maps-section {
+            position: absolute; top: 220px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 40px; justify-content: center; width: 100%;
+            padding: 0 100px;
+        }
+        
+        .map-card {
+            width: 500px; background: var(--bg-dark); border-radius: 30px; 
+            border: 2px solid rgba(255,255,255,0.05); overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .map-card.next { 
+            border-color: var(--blue); 
+            box-shadow: 0 0 50px rgba(0, 68, 255, 0.3);
+            transform: scale(1.05);
+        }
+        .map-card.next::before {
+            content: 'PROSSIMO GAME';
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--blue); color: white; padding: 4px 15px; border-radius: 20px;
+            font-size: 10px; font-weight: 900; letter-spacing: 2px; z-index: 10;
+            animation: pulse 2s infinite;
+        }
+
+        .map-image { width: 100%; height: 200px; background-size: cover; background-position: center; position: relative; }
+        .map-overlay { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg-dark), transparent); }
+        .map-name-label { 
+            position: absolute; bottom: 20px; left: 0; width: 100%; text-align: center;
+            font-size: 28px; font-weight: 900; text-transform: uppercase; letter-spacing: 4px;
+            text-shadow: 0 4px 20px rgba(0,0,0,1);
+        }
+
+        .map-picks { display: grid; grid-template-columns: 1fr auto 1fr; padding: 25px; gap: 20px; }
+        .team-picks { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .picks-row { display: flex; gap: 10px; }
+        .pick-flag { width: 80px; height: 50px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.1); background-size: cover; background-position: center; position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .pick-flag.sniped { filter: grayscale(1) brightness(0.3); }
+        .pick-flag.sniped::after { content: '✕'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #ff4444; font-size: 32px; font-weight: 900; text-shadow: 0 0 10px rgba(0,0,0,1); }
+        
+        .winner-tag { 
+            margin-top: 15px; font-size: 14px; font-weight: 900; letter-spacing: 3px; padding: 6px 20px; border-radius: 30px; text-transform: uppercase;
+            background: rgba(255,255,255,0.05); color: #555;
+        }
+        .winner-tag.win1 { background: rgba(0, 68, 255, 0.2); color: #00f2ff; border: 1px solid var(--blue); }
+        .winner-tag.win2 { background: rgba(255, 0, 0, 0.1); color: #ff4444; border: 1px solid #8b0000; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 68, 255, 0.7); transform: translateX(-50%) scale(1); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 68, 255, 0); transform: translateX(-50%) scale(1.05); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 68, 255, 0); transform: translateX(-50%) scale(1); }
+        }
+
+        #timer-container { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: none; flex-direction: column; align-items: center; gap: 12px; }
+        #timer-label { color: var(--accent); font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 8px; text-shadow: 0 0 30px rgba(0, 242, 255, 0.8); }
+        #timer-display { color: #fff; font-size: 64px; font-weight: 950; background: linear-gradient(180deg, #0a192f 0%, #000c1d 100%); padding: 10px 60px; border-radius: 25px; border: 4px solid var(--accent); box-shadow: 0 0 50px rgba(0, 242, 255, 0.4); letter-spacing: 4px; }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <div class="team-section team-left">
+            <div id="t1-name" class="team-name">--</div>
+            <div id="t1-players" class="player-names">-- & --</div>
+            <div id="t1-draft" class="draft-civs"></div>
+            <div id="t1-bans-box" style="display: none;">
+                <div class="ban-label">Bans</div>
+                <div id="t1-bans" class="bans-container"></div>
+            </div>
+        </div>
+
+        <div class="score-center">
+            <div class="score-row">
+                <div id="t1-score" class="score-box">0</div>
+                <div class="vs-box">VS</div>
+                <div id="t2-score" class="score-box">0</div>
+            </div>
+            <div class="bo-label">Best of 3</div>
+        </div>
+
+        <div class="team-section team-right">
+            <div id="t2-name" class="team-name">--</div>
+            <div id="t2-players" class="player-names">-- & --</div>
+            <div id="t2-draft" class="draft-civs"></div>
+            <div id="t2-bans-box" style="display: none;">
+                <div class="ban-label">Bans</div>
+                <div id="t2-bans" class="bans-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="maps-section"></div>
+
+    <div id="timer-container">
+        <div id="timer-label">Il game inizia tra...</div>
+        <div id="timer-display">00:00</div>
+    </div>
+
+    <script>
+        const SUB_URL = "https://laliiuqjpxanhwhxajlm.supabase.co";
+        const SUB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhbGlpdXFqcHhhbmh3aHhhamxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjQ5MjEsImV4cCI6MjA4ODU0MDkyMX0.1xIE1MXy1JxgGzpP0Hitotz8o3aMwASV8NUr06bQjkA";
+        
+        let OVERLAY_ID = window.location.pathname.split('/').filter(p => p && p !== 'index.html').pop();
+        if (!OVERLAY_ID || OVERLAY_ID === 'overlays') {
+            const params = new URLSearchParams(window.location.search);
+            OVERLAY_ID = params.get('id') || "tournament-2v2-high-match";
+        }
+        
+        const IS_HIGH_ELO = OVERLAY_ID.includes('high');
+
+        const { createClient } = window.supabase;
+        const client = createClient(SUB_URL, SUB_KEY);
+        let lastState = null;
+
+        function getCivFlagUrl(id) {
+            if (!id) return '';
+            const mapping = {
+                'abbasid': 'Abbasid Dynasty', 'ayyubids': 'Ayyubids', 'byzantines': 'Byzantines',
+                'chinese': 'Chinese', 'delhi': 'Delhi Sultanate', 'english': 'English',
+                'french': 'French', 'hre': 'Holy Roman Empire', 'japanese': 'Japanese',
+                'jeannedarc': 'Jeanne dArc', 'malians': 'Malians', 'mongols': 'Mongols',
+                'orderofthedragon': 'Order of the Dragon', 'ottomans': 'Ottomans',
+                'rus': 'Rus', 'zhuxi': 'Zhu Xis Legacy'
+            };
+            const name = mapping[id.toLowerCase()] || id;
+            return `/civs/${name}.png`;
+        }
+
+        function getMapUrl(name) { return `/maps/${name}.png`; }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return [m, s].map(v => v.toString().padStart(2, '0')).join(':');
+        }
+
+        function updateTimer() {
+            const container = document.getElementById('timer-container');
+            const display = document.getElementById('timer-display');
+            if (!lastState || !lastState.timer || !lastState.timer.active) {
+                container.style.display = 'none';
+                return;
+            }
+            container.style.display = 'flex';
+            const elapsed = Math.floor((Date.now() - (lastState.timer.timestamp || Date.now())) / 1000);
+            const total = ((lastState.timer.min || 0) * 60) + (lastState.timer.sec || 0);
+            let remaining = Math.max(0, total - elapsed);
+            display.innerText = remaining <= 0 ? "STARTING!" : formatTime(remaining);
+        }
+
+        function render(state) {
+            if (!state) return;
+            lastState = state;
+
+            document.getElementById('t1-name').innerText = state.t1?.name || 'TEAM ALPHA';
+            document.getElementById('t1-players').innerText = (state.t1?.players || []).join(' & ') || '-- & --';
+            document.getElementById('t1-score').innerText = state.t1?.score ?? 0;
+            
+            document.getElementById('t2-name').innerText = state.t2?.name || 'TEAM BETA';
+            document.getElementById('t2-players').innerText = (state.t2?.players || []).join(' & ') || '-- & --';
+            document.getElementById('t2-score').innerText = state.t2?.score ?? 0;
+
+            const renderDraft = (containerId, civs) => {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                (civs || []).forEach(civId => {
+                    const div = document.createElement('div');
+                    div.className = 'draft-flag active';
+                    div.style.backgroundImage = `url('${getCivFlagUrl(civId)}')`;
+                    container.appendChild(div);
+                });
+                for(let i = (civs?.length || 0); i < 6; i++) {
+                    const div = document.createElement('div');
+                    div.className = 'draft-flag';
+                    container.appendChild(div);
+                }
+            };
+            renderDraft('t1-draft', state.t1?.draftCivs);
+            renderDraft('t2-draft', state.t2?.draftCivs);
+
+            if (IS_HIGH_ELO) {
+                document.getElementById('t1-bans-box').style.display = 'block';
+                document.getElementById('t2-bans-box').style.display = 'block';
+                const renderBans = (containerId, bans) => {
+                    const container = document.getElementById(containerId);
+                    container.innerHTML = '';
+                    (bans || []).forEach(civId => {
+                        const div = document.createElement('div');
+                        div.className = 'ban-flag';
+                        div.style.backgroundImage = `url('${getCivFlagUrl(civId)}')`;
+                        container.appendChild(div);
+                    });
+                };
+                renderBans('t1-bans', state.t1?.bans);
+                renderBans('t2-bans', state.t2?.bans);
+            }
+
+            const mapsContainer = document.getElementById('maps-section');
+            mapsContainer.innerHTML = '';
+            (state.maps || []).forEach((map, idx) => {
+                const card = document.createElement('div');
+                card.className = `map-card ${map.isNext ? 'next' : ''}`;
+                const winnerText = map.winner === 1 ? 'TEAM 1 WIN' : map.winner === 2 ? 'TEAM 2 WIN' : 'DA GIOCARE';
+                const winnerClass = map.winner === 1 ? 'win1' : map.winner === 2 ? 'win2' : '';
+                card.innerHTML = `
+                    <div class="map-image" style="background-image: url('${getMapUrl(map.name)}')">
+                        <div class="map-overlay"></div>
+                        <div class="map-name-label">${map.name}</div>
+                    </div>
+                    <div class="map-picks">
+                        <div class="team-picks">
+                            <div class="picks-row">
+                                <div class="pick-flag ${map.t1Snipe === map.t1Civs[0] ? 'sniped' : ''}" style="background-image: url('${getCivFlagUrl(map.t1Civs[0])}')"></div>
+                                <div class="pick-flag ${map.t1Snipe === map.t1Civs[1] ? 'sniped' : ''}" style="background-image: url('${getCivFlagUrl(map.t1Civs[1])}')"></div>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <div class="vs-box" style="font-size: 16px; opacity: 0.3;">VS</div>
+                            <div class="winner-tag ${winnerClass}">${winnerText}</div>
+                        </div>
+                        <div class="team-picks">
+                            <div class="picks-row">
+                                <div class="pick-flag ${map.t2Snipe === map.t2Civs[0] ? 'sniped' : ''}" style="background-image: url('${getCivFlagUrl(map.t2Civs[0])}')"></div>
+                                <div class="pick-flag ${map.t2Snipe === map.t2Civs[1] ? 'sniped' : ''}" style="background-image: url('${getCivFlagUrl(map.t2Civs[1])}')"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                mapsContainer.appendChild(card);
+            });
+            updateTimer();
+        }
+
+        async function init() {
+            const { data } = await client.from('stream_overlays').select('state').eq('id', OVERLAY_ID).single();
+            if (data?.state) render(data.state);
+            client.channel('public:stream_overlays').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stream_overlays', filter: `id=eq.${OVERLAY_ID}` }, payload => render(payload.new.state)).subscribe();
+            setInterval(updateTimer, 1000);
+        }
+        init();
+    </script>
+</body>
+</html>

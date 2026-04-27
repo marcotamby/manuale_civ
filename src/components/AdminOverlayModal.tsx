@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { X, ExternalLink, Copy, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft, Pencil, Check, Upload } from 'lucide-react';
 import { AoE4MatchDashboard } from './AoE4MatchDashboard';
 import { TournamentOverlayDashboard } from './TournamentOverlayDashboard';
+import { TournamentOverlay2v2Dashboard } from './TournamentOverlay2v2Dashboard';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
 import { overlayService } from '../services/overlayService';
@@ -33,6 +34,34 @@ const OVERLAYS: OverlayItem[] = [
     name: 'Torneo 1V1 (Tabellone)',
     description: 'Overlay 1V1 con tabellone progressivo a 8 partecipanti.',
     path: '/overlays/tournament-1v1-bracket/index.html',
+    icon: Trophy
+  },
+  {
+    id: 'tournament-2v2-low-match',
+    name: 'Torneo 2V2 Low Elo (Match)',
+    description: 'Match 2V2 per player Low Elo. Solo Pick civ.',
+    path: '/overlays/tournament-2v2-low-match/index.html',
+    icon: Users
+  },
+  {
+    id: 'tournament-2v2-low-bracket',
+    name: 'Torneo 2V2 Low Elo (Tabellone)',
+    description: 'Tabellone per torneo 2V2 Low Elo.',
+    path: '/overlays/tournament-2v2-low-bracket/index.html',
+    icon: Trophy
+  },
+  {
+    id: 'tournament-2v2-high-match',
+    name: 'Torneo 2V2 High Elo (Match)',
+    description: 'Match 2V2 per player High Elo. Include Ban e Sniper civ.',
+    path: '/overlays/tournament-2v2-high-match/index.html',
+    icon: ShieldCheck
+  },
+  {
+    id: 'tournament-2v2-high-bracket',
+    name: 'Torneo 2V2 High Elo (Tabellone)',
+    description: 'Tabellone per torneo 2V2 High Elo.',
+    path: '/overlays/tournament-2v2-high-bracket/index.html',
     icon: Trophy
   }
 ];
@@ -429,6 +458,12 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                     <div className="h-full bg-black/20 p-8">
                       {selectedOverlay.id === 'aoe4-match' ? (
                         <AoE4MatchDashboard onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} />
+                      ) : selectedOverlay.id.startsWith('tournament-2v2') ? (
+                        <TournamentOverlay2v2Dashboard 
+                          overlayId={selectedOverlay.id} 
+                          mode={selectedOverlay.id.includes('high') ? 'high' : 'low'} 
+                          onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} 
+                        />
                       ) : (
                         <TournamentOverlayDashboard onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} />
                       )}
