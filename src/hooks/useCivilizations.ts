@@ -28,8 +28,8 @@ export function useCivilizations() {
           id: row.id,
           name: row.name,
           flag: row.flag 
-            ? row.flag.replace('.webp', '.png').replace("Jeanne d'Arc", "jeannedarc") 
-            : localCiv?.flag,
+            ? row.flag.replace('.png', '.webp').replace("Jeanne d'Arc", "jeannedarc") 
+            : localCiv?.flag?.replace('.png', '.webp'),
           difficulty: row.difficulty,
           shortDescription: row.short_description || localCiv?.shortDescription || '',
           passiveBonuses: (row.passive_bonuses && row.passive_bonuses.length > 0) ? row.passive_bonuses : (localCiv?.passiveBonuses || []),

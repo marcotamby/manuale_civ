@@ -115,18 +115,18 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
   if (!civ1 || !civ2) return null;
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full relative z-10">
+    <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full relative z-10 bg-transparent">
       {/* Header */}
-      <div className="flex flex-col items-center justify-center text-center p-6 md:p-8 bg-black/20 border-b border-white/5 relative rounded-3xl mb-8">
+      <div className="flex flex-col items-center justify-center text-center p-6 md:p-8 relative rounded-3xl mb-8 z-10">
         <button
           onClick={onClose}
-          className="absolute right-6 top-6 p-2 hover:bg-white/10 rounded-full transition-colors"
+          className="absolute right-6 top-6 p-2 hover:bg-white/10 rounded-full transition-colors z-20"
         >
           <X size={24} className="text-gray-400" />
         </button>
         <div className="flex flex-col md:flex-row items-center gap-3 mb-2">
           <BarChart2 className="text-blue-500" size={32} />
-          <h1 className="text-3xl font-bold text-white">Confronto Civiltà</h1>
+          <h1 className="text-3xl font-bold text-white uppercase tracking-wider drop-shadow-lg">Confronto Civiltà</h1>
         </div>
         <p className="text-gray-400">
           Analisi fianco a fianco di <span className="text-white font-medium">{civ1?.name}</span> e <span className="text-white font-medium">{civ2?.name}</span>.
@@ -135,14 +135,14 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
 
       <div className="p-4 md:p-8 space-y-8 max-w-7xl mx-auto w-full">
         {/* Row 1: Flags & Names */}
-        <div className="grid grid-cols-2 gap-3 md:gap-8">
+        <div className="grid grid-cols-2 gap-3 md:gap-8 relative z-10">
           {[civ1, civ2].map(civ => (
             <div key={civ!.id} className="relative glass rounded-3xl flex flex-col items-center justify-end text-center p-8 border border-white/5 hover:border-yellow-500/20 transition-all min-h-[220px] md:min-h-[300px] overflow-hidden group">
               {/* Massive High Quality Background Flag */}
               <div className="absolute inset-0 pointer-events-none">
                 <div 
-                  className="absolute inset-0 bg-cover bg-center opacity-70 scale-110 group-hover:scale-105 transition-transform duration-1000"
-                  style={{ backgroundImage: `url(${civ!.flag})` }}
+                  className="absolute inset-0 bg-cover bg-center opacity-90 scale-110 group-hover:scale-105 transition-transform duration-1000"
+                  style={{ backgroundImage: `url(${civ!.flag.replace('.webp', '.png')})` }}
                 />
                 {/* Elegant Fading Overlays */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-brand-dark)] via-[var(--color-brand-dark)]/20 to-transparent" />
@@ -153,7 +153,7 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/5 blur-[100px] rounded-full pointer-events-none" />
 
               <div className="relative z-10 w-full">
-                <h2 className="text-3xl md:text-5xl font-black text-white mb-3 tracking-tighter uppercase drop-shadow-2xl">{civ!.name}</h2>
+                <h2 className="text-3xl md:text-5xl font-black text-white mb-3 tracking-tighter uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,1)]">{civ!.name}</h2>
                 <div className="flex justify-center">
                   <span className={`text-[10px] md:text-xs font-black px-5 py-2 rounded-full border shadow-2xl backdrop-blur-md ${civ!.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/20' :
                     civ!.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-500/40 bg-yellow-500/20' :

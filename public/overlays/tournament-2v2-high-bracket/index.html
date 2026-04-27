@@ -34,12 +34,12 @@
 
         #phases-wrapper {
             display: flex; width: 100%; height: 100%; justify-content: space-between;
-            transform: scale(0.88); transform-origin: top center;
+            transform: scale(0.75); transform-origin: top center;
         }
 
         .phase-column {
             display: flex; flex-direction: column; justify-content: space-around;
-            flex: 1; gap: 30px; padding: 0 15px; position: relative; z-index: 5;
+            flex: 1; gap: 15px; padding: 0 15px; position: relative; z-index: 5;
         }
 
         .phase-label { 
@@ -53,17 +53,17 @@
 
         .match-card { 
             background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255, 255, 255, 0.15); 
-            border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
+            border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
             transition: all 0.5s ease; width: 100%; position: relative;
-            display: flex; flex-direction: column;
+            display: flex; flex-direction: column; gap: 2px;
         }
         
         .team-row { 
-            display: flex; align-items: center; padding: 12px 20px; height: 72px; 
+            display: flex; align-items: center; padding: 10px 16px; height: 68px; 
             position: relative; overflow: hidden;
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
         }
-        .team-row:first-child { border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
         .team-row.winner { background: rgba(255, 255, 255, 0.08); }
         .team-row.winner::after { content: '🏆'; position: absolute; right: 15px; font-size: 24px; filter: drop-shadow(0 0 10px var(--gold)); z-index: 5; }
         
@@ -72,15 +72,12 @@
         .bracket-civ-flag { 
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background-size: cover; background-position: center; 
-            opacity: 0.5; z-index: 1; pointer-events: none;
+            opacity: 0.9; z-index: 1; pointer-events: none;
         }
 
         .team-info { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 5; }
-        .team-name { font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; line-height: 1.1; color: white; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
-        .team-players { font-size: 9px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
-
-        .team-civs { display: flex; gap: 4px; margin-top: 4px; }
-        .civ-flag { width: 24px; height: 14px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.2); background-size: cover; background-position: center; }
+        .team-name { font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; line-height: 1.1; color: white; text-shadow: 0 2px 12px rgba(0,0,0,1); }
+        .team-players { font-size: 9px; font-weight: 700; color: #ccc; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 1px 4px rgba(0,0,0,1); }
 
         .bracket-svg { position: absolute; inset: 0; pointer-events: none; z-index: 0; width: 100%; height: 100%; }
         .bracket-line { stroke: rgba(255, 255, 255, 0.25); stroke-width: 2; fill: none; }
@@ -123,7 +120,7 @@
                 'french': 'French',
                 'hre': 'Holy Roman Empire',
                 'japanese': 'Japanese',
-                'jeannedarc': 'Jeanne dArc',
+                'jeannedarc': 'jeannedarc',
                 'malians': 'Malians',
                 'mongols': 'Mongols',
                 'orderofthedragon': 'Order of the Dragon',

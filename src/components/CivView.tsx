@@ -664,7 +664,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         {/* Unified Cinematic Fading Flag Background - Spans both Header and Navbar */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
           <img 
-            src={civ.flag} 
+            src={civ.flag.replace('.webp', '.png')} 
             alt="" 
             className="h-full w-full object-cover object-center md:object-left opacity-[0.8] md:opacity-[0.9]"
             style={{
