@@ -75,10 +75,17 @@
             opacity: 1; z-index: 1; pointer-events: none;
         }
 
-        .team-info { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 15; }
-        .team-name { font-size: 20px; font-weight: 950; color: white; text-transform: uppercase; letter-spacing: -0.5px; display: flex; align-items: center; text-shadow: 0 2px 10px rgba(0,0,0,1); }
-        .team-players { font-size: 11px; font-weight: 700; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; letter-spacing: 1px; margin-top: -2px; text-shadow: 0 2px 10px rgba(0,0,0,1); }
+        .team-info { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 15; min-width: 0; }
+        .team-name { font-size: 20px; font-weight: 950; color: white; text-transform: uppercase; letter-spacing: -0.5px; display: flex; align-items: center; text-shadow: 0 2px 10px rgba(0,0,0,1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .team-players { font-size: 11px; font-weight: 700; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; letter-spacing: 1px; margin-top: -2px; text-shadow: 0 2px 10px rgba(0,0,0,1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
+        .team-civs-container {
+            display: flex; flex-direction: row-reverse; align-items: center; gap: 6px; margin-right: 12px; z-index: 10;
+        }
+        .civ-flag-mini {
+            width: 52px; height: 32px; background-size: cover; background-position: center; border-radius: 4px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 10px rgba(0,0,0,0.4); flex-shrink: 0;
+        }
+
         .team-score-box {
             position: relative; z-index: 20;
             background: rgba(255, 255, 255, 0.15);
@@ -88,6 +95,7 @@
             border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            flex-shrink: 0;
         }
 
         .bracket-svg { position: absolute; inset: 0; pointer-events: none; z-index: 0; width: 100%; height: 100%; }
@@ -208,26 +216,24 @@
                     const card = document.createElement('div');
                     card.className = 'match-card';
                     card.id = `match-${pIdx}-${mIdx}`;
-                    
-                    const renderTeam = (teamName, players, civs, isWinner, hasBye, isT1) => {
+                                      const renderTeam = (teamName, players, civs, isWinner, hasBye, isT1) => {
                         const playerDisplay = (players || []).filter(p => p && p.trim()).join(' & ');
                         const score = match[isT1 ? 't1Score' : 't2Score'];
                         
                         let civFlagsHtml = '';
                         if (civs && civs.length > 0) {
-                            // Reverse to handle right-to-left stacking properly
                             const sortedCivs = [...civs].reverse();
+                            civFlagsHtml = '<div class="team-civs-container">';
                             sortedCivs.forEach((cId, idx) => {
-                                const offset = idx * 60;
                                 const isLeftmost = idx === sortedCivs.length - 1;
-                                const mask = isLeftmost ? 'linear-gradient(to left, black 40%, transparent 100%)' : 'linear-gradient(to left, black 100%, transparent 100%)';
-                                civFlagsHtml += `<div class="bracket-civ-flag" style="background-image: url('${getCivFlagUrl(cId)}'); width: 100%; right: ${offset}px; -webkit-mask-image: ${mask}; mask-image: ${mask}; z-index: ${idx};"></div>`;
+                                const style = isLeftmost ? 'opacity: 0.5; -webkit-mask-image: linear-gradient(to right, transparent, black);' : '';
+                                civFlagsHtml += `<div class="civ-flag-mini" style="background-image: url('${getCivFlagUrl(cId)}'); ${style}"></div>`;
                             });
+                            civFlagsHtml += '</div>';
                         }
 
                         return `
                             <div class="team-row ${isWinner ? 'winner' : ''}">
-                                ${civFlagsHtml}
                                 <div class="team-info">
                                     <div class="team-name">
                                         ${teamName || '--'}
@@ -235,6 +241,7 @@
                                     </div>
                                     <div class="team-players">${playerDisplay || '--'}</div>
                                 </div>
+                                ${civFlagsHtml}
                                 <div class="team-score-box">${score || 0}</div>
                             </div>
                         `;
