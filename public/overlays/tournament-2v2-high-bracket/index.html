@@ -5,7 +5,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --gold: #d4af37; --gold-bright: #ffed4a; --red: #8b0000; --blue: #0044ff; }
+        :root { --gold: #d4af37; --gold-bright: #ffed4a; --red: #8b0000; --blue: #0044ff; --silver: #c0c0c0; }
         * { font-family: 'Outfit', sans-serif !important; margin: 0; padding: 0; box-sizing: border-box; }
         
         body { 
@@ -24,8 +24,8 @@
         #bracket-title { font-size: 48px; font-weight: 950; text-transform: uppercase; letter-spacing: 10px; color: #fff; text-shadow: 0 0 30px rgba(212, 175, 55, 0.5); }
 
         #bracket-container {
-            position: absolute; top: 180px; left: 50%; transform: translateX(-50%);
-            width: 1720px; height: 800px;
+            position: absolute; top: 160px; left: 50%; transform: translateX(-50%);
+            width: 1820px; height: 860px;
             display: flex; justify-content: space-between; align-items: stretch;
             padding: 60px 40px;
             background: rgba(10, 15, 28, 0.7);
@@ -36,40 +36,52 @@
 
         .phase-column {
             display: flex; flex-direction: column; justify-content: space-around;
-            flex: 1; gap: 20px; padding: 0 10px;
+            flex: 1; gap: 40px; padding: 0 20px; position: relative; z-index: 5;
         }
 
         .phase-label { 
             position: absolute; top: -100px; left: 50%; transform: translateX(-50%); 
-            background: var(--gold); color: #000; padding: 10px 40px; border-radius: 15px; 
+            background: linear-gradient(135deg, #ffffff 0%, #b0b0b0 100%); 
+            color: #000; padding: 10px 40px; border-radius: 15px; 
             font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 6px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); white-space: nowrap; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid #fff;
+            white-space: nowrap; z-index: 10;
         }
 
         .match-card { 
             background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255, 255, 255, 0.15); 
             border-radius: 20px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.9); 
-            transition: all 0.5s ease;
+            transition: all 0.5s ease; width: 100%; position: relative;
         }
         
         .team-row { 
-            display: flex; align-items: center; padding: 15px 25px; height: 100px; 
+            display: flex; align-items: center; padding: 15px 25px; height: 85px; 
             position: relative; border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
+            overflow: hidden;
         }
         .team-row:last-child { border-bottom: none; }
-        .team-row.winner { background: rgba(212, 175, 55, 0.15); }
-        .team-row.winner::after { content: '🏆'; position: absolute; right: 20px; font-size: 32px; filter: drop-shadow(0 0 10px var(--gold)); }
+        .team-row.winner { background: rgba(255, 255, 255, 0.1); }
+        .team-row.winner::after { content: '🏆'; position: absolute; right: 20px; font-size: 32px; filter: drop-shadow(0 0 10px var(--gold)); z-index: 5; }
         
-        .bye-badge { background: var(--gold); color: black; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 4px; margin-left: 10px; vertical-align: middle; }
+        .bye-badge { background: var(--gold); color: black; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 4px; margin-left: 10px; vertical-align: middle; position: relative; z-index: 10; }
         
-        .team-info { flex: 1; display: flex; flex-direction: column; }
-        .team-name { font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; line-height: 1.1; }
-        .team-players { font-size: 12px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 2px; }
+        .bracket-civ-flag { 
+            position: absolute; inset: 0; background-size: cover; background-position: center; 
+            opacity: 0.6; z-index: 1; 
+            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 90%); 
+            mask-image: linear-gradient(to right, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 90%); 
+        }
 
-        .team-civs { display: flex; gap: 5px; margin-top: 8px; }
-        .civ-flag { width: 30px; height: 18px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.1); background-size: cover; background-position: center; }
+        .team-info { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 5; }
+        .team-name { font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; line-height: 1.1; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+        .team-players { font-size: 11px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 2px; }
 
-        .vs-divider { position: absolute; left: 50%; transform: translateX(-50%); font-size: 12px; font-weight: 900; color: rgba(255,255,255,0.1); letter-spacing: 5px; z-index: 5; }
+        .team-civs { display: flex; gap: 5px; margin-top: 5px; }
+        .civ-flag { width: 30px; height: 18px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); background-size: cover; background-position: center; }
+
+        .bracket-svg { position: absolute; inset: 0; pointer-events: none; z-index: 0; width: 100%; height: 100%; }
+        .bracket-line { stroke: rgba(255, 255, 255, 0.15); stroke-width: 2.5; fill: none; transition: all 0.8s ease; }
+        .bracket-line.active { stroke: rgba(255, 255, 255, 0.8); stroke-width: 4; filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4)); }
 
     </style>
 </head>
@@ -78,7 +90,10 @@
         <div id="bracket-title">TABELLONE TORNEO 2V2</div>
     </div>
     
-    <div id="bracket-container"></div>
+    <div id="bracket-container">
+        <svg id="bracket-svg" class="bracket-svg"></svg>
+        <div id="phases-wrapper" style="display: flex; width: 100%; height: 100%; justify-content: space-between;"></div>
+    </div>
 
     <script>
         const SUB_URL = "https://laliiuqjpxanhwhxajlm.supabase.co";
@@ -107,51 +122,114 @@
             return `/civs/${name}.png`;
         }
 
+        function updateLines(state) {
+            const svg = document.getElementById('bracket-svg');
+            const containerRect = document.getElementById('bracket-container').getBoundingClientRect();
+            svg.innerHTML = '';
+
+            const phases = state.bracket.phases || [];
+            phases.forEach((phase, pIdx) => {
+                if (pIdx >= phases.length - 1) return;
+                
+                const nextPhase = phases[pIdx + 1];
+                phase.matches.forEach((match, mIdx) => {
+                    const startMatchEl = document.getElementById(`match-${pIdx}-${mIdx}`);
+                    const nextMatchIdx = Math.floor(mIdx / 2);
+                    const endMatchEl = document.getElementById(`match-${pIdx + 1}-${nextMatchIdx}`);
+                    
+                    if (startMatchEl && endMatchEl) {
+                        const sRect = startMatchEl.getBoundingClientRect();
+                        const eRect = endMatchEl.getBoundingClientRect();
+                        
+                        const xStart = sRect.right - containerRect.left;
+                        const yStart = (sRect.top + sRect.height / 2) - containerRect.top;
+                        
+                        const xEnd = eRect.left - containerRect.left;
+                        const yBase = (eRect.top + eRect.height / 2) - containerRect.top;
+                        
+                        // Slot 0 (top) or Slot 1 (bottom) in the next match card
+                        const slot = mIdx % 2 === 0 ? 0 : 1;
+                        // Approximate height of a team row is 85px
+                        const yEnd = yBase + (slot === 0 ? -42 : 42);
+                        
+                        const xMid = xStart + (xEnd - xStart) / 2;
+                        
+                        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                        path.setAttribute('class', `bracket-line ${match.w > 0 ? 'active' : ''}`);
+                        const d = `M ${xStart},${yStart} L ${xMid},${yStart} L ${xMid},${yEnd} L ${xEnd},${yEnd}`;
+                        path.setAttribute('d', d);
+                        svg.appendChild(path);
+                    }
+                });
+            });
+        }
+
         function render(state) {
             if (!state || !state.bracket) return;
             const b = state.bracket;
             document.getElementById('bracket-title').innerText = b.title || 'TABELLONE TORNEO 2V2';
-            const container = document.getElementById('bracket-container');
-            container.innerHTML = '';
+
+            const wrapper = document.getElementById('phases-wrapper');
+            wrapper.innerHTML = '';
+
             (b.phases || []).forEach((phase, pIdx) => {
                 const column = document.createElement('div');
                 column.className = 'phase-column';
-                column.style.position = 'relative';
+
                 const label = document.createElement('div');
                 label.className = 'phase-label';
                 label.innerText = phase.name;
                 column.appendChild(label);
+
                 (phase.matches || []).forEach((match, mIdx) => {
                     const card = document.createElement('div');
                     card.className = 'match-card';
-                    const renderTeam = (teamName, players, civs, isWinner, hasBye) => `
-                        <div class="team-row ${isWinner ? 'winner' : ''}">
-                            <div class="team-info">
-                                <div class="team-name">
-                                    ${teamName || '--'}
-                                    ${hasBye ? '<span class="bye-badge">BYE</span>' : ''}
-                                </div>
-                                <div class="team-players">${(players || []).join(' & ') || '-- & --'}</div>
-                                <div class="team-civs">
-                                    ${(civs || []).map(c => `<div class="civ-flag" style="background-image: url('${getCivFlagUrl(c)}')"></div>`).join('')}
+                    card.id = `match-${pIdx}-${mIdx}`;
+                    
+                    const renderTeam = (teamName, players, civs, isWinner, hasBye) => {
+                        const lastCiv = civs && civs.length > 0 ? civs[civs.length - 1] : null;
+                        return `
+                            <div class="team-row ${isWinner ? 'winner' : ''}">
+                                ${lastCiv ? `<div class="bracket-civ-flag" style="background-image: url('${getCivFlagUrl(lastCiv)}')"></div>` : ''}
+                                <div class="team-info">
+                                    <div class="team-name">
+                                        ${teamName || '--'}
+                                        ${hasBye ? '<span class="bye-badge">BYE</span>' : ''}
+                                    </div>
+                                    <div class="team-players">${(players || []).join(' & ') || '-- & --'}</div>
+                                    <div class="team-civs">
+                                        ${(civs || []).map(c => `<div class="civ-flag" style="background-image: url('${getCivFlagUrl(c)}')"></div>`).join('')}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    `;
+                        `;
+                    };
+
                     card.innerHTML = `
                         ${renderTeam(match.t1, match.t1Players, match.t1Civs, match.w === 1, match.t1Bye)}
                         ${renderTeam(match.t2, match.t2Players, match.t2Civs, match.w === 2, match.t2Bye)}
                     `;
                     column.appendChild(card);
                 });
-                container.appendChild(column);
+                wrapper.appendChild(column);
             });
+
+            setTimeout(() => updateLines(state), 300);
         }
 
         async function init() {
             const { data } = await client.from('stream_overlays').select('state').eq('id', OVERLAY_ID).single();
             if (data?.state) render(data.state);
-            client.channel('public:stream_overlays').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stream_overlays', filter: `id=eq.${OVERLAY_ID}` }, payload => render(payload.new.state)).subscribe();
+
+            client.channel('public:stream_overlays')
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stream_overlays', filter: `id=eq.${OVERLAY_ID}` }, payload => render(payload.new.state))
+                .subscribe();
+            
+            window.addEventListener('resize', () => {
+                const { data } = client.from('stream_overlays').select('state').eq('id', OVERLAY_ID).single().then(res => {
+                   if (res.data?.state) updateLines(res.data.state);
+                });
+            });
         }
         init();
     </script>

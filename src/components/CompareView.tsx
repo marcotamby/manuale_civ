@@ -134,32 +134,28 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
         {/* Row 1: Flags & Names */}
         <div className="grid grid-cols-2 gap-3 md:gap-8">
           {[civ1, civ2].map(civ => (
-            <div key={civ!.id} className="relative glass rounded-3xl flex flex-col items-center justify-center text-center p-8 border border-white/5 hover:border-yellow-500/20 transition-all min-h-[220px] md:min-h-[280px] overflow-hidden group">
-              {/* Large Stylized Background Flag */}
-              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+            <div key={civ!.id} className="relative glass rounded-3xl flex flex-col items-center justify-end text-center p-8 border border-white/5 hover:border-yellow-500/20 transition-all min-h-[220px] md:min-h-[300px] overflow-hidden group">
+              {/* Massive High Quality Background Flag */}
+              <div className="absolute inset-0 pointer-events-none">
                 <div 
-                  className="absolute inset-0 bg-cover bg-center opacity-15 scale-125 group-hover:scale-110 transition-transform duration-1000 grayscale-[0.2]"
+                  className="absolute inset-0 bg-cover bg-center opacity-40 scale-110 group-hover:scale-105 transition-transform duration-1000"
                   style={{ backgroundImage: `url(${civ!.flag})` }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-brand-dark)] via-transparent to-[var(--color-brand-dark)]" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-brand-dark)] via-transparent to-[var(--color-brand-dark)]" />
+                {/* Elegant Fading Overlays */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-brand-dark)] via-[var(--color-brand-dark)]/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-brand-dark)]/20 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-black/20" />
               </div>
 
-              {/* Main High Quality Flag */}
-              <div className="relative z-10 mb-4">
-                <img 
-                  src={civ!.flag} 
-                  alt={civ!.name} 
-                  className="w-24 h-24 md:w-32 md:h-32 object-contain drop-shadow-[0_0_30px_rgba(0,0,0,0.8)] filter brightness-110" 
-                />
-              </div>
+              {/* Glowing Aura */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/5 blur-[100px] rounded-full pointer-events-none" />
 
-              <div className="relative z-10">
-                <h2 className="text-2xl md:text-4xl font-black text-white mb-2 tracking-tighter uppercase">{civ!.name}</h2>
+              <div className="relative z-10 w-full">
+                <h2 className="text-3xl md:text-5xl font-black text-white mb-3 tracking-tighter uppercase drop-shadow-2xl">{civ!.name}</h2>
                 <div className="flex justify-center">
-                  <span className={`text-[10px] md:text-xs font-black px-4 py-1.5 rounded-full border shadow-lg ${civ!.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/10' :
-                    civ!.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-500/40 bg-yellow-500/10' :
-                      'text-red-400 border-red-400/30 bg-red-500/10'
+                  <span className={`text-[10px] md:text-xs font-black px-5 py-2 rounded-full border shadow-2xl backdrop-blur-md ${civ!.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/20' :
+                    civ!.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-500/40 bg-yellow-500/20' :
+                      'text-red-400 border-red-400/30 bg-red-500/20'
                     }`}>
                     {civ!.difficulty.toUpperCase()}
                   </span>
