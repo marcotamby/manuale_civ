@@ -706,12 +706,14 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
           </button>
           
           {!showResetConfirm ? (
-            <button onClick={() => setShowResetConfirm(true)} className="p-3 rounded-xl bg-red-600/10 border border-red-600/30 text-red-500 hover:bg-red-600 hover:text-white transition-all">
-              <RefreshCcw size={16} />
+            <button onClick={() => setShowResetConfirm(true)} className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-600/10 border border-red-600/30 text-red-500 hover:bg-red-600 hover:text-white transition-all font-black text-xs uppercase tracking-widest">
+              <RefreshCcw size={14} />
+              Reset Campi
             </button>
           ) : (
             <div className="flex items-center gap-2 bg-red-600 p-1 rounded-xl shadow-lg animate-in zoom-in-95 duration-200">
-              <button onClick={handleReset} className="bg-white text-red-600 px-4 py-2 rounded-lg font-black text-[10px] uppercase hover:bg-gray-100 transition-all">RESET</button>
+              <span className="text-[10px] font-black text-white px-3 uppercase tracking-tighter">Sei sicuro?</span>
+              <button onClick={handleReset} className="bg-white text-red-600 px-4 py-2 rounded-lg font-black text-[10px] uppercase hover:bg-gray-100 transition-all">SI, RESET</button>
               <button onClick={() => setShowResetConfirm(false)} className="bg-black/20 text-white w-8 h-8 flex items-center justify-center rounded-lg hover:bg-black/30"><X size={14}/></button>
             </div>
           )}
