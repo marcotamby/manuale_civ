@@ -17,8 +17,7 @@
         
         body { 
             width: 1920px; height: 1080px; color: white; overflow: hidden;
-            background: transparent;
-            /* background: #05080f; /* For testing */
+            background: url('/overlays/tournament-bg.png') center/cover no-repeat transparent;
         }
 
         #header { 
@@ -44,13 +43,13 @@
         .bo-label { margin-top: 10px; font-size: 12px; font-weight: 900; color: #aaa; text-transform: uppercase; letter-spacing: 6px; }
 
         .draft-civs { display: flex; gap: 8px; margin-top: 15px; }
-        .draft-flag { width: 40px; height: 24px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); filter: grayscale(1) opacity(0.5); background-size: cover; background-position: center; }
+        .draft-flag { width: 40px; height: 24px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); filter: grayscale(1) opacity(0.5); background-size: cover; background-position: center; image-rendering: -webkit-optimize-contrast; }
         .draft-flag.active { filter: none; opacity: 1; border-color: var(--gold); }
 
         .bans-container { position: absolute; bottom: 15px; display: flex; gap: 10px; }
         .team-left .bans-container { left: 60px; }
         .team-right .bans-container { right: 60px; }
-        .ban-flag { width: 32px; height: 20px; border-radius: 3px; border: 1px solid rgba(255,0,0,0.5); filter: grayscale(0.5) sepia(0.5) hue-rotate(-50deg); background-size: cover; }
+        .ban-flag { width: 32px; height: 20px; border-radius: 3px; border: 1px solid rgba(255,0,0,0.5); filter: grayscale(0.5) sepia(0.5) hue-rotate(-50deg); background-size: cover; image-rendering: -webkit-optimize-contrast; }
         .ban-label { font-size: 9px; font-weight: 900; color: #ff4444; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 2px; }
 
         /* Maps Section */
@@ -91,7 +90,7 @@
         .map-picks { display: grid; grid-cols: 1fr 1fr; padding: 25px; gap: 20px; }
         .team-picks { display: flex; flex-direction: column; align-items: center; gap: 12px; }
         .picks-row { display: flex; gap: 10px; }
-        .pick-flag { width: 80px; height: 50px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.1); background-size: cover; background-position: center; position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .pick-flag { width: 80px; height: 50px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.1); background-size: cover; background-position: center; position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.5); image-rendering: -webkit-optimize-contrast; }
         .pick-flag.sniped { filter: grayscale(1) brightness(0.3); }
         .pick-flag.sniped::after { content: '✕'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #ff4444; font-size: 32px; font-weight: 900; text-shadow: 0 0 10px rgba(0,0,0,1); }
         
@@ -195,7 +194,7 @@
                 'zhuxi': 'Zhu Xis Legacy'
             };
             const name = mapping[id.toLowerCase()] || id;
-            return `/civs/${name}.png`;
+            return `/civs/${name}.webp`;
         }
 
         function getMapUrl(name) {
