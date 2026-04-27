@@ -174,11 +174,11 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                     (e.target as HTMLImageElement).classList.remove('opacity-0');
                   }}
                 />
-                {/* Cinematic Vignette Overlay - Much more subtle to keep flags sharp */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-40 group-hover:opacity-30 transition-opacity duration-500" />
+                {/* Cinematic Vignette Overlay - Extremely subtle to keep flags perfectly sharp */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-30 group-hover:opacity-20 transition-opacity duration-500" />
                 
                 {/* Subtle top/right fade as requested */}
-                <div className="absolute inset-0 bg-gradient-to-bl from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-40 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-bl from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-30 transition-opacity duration-500" />
               </div>
 
               {/* Selection Indicator */}
