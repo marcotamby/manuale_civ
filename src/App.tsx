@@ -213,15 +213,12 @@ function App() {
       {/* Global Homepage Extended Background - Desktop Only */}
       { (isHome || isTournaments || isFaq || isCiv) && (
         <div 
-          className="fixed top-0 left-0 right-0 h-[320px] md:h-[600px] lg:h-[800px] z-0 pointer-events-none block"
+          className="fixed top-0 left-0 right-0 h-[280px] md:h-[600px] lg:h-[800px] z-0 pointer-events-none block bg-contain md:bg-cover bg-no-repeat bg-top"
           style={{ 
             backgroundImage: `url('/header-bg.png')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'top center',
-            backgroundRepeat: 'no-repeat',
             opacity: 0.35,
-            maskImage: `linear-gradient(to bottom, black 30%, transparent 100%), linear-gradient(to right, transparent, black 15%, black 85%, transparent)`,
-            WebkitMaskImage: `linear-gradient(to bottom, black 30%, transparent 100%), linear-gradient(to right, transparent, black 15%, black 85%, transparent)`,
+            maskImage: `linear-gradient(to bottom, black 40%, transparent 100%), linear-gradient(to right, transparent, black 10%, black 90%, transparent)`,
+            WebkitMaskImage: `linear-gradient(to bottom, black 40%, transparent 100%), linear-gradient(to right, transparent, black 10%, black 90%, transparent)`,
             maskComposite: 'intersect',
             WebkitMaskComposite: 'source-in'
           }}
