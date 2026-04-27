@@ -187,10 +187,13 @@
                     card.id = `match-${pIdx}-${mIdx}`;
                     
                     const renderTeam = (teamName, players, civs, isWinner, hasBye) => {
-                        const lastCiv = civs && civs.length > 0 ? civs[civs.length - 1] : null;
+                        const civ1 = civs && civs.length > 0 ? civs[0] : null;
+                        const civ2 = civs && civs.length > 1 ? civs[1] : null;
+                        
                         return `
                             <div class="team-row ${isWinner ? 'winner' : ''}">
-                                ${lastCiv ? `<div class="bracket-civ-flag" style="background-image: url('${getCivFlagUrl(lastCiv)}')"></div>` : ''}
+                                ${civ1 ? `<div class="bracket-civ-flag" style="background-image: url('${getCivFlagUrl(civ1)}'); width: 50%; left: 0; -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(to right, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%);"></div>` : ''}
+                                ${civ2 ? `<div class="bracket-civ-flag" style="background-image: url('${getCivFlagUrl(civ2)}'); width: 50%; left: 50%; -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(to left, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%);"></div>` : ''}
                                 <div class="team-info">
                                     <div class="team-name">
                                         ${teamName || '--'}
