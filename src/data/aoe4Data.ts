@@ -185,7 +185,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "abbasid",
     name: "Abbasidi",
-    flag: "/civs/Abbasid Dynasty.webp",
+    flag: "/civs/Abbasid Dynasty.png",
     difficulty: "Medio",
     primaryColor: "#1f2937",
     shortDescription: "A flexible and adaptable civilization focused on the House of Wisdom.",
@@ -239,7 +239,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "ayyubids",
     name: "Ayyubidi",
-    flag: "/civs/Ayyubids.webp",
+    flag: "/civs/Ayyubids.png",
     difficulty: "Medio",
     primaryColor: "#eab308",
     shortDescription: "A versatile civilization leveraging Desert Raiders and House of Wisdom advancements.",
@@ -275,7 +275,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "delhi",
     name: "Sultanato di Delhi",
-    flag: "/civs/Delhi Sultanate.webp",
+    flag: "/civs/Delhi Sultanate.png",
     difficulty: "Difficile",
     primaryColor: "#10b981",
     shortDescription: "A research-focused civilization with free technologies and War Elephants.",
@@ -302,7 +302,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "byzantines",
     name: "Bizantini",
-    flag: "/civs/Byzantines.webp",
+    flag: "/civs/Byzantines.png",
     difficulty: "Difficile",
     primaryColor: "#8b5cf6",
     shortDescription: "A complex defensive civilization utilizing an aqueduct network and mercenaries.",
@@ -327,7 +327,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "chinese",
     name: "Cinesi",
-    flag: "/civs/Chinese.webp",
+    flag: "/civs/Chinese.png",
     difficulty: "Difficile",
     primaryColor: "#ef4444",
     shortDescription: "Civiltà flessibile che si evolve attraverso le Grandi Dinastie. Costruisce velocemente, tassa le risorse e padroneggia la polvere da sparo.",
@@ -421,7 +421,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "english",
     name: "Inglesi",
-    flag: "/civs/English.webp",
+    flag: "/civs/English.png",
     difficulty: "Facile",
     primaryColor: "#f59e0b",
     shortDescription: "A defensive civilization with a strong agricultural economy and the formidable Longbowman.",
@@ -504,7 +504,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "french",
     name: "Francesi",
-    flag: "/civs/French.webp",
+    flag: "/civs/French.png",
     difficulty: "Facile",
     primaryColor: "#3b82f6",
     shortDescription: "A cavalry-focused civilization with a strong trading economy and powerful Royal Knights.",
@@ -565,7 +565,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "goldenhorde",
     name: "Orda d'Oro",
-    flag: "/civs/Golden Horde.webp",
+    flag: "/civs/Golden Horde.png",
     difficulty: "Medio",
     primaryColor: "#f59e0b",
     shortDescription: "An aggressive variant of the Mongols focusing on early cavalry and economy.",
@@ -666,7 +666,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "hre",
     name: "Sacro Romano Impero",
-    flag: "/civs/Holy Roman Empire.webp",
+    flag: "/civs/Holy Roman Empire.png",
     difficulty: "Medio",
     primaryColor: "#fbbf24",
     shortDescription: "An infantry-heavy civilization buffed by religious Prelates.",
@@ -726,7 +726,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "japanese",
     name: "Giapponesi",
-    flag: "/civs/Japanese.webp",
+    flag: "/civs/Japanese.png",
     difficulty: "Medio",
     primaryColor: "#e2e8f0",
     shortDescription: "An infantry and farming-centric civilization utilizing Samurai and Shinobi.",
@@ -760,7 +760,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "jeannedarc",
     name: "Giovanna d'Arco",
-    flag: "/civs/jeannedarc.webp",
+    flag: "/civs/jeannedarc.png",
     difficulty: "Difficile",
     primaryColor: "#3b82f6",
     shortDescription: "A hero-led civilization where Jeanne d'Arc levels up and leads her army to victory.",
@@ -786,7 +786,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "lancaster",
     name: "Lancaster",
-    flag: "/civs/House of Lancaster.webp",
+    flag: "/civs/House of Lancaster.png",
     difficulty: "Facile",
     primaryColor: "#2563eb",
     shortDescription: "A variant of the English with powerful longbowmen upgrades and defensive traits.",
@@ -862,7 +862,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "macedonian",
     name: "Macedoni",
-    flag: "/civs/Macedonian Dynasty.webp",
+    flag: "/civs/Macedonian Dynasty.png",
     difficulty: "Facile",
     primaryColor: "#991b1b",
     shortDescription: "A variant of the Byzantines featuring robust frontline units and unique mercenaries.",
@@ -893,7 +893,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "malians",
     name: "Maliani",
-    flag: "/civs/Malians.webp",
+    flag: "/civs/Malians.png",
     difficulty: "Difficile",
     primaryColor: "#ef4444",
     shortDescription: "An economy-driven civilization focused on Gold, Cattle, and stealthy infantry.",
@@ -923,7 +923,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "mongols",
     name: "Mongoli",
-    flag: "/civs/Mongols.webp",
+    flag: "/civs/Mongols.png",
     difficulty: "Difficile",
     primaryColor: "#06b6d4",
     shortDescription: "A nomadic civilization capable of moving their bases, excelling in rapid cavalry strikes.",
@@ -976,7 +976,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "orderofthedragon",
     name: "Ordine del Drago",
-    flag: "/civs/Order of the Dragon.webp",
+    flag: "/civs/Order of the Dragon.png",
     difficulty: "Facile",
     primaryColor: "#fbbf24",
     shortDescription: "An elite variant of the Holy Roman Empire, focusing on fewer, but incredibly powerful units.",
@@ -1005,7 +1005,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "ottomans",
     name: "Ottomani",
-    flag: "/civs/Ottomans.webp",
+    flag: "/civs/Ottomans.png",
     difficulty: "Medio",
     primaryColor: "#dc2626",
     shortDescription: "A military powerhouse offering free troop production through Military Schools.",
@@ -1031,7 +1031,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "rus",
     name: "Rusiani",
-    flag: "/civs/Rus.webp",
+    flag: "/civs/Rus.png",
     difficulty: "Medio",
     primaryColor: "#b91c1c",
     shortDescription: "A hunting and forestry civilization relying on Bounties and robust Wooden Fortresses.",
@@ -1085,7 +1085,7 @@ export const civilizationsData: Civilization[] = [
   {
     id: "sengoku",
     name: "Sengoku Daimyo",
-    flag: "/civs/Sengoku Daimyo.webp",
+    flag: "/civs/Sengoku Daimyo.png",
     difficulty: "Difficile",
     primaryColor: "#e11d48",
     shortDescription: "A variant of the Japanese focusing intensely on Samurai warfare and rapid expansion.",
