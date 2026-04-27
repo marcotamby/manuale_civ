@@ -152,11 +152,11 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
             <div
               key={civ.id}
               onClick={() => handleCardClick(civ.id)}
-              className={`group relative h-36 md:h-52 rounded-xl cursor-pointer overflow-hidden border transition-all duration-500 z-10 ${isSelected
+              className={`group relative h-36 md:h-52 rounded-xl cursor-pointer overflow-hidden border z-10 will-change-transform ${isSelected
                 ? 'border-blue-400 shadow-[0_0_40px_rgba(59,130,246,0.6)] scale-[1.02] z-20 brightness-125'
                 : isUnselectable
                   ? 'border-white/5 opacity-40 cursor-not-allowed'
-                  : 'border-[#D4AF37]/30 hover:border-white/80 hover:shadow-[0_50px_100px_rgba(0,0,0,1)] hover:-translate-y-1 hover:scale-110 2xl:hover:scale-[1.25] hover:z-50 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]'
+                  : 'border-[#D4AF37]/30 hover:border-white/80 hover:shadow-[0_50px_100px_rgba(0,0,0,1)] hover:-translate-y-1 hover:scale-110 2xl:hover:scale-120 hover:z-50 transition-[transform,border-color,box-shadow,opacity] duration-400 [transition-timing-function:cubic-bezier(0.25,1.4,0.5,1)]'
                 }`}
             >
               {/* Full Cover Flag Background */}
@@ -168,7 +168,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                   onLoad={(e) => {
                     (e.target as HTMLImageElement).classList.remove('opacity-0');
                   }}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 xl:group-hover:scale-105 2xl:group-hover:scale-125"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 xl:group-hover:scale-105 2xl:group-hover:scale-115"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>';
                     (e.target as HTMLImageElement).classList.remove('opacity-0');
