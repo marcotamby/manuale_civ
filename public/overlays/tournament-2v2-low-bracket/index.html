@@ -218,10 +218,10 @@
                             // Reverse to handle right-to-left stacking properly
                             const sortedCivs = [...civs].reverse();
                             sortedCivs.forEach((cId, idx) => {
-                                const offset = idx * 120;
+                                const offset = idx * 60;
                                 const isLeftmost = idx === sortedCivs.length - 1;
-                                const mask = isLeftmost ? 'linear-gradient(to left, black 30%, transparent 100%)' : 'linear-gradient(to left, black 100%, transparent 100%)';
-                                civFlagsHtml += `<div class="bracket-civ-flag" style="background-image: url('${getCivFlagUrl(cId)}'); width: 400px; right: ${offset}px; -webkit-mask-image: ${mask}; mask-image: ${mask}; z-index: ${10-idx};"></div>`;
+                                const mask = isLeftmost ? 'linear-gradient(to left, black 40%, transparent 100%)' : 'linear-gradient(to left, black 100%, transparent 100%)';
+                                civFlagsHtml += `<div class="bracket-civ-flag" style="background-image: url('${getCivFlagUrl(cId)}'); width: 100%; right: ${offset}px; -webkit-mask-image: ${mask}; mask-image: ${mask}; z-index: ${idx};"></div>`;
                             });
                         }
 
