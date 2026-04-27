@@ -581,13 +581,13 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                           value={match.t1Players[0]}
                           onChange={(e) => updateBracketPlayer(pIdx, mIdx, 1, 0, e.target.value)}
                           placeholder="P1"
-                          className="flex-1 bg-black/40 border border-white/5 rounded-lg px-2 h-9 text-[10px] text-white outline-none focus:border-blue-500/30"
+                          className="flex-1 min-w-0 bg-black/40 border border-white/5 rounded-lg px-2 h-9 text-[10px] text-white outline-none focus:border-blue-500/30"
                         />
                         <input
                           value={match.t1Players[1]}
                           onChange={(e) => updateBracketPlayer(pIdx, mIdx, 1, 1, e.target.value)}
                           placeholder="P2"
-                          className="flex-1 bg-black/40 border border-white/5 rounded-lg px-2 h-9 text-[10px] text-white outline-none focus:border-blue-500/30"
+                          className="flex-1 min-w-0 bg-black/40 border border-white/5 rounded-lg px-2 h-9 text-[10px] text-white outline-none focus:border-blue-500/30"
                         />
                       </div>
 
@@ -654,13 +654,13 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                           value={match.t2Players[0]}
                           onChange={(e) => updateBracketPlayer(pIdx, mIdx, 2, 0, e.target.value)}
                           placeholder="P1"
-                          className="flex-1 bg-black/40 border border-white/5 rounded-lg px-2 h-9 text-[10px] text-white outline-none focus:border-blue-500/30"
+                          className="flex-1 min-w-0 bg-black/40 border border-white/5 rounded-lg px-2 h-9 text-[10px] text-white outline-none focus:border-blue-500/30"
                         />
                         <input
                           value={match.t2Players[1]}
                           onChange={(e) => updateBracketPlayer(pIdx, mIdx, 2, 1, e.target.value)}
                           placeholder="P2"
-                          className="flex-1 bg-black/40 border border-white/5 rounded-lg px-2 h-9 text-[10px] text-white outline-none focus:border-blue-500/30"
+                          className="flex-1 min-w-0 bg-black/40 border border-white/5 rounded-lg px-2 h-9 text-[10px] text-white outline-none focus:border-blue-500/30"
                         />
                       </div>
 
