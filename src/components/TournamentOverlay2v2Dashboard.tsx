@@ -601,7 +601,7 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                           newPhases[pIdx].matches[mIdx].t1Civs = vals;
                           setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
                         }}
-                        max={6}
+                        max={10}
                         label="Civ Giocate"
                       />
                     </div>
@@ -677,7 +677,7 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                           newPhases[pIdx].matches[mIdx].t2Civs = vals;
                           setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
                         }}
-                        max={6}
+                        max={10}
                         label="Civ Giocate"
                       />
                     </div>
