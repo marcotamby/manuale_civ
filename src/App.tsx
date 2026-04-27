@@ -216,7 +216,7 @@ function App() {
           className="fixed top-0 left-0 right-0 h-[280px] md:h-[600px] lg:h-[800px] z-0 pointer-events-none block bg-contain md:bg-cover bg-no-repeat bg-top"
           style={{ 
             backgroundImage: `url('/header-bg.png')`,
-            opacity: 0.28,
+            opacity: 0.18,
             maskImage: `linear-gradient(to bottom, black 40%, transparent 100%), linear-gradient(to right, transparent, black 10%, black 90%, transparent)`,
             WebkitMaskImage: `linear-gradient(to bottom, black 40%, transparent 100%), linear-gradient(to right, transparent, black 10%, black 90%, transparent)`,
             maskComposite: 'intersect',
