@@ -456,45 +456,41 @@ export function TournamentsPage() {
       }
 
       const performUpsert = async (data: any) => {
-        let upsertError;
         const currentId = editingTournament?.id;
         
-        if (currentId && currentId.length > 20) {
-          // Explicitly update by UUID if we have it
-          const { error } = await supabase
-            .from('tournaments')
-            .update(data)
-            .eq('id', currentId);
-          upsertError = error;
-        } else {
-          // New tournament or no UUID, use upsert with slug conflict resolution
-          const { error } = await supabase
-            .from('tournaments')
-            .upsert(data, { onConflict: 'slug' });
-          upsertError = error;
-        }
-
-        if (upsertError) {
-          if (upsertError.message.includes('display_order')) {
-            const { display_order, ...safeData } = data;
-            let retryError;
-            if (currentId && currentId.length > 20) {
-              const { error } = await supabase
-                .from('tournaments')
-                .update(safeData)
-                .eq('id', currentId);
-              retryError = error;
-            } else {
-              const { error } = await supabase
-                .from('tournaments')
-                .upsert(safeData, { onConflict: 'slug' });
-              retryError = error;
-            }
-            if (retryError) throw retryError;
+        const execute = async (payload: any) => {
+          if (currentId && currentId.length > 20) {
+            return await supabase.from('tournaments').update(payload).eq('id', currentId);
           } else {
-            throw upsertError;
+            return await supabase.from('tournaments').upsert(payload, { onConflict: 'slug' });
+          }
+        };
+
+        let result = await execute(data);
+        
+        if (result.error) {
+          const errorMsg = result.error.message;
+          // If columns are missing, retry without them and warn the user
+          if (errorMsg.includes('display_order') || errorMsg.includes('banner_position_x') || errorMsg.includes('banner_position_y')) {
+            console.warn("Missing database columns, retrying safe update:", errorMsg);
+            
+            const safeData = { ...data };
+            delete (safeData as any).display_order;
+            delete (safeData as any).banner_position_x;
+            delete (safeData as any).banner_position_y;
+            
+            result = await execute(safeData);
+            
+            if (!result.error) {
+              toast.error(
+                "Attenzione: Database non aggiornato! La posizione dell'immagine e l'ordine non verranno salvati. Contatta l'amministratore per eseguire lo script SQL.",
+                { duration: 6000 }
+              );
+            }
           }
         }
+
+        if (result.error) throw result.error;
       };
 
       await performUpsert(tournamentData);
