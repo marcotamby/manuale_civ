@@ -140,7 +140,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
       {/* Dynamic Background Layer */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <div 
-          className={`absolute inset-0 ${isSpecialPage ? 'lg:hidden' : ''}`}
+          className={`absolute inset-0 ${isSpecialPage ? 'lg:hidden' : ''} hidden md:block`}
           style={{ 
             backgroundImage: `linear-gradient(to right, #0d1424 0%, rgba(13, 20, 36, 0) 25%, rgba(13, 20, 36, 0) 75%, #0d1424 100%), url('/header-bg.png')`,
             backgroundSize: 'cover',

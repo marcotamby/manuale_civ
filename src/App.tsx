@@ -213,18 +213,18 @@ function App() {
       {/* Global Homepage Extended Background - Desktop Only */}
       { (isHome || isTournaments || isFaq || isCiv) && (
         <div 
-          className="fixed top-0 left-0 right-0 h-[600px] lg:h-[800px] z-0 pointer-events-none block"
+          className="fixed top-0 left-0 right-0 h-[500px] md:h-[600px] lg:h-[800px] z-0 pointer-events-none block"
           style={{ 
             backgroundImage: `
-              linear-gradient(to bottom, transparent 0%, ${isCiv ? 'transparent 15%, #0a0a0b 50%' : 'transparent 40%, #0a0a0b 100%'}),
+              linear-gradient(to bottom, transparent 0%, ${isCiv ? 'transparent 15%, #0a0a0b 50%' : 'transparent 30%, #0a0a0b 100%'}),
               linear-gradient(to right, #0a0a0b 0%, rgba(10, 10, 11, 0) 15%, rgba(10, 10, 11, 0) 85%, #0a0a0b 100%),
               url('/header-bg.png')
             `,
             backgroundSize: 'cover',
             backgroundPosition: 'center 20%',
             opacity: isCiv ? 0.4 : 0.6,
-            maskImage: `linear-gradient(to bottom, black ${isCiv ? '15%' : '85%'}, transparent ${isCiv ? '35%' : '100%'})`,
-            WebkitMaskImage: `linear-gradient(to bottom, black ${isCiv ? '15%' : '85%'}, transparent ${isCiv ? '35%' : '100%'})`
+            maskImage: `linear-gradient(to bottom, black ${isCiv ? '10%' : '20%'}, transparent ${isCiv ? '60%' : '95%'})`,
+            WebkitMaskImage: `linear-gradient(to bottom, black ${isCiv ? '10%' : '20%'}, transparent ${isCiv ? '60%' : '95%'})`
           }}
         ></div>
       )}
