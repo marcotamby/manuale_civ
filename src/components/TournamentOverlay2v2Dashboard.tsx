@@ -267,14 +267,9 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
       if (match.w > 0) {
         nextPhase.matches[nextMatchIdx][slot] = match.w === 1 ? match.t1 : match.t2;
         nextPhase.matches[nextMatchIdx][playerSlot] = match.w === 1 ? match.t1Players : match.t2Players;
-        // Propagate civs too
-        const civSlot = matchIdx % 2 === 0 ? 't1Civs' : 't2Civs';
-        nextPhase.matches[nextMatchIdx][civSlot] = match.w === 1 ? match.t1Civs : match.t2Civs;
       } else {
         nextPhase.matches[nextMatchIdx][slot] = '';
         nextPhase.matches[nextMatchIdx][playerSlot] = ['', ''];
-        const civSlot = matchIdx % 2 === 0 ? 't1Civs' : 't2Civs';
-        nextPhase.matches[nextMatchIdx][civSlot] = [];
       }
       // Recursive propagation for further rounds
       propagateWinner(phases, phaseIdx + 1, nextMatchIdx);
