@@ -553,42 +553,32 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                             setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
                           }} className="w-7 h-7 flex items-center justify-center hover:bg-white/10 rounded-lg text-gray-400 transition-colors"><Plus size={14}/></button>
                         </div>
+                      </div>
+                      <div className="flex gap-2 items-center">
+                        <input
+                          value={match.t1Players[0]}
+                          onChange={(e) => updateBracketPlayer(pIdx, mIdx, 1, 0, e.target.value)}
+                          placeholder="P1"
+                          className="flex-1 bg-black/40 border border-white/5 rounded-lg px-2 py-1.5 text-[10px] text-white outline-none focus:border-blue-500/30"
+                        />
+                        <input
+                          value={match.t1Players[1]}
+                          onChange={(e) => updateBracketPlayer(pIdx, mIdx, 1, 1, e.target.value)}
+                          placeholder="P2"
+                          className="flex-1 bg-black/40 border border-white/5 rounded-lg px-2 py-1.5 text-[10px] text-white outline-none focus:border-blue-500/30"
+                        />
                         <button 
                           onClick={() => updateBracketWinner(pIdx, mIdx, 1)}
-                          className={`w-9 h-9 flex-shrink-0 rounded-xl flex items-center justify-center text-[11px] font-black transition-all border ${match.w === 1 ? 'bg-blue-600 border-blue-400 text-white shadow-lg shadow-blue-500/40 scale-105' : 'bg-white/5 border-white/5 text-gray-500 hover:text-white hover:bg-white/10'}`}
+                          className={`w-8 h-8 flex-shrink-0 rounded-lg flex items-center justify-center text-[10px] font-black transition-all border ${match.w === 1 ? 'bg-blue-600 border-blue-400 text-white' : 'bg-white/5 border-white/5 text-gray-600 hover:text-white'}`}
                         >
                           W
                         </button>
                         <button 
                           onClick={() => toggleBye(pIdx, mIdx, 1)}
-                          className={`w-14 h-9 flex-shrink-0 rounded-xl flex items-center justify-center text-[10px] font-black transition-all border ${match.t1Bye ? 'bg-yellow-500 border-yellow-400 text-black shadow-lg shadow-yellow-500/40 scale-105' : 'bg-white/5 border-white/5 text-gray-500 hover:text-yellow-500 hover:bg-yellow-500/5'}`}
+                          className={`w-12 h-8 flex-shrink-0 rounded-lg flex items-center justify-center text-[9px] font-black transition-all border ${match.t1Bye ? 'bg-yellow-500 border-yellow-400 text-black' : 'bg-white/5 border-white/5 text-gray-600 hover:text-yellow-500'}`}
                         >
                           BYE
                         </button>
-                      </div>
-                      <div className="flex gap-2">
-                        <input 
-                          type="text" 
-                          value={match.t1Players[0]} 
-                          onChange={(e) => {
-                            const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
-                            newPhases[pIdx].matches[mIdx].t1Players[0] = e.target.value;
-                            setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
-                          }}
-                          placeholder="P1"
-                          className="flex-1 bg-black/20 border border-white/5 rounded-md px-2 py-1 text-[9px] text-gray-400 font-bold uppercase outline-none"
-                        />
-                        <input 
-                          type="text" 
-                          value={match.t1Players[1]} 
-                          onChange={(e) => {
-                            const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
-                            newPhases[pIdx].matches[mIdx].t1Players[1] = e.target.value;
-                            setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
-                          }}
-                          placeholder="P2"
-                          className="flex-1 bg-black/20 border border-white/5 rounded-md px-2 py-1 text-[9px] text-gray-400 font-bold uppercase outline-none"
-                        />
                       </div>
                       <MultiCivSelect 
                         values={match.t1Civs} 
@@ -635,42 +625,32 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                             setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
                           }} className="w-7 h-7 flex items-center justify-center hover:bg-white/10 rounded-lg text-gray-400 transition-colors"><Plus size={14}/></button>
                         </div>
+                      </div>
+                      <div className="flex gap-2 items-center">
+                        <input
+                          value={match.t2Players[0]}
+                          onChange={(e) => updateBracketPlayer(pIdx, mIdx, 2, 0, e.target.value)}
+                          placeholder="P1"
+                          className="flex-1 bg-black/40 border border-white/5 rounded-lg px-2 py-1.5 text-[10px] text-white outline-none focus:border-blue-500/30"
+                        />
+                        <input
+                          value={match.t2Players[1]}
+                          onChange={(e) => updateBracketPlayer(pIdx, mIdx, 2, 1, e.target.value)}
+                          placeholder="P2"
+                          className="flex-1 bg-black/40 border border-white/5 rounded-lg px-2 py-1.5 text-[10px] text-white outline-none focus:border-blue-500/30"
+                        />
                         <button 
                           onClick={() => updateBracketWinner(pIdx, mIdx, 2)}
-                          className={`w-9 h-9 flex-shrink-0 rounded-xl flex items-center justify-center text-[11px] font-black transition-all border ${match.w === 2 ? 'bg-red-600 border-red-400 text-white shadow-lg shadow-red-500/40 scale-105' : 'bg-white/5 border-white/5 text-gray-500 hover:text-white hover:bg-white/10'}`}
+                          className={`w-8 h-8 flex-shrink-0 rounded-lg flex items-center justify-center text-[10px] font-black transition-all border ${match.w === 2 ? 'bg-red-600 border-red-400 text-white' : 'bg-white/5 border-white/5 text-gray-600 hover:text-white'}`}
                         >
-                          <Trophy size={14} />
+                          W
                         </button>
                         <button 
                           onClick={() => toggleBye(pIdx, mIdx, 2)}
-                          className={`w-9 h-9 flex-shrink-0 rounded-xl flex items-center justify-center text-[10px] font-black transition-all border ${match.t2Bye ? 'bg-yellow-500 border-yellow-400 text-black shadow-lg shadow-yellow-500/40 scale-105' : 'bg-white/5 border-white/5 text-gray-500 hover:text-yellow-500 hover:bg-yellow-500/5'}`}
+                          className={`w-12 h-8 flex-shrink-0 rounded-lg flex items-center justify-center text-[9px] font-black transition-all border ${match.t2Bye ? 'bg-yellow-500 border-yellow-400 text-black' : 'bg-white/5 border-white/5 text-gray-600 hover:text-yellow-500'}`}
                         >
-                          <Ban size={14} />
+                          BYE
                         </button>
-                      </div>
-                      <div className="flex gap-2">
-                        <input 
-                          type="text" 
-                          value={match.t2Players[0]} 
-                          onChange={(e) => {
-                            const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
-                            newPhases[pIdx].matches[mIdx].t2Players[0] = e.target.value;
-                            setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
-                          }}
-                          placeholder="P1"
-                          className="flex-1 bg-black/20 border border-white/5 rounded-md px-2 py-1 text-[9px] text-gray-400 font-bold uppercase outline-none"
-                        />
-                        <input 
-                          type="text" 
-                          value={match.t2Players[1]} 
-                          onChange={(e) => {
-                            const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
-                            newPhases[pIdx].matches[mIdx].t2Players[1] = e.target.value;
-                            setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
-                          }}
-                          placeholder="P2"
-                          className="flex-1 bg-black/20 border border-white/5 rounded-md px-2 py-1 text-[9px] text-gray-400 font-bold uppercase outline-none"
-                        />
                       </div>
                       <MultiCivSelect 
                         values={match.t2Civs} 
