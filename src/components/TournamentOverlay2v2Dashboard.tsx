@@ -535,7 +535,7 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
               
               <div className="space-y-6">
                 {phase.matches.map((match: any, mIdx: number) => (
-                  <div key={match.id} className="p-5 bg-[#0d111a] border border-slate-400/30 rounded-3xl space-y-6 hover:border-blue-500/40 transition-all shadow-2xl group relative overflow-hidden">
+                  <div key={match.id} className="p-5 bg-[#0d111a] border border-slate-400/30 rounded-3xl space-y-6 hover:border-blue-500/40 transition-all shadow-2xl group relative">
                     {/* Team 1 */}
                     <div className="space-y-3">
                       <div className="flex items-center">
