@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { useCivData } from './CivContext';
 import { Shield, Sword, Zap, X, BarChart2, ChevronUp, ChevronDown, Users } from 'lucide-react';
 import { CustomSelect } from './CustomSelect';
@@ -63,14 +64,16 @@ interface CompareViewProps {
 
 export function CompareView({ civIds, onClose }: CompareViewProps) {
   const { civilizations } = useCivData();
+  const { civ1Id, civ2Id } = useParams();
   const [matchupWinRate, setMatchupWinRate] = useState<number | null>(null);
   const [gamesCount, setGamesCount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [rankLevel, setRankLevel] = useState<RankLevel>('');
   const [ratingRange, setRatingRange] = useState<RatingRange>('');
 
-  const civ1 = civilizations.find(c => c.id === civIds[0]);
-  const civ2 = civilizations.find(c => c.id === civIds[1]);
+  const finalCivIds = (civIds && civIds.length >= 2) ? civIds : [civ1Id || '', civ2Id || ''];
+  const civ1 = civilizations.find(c => c.id === finalCivIds[0]);
+  const civ2 = civilizations.find(c => c.id === finalCivIds[1]);
 
   useEffect(() => {
     if (!civ1 || !civ2) return;
@@ -112,9 +115,9 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
   if (!civ1 || !civ2) return null;
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-[var(--color-brand-dark)] h-full">
+    <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full relative z-10">
       {/* Header */}
-      <div className="flex flex-col items-center justify-center text-center p-6 md:p-8 bg-black/40 border-b border-white/5 relative">
+      <div className="flex flex-col items-center justify-center text-center p-6 md:p-8 bg-black/20 border-b border-white/5 relative rounded-3xl mb-8">
         <button
           onClick={onClose}
           className="absolute right-6 top-6 p-2 hover:bg-white/10 rounded-full transition-colors"

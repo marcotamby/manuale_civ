@@ -169,7 +169,7 @@ function App() {
 
   const handleCompare = (civIds: string[]) => {
     setCompareIds(civIds);
-    navigate('/compare');
+    navigate(`/compare/${civIds[0]}/${civIds[1]}`);
   };
 
   const civIndex = civilizationsData.findIndex((c) => c.id === selectedCivId);
@@ -211,7 +211,7 @@ function App() {
       />
 
       {/* Global Homepage Extended Background - Desktop Only */}
-      { (isHome || isTournaments || isFaq || isCiv) && (
+      { (isHome || isTournaments || isFaq || isCiv || isCompare) && (
         <div 
           className="fixed top-0 left-0 right-0 h-[280px] md:h-[600px] lg:h-[800px] z-0 pointer-events-none block bg-contain md:bg-cover bg-no-repeat bg-top"
           style={{ 
@@ -310,6 +310,7 @@ function App() {
                 <Route path="/civ/:civId" element={<CivView civId={selectedCivId} onSelectUnit={setSelectedUnit} />} />
                 <Route path="/civ/:civId/:tab" element={<CivView civId={selectedCivId} onSelectUnit={setSelectedUnit} />} />
                 <Route path="/compare" element={<CompareView civIds={compareIds} onClose={() => navigate('/')} />} />
+                <Route path="/compare/:civ1Id/:civ2Id" element={<CompareView civIds={compareIds} onClose={() => navigate('/')} />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/faq" element={<FAQPage />} />
                 <Route path="/tornei" element={<TournamentsPage />} />
