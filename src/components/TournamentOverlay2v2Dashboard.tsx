@@ -234,12 +234,22 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
     
     if (teamIdx === 1) {
       match.t1Bye = !match.t1Bye;
-      if (match.t1Bye) { match.t2Bye = false; match.w = 1; }
-      else if (match.w === 1) match.w = 0;
+      // If Team 1 is a BYE, Team 2 wins by default
+      if (match.t1Bye) { 
+        match.t2Bye = false; 
+        match.w = 2; 
+      } else if (match.w === 2) {
+        match.w = 0;
+      }
     } else {
       match.t2Bye = !match.t2Bye;
-      if (match.t2Bye) { match.t1Bye = false; match.w = 2; }
-      else if (match.w === 2) match.w = 0;
+      // If Team 2 is a BYE, Team 1 wins by default
+      if (match.t2Bye) { 
+        match.t1Bye = false; 
+        match.w = 1; 
+      } else if (match.w === 1) {
+        match.w = 0;
+      }
     }
 
     propagateWinner(newPhases, phaseIdx, matchIdx);

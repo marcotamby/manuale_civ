@@ -112,12 +112,28 @@
         function getCivFlagUrl(id) {
             if (!id) return '';
             const mapping = {
-                'abbasid': 'Abbasid Dynasty', 'ayyubids': 'Ayyubids', 'byzantines': 'Byzantines',
-                'chinese': 'Chinese', 'delhi': 'Delhi Sultanate', 'english': 'English',
-                'french': 'French', 'hre': 'Holy Roman Empire', 'japanese': 'Japanese',
-                'jeannedarc': 'Jeanne dArc', 'malians': 'Malians', 'mongols': 'Mongols',
-                'orderofthedragon': 'Order of the Dragon', 'ottomans': 'Ottomans',
-                'rus': 'Rus', 'zhuxi': 'Zhu Xis Legacy'
+                'abbasid': 'Abbasid Dynasty',
+                'ayyubids': 'Ayyubids',
+                'byzantines': 'Byzantines',
+                'chinese': 'Chinese',
+                'delhi': 'Delhi Sultanate',
+                'english': 'English',
+                'french': 'French',
+                'hre': 'Holy Roman Empire',
+                'japanese': 'Japanese',
+                'jeannedarc': 'Jeanne dArc',
+                'malians': 'Malians',
+                'mongols': 'Mongols',
+                'orderofthedragon': 'Order of the Dragon',
+                'ottomans': 'Ottomans',
+                'rus': 'Rus',
+                'zhuxi': 'Zhu Xis Legacy',
+                'goldenhorde': 'Golden Horde',
+                'lancaster': 'House of Lancaster',
+                'macedonian': 'Macedonian Dynasty',
+                'sengoku': 'Sengoku Daimyo',
+                'templar': 'Knights Templar',
+                'tughlaq': 'Tughlaq Dynasty'
             };
             const name = mapping[id.toLowerCase()] || id;
             return `/civs/${name}.png`;
@@ -186,6 +202,7 @@
                     const renderTeam = (teamName, players, civs, isWinner, hasBye) => {
                         const c1 = civs && civs.length > 0 ? civs[0] : null;
                         const c2 = civs && civs.length > 1 ? civs[1] : null;
+                        const playerDisplay = (players || []).filter(p => p && p.trim()).join(' & ');
                         
                         return `
                             <div class="team-row ${isWinner ? 'winner' : ''}">
@@ -196,10 +213,7 @@
                                         ${teamName || '--'}
                                         ${hasBye ? '<span class="bye-badge">BYE</span>' : ''}
                                     </div>
-                                    <div class="team-players">${(players || []).join(' & ') || '-- & --'}</div>
-                                    <div class="team-civs">
-                                        ${(civs || []).map(c => `<div class="civ-flag" style="background-image: url('${getCivFlagUrl(c)}')"></div>`).join('')}
-                                    </div>
+                                    <div class="team-players">${playerDisplay || '-- & --'}</div>
                                 </div>
                             </div>
                         `;
