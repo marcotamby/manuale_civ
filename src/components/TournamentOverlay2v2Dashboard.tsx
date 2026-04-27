@@ -44,6 +44,7 @@ function generatePhases(count: number) {
         t1: '', t2: '', 
         t1Players: ['', ''], t2Players: ['', ''], 
         t1Civs: [], t2Civs: [], 
+        t1Score: 0, t2Score: 0,
         w: 0,
         t1Bye: false, t2Bye: false
       });
@@ -539,6 +540,19 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                           placeholder="TEAM 1"
                           className="flex-1 bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-[11px] text-white font-black uppercase outline-none focus:border-blue-500/30"
                         />
+                        <div className="flex items-center bg-black/60 rounded-lg p-0.5 border border-white/5">
+                          <button onClick={() => {
+                            const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
+                            newPhases[pIdx].matches[mIdx].t1Score = Math.max(0, (match.t1Score || 0) - 1);
+                            setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
+                          }} className="w-6 h-6 flex items-center justify-center hover:bg-white/10 rounded text-gray-500"><Minus size={12}/></button>
+                          <span className="w-6 text-center font-black text-blue-500 text-xs">{match.t1Score || 0}</span>
+                          <button onClick={() => {
+                            const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
+                            newPhases[pIdx].matches[mIdx].t1Score = (match.t1Score || 0) + 1;
+                            setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
+                          }} className="w-6 h-6 flex items-center justify-center hover:bg-white/10 rounded text-gray-500"><Plus size={12}/></button>
+                        </div>
                         <button 
                           onClick={() => updateBracketWinner(pIdx, mIdx, 1)}
                           className={`w-9 h-7 rounded-lg flex items-center justify-center text-[10px] font-black transition-all ${match.w === 1 ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'bg-white/5 text-gray-400 hover:text-white'}`}
@@ -608,6 +622,19 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                           placeholder="TEAM 2"
                           className="flex-1 bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-[11px] text-white font-black uppercase outline-none focus:border-blue-500/30"
                         />
+                        <div className="flex items-center bg-black/60 rounded-lg p-0.5 border border-white/5">
+                          <button onClick={() => {
+                            const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
+                            newPhases[pIdx].matches[mIdx].t2Score = Math.max(0, (match.t2Score || 0) - 1);
+                            setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
+                          }} className="w-6 h-6 flex items-center justify-center hover:bg-white/10 rounded text-gray-500"><Minus size={12}/></button>
+                          <span className="w-6 text-center font-black text-red-500 text-xs">{match.t2Score || 0}</span>
+                          <button onClick={() => {
+                            const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
+                            newPhases[pIdx].matches[mIdx].t2Score = (match.t2Score || 0) + 1;
+                            setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
+                          }} className="w-6 h-6 flex items-center justify-center hover:bg-white/10 rounded text-gray-500"><Plus size={12}/></button>
+                        </div>
                         <button 
                           onClick={() => updateBracketWinner(pIdx, mIdx, 2)}
                           className={`w-9 h-7 rounded-lg flex items-center justify-center text-[10px] font-black transition-all ${match.w === 2 ? 'bg-red-600 text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-gray-400 hover:text-white'}`}
