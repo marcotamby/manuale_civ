@@ -548,20 +548,32 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                             setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
                           }}
                           placeholder="TEAM 1"
-                          className="flex-1 bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-[11px] text-white font-black uppercase outline-none focus:border-blue-500/30"
+                          className="flex-1 bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-[11px] text-white font-black uppercase outline-none focus:border-blue-500/30 min-w-0"
                         />
+                        <button 
+                          onClick={() => updateBracketWinner(pIdx, mIdx, 1)}
+                          className={`w-7 h-7 flex-shrink-0 rounded-lg flex items-center justify-center text-[9px] font-black transition-all border ${match.w === 1 ? 'bg-blue-600 border-blue-400 text-white' : 'bg-white/5 border-white/5 text-gray-600 hover:text-white'}`}
+                        >
+                          W
+                        </button>
+                        <button 
+                          onClick={() => toggleBye(pIdx, mIdx, 1)}
+                          className={`w-10 h-7 flex-shrink-0 rounded-lg flex items-center justify-center text-[8px] font-black transition-all border ${match.t1Bye ? 'bg-yellow-500 border-yellow-400 text-black' : 'bg-white/5 border-white/5 text-gray-600 hover:text-yellow-500'}`}
+                        >
+                          BYE
+                        </button>
                         <div className="flex items-center bg-black/60 rounded-xl p-1 border border-white/10 shadow-inner flex-shrink-0">
                           <button onClick={() => {
                             const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
                             newPhases[pIdx].matches[mIdx].t1Score = Math.max(0, (match.t1Score || 0) - 1);
                             setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
-                          }} className="w-7 h-7 flex items-center justify-center hover:bg-white/10 rounded-lg text-gray-400 transition-colors"><Minus size={14}/></button>
+                          }} className="w-6 h-6 flex items-center justify-center hover:bg-white/10 rounded-lg text-gray-400 transition-colors"><Minus size={12}/></button>
                           <span className="w-6 text-center font-black text-blue-400 text-sm">{match.t1Score || 0}</span>
                           <button onClick={() => {
                             const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
                             newPhases[pIdx].matches[mIdx].t1Score = (match.t1Score || 0) + 1;
                             setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
-                          }} className="w-7 h-7 flex items-center justify-center hover:bg-white/10 rounded-lg text-gray-400 transition-colors"><Plus size={14}/></button>
+                          }} className="w-6 h-6 flex items-center justify-center hover:bg-white/10 rounded-lg text-gray-400 transition-colors"><Plus size={12}/></button>
                         </div>
                       </div>
                       <div className="flex gap-2 items-center">
@@ -577,19 +589,8 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                           placeholder="P2"
                           className="flex-1 bg-black/40 border border-white/5 rounded-lg px-2 py-1.5 text-[10px] text-white outline-none focus:border-blue-500/30"
                         />
-                        <button 
-                          onClick={() => updateBracketWinner(pIdx, mIdx, 1)}
-                          className={`w-8 h-8 flex-shrink-0 rounded-lg flex items-center justify-center text-[10px] font-black transition-all border ${match.w === 1 ? 'bg-blue-600 border-blue-400 text-white' : 'bg-white/5 border-white/5 text-gray-600 hover:text-white'}`}
-                        >
-                          W
-                        </button>
-                        <button 
-                          onClick={() => toggleBye(pIdx, mIdx, 1)}
-                          className={`w-12 h-8 flex-shrink-0 rounded-lg flex items-center justify-center text-[9px] font-black transition-all border ${match.t1Bye ? 'bg-yellow-500 border-yellow-400 text-black' : 'bg-white/5 border-white/5 text-gray-600 hover:text-yellow-500'}`}
-                        >
-                          BYE
-                        </button>
                       </div>
+
                       <MultiCivSelect 
                         values={match.t1Civs} 
                         onChange={(vals) => {
@@ -620,20 +621,32 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                             setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
                           }}
                           placeholder="TEAM 2"
-                          className="flex-1 bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-[11px] text-white font-black uppercase outline-none focus:border-blue-500/30"
+                          className="flex-1 bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-[11px] text-white font-black uppercase outline-none focus:border-blue-500/30 min-w-0"
                         />
+                        <button 
+                          onClick={() => updateBracketWinner(pIdx, mIdx, 2)}
+                          className={`w-7 h-7 flex-shrink-0 rounded-lg flex items-center justify-center text-[9px] font-black transition-all border ${match.w === 2 ? 'bg-red-600 border-red-400 text-white' : 'bg-white/5 border-white/5 text-gray-600 hover:text-white'}`}
+                        >
+                          W
+                        </button>
+                        <button 
+                          onClick={() => toggleBye(pIdx, mIdx, 2)}
+                          className={`w-10 h-7 flex-shrink-0 rounded-lg flex items-center justify-center text-[8px] font-black transition-all border ${match.t2Bye ? 'bg-yellow-500 border-yellow-400 text-black' : 'bg-white/5 border-white/5 text-gray-600 hover:text-yellow-500'}`}
+                        >
+                          BYE
+                        </button>
                         <div className="flex items-center bg-black/60 rounded-xl p-1 border border-white/10 shadow-inner flex-shrink-0">
                           <button onClick={() => {
                             const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
                             newPhases[pIdx].matches[mIdx].t2Score = Math.max(0, (match.t2Score || 0) - 1);
                             setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
-                          }} className="w-7 h-7 flex items-center justify-center hover:bg-white/10 rounded-lg text-gray-400 transition-colors"><Minus size={14}/></button>
+                          }} className="w-6 h-6 flex items-center justify-center hover:bg-white/10 rounded-lg text-gray-400 transition-colors"><Minus size={12}/></button>
                           <span className="w-6 text-center font-black text-red-400 text-sm">{match.t2Score || 0}</span>
                           <button onClick={() => {
                             const newPhases = JSON.parse(JSON.stringify(state.bracket.phases));
                             newPhases[pIdx].matches[mIdx].t2Score = (match.t2Score || 0) + 1;
                             setState({ ...state, bracket: { ...state.bracket, phases: newPhases } });
-                          }} className="w-7 h-7 flex items-center justify-center hover:bg-white/10 rounded-lg text-gray-400 transition-colors"><Plus size={14}/></button>
+                          }} className="w-6 h-6 flex items-center justify-center hover:bg-white/10 rounded-lg text-gray-400 transition-colors"><Plus size={12}/></button>
                         </div>
                       </div>
                       <div className="flex gap-2 items-center">
@@ -649,19 +662,8 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                           placeholder="P2"
                           className="flex-1 bg-black/40 border border-white/5 rounded-lg px-2 py-1.5 text-[10px] text-white outline-none focus:border-blue-500/30"
                         />
-                        <button 
-                          onClick={() => updateBracketWinner(pIdx, mIdx, 2)}
-                          className={`w-8 h-8 flex-shrink-0 rounded-lg flex items-center justify-center text-[10px] font-black transition-all border ${match.w === 2 ? 'bg-red-600 border-red-400 text-white' : 'bg-white/5 border-white/5 text-gray-600 hover:text-white'}`}
-                        >
-                          W
-                        </button>
-                        <button 
-                          onClick={() => toggleBye(pIdx, mIdx, 2)}
-                          className={`w-12 h-8 flex-shrink-0 rounded-lg flex items-center justify-center text-[9px] font-black transition-all border ${match.t2Bye ? 'bg-yellow-500 border-yellow-400 text-black' : 'bg-white/5 border-white/5 text-gray-600 hover:text-yellow-500'}`}
-                        >
-                          BYE
-                        </button>
                       </div>
+
                       <MultiCivSelect 
                         values={match.t2Civs} 
                         onChange={(vals) => {
