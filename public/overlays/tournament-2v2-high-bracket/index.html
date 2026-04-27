@@ -34,7 +34,7 @@
 
         #phases-wrapper {
             display: flex; width: 100%; height: 100%; justify-content: space-between;
-            transform: scale(0.75); transform-origin: top center;
+            transform: scale(0.82); transform-origin: top center;
         }
 
         .phase-column {
@@ -67,12 +67,12 @@
         .team-row.winner { background: rgba(255, 255, 255, 0.08); }
         .team-row.winner::after { content: '🏆'; position: absolute; right: 15px; font-size: 24px; filter: drop-shadow(0 0 10px var(--gold)); z-index: 5; }
         
-        .bye-badge { background: var(--gold); color: black; font-size: 8px; font-weight: 900; padding: 1px 6px; border-radius: 3px; margin-left: 8px; vertical-align: middle; position: relative; z-index: 10; }
+        .bye-badge { background: #fff; color: #000; font-size: 10px; font-weight: 950; padding: 2px 8px; border-radius: 4px; margin-left: 10px; vertical-align: middle; position: relative; z-index: 10; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
         
         .bracket-civ-flag { 
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            position: absolute; top: 0; bottom: 0;
             background-size: cover; background-position: center; 
-            opacity: 0.9; z-index: 1; pointer-events: none;
+            opacity: 1; z-index: 1; pointer-events: none;
         }
 
         .team-info { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 5; }
@@ -205,14 +205,14 @@
                         
                         return `
                             <div class="team-row ${isWinner ? 'winner' : ''}">
-                                ${c1 ? `<div class="bracket-civ-flag" style="background-image: url('${getCivFlagUrl(c1)}'); width: 50%; left: 0; -webkit-mask-image: linear-gradient(to right, black 30%, transparent 100%); mask-image: linear-gradient(to right, black 30%, transparent 100%);"></div>` : ''}
-                                ${c2 ? `<div class="bracket-civ-flag" style="background-image: url('${getCivFlagUrl(c2)}'); width: 50%; left: 50%; -webkit-mask-image: linear-gradient(to left, black 30%, transparent 100%); mask-image: linear-gradient(to left, black 30%, transparent 100%);"></div>` : ''}
+                                ${c2 ? `<div class="bracket-civ-flag" style="background-image: url('${getCivFlagUrl(c2)}'); width: 400px; right: 0; -webkit-mask-image: linear-gradient(to left, black 50%, transparent 100%); mask-image: linear-gradient(to left, black 50%, transparent 100%);"></div>` : ''}
+                                ${c1 ? `<div class="bracket-civ-flag" style="background-image: url('${getCivFlagUrl(c1)}'); width: 400px; right: 180px; -webkit-mask-image: linear-gradient(to left, black 40%, transparent 100%); mask-image: linear-gradient(to left, black 40%, transparent 100%);"></div>` : ''}
                                 <div class="team-info">
                                     <div class="team-name">
                                         ${teamName || '--'}
                                         ${hasBye ? '<span class="bye-badge">BYE</span>' : ''}
                                     </div>
-                                    <div class="team-players">${playerDisplay || '-- & --'}</div>
+                                    <div class="team-players">${playerDisplay || '--'}</div>
                                 </div>
                             </div>
                         `;

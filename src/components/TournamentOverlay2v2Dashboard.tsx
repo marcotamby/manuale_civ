@@ -541,13 +541,13 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                         />
                         <button 
                           onClick={() => updateBracketWinner(pIdx, mIdx, 1)}
-                          className={`w-7 h-7 rounded-lg flex items-center justify-center text-[9px] font-black transition-all ${match.w === 1 ? 'bg-blue-600 text-white' : 'bg-white/5 text-gray-700 hover:text-white'}`}
+                          className={`w-9 h-7 rounded-lg flex items-center justify-center text-[10px] font-black transition-all ${match.w === 1 ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'bg-white/5 text-gray-400 hover:text-white'}`}
                         >
                           W
                         </button>
                         <button 
                           onClick={() => toggleBye(pIdx, mIdx, 1)}
-                          className={`px-2 py-1 rounded-lg text-[8px] font-black transition-all border ${match.t1Bye ? 'bg-yellow-600 border-yellow-400 text-white' : 'bg-white/5 border-white/5 text-gray-700 hover:text-yellow-500'}`}
+                          className={`w-12 h-7 rounded-lg flex items-center justify-center text-[9px] font-black transition-all border ${match.t1Bye ? 'bg-yellow-500 border-yellow-400 text-black shadow-lg shadow-yellow-500/20' : 'bg-white/5 border-white/5 text-gray-400 hover:text-yellow-500'}`}
                         >
                           BYE
                         </button>
@@ -610,13 +610,13 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                         />
                         <button 
                           onClick={() => updateBracketWinner(pIdx, mIdx, 2)}
-                          className={`w-7 h-7 rounded-lg flex items-center justify-center text-[9px] font-black transition-all ${match.w === 2 ? 'bg-red-600 text-white' : 'bg-white/5 text-gray-700 hover:text-white'}`}
+                          className={`w-9 h-7 rounded-lg flex items-center justify-center text-[10px] font-black transition-all ${match.w === 2 ? 'bg-red-600 text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-gray-400 hover:text-white'}`}
                         >
                           W
                         </button>
                         <button 
                           onClick={() => toggleBye(pIdx, mIdx, 2)}
-                          className={`px-2 py-1 rounded-lg text-[8px] font-black transition-all border ${match.t2Bye ? 'bg-yellow-600 border-yellow-400 text-white' : 'bg-white/5 border-white/5 text-gray-700 hover:text-yellow-500'}`}
+                          className={`w-12 h-7 rounded-lg flex items-center justify-center text-[9px] font-black transition-all border ${match.t2Bye ? 'bg-yellow-500 border-yellow-400 text-black shadow-lg shadow-yellow-500/20' : 'bg-white/5 border-white/5 text-gray-400 hover:text-yellow-500'}`}
                         >
                           BYE
                         </button>
