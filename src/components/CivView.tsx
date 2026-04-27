@@ -1624,7 +1624,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             <div className="space-y-6">
               {qaLoading ? (
                 <div className="flex py-12 justify-center">
-                  <Loader2 className="animate-spin text-yellow-500" size={32} />
+                  <Loader2 className="w-12 h-12 text-blue-400 animate-spin" />
                 </div>
               ) : questions.length > 0 ? (
                 questions.map((q) => (

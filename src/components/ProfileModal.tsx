@@ -526,7 +526,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                             </div>
                             {isLoading ? (
                                 <div className="flex items-center justify-center py-10">
-                                    <Loader2 size={24} className="animate-spin text-blue-500" />
+                                    <Loader2 size={24} className="animate-spin text-blue-400" />
                                 </div>
                             ) : mySuggestions.length > 0 ? (
                                 <div className="space-y-3">

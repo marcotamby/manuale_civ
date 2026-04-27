@@ -612,7 +612,7 @@ export function TournamentsPage() {
 
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-      <Loader2 className="w-12 h-12 text-yellow-500 animate-spin" />
+      <Loader2 className="w-12 h-12 text-blue-400 animate-spin" />
     </div>
   );
 

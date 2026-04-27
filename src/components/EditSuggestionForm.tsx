@@ -545,7 +545,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                      onChange={handleFileUpload}
                    />
                    {isUploading ? (
-                     <Loader2 size={20} className="text-yellow-500 animate-spin" />
+                     <Loader2 size={20} className="text-blue-400 animate-spin" />
                    ) : (
                      <Upload size={20} className="text-gray-400 group-hover:text-white transition-colors" />
                    )}
@@ -555,7 +555,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
               {isUploading && (
                 <div className="mt-3 bg-yellow-500/5 border border-dashed border-yellow-500/20 rounded-2xl p-6 flex flex-col items-center gap-3 animate-in fade-in duration-500">
                   <div className="relative">
-                    <Loader2 size={32} className="text-yellow-500 animate-spin" />
+                    <Loader2 size={32} className="text-blue-400 animate-spin" />
                     <div className="absolute inset-0 bg-yellow-500/20 blur-xl animate-pulse"></div>
                   </div>
                   <div className="text-center">

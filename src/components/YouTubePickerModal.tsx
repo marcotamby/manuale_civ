@@ -82,7 +82,7 @@ export function YouTubePickerModal({ isOpen, onClose, onSelect, selectedIds }: Y
         <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 text-gray-400 gap-4">
-              <Loader2 size={40} className="animate-spin text-red-500" />
+              <Loader2 size={40} className="animate-spin text-blue-400" />
               <p>Caricamento archivio video...</p>
             </div>
           ) : filteredVideos.length > 0 ? (

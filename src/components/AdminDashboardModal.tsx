@@ -585,7 +585,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
         {isLoading || qaLoading ? (
           <div className="flex flex-col items-center justify-center h-40">
-            <Loader2 size={32} className="animate-spin text-blue-500 mb-4" />
+            <Loader2 className="animate-spin text-blue-400 mb-4" size={32} />
             <p className="text-gray-400">Caricamento in corso...</p>
           </div>
         ) : activeTab === 'proposte' ? (
@@ -854,7 +854,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
               )}
               {userLoading ? (
                 <div className="flex flex-col items-center justify-center h-60">
-                  <Loader2 size={32} className="animate-spin text-blue-500 mb-2" />
+                  <Loader2 className="animate-spin text-blue-400 mb-2" size={32} />
                   <p className="text-gray-400 text-sm">Caricamento...</p>
                 </div>
               ) : (
