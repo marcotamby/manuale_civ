@@ -548,7 +548,7 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
           </div>
         </div>
 
-        <div className="w-full overflow-x-auto pb-8 elegant-scrollbar">
+        <div className="w-full max-h-[65vh] overflow-auto pb-8 elegant-scrollbar">
           <div className="flex gap-12 items-start min-w-max px-2">
             {state.bracket.phases.map((phase: any, pIdx: number) => (
               <div key={pIdx} className="space-y-6 w-[320px] lg:w-[360px]">
