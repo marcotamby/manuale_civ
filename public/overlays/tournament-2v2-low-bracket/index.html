@@ -23,7 +23,7 @@
         #bracket-title { font-size: 38px; font-weight: 950; text-transform: uppercase; letter-spacing: 8px; color: #fff; }
 
         #bracket-container {
-            position: absolute; top: 120px; left: 50%; transform: translateX(-50%) scale(0.86); transform-origin: top center;
+            position: absolute; top: 170px; left: 50%; transform: translateX(-50%) scale(0.86); transform-origin: top center;
             width: 1840px; height: 920px;
             display: flex; justify-content: space-between; align-items: stretch;
             padding: 30px 10px;
@@ -56,8 +56,21 @@
             transition: all 0.5s ease; width: 100%; position: relative;
             display: flex; flex-direction: column; gap: 2px;
         }
+
+        .caster-box {
+            background: linear-gradient(135deg, rgba(20, 30, 50, 0.95) 0%, rgba(10, 15, 28, 0.95) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 12px 20px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            position: relative;
+            z-index: 10;
+        }
+        .caster-label { font-size: 11px; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 4px; margin-bottom: 5px; text-shadow: 0 2px 5px rgba(0,0,0,1); }
+        .caster-name { font-size: 22px; font-weight: 950; color: white; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 10px rgba(0,0,0,1); }
         
-        .team-row { 
+        .team-row {  
             display: flex; align-items: center; padding: 10px 16px; height: 68px; 
             position: relative; overflow: hidden;
             background: rgba(255, 255, 255, 0.03);
@@ -229,6 +242,25 @@
                 label.innerText = phase.name;
                 column.appendChild(label);
 
+                const isFinale = pIdx === (b.phases.length - 1);
+                let caster1Html = '';
+                let caster2Html = '';
+
+                if (isFinale && state.casters && state.casters.length > 0) {
+                    if (state.casters[0] && state.casters[0].active) {
+                        caster1Html = `<div class="caster-box"><span class="caster-label">CASTER</span><span class="caster-name">${state.casters[0].name || 'Caster 1'}</span></div>`;
+                    }
+                    if (state.casters[1] && state.casters[1].active) {
+                        caster2Html = `<div class="caster-box"><span class="caster-label">CASTER</span><span class="caster-name">${state.casters[1].name || 'Caster 2'}</span></div>`;
+                    }
+                }
+
+                if (caster1Html) {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = caster1Html;
+                    column.appendChild(temp.firstElementChild);
+                }
+
                 (phase.matches || []).forEach((match, mIdx) => {
                     const card = document.createElement('div');
                     card.className = 'match-card';
@@ -268,6 +300,13 @@
                     `;
                     column.appendChild(card);
                 });
+
+                if (caster2Html) {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = caster2Html;
+                    column.appendChild(temp.firstElementChild);
+                }
+
                 wrapper.appendChild(column);
             });
 
