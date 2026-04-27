@@ -83,7 +83,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     orderofthedragon: "#fbbf24",
     ottomans: "#dc2626",
     rus: "#b91c1c",
-    sengoku: "#e2e8f0",
+    sengoku: "#e11d48",
     templar: "#dc2626",
     tughlaq: "#94a3b8",
     zhuxi: "#16a34a"

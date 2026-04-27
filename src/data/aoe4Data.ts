@@ -241,7 +241,7 @@ export const civilizationsData: Civilization[] = [
     name: "Ayyubidi",
     flag: "/civs/Ayyubids.webp",
     difficulty: "Medio",
-    primaryColor: "#059669",
+    primaryColor: "#eab308",
     shortDescription: "A versatile civilization leveraging Desert Raiders and House of Wisdom advancements.",
     passiveBonuses: ["House of Wisdom wings grant unique, immediate bonuses when advancing."],
     uniqueUnits: [
@@ -728,7 +728,7 @@ export const civilizationsData: Civilization[] = [
     name: "Giapponesi",
     flag: "/civs/Japanese.webp",
     difficulty: "Medio",
-    primaryColor: "#e11d48",
+    primaryColor: "#e2e8f0",
     shortDescription: "An infantry and farming-centric civilization utilizing Samurai and Shinobi.",
     passiveBonuses: ["Town Centers can upgrade into Daimyo Manors to increase farm gather rates.", "Forges offer unique melee upgrade paths."],
     uniqueUnits: [
@@ -788,7 +788,7 @@ export const civilizationsData: Civilization[] = [
     name: "Lancaster",
     flag: "/civs/House of Lancaster.webp",
     difficulty: "Facile",
-    primaryColor: "#ef4444",
+    primaryColor: "#2563eb",
     shortDescription: "A variant of the English with powerful longbowmen upgrades and defensive traits.",
     passiveBonuses: ["Enhanced defensive networks.", "Focus on ranged superiority and area denial."],
     uniqueUnits: [
@@ -864,7 +864,7 @@ export const civilizationsData: Civilization[] = [
     name: "Macedoni",
     flag: "/civs/Macedonian Dynasty.webp",
     difficulty: "Facile",
-    primaryColor: "#8b5cf6",
+    primaryColor: "#991b1b",
     shortDescription: "A variant of the Byzantines featuring robust frontline units and unique mercenaries.",
     passiveBonuses: ["Specialized infantry formations.", "Unique mercenary contracts."],
     uniqueUnits: [
@@ -1264,7 +1264,7 @@ export const civilizationsData: Civilization[] = [
     name: "Dinastia di Tughlaq",
     flag: "/civs/Tughlaq Dynasty.png",
     difficulty: "Medio",
-    primaryColor: "#0d9488",
+    primaryColor: "#94a3b8",
     shortDescription: "A variant of the Delhi Sultanate heavily utilizing elephants and defensive structures.",
     passiveBonuses: ["Earlier access to War Elephants.", "Stronger defensive network integration."],
     uniqueUnits: [
