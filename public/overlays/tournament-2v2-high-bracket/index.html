@@ -124,8 +124,12 @@
             background-position: center; 
             image-rendering: -webkit-optimize-contrast;
             transform: translateZ(0);
-            filter: brightness(1.1) contrast(1.1);
+            filter: contrast(1.05);
             -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 10%, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%);
+            transition: filter 0.5s ease;
+        }
+        .civ-flag-mini.is-loser {
+            filter: brightness(0.4) saturate(0.6) contrast(0.9);
         }
 
         .team-score-box {
@@ -298,10 +302,11 @@
                         
                         let civFlagsHtml = '';
                         if (civs && civs.length > 0) {
+                            const isLoser = match.w && match.w !== (isT1 ? 1 : 2);
                             const sortedCivs = [...civs].reverse();
                             civFlagsHtml = '<div class="team-civs-container">';
                             sortedCivs.forEach((cId) => {
-                                civFlagsHtml += `<div class="civ-flag-mini" style="background-image: url('${getCivFlagUrl(cId)}');"></div>`;
+                                civFlagsHtml += `<div class="civ-flag-mini ${isLoser ? 'is-loser' : ''}" style="background-image: url('${getCivFlagUrl(cId)}');"></div>`;
                             });
                             civFlagsHtml += '</div>';
                         }
