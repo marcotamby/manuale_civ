@@ -46,8 +46,9 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
   const [state, setState] = useState<any>(DEFAULT_STATE);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [activeTab, setActiveTab] = useState<'match' | 'bracket'>('match');
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  const isBracket = overlayId.includes('bracket');
 
   useEffect(() => {
     overlayService.getOverlayState(overlayId)
@@ -562,29 +563,6 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
           )}
         </div>
 
-        <div className="flex gap-2 bg-black/60 p-1.5 rounded-2xl border border-white/5 shadow-inner">
-           <button
-            onClick={() => setActiveTab('match')}
-            className={`px-10 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-all border ${
-              activeTab === 'match' 
-                ? 'bg-gradient-to-b from-white to-gray-400 text-black shadow-xl border-white' 
-                : 'bg-white/5 text-gray-500 border-white/5 hover:text-white'
-            }`}
-          >
-            Match Attivo
-          </button>
-          <button
-            onClick={() => setActiveTab('bracket')}
-            className={`px-10 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-all border ${
-              activeTab === 'bracket' 
-                ? 'bg-gradient-to-b from-white to-gray-400 text-black shadow-xl border-white' 
-                : 'bg-white/5 text-gray-500 border-white/5 hover:text-white'
-            }`}
-          >
-            Tabellone
-          </button>
-        </div>
-
         <div className="flex items-center gap-4 bg-yellow-500/10 border border-yellow-500/30 px-6 py-2.5 rounded-2xl shadow-lg shadow-yellow-500/5">
            {mode === 'high' ? <ShieldAlert className="text-yellow-500" size={18} /> : <Target className="text-yellow-500" size={18} />}
            <div className="flex flex-col">
@@ -596,7 +574,7 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
 
       <div className="p-8 pb-32">
         <div className="max-w-7xl mx-auto">
-          {activeTab === 'match' ? renderMatchTab() : renderBracketTab()}
+          {isBracket ? renderBracketTab() : renderMatchTab()}
         </div>
       </div>
     </div>
