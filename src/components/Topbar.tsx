@@ -309,12 +309,12 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
         {/* Dynamic Background Layer */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <div 
-            className={`absolute inset-0 ${isSpecialPage ? 'lg:hidden' : ''} hidden md:block`}
+            className={`absolute inset-0 ${isSpecialPage ? 'lg:hidden' : ''}`}
             style={{ 
-              backgroundImage: `linear-gradient(to right, #0d1424 0%, rgba(13, 20, 36, 0) 25%, rgba(13, 20, 36, 0) 75%, #0d1424 100%), url('/header-bg.png')`,
+              backgroundImage: `linear-gradient(to bottom, rgba(13, 20, 36, 0) 0%, #0d1424 100%), url('/header-bg.png')`,
               backgroundSize: 'cover',
               backgroundPosition: 'center 35%',
-              opacity: 0.7 
+              opacity: 0.8 
             }}
           ></div>
         </div>
@@ -323,24 +323,6 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
         <div className="lg:hidden absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent z-10"></div>
 
 
-        {/* Mobile-only / Legacy Left container - Hidden on Desktop now as it's in utility bar */}
-        <div className="lg:hidden flex flex-wrap items-center justify-center gap-1.5 order-2 min-w-0 w-full relative z-10">
-          <a
-            href="https://discord.gg/8Tx2YdXrEu"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-3 py-2 glass rounded-lg border border-indigo-500/30 text-indigo-400 text-[11px] font-bold uppercase group"
-          >
-            <span className="">Discord</span>
-          </a>
-          <Link
-            to="/tornei"
-            className="flex items-center gap-2 px-3 py-2 glass rounded-lg border border-emerald-500/30 text-emerald-400 text-[11px] font-bold uppercase"
-          >
-            <Trophy size={14} />
-            <span className="">Tornei</span>
-          </Link>
-        </div>
 
       {/* Center Title Area */}
       <Link 
@@ -368,13 +350,33 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
         {/* Mobile-only Auth / Right side - Hidden on Desktop */}
         <div className="lg:hidden flex items-center justify-center order-3 min-w-0 relative z-10">
           {isAuthenticated ? (
-            <button onClick={() => (window as any).openProfileModal?.()} className="p-2 glass rounded-lg">
-              <User size={18} className="text-yellow-500" />
-            </button>
+            <div className="flex flex-col items-center gap-1">
+              <button onClick={() => (window as any).openProfileModal?.()} className="p-2 glass rounded-lg border border-yellow-500/30">
+                {user?.avatar_url ? (
+                  <img src={user.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />
+                ) : (
+                  <User size={18} className="text-yellow-500" />
+                )}
+              </button>
+              <button 
+                onClick={() => setShowLogoutConfirm(true)}
+                className="text-[9px] font-black text-gray-400 hover:text-white transition-colors uppercase tracking-[0.2em]"
+              >
+                ESCI
+              </button>
+            </div>
           ) : (
-            <button onClick={() => openLoginModal()} className="text-[10px] bg-yellow-600/10 text-yellow-500 border border-yellow-500/30 px-4 py-1.5 rounded-lg font-bold uppercase">
-              Accedi
-            </button>
+            <div className="flex flex-col items-center gap-1">
+              <button onClick={() => openLoginModal()} className="p-2 glass rounded-lg border border-yellow-500/30">
+                <User size={18} className="text-yellow-500" />
+              </button>
+              <button 
+                onClick={() => openLoginModal()}
+                className="text-[9px] font-black text-yellow-500 hover:text-yellow-400 transition-colors uppercase tracking-[0.2em]"
+              >
+                LOGIN
+              </button>
+            </div>
           )}
         </div>
       </div>
