@@ -549,7 +549,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
     return answers.map((a: any) => (
       <div key={a.id} className="space-y-4">
-        <div className={`p-5 rounded-2xl group/a relative transition-all bg-white/[0.02] border-l-2 ${depth % 2 === 0 ? 'border-blue-500/30' : 'border-cyan-500/30'} ml-2 md:ml-12`}>
+        <div className={`p-4 rounded-2xl group/a relative transition-all bg-white/[0.02] border-l-2 ${depth % 2 === 0 ? 'border-blue-500/30' : 'border-cyan-500/30'} ml-2 md:ml-12`}>
           <div className="flex items-start gap-4">
             <div className="shrink-0">
               <div className="w-12 h-12 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
@@ -584,7 +584,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 {a.answer_text}
               </p>
               
-              <div className="flex justify-end pt-3">
+              <div className="flex justify-end pt-1">
                  <button 
                    onClick={() => {
                      if (replyTo && replyTo.parentId === a.id) {
@@ -597,7 +597,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                    className={`flex items-center gap-2 px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                      replyTo && replyTo.parentId === a.id 
                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' 
-                       : 'text-gray-500 hover:text-blue-400 hover:bg-blue-500/10'
+                       : 'text-gray-400 hover:text-blue-400 hover:bg-blue-500/10'
                    }`}
                  >
                    <MessageSquare size={12} />
@@ -1543,7 +1543,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 
                 {/* Question Submission Box */}
                 {user ? (
-                   <div className={`bg-gradient-to-br from-blue-900/40 via-[#0f1423] to-cyan-900/20 rounded-3xl border border-blue-500/30 shadow-[0_0_50px_rgba(37,99,235,0.15)] relative overflow-hidden group transition-all duration-300 ${isQaExpanded ? 'p-6' : 'p-3'}`}>
+                   <div className={`bg-gradient-to-br from-blue-900/40 via-[#0f1423] to-cyan-900/20 rounded-3xl border border-blue-500/30 shadow-[0_0_50px_rgba(37,99,235,0.15)] relative overflow-hidden group transition-all duration-300 ${isQaExpanded ? 'p-5 pb-4' : 'p-3'}`}>
                       <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] pointer-events-none" />
                       
                       {!isQaExpanded ? (
@@ -1569,7 +1569,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         </div>
                       ) : (
                         <>
-                          <div className="flex items-center justify-between mb-4 relative z-10">
+                          <div className="flex items-center justify-between mb-3 relative z-10">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
                                   {user.avatar_url ? (
@@ -1598,7 +1598,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                             </button>
                           </div>
                           <form onSubmit={handleQuestionSubmit} className="flex flex-col relative z-10">
-                            <div className="relative group/input flex-1 mb-4">
+                            <div className="relative group/input flex-1 mb-3">
                               <textarea
                                 value={questionText}
                                 onChange={(e) => setQuestionText(e.target.value)}
@@ -1664,11 +1664,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                     </div>
                   ) : questions.length > 0 ? (
                     questions.map((q) => (
-                      <div key={q.id} className="bg-gradient-to-r from-white/[0.03] to-white/[0.01] p-7 rounded-3xl border border-white/10 relative overflow-hidden group/q shadow-xl backdrop-blur-sm space-y-6">
+                      <div key={q.id} className="bg-gradient-to-r from-white/[0.03] to-white/[0.01] p-5 rounded-3xl border border-white/10 relative overflow-hidden group/q shadow-xl backdrop-blur-sm space-y-4">
 
                              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-600 to-cyan-500 opacity-30" />
                              
-                             <div className="flex items-start gap-5 mb-5">
+                             <div className="flex items-start gap-5 mb-3">
                                <div className="shrink-0">
                                   <div className="w-14 h-14 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
                                     {q.profile?.avatar_url ? (
@@ -1704,7 +1704,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                    {renderAnswers(q.answers, q.id)}
                                 </div>
                              )}
-                                      <div className="flex justify-end pt-2 border-t border-white/5">
+                                      <div className="flex justify-end pt-1 border-t border-white/5">
                                <button 
                                   onClick={() => {
                                     if (replyTo && replyTo.questionId === q.id && !replyTo.parentId) {
@@ -1716,8 +1716,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                   }}
                                   className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
                                     replyTo && replyTo.questionId === q.id && !replyTo.parentId
-                                      ? 'bg-white/10 text-white' 
-                                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                       ? 'bg-white/10 text-white' 
+                                       : 'text-gray-400 hover:text-blue-400 hover:bg-blue-500/10'
                                   }`}
                                 >
                                   <MessageSquare size={14} />
