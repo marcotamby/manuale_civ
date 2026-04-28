@@ -182,7 +182,7 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
     );
   };
 
-  const MultiCivSelect = ({ values, onChange, max = 8, label = "Civ Pickate" }: { values: string[], onChange: (vals: string[]) => void, max?: number, label?: string }) => {
+  const MultiCivSelect = ({ values, onChange, max = 9, label = "Civ Pickate" }: { values: string[], onChange: (vals: string[]) => void, max?: number, label?: string }) => {
     return (
       <div className="space-y-3">
         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block">{label} ({values.length}/{max})</label>
