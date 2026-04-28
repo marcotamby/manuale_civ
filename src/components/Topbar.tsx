@@ -348,31 +348,37 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
 
       {/* Auth / Right side */}
         {/* Mobile-only Auth / Right side - Hidden on Desktop */}
-        <div className="lg:hidden flex items-center justify-center order-3 min-w-0 relative z-10">
+        <div className="lg:hidden flex items-center justify-center order-3 min-w-0 relative z-10 py-4">
           {isAuthenticated ? (
-            <div className="flex flex-col items-center gap-1">
-              <button onClick={() => (window as any).openProfileModal?.()} className="p-2 glass rounded-lg border border-yellow-500/30">
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => (window as any).openProfileModal?.()} 
+                className="w-14 h-14 glass rounded-2xl border border-yellow-500/30 flex items-center justify-center overflow-hidden shadow-lg shadow-yellow-500/5 active:scale-95 transition-transform shrink-0"
+              >
                 {user?.avatar_url ? (
-                  <img src={user.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />
+                  <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <User size={18} className="text-yellow-500" />
+                  <User size={28} className="text-yellow-500" />
                 )}
               </button>
               <button 
                 onClick={() => setShowLogoutConfirm(true)}
-                className="text-[9px] font-black text-gray-400 hover:text-white transition-colors uppercase tracking-[0.2em]"
+                className="px-6 py-3 bg-red-600/10 text-red-500 border border-red-500/30 rounded-xl text-[11px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-red-600/5"
               >
                 ESCI
               </button>
             </div>
           ) : (
-            <div className="flex flex-col items-center gap-1">
-              <button onClick={() => openLoginModal()} className="p-2 glass rounded-lg border border-yellow-500/30">
-                <User size={18} className="text-yellow-500" />
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => openLoginModal()}
+                className="w-14 h-14 glass rounded-2xl border border-yellow-500/30 flex items-center justify-center overflow-hidden active:scale-95 transition-transform shadow-lg shadow-yellow-500/5 shrink-0"
+              >
+                <User size={28} className="text-yellow-500" />
               </button>
               <button 
                 onClick={() => openLoginModal()}
-                className="text-[9px] font-black text-yellow-500 hover:text-yellow-400 transition-colors uppercase tracking-[0.2em]"
+                className="px-6 py-3 bg-yellow-600/10 text-yellow-500 border border-yellow-500/30 rounded-xl text-[11px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-yellow-500/5"
               >
                 LOGIN
               </button>
