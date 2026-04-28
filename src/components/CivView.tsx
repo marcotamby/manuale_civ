@@ -36,6 +36,18 @@ const getRankIcon = (rank: string | undefined) => {
   )?.[1];
 };
 
+const getRankColor = (rank: string | undefined) => {
+  if (!rank || rank === 'Unranked') return { text: '#9ca3af', bg: 'rgba(156, 163, 175, 0.1)', border: 'rgba(156, 163, 175, 0.2)' };
+  const r = rank.toLowerCase();
+  if (r.includes('bronze')) return { text: '#dca376', bg: 'rgba(220, 163, 118, 0.1)', border: 'rgba(220, 163, 118, 0.2)' };
+  if (r.includes('silver')) return { text: '#a4aab1', bg: 'rgba(164, 170, 177, 0.1)', border: 'rgba(164, 170, 177, 0.2)' };
+  if (r.includes('gold')) return { text: '#f6d271', bg: 'rgba(246, 210, 113, 0.1)', border: 'rgba(246, 210, 113, 0.2)' };
+  if (r.includes('platinum')) return { text: '#4ed2bd', bg: 'rgba(78, 210, 189, 0.1)', border: 'rgba(78, 210, 189, 0.2)' };
+  if (r.includes('diamond')) return { text: '#71b5f6', bg: 'rgba(113, 181, 246, 0.1)', border: 'rgba(113, 181, 246, 0.2)' };
+  if (r.includes('conqueror')) return { text: '#f67171', bg: 'rgba(246, 113, 113, 0.1)', border: 'rgba(246, 113, 113, 0.2)' };
+  return { text: '#9ca3af', bg: 'rgba(156, 163, 175, 0.1)', border: 'rgba(156, 163, 175, 0.2)' };
+};
+
 export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const { civilizations } = useCivData();
   const { isAdmin, isSuperAdmin, canManageCivs, canManageBuildorders, user, toggleFavorite, openLoginModal } = useAuth();
@@ -565,7 +577,19 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             <div className="flex-1">
               <div className="flex items-center gap-2.5 mb-2">
                 <span className="text-base font-black text-white uppercase tracking-tight select-text">{a.user_nickname}</span>
-                <span className="text-[9px] text-blue-400 font-black px-2 py-0.5 bg-blue-500/10 rounded-full border border-blue-500/20 uppercase select-none tracking-widest">{a.user_rank}</span>
+                <span 
+                  className="flex items-center gap-1 px-2 py-0.5 rounded-full border text-[9px] font-black uppercase select-none tracking-widest"
+                  style={{ 
+                    color: getRankColor(a.user_rank).text, 
+                    backgroundColor: getRankColor(a.user_rank).bg,
+                    borderColor: getRankColor(a.user_rank).border
+                  }}
+                >
+                  {getRankIcon(a.user_rank) && (
+                    <img src={getRankIcon(a.user_rank)!} alt="" className="w-3 h-3 object-contain" />
+                  )}
+                  {a.user_rank}
+                </span>
                 <span className="text-[9px] text-gray-500 font-bold select-none uppercase tracking-widest">{new Date(a.created_at).toLocaleDateString('it-IT')}</span>
                 {(isAdmin || (user && a.user_id === user.email)) && (
                   <button 
@@ -1587,7 +1611,15 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                     <span className="text-[8px] px-2 py-0.5 bg-blue-500 text-white font-black rounded-full uppercase tracking-widest">Staff</span>
                                   )}
                                 </div>
-                                <p className="text-[9px] text-blue-400/70 uppercase font-black tracking-widest">{user.rank || 'Unranked'}</p>
+                                  <p 
+                                    className="text-[9px] uppercase font-black tracking-widest flex items-center gap-1.5"
+                                    style={{ color: getRankColor(user.rank).text }}
+                                  >
+                                    {getRankIcon(user.rank) && (
+                                      <img src={getRankIcon(user.rank)!} alt="" className="w-3.5 h-3.5 object-contain" />
+                                    )}
+                                    {user.rank || 'Unranked'}
+                                  </p>
                               </div>
                             </div>
                             <button 
@@ -1683,7 +1715,19 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                <div className="flex-1">
                                    <div className="flex items-center gap-3 mb-2">
                                     <span className="text-base font-black text-white uppercase tracking-tight select-text">{q.user_nickname}</span>
-                                    <span className="text-[10px] text-blue-400 font-black px-2.5 py-0.5 bg-blue-500/10 rounded-full border border-blue-500/20 uppercase select-none tracking-widest">{q.user_rank}</span>
+                                    <span 
+                                      className="flex items-center gap-1.5 text-[10px] font-black px-2.5 py-0.5 rounded-full border uppercase select-none tracking-widest"
+                                      style={{ 
+                                        color: getRankColor(q.user_rank).text, 
+                                        backgroundColor: getRankColor(q.user_rank).bg,
+                                        borderColor: getRankColor(q.user_rank).border
+                                      }}
+                                    >
+                                      {getRankIcon(q.user_rank) && (
+                                        <img src={getRankIcon(q.user_rank)!} alt="" className="w-4 h-4 object-contain" />
+                                      )}
+                                      {q.user_rank}
+                                    </span>
                                     <span className="text-[10px] text-gray-500 font-bold select-none uppercase tracking-widest">{new Date(q.created_at).toLocaleDateString('it-IT')}</span>
                                     {(isAdmin || (user && q.user_id === user.email)) && (
                                       <button 
