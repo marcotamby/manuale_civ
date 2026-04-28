@@ -64,7 +64,7 @@
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .map-wrapper.next {
-            transform: scale(1.05);
+            z-index: 10;
         }
         
         .map-card {
@@ -75,11 +75,23 @@
         }
         
         @keyframes boxPulse {
-            0% { box-shadow: 0 0 30px rgba(0, 68, 255, 0.3); }
-            50% { box-shadow: 0 0 60px rgba(0, 68, 255, 0.6); }
-            100% { box-shadow: 0 0 30px rgba(0, 68, 255, 0.3); }
+            0% { 
+                box-shadow: 0 0 30px rgba(0, 68, 255, 0.3); 
+                transform: scale(1.02);
+                border-color: rgba(0, 68, 255, 0.4);
+            }
+            50% { 
+                box-shadow: 0 0 60px rgba(0, 68, 255, 0.7), 0 0 100px rgba(0, 68, 255, 0.3); 
+                transform: scale(1.06);
+                border-color: rgba(0, 68, 255, 1);
+            }
+            100% { 
+                box-shadow: 0 0 30px rgba(0, 68, 255, 0.3); 
+                transform: scale(1.02);
+                border-color: rgba(0, 68, 255, 0.4);
+            }
         }
-        .map-wrapper.next .map-card { animation: boxPulse 2s infinite; border-color: var(--blue); }
+        .map-wrapper.next .map-card { animation: boxPulse 2.5s infinite ease-in-out; }
         .map-wrapper.next .map-card::before {
             content: 'PROSSIMO GAME';
             position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
