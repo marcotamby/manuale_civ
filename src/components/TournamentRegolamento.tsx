@@ -86,9 +86,9 @@ export function TournamentRegolamento() {
         </button>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-5xl mx-auto px-4">
         {/* Torn Paper Header matching the new style */}
-        <div className="relative group p-6 md:p-8 overflow-hidden mb-8">
+        <div className="relative group p-8 md:p-12 overflow-hidden mb-8">
           {/* Organic 'Torn Book Page' Effect */}
           <div className="absolute inset-0 -z-10 pointer-events-none">
             <div 
@@ -101,11 +101,13 @@ export function TournamentRegolamento() {
           </div>
 
           <div className="flex flex-col items-center text-center">
-            <div className="flex items-center gap-3 text-yellow-500/80 mb-2">
-              <BookOpen size={18} />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em]">Regolamento Ufficiale</span>
+            <div className="flex flex-col items-center gap-2 text-yellow-500/80 mb-4">
+              <div className="p-2.5 bg-yellow-500/10 rounded-full border border-yellow-500/20 mb-1">
+                <BookOpen size={20} />
+              </div>
+              <span className="text-[11px] font-black uppercase tracking-[0.5em] ml-[0.5em]">Regolamento Ufficiale</span>
             </div>
-            <h1 className="text-3xl md:text-5xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400 tracking-tighter leading-tight drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+            <h1 className="text-4xl md:text-6xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400 tracking-tighter leading-tight drop-shadow-[0_0_20px_rgba(255,255,255,0.15)]">
               {tournament.name || tournament.slug}
             </h1>
           </div>

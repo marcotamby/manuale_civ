@@ -242,7 +242,7 @@ function App() {
           />
         )}
 
-        <main className="flex-1 flex flex-col relative overflow-hidden">
+        <main className={`flex-1 flex flex-col relative overflow-hidden ${currentPage !== 'home' ? 'md:pr-32' : ''}`}>
           <div className="flex-1 overflow-hidden flex flex-col">
             {currentPage !== 'home' && (
               <div className="flex items-center gap-3 px-4 md:pl-6 md:pr-[73px] py-2 shrink-0">
