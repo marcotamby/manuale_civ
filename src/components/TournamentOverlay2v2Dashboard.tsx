@@ -449,8 +449,8 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
       </div>
 
       <div className="grid grid-cols-2 gap-8">
-        <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-6 shadow-xl space-y-4">
-          <label className="text-[12px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2">
+        <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-6 shadow-xl space-y-4 flex flex-col">
+          <label className="text-[12px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2 h-6">
             <TimerIcon size={16} /> Timer
           </label>
           <div className="flex items-center justify-between p-4 bg-black/40 rounded-2xl border border-white/5">
@@ -476,8 +476,10 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
           </div>
         </div>
 
-        <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-6 shadow-xl space-y-4">
-          <label className="text-[12px] font-black text-blue-400 uppercase tracking-widest">Casters</label>
+        <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-6 shadow-xl space-y-4 flex flex-col">
+          <label className="text-[12px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2 h-6">
+            <Users size={16} /> Casters
+          </label>
           <div className="grid grid-cols-2 gap-4">
             {state.casters.map((c: any, idx: number) => (
               <div key={idx} className="flex items-center gap-4 p-4 bg-black/40 rounded-2xl border border-white/5">
