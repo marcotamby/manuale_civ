@@ -230,7 +230,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
       </div>
 
       {/* 2. Main Header (Title Row) */}
-      <div className={`w-full ${isSpecialPage ? 'lg:bg-transparent lg:border-b-0 lg:shadow-none' : 'bg-[#0d1424]/80 backdrop-blur-md border-b border-yellow-500/20 shadow-[0_4px_20px_rgba(0,0,0,0.5)]'} flex flex-col lg:grid lg:grid-cols-[1fr_auto_1fr] items-center px-4 py-3 md:px-14 md:py-8 lg:py-12 z-[100] shrink-0 gap-3 md:gap-4 relative`}>
+      <div className={`w-full ${isSpecialPage ? 'lg:bg-transparent lg:border-b-0 lg:shadow-none' : 'bg-[#0d1424]/80 backdrop-blur-md border-b border-yellow-500/20 shadow-[0_4px_20px_rgba(0,0,0,0.5)]'} flex flex-col items-center px-4 py-3 md:px-14 md:py-4 lg:py-6 z-[100] shrink-0 gap-3 md:gap-4 relative`}>
         
         {/* Dynamic Background Layer */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
@@ -249,10 +249,6 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
         <div className="lg:hidden absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent z-10"></div>
 
 
-
-
-
-      {/* Left container for social links */}
         {/* Mobile-only / Legacy Left container - Hidden on Desktop now as it's in utility bar */}
         <div className="lg:hidden flex flex-wrap items-center justify-center gap-1.5 order-2 min-w-0 w-full relative z-10">
           <a
