@@ -131,7 +131,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
   };
 
   const calculateNotifications = () => {
-    if (!isAuthenticated || !user?.email || favorites.length === 0) {
+    if (!isAuthenticated || !user?.email) {
       setNotificationCount(0);
       return;
     }
@@ -141,21 +141,22 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
     const lastSeenData = rawData ? JSON.parse(rawData) : {};
     
     let totalUnread = 0;
-    favorites.forEach(favId => {
-      const civ = civilizations.find(c => c.id === favId);
-      if (civ) {
-        const stored = lastSeenData[favId] || { bo: 0, video: 0 };
-        const currentBO = civ.buildOrders?.length || 0;
-        const currentVideo = civ.videos?.length || 0;
-
-        // Ensure we compare with numbers and handle potential missing properties in 'stored'
-        const storedBO = typeof stored.bo === 'number' ? stored.bo : 0;
-        const storedVideo = typeof stored.video === 'number' ? stored.video : 0;
-
-        if (currentBO > storedBO) totalUnread += (currentBO - storedBO);
-        if (currentVideo > storedVideo) totalUnread += (currentVideo - storedVideo);
-      }
-    });
+    if (favorites.length > 0) {
+        favorites.forEach(favId => {
+          const civ = civilizations.find(c => c.id === favId);
+          if (civ) {
+            const stored = lastSeenData[favId] || { bo: 0, video: 0 };
+            const currentBO = civ.buildOrders?.length || 0;
+            const currentVideo = civ.videos?.length || 0;
+    
+            const storedBO = typeof stored.bo === 'number' ? stored.bo : 0;
+            const storedVideo = typeof stored.video === 'number' ? stored.video : 0;
+    
+            if (currentBO > storedBO) totalUnread += (currentBO - storedBO);
+            if (currentVideo > storedVideo) totalUnread += (currentVideo - storedVideo);
+          }
+        });
+    }
     
     setNotificationCount(totalUnread + qaUnreadCount);
   };
