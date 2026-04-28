@@ -666,10 +666,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           <img 
             src={civ.flag.replace('.webp', '.png')} 
             alt="" 
-            className="h-full w-full object-cover object-center md:object-left opacity-[0.8] md:opacity-[0.9]"
+            className="h-full w-full object-cover object-center md:object-right opacity-[0.8] md:opacity-[0.9]"
             style={{
-              maskImage: 'linear-gradient(to right, black 0%, black 40%, transparent 90%), linear-gradient(to bottom, transparent 0%, black 25%)',
-              WebkitMaskImage: 'linear-gradient(to right, black 0%, black 40%, transparent 90%), linear-gradient(to bottom, transparent 0%, black 25%)',
+              maskImage: 'linear-gradient(to left, black 0%, black 40%, transparent 90%), linear-gradient(to bottom, transparent 0%, black 25%)',
+              WebkitMaskImage: 'linear-gradient(to left, black 0%, black 40%, transparent 90%), linear-gradient(to bottom, transparent 0%, black 25%)',
               maskComposite: 'intersect',
               WebkitMaskComposite: 'source-in'
             }}
@@ -703,7 +703,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           <div className="flex flex-col items-start gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-3 flex-wrap mb-2">
-                <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">
+                <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400 drop-shadow-[0_2px_10px_rgba(255,255,255,0.15)]">
                   {civ.name}
                 </h1>
                 <span className={`text-xs font-bold px-3 py-1 rounded-full border ${civ.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/10' :
