@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { X, User, Heart, MessageSquare, Trophy, ExternalLink, Loader2, ChevronDown, LogOut, Camera, Trash2 as TrashIcon } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
@@ -127,6 +127,7 @@ function RankDropdown({ value, onChange }: { value: string; onChange: (rank: str
 export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps) {
     const { user, favorites, updateProfile, logout, isAdmin, isSuperAdmin } = useAuth();
     const { civilizations } = useCivData();
+    const [mySuggestions, setMySuggestions] = useState<Suggestion[]>([]);
     const [qaNotifications, setQaNotifications] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isQaLoading, setIsQaLoading] = useState(false);
@@ -337,8 +338,11 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
         setQaUpdateTrigger(prev => prev + 1);
     };
 
-    const seenQaIds = user?.email ? JSON.parse(localStorage.getItem(`seenQaNotifs_${user.email.toLowerCase()}`) || '[]') : [];
-    const unreadQaNotifs = qaNotifications.filter(n => !seenQaIds.includes(n.id));
+    const unreadQaNotifs = useMemo(() => {
+        const seenQaIds = user?.email ? JSON.parse(localStorage.getItem(`seenQaNotifs_${user.email.toLowerCase()}`) || '[]') : [];
+        return qaNotifications.filter(n => !seenQaIds.includes(n.id));
+    }, [qaNotifications, user?.email, qaUpdateTrigger]);
+
     const hasUnreadQa = unreadQaNotifs.length > 0;
 
     const fetchMySuggestions = async () => {
@@ -466,7 +470,6 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                         ) : unreadQaNotifs.length > 0 ? (
                             <div className="space-y-2">
                                 {unreadQaNotifs.slice(0, 10).map((notif) => {
-                                    const isUnread = true; // They are all unread now due to filtering
                                     return (
                                         <div 
                                             key={notif.id}

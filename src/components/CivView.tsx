@@ -591,7 +591,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   {a.user_rank}
                 </span>
                 <span className="text-[9px] text-gray-500 font-bold select-none uppercase tracking-widest">{new Date(a.created_at).toLocaleDateString('it-IT')}</span>
-                {(isAdmin || (user && a.user_id === user.email)) && (
+                {isAdmin && (
                   <button 
                     onClick={() => handleDeleteQA(a.id, 'answer')}
                     className="ml-auto opacity-0 group-hover/a:opacity-100 p-1.5 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
@@ -1732,7 +1732,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                       {q.user_rank}
                                     </span>
                                     <span className="text-[10px] text-gray-500 font-bold select-none uppercase tracking-widest">{new Date(q.created_at).toLocaleDateString('it-IT')}</span>
-                                    {(isAdmin || (user && q.user_id === user.email)) && (
+                                    {isAdmin && (
                                       <button 
                                         onClick={() => handleDeleteQA(q.id, 'question')}
                                         className="ml-auto opacity-0 group-hover/q:opacity-100 p-2 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
