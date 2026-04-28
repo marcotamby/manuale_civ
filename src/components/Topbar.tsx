@@ -327,7 +327,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
       {/* Center Title Area */}
       <Link 
         to="/" 
-        className="flex flex-col items-center justify-center text-center w-full order-1 lg:order-2 group cursor-pointer hover:opacity-95 transition-all py-1 px-4 relative z-10"
+        className="flex flex-col items-center justify-center text-center w-full order-1 lg:order-2 group cursor-pointer hover:opacity-95 transition-all pt-6 md:pt-1 pb-1 px-4 relative z-10"
       >
         <h2 className="text-[14px] md:text-[14px] font-bold text-slate-400 tracking-[0.7em] md:tracking-[0.5em] uppercase mb-1 whitespace-nowrap">
           Age of Empires IV
