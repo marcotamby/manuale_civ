@@ -180,9 +180,18 @@
         .caster-webcam { position: absolute; inset: 0; background: #000; z-index: 1; }
         .caster-name-label {
             position: relative; z-index: 2; 
-            background: linear-gradient(to right, transparent, rgba(0, 180, 210, 0.5), transparent);
-            padding: 8px 20px; font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px;
-            color: white; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;
+            padding: 10px 20px; font-size: 18px; font-weight: 950; text-transform: uppercase; letter-spacing: 3px;
+            text-align: center;
+            border-top: 2px solid rgba(0, 242, 255, 0.5);
+            background: linear-gradient(to bottom, #ffffff 20%, #00f2ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+        }
+        .caster-name-label::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.8), transparent);
+            z-index: -1;
         }
 
         .draft-flag.banned { 
