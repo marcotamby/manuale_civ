@@ -577,7 +577,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   </button>
                 )}
               </div>
-              <p className="text-gray-200 text-lg leading-relaxed select-text font-medium">
+              <p className="text-gray-200 text-base leading-relaxed select-text font-medium">
                 {a.replyToNickname && (
                   <span className="text-blue-500/80 font-bold mr-2 select-none italic">@{a.replyToNickname}</span>
                 )}
@@ -1695,7 +1695,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                       </button>
                                     )}
                                   </div>
-                                  <p className="text-gray-200 text-lg leading-relaxed select-text font-medium">{q.question_text}</p>
+                                  <p className="text-gray-200 text-base leading-relaxed select-text font-medium">{q.question_text}</p>
                                </div>
                              </div>
 
