@@ -81,7 +81,7 @@ export function PrivacyPage() {
             <h2 className="text-xl font-bold text-yellow-500 mb-3">7. I Tuoi Diritti</h2>
             <p>In ogni momento puoi:</p>
             <ul className="list-disc ml-6 mt-2 space-y-1">
-              <li>Richiedere la cancellazione totale dei tuoi dati e del tuo account inviando una mail all'amministratore.</li>
+              <li>Richiedere la cancellazione totale dei tuoi dati e del tuo account inviando una mail all'amministratore (<a href="mailto:marco.tamborrino.94@gmail.com" className="text-yellow-500 hover:underline">marco.tamborrino.94@gmail.com</a>).</li>
               <li>Revocare l'accesso al sito direttamente dalle impostazioni di sicurezza del tuo account Google.</li>
               <li>Richiedere informazioni su quali dati sono associati alla tua email.</li>
             </ul>
