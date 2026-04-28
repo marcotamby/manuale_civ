@@ -4,7 +4,7 @@ export function PrivacyPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full bg-[#0d1424] text-gray-300">
+    <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full lg:bg-transparent bg-[#0d1424] text-gray-300 relative z-10 elegant-scrollbar">
       <div className="max-w-4xl mx-auto glass p-8 rounded-2xl border border-[#D4AF37]/30 shadow-2xl">
         <button 
           onClick={() => navigate('/')}

@@ -43,9 +43,10 @@ function App() {
   const { civilizations: civilizationsData, loading, error, refreshCivs, updateCivLocally, updateGlobalUnitLocally } = useCivData();
 
   const isFaq = location.pathname === '/faq';
+  const isPrivacy = location.pathname === '/privacy';
   const isTournaments = location.pathname.includes('/tornei');
   
-  const currentPage = isHome ? 'home' : isCompare ? 'compare' : isCiv ? 'civ' : isFaq ? 'faq' : isTournaments ? 'tornei' : 'home';
+  const currentPage = isHome ? 'home' : isCompare ? 'compare' : isCiv ? 'civ' : isFaq ? 'faq' : isPrivacy ? 'privacy' : isTournaments ? 'tornei' : 'home';
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false);
@@ -211,7 +212,7 @@ function App() {
       />
 
       {/* Global Homepage Extended Background - Desktop Only */}
-      { (isHome || isTournaments || isFaq || isCiv || isCompare) && (
+      { (isHome || isTournaments || isFaq || isPrivacy || isCiv || isCompare) && (
         <div 
           className="fixed top-0 left-0 right-0 h-[280px] md:h-[600px] lg:h-[800px] z-0 pointer-events-none block bg-contain md:bg-cover bg-no-repeat bg-top"
           style={{ 
