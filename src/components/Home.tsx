@@ -174,8 +174,8 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                     (e.target as HTMLImageElement).classList.remove('opacity-0');
                   }}
                 />
-                {/* Cinematic Vignette Overlay - Improved for text legibility but kept very subtle */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-40 group-hover:opacity-30 transition-opacity duration-500" />
+                {/* Cinematic Vignette Overlay - Slightly increased for better text legibility */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent opacity-55 group-hover:opacity-45 transition-opacity duration-500" />
                 
                 {/* Subtle top/right fade */}
                 <div className="absolute inset-0 bg-gradient-to-bl from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
