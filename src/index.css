@@ -30,7 +30,7 @@ p, li, h1, h2, h3, h4, h5, h6, td, th, strong, em, b, i, blockquote, code, pre {
 }
 
 /* Explicitly disable selection on interactive/UI elements to avoid the I-beam cursor */
-button, a, [role="button"], .cursor-pointer, .select-none, img, svg {
+button, a, [role="button"], .cursor-pointer, img, svg {
   user-select: none;
   -webkit-user-select: none;
   cursor: pointer !important;
