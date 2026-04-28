@@ -329,11 +329,11 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
         to="/" 
         className="flex flex-col items-center justify-center text-center w-full order-1 lg:order-2 group cursor-pointer hover:opacity-95 transition-all py-1 px-4 relative z-10"
       >
-        <h2 className="text-[14px] md:text-[14px] font-bold text-slate-400 tracking-[0.4em] md:tracking-[0.5em] uppercase mb-1 whitespace-nowrap">
+        <h2 className="text-[14px] md:text-[14px] font-bold text-slate-400 tracking-[0.7em] md:tracking-[0.5em] uppercase mb-1 whitespace-nowrap">
           Age of Empires IV
         </h2>
         
-        <h1 className="text-4xl md:text-4xl lg:text-3xl xl:text-4xl 2xl:text-6xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 drop-shadow-[0_4px_15px_rgba(255,255,255,0.15)] tracking-tighter leading-tight px-2 transition-all duration-300">
+        <h1 className="text-4xl md:text-4xl lg:text-3xl xl:text-4xl 2xl:text-6xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 drop-shadow-[0_4px_15px_rgba(255,255,255,0.15)] tracking-[0.1em] md:tracking-tighter leading-tight px-2 transition-all duration-300">
           Manuale delle Civiltà
         </h1>
 
@@ -348,7 +348,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
 
       {/* Auth / Right side */}
         {/* Mobile-only Auth / Right side - Hidden on Desktop */}
-        <div className="lg:hidden flex items-center justify-between w-full order-3 min-w-0 relative z-10 py-4 px-2">
+        <div className="lg:hidden flex items-center justify-between w-full order-3 min-w-0 relative z-10 py-4">
           {isAuthenticated ? (
             <>
               <div className="flex items-center gap-2">
