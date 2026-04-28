@@ -348,15 +348,15 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
 
       {/* Auth / Right side */}
         {/* Mobile-only Auth / Right side - Hidden on Desktop */}
-        <div className="lg:hidden flex items-center justify-center order-3 min-w-0 relative z-10 py-6">
-          <div className="flex items-center justify-center gap-2">
-            {isAuthenticated ? (
-              <>
+        <div className="lg:hidden flex items-center justify-between w-full order-3 min-w-0 relative z-10 py-4 px-2">
+          {isAuthenticated ? (
+            <>
+              <div className="flex items-center gap-2">
                 {/* 1. Pannello (Admin only) */}
                 {isAdmin && (
                   <button 
                     onClick={onOpenAdminDashboard} 
-                    className="px-3 py-2 bg-[#0d1424] rounded-xl border border-yellow-500/30 text-yellow-500 text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg"
+                    className="h-10 px-3 bg-[#0d1424] rounded-xl border border-yellow-500/30 text-yellow-500 text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg"
                   >
                     Pannello
                   </button>
@@ -365,28 +365,30 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
                 {/* 2. Profilo */}
                 <button 
                   onClick={() => (window as any).openProfileModal?.()} 
-                  className="w-11 h-11 bg-[#0d1424] rounded-xl border border-yellow-500/30 flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-lg"
+                  className="w-10 h-10 bg-[#0d1424] rounded-xl border border-yellow-500/30 flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-lg"
                 >
-                  <User size={22} className="text-yellow-500" />
+                  <User size={20} className="text-yellow-500" />
                 </button>
+              </div>
 
-                {/* 3. ESCI (Rightmost) */}
-                <button 
-                  onClick={() => setShowLogoutConfirm(true)}
-                  className="px-3 py-2 bg-[#0d1424] rounded-xl border border-yellow-500/30 text-yellow-500 text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg"
-                >
-                  ESCI
-                </button>
-              </>
-            ) : (
+              {/* 3. ESCI (Rightmost) */}
+              <button 
+                onClick={() => setShowLogoutConfirm(true)}
+                className="h-10 px-4 bg-[#0d1424] rounded-xl border border-yellow-500/30 text-yellow-500 text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg"
+              >
+                ESCI
+              </button>
+            </>
+          ) : (
+            <div className="flex items-center justify-end w-full">
               <button 
                 onClick={() => openLoginModal()}
-                className="px-6 py-2.5 bg-[#0d1424] rounded-xl border border-yellow-500/30 text-yellow-500 text-[11px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg"
+                className="h-10 px-6 bg-[#0d1424] rounded-xl border border-yellow-500/30 text-yellow-500 text-[11px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg"
               >
                 LOGIN
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
