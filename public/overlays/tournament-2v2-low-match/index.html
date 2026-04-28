@@ -62,6 +62,7 @@
         .map-wrapper {
             display: flex; flex-direction: column; align-items: center; gap: 8px;
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
         .map-wrapper.next {
             z-index: 10;
@@ -113,12 +114,12 @@
         }
 
         .winner-icon {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            z-index: 5; display: none; filter: drop-shadow(0 0 20px rgba(255,215,0,0.8));
-            font-size: 35px;
+            position: absolute; top: -25px;
+            z-index: 100; display: none; filter: drop-shadow(0 0 15px rgba(255,215,0,0.6));
+            font-size: 32px;
         }
-        .winner-icon.win-t1 { left: 40px; }
-        .winner-icon.win-t2 { right: 40px; }
+        .winner-icon.win-t1 { left: 0px; }
+        .winner-icon.win-t2 { right: 0px; }
 
         /* Left/Right Civ Layout */
         .civs-left, .civs-right {
@@ -177,9 +178,9 @@
         .caster-webcam { position: absolute; inset: 0; background: #000; z-index: 1; }
         .caster-name-label {
             position: relative; z-index: 2; 
-            background: linear-gradient(to right, transparent, rgba(0, 68, 255, 0.8), transparent);
+            background: linear-gradient(to right, transparent, rgba(0, 180, 210, 0.5), transparent);
             padding: 8px 20px; font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px;
-            color: white; border-top: 1px solid rgba(255,255,255,0.2); text-align: center;
+            color: white; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;
         }
 
         .draft-flag.banned { 
@@ -378,6 +379,7 @@
 
                 const mapNameStr = map.name ? map.name : 'TBD';
                 wrapper.innerHTML = `
+                    <div class="winner-icon ${isT1Winner ? 'win-t1' : 'win-t2'}" style="display: ${map.winner ? 'block' : 'none'};">🏆</div>
                     <div class="map-card">
                         <div class="map-image" style="background-image: url('${getMapUrl(map.name)}')"></div>
                         <div class="map-overlay"></div>
@@ -388,8 +390,6 @@
                         <div class="civs-right">
                             ${t2FlagsHTML}
                         </div>
-                        
-                        <div class="winner-icon ${isT1Winner ? 'win-t1' : 'win-t2'}" style="display: ${map.winner ? 'block' : 'none'};">🏆</div>
                     </div>
                     <div class="map-name-label">${mapNameStr}</div>
                 `;
