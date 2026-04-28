@@ -60,7 +60,7 @@
         }
         
         .map-card {
-            width: 400px; height: 200px; background: var(--bg-dark); border-radius: 20px; 
+            width: 440px; height: 220px; background: var(--bg-dark); border-radius: 20px; 
             border: 2px solid rgba(255,255,255,0.05); overflow: hidden;
             box-shadow: 0 20px 60px rgba(0,0,0,0.8);
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -72,6 +72,12 @@
             box-shadow: 0 0 50px rgba(0, 68, 255, 0.3);
             transform: scale(1.05);
         }
+        @keyframes boxPulse {
+            0% { box-shadow: 0 0 30px rgba(0, 68, 255, 0.3); }
+            50% { box-shadow: 0 0 60px rgba(0, 68, 255, 0.6); }
+            100% { box-shadow: 0 0 30px rgba(0, 68, 255, 0.3); }
+        }
+        .map-card.next { animation: boxPulse 2s infinite; }
         .map-card.next::before {
             content: 'PROSSIMO GAME';
             position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
@@ -84,16 +90,20 @@
         .map-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.2)); z-index: 2; }
         
         .map-name-label { 
-            position: absolute; bottom: 15px; left: 0; width: 100%; text-align: center;
-            font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 4px;
-            text-shadow: 0 4px 20px rgba(0,0,0,1); z-index: 3; color: white;
+            position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
+            padding: 4px 16px; border-radius: 8px; background: rgba(0,0,0,0.7);
+            font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 4px;
+            text-shadow: 0 2px 10px rgba(0,0,0,1); z-index: 3; color: white;
+            white-space: nowrap;
         }
 
         .winner-icon {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 4; display: none; filter: drop-shadow(0 0 20px rgba(255,215,0,0.5));
+            position: absolute; top: 50%; transform: translateY(-50%);
+            z-index: 5; display: none; filter: drop-shadow(0 0 20px rgba(255,215,0,0.8));
             font-size: 60px;
         }
+        .winner-icon.win-t1 { left: 40px; }
+        .winner-icon.win-t2 { right: 40px; }
 
         /* Left/Right Civ Layout */
         .civs-left, .civs-right {
@@ -277,39 +287,54 @@
                 renderBans('t2-bans', state.t2?.bans);
             }
 
+            const bestOfElem = document.getElementById('best-of-text');
+            if (bestOfElem) bestOfElem.innerText = `BEST OF ${state.maps?.length || 3}`;
+            
             const mapsContainer = document.getElementById('maps-section');
             mapsContainer.innerHTML = '';
             (state.maps || []).forEach((map, idx) => {
+                const isT1Winner = map.winner === 1;
+                const isT2Winner = map.winner === 2;
+                const loserT1Class = isT2Winner ? 'loser-t1' : '';
+                const loserT2Class = isT1Winner ? 'loser-t2' : '';
+                
                 const card = document.createElement('div');
-                card.className = `map-card ${map.isNext ? 'next' : ''}`;
-                const winnerText = map.winner === 1 ? 'TEAM 1 WIN' : map.winner === 2 ? 'TEAM 2 WIN' : 'DA GIOCARE';
-                const winnerClass = map.winner === 1 ? 'win1' : map.winner === 2 ? 'win2' : '';
+                card.className = `map-card ${map.isNext ? 'next' : ''} ${loserT1Class} ${loserT2Class}`;
+                
+                let t1FlagsHTML = '';
+                (map.t1Civs || []).forEach(civId => {
+                    if (civId) t1FlagsHTML += `<div class="map-civ-flag ${map.t1Snipe === civId ? 'sniped' : ''}" style="background-image: url('${getCivFlagUrl(civId)}')"></div>`;
+                });
+                if (map.t1Snipe && !(map.t1Civs || []).includes(map.t1Snipe)) {
+                    t1FlagsHTML += `<div class="map-civ-flag sniped" style="background-image: url('${getCivFlagUrl(map.t1Snipe)}')"></div>`;
+                }
+
+                let t2FlagsHTML = '';
+                (map.t2Civs || []).forEach(civId => {
+                    if (civId) t2FlagsHTML += `<div class="map-civ-flag ${map.t2Snipe === civId ? 'sniped' : ''}" style="background-image: url('${getCivFlagUrl(civId)}')"></div>`;
+                });
+                if (map.t2Snipe && !(map.t2Civs || []).includes(map.t2Snipe)) {
+                    t2FlagsHTML += `<div class="map-civ-flag sniped" style="background-image: url('${getCivFlagUrl(map.t2Snipe)}')"></div>`;
+                }
+
+                const mapNameStr = map.name ? map.name : 'TBD';
                 card.innerHTML = `
-                    <div class="map-image" style="background-image: url('${getMapUrl(map.name)}')">
-                        <div class="map-overlay"></div>
-                        <div class="map-name-label">${map.name}</div>
+                    <div class="map-image" style="background-image: url('${getMapUrl(map.name)}')"></div>
+                    <div class="map-overlay"></div>
+                    
+                    <div class="civs-left">
+                        ${t1FlagsHTML}
                     </div>
-                    <div class="map-picks">
-                        <div class="team-picks">
-                            <div class="picks-row">
-                                <div class="pick-flag ${map.t1Snipe === map.t1Civs[0] ? 'sniped' : ''}" style="background-image: url('${getCivFlagUrl(map.t1Civs[0])}')"></div>
-                                <div class="pick-flag ${map.t1Snipe === map.t1Civs[1] ? 'sniped' : ''}" style="background-image: url('${getCivFlagUrl(map.t1Civs[1])}')"></div>
-                            </div>
-                        </div>
-                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <div class="vs-box" style="font-size: 16px; opacity: 0.3;">VS</div>
-                            <div class="winner-tag ${winnerClass}">${winnerText}</div>
-                        </div>
-                        <div class="team-picks">
-                            <div class="picks-row">
-                                <div class="pick-flag ${map.t2Snipe === map.t2Civs[0] ? 'sniped' : ''}" style="background-image: url('${getCivFlagUrl(map.t2Civs[0])}')"></div>
-                                <div class="pick-flag ${map.t2Snipe === map.t2Civs[1] ? 'sniped' : ''}" style="background-image: url('${getCivFlagUrl(map.t2Civs[1])}')"></div>
-                            </div>
-                        </div>
+                    <div class="civs-right">
+                        ${t2FlagsHTML}
                     </div>
+                    
+                    <div class="map-name-label">${mapNameStr}</div>
+                    <div class="winner-icon ${isT1Winner ? 'win-t1' : 'win-t2'}" style="display: ${map.winner ? 'block' : 'none'};">🏆</div>
                 `;
                 mapsContainer.appendChild(card);
             });
+
             updateTimer();
         }
 
