@@ -334,7 +334,8 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
         </h2>
         
         <h1 className="text-4xl md:text-4xl lg:text-3xl xl:text-4xl 2xl:text-6xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 drop-shadow-[0_4px_15px_rgba(255,255,255,0.15)] tracking-[0.1em] md:tracking-tighter leading-tight px-2 transition-all duration-300">
-          Manuale delle Civiltà
+          <span className="block md:inline">Manuale</span>
+          <span className="block md:inline md:ml-3">delle Civiltà</span>
         </h1>
 
         <div className="w-40 md:w-64 h-[1px] bg-gradient-to-r from-transparent via-sky-500/20 to-transparent mt-1 md:mt-3 mb-2 relative overflow-hidden">
