@@ -453,7 +453,7 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
           <label className="text-[12px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2 h-6">
             <TimerIcon size={16} /> Timer
           </label>
-          <div className="flex items-center justify-between p-4 bg-black/40 rounded-2xl border border-white/5">
+          <div className="flex items-center justify-between p-4 bg-black/40 rounded-2xl border border-white/5 h-20">
             <div className="flex items-center gap-3">
                <div className="flex items-center bg-black/60 rounded-xl p-1.5 border border-white/10">
                  <button onClick={() => setState({...state, timer: {...state.timer, min: Math.max(0, state.timer.min - 1)}})} className="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-lg text-gray-500"><Minus size={14}/></button>
@@ -482,7 +482,7 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
           </label>
           <div className="grid grid-cols-2 gap-4">
             {state.casters.map((c: any, idx: number) => (
-              <div key={idx} className="flex items-center gap-4 p-4 bg-black/40 rounded-2xl border border-white/5">
+              <div key={idx} className="flex items-center gap-4 p-4 bg-black/40 rounded-2xl border border-white/5 h-20">
                 <input 
                   type="text" 
                   value={c.name} 
