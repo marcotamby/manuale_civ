@@ -22,7 +22,7 @@ interface TopbarProps {
 export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: TopbarProps) {
   const { isAuthenticated, isAdmin, isSuperAdmin, isStreamer, user, logout, openLoginModal, favorites } = useAuth();
   const { civilizations } = useCivData();
-  const { activeAdmins: _activeAdmins, onlineUserCount } = usePresence();
+  const { activeAdmins: _activeAdmins, onlineUserCount, usersByPage } = usePresence();
   const [pendingCount, setPendingCount] = useState(0);
   const [pendingQaCount, setPendingQaCount] = useState(0);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -177,14 +177,88 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
          <div className="flex items-center gap-6">
             {/* Online Stats */}
             <div className="flex items-center gap-4 mr-2">
-              <div className="flex items-center gap-2">
-                <div className="h-1.5 w-1.5 rounded-full bg-slate-500 shadow-[0_0_8px_rgba(148,163,184,0.5)]"></div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{onlineUserCount} Online</span>
-              </div>
-              {Object.keys(_activeAdmins).length > 0 && (isAdmin || isStreamer) && (
+              {/* Users Online */}
+              <div className="relative group cursor-help py-3">
                 <div className="flex items-center gap-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)] animate-pulse"></div>
-                  <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest">{Object.keys(_activeAdmins).length} Admin Live</span>
+                  <div className="h-1.5 w-1.5 rounded-full bg-slate-500 shadow-[0_0_8px_rgba(148,163,184,0.5)]"></div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{onlineUserCount} Online</span>
+                </div>
+
+                {/* Tooltip */}
+                <div className="absolute top-full right-0 mt-0 w-56 bg-[#111827] border border-slate-500/30 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-300 transform translate-y-1 group-hover:translate-y-0 z-[200] overflow-hidden">
+                  <div className="p-3 border-b border-white/10 bg-slate-500/5">
+                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Community Online</h4>
+                  </div>
+                  <div className="p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-gray-500 uppercase">Totale</span>
+                      <span className="text-xs font-black text-white">{onlineUserCount}</span>
+                    </div>
+                    {Object.entries(usersByPage).map(([page, count]) => {
+                      if (page === 'other' || count === 0) return null;
+                      const civName = civilizations.find(c => c.id === page)?.name;
+                      return (
+                        <div key={page} className="flex items-center justify-between text-[10px]">
+                          <span className="text-gray-400 truncate pr-2 uppercase font-medium">{civName || page}</span>
+                          <span className="text-slate-400 font-bold">{count}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Admins Live */}
+              {Object.keys(_activeAdmins).length > 0 && (isAdmin || isStreamer) && (
+                <div className="relative group cursor-help py-3">
+                  <div className="flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)] animate-pulse"></div>
+                    <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest">{Object.keys(_activeAdmins).length} Admin Live</span>
+                  </div>
+
+                  {/* Tooltip */}
+                  <div className="absolute top-full right-0 mt-0 w-64 bg-[#111827] border border-yellow-500/30 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-300 transform translate-y-1 group-hover:translate-y-0 z-[200] overflow-hidden">
+                    <div className="p-3 border-b border-white/10 bg-yellow-500/5">
+                      <h4 className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.2em]">Staff Online</h4>
+                    </div>
+                    <div className="p-2 space-y-1 max-h-60 overflow-y-auto custom-scrollbar">
+                      {Object.values(_activeAdmins).map((admin, idx) => {
+                        const activityCiv = admin.activity?.civId 
+                          ? civilizations.find(c => c.id === admin.activity.civId)?.name 
+                          : admin.activity?.section 
+                            ? admin.activity.section.charAt(0).toUpperCase() + admin.activity.section.slice(1)
+                            : null;
+                        
+                        return (
+                          <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
+                            <div className="w-8 h-8 rounded-full border border-yellow-500/20 overflow-hidden bg-yellow-500/5 shrink-0">
+                              {admin.user.avatar ? (
+                                <img src={admin.user.avatar || undefined} alt={admin.user.name || ''} className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <User size={14} className="text-yellow-500/50" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-white truncate uppercase tracking-tighter">
+                                {admin.user.nickname || admin.user.name}
+                              </p>
+                              <p className="text-[10px] text-gray-400 truncate flex items-center gap-1.5 font-medium italic">
+                                {admin.activity.type === 'editing' ? (
+                                  <><span className="w-1 h-1 rounded-full bg-red-500 animate-pulse"></span> Editing: {activityCiv || '...'}</>
+                                ) : admin.activity.type === 'viewing' ? (
+                                  <><span className="w-1 h-1 rounded-full bg-blue-400"></span> Viewing: {activityCiv || '...'}</>
+                                ) : (
+                                  <><span className="w-1 h-1 rounded-full bg-gray-600"></span> Online</>
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -230,7 +304,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
       </div>
 
       {/* 2. Main Header (Title Row) */}
-      <div className={`w-full ${isSpecialPage ? 'lg:bg-transparent lg:border-b-0 lg:shadow-none' : 'bg-[#0d1424]/80 backdrop-blur-md border-b border-yellow-500/20 shadow-[0_4px_20px_rgba(0,0,0,0.5)]'} flex flex-col items-center px-4 py-3 md:px-14 md:py-4 lg:py-6 z-[100] shrink-0 gap-3 md:gap-4 relative`}>
+      <div className={`w-full ${isSpecialPage ? 'lg:bg-transparent lg:border-b-0 lg:shadow-none' : 'bg-[#0d1424]/80 backdrop-blur-md border-b border-yellow-500/20 shadow-[0_4px_20px_rgba(0,0,0,0.5)]'} flex flex-col items-center px-4 py-3 md:px-14 md:py-4 lg:pt-6 lg:pb-0 z-[100] shrink-0 gap-3 md:gap-4 relative`}>
         
         {/* Dynamic Background Layer */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
