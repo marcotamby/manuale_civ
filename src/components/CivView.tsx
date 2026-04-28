@@ -1730,8 +1730,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                            </div>
                         )}
                      </div>
-                   </div>
-                ))
+                 ))
               ) : (
                 <div className="bg-[#0f1423] p-20 rounded-[40px] border border-white/5 text-center flex flex-col items-center shadow-2xl relative overflow-hidden">
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-blue-500/5 blur-[100px] pointer-events-none" />
