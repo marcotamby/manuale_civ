@@ -547,25 +547,25 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
     return answers.map((a: any) => (
       <div key={a.id} className="space-y-4">
-        <div className="bg-white/[0.02] p-5 rounded-2xl border border-white/5 group/a backdrop-blur-sm relative transition-all hover:bg-white/[0.04] shadow-sm">
+        <div className={`p-5 rounded-2xl group/a relative transition-all bg-white/[0.02] border-l-2 ${depth % 2 === 0 ? 'border-blue-500/30' : 'border-cyan-500/30'} ml-2 md:ml-12`}>
           <div className="flex items-start gap-4">
             <div className="shrink-0">
-              <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
+              <div className="w-12 h-12 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
                 {a.profile?.avatar_url ? (
                   <img src={a.profile.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
                 ) : a.user_rank && getRankIcon(a.user_rank) ? (
-                  <img src={getRankIcon(a.user_rank) || ''} alt={a.user_rank} className="w-6 h-6 object-contain" />
+                  <img src={getRankIcon(a.user_rank) || ''} alt={a.user_rank} className="w-8 h-8 object-contain" />
                 ) : (
-                  <UserCircle size={20} className="text-gray-600" />
+                  <UserCircle size={24} className="text-gray-600" />
                 )}
               </div>
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2.5 mb-2">
-                <span className="text-sm font-black text-blue-400 uppercase tracking-tight select-text">{a.user_nickname}</span>
-                <span className="text-[9px] text-gray-400 font-black px-2 py-0.5 bg-white/5 rounded-full border border-white/5 uppercase select-none tracking-widest">{a.user_rank}</span>
-                <span className="text-[9px] text-gray-600 font-bold select-none uppercase tracking-widest">{new Date(a.created_at).toLocaleDateString('it-IT')}</span>
-                {isAdmin && (
+                <span className="text-base font-black text-white uppercase tracking-tight select-text">{a.user_nickname}</span>
+                <span className="text-[9px] text-blue-400 font-black px-2 py-0.5 bg-blue-500/10 rounded-full border border-blue-500/20 uppercase select-none tracking-widest">{a.user_rank}</span>
+                <span className="text-[9px] text-gray-500 font-bold select-none uppercase tracking-widest">{new Date(a.created_at).toLocaleDateString('it-IT')}</span>
+                {(isAdmin || (user && a.user_id === user.email)) && (
                   <button 
                     onClick={() => handleDeleteQA(a.id, 'answer')}
                     className="ml-auto opacity-0 group-hover/a:opacity-100 p-1.5 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
@@ -575,7 +575,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   </button>
                 )}
               </div>
-              <p className="text-gray-300 text-sm leading-relaxed select-text font-medium">
+              <p className="text-gray-200 text-lg leading-relaxed select-text font-medium">
                 {a.replyToNickname && (
                   <span className="text-blue-500/80 font-bold mr-2 select-none italic">@{a.replyToNickname}</span>
                 )}
@@ -610,7 +610,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                     value={answerText}
                     onChange={(e) => setAnswerText(e.target.value)}
                     placeholder={`Rispondi a ${a.user_nickname}...`}
-                    className="w-full bg-black/60 border border-blue-500/20 rounded-2xl px-5 py-4 text-white placeholder:text-gray-600 focus:border-blue-500/50 outline-none transition-all text-sm min-h-[100px] resize-y shadow-inner"
+                    className="w-full bg-black/60 border border-blue-500/20 rounded-2xl px-5 py-4 text-white placeholder:text-gray-600 focus:border-blue-500/50 outline-none transition-all text-base min-h-[100px] resize-y shadow-inner"
                     autoFocus
                   />
                   <div className="flex justify-end">
@@ -1628,9 +1628,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 </div>
               ) : questions.length > 0 ? (
                 questions.map((q) => (
-                  <div key={q.id} className="space-y-4">
-                      {/* Question Card */}
-                      <div className="bg-gradient-to-r from-white/[0.03] to-white/[0.01] p-7 rounded-3xl border border-white/10 relative overflow-hidden group/q shadow-xl backdrop-blur-sm">
+                  <div key={q.id} className="bg-gradient-to-r from-white/[0.03] to-white/[0.01] p-7 rounded-3xl border border-white/10 relative overflow-hidden group/q shadow-xl backdrop-blur-sm space-y-6">
+
                          <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-600 to-cyan-500 opacity-30" />
                          
                          <div className="flex items-start gap-5 mb-5">
@@ -1650,7 +1649,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                 <span className="text-base font-black text-white uppercase tracking-tight select-text">{q.user_nickname}</span>
                                 <span className="text-[10px] text-blue-400 font-black px-2.5 py-0.5 bg-blue-500/10 rounded-full border border-blue-500/20 uppercase select-none tracking-widest">{q.user_rank}</span>
                                 <span className="text-[10px] text-gray-500 font-bold select-none uppercase tracking-widest">{new Date(q.created_at).toLocaleDateString('it-IT')}</span>
-                                {canManageCivs && (
+                                {(isAdmin || (user && q.user_id === user.email)) && (
                                   <button 
                                     onClick={() => handleDeleteQA(q.id, 'question')}
                                     className="ml-auto opacity-0 group-hover/q:opacity-100 p-2 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
@@ -1663,6 +1662,12 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                               <p className="text-gray-200 text-lg leading-relaxed select-text font-medium">{q.question_text}</p>
                            </div>
                          </div>
+
+                         {q.answers && q.answers.length > 0 && (
+                            <div className="pt-4 border-t border-white/5 space-y-4">
+                               {renderAnswers(q.answers, q.id)}
+                            </div>
+                         )}
                                   <div className="flex justify-end pt-2 border-t border-white/5">
                            <button 
                               onClick={() => {
@@ -1725,12 +1730,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                            </div>
                         )}
                      </div>
-
-                     {/* Answers List (Recursive Threading - Now flattened on the same plane) */}
-                     <div className="ml-4 md:ml-20 space-y-4">
-                        {renderAnswers(q.answers, q.id)}
-                     </div>
-                  </div>
+                   </div>
                 ))
               ) : (
                 <div className="bg-[#0f1423] p-20 rounded-[40px] border border-white/5 text-center flex flex-col items-center shadow-2xl relative overflow-hidden">
