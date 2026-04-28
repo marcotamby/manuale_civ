@@ -1614,15 +1614,19 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                     <span className="text-[8px] px-2 py-0.5 bg-blue-500 text-white font-black rounded-full uppercase tracking-widest">Staff</span>
                                   )}
                                 </div>
-                                <p 
-                                  className="text-[10px] uppercase font-black tracking-widest flex items-center gap-1.5"
-                                  style={{ color: getRankColor(user.rank).text }}
+                                <span 
+                                  className="flex items-center gap-1.5 text-[10px] font-black px-2.5 py-0.5 rounded-full border uppercase select-none tracking-widest"
+                                  style={{ 
+                                    color: getRankColor(user.rank).text, 
+                                    backgroundColor: getRankColor(user.rank).bg,
+                                    borderColor: getRankColor(user.rank).border
+                                  }}
                                 >
                                   {getRankIcon(user.rank) && (
                                     <img src={getRankIcon(user.rank)!} alt="" className="w-4 h-4 object-contain" />
                                   )}
                                   {user.rank || 'Unranked'}
-                                </p>
+                                </span>
                               </div>
                             </div>
                             <button 
