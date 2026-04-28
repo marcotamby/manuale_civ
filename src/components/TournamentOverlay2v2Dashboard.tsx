@@ -14,9 +14,9 @@ const DEFAULT_STATE = {
   t1: { name: '', players: ['', ''], score: 0, draftCivs: [], bans: [] },
   t2: { name: '', players: ['', ''], score: 0, draftCivs: [], bans: [] },
   maps: [
-    { name: 'Dry Arabia', t1Civs: ['', ''], t2Civs: ['', ''], winner: 0, isNext: true, t1Snipe: '', t2Snipe: '' },
-    { name: 'Lipany', t1Civs: ['', ''], t2Civs: ['', ''], winner: 0, isNext: false, t1Snipe: '', t2Snipe: '' },
-    { name: 'High View', t1Civs: ['', ''], t2Civs: ['', ''], winner: 0, isNext: false, t1Snipe: '', t2Snipe: '' }
+    { name: '', t1Civs: ['', ''], t2Civs: ['', ''], winner: 0, isNext: false, t1Snipe: '', t2Snipe: '' },
+    { name: '', t1Civs: ['', ''], t2Civs: ['', ''], winner: 0, isNext: false, t1Snipe: '', t2Snipe: '' },
+    { name: '', t1Civs: ['', ''], t2Civs: ['', ''], winner: 0, isNext: false, t1Snipe: '', t2Snipe: '' }
   ],
   timer: { active: false, min: 5, sec: 0, timestamp: Date.now() },
   casters: [
@@ -174,6 +174,7 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
           onChange={(e) => onChange(e.target.value)}
           className="w-full bg-[#0d111a] border border-white/10 rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-blue-500/50 appearance-none cursor-pointer font-black uppercase tracking-widest"
         >
+          <option value="">SELEZIONA MAPPA</option>
           {AOE4_MAPS.map(m => <option key={m} value={m}>{m.toUpperCase()}</option>)}
         </select>
         <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600" size={14} />
@@ -406,7 +407,13 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                       WIN T1
                     </button>
                     <button 
-                      onClick={() => { const nm = [...state.maps]; nm.forEach((m, i) => m.isNext = (i === mIdx)); setState({...state, maps: nm}); }}
+                      onClick={() => { 
+                        const nm = [...state.maps]; 
+                        const wasNext = nm[mIdx].isNext;
+                        nm.forEach((m) => m.isNext = false); 
+                        if (!wasNext) nm[mIdx].isNext = true;
+                        setState({...state, maps: nm}); 
+                      }}
                       className={`p-2 rounded-full transition-all ${map.isNext ? 'text-blue-400 bg-blue-400/10' : 'text-gray-700 hover:text-gray-500'}`}
                       title="Segna come prossimo game"
                     >
