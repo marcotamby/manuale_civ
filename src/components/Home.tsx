@@ -174,11 +174,11 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                     (e.target as HTMLImageElement).classList.remove('opacity-0');
                   }}
                 />
-                {/* Cinematic Vignette Overlay - Extremely subtle to keep flags perfectly sharp */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-30 group-hover:opacity-20 transition-opacity duration-500" />
+                {/* Cinematic Vignette Overlay - Improved for text legibility but kept very subtle */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-40 group-hover:opacity-30 transition-opacity duration-500" />
                 
-                {/* Subtle top/right fade as requested */}
-                <div className="absolute inset-0 bg-gradient-to-bl from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-30 transition-opacity duration-500" />
+                {/* Subtle top/right fade */}
+                <div className="absolute inset-0 bg-gradient-to-bl from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
               </div>
 
               {/* Selection Indicator */}
@@ -250,7 +250,9 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
 
               {/* Text at bottom */}
               <div className="absolute bottom-0 left-0 right-0 p-2 md:p-3">
-                <h3 className="text-sm md:text-base font-bold text-white mb-0.5 group-hover:text-yellow-400 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{civ.name}</h3>
+                <h3 className="text-sm md:text-base font-bold text-white mb-0.5 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:via-slate-200 group-hover:to-slate-400 transition-all duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                  {civ.name}
+                </h3>
 
                 {/* Mobile Difficulty Badge */}
                 <div className={`text-[9px] font-bold w-fit px-1.5 py-0.5 rounded-md backdrop-blur-sm border md:hidden mb-1 ${civ.difficulty === 'Facile' ? 'text-green-400 border-green-400/30 bg-green-400/10' :
@@ -259,8 +261,6 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                   }`}>
                   {civ.difficulty}
                 </div>
-
-                <p className="text-[10px] text-gray-300 line-clamp-1 opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{civ.shortDescription}</p>
               </div>
             </div>
           );
