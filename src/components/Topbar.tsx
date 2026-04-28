@@ -329,11 +329,11 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
         to="/" 
         className="flex flex-col items-center justify-center text-center w-full order-1 lg:order-2 group cursor-pointer hover:opacity-95 transition-all py-1 px-4 relative z-10"
       >
-        <h2 className="text-[13px] md:text-[14px] font-bold text-slate-400 tracking-[0.4em] md:tracking-[0.5em] uppercase mb-1 whitespace-nowrap">
+        <h2 className="text-[14px] md:text-[14px] font-bold text-slate-400 tracking-[0.4em] md:tracking-[0.5em] uppercase mb-1 whitespace-nowrap">
           Age of Empires IV
         </h2>
         
-        <h1 className="text-3xl md:text-4xl lg:text-3xl xl:text-4xl 2xl:text-6xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 drop-shadow-[0_4px_15px_rgba(255,255,255,0.15)] tracking-tight leading-tight px-2 transition-all duration-300">
+        <h1 className="text-4xl md:text-4xl lg:text-3xl xl:text-4xl 2xl:text-6xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 drop-shadow-[0_4px_15px_rgba(255,255,255,0.15)] tracking-tighter leading-tight px-2 transition-all duration-300">
           Manuale delle Civiltà
         </h1>
 
@@ -349,51 +349,42 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
       {/* Auth / Right side */}
         {/* Mobile-only Auth / Right side - Hidden on Desktop */}
         <div className="lg:hidden flex items-center justify-center order-3 min-w-0 relative z-10 py-6">
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center justify-center gap-2">
             {isAuthenticated ? (
               <>
-                {/* Profile Symbol Button */}
-                <button 
-                  onClick={() => (window as any).openProfileModal?.()} 
-                  className="w-14 h-14 bg-[#1a1c23] rounded-2xl border-2 border-yellow-500/50 flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-lg"
-                >
-                  <User size={28} className="text-yellow-500" />
-                </button>
-
-                {/* Avatar Image Button */}
-                {user?.avatar_url && (
+                {/* 1. Pannello (Admin only) */}
+                {isAdmin && (
                   <button 
-                    onClick={() => (window as any).openProfileModal?.()} 
-                    className="w-14 h-14 bg-[#1a1c23] rounded-2xl border-2 border-yellow-500/50 flex items-center justify-center overflow-hidden active:scale-95 transition-transform shrink-0 shadow-lg"
+                    onClick={onOpenAdminDashboard} 
+                    className="px-3 py-2 bg-[#0d1424] rounded-xl border border-yellow-500/30 text-yellow-500 text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg"
                   >
-                    <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                    Pannello
                   </button>
                 )}
 
-                {/* ESCI Button (Solid) */}
+                {/* 2. Profilo */}
+                <button 
+                  onClick={() => (window as any).openProfileModal?.()} 
+                  className="w-11 h-11 bg-[#0d1424] rounded-xl border border-yellow-500/30 flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-lg"
+                >
+                  <User size={22} className="text-yellow-500" />
+                </button>
+
+                {/* 3. ESCI (Rightmost) */}
                 <button 
                   onClick={() => setShowLogoutConfirm(true)}
-                  className="px-6 py-4 bg-red-600 text-white border-2 border-red-500/50 rounded-2xl text-[12px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-xl shadow-red-900/40 flex items-center gap-2"
+                  className="px-3 py-2 bg-[#0d1424] rounded-xl border border-yellow-500/30 text-yellow-500 text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg"
                 >
-                  <LogOut size={16} />
                   ESCI
                 </button>
               </>
             ) : (
-              <>
-                <button 
-                  onClick={() => openLoginModal()}
-                  className="w-14 h-14 bg-[#1a1c23] rounded-2xl border-2 border-yellow-500/50 flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-lg"
-                >
-                  <User size={28} className="text-yellow-500" />
-                </button>
-                <button 
-                  onClick={() => openLoginModal()}
-                  className="px-8 py-4 bg-yellow-600 text-black border-2 border-yellow-500 rounded-2xl text-[12px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-xl shadow-yellow-900/40"
-                >
-                  LOGIN
-                </button>
-              </>
+              <button 
+                onClick={() => openLoginModal()}
+                className="px-6 py-2.5 bg-[#0d1424] rounded-xl border border-yellow-500/30 text-yellow-500 text-[11px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg"
+              >
+                LOGIN
+              </button>
             )}
           </div>
         </div>
