@@ -106,7 +106,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
         </div>
 
         {isOpen && (
-          <div className={`absolute z-[100] ${isSm ? 'right-0' : 'left-0'} mt-2 bg-[#0d111a] border border-white/20 rounded-2xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-150 min-w-[200px]`}>
+          <div className={`absolute z-[1000] ${isSm ? 'right-0' : 'left-0'} mt-2 bg-[#0d111a] border border-white/20 rounded-2xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-150 ${isSm ? 'min-w-[150px]' : 'min-w-[200px]'}`}>
              <div 
                onClick={() => { onChange(''); setIsOpen(false); }}
                className="flex items-center gap-4 px-4 py-3 hover:bg-blue-600/10 transition-all cursor-pointer group border-b border-white/5"
@@ -255,7 +255,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
         </div>
       </div>
 
-      <div className="p-8 bg-gradient-to-b from-transparent to-black/20">
+      <div className="p-8 pb-64 bg-gradient-to-b from-transparent to-black/20">
         {activeTab === 'match' ? (
           <div className="max-w-6xl mx-auto space-y-12 animate-in fade-in slide-in-from-top-4 duration-500">
             <div className="grid grid-cols-2 gap-8">
