@@ -126,6 +126,7 @@ function RankDropdown({ value, onChange }: { value: string; onChange: (rank: str
 
 export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps) {
     const { user, favorites, updateProfile, logout, isAdmin, isSuperAdmin } = useAuth();
+    const { civilizations } = useCivData();
     const [mySuggestions, setMySuggestions] = useState<Suggestion[]>([]);
     const [qaNotifications, setQaNotifications] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
