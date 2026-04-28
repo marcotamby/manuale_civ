@@ -492,14 +492,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       if (isAutoApproved) {
         targetStatus = 'approved';
       } else {
-        const { data: existingApproved } = await supabase
-          .from('answers')
-          .select('id')
-          .eq('question_id', questionId)
-          .eq('user_id', user.email)
-          .eq('status', 'approved')
-          .limit(1);
-          
+
         const { data: existingQApproved } = await supabase
           .from('questions')
           .select('id')
