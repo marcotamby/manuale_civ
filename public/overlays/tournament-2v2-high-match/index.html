@@ -180,18 +180,22 @@
         .caster-webcam { position: absolute; inset: 0; background: #000; z-index: 1; }
         .caster-name-label {
             position: relative; z-index: 2; 
-            padding: 10px 20px; font-size: 18px; font-weight: 950; text-transform: uppercase; letter-spacing: 3px;
+            padding: 10px 20px; font-size: 18px; font-weight: 950; text-transform: uppercase; letter-spacing: 4px;
             text-align: center;
-            border-top: 2px solid rgba(0, 242, 255, 0.5);
-            background: linear-gradient(to bottom, #ffffff 20%, #00f2ff 100%);
+            
+            /* Silver White Gradient Text */
+            background: linear-gradient(to bottom, #ffffff 0%, #cbd5e1 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
         }
         .caster-name-label::before {
             content: ''; position: absolute; inset: 0;
-            background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.8), transparent);
+            /* Cyan Background Bar (Timer Accent) */
+            background: linear-gradient(to right, transparent, rgba(0, 242, 255, 0.4), transparent);
             z-index: -1;
+            border-top: 2px solid rgba(0, 242, 255, 0.8);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
         }
 
         .draft-flag.banned { 
