@@ -4,7 +4,6 @@ import { useCivData } from './CivContext';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Link, useLocation } from 'react-router-dom';
-import { RANK_ICONS } from './ProfileModal';
 import { Coffee, Radio as _Radio, HelpCircle, LogOut, Trophy, Monitor } from 'lucide-react';
 import { usePresence } from './PresenceContext';
 
@@ -23,7 +22,7 @@ interface TopbarProps {
 export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: TopbarProps) {
   const { isAuthenticated, isAdmin, isSuperAdmin, isStreamer, user, logout, openLoginModal, favorites } = useAuth();
   const { civilizations } = useCivData();
-  const { activeAdmins: _activeAdmins, onlineUserCount, usersByPage } = usePresence();
+  const { activeAdmins: _activeAdmins, onlineUserCount } = usePresence();
   const [pendingCount, setPendingCount] = useState(0);
   const [pendingQaCount, setPendingQaCount] = useState(0);
   const [notificationCount, setNotificationCount] = useState(0);
