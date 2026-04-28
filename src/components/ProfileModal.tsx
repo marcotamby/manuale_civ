@@ -126,9 +126,10 @@ function RankDropdown({ value, onChange }: { value: string; onChange: (rank: str
 
 export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps) {
     const { user, favorites, updateProfile, logout, isAdmin, isSuperAdmin } = useAuth();
-    const { civilizations } = useCivData();
     const [mySuggestions, setMySuggestions] = useState<Suggestion[]>([]);
+    const [qaNotifications, setQaNotifications] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isQaLoading, setIsQaLoading] = useState(false);
     
     // Local state for pending changes
     const [pendingNickname, setPendingNickname] = useState(user?.nickname || '');
@@ -256,8 +257,88 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     useEffect(() => {
         if (isOpen && user?.email) {
             fetchMySuggestions();
+            fetchQaNotifications();
         }
     }, [isOpen, user?.email]);
+
+    const fetchQaNotifications = async () => {
+        if (!user?.email) return;
+        
+        try {
+            setIsQaLoading(true);
+            // 1. Fetch my questions
+            const { data: myQuestions } = await supabase
+                .from('questions')
+                .select('id, question_text, civ_id, status, created_at')
+                .eq('user_id', user.email);
+            
+            if (!myQuestions) {
+                setQaNotifications([]);
+                return;
+            }
+
+            const notifications: any[] = [];
+
+            // Approved questions notifications
+            myQuestions.forEach(q => {
+                if (q.status === 'approved') {
+                    notifications.push({
+                        id: `appr_${q.id}`,
+                        type: 'approval',
+                        text: `La tua domanda "${q.question_text.length > 40 ? q.question_text.substring(0, 40) + '...' : q.question_text}" è stata approvata!`,
+                        civId: q.civ_id,
+                        createdAt: q.created_at
+                    });
+                }
+            });
+
+            // Replies notifications
+            const myQuestionIds = myQuestions.map(q => q.id);
+            if (myQuestionIds.length > 0) {
+                const { data: replies } = await supabase
+                    .from('answers')
+                    .select('id, question_id, user_nickname, answer_text, created_at, status')
+                    .in('question_id', myQuestionIds)
+                    .neq('user_id', user.email)
+                    .eq('status', 'approved');
+                
+                if (replies) {
+                    replies.forEach(r => {
+                        const parentQ = myQuestions.find(q => q.id === r.question_id);
+                        notifications.push({
+                            id: `repl_${r.id}`,
+                            type: 'reply',
+                            text: `${r.user_nickname} ha risposto alla tua domanda su ${parentQ?.civ_id || 'una civiltà'}: "${r.answer_text.length > 40 ? r.answer_text.substring(0, 40) + '...' : r.answer_text}"`,
+                            civId: parentQ?.civ_id || '',
+                            createdAt: r.created_at
+                        });
+                    });
+                }
+            }
+
+            // Sort by date desc
+            notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            setQaNotifications(notifications);
+        } catch (err) {
+            console.error('Error fetching QA notifications:', err);
+        } finally {
+            setIsQaLoading(false);
+        }
+    };
+
+    const markQaAsRead = () => {
+        if (!user?.email) return;
+        const allIds = qaNotifications.map(n => n.id);
+        localStorage.setItem(`seenQaNotifs_${user.email}`, JSON.stringify(allIds));
+        // Force re-render of notification count
+        (window as any).refreshNotificationCount?.();
+        // Just trigger a re-render locally too
+        setLastSeenData(prev => ({...prev})); 
+    };
+
+    const seenQaIds = user?.email ? JSON.parse(localStorage.getItem(`seenQaNotifs_${user.email}`) || '[]') : [];
+    const unreadQaNotifs = qaNotifications.filter(n => !seenQaIds.includes(n.id));
+    const hasUnreadQa = unreadQaNotifs.length > 0;
 
     const fetchMySuggestions = async () => {
         try {
@@ -353,6 +434,73 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 custom-scrollbar">
+
+                    {/* Le Tue Notifiche (Q&A) */}
+                    <section>
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2 text-blue-400 tracking-widest uppercase text-xs font-bold">
+                                <MessageSquare size={14} />
+                                <span>Notifiche Community</span>
+                            </div>
+                            {qaNotifications.length > 0 && (
+                                <button
+                                    onClick={markQaAsRead}
+                                    disabled={!hasUnreadQa}
+                                    className={`flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-tight transition-all py-1 px-2 rounded-md ${
+                                        hasUnreadQa 
+                                            ? 'text-blue-400 hover:text-white hover:bg-blue-500/20 underline underline-offset-4 decoration-blue-500/50' 
+                                            : 'text-gray-600 cursor-default opacity-50'
+                                    }`}
+                                >
+                                    {hasUnreadQa && <div className="w-1 h-1 rounded-full bg-blue-400 animate-pulse" />}
+                                    Segna come lette
+                                </button>
+                            )}
+                        </div>
+
+                        {isQaLoading ? (
+                            <div className="flex items-center justify-center py-6 bg-white/[0.02] rounded-xl border border-white/5">
+                                <Loader2 size={20} className="animate-spin text-blue-500/50" />
+                            </div>
+                        ) : qaNotifications.length > 0 ? (
+                            <div className="space-y-2">
+                                {qaNotifications.slice(0, 10).map((notif) => {
+                                    const isUnread = !seenQaIds.includes(notif.id);
+                                    return (
+                                        <div 
+                                            key={notif.id}
+                                            onClick={() => {
+                                                if (notif.civId) {
+                                                    onSelectCiv(notif.civId);
+                                                    onClose();
+                                                }
+                                            }}
+                                            className={`group p-3 rounded-xl border transition-all cursor-pointer flex items-start gap-3 ${
+                                                isUnread 
+                                                    ? 'bg-blue-500/10 border-blue-500/30 hover:bg-blue-500/15 hover:border-blue-500/40' 
+                                                    : 'bg-white/[0.03] border-white/5 hover:bg-white/[0.05] hover:border-white/10'
+                                            }`}
+                                        >
+                                            <div className={`mt-1 h-1.5 w-1.5 rounded-full shrink-0 ${isUnread ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]' : 'bg-gray-700'}`}></div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className={`text-sm ${isUnread ? 'text-white font-bold' : 'text-gray-400'}`}>
+                                                    {notif.text}
+                                                </p>
+                                                <p className="text-[10px] text-gray-500 mt-1 uppercase font-bold tracking-tighter">
+                                                    {new Date(notif.createdAt).toLocaleDateString('it-IT')} • {notif.civId.toUpperCase()}
+                                                </p>
+                                            </div>
+                                            <ExternalLink size={12} className="text-gray-600 group-hover:text-blue-400 transition-colors mt-1" />
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div className="text-center py-6 bg-white/[0.02] rounded-xl border border-white/5">
+                                <p className="text-sm text-gray-500">Nessuna nuova notifica dalla community.</p>
+                            </div>
+                        )}
+                    </section>
 
                     {/* Informazioni In-Gioco */}
                     <section>

@@ -26,6 +26,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
   const [pendingCount, setPendingCount] = useState(0);
   const [pendingQaCount, setPendingQaCount] = useState(0);
   const [notificationCount, setNotificationCount] = useState(0);
+  const [qaUnreadCount, setQaUnreadCount] = useState(0);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const fetchPendingCount = async () => {
@@ -87,6 +88,48 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
 
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+  const fetchQaUnreadCount = async () => {
+    if (!isAuthenticated || !user?.email) {
+      setQaUnreadCount(0);
+      return;
+    }
+
+    try {
+      const { data: myQs } = await supabase
+        .from('questions')
+        .select('id, status')
+        .eq('user_id', user.email);
+      
+      if (!myQs) return;
+
+      const seenIds = JSON.parse(localStorage.getItem(`seenQaNotifs_${user.email}`) || '[]');
+      let unread = 0;
+
+      myQs.forEach(q => {
+        if (q.status === 'approved' && !seenIds.includes(`appr_${q.id}`)) unread++;
+      });
+
+      const myQIds = myQs.map(q => q.id);
+      if (myQIds.length > 0) {
+        const { data: replies } = await supabase
+          .from('answers')
+          .select('id, question_id')
+          .in('question_id', myQIds)
+          .neq('user_id', user.email)
+          .eq('status', 'approved');
+        
+        if (replies) {
+          replies.forEach(r => {
+            if (!seenIds.includes(`repl_${r.id}`)) unread++;
+          });
+        }
+      }
+      setQaUnreadCount(unread);
+    } catch (e) {
+      console.error('Error fetching Q&A notifications:', e);
+    }
+  };
+
   const calculateNotifications = () => {
     if (!isAuthenticated || !user?.email || favorites.length === 0) {
       setNotificationCount(0);
@@ -113,22 +156,27 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
         if (currentVideo > storedVideo) totalUnread += (currentVideo - storedVideo);
       }
     });
-
-    setNotificationCount(totalUnread);
+    
+    setNotificationCount(totalUnread + qaUnreadCount);
   };
+
+  useEffect(() => {
+    fetchQaUnreadCount();
+  }, [isAuthenticated, user?.email, civilizations, refreshTrigger]);
 
   useEffect(() => {
     calculateNotifications();
 
     (window as any).refreshNotificationCount = () => {
       fetchPendingCount();
+      fetchQaUnreadCount();
       setRefreshTrigger(prev => prev + 1);
     };
 
     return () => {
       (window as any).refreshNotificationCount = undefined;
     };
-  }, [favorites, civilizations, isAuthenticated, user?.email, refreshTrigger]);
+  }, [favorites, civilizations, isAuthenticated, user?.email, refreshTrigger, qaUnreadCount]);
 
   const location = useLocation();
   const isSpecialPage = isHome || location.pathname.includes('/tornei') || location.pathname === '/faq' || location.pathname === '/privacy' || location.pathname.startsWith('/civ/') || location.pathname.startsWith('/compare');
