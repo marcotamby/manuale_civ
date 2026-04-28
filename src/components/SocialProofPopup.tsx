@@ -97,7 +97,7 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
             onClick={handleFollow}
             className="relative flex items-center justify-center px-3 sm:px-5 py-1.5 sm:py-2.5 bg-blue-700/20 hover:bg-blue-700/40 border border-blue-500/30 rounded-lg sm:rounded-xl text-[9px] sm:text-xs font-black text-blue-200 transition-all active:scale-95 shrink-0 sm:w-full"
           >
-            <Bell size={10} className="mr-1.5 sm:absolute sm:left-3 sm:mr-0" />
+            <Bell size={14} className="mr-1.5 sm:absolute sm:left-4 sm:mr-0" />
             <span className="sm:w-full text-center">SEGUI!</span>
           </button>
         </div>
