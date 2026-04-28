@@ -454,16 +454,24 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
             <TimerIcon size={16} /> Timer
           </label>
           <div className="flex items-center justify-between p-4 bg-black/40 rounded-2xl border border-white/5">
-            <div className="flex items-center gap-4">
-               <input type="number" value={state.timer.min} onChange={(e) => setState({...state, timer: {...state.timer, min: parseInt(e.target.value)||0}})} className="w-12 bg-transparent text-center font-black text-white text-xl outline-none" />
-               <span className="text-gray-700">:</span>
-               <input type="number" value={state.timer.sec} onChange={(e) => setState({...state, timer: {...state.timer, sec: parseInt(e.target.value)||0}})} className="w-12 bg-transparent text-center font-black text-white text-xl outline-none" />
+            <div className="flex items-center gap-3">
+               <div className="flex items-center bg-black/60 rounded-xl p-1.5 border border-white/10">
+                 <button onClick={() => setState({...state, timer: {...state.timer, min: Math.max(0, state.timer.min - 1)}})} className="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-lg text-gray-500"><Minus size={14}/></button>
+                 <input type="number" value={state.timer.min} onChange={(e) => setState({...state, timer: {...state.timer, min: parseInt(e.target.value)||0}})} className="w-10 bg-transparent text-center font-black text-white text-base outline-none" />
+                 <button onClick={() => setState({...state, timer: {...state.timer, min: state.timer.min + 1}})} className="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-lg text-gray-500"><Plus size={14}/></button>
+               </div>
+               <span className="text-gray-700 font-black text-lg">:</span>
+               <div className="flex items-center bg-black/60 rounded-xl p-1.5 border border-white/10">
+                 <button onClick={() => setState({...state, timer: {...state.timer, sec: Math.max(0, state.timer.sec - 1)}})} className="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-lg text-gray-500"><Minus size={14}/></button>
+                 <input type="number" value={state.timer.sec} onChange={(e) => setState({...state, timer: {...state.timer, sec: parseInt(e.target.value)||0}})} className="w-10 bg-transparent text-center font-black text-white text-base outline-none" />
+                 <button onClick={() => setState({...state, timer: {...state.timer, sec: state.timer.sec + 1}})} className="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-lg text-gray-500"><Plus size={14}/></button>
+               </div>
             </div>
             <button 
               onClick={() => setState({...state, timer: {...state.timer, active: !state.timer.active, timestamp: Date.now()}})}
-              className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${state.timer.active ? 'bg-red-600 shadow-red-900/20' : 'bg-green-600 shadow-green-900/20'} shadow-lg`}
+              className={`w-12 h-6 rounded-full relative transition-all ${state.timer.active ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]' : 'bg-white/10'}`}
             >
-              {state.timer.active ? 'STOP' : 'START'}
+              <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${state.timer.active ? 'left-7' : 'left-1'}`} />
             </button>
           </div>
         </div>
@@ -472,19 +480,19 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
           <label className="text-[12px] font-black text-blue-400 uppercase tracking-widest">Casters</label>
           <div className="grid grid-cols-2 gap-4">
             {state.casters.map((c: any, idx: number) => (
-              <div key={idx} className="flex items-center gap-3 p-3 bg-black/40 rounded-xl border border-white/5">
+              <div key={idx} className="flex items-center gap-4 p-4 bg-black/40 rounded-2xl border border-white/5">
                 <input 
                   type="text" 
                   value={c.name} 
                   onChange={(e) => { const nc = [...state.casters]; nc[idx].name = e.target.value; setState({...state, casters: nc}); }} 
                   placeholder={`Caster ${idx+1}`} 
-                  className="flex-1 min-w-0 bg-transparent text-xs font-bold text-white outline-none" 
+                  className="flex-1 min-w-0 bg-transparent text-sm font-black text-white uppercase tracking-widest outline-none placeholder:text-gray-700" 
                 />
                 <button 
                   onClick={() => { const nc = [...state.casters]; nc[idx].active = !nc[idx].active; setState({...state, casters: nc}); }}
-                  className={`w-10 h-5 rounded-full relative transition-all ${c.active ? 'bg-blue-600' : 'bg-white/10'}`}
+                  className={`w-12 h-6 rounded-full relative transition-all ${c.active ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]' : 'bg-white/10'}`}
                 >
-                  <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${c.active ? 'left-5.5' : 'left-0.5'}`} />
+                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${c.active ? 'left-7' : 'left-1'}`} />
                 </button>
               </div>
             ))}
@@ -751,12 +759,28 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
           )}
         </div>
 
-        <div className="flex items-center gap-4 bg-yellow-500/10 border border-yellow-500/30 px-6 py-2.5 rounded-2xl shadow-lg shadow-yellow-500/5">
-           {mode === 'high' ? <ShieldAlert className="text-yellow-500" size={18} /> : <Target className="text-yellow-500" size={18} />}
-           <div className="flex flex-col">
-             <span className="text-[10px] font-black text-white uppercase tracking-widest">{mode === 'high' ? 'High Elo' : 'Low Elo'}</span>
-             <span className="text-[8px] font-bold text-yellow-500/60 uppercase tracking-tighter">Draft con {mode === 'high' ? 'Ban + Sniper' : 'Solo Pick'}</span>
-           </div>
+        <div className="flex items-center gap-4">
+          <div className="flex bg-black/40 rounded-xl p-1 border border-white/10">
+            <button onClick={() => {
+              if (!window.confirm("Passare a BO3 cambierà il numero di mappe. Continuare?")) return;
+              const newMaps = [...state.maps];
+              newMaps.length = 3;
+              setState({...state, maps: newMaps});
+            }} className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${state.maps?.length === 3 ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}>BO3</button>
+            <button onClick={() => {
+              if (!window.confirm("Passare a BO5 cambierà il numero di mappe. Continuare?")) return;
+              const newMaps = [...state.maps];
+              while (newMaps.length < 5) newMaps.push({ name: '', t1Civs: ['', ''], t2Civs: ['', ''], winner: 0, isNext: false, t1Snipe: '', t2Snipe: '' });
+              setState({...state, maps: newMaps});
+            }} className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${state.maps?.length === 5 ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}>BO5</button>
+          </div>
+          <div className="flex items-center gap-4 bg-yellow-500/10 border border-yellow-500/30 px-6 py-2.5 rounded-2xl shadow-lg shadow-yellow-500/5">
+             {mode === 'high' ? <ShieldAlert className="text-yellow-500" size={18} /> : <Target className="text-yellow-500" size={18} />}
+             <div className="flex flex-col">
+               <span className="text-[10px] font-black text-white uppercase tracking-widest">{mode === 'high' ? 'High Elo' : 'Low Elo'}</span>
+               <span className="text-[8px] font-bold text-yellow-500/60 uppercase tracking-tighter">Draft con {mode === 'high' ? 'Ban + Sniper' : 'Solo Pick'}</span>
+             </div>
+          </div>
         </div>
       </div>
 
