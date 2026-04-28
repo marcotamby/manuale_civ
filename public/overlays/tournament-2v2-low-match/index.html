@@ -171,13 +171,14 @@
             pointer-events: none; z-index: 50;
         }
         .caster-box {
-            width: 340px; height: 220px; background: rgba(0,0,0,0.6);
+            width: 340px; height: 220px; background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(0, 242, 255, 0.4); border-radius: 12px;
             position: relative; overflow: hidden;
             display: flex; flex-direction: column; justify-content: flex-end;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 10px rgba(0, 242, 255, 0.1);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
         }
-        .caster-webcam { position: absolute; inset: 0; background: #000; z-index: 1; }
+        .caster-webcam { position: absolute; inset: 0; background: transparent; z-index: 1; }
         .caster-name-label {
             position: relative; z-index: 2; 
             padding: 10px 20px; font-size: 18px; font-weight: 950; text-transform: uppercase; letter-spacing: 4px;
