@@ -334,14 +334,14 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       const threadedQuestions = (qData || []).filter(q => {
         if (isStaff) return true;
         if (q.status === 'approved') return true;
-        if (userEmail && q.user_id?.toLowerCase() === userEmail) return true;
+        if (userEmail && q.user_id && q.user_id.toLowerCase() === userEmail) return true;
         return false;
       }).map(q => {
         const qProfile = profiles.find(p => p.email?.toLowerCase() === q.user_id?.toLowerCase());
         
         // Filter and sort answers for this question
         const qAnswers = aData.filter(a => a.question_id === q.id)
-          .filter(a => isStaff || a.status === 'approved' || (userEmail && a.user_id?.toLowerCase() === userEmail))
+          .filter(a => isStaff || a.status === 'approved' || (userEmail && a.user_id && a.user_id.toLowerCase() === userEmail))
           .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
 
         // Recursive thread builder
@@ -508,7 +508,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           .eq('status', 'approved')
           .limit(1);
  
-        if ((existingApproved && existingApproved.length > 0) || (existingQApproved && existingQApproved.length > 0)) {
+        if (existingQApproved && existingQApproved.length > 0) {
           targetStatus = 'approved';
         }
       }
@@ -577,6 +577,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             <div className="flex-1">
               <div className="flex items-center gap-2.5 mb-2">
                 <span className="text-base font-black text-white uppercase tracking-tight select-text">{a.user_nickname}</span>
+                {a.status === 'pending' && (
+                  <span className="text-[8px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-black rounded-full uppercase tracking-widest animate-pulse">In Approvazione</span>
+                )}
                 <span 
                   className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[10px] font-black uppercase select-none tracking-widest"
                   style={{ 
@@ -1722,6 +1725,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                <div className="flex-1">
                                    <div className="flex items-center gap-3 mb-2">
                                     <span className="text-base font-black text-white uppercase tracking-tight select-text">{q.user_nickname}</span>
+                                     {q.status === 'pending' && (
+                                       <span className="text-[9px] px-2 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-black rounded-full uppercase tracking-widest animate-pulse">In Approvazione</span>
+                                     )}
                                     <span 
                                       className="flex items-center gap-1.5 text-[10px] font-black px-2.5 py-0.5 rounded-full border uppercase select-none tracking-widest"
                                       style={{ 
