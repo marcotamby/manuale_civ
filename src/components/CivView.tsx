@@ -1536,6 +1536,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   <X size={16} />
                 </button>
               </div>
+            )}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Main Column */}
               <div className={`${(!user && questions.length > 0) ? 'lg:col-span-8' : 'lg:col-span-12'} space-y-8`}>
