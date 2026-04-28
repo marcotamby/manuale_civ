@@ -1584,8 +1584,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                <UserCircle size={20} className="text-blue-400" />
                              )}
                           </div>
-                          <div className="flex-1 bg-black/40 border border-blue-500/10 rounded-xl px-4 py-2.5 text-gray-500 text-sm font-medium">
-                             Fai una domanda relativa a questa civiltà...
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <span className="text-xs font-black text-white uppercase tracking-tight truncate hidden sm:block">{user.nickname || user.name || 'Il Tuo Profilo'}</span>
+                            <div className="flex-1 bg-black/40 border border-blue-500/10 rounded-xl px-4 py-2.5 text-gray-500 text-sm font-medium truncate">
+                               Fai una domanda relativa a questa civiltà...
+                            </div>
                           </div>
                           <button className="p-2 bg-blue-600/20 text-blue-400 rounded-lg">
                             <Plus size={18} />
@@ -1604,22 +1607,22 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                     <UserCircle size={24} className="text-blue-400" />
                                   )}
                               </div>
-                              <div>
+                              <div className="flex items-center gap-4 flex-wrap">
                                 <div className="flex items-center gap-2">
                                   <p className="text-sm font-black text-white uppercase tracking-tight">{user.nickname || user.name || 'Il Tuo Profilo'}</p>
                                   {(isAdmin || canManageCivs || canManageBuildorders) && (
                                     <span className="text-[8px] px-2 py-0.5 bg-blue-500 text-white font-black rounded-full uppercase tracking-widest">Staff</span>
                                   )}
                                 </div>
-                                  <p 
-                                    className="text-[10px] uppercase font-black tracking-widest flex items-center gap-1.5"
-                                    style={{ color: getRankColor(user.rank).text }}
-                                  >
-                                    {getRankIcon(user.rank) && (
-                                      <img src={getRankIcon(user.rank)!} alt="" className="w-4 h-4 object-contain" />
-                                    )}
-                                    {user.rank || 'Unranked'}
-                                  </p>
+                                <p 
+                                  className="text-[10px] uppercase font-black tracking-widest flex items-center gap-1.5"
+                                  style={{ color: getRankColor(user.rank).text }}
+                                >
+                                  {getRankIcon(user.rank) && (
+                                    <img src={getRankIcon(user.rank)!} alt="" className="w-4 h-4 object-contain" />
+                                  )}
+                                  {user.rank || 'Unranked'}
+                                </p>
                               </div>
                             </div>
                             <button 

@@ -102,7 +102,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
       
       if (!myQs) return;
 
-      const seenIds = JSON.parse(localStorage.getItem(`seenQaNotifs_${user.email}`) || '[]');
+      const seenIds = JSON.parse(localStorage.getItem(`seenQaNotifs_${user.email.toLowerCase()}`) || '[]');
       let unread = 0;
 
       myQs.forEach(q => {
@@ -136,7 +136,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
       return;
     }
 
-    const lastSeenKey = `lastSeenCounts_${user.email}`;
+    const lastSeenKey = `lastSeenCounts_${user.email.toLowerCase()}`;
     const rawData = localStorage.getItem(lastSeenKey);
     const lastSeenData = rawData ? JSON.parse(rawData) : {};
     

@@ -127,10 +127,10 @@ function RankDropdown({ value, onChange }: { value: string; onChange: (rank: str
 export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps) {
     const { user, favorites, updateProfile, logout, isAdmin, isSuperAdmin } = useAuth();
     const { civilizations } = useCivData();
-    const [mySuggestions, setMySuggestions] = useState<Suggestion[]>([]);
     const [qaNotifications, setQaNotifications] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isQaLoading, setIsQaLoading] = useState(false);
+    const [qaUpdateTrigger, setQaUpdateTrigger] = useState(0);
     
     // Local state for pending changes
     const [pendingNickname, setPendingNickname] = useState(user?.nickname || '');
@@ -330,14 +330,14 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     const markQaAsRead = () => {
         if (!user?.email) return;
         const allIds = qaNotifications.map(n => n.id);
-        localStorage.setItem(`seenQaNotifs_${user.email}`, JSON.stringify(allIds));
-        // Force re-render of notification count
+        localStorage.setItem(`seenQaNotifs_${user.email.toLowerCase()}`, JSON.stringify(allIds));
+        // Force re-render of notification count in Topbar
         (window as any).refreshNotificationCount?.();
-        // Just trigger a re-render locally too
-        setLastSeenData(prev => ({...prev})); 
+        // Trigger local re-render
+        setQaUpdateTrigger(prev => prev + 1);
     };
 
-    const seenQaIds = user?.email ? JSON.parse(localStorage.getItem(`seenQaNotifs_${user.email}`) || '[]') : [];
+    const seenQaIds = user?.email ? JSON.parse(localStorage.getItem(`seenQaNotifs_${user.email.toLowerCase()}`) || '[]') : [];
     const unreadQaNotifs = qaNotifications.filter(n => !seenQaIds.includes(n.id));
     const hasUnreadQa = unreadQaNotifs.length > 0;
 
@@ -447,13 +447,13 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                 <button
                                     onClick={markQaAsRead}
                                     disabled={!hasUnreadQa}
-                                    className={`flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-tight transition-all py-1 px-2 rounded-md ${
+                                    className={`flex items-center gap-1.5 text-[10px] uppercase font-black tracking-widest transition-all py-1.5 px-3 rounded-lg border shadow-sm ${
                                         hasUnreadQa 
-                                            ? 'text-blue-400 hover:text-white hover:bg-blue-500/20 underline underline-offset-4 decoration-blue-500/50' 
-                                            : 'text-gray-600 cursor-default opacity-50'
+                                            ? 'text-blue-400 border-blue-500/30 hover:text-white hover:bg-blue-500/20 hover:border-blue-500/50 bg-blue-500/5 cursor-pointer active:scale-95' 
+                                            : 'text-gray-600 border-white/5 cursor-default opacity-30 bg-white/[0.01]'
                                     }`}
                                 >
-                                    {hasUnreadQa && <div className="w-1 h-1 rounded-full bg-blue-400 animate-pulse" />}
+                                    {hasUnreadQa && <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse mr-0.5" />}
                                     Segna come lette
                                 </button>
                             )}
@@ -463,10 +463,10 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                             <div className="flex items-center justify-center py-6 bg-white/[0.02] rounded-xl border border-white/5">
                                 <Loader2 size={20} className="animate-spin text-blue-500/50" />
                             </div>
-                        ) : qaNotifications.length > 0 ? (
+                        ) : unreadQaNotifs.length > 0 ? (
                             <div className="space-y-2">
-                                {qaNotifications.slice(0, 10).map((notif) => {
-                                    const isUnread = !seenQaIds.includes(notif.id);
+                                {unreadQaNotifs.slice(0, 10).map((notif) => {
+                                    const isUnread = true; // They are all unread now due to filtering
                                     return (
                                         <div 
                                             key={notif.id}
@@ -476,15 +476,11 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                                     onClose();
                                                 }
                                             }}
-                                            className={`group p-3 rounded-xl border transition-all cursor-pointer flex items-start gap-3 ${
-                                                isUnread 
-                                                    ? 'bg-blue-500/10 border-blue-500/30 hover:bg-blue-500/15 hover:border-blue-500/40' 
-                                                    : 'bg-white/[0.03] border-white/5 hover:bg-white/[0.05] hover:border-white/10'
-                                            }`}
+                                            className="group p-3 rounded-xl border transition-all cursor-pointer flex items-start gap-3 bg-blue-500/10 border-blue-500/30 hover:bg-blue-500/15 hover:border-blue-500/40"
                                         >
-                                            <div className={`mt-1 h-1.5 w-1.5 rounded-full shrink-0 ${isUnread ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]' : 'bg-gray-700'}`}></div>
+                                            <div className="mt-1 h-1.5 w-1.5 rounded-full shrink-0 bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></div>
                                             <div className="flex-1 min-w-0">
-                                                <p className={`text-sm ${isUnread ? 'text-white font-bold' : 'text-gray-400'}`}>
+                                                <p className="text-sm text-white font-bold">
                                                     {notif.text}
                                                 </p>
                                                 <p className="text-[10px] text-gray-500 mt-1 uppercase font-bold tracking-tighter">
