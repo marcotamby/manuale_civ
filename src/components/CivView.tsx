@@ -1616,7 +1616,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                     style={{ color: getRankColor(user.rank).text }}
                                   >
                                     {getRankIcon(user.rank) && (
-                                      <img src={getRankIcon(user.rank)!} alt="" className="w-5 h-5 object-contain" />
+                                      <img src={getRankIcon(user.rank)!} alt="" className="w-4 h-4 object-contain" />
                                     )}
                                     {user.rank || 'Unranked'}
                                   </p>
@@ -1716,7 +1716,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                    <div className="flex items-center gap-3 mb-2">
                                     <span className="text-base font-black text-white uppercase tracking-tight select-text">{q.user_nickname}</span>
                                     <span 
-                                      className="flex items-center gap-2 text-[11px] font-black px-3 py-1 rounded-full border uppercase select-none tracking-widest"
+                                      className="flex items-center gap-1.5 text-[10px] font-black px-2.5 py-0.5 rounded-full border uppercase select-none tracking-widest"
                                       style={{ 
                                         color: getRankColor(q.user_rank).text, 
                                         backgroundColor: getRankColor(q.user_rank).bg,
@@ -1724,7 +1724,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                       }}
                                     >
                                       {getRankIcon(q.user_rank) && (
-                                        <img src={getRankIcon(q.user_rank)!} alt="" className="w-5 h-5 object-contain" />
+                                        <img src={getRankIcon(q.user_rank)!} alt="" className="w-4 h-4 object-contain" />
                                       )}
                                       {q.user_rank}
                                     </span>
