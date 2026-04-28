@@ -135,14 +135,14 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
 
       <div className="p-4 md:p-8 space-y-8 max-w-7xl mx-auto w-full">
         {/* Row 1: Flags & Names */}
-        <div className="grid grid-cols-2 gap-3 md:gap-8 relative z-10">
+        <div className="grid grid-cols-2 gap-2 md:gap-8 relative z-10">
           {[civ1, civ2].map(civ => (
-            <div key={civ!.id} className="relative glass rounded-3xl flex flex-col items-center justify-end text-center p-8 border border-white/5 hover:border-yellow-500/20 transition-all min-h-[220px] md:min-h-[300px] overflow-hidden group">
+            <div key={civ!.id} className="relative glass rounded-2xl md:rounded-3xl flex flex-col items-center justify-end text-center p-3 sm:p-4 md:p-8 border border-white/5 hover:border-yellow-500/20 transition-all min-h-[180px] sm:min-h-[220px] md:min-h-[300px] overflow-hidden group">
               {/* Massive High Quality Background Flag */}
               <div className="absolute inset-0 pointer-events-none">
                 <div 
                   className="absolute inset-0 bg-cover bg-center opacity-90 scale-110 group-hover:scale-105 transition-transform duration-1000"
-                  style={{ backgroundImage: `url(${civ!.flag.replace('.webp', '.png')})` }}
+                  style={{ backgroundImage: `url('${civ!.flag.replace('.webp', '.png')}')` }}
                 />
                 {/* Elegant Fading Overlays */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-brand-dark)] via-[var(--color-brand-dark)]/20 to-transparent" />
@@ -152,10 +152,10 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
               {/* Glowing Aura */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/5 blur-[100px] rounded-full pointer-events-none" />
 
-              <div className="relative z-10 w-full">
-                <h2 className="text-3xl md:text-5xl font-black text-white mb-3 tracking-tighter uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,1)]">{civ!.name}</h2>
-                <div className="flex justify-center">
-                  <span className={`text-[10px] md:text-xs font-black px-5 py-2 rounded-full border shadow-2xl backdrop-blur-md ${civ!.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/20' :
+              <div className="relative z-10 w-full flex flex-col items-center">
+                <h2 className="text-xl sm:text-3xl md:text-5xl font-black text-white mb-2 md:mb-3 tracking-tighter uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,1)] w-full break-words leading-tight">{civ!.name}</h2>
+                <div className="flex justify-center mt-1">
+                  <span className={`text-[9px] md:text-xs font-black px-3 md:px-5 py-1.5 md:py-2 rounded-full border shadow-2xl backdrop-blur-md whitespace-nowrap ${civ!.difficulty === 'Facile' ? 'text-green-400 border-green-500/40 bg-green-500/20' :
                     civ!.difficulty === 'Medio' ? 'text-yellow-400 border-yellow-500/40 bg-yellow-500/20' :
                       'text-red-400 border-red-400/30 bg-red-500/20'
                     }`}>
@@ -269,17 +269,17 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
                 <ChevronUp size={16} className="text-emerald-400" />
                 Punti di Forza
               </h3>
-              <div className="bg-slate-900/40 backdrop-blur-md p-5 rounded-2xl border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.05)] text-gray-300 text-[11px] md:text-sm leading-relaxed">
+              <div className="bg-slate-900/40 backdrop-blur-md p-3 md:p-5 rounded-2xl border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.05)] text-gray-300 text-[11px] md:text-sm leading-relaxed">
                 <div className="space-y-3">
                   {civ!.strengths && civ!.strengths.length > 0 ? (
                     civ!.strengths.map((str, idx) => (
                       <div key={idx} className="flex items-start gap-2.5 group/item">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)] mt-1.5 shrink-0 group-hover/item:scale-125 transition-transform" />
-                        <span className="text-slate-200/90 group-hover/item:text-white transition-colors">{str}</span>
+                        <span className="text-slate-200/90 group-hover/item:text-white transition-colors break-words">{str}</span>
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-500 italic text-xs pl-4">Dati non disponibili.</p>
+                    <p className="text-gray-500 italic text-xs pl-2">Dati non disponibili.</p>
                   )}
                 </div>
               </div>
@@ -295,17 +295,17 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
                 <ChevronDown size={16} className="text-rose-400" />
                 Punti Deboli
               </h3>
-              <div className="bg-slate-900/40 backdrop-blur-md p-5 rounded-2xl border border-rose-500/30 shadow-[0_0_15px_rgba(244,63,94,0.05)] text-gray-300 text-[11px] md:text-sm leading-relaxed">
+              <div className="bg-slate-900/40 backdrop-blur-md p-3 md:p-5 rounded-2xl border border-rose-500/30 shadow-[0_0_15px_rgba(244,63,94,0.05)] text-gray-300 text-[11px] md:text-sm leading-relaxed">
                 <div className="space-y-3">
                   {civ!.weaknesses && civ!.weaknesses.length > 0 ? (
                     civ!.weaknesses.map((wk, idx) => (
                       <div key={idx} className="flex items-start gap-2.5 group/item">
                         <div className="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.4)] mt-1.5 shrink-0 group-hover/item:scale-125 transition-transform" />
-                        <span className="text-slate-200/90 group-hover/item:text-white transition-colors">{wk}</span>
+                        <span className="text-slate-200/90 group-hover/item:text-white transition-colors break-words">{wk}</span>
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-500 italic text-xs pl-4">Dati non disponibili.</p>
+                    <p className="text-gray-500 italic text-xs pl-2">Dati non disponibili.</p>
                   )}
                 </div>
               </div>
