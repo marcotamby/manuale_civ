@@ -4,7 +4,7 @@ export function DesktopFooter() {
   return (
     <footer className="hidden md:flex items-center justify-between px-8 py-4 border-t border-white/10 bg-[#16171d] z-50">
       <div className="flex items-center gap-4 lg:gap-8 flex-nowrap shrink-0">
-        <p className="text-[10px] lg:text-[12px] font-black text-cyan-400 uppercase tracking-[0.2em] select-none whitespace-nowrap">
+        <p className="text-[10px] lg:text-[12px] font-black uppercase tracking-[0.2em] select-none whitespace-nowrap bg-gradient-to-b from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
           Social & Community
         </p>
         
