@@ -141,7 +141,7 @@
             mask-image: linear-gradient(to left, black 20%, transparent 100%);
         }
         
-        .map-civ-flag.sniped { filter: grayscale(1) brightness(0.3); }
+        .map-civ-flag.sniped { filter: grayscale(1) brightness(0.6); }
         .map-civ-flag.sniped::after {
             content: '✕'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
             color: #ff4444; font-size: 40px; font-weight: 900; text-shadow: 0 0 15px rgba(0,0,0,1);
@@ -159,6 +159,35 @@
         #timer-container { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: none; flex-direction: column; align-items: center; gap: 12px; }
         #timer-label { color: var(--accent); font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 8px; text-shadow: 0 0 30px rgba(0, 242, 255, 0.8); }
         #timer-display { color: #fff; font-size: 64px; font-weight: 950; background: linear-gradient(180deg, #0a192f 0%, #000c1d 100%); padding: 10px 60px; border-radius: 25px; border: 4px solid var(--accent); box-shadow: 0 0 50px rgba(0, 242, 255, 0.4); letter-spacing: 4px; }
+
+        /* Casters Section */
+        #casters-container {
+            position: absolute; bottom: 40px; width: 100%; padding: 0 80px;
+            display: flex; justify-content: space-between; align-items: flex-end;
+            pointer-events: none; z-index: 50;
+        }
+        .caster-box {
+            width: 320px; height: 180px; background: rgba(0,0,0,0.6);
+            border: 2px solid rgba(255,255,255,0.1); border-radius: 12px;
+            position: relative; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: flex-end;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .caster-webcam { position: absolute; inset: 0; background: #000; z-index: 1; }
+        .caster-name-label {
+            position: relative; z-index: 2; background: linear-gradient(to right, var(--blue), transparent);
+            padding: 8px 20px; font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px;
+            color: white; border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .draft-flag.banned { 
+            filter: grayscale(0.8) brightness(0.4) sepia(1) hue-rotate(-50deg) saturate(5); 
+            position: relative;
+        }
+        .draft-flag.banned::after {
+            content: '✕'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            color: #ff0000; font-size: 24px; font-weight: 900; text-shadow: 0 0 10px rgba(0,0,0,1);
+        }
     </style>
 </head>
 <body>
@@ -167,10 +196,6 @@
             <div id="t1-name" class="team-name">--</div>
             <div id="t1-players" class="player-names">-- & --</div>
             <div id="t1-draft" class="draft-civs"></div>
-            <div id="t1-bans-box" style="display: none;">
-                <div class="ban-label">Bans</div>
-                <div id="t1-bans" class="bans-container"></div>
-            </div>
         </div>
 
         <div class="score-center">
@@ -186,14 +211,21 @@
             <div id="t2-name" class="team-name">--</div>
             <div id="t2-players" class="player-names">-- & --</div>
             <div id="t2-draft" class="draft-civs"></div>
-            <div id="t2-bans-box" style="display: none;">
-                <div class="ban-label">Bans</div>
-                <div id="t2-bans" class="bans-container"></div>
-            </div>
         </div>
     </div>
 
     <div id="maps-section"></div>
+
+    <div id="casters-container">
+        <div id="caster-1" class="caster-box" style="display: none;">
+            <div class="caster-webcam"></div>
+            <div class="caster-name-label">CASTER 1</div>
+        </div>
+        <div id="caster-2" class="caster-box" style="display: none;">
+            <div class="caster-webcam"></div>
+            <div class="caster-name-label">CASTER 2</div>
+        </div>
+    </div>
 
     <div id="timer-container">
         <div id="timer-label">Il game inizia tra...</div>
@@ -267,7 +299,7 @@
             document.getElementById('t2-players').innerText = (state.t2?.players || []).join(' & ') || '-- & --';
             document.getElementById('t2-score').innerText = state.t2?.score ?? 0;
 
-            const renderDraft = (containerId, civs) => {
+            const renderDraft = (containerId, civs, bans) => {
                 const container = document.getElementById(containerId);
                 container.innerHTML = '';
                 (civs || []).forEach(civId => {
@@ -276,31 +308,30 @@
                     div.style.backgroundImage = `url('${getCivFlagUrl(civId)}')`;
                     container.appendChild(div);
                 });
-                for(let i = (civs?.length || 0); i < 6; i++) {
+                (bans || []).forEach(civId => {
+                    const div = document.createElement('div');
+                    div.className = 'draft-flag active banned';
+                    div.style.backgroundImage = `url('${getCivFlagUrl(civId)}')`;
+                    container.appendChild(div);
+                });
+                const totalFlags = (civs?.length || 0) + (bans?.length || 0);
+                for(let i = totalFlags; i < 10; i++) {
                     const div = document.createElement('div');
                     div.className = 'draft-flag';
                     container.appendChild(div);
                 }
             };
-            renderDraft('t1-draft', state.t1?.draftCivs);
-            renderDraft('t2-draft', state.t2?.draftCivs);
-
-            if (IS_HIGH_ELO) {
-                document.getElementById('t1-bans-box').style.display = 'block';
-                document.getElementById('t2-bans-box').style.display = 'block';
-                const renderBans = (containerId, bans) => {
-                    const container = document.getElementById(containerId);
-                    container.innerHTML = '';
-                    (bans || []).forEach(civId => {
-                        const div = document.createElement('div');
-                        div.className = 'ban-flag';
-                        div.style.backgroundImage = `url('${getCivFlagUrl(civId)}')`;
-                        container.appendChild(div);
-                    });
-                };
-                renderBans('t1-bans', state.t1?.bans);
-                renderBans('t2-bans', state.t2?.bans);
-            }
+            renderDraft('t1-draft', state.t1?.draftCivs, state.t1?.bans);
+            renderDraft('t2-draft', state.t2?.draftCivs, state.t2?.bans);
+            
+            // Render Casters
+            (state.casters || []).forEach((c, i) => {
+                const el = document.getElementById(`caster-${i+1}`);
+                if (el) {
+                    el.style.display = c.active ? 'flex' : 'none';
+                    el.querySelector('.caster-name-label').innerText = c.name || `CASTER ${i+1}`;
+                }
+            });
 
             const bestOfElem = document.getElementById('best-of-text');
             if (bestOfElem) bestOfElem.innerText = `BEST OF ${state.maps?.length || 3}`;
