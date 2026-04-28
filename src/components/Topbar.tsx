@@ -131,7 +131,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
   }, [favorites, civilizations, isAuthenticated, user?.email, refreshTrigger]);
 
   const location = useLocation();
-  const isSpecialPage = isHome || location.pathname.includes('/tornei') || location.pathname === '/faq' || location.pathname.startsWith('/civ/') || location.pathname.startsWith('/compare');
+  const isSpecialPage = isHome || location.pathname.includes('/tornei') || location.pathname === '/faq' || location.pathname === '/privacy' || location.pathname.startsWith('/civ/') || location.pathname.startsWith('/compare');
 
   return (
     <div className="w-full flex flex-col shrink-0 z-[100] relative select-none">
