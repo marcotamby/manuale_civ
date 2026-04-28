@@ -42,7 +42,7 @@ const getRankColor = (rank: string | undefined) => {
   if (r.includes('bronze')) return { text: '#dca376', bg: 'rgba(220, 163, 118, 0.1)', border: 'rgba(220, 163, 118, 0.2)' };
   if (r.includes('silver')) return { text: '#a4aab1', bg: 'rgba(164, 170, 177, 0.1)', border: 'rgba(164, 170, 177, 0.2)' };
   if (r.includes('gold')) return { text: '#f6d271', bg: 'rgba(246, 210, 113, 0.1)', border: 'rgba(246, 210, 113, 0.2)' };
-  if (r.includes('platinum')) return { text: '#4ed2bd', bg: 'rgba(78, 210, 189, 0.1)', border: 'rgba(78, 210, 189, 0.2)' };
+  if (r.includes('platinum')) return { text: '#e5e7eb', bg: 'rgba(229, 231, 235, 0.1)', border: 'rgba(229, 231, 235, 0.2)' };
   if (r.includes('diamond')) return { text: '#71b5f6', bg: 'rgba(113, 181, 246, 0.1)', border: 'rgba(113, 181, 246, 0.2)' };
   if (r.includes('conqueror')) return { text: '#f67171', bg: 'rgba(246, 113, 113, 0.1)', border: 'rgba(246, 113, 113, 0.2)' };
   return { text: '#9ca3af', bg: 'rgba(156, 163, 175, 0.1)', border: 'rgba(156, 163, 175, 0.2)' };
@@ -578,7 +578,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <div className="flex items-center gap-2.5 mb-2">
                 <span className="text-base font-black text-white uppercase tracking-tight select-text">{a.user_nickname}</span>
                 <span 
-                  className="flex items-center gap-1 px-2 py-0.5 rounded-full border text-[9px] font-black uppercase select-none tracking-widest"
+                  className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[10px] font-black uppercase select-none tracking-widest"
                   style={{ 
                     color: getRankColor(a.user_rank).text, 
                     backgroundColor: getRankColor(a.user_rank).bg,
@@ -586,7 +586,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   }}
                 >
                   {getRankIcon(a.user_rank) && (
-                    <img src={getRankIcon(a.user_rank)!} alt="" className="w-3 h-3 object-contain" />
+                    <img src={getRankIcon(a.user_rank)!} alt="" className="w-4 h-4 object-contain" />
                   )}
                   {a.user_rank}
                 </span>
@@ -1612,11 +1612,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                   )}
                                 </div>
                                   <p 
-                                    className="text-[9px] uppercase font-black tracking-widest flex items-center gap-1.5"
+                                    className="text-[10px] uppercase font-black tracking-widest flex items-center gap-1.5"
                                     style={{ color: getRankColor(user.rank).text }}
                                   >
                                     {getRankIcon(user.rank) && (
-                                      <img src={getRankIcon(user.rank)!} alt="" className="w-3.5 h-3.5 object-contain" />
+                                      <img src={getRankIcon(user.rank)!} alt="" className="w-5 h-5 object-contain" />
                                     )}
                                     {user.rank || 'Unranked'}
                                   </p>
@@ -1716,7 +1716,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                    <div className="flex items-center gap-3 mb-2">
                                     <span className="text-base font-black text-white uppercase tracking-tight select-text">{q.user_nickname}</span>
                                     <span 
-                                      className="flex items-center gap-1.5 text-[10px] font-black px-2.5 py-0.5 rounded-full border uppercase select-none tracking-widest"
+                                      className="flex items-center gap-2 text-[11px] font-black px-3 py-1 rounded-full border uppercase select-none tracking-widest"
                                       style={{ 
                                         color: getRankColor(q.user_rank).text, 
                                         backgroundColor: getRankColor(q.user_rank).bg,
@@ -1724,7 +1724,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                       }}
                                     >
                                       {getRankIcon(q.user_rank) && (
-                                        <img src={getRankIcon(q.user_rank)!} alt="" className="w-4 h-4 object-contain" />
+                                        <img src={getRankIcon(q.user_rank)!} alt="" className="w-5 h-5 object-contain" />
                                       )}
                                       {q.user_rank}
                                     </span>
