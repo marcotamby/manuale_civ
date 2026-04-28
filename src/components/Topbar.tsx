@@ -330,7 +330,9 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
         className="flex flex-col items-center justify-center text-center w-full order-1 lg:order-2 group cursor-pointer hover:opacity-95 transition-all pt-6 md:pt-1 pb-1 px-4 relative z-10"
       >
         <h2 className="text-[14px] md:text-[14px] font-bold text-slate-400 tracking-[0.7em] md:tracking-[0.5em] uppercase mb-1 whitespace-nowrap">
-          Age of Empires IV
+          <span className="bg-black/30 backdrop-blur-sm px-4 py-0.5 rounded-full md:bg-transparent md:backdrop-blur-none md:px-0">
+            Age of Empires IV
+          </span>
         </h2>
         
         <h1 className="text-4xl md:text-4xl lg:text-3xl xl:text-4xl 2xl:text-6xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 drop-shadow-[0_4px_15px_rgba(255,255,255,0.15)] tracking-[0.1em] md:tracking-tighter leading-tight px-2 transition-all duration-300">
