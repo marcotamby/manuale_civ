@@ -138,7 +138,7 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
         </div>
 
         {isOpen && (
-          <div className={`absolute z-[1000] ${isSm ? 'right-0' : 'left-0'} mt-2 bg-[#0d111a] border border-white/20 rounded-xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto elegant-scrollbar ${isSm ? 'min-w-[150px]' : 'min-w-[180px]'} animate-in fade-in zoom-in-95 duration-150`}>
+          <div className={`absolute z-[1000] left-0 mt-2 bg-[#0d111a] border border-white/20 rounded-xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto elegant-scrollbar ${isSm ? 'min-w-[150px]' : 'min-w-[180px]'} animate-in fade-in zoom-in-95 duration-150`}>
              <div 
                 onClick={() => { onChange(''); setIsOpen(false); }}
                 className="flex items-center gap-3 px-4 py-2 hover:bg-blue-600/10 transition-all cursor-pointer group border-b border-white/5"
