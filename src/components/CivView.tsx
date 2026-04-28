@@ -188,6 +188,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const [qaMessageClosing, setQaMessageClosing] = useState(false);
   const [boVotes, setBoVotes] = useState<Record<string, { up: number, down: number, userVote: number | null }>>({});
   const [boMessage, setBoMessage] = useState<{ id: string, text: string } | null>(null);
+  const [isQaExpanded, setIsQaExpanded] = useState(false);
 
   const fetchVotes = async () => {
     if (!civ?.buildOrders || civ.buildOrders.length === 0) return;
@@ -433,6 +434,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       if (error) throw error;
       
       setQuestionText('');
+      setIsQaExpanded(false);
       
       setQaSubmissionSuccess(true);
       
@@ -1500,7 +1502,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         )}
 
         {activeTab === 'domande' && (
-          <div className="max-w-4xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="max-w-6xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div>
               <h2 className="text-2xl font-bold text-white mb-1 flex items-center gap-2">
                 <MessageSquare className="text-yellow-500" size={24} />
@@ -1534,211 +1536,265 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   <X size={16} />
                 </button>
               </div>
-            )}
-
-            {/* Question Submission Box */}
-            {user ? (
-               <div className="bg-gradient-to-br from-blue-900/40 via-[#0f1423] to-cyan-900/20 p-8 rounded-3xl border border-blue-500/30 shadow-[0_0_50px_rgba(37,99,235,0.15)] relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] pointer-events-none" />
-                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/5 blur-[100px] pointer-events-none" />
-                      <div className="flex items-center gap-4 mb-6">
-                    <div className="w-14 h-14 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
-                        {user.avatar_url ? (
-                          <img src={user.avatar_url} alt="You" className="w-full h-full object-cover rounded-full" />
-                        ) : user.rank && getRankIcon(user.rank) ? (
-                          <img src={getRankIcon(user.rank) || ''} alt={user.rank} className="w-8 h-8 object-contain" />
-                        ) : (
-                          <UserCircle size={32} className="text-blue-400" />
-                        )}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="text-lg font-black text-white uppercase tracking-tight">{user.nickname || user.name || 'Il Tuo Profilo'}</p>
-                        {(isAdmin || canManageCivs || canManageBuildorders) && (
-                          <span className="text-[9px] px-2 py-0.5 bg-blue-500 text-white font-black rounded-full uppercase tracking-widest shadow-lg shadow-blue-500/40">Staff</span>
-                        )}
-                      </div>
-                      <p className="text-[10px] text-blue-400/70 uppercase font-black tracking-[0.2em]">{user.rank || 'Unranked'}</p>
-                    </div>
-                  </div>
-                  <form onSubmit={handleQuestionSubmit} className="flex flex-col relative z-10">
-                    <div className="relative group/input flex-1 mb-4">
-                      <textarea
-                        value={questionText}
-                        onChange={(e) => setQuestionText(e.target.value)}
-                        placeholder="Fai una domanda relativa a questa civiltà. Sii specifico per ricevere risposte dettagliate!"
-                        className="w-full bg-black/40 border border-blue-500/20 rounded-2xl px-6 py-5 text-white placeholder:text-gray-600 focus:border-blue-500/50 focus:bg-black/60 outline-none transition-all text-base min-h-[180px] resize-y shadow-inner"
-                      />
-                      <div className="absolute top-4 right-4 text-blue-500/20 group-focus-within/input:text-blue-500/40 transition-colors">
-                        <MessageSquare size={20} />
-                      </div>
-                    </div>
-                    <div className="flex justify-end items-center py-2">
-                      <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider max-w-[250px]">
-                      </p>
-                        <button
-                        type="submit"
-                        disabled={!questionText.trim() || isSubmittingQA || qaSubmissionSuccess}
-                        className={`flex items-center gap-3 px-8 py-3.5 rounded-2xl text-xs font-black uppercase transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl border border-white/10 ${
-                          qaSubmissionSuccess 
-                            ? 'bg-green-600 text-white shadow-green-500/20' 
-                            : 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-blue-500/30'
-                        }`}
-                      >
-                        {isSubmittingQA ? (
-                          <>
-                            <Loader2 size={16} className="animate-spin" />
-                            Inviando...
-                          </>
-                        ) : qaSubmissionSuccess ? (
-                          <>
-                            <CheckCircle size={16} />
-                            Domanda Inviata!
-                          </>
-                        ) : (
-                          <>
-                            <Send size={16} />
-                            Invia Domanda
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </form>
-               </div>
-            ) : (
-              <div className="bg-[#0f1423] p-10 rounded-3xl border border-white/5 text-center shadow-2xl">
-                <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-blue-500/20">
-                   <UserCircle size={32} className="text-blue-400" />
-                </div>
-                <p className="text-gray-300 text-base mb-6 font-medium">Accedi per partecipare alla discussione e aiutare la community.</p>
-                <button 
-                  onClick={() => openLoginModal()}
-                  className="px-10 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-2xl text-xs font-black uppercase transition-all shadow-xl shadow-blue-600/20 hover:scale-105 active:scale-95 border border-white/10"
-                >
-                  Accedi Ora
-                </button>
-              </div>
-            )}
-
-            {/* Questions List */}
-            <div className="space-y-6">
-              {qaLoading ? (
-                <div className="flex py-12 justify-center">
-                  <Loader2 className="w-12 h-12 text-blue-400 animate-spin" />
-                </div>
-              ) : questions.length > 0 ? (
-                questions.map((q) => (
-                  <div key={q.id} className="bg-gradient-to-r from-white/[0.03] to-white/[0.01] p-7 rounded-3xl border border-white/10 relative overflow-hidden group/q shadow-xl backdrop-blur-sm space-y-6">
-
-                         <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-600 to-cyan-500 opacity-30" />
-                         
-                         <div className="flex items-start gap-5 mb-5">
-                           <div className="shrink-0">
-                              <div className="w-14 h-14 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
-                                {q.profile?.avatar_url ? (
-                                  <img src={q.profile.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
-                                ) : q.user_rank && getRankIcon(q.user_rank) ? (
-                                  <img src={getRankIcon(q.user_rank) || ''} alt={q.user_rank} className="w-9 h-9 object-contain" />
-                                ) : (
-                                  <UserCircle size={32} className="text-gray-700" />
-                                )}
-                              </div>
-                           </div>
-                           <div className="flex-1">
-                               <div className="flex items-center gap-3 mb-2">
-                                <span className="text-base font-black text-white uppercase tracking-tight select-text">{q.user_nickname}</span>
-                                <span className="text-[10px] text-blue-400 font-black px-2.5 py-0.5 bg-blue-500/10 rounded-full border border-blue-500/20 uppercase select-none tracking-widest">{q.user_rank}</span>
-                                <span className="text-[10px] text-gray-500 font-bold select-none uppercase tracking-widest">{new Date(q.created_at).toLocaleDateString('it-IT')}</span>
-                                {(isAdmin || (user && q.user_id === user.email)) && (
-                                  <button 
-                                    onClick={() => handleDeleteQA(q.id, 'question')}
-                                    className="ml-auto opacity-0 group-hover/q:opacity-100 p-2 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
-                                    title="Elimina domanda"
-                                  >
-                                    <Trash2 size={16} />
-                                  </button>
-                                )}
-                              </div>
-                              <p className="text-gray-200 text-lg leading-relaxed select-text font-medium">{q.question_text}</p>
-                           </div>
-                         </div>
-
-                         {q.answers && q.answers.length > 0 && (
-                            <div className="pt-4 border-t border-white/5 space-y-4">
-                               {renderAnswers(q.answers, q.id)}
-                            </div>
-                         )}
-                                  <div className="flex justify-end pt-2 border-t border-white/5">
-                           <button 
-                              onClick={() => {
-                                if (replyTo && replyTo.questionId === q.id && !replyTo.parentId) {
-                                  setReplyTo(null);
-                                } else {
-                                  setReplyTo({ questionId: q.id });
-                                  setAnswerText('');
-                                }
-                              }}
-                              className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                                replyTo && replyTo.questionId === q.id && !replyTo.parentId
-                                  ? 'bg-white/10 text-white' 
-                                  : 'text-gray-400 hover:text-white hover:bg-white/5'
-                              }`}
-                            >
-                              <MessageSquare size={14} />
-                              {replyTo && replyTo.questionId === q.id && !replyTo.parentId ? 'Annulla' : 'Rispondi'}
-                            </button>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              {/* Main Column */}
+              <div className={`${(!user && questions.length > 0) ? 'lg:col-span-8' : 'lg:col-span-12'} space-y-8`}>
+                
+                {/* Question Submission Box */}
+                {user ? (
+                   <div className={`bg-gradient-to-br from-blue-900/40 via-[#0f1423] to-cyan-900/20 rounded-3xl border border-blue-500/30 shadow-[0_0_50px_rgba(37,99,235,0.15)] relative overflow-hidden group transition-all duration-300 ${isQaExpanded ? 'p-6' : 'p-3'}`}>
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] pointer-events-none" />
+                      
+                      {!isQaExpanded ? (
+                        <div 
+                          className="flex items-center gap-4 cursor-pointer"
+                          onClick={() => setIsQaExpanded(true)}
+                        >
+                          <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center overflow-hidden shrink-0">
+                             {user.avatar_url ? (
+                               <img src={user.avatar_url} alt="You" className="w-full h-full object-cover rounded-full" />
+                             ) : user.rank && getRankIcon(user.rank) ? (
+                               <img src={getRankIcon(user.rank) || ''} alt={user.rank} className="w-6 h-6 object-contain" />
+                             ) : (
+                               <UserCircle size={20} className="text-blue-400" />
+                             )}
+                          </div>
+                          <div className="flex-1 bg-black/40 border border-blue-500/10 rounded-xl px-4 py-2.5 text-gray-500 text-sm font-medium">
+                             Fai una domanda relativa a questa civiltà...
+                          </div>
+                          <button className="p-2 bg-blue-600/20 text-blue-400 rounded-lg">
+                            <Plus size={18} />
+                          </button>
                         </div>
-
-                        {/* Answer Input (Root) */}
-                        {replyTo && replyTo.questionId === q.id && !replyTo.parentId && (
-                           <div className="mt-6 pt-6 border-t border-white/10 space-y-4 animate-in fade-in slide-in-from-top-3 duration-300 outline-none">
+                      ) : (
+                        <>
+                          <div className="flex items-center justify-between mb-4 relative z-10">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
+                                  {user.avatar_url ? (
+                                    <img src={user.avatar_url} alt="You" className="w-full h-full object-cover rounded-full" />
+                                  ) : user.rank && getRankIcon(user.rank) ? (
+                                    <img src={getRankIcon(user.rank) || ''} alt={user.rank} className="w-6 h-6 object-contain" />
+                                  ) : (
+                                    <UserCircle size={24} className="text-blue-400" />
+                                  )}
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm font-black text-white uppercase tracking-tight">{user.nickname || user.name || 'Il Tuo Profilo'}</p>
+                                  {(isAdmin || canManageCivs || canManageBuildorders) && (
+                                    <span className="text-[8px] px-2 py-0.5 bg-blue-500 text-white font-black rounded-full uppercase tracking-widest">Staff</span>
+                                  )}
+                                </div>
+                                <p className="text-[9px] text-blue-400/70 uppercase font-black tracking-widest">{user.rank || 'Unranked'}</p>
+                              </div>
+                            </div>
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); setIsQaExpanded(false); }}
+                              className="p-1.5 hover:bg-white/5 rounded-lg text-gray-500 hover:text-white transition-all"
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
+                          <form onSubmit={handleQuestionSubmit} className="flex flex-col relative z-10">
+                            <div className="relative group/input flex-1 mb-4">
                               <textarea
-                                value={answerText}
-                                onChange={(e) => setAnswerText(e.target.value)}
-                                placeholder="Condividi la tua esperienza con la community..."
-                                className="w-full bg-black/60 border border-blue-500/20 rounded-2xl px-6 py-5 text-white placeholder:text-gray-600 focus:border-blue-500/50 focus:bg-black/80 outline-none transition-all text-base min-h-[120px] resize-y shadow-inner"
+                                value={questionText}
+                                onChange={(e) => setQuestionText(e.target.value)}
+                                placeholder="Sii specifico per ricevere risposte dettagliate!"
+                                className="w-full bg-black/40 border border-blue-500/20 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:border-blue-500/50 focus:bg-black/60 outline-none transition-all text-sm min-h-[120px] resize-y shadow-inner"
                                 autoFocus
                               />
-                              <div className="flex justify-end">
+                            </div>
+                            <div className="flex justify-end items-center">
                                 <button
-                                  onClick={() => handleAnswerSubmit(q.id)}
-                                  disabled={!answerText.trim() || isSubmittingAns === q.id}
-                                  className={`flex items-center gap-3 px-8 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-xl border border-white/10 active:scale-95 ${
-                                    ansSubmissionSuccess === q.id
-                                      ? 'bg-green-600 text-white shadow-green-500/20'
-                                      : 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-[0_10px_25px_rgba(37,99,235,0.3)] hover:shadow-[0_15px_35px_rgba(37,99,235,0.5)]'
+                                type="submit"
+                                disabled={!questionText.trim() || isSubmittingQA || qaSubmissionSuccess}
+                                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl border border-white/10 ${
+                                  qaSubmissionSuccess 
+                                    ? 'bg-green-600 text-white shadow-green-500/20' 
+                                    : 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-blue-500/30'
+                                }`}
+                              >
+                                {isSubmittingQA ? (
+                                  <>
+                                    <Loader2 size={14} className="animate-spin" />
+                                    Inviando...
+                                  </>
+                                ) : qaSubmissionSuccess ? (
+                                  <>
+                                    <CheckCircle size={14} />
+                                    Inviata!
+                                  </>
+                                ) : (
+                                  <>
+                                    <Send size={14} />
+                                    Invia Domanda
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          </form>
+                        </>
+                      )}
+                   </div>
+                ) : questions.length === 0 ? (
+                  <div className="max-w-sm">
+                    <div 
+                      onClick={() => openLoginModal()}
+                      className="glass flex flex-col items-center justify-center p-8 rounded-3xl border border-dashed border-blue-500/20 hover:border-blue-500/40 hover:bg-blue-500/5 transition-all group cursor-pointer text-center shadow-2xl"
+                    >
+                      <div className="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <UserCircle size={32} className="text-blue-400" />
+                      </div>
+                      <h3 className="text-xl font-black mb-3 uppercase tracking-tighter text-white">Accedi</h3>
+                      <p className="text-sm text-gray-500 px-4 font-medium leading-relaxed">
+                        Accedi per partecipare alla discussione e aiutare la community.
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
+
+                {/* Questions List */}
+                <div className="space-y-6">
+                  {qaLoading ? (
+                    <div className="flex py-12 justify-center">
+                      <Loader2 className="w-12 h-12 text-blue-400 animate-spin" />
+                    </div>
+                  ) : questions.length > 0 ? (
+                    questions.map((q) => (
+                      <div key={q.id} className="bg-gradient-to-r from-white/[0.03] to-white/[0.01] p-7 rounded-3xl border border-white/10 relative overflow-hidden group/q shadow-xl backdrop-blur-sm space-y-6">
+
+                             <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-600 to-cyan-500 opacity-30" />
+                             
+                             <div className="flex items-start gap-5 mb-5">
+                               <div className="shrink-0">
+                                  <div className="w-14 h-14 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
+                                    {q.profile?.avatar_url ? (
+                                      <img src={q.profile.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
+                                    ) : q.user_rank && getRankIcon(q.user_rank) ? (
+                                      <img src={getRankIcon(q.user_rank) || ''} alt={q.user_rank} className="w-9 h-9 object-contain" />
+                                    ) : (
+                                      <UserCircle size={32} className="text-gray-700" />
+                                    )}
+                                  </div>
+                               </div>
+                               <div className="flex-1">
+                                   <div className="flex items-center gap-3 mb-2">
+                                    <span className="text-base font-black text-white uppercase tracking-tight select-text">{q.user_nickname}</span>
+                                    <span className="text-[10px] text-blue-400 font-black px-2.5 py-0.5 bg-blue-500/10 rounded-full border border-blue-500/20 uppercase select-none tracking-widest">{q.user_rank}</span>
+                                    <span className="text-[10px] text-gray-500 font-bold select-none uppercase tracking-widest">{new Date(q.created_at).toLocaleDateString('it-IT')}</span>
+                                    {(isAdmin || (user && q.user_id === user.email)) && (
+                                      <button 
+                                        onClick={() => handleDeleteQA(q.id, 'question')}
+                                        className="ml-auto opacity-0 group-hover/q:opacity-100 p-2 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                                        title="Elimina domanda"
+                                      >
+                                        <Trash2 size={16} />
+                                      </button>
+                                    )}
+                                  </div>
+                                  <p className="text-gray-200 text-lg leading-relaxed select-text font-medium">{q.question_text}</p>
+                               </div>
+                             </div>
+
+                             {q.answers && q.answers.length > 0 && (
+                                <div className="pt-4 border-t border-white/5 space-y-4">
+                                   {renderAnswers(q.answers, q.id)}
+                                </div>
+                             )}
+                                      <div className="flex justify-end pt-2 border-t border-white/5">
+                               <button 
+                                  onClick={() => {
+                                    if (replyTo && replyTo.questionId === q.id && !replyTo.parentId) {
+                                      setReplyTo(null);
+                                    } else {
+                                      setReplyTo({ questionId: q.id });
+                                      setAnswerText('');
+                                    }
+                                  }}
+                                  className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                                    replyTo && replyTo.questionId === q.id && !replyTo.parentId
+                                      ? 'bg-white/10 text-white' 
+                                      : 'text-gray-400 hover:text-white hover:bg-white/5'
                                   }`}
                                 >
-                                  {isSubmittingAns === q.id ? (
-                                    <>
-                                      <Loader2 size={16} className="animate-spin" />
-                                      Inviando...
-                                    </>
-                                  ) : ansSubmissionSuccess === q.id ? (
-                                    <>
-                                      <CheckCircle size={16} />
-                                      Risposta Inviata!
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Send size={16} />
-                                      Invia Risposta
-                                    </>
-                                  )}
+                                  <MessageSquare size={14} />
+                                  {replyTo && replyTo.questionId === q.id && !replyTo.parentId ? 'Annulla' : 'Rispondi'}
                                 </button>
-                              </div>
-                           </div>
-                        )}
-                     </div>
-                 ))
-              ) : (
-                <div className="bg-[#0f1423] p-20 rounded-[40px] border border-white/5 text-center flex flex-col items-center shadow-2xl relative overflow-hidden">
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-blue-500/5 blur-[100px] pointer-events-none" />
-                  <div className="w-20 h-20 bg-gradient-to-br from-blue-600/20 to-cyan-500/20 rounded-3xl flex items-center justify-center mb-8 border border-blue-500/20 shadow-xl shadow-blue-900/10">
-                    <MessageSquare size={40} className="text-blue-400" />
+                            </div>
+
+                            {/* Answer Input (Root) */}
+                            {replyTo && replyTo.questionId === q.id && !replyTo.parentId && (
+                               <div className="mt-6 pt-6 border-t border-white/10 space-y-4 animate-in fade-in slide-in-from-top-3 duration-300 outline-none">
+                                  <textarea
+                                    value={answerText}
+                                    onChange={(e) => setAnswerText(e.target.value)}
+                                    placeholder="Condividi la tua esperienza con la community..."
+                                    className="w-full bg-black/60 border border-blue-500/20 rounded-2xl px-6 py-5 text-white placeholder:text-gray-600 focus:border-blue-500/50 focus:bg-black/80 outline-none transition-all text-base min-h-[120px] resize-y shadow-inner"
+                                    autoFocus
+                                  />
+                                  <div className="flex justify-end">
+                                    <button
+                                      onClick={() => handleAnswerSubmit(q.id)}
+                                      disabled={!answerText.trim() || isSubmittingAns === q.id}
+                                      className={`flex items-center gap-3 px-8 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-xl border border-white/10 active:scale-95 ${
+                                        ansSubmissionSuccess === q.id
+                                          ? 'bg-green-600 text-white shadow-green-500/20'
+                                          : 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-[0_10px_25px_rgba(37,99,235,0.3)] hover:shadow-[0_15px_35px_rgba(37,99,235,0.5)]'
+                                      }`}
+                                    >
+                                      {isSubmittingAns === q.id ? (
+                                        <>
+                                          <Loader2 size={16} className="animate-spin" />
+                                          Inviando...
+                                        </>
+                                      ) : ansSubmissionSuccess === q.id ? (
+                                        <>
+                                          <CheckCircle size={16} />
+                                          Risposta Inviata!
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Send size={16} />
+                                          Invia Risposta
+                                        </>
+                                      )}
+                                    </button>
+                                  </div>
+                               </div>
+                            )}
+                         </div>
+                      ))
+                  ) : (
+                    <div className="bg-[#0f1423] p-12 rounded-[40px] border border-white/5 text-center flex flex-col items-center shadow-2xl relative overflow-hidden">
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-blue-500/5 blur-[100px] pointer-events-none" />
+                      <div className="w-16 h-16 bg-gradient-to-br from-blue-600/20 to-cyan-500/20 rounded-2xl flex items-center justify-center mb-6 border border-blue-500/20">
+                        <MessageSquare size={32} className="text-blue-400" />
+                      </div>
+                      <h3 className="text-xl font-black text-white mb-2 uppercase tracking-tight">Ancora nessuna domanda</h3>
+                      <p className="text-gray-500 max-w-xs text-sm leading-relaxed">Sii il primo a rompere il ghiaccio! Fai una domanda su questa civiltà.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Sidebar (Not logged in + has questions) */}
+              {!user && questions.length > 0 && (
+                <div className="lg:col-span-4 sticky top-24">
+                  <div className="bg-[#0f1423] p-8 rounded-3xl border border-white/5 text-center shadow-2xl flex flex-col items-center">
+                    <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mb-6 border border-blue-500/20">
+                      <UserCircle size={32} className="text-blue-400" />
+                    </div>
+                    <h3 className="text-lg font-black text-white mb-2 uppercase tracking-tight">Partecipa</h3>
+                    <p className="text-gray-400 text-sm mb-6 font-medium leading-relaxed">Accedi per fare domande o rispondere alla community.</p>
+                    <button 
+                      onClick={() => openLoginModal()}
+                      className="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all shadow-xl shadow-blue-600/20 hover:scale-[1.02] active:scale-95 border border-white/10"
+                    >
+                      Accedi Ora
+                    </button>
                   </div>
-                  <h3 className="text-2xl font-black text-white mb-3 uppercase tracking-tight">Ancora nessuna domanda</h3>
-                  <p className="text-gray-500 max-w-sm text-base leading-relaxed">Sii il primo a rompere il ghiaccio! Fai una domanda su questa civiltà e aiuta la community a crescere.</p>
                 </div>
               )}
             </div>
