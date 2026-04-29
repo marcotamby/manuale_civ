@@ -554,10 +554,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
     return answers.map((a: any) => (
       <div key={a.id} className="space-y-4">
-        <div className={`p-4 rounded-2xl group/a relative transition-all bg-white/[0.02] border-l-2 ${depth % 2 === 0 ? 'border-blue-500/30' : 'border-cyan-500/30'} ml-2 md:ml-12`}>
-          <div className="flex items-start gap-4">
+        <div className={`p-3 md:p-4 rounded-2xl group/a relative transition-all bg-white/[0.02] border-l-2 ${depth % 2 === 0 ? 'border-blue-500/30' : 'border-cyan-500/30'} ml-2 md:ml-12`}>
+          <div className="flex items-start gap-2 md:gap-4">
             <div className="shrink-0">
-              <div className="w-12 h-12 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
+              <div className="w-9 h-9 md:w-12 md:h-12 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
                 {a.profile?.avatar_url ? (
                   <img src={a.profile.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
                 ) : a.user_rank && getRankIcon(a.user_rank) ? (
@@ -567,14 +567,14 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 )}
               </div>
             </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2.5 mb-2">
-                <span className="text-base font-black text-white uppercase tracking-tight select-text">{a.user_nickname}</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <span className="text-sm md:text-base font-black text-white uppercase tracking-tight select-text truncate">{a.user_nickname}</span>
                 {a.status === 'pending' && (
                   <span className="text-[8px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-black rounded-full uppercase tracking-widest animate-pulse">In Approvazione</span>
                 )}
                 <span 
-                  className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[10px] font-black uppercase select-none tracking-widest"
+                  className="flex items-center gap-1.5 px-2 md:px-2.5 py-0.5 rounded-full border text-[9px] md:text-[10px] font-black uppercase select-none tracking-widest"
                   style={{ 
                     color: getRankColor(a.user_rank).text, 
                     backgroundColor: getRankColor(a.user_rank).bg,
@@ -582,7 +582,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   }}
                 >
                   {getRankIcon(a.user_rank) && (
-                    <img src={getRankIcon(a.user_rank)!} alt="" className="w-4 h-4 object-contain" />
+                    <img src={getRankIcon(a.user_rank)!} alt="" className="w-3 h-3 md:w-4 md:h-4 object-contain" />
                   )}
                   {a.user_rank}
                 </span>
@@ -597,7 +597,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   </button>
                 )}
               </div>
-              <p className="text-gray-200 text-base leading-relaxed select-text font-medium">
+              <p className="text-gray-200 text-sm md:text-base leading-relaxed select-text font-medium break-words">
                 {a.replyToNickname && (
                   <span className="text-blue-500/80 font-bold mr-2 select-none italic">@{a.replyToNickname}</span>
                 )}
@@ -1699,13 +1699,13 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                     </div>
                   ) : questions.length > 0 ? (
                     questions.map((q) => (
-                      <div key={q.id} className="bg-gradient-to-r from-white/[0.03] to-white/[0.01] p-5 rounded-3xl border border-white/10 relative overflow-hidden group/q shadow-xl backdrop-blur-sm space-y-4">
+                      <div key={q.id} className="bg-gradient-to-r from-white/[0.03] to-white/[0.01] p-4 md:p-5 rounded-3xl border border-white/10 relative overflow-hidden group/q shadow-xl backdrop-blur-sm space-y-4">
 
                              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-600 to-cyan-500 opacity-30" />
                              
-                             <div className="flex items-start gap-5 mb-3">
+                             <div className="flex items-start gap-3 md:gap-5 mb-3">
                                <div className="shrink-0">
-                                  <div className="w-14 h-14 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
+                                  <div className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
                                     {q.profile?.avatar_url ? (
                                       <img src={q.profile.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
                                     ) : q.user_rank && getRankIcon(q.user_rank) ? (
@@ -1715,14 +1715,14 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                     )}
                                   </div>
                                </div>
-                               <div className="flex-1">
-                                   <div className="flex items-center gap-3 mb-2">
-                                    <span className="text-base font-black text-white uppercase tracking-tight select-text">{q.user_nickname}</span>
+                               <div className="flex-1 min-w-0">
+                                   <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                    <span className="text-sm md:text-base font-black text-white uppercase tracking-tight select-text truncate">{q.user_nickname}</span>
                                      {q.status === 'pending' && (
                                        <span className="text-[9px] px-2 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-black rounded-full uppercase tracking-widest animate-pulse">In Approvazione</span>
                                      )}
                                     <span 
-                                      className="flex items-center gap-1.5 text-[10px] font-black px-2.5 py-0.5 rounded-full border uppercase select-none tracking-widest"
+                                      className="flex items-center gap-1.5 text-[9px] md:text-[10px] font-black px-2 md:px-2.5 py-0.5 rounded-full border uppercase select-none tracking-widest"
                                       style={{ 
                                         color: getRankColor(q.user_rank).text, 
                                         backgroundColor: getRankColor(q.user_rank).bg,
@@ -1730,7 +1730,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                       }}
                                     >
                                       {getRankIcon(q.user_rank) && (
-                                        <img src={getRankIcon(q.user_rank)!} alt="" className="w-4 h-4 object-contain" />
+                                        <img src={getRankIcon(q.user_rank)!} alt="" className="w-3 h-3 md:w-4 md:h-4 object-contain" />
                                       )}
                                       {q.user_rank}
                                     </span>
@@ -1745,7 +1745,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                       </button>
                                     )}
                                   </div>
-                                  <p className="text-gray-200 text-base leading-relaxed select-text font-medium">{q.question_text}</p>
+                                  <p className="text-gray-200 text-sm md:text-base leading-relaxed select-text font-medium break-words">{q.question_text}</p>
                                </div>
                              </div>
 

@@ -266,6 +266,42 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
           );
         })}
       </div>
+
+      {/* Sticky Mobile Compare Confirmation Bar */}
+      {isCompareMode && (
+        <div className="lg:hidden fixed bottom-24 left-0 right-0 z-[100] px-4 animate-in slide-in-from-bottom-10 duration-300">
+          <div className="glass p-3 rounded-2xl border border-white/10 shadow-2xl flex items-center justify-between gap-4 bg-[#0d1424]/80 backdrop-blur-xl">
+            <div className="flex flex-col">
+              <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Confronto</span>
+              <span className="text-xs font-bold text-white">
+                {selectedForCompare.length} / 2 Selezionate
+              </span>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setIsCompareMode(false);
+                  setSelectedForCompare([]);
+                }}
+                className="px-4 py-2 bg-white/5 hover:bg-white/10 text-gray-400 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/5"
+              >
+                Annulla
+              </button>
+              <button
+                onClick={handleStartCompare}
+                disabled={selectedForCompare.length < 2}
+                className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                  selectedForCompare.length === 2 
+                    ? 'bg-green-600 text-white shadow-lg shadow-green-600/30' 
+                    : 'bg-gray-800 text-gray-600 cursor-not-allowed'
+                }`}
+              >
+                Conferma
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -413,7 +413,9 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
                     Pannello
                   </button>
                 )}
+              </div>
 
+              <div className="flex items-center gap-2">
                 {/* 2. Profilo */}
                 <button 
                   onClick={() => (window as any).openProfileModal?.()} 
@@ -421,15 +423,15 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
                 >
                   <User size={20} className="text-yellow-500" />
                 </button>
-              </div>
 
-              {/* 3. ESCI (Rightmost) */}
-              <button 
-                onClick={() => setShowLogoutConfirm(true)}
-                className="h-10 px-4 bg-[#0d1424] rounded-xl border border-yellow-500/30 text-yellow-500 text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg"
-              >
-                ESCI
-              </button>
+                {/* 3. ESCI (Rightmost) */}
+                <button 
+                  onClick={() => setShowLogoutConfirm(true)}
+                  className="h-10 px-4 bg-[#0d1424] rounded-xl border border-yellow-500/30 text-yellow-500 text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg"
+                >
+                  ESCI
+                </button>
+              </div>
             </>
           ) : (
             <div className="flex items-center justify-end w-full">
