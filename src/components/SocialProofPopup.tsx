@@ -15,11 +15,15 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
   const [favoriteCount, setFavoriteCount] = useState<number | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+    let timer: NodeJS.Timeout;
+
     // Determine if we should show the popup
     const alreadyFavorited = favorites.includes(civId);
-    const sessionDismissed = sessionStorage.getItem(`social_proof_dismissed_${civId}`);
+    // Use sessionStorage so it can reappear in future visits (new sessions)
+    const hasDismissed = sessionStorage.getItem(`social_proof_dismissed_${civId}`);
     
-    if (alreadyFavorited || sessionDismissed) {
+    if (alreadyFavorited || hasDismissed) {
       setIsVisible(false);
       return;
     }
@@ -32,11 +36,12 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
           .select('*', { count: 'exact', head: true })
           .eq('civ_id', civId);
 
-        if (!error && count !== null) {
+        if (isMounted && !error && count !== null && count > 0) {
           setFavoriteCount(count);
-          // Show popup after a delay
-          const timer = setTimeout(() => setIsVisible(true), 5000);
-          return () => clearTimeout(timer);
+          // Show popup after exactly 5 seconds
+          timer = setTimeout(() => {
+            if (isMounted) setIsVisible(true);
+          }, 5000);
         }
       } catch (err) {
         console.error('Error fetching favorite count:', err);
@@ -44,6 +49,11 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
     };
 
     fetchFavoriteCount();
+
+    return () => {
+      isMounted = false;
+      if (timer) clearTimeout(timer);
+    };
   }, [civId, favorites]);
 
   const handleDismiss = () => {
