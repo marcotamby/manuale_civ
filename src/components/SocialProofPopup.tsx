@@ -16,7 +16,7 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
 
   useEffect(() => {
     let isMounted = true;
-    let timer: NodeJS.Timeout;
+    let timer: any;
 
     // Determine if we should show the popup
     const alreadyFavorited = favorites.includes(civId);
