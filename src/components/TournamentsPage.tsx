@@ -1004,7 +1004,7 @@ export function TournamentsPage() {
                 </h2>
               </div>
               <div className="flex items-center gap-4">
-                {saveStatus === 'saving' && <Loader2 className="w-4 h-4 animate-spin text-yellow-500" />}
+                {saveStatus === 'saving' && <Loader2 className="w-4 h-4 animate-spin text-blue-400" />}
                 <button 
                   onClick={() => handleUpdateTournament('top')}
                   disabled={isSubmitting}
@@ -1015,7 +1015,7 @@ export function TournamentsPage() {
                       : "bg-gradient-to-b from-slate-200 to-slate-400 text-black hover:brightness-110"
                   )}
                 >
-                  {saveStatus === 'saving' && saveTrigger === 'top' ? <Loader2 size={14} className="animate-spin" /> : 
+                  {saveStatus === 'saving' && saveTrigger === 'top' ? <Loader2 size={14} className="animate-spin text-blue-400" /> : 
                    saveStatus === 'saved' && saveTrigger === 'top' ? <CheckCircle2 size={14} /> : <Save size={14} />}
                   {saveStatus === 'saved' && saveTrigger === 'top' ? 'Salvato!' : 'Salva'}
                 </button>
@@ -1150,7 +1150,7 @@ export function TournamentsPage() {
                         onChange={handleBannerUpload}
                       />
                       {isUploading ? (
-                        <Loader2 size={20} className="text-yellow-500 animate-spin" />
+                        <Loader2 size={20} className="text-blue-400 animate-spin" />
                       ) : (
                         <Upload size={20} className="text-gray-400" />
                       )}
@@ -1351,7 +1351,7 @@ export function TournamentsPage() {
                       saveStatus === 'saved' && saveTrigger === 'bottom' ? "bg-green-600 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]" : "bg-gradient-to-b from-slate-100 to-slate-400 text-black hover:brightness-110"
                     )}
                   >
-                    {saveStatus === 'saving' && saveTrigger === 'bottom' ? <Loader2 className="animate-spin" size={18}/> : 
+                    {saveStatus === 'saving' && saveTrigger === 'bottom' ? <Loader2 className="animate-spin text-blue-400" size={18}/> : 
                      saveStatus === 'saved' && saveTrigger === 'bottom' ? <CheckCircle2 size={18}/> : <Save size={18}/>} 
                     {saveStatus === 'saving' && saveTrigger === 'bottom' ? 'SALVATAGGIO...' : 
                      saveStatus === 'saved' && saveTrigger === 'bottom' ? 'SALVATO!' : 

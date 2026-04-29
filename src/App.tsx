@@ -181,7 +181,7 @@ function App() {
     return (
       <div className="flex h-screen items-center justify-center bg-[var(--color-brand-dark)] text-white">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
       </div>
     );

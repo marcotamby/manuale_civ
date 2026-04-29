@@ -49,7 +49,7 @@ export function TournamentRegolamento() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#0a0a0b]">
-        <Loader2 className="w-12 h-12 text-yellow-500 animate-spin" />
+        <Loader2 className="w-12 h-12 text-blue-400 animate-spin" />
         <p className="text-gray-500 mt-4 font-serif italic uppercase tracking-widest text-xs">Caricamento Regolamento...</p>
       </div>
     );

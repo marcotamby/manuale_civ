@@ -65,7 +65,7 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <Loader2 className="w-8 h-8 text-yellow-500 animate-spin" />
+        <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
       </div>
     );
   }

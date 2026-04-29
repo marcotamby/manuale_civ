@@ -521,7 +521,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                     }`}
                   >
                     {uploading ? (
-                      <Loader2 className="text-yellow-500 animate-spin" size={24} />
+                      <Loader2 className="text-cyan-400 animate-spin" size={24} />
                     ) : (
                       <>
                         <Upload className="text-yellow-500" size={24} />
