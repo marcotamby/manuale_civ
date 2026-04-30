@@ -296,10 +296,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       }
 
       const counts: Record<string, { count: number, userVoted: boolean }> = {};
+      const currentUserEmail = user?.email?.toLowerCase();
       data.forEach(v => {
         if (!counts[v.item_id]) counts[v.item_id] = { count: 0, userVoted: false };
         counts[v.item_id].count++;
-        if (user && v.user_email === user.email) {
+        if (currentUserEmail && v.user_email.toLowerCase() === currentUserEmail) {
           counts[v.item_id].userVoted = true;
         }
       });
@@ -332,15 +333,18 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     });
 
     try {
+      const userEmail = user.email.toLowerCase();
       if (hasVoted) {
-        await supabase
+        const { error } = await supabase
           .from('qa_votes')
           .delete()
-          .match({ user_email: user.email, item_id: itemId });
+          .match({ user_email: userEmail, item_id: itemId });
+        if (error) throw error;
       } else {
-        await supabase
+        const { error } = await supabase
           .from('qa_votes')
-          .insert({ user_email: user.email, item_id: itemId, item_type: itemType });
+          .insert({ user_email: userEmail, item_id: itemId, item_type: itemType });
+        if (error) throw error;
       }
     } catch (e) {
       console.error('Error voting on QA:', e);
