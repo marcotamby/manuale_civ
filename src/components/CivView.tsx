@@ -668,21 +668,6 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   {a.user_rank}
                 </span>
                 <span className="text-[9px] text-gray-500 font-bold select-none uppercase tracking-widest">{new Date(a.created_at).toLocaleDateString('it-IT')}</span>
-                
-                <button 
-                  onClick={() => handleQAVote(a.id, 'answer')}
-                  className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full transition-all border ${
-                    qaVotes[a.id]?.userVoted 
-                      ? 'text-blue-400 bg-blue-500/10 border-blue-500/20' 
-                      : 'text-gray-500 hover:text-blue-400 hover:bg-blue-500/5 border-transparent'
-                  }`}
-                  title="Mi piace"
-                >
-                  <ThumbsUp size={11} className={qaVotes[a.id]?.userVoted ? 'fill-current' : ''} />
-                  {qaVotes[a.id]?.count > 0 && (
-                    <span className="text-[10px] font-black">{qaVotes[a.id].count}</span>
-                  )}
-                </button>
 
                 {isAdmin && (
                   <button 
@@ -701,7 +686,21 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 {a.answer_text}
               </p>
               
-              <div className="flex justify-end pt-1">
+               <div className="flex justify-end pt-1 gap-1">
+                  <button 
+                    onClick={() => handleQAVote(a.id, 'answer')}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      qaVotes[a.id]?.userVoted 
+                        ? 'text-blue-400 bg-blue-500/10' 
+                        : 'text-gray-400 hover:text-blue-400 hover:bg-blue-500/5'
+                    }`}
+                    title="Mi piace"
+                  >
+                    <ThumbsUp size={14} className={qaVotes[a.id]?.userVoted ? 'fill-current' : ''} />
+                    {qaVotes[a.id]?.count > 0 && (
+                      <span className="font-black">{qaVotes[a.id].count}</span>
+                    )}
+                  </button>
                  <button 
                    onClick={() => {
                      if (replyTo && replyTo.parentId === a.id) {
@@ -1851,7 +1850,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                    {renderAnswers(q.answers, q.id)}
                                 </div>
                              )}
-                                      <div className="flex justify-end pt-1 border-t border-white/5 gap-2">
+                                      <div className="flex justify-end pt-1 border-t border-white/5 gap-1">
                                <button 
                                  onClick={() => handleQAVote(q.id, 'question')}
                                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
