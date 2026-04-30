@@ -3,6 +3,34 @@ import { Heart, X, Users, Bell } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 
+const getCivArticle = (name: string): string => {
+  const articles: Record<string, string> = {
+    'Abbasidi': 'gli ',
+    'Ayyubidi': 'gli ',
+    'Bizantini': 'i ',
+    'Cinesi': 'i ',
+    'Dinastia di Tughlaq': 'i ',
+    'Eredità di Zhu Xi': "l'",
+    'Francesi': 'i ',
+    'Giapponesi': 'i ',
+    "Giovanna d'Arco": '',
+    'Inglesi': 'gli ',
+    'Knights Templar': 'i ',
+    'Lancaster': 'i ',
+    'Macedoni': 'i ',
+    'Maliani': 'i ',
+    'Mongoli': 'i ',
+    "Orda d'Oro": "l'",
+    'Ordine del Drago': "l'",
+    'Ottomani': 'gli ',
+    'Rusiani': 'i ',
+    'Sacro Romano Impero': 'il ',
+    'Sengoku Daimyo': 'i ',
+    'Sultanato di Delhi': 'il '
+  };
+  return articles[name] ?? 'gli ';
+};
+
 interface SocialProofPopupProps {
   civId: string;
   civName: string;
@@ -98,7 +126,7 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
                 {favoriteCount} {favoriteCount === 1 ? 'persona ha scelto' : 'persone hanno scelto'}
               </p>
               <p className="text-[10px] sm:text-xs text-gray-400 font-medium leading-tight mt-0.5 sm:mt-1.5">
-                gli <span className="text-blue-200 font-bold">{civName}</span>! 
+                {getCivArticle(civName)}<span className="text-blue-200 font-bold">{civName}</span>! 
               </p>
             </div>
           </div>
