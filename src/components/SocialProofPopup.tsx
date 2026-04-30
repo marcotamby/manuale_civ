@@ -125,7 +125,7 @@ export function SocialProofPopup({ civId, civName, onFollow }: SocialProofPopupP
               <p className="text-white font-bold text-sm sm:text-lg leading-tight">
                 {favoriteCount} {favoriteCount === 1 ? 'persona ha scelto' : 'persone hanno scelto'}
               </p>
-              <p className="text-[10px] sm:text-xs text-gray-400 font-medium leading-tight mt-0.5 sm:mt-1.5">
+              <p className="text-xs sm:text-lg text-gray-400 font-medium leading-tight mt-1 sm:mt-2">
                 {getCivArticle(civName)}<span className="text-blue-200 font-bold">{civName}</span>! 
               </p>
             </div>
