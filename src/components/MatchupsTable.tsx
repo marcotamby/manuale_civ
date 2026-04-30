@@ -211,7 +211,7 @@ export function MatchupsTable({ selectedCiv }: { selectedCiv: string }) {
       )}
 
       {!loading && !error && (
-        <div className="glass rounded-2xl overflow-hidden border border-[#D4AF37]/15 shadow-2xl">
+        <div className="bg-[#0a0c12]/90 backdrop-blur-xl rounded-2xl overflow-hidden border border-[#D4AF37]/20 shadow-2xl">
           <div className="overflow-x-auto no-scrollbar">
             <table className="w-full text-left border-collapse">
               <thead>
