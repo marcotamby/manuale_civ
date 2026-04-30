@@ -208,6 +208,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     if (!civ?.buildOrders) return;
     
     const fetchBOAuthors = async () => {
+      if (!civ?.buildOrders) return;
       const emails = Array.from(new Set(civ.buildOrders.map(bo => bo.author_id).filter(Boolean)));
       if (emails.length === 0) return;
       
