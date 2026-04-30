@@ -1,5 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Save, Plus, Trash2, Edit, Zap, Info, Map, Play, AlertTriangle, ChevronUp, ChevronDown, Cog, Loader2, CheckCircle2 } from 'lucide-react';
+import { X, Save, Plus, Trash2, Edit, Zap, Info, Map, Play, AlertTriangle, ChevronUp, ChevronDown, Cog, Loader2, CheckCircle2, GripVertical } from 'lucide-react';
+import { 
+  DndContext, 
+  closestCenter, 
+  KeyboardSensor, 
+  PointerSensor, 
+  useSensor, 
+  useSensors, 
+  DragEndEvent 
+} from '@dnd-kit/core';
+import { 
+  arrayMove, 
+  SortableContext, 
+  sortableKeyboardCoordinates, 
+  verticalListSortingStrategy,
+  useSortable 
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { supabase } from '../lib/supabaseClient';
 import { YouTubePickerModal } from './YouTubePickerModal';
 import { Toast } from './Toast';
@@ -18,6 +35,71 @@ interface AdminCivEditorModalProps {
   initialId?: string;
 }
 
+function SortableVideoItem({ id, videoId, idx, onRemove, onUpdate }: { 
+  id: string, 
+  videoId: string, 
+  idx: number, 
+  onRemove: (idx: number) => void,
+  onUpdate: (idx: number, value: string) => void
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 100 : 1,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      className={`flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg p-2 group hover:border-red-500/30 transition-all mb-2 ${isDragging ? 'shadow-2xl ring-2 ring-red-500/50' : ''}`}
+    >
+      <div 
+        {...attributes} 
+        {...listeners} 
+        className="cursor-grab active:cursor-grabbing p-1 text-gray-500 hover:text-white transition-colors"
+      >
+        <GripVertical size={16} />
+      </div>
+      <div className="w-16 aspect-video rounded bg-black overflow-hidden shrink-0 border border-white/10">
+        <img 
+          src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} 
+          alt="Thumbnail" 
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/120x67?text=Invalid+ID';
+          }}
+        />
+      </div>
+      <div className="flex-1 min-w-0">
+        <input 
+          type="text" 
+          value={videoId}
+          onChange={(e) => onUpdate(idx, e.target.value)}
+          onPointerDown={(e) => e.stopPropagation()} // Prevent drag when clicking input
+          className="bg-transparent border-none text-xs text-white w-full focus:ring-0 p-0 font-mono"
+        />
+      </div>
+      <button
+        onClick={() => onRemove(idx)}
+        className="p-1.5 rounded bg-red-500/10 hover:bg-red-500/20 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <Trash2 size={14} />
+      </button>
+    </div>
+  );
+}
+
 export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSection, initialId }: AdminCivEditorModalProps) {
   const { globalUnits } = useCivData();
   const { user } = useAuth();
@@ -32,6 +114,29 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
     message: '',
     type: 'success'
   });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setEditedCiv((prev) => {
+        const oldIndex = prev.videos.indexOf(active.id as string);
+        const newIndex = prev.videos.indexOf(over.id as string);
+        
+        return {
+          ...prev,
+          videos: arrayMove(prev.videos, oldIndex, newIndex),
+        };
+      });
+    }
+  };
 
 
   // Refs for scrolling
@@ -329,34 +434,95 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                 <div>
                   <div className="flex justify-between items-end mb-1.5">
                     <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
-                      <Play size={12} className="text-red-500" /> YouTube
+                      <Play size={12} className="text-red-500" /> Video Guide (YouTube)
                     </label>
                     <button
                       type="button"
                       onClick={() => setIsYoutubePickerOpen(true)}
-                      className="text-[9px] bg-red-600/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded flex items-center gap-1 hover:bg-red-600/40 transition-all font-bold uppercase tracking-tighter"
+                      className="text-[9px] bg-red-600/20 text-red-400 border border-red-500/30 px-2 py-1 rounded flex items-center gap-1 hover:bg-red-600/40 transition-all font-bold uppercase tracking-tighter"
                     >
-                      Sfoglia Canale
+                      <Plus size={10} /> Sfoglia Canale
                     </button>
                   </div>
-                  <textarea
-                    value={editedCiv.videos?.join(', ') || ''}
-                    onChange={e => {
-                      const rawValues = e.target.value.split(',').map(v => v.trim()).filter(Boolean);
-                      const parsedIds = rawValues.map(val => {
-                        if (val.includes('youtube.com/watch?v=')) {
-                          return val.split('v=')[1]?.split('&')[0] || val;
-                        } else if (val.includes('youtu.be/')) {
-                          return val.split('youtu.be/')[1]?.split('?')[0] || val;
+                  
+                  <div className="space-y-1 bg-black/40 border border-gray-600 rounded-lg p-3 min-h-[100px] max-h-[300px] overflow-y-auto custom-scrollbar">
+                    {editedCiv.videos && editedCiv.videos.length > 0 ? (
+                      <DndContext 
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                      >
+                        <SortableContext 
+                          items={editedCiv.videos}
+                          strategy={verticalListSortingStrategy}
+                        >
+                          {editedCiv.videos.map((videoId: string, idx: number) => (
+                            <SortableVideoItem 
+                              key={videoId}
+                              id={videoId}
+                              videoId={videoId}
+                              idx={idx}
+                              onUpdate={(i, val) => {
+                                const newVideos = [...editedCiv.videos];
+                                newVideos[i] = val;
+                                setEditedCiv({ ...editedCiv, videos: newVideos });
+                              }}
+                              onRemove={(i) => {
+                                const newVideos = [...editedCiv.videos];
+                                newVideos.splice(i, 1);
+                                setEditedCiv({ ...editedCiv, videos: newVideos });
+                              }}
+                            />
+                          ))}
+                        </SortableContext>
+                      </DndContext>
+                    ) : (
+                      <div className="h-full flex flex-col items-center justify-center py-6 text-gray-500 border-2 border-dashed border-white/5 rounded-lg">
+                        <Play size={20} className="mb-2 opacity-20" />
+                        <p className="text-[10px] font-bold uppercase tracking-widest">Nessun video aggiunto</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="mt-2 flex gap-2">
+                    <input 
+                      type="text"
+                      placeholder="Incolla ID video o Link..."
+                      className="flex-1 bg-black/40 border border-gray-600 rounded-lg px-3 py-1.5 text-xs text-white focus:border-red-500 transition-colors"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          const val = (e.target as HTMLInputElement).value.trim();
+                          if (!val) return;
+                          
+                          let id = val;
+                          if (val.includes('v=')) id = val.split('v=')[1].split('&')[0];
+                          else if (val.includes('youtu.be/')) id = val.split('youtu.be/')[1].split('?')[0];
+                          
+                          setEditedCiv({ ...editedCiv, videos: [...(editedCiv.videos || []), id] });
+                          (e.target as HTMLInputElement).value = '';
                         }
-                        return val;
-                      });
-                      setEditedCiv({ ...editedCiv, videos: parsedIds });
-                    }}
-                    placeholder="ID video separati da virgola..."
-                    rows={2}
-                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-xs text-white focus:border-red-500 transition-colors"
-                  />
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        const input = (e.currentTarget.previousSibling as HTMLInputElement);
+                        const val = input.value.trim();
+                        if (!val) return;
+                        
+                        let id = val;
+                        if (val.includes('v=')) id = val.split('v=')[1].split('&')[0];
+                        else if (val.includes('youtu.be/')) id = val.split('youtu.be/')[1].split('?')[0];
+                        
+                        setEditedCiv({ ...editedCiv, videos: [...(editedCiv.videos || []), id] });
+                        input.value = '';
+                      }}
+                      className="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                    >
+                      Aggiungi
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
