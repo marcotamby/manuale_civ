@@ -333,7 +333,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     });
 
     try {
-      const userEmail = user.email.toLowerCase();
+      const userEmail = user?.email?.toLowerCase();
+      if (!userEmail) return;
+
       if (hasVoted) {
         const { error } = await supabase
           .from('qa_votes')
