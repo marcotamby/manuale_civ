@@ -199,6 +199,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const [qaMessage, setQaMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
   const [qaMessageClosing, setQaMessageClosing] = useState(false);
   const [boVotes, setBoVotes] = useState<Record<string, { up: number, down: number, userVote: number | null }>>({});
+  const [qaVotes, setQaVotes] = useState<Record<string, { count: number, userVoted: boolean }>>({});
   const [boMessage, setBoMessage] = useState<{ id: string, text: string } | null>(null);
   const [isQaExpanded, setIsQaExpanded] = useState(false);
 
@@ -276,6 +277,77 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   useEffect(() => {
     if (civ?.buildOrders) fetchVotes();
   }, [civ?.buildOrders, user?.email]);
+
+  const fetchQAVotes = async (itemIds: string[]) => {
+    if (itemIds.length === 0) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('qa_votes')
+        .select('*')
+        .in('item_id', itemIds);
+      
+      if (error) {
+        if (error.code === '42P01') { // Table doesn't exist yet
+          console.warn('qa_votes table does not exist. Please run the migration script.');
+          return;
+        }
+        throw error;
+      }
+
+      const counts: Record<string, { count: number, userVoted: boolean }> = {};
+      data.forEach(v => {
+        if (!counts[v.item_id]) counts[v.item_id] = { count: 0, userVoted: false };
+        counts[v.item_id].count++;
+        if (user && v.user_email === user.email) {
+          counts[v.item_id].userVoted = true;
+        }
+      });
+      setQaVotes(counts);
+    } catch (e) {
+      console.error('Error fetching QA votes:', e);
+    }
+  };
+
+  const handleQAVote = async (itemId: string, itemType: 'question' | 'answer') => {
+    if (!user) {
+      openLoginModal('Accedi con il tuo account Google per votare domande e risposte!');
+      return;
+    }
+
+    const hasVoted = qaVotes[itemId]?.userVoted;
+    
+    // Optimistic update
+    setQaVotes(prev => {
+      const next = { ...prev };
+      if (!next[itemId]) next[itemId] = { count: 0, userVoted: false };
+      if (hasVoted) {
+        next[itemId].count = Math.max(0, next[itemId].count - 1);
+        next[itemId].userVoted = false;
+      } else {
+        next[itemId].count++;
+        next[itemId].userVoted = true;
+      }
+      return next;
+    });
+
+    try {
+      if (hasVoted) {
+        await supabase
+          .from('qa_votes')
+          .delete()
+          .match({ user_email: user.email, item_id: itemId });
+      } else {
+        await supabase
+          .from('qa_votes')
+          .insert({ user_email: user.email, item_id: itemId, item_type: itemType });
+      }
+    } catch (e) {
+      console.error('Error voting on QA:', e);
+      // Re-sync with server on error
+      fetchQA();
+    }
+  };
 
   const fetchQA = async () => {
     try {
@@ -367,6 +439,15 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       });
 
       setQuestions(threadedQuestions);
+
+      // Fetch votes for all items
+      const allItemIds = [
+        ...qData?.map(q => q.id) || [],
+        ...aData?.map(a => a.id) || []
+      ];
+      if (allItemIds.length > 0) {
+        fetchQAVotes(allItemIds);
+      }
     } catch (err) {
       console.error('Error fetching Q&A:', err);
     } finally {
@@ -587,6 +668,22 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                   {a.user_rank}
                 </span>
                 <span className="text-[9px] text-gray-500 font-bold select-none uppercase tracking-widest">{new Date(a.created_at).toLocaleDateString('it-IT')}</span>
+                
+                <button 
+                  onClick={() => handleQAVote(a.id, 'answer')}
+                  className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full transition-all border ${
+                    qaVotes[a.id]?.userVoted 
+                      ? 'text-blue-400 bg-blue-500/10 border-blue-500/20' 
+                      : 'text-gray-500 hover:text-blue-400 hover:bg-blue-500/5 border-transparent'
+                  }`}
+                  title="Mi piace"
+                >
+                  <ThumbsUp size={11} className={qaVotes[a.id]?.userVoted ? 'fill-current' : ''} />
+                  {qaVotes[a.id]?.count > 0 && (
+                    <span className="text-[10px] font-black">{qaVotes[a.id].count}</span>
+                  )}
+                </button>
+
                 {isAdmin && (
                   <button 
                     onClick={() => handleDeleteQA(a.id, 'answer')}
@@ -1754,7 +1851,21 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                    {renderAnswers(q.answers, q.id)}
                                 </div>
                              )}
-                                      <div className="flex justify-end pt-1 border-t border-white/5">
+                                      <div className="flex justify-end pt-1 border-t border-white/5 gap-2">
+                               <button 
+                                 onClick={() => handleQAVote(q.id, 'question')}
+                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                                   qaVotes[q.id]?.userVoted 
+                                     ? 'text-blue-400 bg-blue-500/10' 
+                                     : 'text-gray-400 hover:text-blue-400 hover:bg-blue-500/5'
+                                 }`}
+                                 title="Mi piace"
+                               >
+                                 <ThumbsUp size={14} className={qaVotes[q.id]?.userVoted ? 'fill-current' : ''} />
+                                 {qaVotes[q.id]?.count > 0 && (
+                                   <span className="font-black">{qaVotes[q.id].count}</span>
+                                 )}
+                               </button>
                                <button 
                                   onClick={() => {
                                     if (replyTo && replyTo.questionId === q.id && !replyTo.parentId) {
