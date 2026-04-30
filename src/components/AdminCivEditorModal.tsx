@@ -7,7 +7,7 @@ import {
   PointerSensor, 
   useSensor, 
   useSensors, 
-  DragEndEvent 
+  type DragEndEvent 
 } from '@dnd-kit/core';
 import { 
   arrayMove, 
@@ -126,13 +126,14 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      setEditedCiv((prev) => {
-        const oldIndex = prev.videos.indexOf(active.id as string);
-        const newIndex = prev.videos.indexOf(over.id as string);
+      setEditedCiv((prev: Civilization) => {
+        const videos = prev.videos || [];
+        const oldIndex = videos.indexOf(active.id as string);
+        const newIndex = videos.indexOf(over.id as string);
         
         return {
           ...prev,
-          videos: arrayMove(prev.videos, oldIndex, newIndex),
+          videos: arrayMove(videos, oldIndex, newIndex),
         };
       });
     }
@@ -294,14 +295,14 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
   };
 
   const handleBonusChange = (index: number, value: string) => {
-    setEditedCiv(prev => {
+    setEditedCiv((prev: Civilization) => {
       const newBonuses = [...prev.passiveBonuses];
       newBonuses[index] = value;
       return { ...prev, passiveBonuses: newBonuses };
     });
   };
   const updateArrayField = <T extends keyof Civilization>(field: T, index: number, key: string | { [key: string]: any }, value?: any) => {
-    setEditedCiv(prev => {
+    setEditedCiv((prev: Civilization) => {
       const newArr = [...(prev[field] as any[])];
       
       if (typeof key === 'object') {
@@ -463,12 +464,12 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                               videoId={videoId}
                               idx={idx}
                               onUpdate={(i, val) => {
-                                const newVideos = [...editedCiv.videos];
+                                const newVideos = [...(editedCiv.videos || [])];
                                 newVideos[i] = val;
                                 setEditedCiv({ ...editedCiv, videos: newVideos });
                               }}
                               onRemove={(i) => {
-                                const newVideos = [...editedCiv.videos];
+                                const newVideos = [...(editedCiv.videos || [])];
                                 newVideos.splice(i, 1);
                                 setEditedCiv({ ...editedCiv, videos: newVideos });
                               }}
@@ -800,24 +801,24 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
         </div>
       </div>
 
-      <YouTubePickerModal
-        isOpen={isYoutubePickerOpen}
-        onClose={() => setIsYoutubePickerOpen(false)}
-        selectedIds={editedCiv.videos || []}
-        onSelect={(videoIds) => {
-          setEditedCiv({
-            ...editedCiv,
-            videos: videoIds
-          });
-        }}
-      />
+      {isYoutubePickerOpen && (
+        <YouTubePickerModal 
+          isOpen={isYoutubePickerOpen}
+          onClose={() => setIsYoutubePickerOpen(false)}
+          onSelect={(videoId) => {
+             setEditedCiv({ ...editedCiv, videos: [...(editedCiv.videos || []), videoId] });
+             setIsYoutubePickerOpen(false);
+          }}
+        />
+      )}
 
-      <Toast
-        isVisible={toast.isVisible}
-        message={toast.message}
-        type={toast.type}
-        onClose={() => setToast({ ...toast, isVisible: false })}
-      />
+      {toast.isVisible && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast({ ...toast, isVisible: false })} 
+        />
+      )}
     </div>
   );
 }
