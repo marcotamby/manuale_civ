@@ -209,19 +209,30 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     
     const fetchBOAuthors = async () => {
       if (!civ?.buildOrders) return;
-      const emails = Array.from(new Set(civ.buildOrders.map(bo => bo.author_id).filter(Boolean)));
-      if (emails.length === 0) return;
       
-      const { data } = await supabase
-        .from('profiles')
-        .select('email, avatar_url, rank, nickname')
-        .in('email', emails);
+      const emails = Array.from(new Set(civ.buildOrders.map(bo => bo.author_id).filter(Boolean)));
+      const nicknames = Array.from(new Set(civ.buildOrders.filter(bo => !bo.author_id).map(bo => bo.author_nickname).filter(Boolean)));
+      
+      if (emails.length === 0 && nicknames.length === 0) return;
+      
+      let combinedData: any[] = [];
+      
+      if (emails.length > 0) {
+        const { data } = await supabase.from('profiles').select('email, avatar_url, rank, nickname').in('email', emails);
+        if (data) combinedData = [...combinedData, ...data];
+      }
+      
+      if (nicknames.length > 0) {
+        const { data } = await supabase.from('profiles').select('email, avatar_url, rank, nickname').in('nickname', nicknames);
+        if (data) combinedData = [...combinedData, ...data];
+      }
         
-      if (data) {
-        const profileMap = data.reduce((acc: any, curr: any) => {
-          acc[curr.email.toLowerCase()] = curr;
-          return acc;
-        }, {});
+      if (combinedData.length > 0) {
+        const profileMap: Record<string, any> = {};
+        combinedData.forEach(p => {
+          if (p.email) profileMap[p.email.toLowerCase()] = p;
+          if (p.nickname) profileMap[p.nickname.toLowerCase()] = p;
+        });
         setBoAuthors(profileMap);
       }
     };
@@ -1464,10 +1475,14 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                               </div>
                               <div className="flex flex-col">
                                  <span className="text-lg font-black text-blue-400 truncate uppercase tracking-tighter">
-                                   {boAuthors[selectedBO.author_id?.toLowerCase() || '']?.nickname || selectedBO.author_nickname || 'Contributore'}
+                                   {boAuthors[selectedBO.author_id?.toLowerCase() || '']?.nickname || 
+                                    boAuthors[selectedBO.author_nickname?.toLowerCase() || '']?.nickname || 
+                                    selectedBO.author_nickname || 'Contributore'}
                                  </span>
                                  <span className="text-[10px] font-bold text-gray-500 uppercase bg-black/40 px-2 py-0.5 rounded w-fit">
-                                   {boAuthors[selectedBO.author_id?.toLowerCase() || '']?.rank || selectedBO.author_rank || 'Unranked'}
+                                   {boAuthors[selectedBO.author_id?.toLowerCase() || '']?.rank || 
+                                    boAuthors[selectedBO.author_nickname?.toLowerCase() || '']?.rank || 
+                                    selectedBO.author_rank || 'Unranked'}
                                  </span>
                               </div>
                            </div>
