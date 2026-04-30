@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { civilizationsData } from '../data/aoe4Data';
 import { CustomSelect } from './CustomSelect';
-import { Users, Trophy } from 'lucide-react';
+import { Users, Trophy, Loader2 } from 'lucide-react';
 
 // Maps app civ IDs to the exact IDs used by the AoE4World API
 const CIV_ID_TO_API_KEY: Record<string, string> = {
@@ -195,23 +195,24 @@ export function MatchupsTable({ selectedCiv }: { selectedCiv: string }) {
           value={ratingRange}
           onChange={setRatingRange}
         />
-        {loading && (
-          <div className="flex items-end pb-2">
-            <span className="text-gray-400 text-xs font-bold animate-pulse uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full border border-white/10">Sincronizzazione dati live...</span>
-          </div>
-        )}
       </div>
 
       {error && <div className="text-red-400 text-sm py-4 italic bg-red-500/10 border border-red-500/20 rounded-xl px-4">{error}</div>}
 
-      {!loading && !error && (activeSubTab === 'civ' ? matchups.length === 0 : mapStats.length === 0) && (
+      {!error && (activeSubTab === 'civ' ? matchups.length === 0 : mapStats.length === 0) && !loading && (
         <div className="text-gray-400 text-sm py-8 text-center glass rounded-2xl border border-white/5 italic">
           Nessun dato disponibile per questi criteri di ricerca.
         </div>
       )}
 
-      {!loading && !error && (
-        <div className="bg-[#0a0c12]/90 backdrop-blur-xl rounded-2xl overflow-hidden border border-[#D4AF37]/20 shadow-2xl">
+      {!error && (
+        <div className="bg-[#0a0c12]/90 backdrop-blur-xl rounded-2xl overflow-hidden border border-[#D4AF37]/20 shadow-2xl relative min-h-[400px]">
+          {loading && (
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center z-20 animate-in fade-in duration-200">
+              <Loader2 className="w-10 h-10 text-yellow-500 animate-spin mb-3" />
+              <span className="text-gray-400 text-xs font-black uppercase tracking-[0.2em] animate-pulse">Sincronizzazione dati live...</span>
+            </div>
+          )}
           <div className="overflow-x-auto no-scrollbar">
             <table className="w-full text-left border-collapse">
               <thead>
