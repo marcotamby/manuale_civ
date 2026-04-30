@@ -394,9 +394,11 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-white/5">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
-                    <Info size={12} /> Nome Civiltà
-                  </label>
+                  <div className="h-7 flex items-center mb-1.5">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                      <Info size={12} /> Nome Civiltà
+                    </label>
+                  </div>
                   <input
                     type="text"
                     value={editedCiv.name}
@@ -406,9 +408,11 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
-                    <Cog size={12} /> Difficoltà
-                  </label>
+                  <div className="h-7 flex items-center mb-1.5">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                      <Cog size={12} /> Difficoltà
+                    </label>
+                  </div>
                   <select
                     value={editedCiv.difficulty}
                     onChange={e => setEditedCiv({ ...editedCiv, difficulty: e.target.value as any })}
@@ -421,9 +425,11 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
-                    <Info size={12} /> Descrizione Breve
-                  </label>
+                  <div className="h-7 flex items-center mb-1.5">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                      <Info size={12} /> Descrizione Breve
+                    </label>
+                  </div>
                   <textarea
                     value={editedCiv.shortDescription}
                     onChange={e => setEditedCiv({ ...editedCiv, shortDescription: e.target.value })}
@@ -435,7 +441,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
 
               <div className="space-y-4">
                 <div>
-                  <div className="flex justify-between items-center mb-1.5">
+                  <div className="h-7 flex justify-between items-center mb-1.5">
                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
                       <Play size={12} className="text-red-500" /> Video Guide (YouTube)
                     </label>
@@ -763,7 +769,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                        <div className="grid grid-cols-5 gap-1">
                           <input type="number" min="1" max="4" value={gu.age} onChange={e => updateGlobalUnit(idx, 'age', e.target.value)} title="Age" className="bg-gray-800 text-white text-xs rounded px-1 py-1 text-center border border-gray-600" />
                           <input type="number" value={gu.stats?.attack || 0} onChange={e => updateGlobalUnit(idx, 'attack', e.target.value)} title="Attack" className="bg-gray-800 text-red-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
-                          <input type="number" value={gu.stats?.armor || 0} onChange={e => updateGlobalUnit(idx, 'armor', e.target.value)} title="Armor" className="bg-gray-800 text-gray-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                          <input type="number" value={gu.stats?.armor || 0} onChange={e => updateArrayField('uniqueUnits', idx, 'armor', e.target.value)} title="Armor" className="bg-gray-800 text-gray-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
                           <input type="number" value={gu.stats?.health || 0} onChange={e => updateGlobalUnit(idx, 'health', e.target.value)} title="Health" className="bg-gray-800 text-green-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
                           <input type="number" step="0.1" value={gu.stats?.speed || 0} onChange={e => updateGlobalUnit(idx, 'speed', e.target.value)} title="Speed" className="bg-gray-800 text-blue-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
                         </div>
