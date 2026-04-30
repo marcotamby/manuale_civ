@@ -303,7 +303,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
   };
   const updateArrayField = <T extends keyof Civilization>(field: T, index: number, key: string | { [key: string]: any }, value?: any) => {
     setEditedCiv((prev: Civilization) => {
-      const newArr = [...(prev[field] as any[])];
+      const newArr = [...(prev[field] as any[] || [])];
       
       if (typeof key === 'object') {
         newArr[index] = { ...newArr[index], ...key };
@@ -324,7 +324,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
 
 
   const removeFromArray = <T extends keyof Civilization>(field: T, index: number) => {
-    const newArr = [...(editedCiv[field] as any[])];
+    const newArr = [...(editedCiv[field] as any[] || [])];
     newArr.splice(index, 1);
     setEditedCiv({ ...editedCiv, [field]: newArr });
   };
@@ -454,7 +454,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                         onDragEnd={handleDragEnd}
                       >
                         <SortableContext 
-                          items={editedCiv.videos}
+                          items={editedCiv.videos || []}
                           strategy={verticalListSortingStrategy}
                         >
                           {editedCiv.videos.map((videoId: string, idx: number) => (
