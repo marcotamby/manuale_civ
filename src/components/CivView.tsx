@@ -628,7 +628,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           .eq('user_id', user.email)
           .eq('status', 'approved')
           .limit(1);
-  
+ 
         if (existingQApproved && existingQApproved.length > 0) {
           targetStatus = 'approved';
         }
@@ -1195,11 +1195,16 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                             <button 
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setSearchParams({ bo: bo.id }, { replace: true });
+                                setExpandedBOs(prev => {
+                                  const next = new Set(prev);
+                                  if (next.has(bo.id)) next.delete(bo.id);
+                                  else next.add(bo.id);
+                                  return next;
+                                });
                               }}
                               className="text-[10px] font-black uppercase text-yellow-500/80 hover:text-yellow-500 transition-colors mb-4 flex items-center gap-1"
                             >
-                              Leggi tutto
+                              {expandedBOs.has(bo.id) ? 'Mostra meno' : 'Leggi tutto'}
                               <ChevronDown size={10} className={`transition-transform duration-300 ${expandedBOs.has(bo.id) ? 'rotate-180' : ''}`} />
                             </button>
                           )}
@@ -1438,7 +1443,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         {selectedBO.map && (
                           <div className="bg-white/[0.03] rounded-2xl border border-white/10 p-4 space-y-3">
                              <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                                Mappe Consigliate
+                               Mappe Consigliate
                              </h4>
                              <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-lg bg-cyan-500/5 border border-cyan-500/20 flex items-center justify-center">
@@ -1578,16 +1583,30 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         )}
 
         {activeTab === 'matchups' && (
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-1 flex items-center gap-2">
-                <BarChart2 className="text-blue-400" size={24} />
-                Matchup 1v1
-              </h2>
-              <p className="text-sm text-gray-400">Statistiche aggiornate in tempo reale</p>
+          <section className="relative -mx-4 md:-mx-8 px-4 md:px-8 py-16 bg-[#0a0a0b]/98 backdrop-blur-sm border-y border-white/5 overflow-hidden">
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/5 blur-[120px] rounded-full" />
+              <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500/5 blur-[120px] rounded-full" />
             </div>
-            <MatchupsTable selectedCiv={civId} />
-          </div>
+
+            <div className="relative z-10 space-y-8">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 mb-4">
+                  <BarChart2 className="text-blue-400" size={24} />
+                </div>
+                <h2 className="text-3xl md:text-4xl font-sackers font-black text-white tracking-tighter uppercase">
+                  Matchup 1v1
+                </h2>
+                <p className="text-gray-400 mt-2 text-sm md:text-base font-medium italic">
+                  Statistiche aggiornate in tempo reale
+                </p>
+              </div>
+
+              <div className="min-h-[400px] relative z-10">
+                <MatchupsTable selectedCiv={civId} />
+              </div>
+            </div>
+          </section>
         )}
 
         {activeTab === 'video' && (
@@ -1620,8 +1639,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                       const url = new URL(finalId);
                       finalId = url.searchParams.get('v') || url.pathname.slice(1) || finalId;
                     } catch (e) {
-                      // Silently ignore parsing errors
-                    }
+          // Silently ignore parsing errors
+        }
                   }
                   return (
                     <div key={`${finalId}-${index}`} className="flex flex-col h-full">
@@ -1929,50 +1948,50 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                   <MessageSquare size={14} />
                                   {replyTo && replyTo.questionId === q.id && !replyTo.parentId ? 'Annulla' : 'Rispondi'}
                                 </button>
-                             </div>
+                            </div>
 
-                             {/* Answer Input (Root) */}
-                             {replyTo && replyTo.questionId === q.id && !replyTo.parentId && (
-                                <div className="mt-6 pt-6 border-t border-white/10 space-y-4 animate-in fade-in slide-in-from-top-3 duration-300 outline-none">
-                                   <textarea
-                                     value={answerText}
-                                     onChange={(e) => setAnswerText(e.target.value)}
-                                     placeholder="Condividi la tua esperienza con la community..."
-                                     className="w-full bg-black/60 border border-blue-500/20 rounded-2xl px-6 py-5 text-white placeholder:text-gray-600 focus:border-blue-500/50 focus:bg-black/80 outline-none transition-all text-base min-h-[120px] resize-y shadow-inner"
-                                     autoFocus
-                                   />
-                                   <div className="flex justify-end">
-                                     <button
-                                       onClick={() => handleAnswerSubmit(q.id)}
-                                       disabled={!answerText.trim() || isSubmittingAns === q.id}
-                                       className={`flex items-center gap-3 px-8 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-xl border border-white/10 active:scale-95 ${
-                                         ansSubmissionSuccess === q.id
-                                           ? 'bg-green-600 text-white shadow-green-500/20'
-                                           : 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-[0_10px_25px_rgba(37,99,235,0.3)] hover:shadow-[0_15px_35px_rgba(37,99,235,0.5)]'
-                                       }`}
-                                     >
-                                       {isSubmittingAns === q.id ? (
-                                         <>
-                                           <Loader2 size={16} className="animate-spin" />
-                                           Inviando...
-                                         </>
-                                       ) : ansSubmissionSuccess === q.id ? (
-                                         <>
-                                           <CheckCircle size={16} />
-                                           Risposta Inviata!
-                                         </>
-                                       ) : (
-                                         <>
-                                           <Send size={16} />
-                                           Invia Risposta
-                                         </>
-                                       )}
-                                     </button>
-                                   </div>
-                                </div>
-                             )}
-                          </div>
-                       ))
+                            {/* Answer Input (Root) */}
+                            {replyTo && replyTo.questionId === q.id && !replyTo.parentId && (
+                               <div className="mt-6 pt-6 border-t border-white/10 space-y-4 animate-in fade-in slide-in-from-top-3 duration-300 outline-none">
+                                  <textarea
+                                    value={answerText}
+                                    onChange={(e) => setAnswerText(e.target.value)}
+                                    placeholder="Condividi la tua esperienza con la community..."
+                                    className="w-full bg-black/60 border border-blue-500/20 rounded-2xl px-6 py-5 text-white placeholder:text-gray-600 focus:border-blue-500/50 focus:bg-black/80 outline-none transition-all text-base min-h-[120px] resize-y shadow-inner"
+                                    autoFocus
+                                  />
+                                  <div className="flex justify-end">
+                                    <button
+                                      onClick={() => handleAnswerSubmit(q.id)}
+                                      disabled={!answerText.trim() || isSubmittingAns === q.id}
+                                      className={`flex items-center gap-3 px-8 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-xl border border-white/10 active:scale-95 ${
+                                        ansSubmissionSuccess === q.id
+                                          ? 'bg-green-600 text-white shadow-green-500/20'
+                                          : 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-[0_10px_25px_rgba(37,99,235,0.3)] hover:shadow-[0_15px_35px_rgba(37,99,235,0.5)]'
+                                      }`}
+                                    >
+                                      {isSubmittingAns === q.id ? (
+                                        <>
+                                          <Loader2 size={16} className="animate-spin" />
+                                          Inviando...
+                                        </>
+                                      ) : ansSubmissionSuccess === q.id ? (
+                                        <>
+                                          <CheckCircle size={16} />
+                                          Risposta Inviata!
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Send size={16} />
+                                          Invia Risposta
+                                        </>
+                                      )}
+                                    </button>
+                                  </div>
+                               </div>
+                            )}
+                         </div>
+                      ))
                   ) : (
                     <div className="bg-[#0f1423] p-12 rounded-[40px] border border-white/5 text-center flex flex-col items-center shadow-2xl relative overflow-hidden">
                       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-blue-500/5 blur-[100px] pointer-events-none" />

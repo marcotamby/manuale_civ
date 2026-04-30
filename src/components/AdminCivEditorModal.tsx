@@ -392,146 +392,144 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
 
           {!initialSection && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-white/5">
+              {/* Row 1: Nome and Difficoltà */}
               <div className="space-y-4">
-                <div>
-                  <div className="h-7 flex items-center mb-1.5">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                      <Info size={12} /> Nome Civiltà
-                    </label>
-                  </div>
-                  <input
-                    type="text"
-                    value={editedCiv.name}
-                    onChange={e => setEditedCiv({ ...editedCiv, name: e.target.value })}
-                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors"
-                  />
+                <div className="h-7 flex items-center mb-1.5">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <Info size={12} /> Nome Civiltà
+                  </label>
                 </div>
-
-                <div>
-                  <div className="h-7 flex items-center mb-1.5">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                      <Cog size={12} /> Difficoltà
-                    </label>
-                  </div>
-                  <select
-                    value={editedCiv.difficulty}
-                    onChange={e => setEditedCiv({ ...editedCiv, difficulty: e.target.value as any })}
-                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors [&>option]:bg-[#1a1c23] [&>option]:text-white"
-                  >
-                    <option value="Facile">Facile</option>
-                    <option value="Medio">Medio</option>
-                    <option value="Difficile">Difficile</option>
-                  </select>
-                </div>
-
-                <div>
-                  <div className="h-7 flex items-center mb-1.5">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                      <Info size={12} /> Descrizione Breve
-                    </label>
-                  </div>
-                  <textarea
-                    value={editedCiv.shortDescription}
-                    onChange={e => setEditedCiv({ ...editedCiv, shortDescription: e.target.value })}
-                    rows={4}
-                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors resize-y text-sm"
-                  />
-                </div>
+                <input
+                  type="text"
+                  value={editedCiv.name}
+                  onChange={e => setEditedCiv({ ...editedCiv, name: e.target.value })}
+                  className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors"
+                />
               </div>
 
               <div className="space-y-4">
-                <div>
-                  <div className="h-7 flex justify-between items-center mb-1.5">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                      <Play size={12} className="text-red-500" /> Video Guide (YouTube)
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => setIsYoutubePickerOpen(true)}
-                      className="text-[9px] bg-red-600/20 text-red-400 border border-red-500/30 px-2 py-1 rounded flex items-center gap-1 hover:bg-red-600/40 transition-all font-bold uppercase tracking-tighter"
+                <div className="h-7 flex items-center mb-1.5">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <Cog size={12} /> Difficoltà
+                  </label>
+                </div>
+                <select
+                  value={editedCiv.difficulty}
+                  onChange={e => setEditedCiv({ ...editedCiv, difficulty: e.target.value as any })}
+                  className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors [&>option]:bg-[#1a1c23] [&>option]:text-white"
+                >
+                  <option value="Facile">Facile</option>
+                  <option value="Medio">Medio</option>
+                  <option value="Difficile">Difficile</option>
+                </select>
+              </div>
+
+              {/* Row 2: Descrizione and Video */}
+              <div className="space-y-4">
+                <div className="h-7 flex items-center mb-1.5">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <Info size={12} /> Descrizione Breve
+                  </label>
+                </div>
+                <textarea
+                  value={editedCiv.shortDescription}
+                  onChange={e => setEditedCiv({ ...editedCiv, shortDescription: e.target.value })}
+                  rows={10}
+                  className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors resize-y text-sm"
+                />
+              </div>
+
+              <div className="space-y-4">
+                <div className="h-7 flex justify-between items-center mb-1.5">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <Play size={12} className="text-red-500" /> Video Guide (YouTube)
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setIsYoutubePickerOpen(true)}
+                    className="text-[9px] bg-red-600/20 text-red-400 border border-red-500/30 px-2 py-1 rounded flex items-center gap-1 hover:bg-red-600/40 transition-all font-bold uppercase tracking-tighter"
+                  >
+                    <Plus size={10} /> Sfoglia Canale
+                  </button>
+                </div>
+                
+                <div className="space-y-1 bg-black/40 border border-gray-600 rounded-lg p-3 min-h-[100px] max-h-[300px] overflow-y-auto custom-scrollbar">
+                  {editedCiv.videos && editedCiv.videos.length > 0 ? (
+                    <DndContext 
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
                     >
-                      <Plus size={10} /> Sfoglia Canale
-                    </button>
-                  </div>
-                  
-                  <div className="space-y-1 bg-black/40 border border-gray-600 rounded-lg p-3 min-h-[100px] max-h-[300px] overflow-y-auto custom-scrollbar">
-                    {editedCiv.videos && editedCiv.videos.length > 0 ? (
-                      <DndContext 
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDragEnd}
+                      <SortableContext 
+                        items={editedCiv.videos || []}
+                        strategy={verticalListSortingStrategy}
                       >
-                        <SortableContext 
-                          items={editedCiv.videos || []}
-                          strategy={verticalListSortingStrategy}
-                        >
-                          {(editedCiv.videos || []).map((videoId: string, idx: number) => (
-                            <SortableVideoItem 
-                              key={videoId}
-                              id={videoId}
-                              videoId={videoId}
-                              idx={idx}
-                              onUpdate={(i, val) => {
-                                const newVideos = [...(editedCiv.videos || [])];
-                                newVideos[i] = val;
-                                setEditedCiv({ ...editedCiv, videos: newVideos });
-                              }}
-                              onRemove={(i) => {
-                                const newVideos = [...(editedCiv.videos || [])];
-                                newVideos.splice(i, 1);
-                                setEditedCiv({ ...editedCiv, videos: newVideos });
-                              }}
-                            />
-                          ))}
-                        </SortableContext>
-                      </DndContext>
-                    ) : (
-                      <div className="h-full flex flex-col items-center justify-center py-6 text-gray-500 border-2 border-dashed border-white/5 rounded-lg">
-                        <Play size={20} className="mb-2 opacity-20" />
-                        <p className="text-[10px] font-bold uppercase tracking-widest">Nessun video aggiunto</p>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="mt-2 flex gap-2">
-                    <input 
-                      type="text"
-                      placeholder="Incolla ID video o Link..."
-                      className="flex-1 bg-black/40 border border-gray-600 rounded-lg px-3 py-1.5 text-xs text-white focus:border-red-500 transition-colors"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          const val = (e.target as HTMLInputElement).value.trim();
-                          if (!val) return;
-                          
-                          let id = val;
-                          if (val.includes('v=')) id = val.split('v=')[1].split('&')[0];
-                          else if (val.includes('youtu.be/')) id = val.split('youtu.be/')[1].split('?')[0];
-                          
-                          setEditedCiv({ ...editedCiv, videos: [...(editedCiv.videos || []), id] });
-                          (e.target as HTMLInputElement).value = '';
-                        }
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        const input = (e.currentTarget.previousSibling as HTMLInputElement);
-                        const val = input.value.trim();
+                        {(editedCiv.videos || []).map((videoId: string, idx: number) => (
+                          <SortableVideoItem 
+                            key={videoId}
+                            id={videoId}
+                            videoId={videoId}
+                            idx={idx}
+                            onUpdate={(i, val) => {
+                              const newVideos = [...(editedCiv.videos || [])];
+                              newVideos[i] = val;
+                              setEditedCiv({ ...editedCiv, videos: newVideos });
+                            }}
+                            onRemove={(i) => {
+                              const newVideos = [...(editedCiv.videos || [])];
+                              newVideos.splice(i, 1);
+                              setEditedCiv({ ...editedCiv, videos: newVideos });
+                            }}
+                          />
+                        ))}
+                      </SortableContext>
+                    </DndContext>
+                  ) : (
+                    <div className="h-full flex flex-col items-center justify-center py-6 text-gray-500 border-2 border-dashed border-white/5 rounded-lg">
+                      <Play size={20} className="mb-2 opacity-20" />
+                      <p className="text-[10px] font-bold uppercase tracking-widest">Nessun video aggiunto</p>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="mt-2 flex gap-2">
+                  <input 
+                    type="text"
+                    placeholder="Incolla ID video o Link..."
+                    className="flex-1 bg-black/40 border border-gray-600 rounded-lg px-3 py-1.5 text-xs text-white focus:border-red-500 transition-colors"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const val = (e.target as HTMLInputElement).value.trim();
                         if (!val) return;
                         
                         let id = val;
-                        if (val.includes('v=')) id = val.split('v=')[1].split('&')[0];
-                        else if (val.includes('youtu.be/')) id = val.split('youtu.be/')[1].split('?')[0];
+                        const match = val.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+                        if (match) id = match[1];
                         
                         setEditedCiv({ ...editedCiv, videos: [...(editedCiv.videos || []), id] });
-                        input.value = '';
-                      }}
-                      className="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
-                    >
-                      Aggiungi
-                    </button>
-                  </div>
+                        (e.target as HTMLInputElement).value = '';
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      const input = (e.currentTarget.previousElementSibling as HTMLInputElement);
+                      const val = input.value.trim();
+                      if (!val) return;
+                      
+                      let id = val;
+                      const match = val.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+                      if (match) id = match[1];
+                      
+                      setEditedCiv({ ...editedCiv, videos: [...(editedCiv.videos || []), id] });
+                      input.value = '';
+                    }}
+                    className="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                  >
+                    Aggiungi
+                  </button>
                 </div>
               </div>
             </div>
@@ -769,7 +767,7 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                        <div className="grid grid-cols-5 gap-1">
                           <input type="number" min="1" max="4" value={gu.age} onChange={e => updateGlobalUnit(idx, 'age', e.target.value)} title="Age" className="bg-gray-800 text-white text-xs rounded px-1 py-1 text-center border border-gray-600" />
                           <input type="number" value={gu.stats?.attack || 0} onChange={e => updateGlobalUnit(idx, 'attack', e.target.value)} title="Attack" className="bg-gray-800 text-red-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
-                          <input type="number" value={gu.stats?.armor || 0} onChange={e => updateArrayField('uniqueUnits', idx, 'armor', e.target.value)} title="Armor" className="bg-gray-800 text-gray-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
+                          <input type="number" value={gu.stats?.armor || 0} onChange={e => updateGlobalUnit(idx, 'armor', e.target.value)} title="Armor" className="bg-gray-800 text-gray-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
                           <input type="number" value={gu.stats?.health || 0} onChange={e => updateGlobalUnit(idx, 'health', e.target.value)} title="Health" className="bg-gray-800 text-green-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
                           <input type="number" step="0.1" value={gu.stats?.speed || 0} onChange={e => updateGlobalUnit(idx, 'speed', e.target.value)} title="Speed" className="bg-gray-800 text-blue-300 text-xs rounded px-1 py-1 text-center border border-gray-600" />
                         </div>
