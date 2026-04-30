@@ -2,51 +2,51 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Main Pages -->
   <url>
-    <loc>https://manualeciv.it/</loc>
+    <loc>https://aoe4guide.it/</loc>
     <lastmod>2026-04-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://manualeciv.it/tornei</loc>
+    <loc>https://aoe4guide.it/tornei</loc>
     <lastmod>2026-04-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://manualeciv.it/faq</loc>
+    <loc>https://aoe4guide.it/faq</loc>
     <lastmod>2026-04-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://manualeciv.it/privacy</loc>
+    <loc>https://aoe4guide.it/privacy</loc>
     <lastmod>2026-04-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
 
   <!-- Civilizations -->
-  <url><loc>https://manualeciv.it/civ/abbasid</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/ayyubids</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/byzantines</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/chinese</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/tughlaq</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/zhuxi</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/french</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/japanese</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/jeannedarc</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/english</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/templar</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/lancaster</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/macedonian</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/malians</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/mongols</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/goldenhorde</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/orderofthedragon</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/ottomans</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/rus</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/hre</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/sengoku</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://manualeciv.it/civ/delhi</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/abbasid</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/ayyubids</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/byzantines</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/chinese</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/tughlaq</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/zhuxi</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/french</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/japanese</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/jeannedarc</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/english</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/templar</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/lancaster</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/macedonian</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/malians</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/mongols</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/goldenhorde</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/orderofthedragon</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/ottomans</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/rus</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/hre</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/sengoku</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://aoe4guide.it/civ/delhi</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
 </urlset>
