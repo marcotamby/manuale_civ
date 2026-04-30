@@ -435,8 +435,8 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
 
               <div className="space-y-4">
                 <div>
-                  <div className="flex justify-between items-end mb-1.5">
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
                       <Play size={12} className="text-red-500" /> Video Guide (YouTube)
                     </label>
                     <button
