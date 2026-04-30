@@ -202,6 +202,31 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   const [qaVotes, setQaVotes] = useState<Record<string, { count: number, userVoted: boolean }>>({});
   const [boMessage, setBoMessage] = useState<{ id: string, text: string } | null>(null);
   const [isQaExpanded, setIsQaExpanded] = useState(false);
+  const [boAuthors, setBoAuthors] = useState<Record<string, any>>({});
+
+  useEffect(() => {
+    if (!civ?.buildOrders) return;
+    
+    const fetchBOAuthors = async () => {
+      const emails = Array.from(new Set(civ.buildOrders.map(bo => bo.author_id).filter(Boolean)));
+      if (emails.length === 0) return;
+      
+      const { data } = await supabase
+        .from('profiles')
+        .select('email, avatar_url, rank, nickname')
+        .in('email', emails);
+        
+      if (data) {
+        const profileMap = data.reduce((acc: any, curr: any) => {
+          acc[curr.email.toLowerCase()] = curr;
+          return acc;
+        }, {});
+        setBoAuthors(profileMap);
+      }
+    };
+    
+    fetchBOAuthors();
+  }, [civ?.id]);
 
   const fetchVotes = async () => {
     if (!civ?.buildOrders || civ.buildOrders.length === 0) return;
@@ -400,7 +425,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       if (userEmails.size > 0) {
         const { data: profData } = await supabase
           .from('profiles')
-          .select('email, avatar_url')
+          .select('email, avatar_url, rank, nickname')
           .in('email', Array.from(userEmails));
         profiles = profData || [];
       }
@@ -430,15 +455,19 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               const aProfile = profiles.find(p => p.email?.toLowerCase() === a.user_id?.toLowerCase());
               return {
                 ...a,
+                user_rank: aProfile?.rank || a.user_rank,
+                user_nickname: aProfile?.nickname || a.user_nickname,
                 profile: aProfile,
                 replyToNickname: parentNick,
-                replies: buildThread(a.id, a.user_nickname)
+                replies: buildThread(a.id, aProfile?.nickname || a.user_nickname)
               };
             });
         };
 
         return {
           ...q,
+          user_rank: qProfile?.rank || q.user_rank,
+          user_nickname: qProfile?.nickname || q.user_nickname,
           profile: qProfile,
           answers: buildThread(null)
         };
@@ -1434,10 +1463,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                               </div>
                               <div className="flex flex-col">
                                  <span className="text-lg font-black text-blue-400 truncate uppercase tracking-tighter">
-                                   {selectedBO.author_nickname || 'Contributore'}
+                                   {boAuthors[selectedBO.author_id?.toLowerCase() || '']?.nickname || selectedBO.author_nickname || 'Contributore'}
                                  </span>
                                  <span className="text-[10px] font-bold text-gray-500 uppercase bg-black/40 px-2 py-0.5 rounded w-fit">
-                                   {selectedBO.author_rank || 'Unranked'}
+                                   {boAuthors[selectedBO.author_id?.toLowerCase() || '']?.rank || selectedBO.author_rank || 'Unranked'}
                                  </span>
                               </div>
                            </div>

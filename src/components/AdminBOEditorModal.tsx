@@ -37,6 +37,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     banner_position: 50,
     author_nickname: user?.nickname || '',
     author_rank: user?.rank || '',
+    author_id: user?.email || '',
     source: '',
     map: ''
   });
