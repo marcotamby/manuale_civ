@@ -247,12 +247,12 @@ export function MatchupsTable({ selectedCiv }: { selectedCiv: string }) {
                         </td>
                         <td className="py-3 px-6">
                           <div className="flex flex-col items-end gap-1">
-                            <span className={`font-bold text-sm ${isFavorable ? 'text-green-400' : 'text-red-400'}`}>
+                            <span className={`font-black text-sm ${isFavorable ? 'text-[#10b981]' : 'text-[#f43f5e]'}`}>
                               {matchup.win_rate.toFixed(1)}%
                             </span>
-                            <div className="w-24 h-1 bg-gray-700 rounded-full overflow-hidden flex">
-                              <div className="h-full bg-green-500 transition-all opacity-80" style={{ width: `${matchup.win_rate}%` }} />
-                              <div className="h-full bg-red-500 transition-all opacity-80" style={{ width: `${100 - matchup.win_rate}%` }} />
+                            <div className="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden flex border border-white/5">
+                              <div className="h-full bg-[#10b981] transition-all shadow-[0_0_8px_rgba(16,185,129,0.4)]" style={{ width: `${matchup.win_rate}%` }} />
+                              <div className="h-full bg-[#f43f5e] transition-all shadow-[0_0_8px_rgba(244,63,94,0.4)]" style={{ width: `${100 - matchup.win_rate}%` }} />
                             </div>
                           </div>
                         </td>
@@ -272,12 +272,12 @@ export function MatchupsTable({ selectedCiv }: { selectedCiv: string }) {
                         </td>
                         <td className="py-3 px-6">
                           <div className="flex flex-col items-end gap-1">
-                            <span className={`font-bold text-sm ${isFavorable ? 'text-green-400' : 'text-red-400'}`}>
+                            <span className={`font-black text-sm ${isFavorable ? 'text-[#10b981]' : 'text-[#f43f5e]'}`}>
                               {stat.win_rate.toFixed(1)}%
                             </span>
-                            <div className="w-24 h-1 bg-gray-700 rounded-full overflow-hidden flex">
-                              <div className="h-full bg-green-500 transition-all opacity-80" style={{ width: `${stat.win_rate}%` }} />
-                              <div className="h-full bg-red-500 transition-all opacity-80" style={{ width: `${100 - stat.win_rate}%` }} />
+                            <div className="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden flex border border-white/5">
+                              <div className="h-full bg-[#10b981] transition-all shadow-[0_0_8px_rgba(16,185,129,0.4)]" style={{ width: `${stat.win_rate}%` }} />
+                              <div className="h-full bg-[#f43f5e] transition-all shadow-[0_0_8px_rgba(244,63,94,0.4)]" style={{ width: `${100 - stat.win_rate}%` }} />
                             </div>
                           </div>
                         </td>
