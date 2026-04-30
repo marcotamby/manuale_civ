@@ -431,7 +431,9 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                     className="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 transition-colors resize-y text-sm"
                   />
                 </div>
+              </div>
 
+              <div className="space-y-4">
                 <div>
                   <div className="flex justify-between items-end mb-1.5">
                     <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
