@@ -38,62 +38,80 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
   const [usersByPage, setUsersByPage] = useState<Record<string, number>>({});
   const [activity, setActivity] = useState<any>({ type: 'idle' });
 
-  // 1. Staff Presence (detailed)
+  const staffChannelRef = useRef<any>(null);
+  const globalChannelRef = useRef<any>(null);
+  const isGlobalConnected = useRef(false);
+
+  // 1. Staff Presence Lifecycle
   useEffect(() => {
     if (!isAuthenticated || (!isAdmin && !isStreamer) || !user?.email) {
+      if (staffChannelRef.current) {
+        staffChannelRef.current.unsubscribe();
+        staffChannelRef.current = null;
+      }
       setActiveAdmins({});
       return;
     }
 
-    const channel = supabase.channel('staff-presence', {
-      config: { presence: { key: user.email } }
-    });
-
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState();
-        const formatted: Record<string, PresenceState> = {};
-        Object.keys(state).forEach(key => {
-          const presences = state[key] as any[];
-          if (presences.length > 0) {
-            formatted[key] = presences[0] as PresenceState;
-          }
-        });
-        setActiveAdmins(formatted);
-      })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          await channel.track({
-            user: {
-              name: user.name,
-              nickname: user.nickname,
-              avatar: user.avatar_url,
-              email: user.email
-            },
-            activity,
-            last_seen: new Date().toISOString()
-          });
-        }
+    // Only create channel if it doesn't exist
+    if (!staffChannelRef.current) {
+      const channel = supabase.channel('staff-presence', {
+        config: { presence: { key: user.email } }
       });
 
-    return () => { channel.unsubscribe(); };
-  }, [isAuthenticated, isAdmin, isStreamer, user?.email, activity]);
+      channel
+        .on('presence', { event: 'sync' }, () => {
+          const state = channel.presenceState();
+          const formatted: Record<string, PresenceState> = {};
+          Object.keys(state).forEach(key => {
+            const presences = state[key] as any[];
+            if (presences.length > 0) {
+              formatted[key] = presences[0] as PresenceState;
+            }
+          });
+          setActiveAdmins(formatted);
+        })
+        .subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+            await channel.track({
+              user: {
+                name: user.name,
+                nickname: user.nickname,
+                avatar: user.avatar_url,
+                email: user.email
+              },
+              activity,
+              last_seen: new Date().toISOString()
+            });
+          }
+        });
 
-    // 2. Global User Presence (privacy-focused)
-    useEffect(() => {
-      let timeoutId: any;
-      let channel: any;
-  
-      const consent = localStorage.getItem('cookieConsent');
-      // If user declined cookies, we don't track them in the global counter
-      if (consent === 'declined') {
-        setOnlineUserCount(0);
-        return;
+      staffChannelRef.current = channel;
+    }
+
+    return () => {
+      // We don't unsubscribe on every re-render, only on unmount or auth change
+      // handled by the dependency array and the cleanup logic at the top of the effect
+    };
+  }, [isAuthenticated, isAdmin, isStreamer, user?.email]);
+
+  // 2. Global User Presence Lifecycle
+  useEffect(() => {
+    let timeoutId: any;
+
+    const consent = localStorage.getItem('cookieConsent');
+    if (consent === 'declined') {
+      if (globalChannelRef.current) {
+        globalChannelRef.current.unsubscribe();
+        globalChannelRef.current = null;
       }
-  
-      // We delay the presence connection by 2 seconds to allow 
-      // the main data fetch (civilizations) to complete first.
-      // This helps bypass some corporate firewall "burst" blocks.
+      setOnlineUserCount(0);
+      return;
+    }
+
+    // Only connect if not already connected
+    if (!globalChannelRef.current) {
+      // Delay initial connection
       timeoutId = setTimeout(() => {
         try {
           let guestId = 'guest-temp';
@@ -106,19 +124,19 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
           } catch (e) {
             console.warn('sessionStorage not available, using temporary guest ID');
           }
-  
+
           const presenceKey = user?.email || guestId;
-  
-          channel = supabase.channel('global-presence', {
+
+          const channel = supabase.channel('global-presence', {
             config: { presence: { key: presenceKey } }
           });
-  
+
           channel
             .on('presence', { event: 'sync' }, () => {
               const state = channel.presenceState();
               const keys = Object.keys(state);
               setOnlineUserCount(keys.length);
-  
+
               const distribution: Record<string, number> = {};
               keys.forEach(key => {
                 const p = state[key] as any[];
@@ -131,11 +149,12 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
             })
             .subscribe(async (status: string) => {
               if (status === 'CHANNEL_ERROR') {
-                console.warn('Connessione al counter bloccata dalla rete (probabile firewall aziendale).');
+                console.warn('Connessione al counter bloccata dalla rete.');
                 return;
               }
-              
+
               if (status === 'SUBSCRIBED') {
+                isGlobalConnected.current = true;
                 try {
                   await channel.track({
                     page: activity.civId || activity.section || 'home',
@@ -146,16 +165,64 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
                 }
               }
             });
+
+          globalChannelRef.current = channel;
         } catch (err) {
           console.error('Failed to initialize presence channel:', err);
         }
       }, 2000);
-  
-      return () => { 
-        clearTimeout(timeoutId);
-        if (channel) channel.unsubscribe(); 
-      };
-    }, [user?.email, activity]);
+    }
+
+    return () => {
+      clearTimeout(timeoutId);
+      // We don't unsubscribe on activity change anymore
+    };
+  }, [user?.email]);
+
+  // 3. Cleanup everything on unmount
+  useEffect(() => {
+    return () => {
+      if (staffChannelRef.current) staffChannelRef.current.unsubscribe();
+      if (globalChannelRef.current) globalChannelRef.current.unsubscribe();
+    };
+  }, []);
+
+  // 4. Update Activity Tracking
+  useEffect(() => {
+    const updatePresence = async () => {
+      // Update Staff Channel
+      if (staffChannelRef.current && isAuthenticated && (isAdmin || isStreamer)) {
+        try {
+          await staffChannelRef.current.track({
+            user: {
+              name: user?.name,
+              nickname: user?.nickname,
+              avatar: user?.avatar_url,
+              email: user?.email
+            },
+            activity,
+            last_seen: new Date().toISOString()
+          });
+        } catch (e) {
+          console.warn('Error updating staff activity:', e);
+        }
+      }
+
+      // Update Global Channel
+      if (globalChannelRef.current && isGlobalConnected.current) {
+        try {
+          await globalChannelRef.current.track({
+            page: activity.civId || activity.section || 'home',
+            active: true
+          });
+        } catch (e) {
+          console.warn('Error updating global activity:', e);
+        }
+      }
+    };
+
+    updatePresence();
+  }, [activity, isAuthenticated, isAdmin, isStreamer]);
 
   const updateActivity = (newActivity: any) => {
     setActivity(newActivity);
