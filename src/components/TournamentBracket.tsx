@@ -119,7 +119,7 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
 
     return (
       <div className={clsx(
-        "flex gap-4 md:gap-12 overflow-x-auto pb-12 elegant-scrollbar pt-4 px-2",
+        "flex gap-4 md:gap-12 overflow-x-auto pb-12 elegant-scrollbar pt-24 px-2",
         !isRoundRobin ? "min-h-[700px]" : "min-h-0"
       )}>
         {sortedRounds.map((round, idx) => (
