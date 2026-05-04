@@ -99,14 +99,13 @@ export function TournamentDetail() {
     loadTournament();
   }, [slug]);
 
-  // Auto-redirect removed to keep users on-site
-  /*
+  // Auto-redirect for Challonge only (to preserve legacy behavior)
   useEffect(() => {
-    if (!loading && !selectedPhase && tournament?.db?.direct_link) {
+    const isChallonge = source === 'challonge' || tournament?.db?.source === 'challonge';
+    if (!loading && !selectedPhase && tournament?.db?.direct_link && isChallonge) {
       window.location.replace(tournament.db.direct_link);
     }
-  }, [loading, selectedPhase, tournament]);
-  */
+  }, [loading, selectedPhase, tournament, source]);
 
   if (loading) {
     return (
