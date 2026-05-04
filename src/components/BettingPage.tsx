@@ -42,6 +42,7 @@ export function BettingPage() {
 
   const loadData = async () => {
     setLoading(true);
+    console.log("Loading betting data for slug:", slug);
     try {
       // Load Tournament
       const { data: tourney } = await supabase
@@ -50,6 +51,7 @@ export function BettingPage() {
         .eq('slug', slug)
         .single();
       setTournament(tourney);
+      console.log("Tournament loaded:", tourney);
 
       // Load Markets
       const { data: marketData } = await supabase
@@ -58,6 +60,7 @@ export function BettingPage() {
         .eq('tournament_slug', slug)
         .order('created_at', { ascending: true });
       setMarkets(marketData || []);
+      console.log("Markets loaded for slug", slug, ":", marketData);
 
       // Load Balance if auth
       if (user) {

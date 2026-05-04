@@ -484,7 +484,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                             <div className="flex flex-col gap-1">
                                 <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">Il Tuo Gregge</span>
                                 <div className="flex items-center gap-3">
-                                    <span className="text-4xl font-black text-white">{user?.sheep_balance || 0}</span>
+                                    <span className="text-4xl font-black text-white">{user?.sheep_balance ?? 100}</span>
                                     <span className="text-3xl animate-bounce duration-2000">🐑</span>
                                 </div>
                                 <p className="text-[10px] text-gray-500 italic mt-1 uppercase font-bold tracking-tighter">
