@@ -271,25 +271,26 @@ export function BettingPage() {
                   </div>
                 </div>
 
+                <div>
+                  <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Livello Evento</label>
+                  <div className="flex gap-2">
+                    {['High Elo', 'Low Elo'].map(lvl => (
+                      <button
+                        key={lvl}
+                        onClick={() => setAdminForm({...adminForm, eventLevel: lvl})}
+                        className={clsx(
+                          "flex-1 py-3 rounded-xl border transition-all font-black text-[10px] uppercase tracking-widest",
+                          adminForm.eventLevel === lvl ? "bg-cyan-500 border-cyan-400 text-black shadow-[0_0_15px_rgba(6,182,212,0.3)]" : "bg-white/5 border-white/10 text-gray-500"
+                        )}
+                      >
+                        {lvl}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {(adminForm.type === 'Match Winner' || adminForm.type === 'Final Score') && (
                   <>
-                    <div>
-                      <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Livello Evento</label>
-                      <div className="flex gap-2">
-                        {['High Elo', 'Low Elo'].map(lvl => (
-                          <button
-                            key={lvl}
-                            onClick={() => setAdminForm({...adminForm, eventLevel: lvl})}
-                            className={clsx(
-                              "flex-1 py-3 rounded-xl border transition-all font-black text-[10px] uppercase tracking-widest",
-                              adminForm.eventLevel === lvl ? "bg-cyan-500 border-cyan-400 text-black shadow-[0_0_15px_rgba(6,182,212,0.3)]" : "bg-white/5 border-white/10 text-gray-500"
-                            )}
-                          >
-                            {lvl}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="text-[10px] font-bold text-gray-500 uppercase mb-2 block tracking-widest">Team A</label>
@@ -335,9 +336,10 @@ export function BettingPage() {
                   <button 
                     onClick={() => {
                       let generated = "";
-                      if (adminForm.type === 'Match Winner') generated = `[${adminForm.eventLevel}] ${adminForm.teamA} vs ${adminForm.teamB}`;
-                      else if (adminForm.type === 'Final Score') generated = `Punteggio: ${adminForm.teamA} vs ${adminForm.teamB}`;
-                      else generated = `Vincitore Torneo: ${tournament?.name}`;
+                      const prefix = `[${adminForm.eventLevel}] `;
+                      if (adminForm.type === 'Match Winner') generated = `${prefix}${adminForm.teamA} vs ${adminForm.teamB}`;
+                      else if (adminForm.type === 'Final Score') generated = `${prefix}Punteggio: ${adminForm.teamA} vs ${adminForm.teamB}`;
+                      else generated = `${prefix}Vincitore Torneo: ${tournament?.name || (slug?.replace(/-/g, ' ')) || 'Torneo'}`;
                       setAdminForm({...adminForm, title: generated});
                     }}
                     className="mt-2 text-[9px] font-black text-cyan-400/60 uppercase tracking-widest hover:text-cyan-400 transition-colors"
