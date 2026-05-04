@@ -105,6 +105,7 @@ export async function fetchTournament(slug: string): Promise<StartGGTournament |
         events {
           id
           name
+          slug
           videogame {
             id
             name

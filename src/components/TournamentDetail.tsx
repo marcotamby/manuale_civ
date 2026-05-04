@@ -10,7 +10,8 @@ import { TournamentBracket } from './TournamentBracket';
 
 export function TournamentDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const eventParam = searchParams.get('event');
   const source = searchParams.get('source') || 'startgg';
   const organizer = searchParams.get('organizer') || 'marcotamby';
   
@@ -58,9 +59,22 @@ export function TournamentDetail() {
             if (data) {
               setTournament({ ...data, db: dbTournament });
               if (data.events && data.events.length > 0) {
-                const event1v1 = data.events.find(e => e.name.toLowerCase().includes('1v1')) || data.events[0];
-                if (event1v1.phases && event1v1.phases.length > 0) {
-                  setSelectedPhase(event1v1.phases[0]);
+                // Priorità 1: Parametro ?event= nell'URL
+                let targetEvent = null;
+                if (eventParam) {
+                  targetEvent = data.events.find(e => 
+                    e.slug?.toLowerCase().includes(eventParam.toLowerCase()) || 
+                    e.name.toLowerCase().includes(eventParam.toLowerCase())
+                  );
+                }
+                
+                // Priorità 2: Cerca 1v1 o prendi il primo
+                if (!targetEvent) {
+                  targetEvent = data.events.find(e => e.name.toLowerCase().includes('1v1')) || data.events[0];
+                }
+
+                if (targetEvent.phases && targetEvent.phases.length > 0) {
+                  setSelectedPhase(targetEvent.phases[0]);
                 }
               }
             } else if (dbTournament) {
@@ -191,19 +205,41 @@ export function TournamentDetail() {
         <div className="sticky top-0 z-30 bg-[#0a0a0b]/80 backdrop-blur-xl border-b border-white/5">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center gap-8 overflow-x-auto elegant-scrollbar pb-px">
-               {tournament.events?.flatMap((e: any) => e.phases || []).map((phase: any) => (
-                <button
-                  key={phase.id}
-                  onClick={() => setSelectedPhase(phase)}
-                  className={`py-4 text-xs font-black uppercase tracking-[0.2em] whitespace-nowrap transition-all border-b-2 ${
-                    selectedPhase?.id === phase.id 
-                      ? 'border-yellow-500 text-yellow-500' 
-                      : 'border-transparent text-gray-500 hover:text-gray-300'
-                  }`}
-                >
-                  {phase.name}
-                </button>
-              ))}
+               {tournament.events?.flatMap((e: any) => 
+                 (e.phases || []).map((phase: any) => ({ ...phase, eventName: e.name }))
+               ).map((phase: any) => {
+                const hasMultipleEvents = (tournament.events?.length || 0) > 1;
+                const hasMultiplePhases = (tournament.events?.find((e: any) => e.name === phase.eventName)?.phases?.length || 0) > 1;
+                
+                let label = phase.name;
+                if (hasMultipleEvents) {
+                  if (hasMultiplePhases) {
+                    label = `${phase.eventName} - ${phase.name}`;
+                  } else {
+                    label = phase.eventName;
+                  }
+                }
+
+                return (
+                  <button
+                    key={phase.id}
+                    onClick={() => {
+                      setSelectedPhase(phase);
+                      // Aggiorna l'URL senza ricaricare la pagina
+                      const newParams = new URLSearchParams(window.location.search);
+                      newParams.set('event', phase.eventName.toLowerCase().replace(/[^a-z0-9]/g, '-'));
+                      setSearchParams(newParams, { replace: true });
+                    }}
+                    className={`py-4 text-xs font-black uppercase tracking-[0.2em] whitespace-nowrap transition-all border-b-2 ${
+                      selectedPhase?.id === phase.id 
+                        ? 'border-yellow-500 text-yellow-500' 
+                        : 'border-transparent text-gray-500 hover:text-gray-300'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
