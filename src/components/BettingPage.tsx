@@ -53,7 +53,6 @@ export function BettingPage() {
 
   const loadData = async () => {
     setLoading(true);
-    console.log("Loading betting data for slug:", slug);
     try {
       // Load Tournament
       const { data: tourney } = await supabase
@@ -62,7 +61,6 @@ export function BettingPage() {
         .eq('slug', slug)
         .single();
       setTournament(tourney);
-      console.log("Tournament loaded:", tourney);
 
       // Load Markets
       const { data: marketData } = await supabase
@@ -71,7 +69,6 @@ export function BettingPage() {
         .eq('tournament_slug', slug)
         .order('created_at', { ascending: true });
       setMarkets(marketData || []);
-      console.log("Markets loaded for slug", slug, ":", marketData);
 
       // Load Balance if auth
       if (user) {
@@ -158,44 +155,6 @@ export function BettingPage() {
     return odds.toFixed(2);
   };
 
-  const handleCreateMarket = async () => {
-    if (!adminForm.title || adminForm.options.some(o => !o)) {
-      toast.error('Compila tutti i campi e le opzioni!');
-      return;
-    }
-
-    setIsCreatingMarket(true);
-    try {
-      const optionsWithMeta = adminForm.options.map(label => ({
-        id: crypto.randomUUID(),
-        label,
-        total_bet: 0
-      }));
-
-      const { error } = await supabase
-        .from('betting_markets')
-        .insert({
-          tournament_slug: slug,
-          title: adminForm.title,
-          description: adminForm.description,
-          type: adminForm.type,
-          options: optionsWithMeta,
-          status: 'open'
-        });
-
-      if (error) throw error;
-
-      toast.success('Mercato creato con successo!');
-      setAdminForm({ title: '', description: '', type: 'Match', options: ['', ''] });
-      setShowAdminTools(false);
-      loadData();
-    } catch (err: any) {
-      toast.error(`Errore: ${err.message}`);
-    } finally {
-      setIsCreatingMarket(false);
-    }
-  };
-
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
       <Loader2 className="w-12 h-12 text-blue-400 animate-spin" />
@@ -206,9 +165,8 @@ export function BettingPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in duration-700">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-6">
-        <div className="relative p-6 md:p-8">
-           <div className="absolute inset-0 -z-10 bg-slate-800/40 backdrop-blur-xl rounded-[2rem] border border-white/5 shadow-2xl" />
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-6 px-4 md:px-0">
+        <div className="relative">
            <button 
             onClick={() => navigate('/tornei')}
             className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-4 text-xs font-black uppercase tracking-widest"
@@ -235,7 +193,6 @@ export function BettingPage() {
         </div>
 
         <div className="flex flex-col items-end gap-4">
-
             {isAuthenticated && (
               <div className="glass px-6 py-3 rounded-2xl border-blue-500/20 shadow-[0_0_30px_rgba(59,130,246,0.1)] flex items-center gap-4 h-[56px]">
                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest whitespace-nowrap">Il Tuo Gregge</span>
@@ -250,7 +207,7 @@ export function BettingPage() {
 
       {/* Admin Market Creation Tools */}
       {isAdmin && showAdminTools && (
-        <div className="mb-12 bg-[#111218] border border-cyan-500/30 rounded-3xl overflow-hidden shadow-[0_0_80px_rgba(6,182,212,0.15)] animate-in slide-in-from-top-4 duration-500">
+        <div className="mb-12 bg-[#111218] border border-cyan-500/30 rounded-3xl overflow-hidden shadow-[0_0_80px_rgba(6,182,212,0.15)] animate-in slide-in-from-top-4 duration-500 px-4 md:px-0">
           <div className="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-cyan-500/10 via-transparent to-transparent">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 flex items-center justify-center border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
@@ -425,7 +382,6 @@ export function BettingPage() {
 
                 <button 
                   onClick={async () => {
-                    // Custom handle for Match Winner/Final Score
                     let finalOptions = adminForm.options;
                     if (adminForm.type === 'Match Winner') {
                       finalOptions = [adminForm.teamA || 'Team A', adminForm.teamB || 'Team B'];
@@ -457,6 +413,15 @@ export function BettingPage() {
 
                       if (error) throw error;
                       toast.success('Scommessa pubblicata!');
+                      setAdminForm({
+                        title: '',
+                        description: '',
+                        type: 'Match Winner',
+                        eventLevel: 'High Elo',
+                        teamA: '',
+                        teamB: '',
+                        options: ['', '']
+                      });
                       setShowAdminTools(false);
                       loadData();
                     } catch (err: any) {
@@ -476,11 +441,11 @@ export function BettingPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 md:px-0">
         {/* Main Betting Area */}
         <div className="lg:col-span-2 space-y-8">
           {markets.length === 0 ? (
-            <div className="glass p-12 rounded-[2.5rem] border-white/5 text-center flex flex-col items-center">
+            <div className="bg-[#0f1115]/80 backdrop-blur-sm p-12 rounded-[2.5rem] border border-slate-400/20 text-center flex flex-col items-center">
               <AlertCircle size={48} className="mb-4 text-gray-600" />
               <h3 className="text-xl font-bold text-white mb-6 uppercase tracking-tighter">Nessuna Scommessa Aperta</h3>
               {isAdmin && (
@@ -494,7 +459,7 @@ export function BettingPage() {
             </div>
           ) : (
             markets.map((market) => (
-              <div key={market.id} className="glass rounded-[2.5rem] overflow-hidden border border-white/10 hover:border-blue-500/30 transition-all duration-500 group shadow-2xl">
+              <div key={market.id} className="bg-[#0f1115]/80 backdrop-blur-sm rounded-[2.5rem] border border-slate-400/20 overflow-hidden group hover:border-slate-400/40 transition-all duration-500 shadow-2xl">
                 {/* Market Header */}
                 <div className="p-6 md:p-8 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-white/5">
                   <div className="flex justify-between items-start mb-4">
@@ -563,7 +528,7 @@ export function BettingPage() {
 
                   {/* Bet Input Area */}
                   {selectedBets[market.id] && market.status === 'open' && (
-                    <div className="mt-8 p-6 bg-blue-600/10 border border-blue-500/20 rounded-3xl animate-in slide-in-from-top-4 duration-300">
+                    <div className="mt-8 p-6 bg-slate-900/60 border border-slate-400/20 rounded-3xl animate-in slide-in-from-top-4 duration-300">
                       <div className="flex flex-col md:flex-row items-center gap-6">
                         <div className="flex-grow w-full">
                           <label className="block text-[10px] font-black text-blue-400 uppercase tracking-widest mb-3">Quante pecore vuoi inviare?</label>
@@ -607,10 +572,8 @@ export function BettingPage() {
         {/* Sidebar: Leaderboard & Rules */}
         <div className="space-y-8">
           {/* My Bets Section */}
-
-          {/* My Bets Section */}
           {isAuthenticated && myBets.length > 0 && (
-            <div className="glass p-8 rounded-[2.5rem] border-blue-500/20 bg-blue-500/5">
+            <div className="bg-[#0f1115]/80 backdrop-blur-sm p-8 rounded-[2.5rem] border border-slate-400/20">
               <h4 className="text-blue-400 font-black uppercase tracking-tighter mb-6 flex items-center gap-3">
                 <TrendingUp size={20} /> Le Tue Scommesse
               </h4>
@@ -651,7 +614,7 @@ export function BettingPage() {
           )}
 
           {/* Leaderboard */}
-          <div className="glass p-8 rounded-[2.5rem] border-white/5 relative overflow-hidden">
+          <div className="bg-[#0f1115]/80 backdrop-blur-sm p-8 rounded-[2.5rem] border border-slate-400/20 relative overflow-hidden">
             <h4 className="text-xl font-black text-white uppercase tracking-tighter mb-6 relative z-10 flex items-center gap-3">
               <Users size={20} className="text-blue-400" />
               I Migliori Pastori
@@ -678,7 +641,6 @@ export function BettingPage() {
               ))}
             </div>
           </div>
-          
         </div>
       </div>
     </div>
