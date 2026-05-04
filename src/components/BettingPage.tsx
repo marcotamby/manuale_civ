@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
-import { Loader2, ArrowLeft, Trophy, Users, TrendingUp, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, ArrowLeft, Trophy, Users, TrendingUp, AlertCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { clsx } from 'clsx';
 
@@ -26,7 +26,7 @@ interface LeaderboardUser {
 export function BettingPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { user, isAuthenticated, canManageTournaments } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(true);
   const [markets, setMarkets] = useState<Market[]>([]);
   const [tournament, setTournament] = useState<any>(null);

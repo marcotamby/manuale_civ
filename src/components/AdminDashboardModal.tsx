@@ -1,6 +1,6 @@
 // Deployment trigger: 2026-04-24 10:15
 import { useState, useEffect } from 'react';
-import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, Trophy, BookOpen, Zap, Edit2, Check, Trash2, Coins, Gavel, Calendar } from 'lucide-react';
+import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, Trophy, BookOpen, Zap, Edit2, Check, Trash2, Coins, Gavel } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
@@ -27,7 +27,7 @@ interface AdminDashboardModalProps {
 }
 
 export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProps) {
-  const { isSuperAdmin, canManageCivs, canManageBuildorders } = useAuth();
+  const { isSuperAdmin, canManageCivs, canManageBuildorders, canManageTournaments } = useAuth();
   const { refreshCivs } = useCivData();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,7 +47,6 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [activeTab, setActiveTab] = useState<'proposte' | 'qa' | 'users' | 'betting'>('proposte');
   const [tournaments, setTournaments] = useState<any[]>([]);
   const [markets, setMarkets] = useState<any[]>([]);
-  const [isBettingLoading, setIsBettingLoading] = useState(false);
   const [newMarket, setNewMarket] = useState({
     tournament_slug: '',
     title: '',
@@ -249,15 +248,12 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
   const fetchTournamentsAndMarkets = async () => {
     try {
-      setIsBettingLoading(true);
       const { data: tData } = await supabase.from('tournaments').select('*').order('date', { ascending: false });
       const { data: mData } = await supabase.from('betting_markets').select('*').order('created_at', { ascending: false });
       setTournaments(tData || []);
       setMarkets(mData || []);
     } catch (err) {
       console.error('Error fetching betting data:', err);
-    } finally {
-      setIsBettingLoading(false);
     }
   };
 
@@ -1110,8 +1106,6 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                   </div>
                 </div>
               )}
-            </div>
-          </div>
             </div>
           </div>
         ) : activeTab === 'betting' ? (

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, User, Heart, MessageSquare, Trophy, ExternalLink, Loader2, ChevronDown, LogOut, Camera, Trash2 as TrashIcon, TrendingUp, History, AlertTriangle } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
@@ -126,6 +127,7 @@ function RankDropdown({ value, onChange }: { value: string; onChange: (rank: str
 }
 
 export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps) {
+    const navigate = useNavigate();
     const { user, favorites, updateProfile, logout, isAdmin, isSuperAdmin } = useAuth();
     const { civilizations } = useCivData();
     const [mySuggestions, setMySuggestions] = useState<Suggestion[]>([]);
