@@ -47,6 +47,17 @@ ALTER TABLE betting_markets ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_bets ENABLE ROW LEVEL SECURITY;
 ALTER TABLE betting_notifications ENABLE ROW LEVEL SECURITY;
 
+-- Helper function to check if user is admin (bypasses RLS on profiles)
+CREATE OR REPLACE FUNCTION is_admin() 
+RETURNS boolean AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM profiles 
+    WHERE id = auth.uid() AND role = 'admin'
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Markets are public
 DROP POLICY IF EXISTS "Markets are public" ON betting_markets;
 CREATE POLICY "Markets are public" ON betting_markets FOR SELECT USING (true);
@@ -55,12 +66,8 @@ CREATE POLICY "Markets are public" ON betting_markets FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Admins can manage markets" ON betting_markets;
 CREATE POLICY "Admins can manage markets" ON betting_markets 
 FOR ALL TO authenticated
-USING (
-    EXISTS (
-        SELECT 1 FROM profiles 
-        WHERE id = auth.uid() AND role = 'admin'
-    )
-);
+USING (is_admin())
+WITH CHECK (is_admin());
 
 -- Users can only see their own bets
 DROP POLICY IF EXISTS "Users can see their own bets" ON user_bets;
