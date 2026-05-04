@@ -318,7 +318,7 @@ export function BettingPage() {
                             onChange={(e) => setAdminForm({...adminForm, teamA: e.target.value})}
                             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 appearance-none cursor-pointer"
                           >
-                            <option value="">Seleziona Team</option>
+                            <option value="" className="bg-[#111218] text-white/50">Seleziona Team</option>
                             {(participantsByLevel[adminForm.eventLevel] || []).map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
                           </select>
                           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/50 pointer-events-none" size={16} />
@@ -332,7 +332,7 @@ export function BettingPage() {
                             onChange={(e) => setAdminForm({...adminForm, teamB: e.target.value})}
                             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 appearance-none cursor-pointer"
                           >
-                            <option value="">Seleziona Team</option>
+                            <option value="" className="bg-[#111218] text-white/50">Seleziona Team</option>
                             {(participantsByLevel[adminForm.eventLevel] || []).map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
                           </select>
                           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/50 pointer-events-none" size={16} />
@@ -409,7 +409,7 @@ export function BettingPage() {
                               }}
                               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 appearance-none cursor-pointer"
                             >
-                              <option value="">Seleziona Team</option>
+                               <option value="" className="bg-[#111218] text-white/50">Seleziona Team</option>
                               {(participantsByLevel[adminForm.eventLevel] || []).map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
                             </select>
                             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/50 pointer-events-none" size={16} />
