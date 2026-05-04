@@ -166,7 +166,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const updated = { 
             ...prev, 
             rank: currentRank, 
-            avatar_url: data.avatar_url,
+            avatar_url: data.avatar_url || prev.avatar_url,
             role: data.role, 
             is_streamer: data.is_streamer,
             can_manage_tournaments: data.can_manage_tournaments,
@@ -187,9 +187,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
              ...parsed, 
              rank: currentRank, 
              nickname: currentNickname, 
-             avatar_url: data.avatar_url,
              role: data.role, 
              is_streamer: data.is_streamer,
+             avatar_url: data.avatar_url || parsed.avatar_url,
              can_manage_tournaments: data.can_manage_tournaments,
              can_manage_civs: data.can_manage_civs,
              can_manage_buildorders: data.can_manage_buildorders,
@@ -201,10 +201,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const email = userEmail.toLowerCase();
         const rank = localStorage.getItem(`auth_user_rank_${email}`) || 'Unranked';
         const nickname = localStorage.getItem(`auth_user_nickname_${email}`) || '';
-        
-        await supabase
-          .from('profiles')
-          .upsert({ email, nickname, rank });
+                await supabase
+           .from('profiles')
+           .upsert({ 
+             email, 
+             nickname, 
+             rank,
+             avatar_url: user?.avatar_url || null 
+           });
       }
     } catch (err) {
       console.error('Error syncing profile:', err);
