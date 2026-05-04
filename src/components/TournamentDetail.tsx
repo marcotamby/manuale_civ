@@ -30,11 +30,11 @@ export function TournamentDetail() {
         const [baseSlug] = (slug || '').split('?');
         const cleanSlug = baseSlug.trim().replace(/\/$/, '');
         
-        // Cerca il record nel database in modo più approfondito
+        // Cerca il record nel database in modo estremo: esatto, parziale o con slash
         const { data: dbTournament } = await supabase
           .from('tournaments')
           .select('*')
-          .or(`slug.eq.${cleanSlug},slug.ilike.${cleanSlug},slug.ilike.${cleanSlug}/`)
+          .or(`slug.eq.${cleanSlug},slug.ilike.${cleanSlug},slug.ilike.%${cleanSlug}%`)
           .maybeSingle();
 
         const activeSource = dbTournament?.source || source;
@@ -195,9 +195,9 @@ export function TournamentDetail() {
                     (tournament.db?.status === 'Concluso') ? 'bg-red-500' : 
                     (tournament.db?.status === 'Programmato') ? 'bg-blue-500' : 
                     (tournament.db?.status === 'In corso') ? 'bg-green-500' :
-                    (tournament.state === 2 || tournament.state === 'LIVE' ? 'bg-green-500' : 'bg-red-500')
+                    (tournament.state === 3 || tournament.state === 'COMPLETED' ? 'bg-red-500' : 'bg-green-500')
                   }`}></span>
-                  {tournament.db?.status || (tournament.state === 2 || tournament.state === 'LIVE' ? 'In corso' : 'Concluso')}
+                  {tournament.db?.status || (tournament.state === 3 || tournament.state === 'COMPLETED' ? 'Concluso' : 'In corso')}
                 </div>
                 <div className="flex items-center gap-2">
                   <Users size={16} />
