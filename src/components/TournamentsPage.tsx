@@ -742,7 +742,17 @@ export function TournamentsPage() {
               <div 
                 className="glass rounded-3xl overflow-hidden border border-white/5 flex flex-col transition-all duration-500 hover:border-white/80 hover:shadow-[0_30px_60px_rgba(0,0,0,0.8)] hover:-translate-y-1 hover:scale-[1.05] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] [backface-visibility:hidden] [transform-style:preserve-3d]"
               >
-                <div className="h-48 relative overflow-hidden cursor-pointer" onClick={() => t.config.directLink ? window.open(t.config.directLink, '_blank') : navigate(`/tornei/${t.slug}`)}>
+                <div 
+                  className="h-48 relative overflow-hidden cursor-pointer" 
+                  onClick={() => {
+                    const canRenderInternal = (t.events?.length > 0 || t.config.source === 'challonge' || t.config.source === 'startgg') && !t.config.slug.startsWith('tb-');
+                    if (canRenderInternal) {
+                      navigate(`/tornei/${t.slug}`);
+                    } else if (t.config.directLink) {
+                      window.open(t.config.directLink, '_blank');
+                    }
+                  }}
+                >
                     <img 
                       src={banner} 
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
