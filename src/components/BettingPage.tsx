@@ -465,7 +465,8 @@ export function BettingPage() {
                         options: optionsWithMeta,
                         status: 'open'
                       };
-                      // Log the payload for final verification
+                      
+                      window.alert('DEBUG: Invio payload a Supabase...');
                       console.log('🚀 Publishing Market Payload:', payload);
 
                       const { error } = await supabase
