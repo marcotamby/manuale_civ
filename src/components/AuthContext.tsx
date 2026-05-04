@@ -172,7 +172,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             can_manage_tournaments: data.can_manage_tournaments,
             can_manage_civs: data.can_manage_civs,
             can_manage_buildorders: data.can_manage_buildorders,
-            sheep_balance: data.sheep_balance,
+            sheep_balance: data.sheep_balance ?? 100,
             id: data.id
           };
           checkRoles(updated);

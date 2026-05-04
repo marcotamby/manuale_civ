@@ -34,6 +34,7 @@ export function BettingPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([]);
   const [selectedBets, setSelectedBets] = useState<{ [marketId: string]: { optionId: string, amount: number } }>({});
   const [placingBetId, setPlacingBetId] = useState<string | null>(null);
+  const [myBets, setMyBets] = useState<any[]>([]);
 
   useEffect(() => {
     loadData();
@@ -75,6 +76,16 @@ export function BettingPage() {
         .order('sheep_balance', { ascending: false })
         .limit(5);
       setLeaderboard(topPastors || []);
+
+      // Load My Bets
+      if (user && marketData && marketData.length > 0) {
+        const { data: userBets } = await supabase
+          .from('user_bets')
+          .select('*')
+          .in('market_id', marketData.map(m => m.id))
+          .order('created_at', { ascending: false });
+        setMyBets(userBets || []);
+      }
 
     } catch (err) {
       console.error('Error loading betting data:', err);
@@ -303,6 +314,48 @@ export function BettingPage() {
               Questo è un sistema di social betting <strong>puramente ludico</strong>. Le "Pecore" non hanno alcun valore monetario reale e non possono essere scambiate con denaro. Il gioco è destinato esclusivamente all'intrattenimento della community.
             </p>
           </div>
+
+          {/* My Bets Section */}
+          {isAuthenticated && myBets.length > 0 && (
+            <div className="glass p-8 rounded-[2.5rem] border-blue-500/20 bg-blue-500/5">
+              <h4 className="text-blue-400 font-black uppercase tracking-tighter mb-6 flex items-center gap-3">
+                <TrendingUp size={20} /> Le Tue Scommesse
+              </h4>
+              <div className="space-y-4">
+                {myBets.map((bet) => {
+                  const market = markets.find(m => m.id === bet.market_id);
+                  const option = market?.options.find(o => o.id === bet.option_id);
+                  
+                  return (
+                    <div key={bet.id} className="p-4 bg-black/40 border border-white/10 rounded-2xl">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{market?.title}</span>
+                        <span className={clsx(
+                          "text-[10px] font-black uppercase px-2 py-0.5 rounded",
+                          bet.status === 'won' ? "bg-green-500/20 text-green-400" :
+                          bet.status === 'lost' ? "bg-red-500/20 text-red-400" : "bg-blue-500/20 text-blue-400"
+                        )}>
+                          {bet.status === 'won' ? 'Vinta' : bet.status === 'lost' ? 'Persa' : 'In attesa'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-end">
+                        <div>
+                          <p className="text-sm font-bold text-white uppercase tracking-tight">{option?.label}</p>
+                          <p className="text-xs text-blue-400 font-bold">{bet.amount} 🐑</p>
+                        </div>
+                        {bet.status === 'won' && (
+                          <div className="text-right">
+                            <p className="text-[10px] font-black text-green-400 uppercase">Premio</p>
+                            <p className="text-sm font-black text-green-400">+{bet.payout} 🐑</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Leaderboard */}
           <div className="glass p-8 rounded-[2.5rem] border-white/5 relative overflow-hidden">
