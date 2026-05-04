@@ -212,12 +212,19 @@ export function BettingPage() {
            >
             <ArrowLeft size={16} /> Torna ai Tornei
            </button>
-           <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-200 via-slate-400 to-slate-200 uppercase tracking-tighter mb-2">
-            Social Betting: {tournament?.name || 'Torneo'}
+           <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-200 via-slate-400 to-slate-200 uppercase tracking-tighter mb-4 leading-none">
+            Social Betting:<br/>
+            <span className="text-blue-400">{tournament?.name || 'Torneo'}</span>
            </h1>
-           <p className="text-blue-400 font-serif italic text-lg flex items-center gap-2">
-            Il mercato delle pecore è aperto 🐑
-           </p>
+           <div className="flex flex-col gap-4">
+             <p className="text-blue-400 font-serif italic text-lg flex items-center gap-2">
+              Il mercato delle pecore è aperto 🐑
+             </p>
+             <div className="bg-slate-900/80 border border-red-500/30 p-3 rounded-xl flex items-center gap-3 text-red-400 text-[10px] font-bold uppercase tracking-widest">
+              <AlertCircle size={14} className="shrink-0" />
+              <span>Le scommesse sono virtuali e utilizzano esclusivamente la valuta del sito (Pecore).</span>
+             </div>
+           </div>
         </div>
 
         <div className="flex flex-col items-end gap-4">
@@ -231,11 +238,11 @@ export function BettingPage() {
             )}
 
             {isAuthenticated && (
-              <div className="glass p-6 rounded-3xl border-blue-500/20 shadow-[0_0_30px_rgba(59,130,246,0.1)] flex flex-col items-center gap-2 min-w-[200px]">
-                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Il Tuo Gregge</span>
-                <div className="flex items-center gap-3">
-                  <span className="text-4xl font-black text-white">{sheepBalance}</span>
-                  <span className="text-3xl">🐑</span>
+              <div className="glass px-6 py-3 rounded-2xl border-blue-500/20 shadow-[0_0_30px_rgba(59,130,246,0.1)] flex items-center gap-4 h-[56px]">
+                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest whitespace-nowrap">Il Tuo Gregge</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-black text-white">{sheepBalance}</span>
+                  <span className="text-2xl animate-bounce" style={{ animationDuration: '2s' }}>🐑</span>
                 </div>
               </div>
             )}
@@ -244,80 +251,92 @@ export function BettingPage() {
 
       {/* Admin Market Creation Tools */}
       {isAdmin && showAdminTools && (
-        <div className="mb-12 glass p-8 rounded-[2.5rem] border-yellow-500/30 bg-yellow-500/5 animate-in slide-in-from-top-4 duration-500">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-black">
-              <Plus size={24} />
+        <div className="mb-12 bg-[#111218] border border-cyan-500/30 rounded-3xl overflow-hidden shadow-[0_0_80px_rgba(6,182,212,0.15)] animate-in slide-in-from-top-4 duration-500">
+          <div className="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-cyan-500/10 via-transparent to-transparent">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 flex items-center justify-center border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
+                <Zap className="text-cyan-400" size={24} fill="currentColor" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-white tracking-tight uppercase">
+                  Nuova Scommessa
+                </h2>
+                <p className="text-xs text-cyan-400/60 font-bold uppercase tracking-widest">{tournament?.name}</p>
+              </div>
             </div>
-            <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Nuova Scommessa per {tournament?.name}</h2>
+            <button onClick={() => setShowAdminTools(false)} className="p-2 text-gray-400 hover:text-white transition-colors">
+              <X size={24} />
+            </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <div>
-                <label className="block text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-2">Titolo del Mercato</label>
-                <input 
-                  type="text" 
-                  value={adminForm.title}
-                  onChange={(e) => setAdminForm({...adminForm, title: e.target.value})}
-                  placeholder="es. Vincitore del Match"
-                  className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-yellow-500 transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-2">Descrizione (Opzionale)</label>
-                <textarea 
-                  value={adminForm.description}
-                  onChange={(e) => setAdminForm({...adminForm, description: e.target.value})}
-                  placeholder="Dettagli aggiuntivi..."
-                  className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-yellow-500 transition-all h-32 resize-none"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <div>
-                <label className="block text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-2">Opzioni su cui scommettere</label>
-                <div className="space-y-3">
-                  {adminForm.options.map((opt, idx) => (
-                    <div key={idx} className="flex gap-2">
-                      <input 
-                        type="text"
-                        value={opt}
-                        onChange={(e) => {
-                          const newOpts = [...adminForm.options];
-                          newOpts[idx] = e.target.value;
-                          setAdminForm({...adminForm, options: newOpts});
-                        }}
-                        placeholder={`Opzione ${idx + 1}`}
-                        className="flex-grow bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-yellow-500 transition-all"
-                      />
-                      {adminForm.options.length > 2 && (
-                        <button 
-                          onClick={() => setAdminForm({...adminForm, options: adminForm.options.filter((_, i) => i !== idx)})}
-                          className="p-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors"
-                        >
-                          <X size={20} />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button 
-                    onClick={() => setAdminForm({...adminForm, options: [...adminForm.options, '']})}
-                    className="w-full py-3 border-2 border-dashed border-white/10 rounded-xl text-gray-500 hover:border-yellow-500/50 hover:text-yellow-500 transition-all text-xs font-black uppercase tracking-widest"
-                  >
-                    + Aggiungi Opzione
-                  </button>
+          <div className="p-8 space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <div>
+                  <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Titolo del Mercato</label>
+                  <input 
+                    type="text" 
+                    value={adminForm.title}
+                    onChange={(e) => setAdminForm({...adminForm, title: e.target.value})}
+                    placeholder="es. Vincitore del Match"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-cyan-500 transition-all placeholder:text-white/20"
+                  />
+                </div>
+                <div>
+                  <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Descrizione (Opzionale)</label>
+                  <textarea 
+                    value={adminForm.description}
+                    onChange={(e) => setAdminForm({...adminForm, description: e.target.value})}
+                    placeholder="Dettagli aggiuntivi..."
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-cyan-500 transition-all h-32 resize-none placeholder:text-white/20"
+                  />
                 </div>
               </div>
 
-              <button 
-                onClick={handleCreateMarket}
-                disabled={isCreatingMarket}
-                className="w-full py-5 bg-yellow-500 hover:bg-yellow-400 text-black font-black uppercase tracking-widest rounded-2xl transition-all shadow-xl shadow-yellow-900/20 active:scale-95 flex items-center justify-center gap-3"
-              >
-                {isCreatingMarket ? <Loader2 size={20} className="animate-spin" /> : 'Pubblica Mercato Scommesse'}
-              </button>
+              <div className="space-y-6">
+                <div>
+                  <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Opzioni su cui scommettere</label>
+                  <div className="space-y-3">
+                    {adminForm.options.map((opt, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <input 
+                          type="text"
+                          value={opt}
+                          onChange={(e) => {
+                            const newOpts = [...adminForm.options];
+                            newOpts[idx] = e.target.value;
+                            setAdminForm({...adminForm, options: newOpts});
+                          }}
+                          placeholder={`Opzione ${idx + 1}`}
+                          className="flex-grow bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 transition-all"
+                        />
+                        {adminForm.options.length > 2 && (
+                          <button 
+                            onClick={() => setAdminForm({...adminForm, options: adminForm.options.filter((_, i) => i !== idx)})}
+                            className="p-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors"
+                          >
+                            <X size={20} />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    <button 
+                      onClick={() => setAdminForm({...adminForm, options: [...adminForm.options, '']})}
+                      className="w-full py-3 border-2 border-dashed border-white/10 rounded-xl text-gray-500 hover:border-cyan-500/50 hover:text-cyan-500 transition-all text-[10px] font-black uppercase tracking-widest"
+                    >
+                      + Aggiungi Opzione
+                    </button>
+                  </div>
+                </div>
+
+                <button 
+                  onClick={handleCreateMarket}
+                  disabled={isCreatingMarket}
+                  className="w-full py-5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:brightness-110 text-white font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3"
+                >
+                  {isCreatingMarket ? <Loader2 size={20} className="animate-spin" /> : 'Pubblica Mercato Scommesse'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -327,10 +346,17 @@ export function BettingPage() {
         {/* Main Betting Area */}
         <div className="lg:col-span-2 space-y-8">
           {markets.length === 0 ? (
-            <div className="glass p-12 rounded-[2.5rem] border-white/5 text-center">
-              <AlertCircle size={48} className="mx-auto mb-4 text-gray-600" />
-              <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tighter">Nessuna Scommessa Aperta</h3>
-              <p className="text-gray-500 text-sm italic">Gli scout non hanno ancora identificato opportunità in questo torneo.</p>
+            <div className="glass p-12 rounded-[2.5rem] border-white/5 text-center flex flex-col items-center">
+              <AlertCircle size={48} className="mb-4 text-gray-600" />
+              <h3 className="text-xl font-bold text-white mb-6 uppercase tracking-tighter">Nessuna Scommessa Aperta</h3>
+              {isAdmin && (
+                <button 
+                  onClick={() => setShowAdminTools(true)}
+                  className="px-8 py-4 bg-gradient-to-b from-slate-200 to-slate-400 hover:from-white hover:to-slate-300 text-slate-900 font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl active:scale-95 flex items-center gap-3 border border-white/20"
+                >
+                  <Plus size={20} strokeWidth={3} /> Crea Mercato
+                </button>
+              )}
             </div>
           ) : (
             markets.map((market) => (
@@ -446,15 +472,7 @@ export function BettingPage() {
 
         {/* Sidebar: Leaderboard & Rules */}
         <div className="space-y-8">
-          {/* Disclaimer */}
-          <div className="glass p-8 rounded-[2.5rem] border-red-500/20 bg-red-500/5">
-            <h4 className="text-red-500 font-black uppercase tracking-tighter mb-4 flex items-center gap-2">
-              <AlertCircle size={20} /> Avviso Importante
-            </h4>
-            <p className="text-gray-400 text-sm font-medium leading-relaxed">
-              Questo è un sistema di social betting <strong>puramente ludico</strong>. Le "Pecore" non hanno alcun valore monetario reale e non possono essere scambiate con denaro. Il gioco è destinato esclusivamente all'intrattenimento della community.
-            </p>
-          </div>
+          {/* My Bets Section */}
 
           {/* My Bets Section */}
           {isAuthenticated && myBets.length > 0 && (
