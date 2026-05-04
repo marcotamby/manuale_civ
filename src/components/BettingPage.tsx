@@ -465,7 +465,8 @@ export function BettingPage() {
                         options: optionsWithMeta,
                         status: 'open'
                       };
-                      console.log('🚀 Publishing Market:', payload);
+                      // Log the payload for final verification
+                      console.log('🚀 Publishing Market Payload:', payload);
 
                       const { error } = await supabase
                         .from('betting_markets')
