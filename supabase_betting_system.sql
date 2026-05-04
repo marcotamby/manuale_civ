@@ -54,7 +54,7 @@ BEGIN
   RETURN (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
     OR 
-    (auth.jwt() ->> 'email' = 'marcotamby@gmail.com')
+    (auth.jwt() ->> 'email' = 'marco.tamborrino.94@gmail.com')
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
