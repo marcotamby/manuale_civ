@@ -150,7 +150,13 @@ export function TournamentDetail() {
 
   const banner = source === 'challonge' 
     ? 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop'
-    : (tournament.images.find((img: any) => img.type === 'banner')?.url || tournament.images[0]?.url);
+    : (tournament.images?.find((img: any) => img.type === 'banner')?.url || tournament.images?.[0]?.url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop');
+
+  const profileImage = source === 'challonge'
+    ? banner
+    : (tournament.images?.find((img: any) => img.type === 'profile')?.url || 
+       tournament.images?.find((img: any) => img.type !== 'banner')?.url || 
+       banner);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#0a0a0b]">
@@ -170,7 +176,7 @@ export function TournamentDetail() {
           
           <div className="flex items-end gap-6">
             <div className="hidden md:block w-32 h-32 rounded-2xl glass border border-yellow-500/30 overflow-hidden shrink-0 shadow-2xl">
-              <img src={source === 'challonge' ? banner : (tournament.images.find((i: any) => i.type === 'profile')?.url || banner)} className="w-full h-full object-cover" />
+              <img src={profileImage} className="w-full h-full object-cover" />
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-3 text-yellow-500 mb-2">
