@@ -99,12 +99,14 @@ export function TournamentDetail() {
     loadTournament();
   }, [slug]);
 
-  // Auto-redirect if direct link exists and no internal bracket is found
+  // Auto-redirect removed to keep users on-site
+  /*
   useEffect(() => {
     if (!loading && !selectedPhase && tournament?.db?.direct_link) {
       window.location.replace(tournament.db.direct_link);
     }
   }, [loading, selectedPhase, tournament]);
+  */
 
   if (loading) {
     return (
