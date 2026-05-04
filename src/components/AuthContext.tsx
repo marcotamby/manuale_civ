@@ -8,6 +8,8 @@ interface UserData {
   avatar_url?: string | null;
   rank?: string;
   nickname?: string;
+  sheep_balance?: number;
+  id?: string;
 }
 
 interface AuthContextType {
@@ -144,7 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('nickname, rank, avatar_url, role, is_streamer, can_manage_tournaments, can_manage_civs, can_manage_buildorders')
+        .select('id, nickname, rank, avatar_url, role, is_streamer, can_manage_tournaments, can_manage_civs, can_manage_buildorders, sheep_balance')
         .eq('email', userEmail.toLowerCase())
         .single();
       
@@ -169,7 +171,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             is_streamer: data.is_streamer,
             can_manage_tournaments: data.can_manage_tournaments,
             can_manage_civs: data.can_manage_civs,
-            can_manage_buildorders: data.can_manage_buildorders
+            can_manage_buildorders: data.can_manage_buildorders,
+            sheep_balance: data.sheep_balance,
+            id: data.id
           };
           checkRoles(updated);
           return updated;

@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { X, User, Heart, MessageSquare, Trophy, ExternalLink, Loader2, ChevronDown, LogOut, Camera, Trash2 as TrashIcon } from 'lucide-react';
+import { X, User, Heart, MessageSquare, Trophy, ExternalLink, Loader2, ChevronDown, LogOut, Camera, Trash2 as TrashIcon, TrendingUp, History, AlertTriangle } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
 import { supabase } from '../lib/supabaseClient';
 import type { Suggestion } from './AdminDashboardModal';
+import { clsx } from 'clsx';
 
 interface ProfileModalProps {
     isOpen: boolean;
@@ -131,6 +132,8 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     const [qaNotifications, setQaNotifications] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isQaLoading, setIsQaLoading] = useState(false);
+    const [isBetLoading, setIsBetLoading] = useState(false);
+    const [betNotifications, setBetNotifications] = useState<any[]>([]);
     const [qaUpdateTrigger, setQaUpdateTrigger] = useState(0);
     
     // Local state for pending changes
@@ -260,8 +263,9 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
         if (isOpen && user?.email) {
             fetchMySuggestions();
             fetchQaNotifications();
+            fetchBetNotifications();
         }
-    }, [isOpen, user?.email]);
+    }, [isOpen, user?.email, user?.id]);
 
     const fetchQaNotifications = async () => {
         if (!user?.email) return;
@@ -325,6 +329,37 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
             console.error('Error fetching QA notifications:', err);
         } finally {
             setIsQaLoading(false);
+        }
+    };
+
+    const fetchBetNotifications = async () => {
+        if (!user?.id) return;
+        try {
+            setIsBetLoading(true);
+            const { data } = await supabase
+                .from('betting_notifications')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false })
+                .limit(20);
+            setBetNotifications(data || []);
+        } catch (err) {
+            console.error('Error fetching bet notifications:', err);
+        } finally {
+            setIsBetLoading(false);
+        }
+    };
+
+    const markBetAsRead = async (id: string) => {
+        try {
+            await supabase
+                .from('betting_notifications')
+                .update({ is_read: true })
+                .eq('id', id);
+            setBetNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+            (window as any).refreshNotificationCount?.();
+        } catch (err) {
+            console.error('Error marking bet notif as read:', err);
         }
     };
 
@@ -439,6 +474,81 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 custom-scrollbar">
+
+                    {/* Il Tuo Gregge */}
+                    <section className="relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/5 to-transparent -z-10 rounded-2xl" />
+                        <div className="flex items-center justify-between p-6 bg-white/[0.03] border border-blue-500/20 rounded-2xl shadow-xl">
+                            <div className="flex flex-col gap-1">
+                                <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">Il Tuo Gregge</span>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-4xl font-black text-white">{user?.sheep_balance || 0}</span>
+                                    <span className="text-3xl animate-bounce duration-2000">🐑</span>
+                                </div>
+                                <p className="text-[10px] text-gray-500 italic mt-1 uppercase font-bold tracking-tighter">
+                                    Le tue risorse per il social betting
+                                </p>
+                            </div>
+                            <button 
+                                onClick={() => { navigate('/tornei'); onClose(); }}
+                                className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-900/40 active:scale-95 flex items-center gap-2"
+                            >
+                                <TrendingUp size={14} /> Scommetti
+                            </button>
+                        </div>
+                    </section>
+
+                    {/* Notifiche Scommesse */}
+                    <section>
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2 text-purple-400 tracking-widest uppercase text-xs font-bold">
+                                <History size={14} />
+                                <span>Mercato delle Pecore</span>
+                            </div>
+                        </div>
+
+                        {isBetLoading ? (
+                            <div className="flex items-center justify-center py-6 bg-white/[0.02] rounded-xl border border-white/5">
+                                <Loader2 size={20} className="animate-spin text-purple-500/50" />
+                            </div>
+                        ) : betNotifications.length > 0 ? (
+                            <div className="space-y-2">
+                                {betNotifications.map((notif) => (
+                                    <div 
+                                        key={notif.id}
+                                        onClick={() => markBetAsRead(notif.id)}
+                                        className={clsx(
+                                            "group p-4 rounded-xl border transition-all cursor-pointer flex items-start gap-4",
+                                            !notif.is_read 
+                                                ? "bg-purple-600/10 border-purple-500/30 hover:bg-purple-600/15 hover:border-purple-500/40" 
+                                                : "bg-white/[0.02] border-white/5 opacity-60 hover:bg-white/[0.04]"
+                                        )}
+                                    >
+                                        <div className={clsx(
+                                            "mt-1.5 h-2 w-2 rounded-full shrink-0",
+                                            !notif.is_read ? "bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]" : "bg-gray-700"
+                                        )} />
+                                        <div className="flex-1 min-w-0">
+                                            <p className={clsx(
+                                                "text-sm",
+                                                !notif.is_read ? "text-white font-bold" : "text-gray-400"
+                                            )}>
+                                                {notif.message}
+                                            </p>
+                                            <p className="text-[10px] text-gray-500 mt-1 uppercase font-bold tracking-tighter">
+                                                {new Date(notif.created_at).toLocaleString('it-IT')}
+                                            </p>
+                                        </div>
+                                        {!notif.is_read && <AlertTriangle size={14} className="text-purple-400 animate-pulse mt-1" />}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-6 bg-white/[0.02] rounded-xl border border-white/5">
+                                <p className="text-sm text-gray-500">Nessuna notifica dal mercato delle pecore.</p>
+                            </div>
+                        )}
+                    </section>
 
                     {/* Le Tue Notifiche (Q&A) */}
                     <section>

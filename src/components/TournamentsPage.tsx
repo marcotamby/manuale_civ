@@ -778,6 +778,19 @@ export function TournamentsPage() {
                         {status === 'Programmato' && <Calendar size={10} className="mr-0.5 text-slate-100" />}
                         {status}
                       </div>
+
+                      {/* Social Betting Button */}
+                      {(status === 'In corso' || status === 'Programmato') && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/tornei/${t.slug}/scommetti`);
+                          }}
+                          className="mt-2 px-4 py-2 bg-gradient-to-r from-purple-600 via-fuchsia-500 to-indigo-600 text-white font-black uppercase text-[10px] tracking-tighter rounded-lg shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)] transition-all hover:scale-110 active:scale-95 transform -skew-x-12 border border-white/20"
+                        >
+                          Scommetti! 🐑
+                        </button>
+                      )}
                     </div>
                 </div>
 

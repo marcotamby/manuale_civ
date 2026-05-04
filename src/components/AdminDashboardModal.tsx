@@ -1,6 +1,6 @@
 // Deployment trigger: 2026-04-24 10:15
 import { useState, useEffect } from 'react';
-import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, Trophy, BookOpen, Zap, Edit2, Check, Trash2 } from 'lucide-react';
+import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, Trophy, BookOpen, Zap, Edit2, Check, Trash2, Coins, Gavel, Calendar } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
@@ -44,7 +44,17 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [editingBOs, setEditingBOs] = useState<Record<string, any>>({});
   const [expandedSugg, setExpandedSugg] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'proposte' | 'qa' | 'users'>('proposte');
+  const [activeTab, setActiveTab] = useState<'proposte' | 'qa' | 'users' | 'betting'>('proposte');
+  const [tournaments, setTournaments] = useState<any[]>([]);
+  const [markets, setMarkets] = useState<any[]>([]);
+  const [isBettingLoading, setIsBettingLoading] = useState(false);
+  const [newMarket, setNewMarket] = useState({
+    tournament_slug: '',
+    title: '',
+    description: '',
+    options: [{ id: 'opt1', label: '', total_bet: 0 }, { id: 'opt2', label: '', total_bet: 0 }],
+    type: 'winner'
+  });
   const [users, setUsers] = useState<any[]>([]);
   const [userSearch, setUserSearch] = useState('');
   const [userLoading, setUserLoading] = useState(false);
@@ -237,6 +247,68 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     setDeleteConfirm({ id: email, type: 'user', item: email });
   };
 
+  const fetchTournamentsAndMarkets = async () => {
+    try {
+      setIsBettingLoading(true);
+      const { data: tData } = await supabase.from('tournaments').select('*').order('date', { ascending: false });
+      const { data: mData } = await supabase.from('betting_markets').select('*').order('created_at', { ascending: false });
+      setTournaments(tData || []);
+      setMarkets(mData || []);
+    } catch (err) {
+      console.error('Error fetching betting data:', err);
+    } finally {
+      setIsBettingLoading(false);
+    }
+  };
+
+  const handleCreateMarket = async () => {
+    if (!newMarket.tournament_slug || !newMarket.title || newMarket.options.some(o => !o.label)) {
+      setToast({ isVisible: true, message: 'Compila tutti i campi obbligatori', type: 'error' });
+      return;
+    }
+
+    try {
+      const { error } = await supabase.from('betting_markets').insert([newMarket]);
+      if (error) throw error;
+      setToast({ isVisible: true, message: 'Mercato creato con successo!', type: 'success' });
+      fetchTournamentsAndMarkets();
+      setNewMarket({
+        tournament_slug: '',
+        title: '',
+        description: '',
+        options: [{ id: 'opt1', label: '', total_bet: 0 }, { id: 'opt2', label: '', total_bet: 0 }],
+        type: 'winner'
+      });
+    } catch (err: any) {
+      setToast({ isVisible: true, message: 'Errore: ' + err.message, type: 'error' });
+    }
+  };
+
+  const handleCloseMarket = async (id: string) => {
+    try {
+      const { error } = await supabase.from('betting_markets').update({ status: 'closed' }).eq('id', id);
+      if (error) throw error;
+      fetchTournamentsAndMarkets();
+    } catch (err: any) {
+      setToast({ isVisible: true, message: 'Errore: ' + err.message, type: 'error' });
+    }
+  };
+
+  const handleSettleMarket = async (marketId: string, winnerOptionId: string) => {
+    if (!window.confirm('Sei sicuro di voler assegnare la vittoria? Questa azione è irreversibile.')) return;
+    try {
+      const { error } = await supabase.rpc('settle_betting_market', {
+        p_market_id: marketId,
+        p_winner_option_id: winnerOptionId
+      });
+      if (error) throw error;
+      setToast({ isVisible: true, message: 'Mercato liquidato e vincite assegnate!', type: 'success' });
+      fetchTournamentsAndMarkets();
+    } catch (err: any) {
+      setToast({ isVisible: true, message: 'Errore: ' + err.message, type: 'error' });
+    }
+  };
+
   const executeDeleteUser = async (email: string) => {
     setIsDeleting(true);
     try {
@@ -276,6 +348,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       fetchQA();
       if (isSuperAdmin) fetchUsers();
       fetchPendingNotifCount();
+      if (canManageTournaments) fetchTournamentsAndMarkets();
     }
   }, [isOpen]);
 
@@ -529,14 +602,14 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 md:p-6 border-b border-[#D4AF37]/20 bg-gradient-to-r from-[#0d1424] to-[#1a1c32] rounded-t-2xl shrink-0 gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20 text-blue-400">
-              {activeTab === 'proposte' ? <Inbox size={24} /> : activeTab === 'users' ? <ShieldCheck size={24} /> : <MessageSquare size={24} />}
+              {activeTab === 'proposte' ? <Inbox size={24} /> : activeTab === 'users' ? <ShieldCheck size={24} /> : activeTab === 'betting' ? <Coins size={24} /> : <MessageSquare size={24} />}
             </div>
             <div>
               <h2 className="text-lg md:text-xl font-bold text-white uppercase tracking-wider">
-                {activeTab === 'proposte' ? 'Gestione Proposte' : activeTab === 'users' ? 'Gestione Permessi' : 'Gestione Q&A'}
+                {activeTab === 'proposte' ? 'Gestione Proposte' : activeTab === 'users' ? 'Gestione Permessi' : activeTab === 'betting' ? 'Gestione Scommesse' : 'Gestione Q&A'}
               </h2>
               <p className="text-[10px] md:text-xs text-gray-400">
-                {activeTab === 'proposte' ? 'Revisiona i suggerimenti della community' : activeTab === 'users' ? 'Gestisci i ruoli e i permessi del team' : 'Modera le domande e risposte degli utenti'}
+                {activeTab === 'proposte' ? 'Revisiona i suggerimenti della community' : activeTab === 'users' ? 'Gestisci i ruoli e i permessi del team' : activeTab === 'betting' ? 'Crea e liquida i mercati delle pecore' : 'Modera le domande e risposte degli utenti'}
               </p>
             </div>
           </div>
@@ -571,6 +644,14 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'users' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
                 >
                   Permessi
+                </button>
+              )}
+              {isSuperAdmin && (
+                <button
+                  onClick={() => setActiveTab('betting')}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'betting' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                >
+                  Scommesse
                 </button>
               )}
             </div>
@@ -1030,6 +1111,146 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                 </div>
               )}
             </div>
+          </div>
+            </div>
+          </div>
+        ) : activeTab === 'betting' ? (
+          <div className="flex-1 flex flex-col min-h-0 overflow-y-auto p-4 md:p-6 custom-scrollbar space-y-8">
+             {/* Create New Market Section */}
+             <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                <h3 className="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2">
+                   <Coins size={16} className="text-blue-400" /> Crea Nuovo Mercato
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                   <div className="space-y-4">
+                      <div>
+                         <label className="text-[10px] font-black text-gray-500 uppercase block mb-1.5">Torneo</label>
+                         <select 
+                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-blue-500"
+                            value={newMarket.tournament_slug}
+                            onChange={(e) => setNewMarket({...newMarket, tournament_slug: e.target.value})}
+                         >
+                            <option value="">Seleziona Torneo...</option>
+                            {tournaments.map(t => (
+                               <option key={t.slug} value={t.slug}>{t.name}</option>
+                            ))}
+                         </select>
+                      </div>
+                      <div>
+                         <label className="text-[10px] font-black text-gray-500 uppercase block mb-1.5">Titolo Mercato</label>
+                         <input 
+                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-blue-500"
+                            placeholder="Es: Vincitore Finale"
+                            value={newMarket.title}
+                            onChange={(e) => setNewMarket({...newMarket, title: e.target.value})}
+                         />
+                      </div>
+                      <div>
+                         <label className="text-[10px] font-black text-gray-500 uppercase block mb-1.5">Tipo</label>
+                         <select 
+                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-blue-500"
+                            value={newMarket.type}
+                            onChange={(e) => setNewMarket({...newMarket, type: e.target.value})}
+                         >
+                            <option value="winner">Vincitore Torneo</option>
+                            <option value="match">Singolo Match</option>
+                         </select>
+                      </div>
+                   </div>
+                   <div className="space-y-4">
+                      <label className="text-[10px] font-black text-gray-500 uppercase block">Opzioni</label>
+                      {newMarket.options.map((opt, idx) => (
+                         <div key={idx} className="flex gap-2">
+                            <input 
+                               className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-blue-500"
+                               placeholder={`Opzione ${idx+1}`}
+                               value={opt.label}
+                               onChange={(e) => {
+                                  const opts = [...newMarket.options];
+                                  opts[idx].label = e.target.value;
+                                  setNewMarket({...newMarket, options: opts});
+                               }}
+                            />
+                            {newMarket.options.length > 2 && (
+                               <button 
+                                  onClick={() => setNewMarket({...newMarket, options: newMarket.options.filter((_, i) => i !== idx)})}
+                                  className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                               >
+                                  <Trash2 size={16} />
+                               </button>
+                            )}
+                         </div>
+                      ))}
+                      <button 
+                         onClick={() => setNewMarket({...newMarket, options: [...newMarket.options, { id: 'opt'+(newMarket.options.length+1), label: '', total_bet: 0 }]})}
+                         className="w-full py-2 border border-dashed border-white/10 rounded-xl text-xs text-gray-400 hover:bg-white/5 transition-colors"
+                      >
+                         + Aggiungi Opzione
+                      </button>
+                      <button 
+                         onClick={handleCreateMarket}
+                         className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-blue-600/20 transition-all mt-4"
+                      >
+                         Crea Mercato
+                      </button>
+                   </div>
+                </div>
+             </div>
+
+             {/* Existing Markets Section */}
+             <div className="space-y-4">
+                <h3 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
+                   <Gavel size={16} className="text-yellow-500" /> Mercati Attivi
+                </h3>
+                <div className="grid grid-cols-1 gap-4">
+                   {markets.map(m => (
+                      <div key={m.id} className="bg-black/40 border border-white/10 rounded-2xl p-5 hover:border-blue-500/30 transition-all">
+                         <div className="flex justify-between items-start mb-4">
+                            <div>
+                               <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-[10px] px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black uppercase tracking-tighter">{m.tournament_slug}</span>
+                                  <span className={`text-[10px] px-2 py-0.5 border rounded font-black uppercase tracking-tighter ${m.status === 'open' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
+                                     {m.status}
+                                  </span>
+                               </div>
+                               <h4 className="text-lg font-bold text-white">{m.title}</h4>
+                            </div>
+                            <div className="flex gap-2">
+                               {m.status === 'open' && (
+                                  <button 
+                                     onClick={() => handleCloseMarket(m.id)}
+                                     className="px-3 py-1.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg text-[10px] font-black uppercase hover:bg-red-500/20 transition-colors"
+                                  >
+                                     Chiudi Bet
+                                  </button>
+                               )}
+                            </div>
+                         </div>
+                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {m.options.map((opt: any) => (
+                               <div key={opt.id} className="bg-white/5 border border-white/5 p-3 rounded-xl flex justify-between items-center group">
+                                  <div>
+                                     <div className="text-xs text-white font-bold">{opt.label}</div>
+                                     <div className="text-[10px] text-gray-500 font-mono">{opt.total_bet} 🐑</div>
+                                  </div>
+                                  {m.status === 'closed' && (
+                                     <button 
+                                        onClick={() => handleSettleMarket(m.id, opt.id)}
+                                        className="px-3 py-1 bg-green-600 hover:bg-green-500 text-white rounded-lg text-[10px] font-black uppercase shadow-lg shadow-green-600/20 opacity-0 group-hover:opacity-100 transition-all"
+                                     >
+                                        Vincitore
+                                     </button>
+                                  )}
+                                  {m.status === 'settled' && m.winner_option_id === opt.id && (
+                                     <span className="text-yellow-500 drop-shadow-[0_0_5px_rgba(234,179,8,0.5)]">🏆</span>
+                                  )}
+                               </div>
+                            ))}
+                         </div>
+                      </div>
+                   ))}
+                </div>
+             </div>
           </div>
         ) : (
           /* Q&A Tab Content */

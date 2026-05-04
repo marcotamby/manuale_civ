@@ -27,6 +27,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
   const [pendingQaCount, setPendingQaCount] = useState(0);
   const [notificationCount, setNotificationCount] = useState(0);
   const [qaUnreadCount, setQaUnreadCount] = useState(0);
+  const [betUnreadCount, setBetUnreadCount] = useState(0);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const fetchPendingCount = async () => {
@@ -130,6 +131,25 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
     }
   };
 
+  const fetchBetUnreadCount = async () => {
+    if (!isAuthenticated || !user?.id) {
+      setBetUnreadCount(0);
+      return;
+    }
+
+    try {
+      const { count, error } = await supabase
+        .from('betting_notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+      
+      if (!error) setBetUnreadCount(count || 0);
+    } catch (e) {
+      console.error('Error fetching betting notifications:', e);
+    }
+  };
+
   const calculateNotifications = () => {
     if (!isAuthenticated || !user?.email) {
       setNotificationCount(0);
@@ -158,12 +178,13 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
         });
     }
     
-    setNotificationCount(totalUnread + qaUnreadCount);
+    setNotificationCount(totalUnread + qaUnreadCount + betUnreadCount);
   };
 
   useEffect(() => {
     fetchQaUnreadCount();
-  }, [isAuthenticated, user?.email, civilizations, refreshTrigger]);
+    fetchBetUnreadCount();
+  }, [isAuthenticated, user?.email, user?.id, civilizations, refreshTrigger]);
 
   useEffect(() => {
     calculateNotifications();
@@ -171,6 +192,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
     (window as any).refreshNotificationCount = () => {
       fetchPendingCount();
       fetchQaUnreadCount();
+      fetchBetUnreadCount();
       setRefreshTrigger(prev => prev + 1);
     };
 
@@ -311,6 +333,14 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
                 </div>
               )}
             </div>
+
+            {/* Sheep Balance (PC) */}
+            {isAuthenticated && (
+              <div className="flex items-center gap-2 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">
+                <span className="text-[11px] font-black text-white">{user?.sheep_balance || 0}</span>
+                <span className="text-xs">🐑</span>
+              </div>
+            )}
 
             {/* Profile / Auth */}
             {isAuthenticated ? (
