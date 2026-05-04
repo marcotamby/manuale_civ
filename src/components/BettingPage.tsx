@@ -460,7 +460,7 @@ export function BettingPage() {
                       const { error } = await supabase
                         .from('betting_markets')
                         .insert({
-                          tournament_slug: slug,
+                          tournament_slug: tournament.slug,
                           title: adminForm.title,
                           description: adminForm.description,
                           type: adminForm.type,
