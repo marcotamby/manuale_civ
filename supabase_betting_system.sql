@@ -52,7 +52,7 @@ CREATE OR REPLACE FUNCTION is_admin()
 RETURNS boolean AS $$
 BEGIN
   RETURN (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin', 'owner', 'superadmin'))
     OR 
     (auth.jwt() ->> 'email' = 'marco.tamborrino.94@gmail.com')
   );
