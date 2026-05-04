@@ -191,9 +191,10 @@ export function TournamentDetail() {
                   <span className={`w-2 h-2 rounded-full animate-pulse ${
                     (tournament.db?.status === 'Concluso' || (!tournament.db?.status && (tournament.state === 3 || tournament.state === 'COMPLETED'))) ? 'bg-red-500' : 
                     (tournament.db?.status === 'Programmato') ? 'bg-blue-500' : 
-                    'bg-green-500'
+                    (tournament.db?.status === 'In corso' || (!tournament.db?.status && (tournament.state === 2 || tournament.state === 'LIVE'))) ? 'bg-green-500' :
+                    'bg-red-500' 
                   }`}></span>
-                  {tournament.db?.status || (tournament.state === 3 || tournament.state === 'COMPLETED' ? 'Concluso' : 'In corso')}
+                  {tournament.db?.status || (tournament.state === 2 || tournament.state === 'LIVE' ? 'In corso' : 'Concluso')}
                 </div>
                 <div className="flex items-center gap-2">
                   <Users size={16} />
