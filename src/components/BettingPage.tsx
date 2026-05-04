@@ -457,16 +457,19 @@ export function BettingPage() {
                         total_bet: 0
                       }));
 
+                      const payload = {
+                        tournament_slug: tournament?.slug || (slug || '').split('?')[0].trim().replace(/\/$/, ''),
+                        title: adminForm.title,
+                        description: adminForm.description,
+                        type: adminForm.type,
+                        options: optionsWithMeta,
+                        status: 'open'
+                      };
+                      console.log('🚀 Publishing Market:', payload);
+
                       const { error } = await supabase
                         .from('betting_markets')
-                        .insert({
-                          tournament_slug: tournament.slug,
-                          title: adminForm.title,
-                          description: adminForm.description,
-                          type: adminForm.type,
-                          options: optionsWithMeta,
-                          status: 'open'
-                        });
+                        .insert(payload);
 
                       if (error) throw error;
                       toast.success('Scommessa pubblicata!');
