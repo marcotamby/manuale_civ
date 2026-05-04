@@ -40,7 +40,10 @@ export function BettingPage() {
   const [adminForm, setAdminForm] = useState({
     title: '',
     description: '',
-    type: 'Match',
+    type: 'Match Winner',
+    eventLevel: 'High Elo',
+    teamA: '',
+    teamB: '',
     options: ['', '']
   });
 
@@ -212,30 +215,26 @@ export function BettingPage() {
            >
             <ArrowLeft size={16} /> Torna ai Tornei
            </button>
-           <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-200 via-slate-400 to-slate-200 uppercase tracking-tighter mb-4 leading-none">
+           <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-white to-slate-400 uppercase tracking-tighter mb-4 leading-none">
             Social Betting:<br/>
-            <span className="text-blue-400">{tournament?.name || 'Torneo'}</span>
+            {tournament?.name || 'Torneo'}
            </h1>
            <div className="flex flex-col gap-4">
-             <p className="text-blue-400 font-serif italic text-lg flex items-center gap-2">
-              Il mercato delle pecore è aperto 🐑
+             <p className="text-[#00f2ff] font-serif italic text-lg flex items-center gap-2 drop-shadow-[0_0_10px_rgba(0,242,255,0.3)]">
+              Il mercato delle pecore è aperto! 🐑
              </p>
-             <div className="bg-slate-900/80 border border-red-500/30 p-3 rounded-xl flex items-center gap-3 text-red-400 text-[10px] font-bold uppercase tracking-widest">
-              <AlertCircle size={14} className="shrink-0" />
-              <span>Le scommesse sono virtuali e utilizzano esclusivamente la valuta del sito (Pecore).</span>
+             <div className="bg-slate-900/80 border border-red-500/30 p-4 rounded-xl flex items-start gap-3 text-red-400 text-[10px] font-bold uppercase tracking-widest leading-relaxed">
+              <AlertCircle size={14} className="shrink-0 mt-0.5" />
+              <span>
+                Il sistema di Social Betting di Manuale Civ è un gioco di simulazione puramente gratuito e non costituisce attività di gioco d'azzardo. 
+                Le "Pecore" sono punti virtuali privi di valore economico, non convertibili e non scambiabili. 
+                Partecipando, l'utente accetta che si tratti di una funzionalità ad esclusivo scopo di intrattenimento e competizione sociale.
+              </span>
              </div>
            </div>
         </div>
 
         <div className="flex flex-col items-end gap-4">
-            {isAdmin && (
-              <button 
-                onClick={() => setShowAdminTools(!showAdminTools)}
-                className="px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-black uppercase tracking-widest rounded-2xl transition-all shadow-xl shadow-yellow-900/20 active:scale-95 flex items-center gap-2"
-              >
-                {showAdminTools ? 'Chiudi Strumenti' : 'Crea Mercato'}
-              </button>
-            )}
 
             {isAuthenticated && (
               <div className="glass px-6 py-3 rounded-2xl border-blue-500/20 shadow-[0_0_30px_rgba(59,130,246,0.1)] flex items-center gap-4 h-[56px]">
@@ -273,68 +272,203 @@ export function BettingPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-6">
                 <div>
-                  <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Titolo del Mercato</label>
+                  <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Tipo di Scommessa</label>
+                  <select 
+                    value={adminForm.type}
+                    onChange={(e) => {
+                      const type = e.target.value;
+                      let newOpts = ['', ''];
+                      if (type === 'Tournament Winner') newOpts = ['Team 1', 'Team 2', 'Team 3'];
+                      setAdminForm({...adminForm, type, options: newOpts});
+                    }}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-cyan-500 transition-all appearance-none cursor-pointer"
+                  >
+                    <option value="Tournament Winner" className="bg-[#111218]">Vincitore Torneo</option>
+                    <option value="Match Winner" className="bg-[#111218]">Vincitore Match</option>
+                    <option value="Final Score" className="bg-[#111218]">Punteggio Finale Match</option>
+                  </select>
+                </div>
+
+                {(adminForm.type === 'Match Winner' || adminForm.type === 'Final Score') && (
+                  <>
+                    <div>
+                      <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Livello Evento</label>
+                      <div className="flex gap-2">
+                        {['High Elo', 'Low Elo'].map(lvl => (
+                          <button
+                            key={lvl}
+                            onClick={() => setAdminForm({...adminForm, eventLevel: lvl})}
+                            className={clsx(
+                              "flex-1 py-3 rounded-xl border transition-all font-black text-[10px] uppercase tracking-widest",
+                              adminForm.eventLevel === lvl ? "bg-cyan-500 border-cyan-400 text-black shadow-[0_0_15px_rgba(6,182,212,0.3)]" : "bg-white/5 border-white/10 text-gray-500"
+                            )}
+                          >
+                            {lvl}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[10px] font-bold text-gray-500 uppercase mb-2 block tracking-widest">Team A</label>
+                        <input 
+                          type="text"
+                          value={adminForm.teamA}
+                          onChange={(e) => setAdminForm({...adminForm, teamA: e.target.value})}
+                          placeholder="Nome Team A"
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-gray-500 uppercase mb-2 block tracking-widest">Team B</label>
+                        <input 
+                          type="text"
+                          value={adminForm.teamB}
+                          onChange={(e) => setAdminForm({...adminForm, teamB: e.target.value})}
+                          placeholder="Nome Team B"
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <div>
+                  <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Titolo della Scommessa</label>
                   <input 
                     type="text" 
                     value={adminForm.title}
                     onChange={(e) => setAdminForm({...adminForm, title: e.target.value})}
-                    placeholder="es. Vincitore del Match"
+                    placeholder="Esempio: Vincitore del Torneo"
                     className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-cyan-500 transition-all placeholder:text-white/20"
                   />
-                </div>
-                <div>
-                  <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Descrizione (Opzionale)</label>
-                  <textarea 
-                    value={adminForm.description}
-                    onChange={(e) => setAdminForm({...adminForm, description: e.target.value})}
-                    placeholder="Dettagli aggiuntivi..."
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-cyan-500 transition-all h-32 resize-none placeholder:text-white/20"
-                  />
+                  <button 
+                    onClick={() => {
+                      let generated = "";
+                      if (adminForm.type === 'Match Winner') generated = `[${adminForm.eventLevel}] ${adminForm.teamA} vs ${adminForm.teamB}`;
+                      else if (adminForm.type === 'Final Score') generated = `Punteggio: ${adminForm.teamA} vs ${adminForm.teamB}`;
+                      else generated = `Vincitore Torneo: ${tournament?.name}`;
+                      setAdminForm({...adminForm, title: generated});
+                    }}
+                    className="mt-2 text-[9px] font-black text-cyan-400/60 uppercase tracking-widest hover:text-cyan-400 transition-colors"
+                  >
+                    Auto-genera Titolo
+                  </button>
                 </div>
               </div>
 
               <div className="space-y-6">
                 <div>
-                  <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Opzioni su cui scommettere</label>
+                  <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Opzioni di Scommessa</label>
                   <div className="space-y-3">
-                    {adminForm.options.map((opt, idx) => (
-                      <div key={idx} className="flex gap-2">
-                        <input 
-                          type="text"
-                          value={opt}
-                          onChange={(e) => {
-                            const newOpts = [...adminForm.options];
-                            newOpts[idx] = e.target.value;
-                            setAdminForm({...adminForm, options: newOpts});
-                          }}
-                          placeholder={`Opzione ${idx + 1}`}
-                          className="flex-grow bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 transition-all"
-                        />
-                        {adminForm.options.length > 2 && (
-                          <button 
-                            onClick={() => setAdminForm({...adminForm, options: adminForm.options.filter((_, i) => i !== idx)})}
-                            className="p-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors"
-                          >
-                            <X size={20} />
-                          </button>
-                        )}
+                    {adminForm.type === 'Match Winner' ? (
+                      <div className="grid grid-cols-2 gap-3">
+                        {[adminForm.teamA || 'Team A', adminForm.teamB || 'Team B'].map((name, i) => (
+                          <div key={i} className="p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-xl text-center text-cyan-400 font-black uppercase text-xs">
+                            {name}
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                    <button 
-                      onClick={() => setAdminForm({...adminForm, options: [...adminForm.options, '']})}
-                      className="w-full py-3 border-2 border-dashed border-white/10 rounded-xl text-gray-500 hover:border-cyan-500/50 hover:text-cyan-500 transition-all text-[10px] font-black uppercase tracking-widest"
-                    >
-                      + Aggiungi Opzione
-                    </button>
+                    ) : adminForm.type === 'Final Score' ? (
+                      <div className="grid grid-cols-2 gap-3">
+                        {['2-0', '2-1', '1-2', '0-2'].map((score) => (
+                          <button
+                            key={score}
+                            onClick={() => {
+                              const label = `${score} (${adminForm.teamA} vs ${adminForm.teamB})`;
+                              if (!adminForm.options.includes(label)) {
+                                setAdminForm({...adminForm, options: [...adminForm.options, label].filter(o => o !== '')});
+                              }
+                            }}
+                            className="p-3 bg-white/5 border border-white/10 rounded-xl text-white text-xs font-bold hover:border-cyan-500 transition-all"
+                          >
+                            {score}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      adminForm.options.map((opt, idx) => (
+                        <div key={idx} className="flex gap-2">
+                          <input 
+                            type="text"
+                            value={opt}
+                            onChange={(e) => {
+                              const newOpts = [...adminForm.options];
+                              newOpts[idx] = e.target.value;
+                              setAdminForm({...adminForm, options: newOpts});
+                            }}
+                            placeholder={`Opzione ${idx + 1}`}
+                            className="flex-grow bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 transition-all"
+                          />
+                          {adminForm.options.length > 2 && (
+                            <button 
+                              onClick={() => setAdminForm({...adminForm, options: adminForm.options.filter((_, i) => i !== idx)})}
+                              className="p-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors"
+                            >
+                              <X size={20} />
+                            </button>
+                          )}
+                        </div>
+                      ))
+                    )}
+                    
+                    {adminForm.type === 'Tournament Winner' && (
+                      <button 
+                        onClick={() => setAdminForm({...adminForm, options: [...adminForm.options, '']})}
+                        className="w-full py-3 border-2 border-dashed border-white/10 rounded-xl text-gray-500 hover:border-cyan-500/50 hover:text-cyan-500 transition-all text-[10px] font-black uppercase tracking-widest"
+                      >
+                        + Aggiungi Team
+                      </button>
+                    )}
                   </div>
                 </div>
 
                 <button 
-                  onClick={handleCreateMarket}
+                  onClick={async () => {
+                    // Custom handle for Match Winner/Final Score
+                    let finalOptions = adminForm.options;
+                    if (adminForm.type === 'Match Winner') {
+                      finalOptions = [adminForm.teamA || 'Team A', adminForm.teamB || 'Team B'];
+                    }
+                    
+                    if (!adminForm.title || finalOptions.some(o => !o)) {
+                      toast.error('Compila tutti i campi!');
+                      return;
+                    }
+
+                    setIsCreatingMarket(true);
+                    try {
+                      const optionsWithMeta = finalOptions.map(label => ({
+                        id: crypto.randomUUID(),
+                        label,
+                        total_bet: 0
+                      }));
+
+                      const { error } = await supabase
+                        .from('betting_markets')
+                        .insert({
+                          tournament_slug: slug,
+                          title: adminForm.title,
+                          description: adminForm.description,
+                          type: adminForm.type,
+                          options: optionsWithMeta,
+                          status: 'open'
+                        });
+
+                      if (error) throw error;
+                      toast.success('Scommessa pubblicata!');
+                      setShowAdminTools(false);
+                      loadData();
+                    } catch (err: any) {
+                      toast.error(err.message);
+                    } finally {
+                      setIsCreatingMarket(false);
+                    }
+                  }}
                   disabled={isCreatingMarket}
                   className="w-full py-5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:brightness-110 text-white font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3"
                 >
-                  {isCreatingMarket ? <Loader2 size={20} className="animate-spin" /> : 'Pubblica Mercato Scommesse'}
+                  {isCreatingMarket ? <Loader2 size={20} className="animate-spin" /> : 'Pubblica Scommessa Ora'}
                 </button>
               </div>
             </div>
@@ -518,9 +652,6 @@ export function BettingPage() {
 
           {/* Leaderboard */}
           <div className="glass p-8 rounded-[2.5rem] border-white/5 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-8 opacity-10">
-              <Trophy size={80} className="text-blue-500" />
-            </div>
             <h4 className="text-xl font-black text-white uppercase tracking-tighter mb-6 relative z-10 flex items-center gap-3">
               <Users size={20} className="text-blue-400" />
               I Migliori Pastori
@@ -548,11 +679,6 @@ export function BettingPage() {
             </div>
           </div>
           
-          {/* Themed Quotes */}
-          <div className="glass p-8 rounded-[2.5rem] border-white/5 italic text-gray-500 text-sm font-serif">
-            <p className="mb-4">"Hai inviato i tuoi scout a recuperare nuove pecore per il tuo gregge..."</p>
-            <p>"Ricorda: un buon pastore sa quando rischiare e quando proteggere il gregge dai lupi."</p>
-          </div>
         </div>
       </div>
     </div>
