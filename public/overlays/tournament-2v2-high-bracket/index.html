@@ -220,7 +220,11 @@
                 
                 phase.matches.forEach((match, mIdx) => {
                     const startMatchEl = document.getElementById(`match-${pIdx}-${mIdx}`);
-                    const nextMatchIdx = Math.floor(mIdx / 2);
+                    const currentRoundMatches = phases[pIdx].matches.length;
+                    const nextRoundMatches = phases[pIdx + 1].matches.length;
+                    const factor = currentRoundMatches / nextRoundMatches;
+                    
+                    const nextMatchIdx = Math.floor(mIdx / Math.max(1, factor));
                     const endMatchEl = document.getElementById(`match-${pIdx + 1}-${nextMatchIdx}`);
                     
                     if (startMatchEl && endMatchEl) {
@@ -233,7 +237,7 @@
                         const xEnd = (eRect.left - containerRect.left) / scale;
                         const yBase = ((eRect.top + eRect.height / 2) - containerRect.top) / scale;
                         
-                        const slot = mIdx % 2 === 0 ? 0 : 1;
+                        const slot = (factor <= 1) ? 1 : (mIdx % 2);
                         const yEnd = yBase + (slot === 0 ? -36 : 36);
                         const xMid = xStart + (xEnd - xStart) * 0.5;
                         

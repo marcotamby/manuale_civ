@@ -35,10 +35,22 @@ function generatePhases(count: number) {
   const roundNames = ['FINALE', 'SEMIFINALE', 'QUARTI DI FINALE', 'OTTAVI DI FINALE', 'SEDICESIMI DI FINALE'];
   
   let roundsNeeded = Math.ceil(Math.log2(count));
-  
+  if (roundsNeeded < 1) roundsNeeded = 1;
+
   for (let i = 0; i < roundsNeeded; i++) {
+    const matchesInRound = Math.pow(2, i);
+    let actualMatches = matchesInRound;
+    
+    // Se è il primo round (quello a sinistra), calcoliamo quanti match servono
+    if (i === roundsNeeded - 1) {
+      actualMatches = count - Math.pow(2, roundsNeeded - 1);
+    }
+    
+    // Se actualMatches è 0 (es. se count è una potenza di 2 perfetta, il calcolo sopra darebbe 0 se non stiamo attenti)
+    // Ma count - 2^(roundsNeeded-1) per count=8 è 8-4=4. Per count=4 è 4-2=2. Funziona.
+    
     const roundMatches = [];
-    for (let j = 0; j < Math.pow(2, i); j++) {
+    for (let j = 0; j < actualMatches; j++) {
       roundMatches.push({
         id: `r${i}-${j}`,
         t1: '', t2: '', 
@@ -49,6 +61,7 @@ function generatePhases(count: number) {
         t1Bye: false, t2Bye: false
       });
     }
+    
     phases.unshift({
       name: roundNames[i] || `ROUND ${roundsNeeded - i}`,
       matches: roundMatches
@@ -273,9 +286,14 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
     if (phaseIdx < phases.length - 1) {
       const match = phases[phaseIdx].matches[matchIdx];
       const nextPhase = phases[phaseIdx + 1];
-      const nextMatchIdx = Math.floor(matchIdx / 2);
-      const slot = matchIdx % 2 === 0 ? 't1' : 't2';
-      const playerSlot = matchIdx % 2 === 0 ? 't1Players' : 't2Players';
+      
+      const currentRoundMatches = phases[phaseIdx].matches.length;
+      const nextRoundMatches = phases[phaseIdx + 1].matches.length;
+      const factor = currentRoundMatches / nextRoundMatches;
+      
+      const nextMatchIdx = Math.floor(matchIdx / Math.max(1, factor));
+      const slot = (factor <= 1) ? 't2' : (matchIdx % 2 === 0 ? 't1' : 't2');
+      const playerSlot = slot === 't1' ? 't1Players' : 't2Players';
       
       if (match.w > 0) {
         nextPhase.matches[nextMatchIdx][slot] = match.w === 1 ? match.t1 : match.t2;
@@ -518,7 +536,7 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
              <div className="flex flex-col gap-1.5">
                <label className="text-[8px] font-black text-gray-500 uppercase tracking-widest px-1">Numero Team</label>
                <div className="flex bg-black/40 rounded-xl p-1 border border-white/10">
-                 {[4, 8, 16, 32].map(c => (
+                 {[4, 5, 8, 16, 32].map(c => (
                    <button 
                      key={c}
                      onClick={() => updateTeamCount(c)}
