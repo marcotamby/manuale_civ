@@ -38,7 +38,7 @@ export function BettingPage() {
   const [myBets, setMyBets] = useState<any[]>([]);
   const [showAdminTools, setShowAdminTools] = useState(false);
   const [isCreatingMarket, setIsCreatingMarket] = useState(false);
-  const [participants, setParticipants] = useState<string[]>([]);
+  const [participantsByLevel, setParticipantsByLevel] = useState<{ [level: string]: string[] }>({ 'High Elo': [], 'Low Elo': [] });
   const [adminForm, setAdminForm] = useState({
     title: '',
     description: '',
@@ -71,11 +71,29 @@ export function BettingPage() {
       try {
         const startggData = await fetchTournament(cleanSlug);
         if (startggData?.events) {
-          const names = new Set<string>();
+          const mapping: { [level: string]: string[] } = { 'High Elo': [], 'Low Elo': [] };
           startggData.events.forEach((e: any) => {
-            e.entrants?.nodes?.forEach((n: any) => names.add(n.name));
+            const eventName = e.name.toLowerCase();
+            let level = '';
+            if (eventName.includes('high')) level = 'High Elo';
+            else if (eventName.includes('low')) level = 'Low Elo';
+            
+            if (level && e.entrants?.nodes) {
+              e.entrants.nodes.forEach((n: any) => {
+                if (!mapping[level].includes(n.name)) mapping[level].push(n.name);
+              });
+            } else if (!level && e.entrants?.nodes) {
+              // Fallback: if no level in name, add to both if empty or handle as generic
+              e.entrants.nodes.forEach((n: any) => {
+                if (!mapping['High Elo'].includes(n.name)) mapping['High Elo'].push(n.name);
+                if (!mapping['Low Elo'].includes(n.name)) mapping['Low Elo'].push(n.name);
+              });
+            }
           });
-          setParticipants(Array.from(names).sort());
+          setParticipantsByLevel({
+            'High Elo': mapping['High Elo'].sort(),
+            'Low Elo': mapping['Low Elo'].sort()
+          });
         }
       } catch (e) {
         console.warn("Could not fetch entrants for dropdowns", e);
@@ -301,7 +319,7 @@ export function BettingPage() {
                             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 appearance-none cursor-pointer"
                           >
                             <option value="">Seleziona Team</option>
-                            {participants.map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
+                            {(participantsByLevel[adminForm.eventLevel] || []).map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
                           </select>
                           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/50 pointer-events-none" size={16} />
                         </div>
@@ -315,7 +333,7 @@ export function BettingPage() {
                             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 appearance-none cursor-pointer"
                           >
                             <option value="">Seleziona Team</option>
-                            {participants.map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
+                            {(participantsByLevel[adminForm.eventLevel] || []).map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
                           </select>
                           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/50 pointer-events-none" size={16} />
                         </div>
@@ -392,7 +410,7 @@ export function BettingPage() {
                               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 appearance-none cursor-pointer"
                             >
                               <option value="">Seleziona Team</option>
-                              {participants.map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
+                              {(participantsByLevel[adminForm.eventLevel] || []).map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
                             </select>
                             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/50 pointer-events-none" size={16} />
                           </div>
