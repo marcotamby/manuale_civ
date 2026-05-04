@@ -885,16 +885,17 @@ export function TournamentsPage() {
                         )}
                         <button 
                           onClick={() => {
-                            // Se è un torneo che possiamo renderizzare internamente, andiamo alla pagina di dettaglio
-                            const hasInternalSlug = t.slug && !t.config.slug.startsWith('tb-');
-                            const isRenderableSource = t.config.source === 'challonge' || t.config.source === 'startgg';
+                            // Navighiamo internamente SOLO se ci sono eventi caricati o se è un torneo challonge con slug valido
+                            const hasEvents = t.events && t.events.length > 0;
+                            const isChallongeWithSlug = t.config.source === 'challonge' && t.slug && !t.config.slug.startsWith('tb-');
+                            const isStartGGWithEvents = t.config.source === 'startgg' && hasEvents;
                             
-                            if (hasInternalSlug && isRenderableSource) {
+                            if (isStartGGWithEvents || isChallongeWithSlug) {
                               navigate(`/tornei/${t.slug}`);
                             } else if (t.config.directLink) {
                               window.open(t.config.directLink, '_blank');
                             } else {
-                              // Feedback visivo se non c'è nulla da mostrare
+                              // Feedback visivo "NON DISPONIBILE" dentro il pulsante
                               setBracketErrorId(t.id);
                               setTimeout(() => setBracketErrorId(null), 3000);
                             }
