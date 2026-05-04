@@ -163,10 +163,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Update user state using functional update to access prev state
         setUser(prev => {
           if (!prev) return null;
+          const dbAvatar = data.avatar_url;
+          const currentAvatar = prev?.avatar_url;
+          
+          // If DB has a custom avatar (base64), use it. 
+          // If DB has a URL but state has base64, KEEP state (don't downgrade to Google URL).
+          const finalAvatar = (dbAvatar && dbAvatar.startsWith('data:image')) 
+            ? dbAvatar 
+            : (currentAvatar && currentAvatar.startsWith('data:image') ? currentAvatar : (dbAvatar || currentAvatar));
+
           const updated = { 
             ...prev, 
             rank: currentRank, 
-            avatar_url: data.avatar_url || prev.avatar_url,
+            avatar_url: finalAvatar,
             role: data.role, 
             is_streamer: data.is_streamer,
             can_manage_tournaments: data.can_manage_tournaments,
@@ -183,13 +192,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const storedUser = localStorage.getItem('auth_user');
         if (storedUser) {
            const parsed = JSON.parse(storedUser);
+           const dbAvatar = data.avatar_url;
+           const sessionAvatar = parsed.avatar_url;
+           const finalAvatar = dbAvatar && (dbAvatar.startsWith('data:image') || !sessionAvatar) 
+              ? dbAvatar 
+              : (sessionAvatar || dbAvatar);
+
            localStorage.setItem('auth_user', JSON.stringify({ 
              ...parsed, 
              rank: currentRank, 
              nickname: currentNickname, 
              role: data.role, 
              is_streamer: data.is_streamer,
-             avatar_url: data.avatar_url || parsed.avatar_url,
+             avatar_url: finalAvatar,
              can_manage_tournaments: data.can_manage_tournaments,
              can_manage_civs: data.can_manage_civs,
              can_manage_buildorders: data.can_manage_buildorders,
@@ -263,12 +278,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const email = userData.email?.toLowerCase() || 'guest';
     const savedRank = localStorage.getItem(`auth_user_rank_${email}`) || localStorage.getItem('auth_user_rank') || 'Unranked';
     const savedNickname = localStorage.getItem(`auth_user_nickname_${email}`) || localStorage.getItem('auth_user_nickname') || '';
+    const savedUser = localStorage.getItem(`auth_user_${email}`) || localStorage.getItem('auth_user');
+    const parsedSavedUser = savedUser ? JSON.parse(savedUser) : null;
     
-    const enrichedUser = { ...userData, rank: savedRank, nickname: savedNickname };
+    // If we have a custom avatar in localStorage, keep it! Don't let login overwrite it.
+    const currentAvatar = userData.avatar_url;
+    const finalAvatar = (parsedSavedUser?.avatar_url?.startsWith('data:image')) 
+      ? parsedSavedUser.avatar_url 
+      : currentAvatar;
+
+    const enrichedUser = { ...userData, rank: savedRank, nickname: savedNickname, avatar_url: finalAvatar };
 
     setIsAuthenticated(true);
     setUser(enrichedUser);
     localStorage.setItem('auth_user', JSON.stringify(enrichedUser));
+    localStorage.setItem(`auth_user_${email}`, JSON.stringify(enrichedUser));
     checkRoles(enrichedUser);
 
     // Migration: save back to per-user keys if using old global keys
@@ -310,6 +334,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       setUser(updatedUser);
       localStorage.setItem('auth_user', JSON.stringify(updatedUser));
+      localStorage.setItem(`auth_user_${email}`, JSON.stringify(updatedUser));
       
       if (data.rank) {
         localStorage.setItem(`auth_user_rank_${email}`, data.rank);
