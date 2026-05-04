@@ -31,7 +31,7 @@ export function TournamentDetail() {
         const { data: dbTournament } = await supabase
           .from('tournaments')
           .select('*')
-          .eq('slug', slug)
+          .ilike('slug', baseSlug.trim())
           .single();
 
         const activeSource = dbTournament?.source || source;
@@ -190,11 +190,11 @@ export function TournamentDetail() {
                 <div className="flex items-center gap-2">
                   <span className={`w-2 h-2 rounded-full animate-pulse ${
                     (tournament.db?.status === 'Concluso' || (!tournament.db?.status && (tournament.state === 3 || tournament.state === 'COMPLETED'))) ? 'bg-red-500' : 
-                    (tournament.db?.status === 'Programmato') ? 'bg-blue-500' : 
-                    (tournament.db?.status === 'In corso' || (!tournament.db?.status && (tournament.state === 2 || tournament.state === 'LIVE'))) ? 'bg-green-500' :
-                    'bg-red-500' 
+                    (tournament.db?.status === 'Programmato' || (!tournament.db?.status && (tournament.state === 1 || tournament.state === 'CREATED'))) ? 'bg-blue-500' : 
+                    'bg-green-500'
                   }`}></span>
-                  {tournament.db?.status || (tournament.state === 2 || tournament.state === 'LIVE' ? 'In corso' : 'Concluso')}
+                  {tournament.db?.status || (tournament.state === 3 || tournament.state === 'COMPLETED' ? 'Concluso' : 
+                   (tournament.state === 1 || tournament.state === 'CREATED' ? 'Programmato' : 'In corso'))}
                 </div>
                 <div className="flex items-center gap-2">
                   <Users size={16} />
