@@ -75,6 +75,13 @@ export function TournamentDetail() {
 
                 if (targetEvent.phases && targetEvent.phases.length > 0) {
                   setSelectedPhase(targetEvent.phases[0]);
+                  
+                  // Se l'utente non aveva specificato un evento nell'URL, lo aggiungiamo ora
+                  if (!eventParam) {
+                    const newParams = new URLSearchParams(window.location.search);
+                    newParams.set('event', targetEvent.name.toLowerCase().replace(/[^a-z0-9]/g, '-'));
+                    setSearchParams(newParams, { replace: true });
+                  }
                 }
               }
             } else if (dbTournament) {
