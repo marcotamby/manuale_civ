@@ -51,6 +51,17 @@ ALTER TABLE betting_notifications ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Markets are public" ON betting_markets;
 CREATE POLICY "Markets are public" ON betting_markets FOR SELECT USING (true);
 
+-- Admins can manage markets
+DROP POLICY IF EXISTS "Admins can manage markets" ON betting_markets;
+CREATE POLICY "Admins can manage markets" ON betting_markets 
+FOR ALL TO authenticated
+USING (
+    EXISTS (
+        SELECT 1 FROM profiles 
+        WHERE id = auth.uid() AND role = 'admin'
+    )
+);
+
 -- Users can only see their own bets
 DROP POLICY IF EXISTS "Users can see their own bets" ON user_bets;
 CREATE POLICY "Users can see their own bets" ON user_bets FOR SELECT USING (auth.uid() = user_id);

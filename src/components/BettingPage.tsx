@@ -379,17 +379,21 @@ export function BettingPage() {
                     ) : (
                       adminForm.options.map((opt, idx) => (
                         <div key={idx} className="flex gap-2">
-                          <input 
-                            type="text"
-                            value={opt}
-                            onChange={(e) => {
-                              const newOpts = [...adminForm.options];
-                              newOpts[idx] = e.target.value;
-                              setAdminForm({...adminForm, options: newOpts});
-                            }}
-                            placeholder={`Opzione ${idx + 1}`}
-                            className="flex-grow bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 transition-all"
-                          />
+                          <div className="relative flex-grow">
+                            <select 
+                              value={opt}
+                              onChange={(e) => {
+                                const newOpts = [...adminForm.options];
+                                newOpts[idx] = e.target.value;
+                                setAdminForm({...adminForm, options: newOpts});
+                              }}
+                              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 appearance-none cursor-pointer"
+                            >
+                              <option value="">Seleziona Team</option>
+                              {participants.map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
+                            </select>
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/50 pointer-events-none" size={16} />
+                          </div>
                           {adminForm.options.length > 2 && (
                             <button 
                               onClick={() => setAdminForm({...adminForm, options: adminForm.options.filter((_, i) => i !== idx)})}
