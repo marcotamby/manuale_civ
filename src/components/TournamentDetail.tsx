@@ -28,6 +28,8 @@ export function TournamentDetail() {
       setDetailError(null);
       try {
         // 1. Get metadata from our DB first
+        const [baseSlug] = (slug || '').split('?');
+        
         // Fetch DB info first and more reliably
         const { data: dbTournament } = await supabase
           .from('tournaments')
