@@ -55,11 +55,14 @@ export function BettingPage() {
     setLoading(true);
     try {
       // Load Tournament
+      const cleanSlug = (slug || '').split('?')[0].trim().replace(/\/$/, '');
+      
       const { data: tourney } = await supabase
         .from('tournaments')
         .select('*')
-        .eq('slug', slug)
-        .single();
+        .or(`slug.eq.${cleanSlug},slug.ilike.${cleanSlug},slug.ilike.%${cleanSlug}%`)
+        .maybeSingle();
+        
       setTournament(tourney);
 
       // Load Markets
@@ -165,8 +168,8 @@ export function BettingPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in duration-700">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-6 px-4 md:px-0">
-        <div className="relative">
+      <div className="flex flex-col md:flex-row items-start justify-between mb-12 gap-6 px-4 md:px-0">
+        <div className="relative flex-1">
            <button 
             onClick={() => navigate('/tornei')}
             className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-4 text-xs font-black uppercase tracking-widest"
@@ -175,26 +178,29 @@ export function BettingPage() {
            </button>
            <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-white to-slate-400 uppercase tracking-tighter mb-4 leading-none">
             Social Betting:<br/>
-            {tournament?.name || 'Torneo'}
+            {tournament?.name || (slug?.replace(/-/g, ' ')) || 'Torneo'}
            </h1>
            <div className="flex flex-col gap-4">
              <p className="text-[#00f2ff] font-serif italic text-lg flex items-center gap-2 drop-shadow-[0_0_10px_rgba(0,242,255,0.3)]">
               Il mercato delle pecore è aperto! 🐑
              </p>
-             <div className="bg-slate-900/80 border border-red-500/30 p-4 rounded-xl flex items-start gap-3 text-red-400 text-[10px] font-bold uppercase tracking-widest leading-relaxed">
-              <AlertCircle size={14} className="shrink-0 mt-0.5" />
-              <span>
-                Il sistema di Social Betting di Manuale Civ è un gioco di simulazione puramente gratuito e non costituisce attività di gioco d'azzardo. 
-                Le "Pecore" sono punti virtuali privi di valore economico, non convertibili e non scambiabili. 
-                Partecipando, l'utente accetta che si tratti di una funzionalità ad esclusivo scopo di intrattenimento e competizione sociale.
-              </span>
+             <div className="group relative">
+               <div className="bg-[#111218] border border-red-500/30 p-3 rounded-xl flex items-center gap-3 text-red-400 text-[10px] font-bold uppercase tracking-widest cursor-help transition-all duration-300 max-h-[40px] hover:max-h-[200px] overflow-hidden">
+                <AlertCircle size={14} className="shrink-0" />
+                <span className="whitespace-nowrap group-hover:whitespace-normal transition-all duration-300">
+                  Il sistema di Social Betting è un gioco di simulazione puramente gratuito e non costituisce attività di gioco d'azzardo. Le "Pecore" sono punti virtuali privi di valore economico, non convertibili e non scambiabili.
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity ml-1">
+                    Partecipando, l'utente accetta che si tratti di una funzionalità ad esclusivo scopo di intrattenimento e competizione sociale.
+                  </span>
+                </span>
+               </div>
              </div>
            </div>
         </div>
 
-        <div className="flex flex-col items-end gap-4">
+        <div className="flex flex-col items-end gap-4 self-start mt-0 md:mt-10">
             {isAuthenticated && (
-              <div className="glass px-6 py-3 rounded-2xl border-blue-500/20 shadow-[0_0_30px_rgba(59,130,246,0.1)] flex items-center gap-4 h-[56px]">
+              <div className="bg-[#111218] px-6 py-3 rounded-2xl border-slate-400/20 shadow-[0_0_30px_rgba(59,130,246,0.1)] flex items-center gap-4 h-[56px] transition-transform hover:scale-105">
                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest whitespace-nowrap">Il Tuo Gregge</span>
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-black text-white">{sheepBalance}</span>
@@ -445,7 +451,7 @@ export function BettingPage() {
         {/* Main Betting Area */}
         <div className="lg:col-span-2 space-y-8">
           {markets.length === 0 ? (
-            <div className="bg-[#0f1115]/80 backdrop-blur-sm p-12 rounded-[2.5rem] border border-slate-400/20 text-center flex flex-col items-center">
+            <div className="bg-[#111218] p-12 rounded-[2.5rem] border border-slate-400/20 text-center flex flex-col items-center">
               <AlertCircle size={48} className="mb-4 text-gray-600" />
               <h3 className="text-xl font-bold text-white mb-6 uppercase tracking-tighter">Nessuna Scommessa Aperta</h3>
               {isAdmin && (
@@ -459,7 +465,7 @@ export function BettingPage() {
             </div>
           ) : (
             markets.map((market) => (
-              <div key={market.id} className="bg-[#0f1115]/80 backdrop-blur-sm rounded-[2.5rem] border border-slate-400/20 overflow-hidden group hover:border-slate-400/40 transition-all duration-500 shadow-2xl">
+              <div key={market.id} className="bg-[#111218] rounded-[2.5rem] border border-slate-400/20 overflow-hidden group hover:border-slate-400/40 transition-all duration-500 shadow-2xl">
                 {/* Market Header */}
                 <div className="p-6 md:p-8 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-white/5">
                   <div className="flex justify-between items-start mb-4">
@@ -528,7 +534,7 @@ export function BettingPage() {
 
                   {/* Bet Input Area */}
                   {selectedBets[market.id] && market.status === 'open' && (
-                    <div className="mt-8 p-6 bg-slate-900/60 border border-slate-400/20 rounded-3xl animate-in slide-in-from-top-4 duration-300">
+                    <div className="mt-8 p-6 bg-[#111218] border border-slate-400/20 rounded-3xl animate-in slide-in-from-top-4 duration-300">
                       <div className="flex flex-col md:flex-row items-center gap-6">
                         <div className="flex-grow w-full">
                           <label className="block text-[10px] font-black text-blue-400 uppercase tracking-widest mb-3">Quante pecore vuoi inviare?</label>
@@ -573,7 +579,7 @@ export function BettingPage() {
         <div className="space-y-8">
           {/* My Bets Section */}
           {isAuthenticated && myBets.length > 0 && (
-            <div className="bg-[#0f1115]/80 backdrop-blur-sm p-8 rounded-[2.5rem] border border-slate-400/20">
+            <div className="bg-[#111218] p-8 rounded-[2.5rem] border border-slate-400/20">
               <h4 className="text-blue-400 font-black uppercase tracking-tighter mb-6 flex items-center gap-3">
                 <TrendingUp size={20} /> Le Tue Scommesse
               </h4>
@@ -614,7 +620,7 @@ export function BettingPage() {
           )}
 
           {/* Leaderboard */}
-          <div className="bg-[#0f1115]/80 backdrop-blur-sm p-8 rounded-[2.5rem] border border-slate-400/20 relative overflow-hidden">
+          <div className="bg-[#111218] p-8 rounded-[2.5rem] border border-slate-400/20 relative overflow-hidden">
             <h4 className="text-xl font-black text-white uppercase tracking-tighter mb-6 relative z-10 flex items-center gap-3">
               <Users size={20} className="text-blue-400" />
               I Migliori Pastori

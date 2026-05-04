@@ -166,11 +166,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const dbAvatar = data.avatar_url;
           const currentAvatar = prev?.avatar_url;
           
-          // If DB has a custom avatar (base64), use it. 
-          // If DB has a URL but state has base64, KEEP state (don't downgrade to Google URL).
-          const finalAvatar = (dbAvatar && dbAvatar.startsWith('data:image')) 
-            ? dbAvatar 
-            : (currentAvatar && currentAvatar.startsWith('data:image') ? currentAvatar : (dbAvatar || currentAvatar));
+          // CRITICAL: Prioritize DB avatar. If it exists, use it.
+          // Don't let session/Google avatar overwrite it.
+          const finalAvatar = dbAvatar || currentAvatar;
 
           const updated = { 
             ...prev, 
@@ -194,9 +192,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
            const parsed = JSON.parse(storedUser);
            const dbAvatar = data.avatar_url;
            const sessionAvatar = parsed.avatar_url;
-           const finalAvatar = dbAvatar && (dbAvatar.startsWith('data:image') || !sessionAvatar) 
-              ? dbAvatar 
-              : (sessionAvatar || dbAvatar);
+           const finalAvatar = dbAvatar || sessionAvatar;
 
            localStorage.setItem('auth_user', JSON.stringify({ 
              ...parsed, 
@@ -281,11 +277,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const savedUser = localStorage.getItem(`auth_user_${email}`) || localStorage.getItem('auth_user');
     const parsedSavedUser = savedUser ? JSON.parse(savedUser) : null;
     
-    // If we have a custom avatar in localStorage, keep it! Don't let login overwrite it.
-    const currentAvatar = userData.avatar_url;
-    const finalAvatar = (parsedSavedUser?.avatar_url?.startsWith('data:image')) 
-      ? parsedSavedUser.avatar_url 
-      : currentAvatar;
+    // Prioritize previously saved user avatar if it exists (might be custom/DB)
+    const finalAvatar = parsedSavedUser?.avatar_url || userData.avatar_url;
 
     const enrichedUser = { ...userData, rank: savedRank, nickname: savedNickname, avatar_url: finalAvatar };
 
