@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
-import { Loader2, ArrowLeft, Trophy, Users, TrendingUp, AlertCircle } from 'lucide-react';
+import { Loader2, ArrowLeft, Trophy, Users, TrendingUp, AlertCircle, Plus, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { clsx } from 'clsx';
 
@@ -26,7 +26,7 @@ interface LeaderboardUser {
 export function BettingPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isAdmin } = useAuth();
   const [loading, setLoading] = useState(true);
   const [markets, setMarkets] = useState<Market[]>([]);
   const [tournament, setTournament] = useState<any>(null);
@@ -35,6 +35,14 @@ export function BettingPage() {
   const [selectedBets, setSelectedBets] = useState<{ [marketId: string]: { optionId: string, amount: number } }>({});
   const [placingBetId, setPlacingBetId] = useState<string | null>(null);
   const [myBets, setMyBets] = useState<any[]>([]);
+  const [showAdminTools, setShowAdminTools] = useState(false);
+  const [isCreatingMarket, setIsCreatingMarket] = useState(false);
+  const [adminForm, setAdminForm] = useState({
+    title: '',
+    description: '',
+    type: 'Match',
+    options: ['', '']
+  });
 
   useEffect(() => {
     loadData();
@@ -147,6 +155,44 @@ export function BettingPage() {
     return odds.toFixed(2);
   };
 
+  const handleCreateMarket = async () => {
+    if (!adminForm.title || adminForm.options.some(o => !o)) {
+      toast.error('Compila tutti i campi e le opzioni!');
+      return;
+    }
+
+    setIsCreatingMarket(true);
+    try {
+      const optionsWithMeta = adminForm.options.map(label => ({
+        id: crypto.randomUUID(),
+        label,
+        total_bet: 0
+      }));
+
+      const { error } = await supabase
+        .from('betting_markets')
+        .insert({
+          tournament_slug: slug,
+          title: adminForm.title,
+          description: adminForm.description,
+          type: adminForm.type,
+          options: optionsWithMeta,
+          status: 'open'
+        });
+
+      if (error) throw error;
+
+      toast.success('Mercato creato con successo!');
+      setAdminForm({ title: '', description: '', type: 'Match', options: ['', ''] });
+      setShowAdminTools(false);
+      loadData();
+    } catch (err: any) {
+      toast.error(`Errore: ${err.message}`);
+    } finally {
+      setIsCreatingMarket(false);
+    }
+  };
+
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
       <Loader2 className="w-12 h-12 text-blue-400 animate-spin" />
@@ -174,16 +220,108 @@ export function BettingPage() {
            </p>
         </div>
 
-        {isAuthenticated && (
-          <div className="glass p-6 rounded-3xl border-blue-500/20 shadow-[0_0_30px_rgba(59,130,246,0.1)] flex flex-col items-center gap-2 min-w-[200px]">
-            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Il Tuo Gregge</span>
-            <div className="flex items-center gap-3">
-              <span className="text-4xl font-black text-white">{sheepBalance}</span>
-              <span className="text-3xl">🐑</span>
+        <div className="flex flex-col items-end gap-4">
+            {isAdmin && (
+              <button 
+                onClick={() => setShowAdminTools(!showAdminTools)}
+                className="px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-black uppercase tracking-widest rounded-2xl transition-all shadow-xl shadow-yellow-900/20 active:scale-95 flex items-center gap-2"
+              >
+                {showAdminTools ? 'Chiudi Strumenti' : 'Crea Mercato'}
+              </button>
+            )}
+
+            {isAuthenticated && (
+              <div className="glass p-6 rounded-3xl border-blue-500/20 shadow-[0_0_30px_rgba(59,130,246,0.1)] flex flex-col items-center gap-2 min-w-[200px]">
+                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Il Tuo Gregge</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-4xl font-black text-white">{sheepBalance}</span>
+                  <span className="text-3xl">🐑</span>
+                </div>
+              </div>
+            )}
+        </div>
+      </div>
+
+      {/* Admin Market Creation Tools */}
+      {isAdmin && showAdminTools && (
+        <div className="mb-12 glass p-8 rounded-[2.5rem] border-yellow-500/30 bg-yellow-500/5 animate-in slide-in-from-top-4 duration-500">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-black">
+              <Plus size={24} />
+            </div>
+            <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Nuova Scommessa per {tournament?.name}</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <div>
+                <label className="block text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-2">Titolo del Mercato</label>
+                <input 
+                  type="text" 
+                  value={adminForm.title}
+                  onChange={(e) => setAdminForm({...adminForm, title: e.target.value})}
+                  placeholder="es. Vincitore del Match"
+                  className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-yellow-500 transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-2">Descrizione (Opzionale)</label>
+                <textarea 
+                  value={adminForm.description}
+                  onChange={(e) => setAdminForm({...adminForm, description: e.target.value})}
+                  placeholder="Dettagli aggiuntivi..."
+                  className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-yellow-500 transition-all h-32 resize-none"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <label className="block text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-2">Opzioni su cui scommettere</label>
+                <div className="space-y-3">
+                  {adminForm.options.map((opt, idx) => (
+                    <div key={idx} className="flex gap-2">
+                      <input 
+                        type="text"
+                        value={opt}
+                        onChange={(e) => {
+                          const newOpts = [...adminForm.options];
+                          newOpts[idx] = e.target.value;
+                          setAdminForm({...adminForm, options: newOpts});
+                        }}
+                        placeholder={`Opzione ${idx + 1}`}
+                        className="flex-grow bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-yellow-500 transition-all"
+                      />
+                      {adminForm.options.length > 2 && (
+                        <button 
+                          onClick={() => setAdminForm({...adminForm, options: adminForm.options.filter((_, i) => i !== idx)})}
+                          className="p-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors"
+                        >
+                          <X size={20} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button 
+                    onClick={() => setAdminForm({...adminForm, options: [...adminForm.options, '']})}
+                    className="w-full py-3 border-2 border-dashed border-white/10 rounded-xl text-gray-500 hover:border-yellow-500/50 hover:text-yellow-500 transition-all text-xs font-black uppercase tracking-widest"
+                  >
+                    + Aggiungi Opzione
+                  </button>
+                </div>
+              </div>
+
+              <button 
+                onClick={handleCreateMarket}
+                disabled={isCreatingMarket}
+                className="w-full py-5 bg-yellow-500 hover:bg-yellow-400 text-black font-black uppercase tracking-widest rounded-2xl transition-all shadow-xl shadow-yellow-900/20 active:scale-95 flex items-center justify-center gap-3"
+              >
+                {isCreatingMarket ? <Loader2 size={20} className="animate-spin" /> : 'Pubblica Mercato Scommesse'}
+              </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Betting Area */}
