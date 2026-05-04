@@ -207,7 +207,7 @@ function BracketSet({ set, isFirstRound, isLastRound, hideConnectors }: { set: S
         <div className="absolute right-[-24px] top-1/2 -translate-y-[1px] w-6 h-[2px] bg-gradient-to-r from-yellow-500/60 to-transparent transition-all duration-300 group-hover/set:from-yellow-400"></div>
       )}
 
-      <div className="glass rounded-xl border border-white/5 hover:border-yellow-500/40 transition-all duration-300 w-full overflow-hidden shadow-lg relative z-10">
+      <div className="glass rounded-xl border border-white/5 hover:border-yellow-500/40 transition-all duration-300 w-full shadow-lg relative z-10">
         <div className="flex flex-col">
         {set.slots.map((slot, idx) => {
           const isWinner = slot.standing?.stats.score.value !== null && 
@@ -219,8 +219,8 @@ function BracketSet({ set, isFirstRound, isLastRound, hideConnectors }: { set: S
             <div 
               key={idx} 
               className={clsx(
-                "flex items-center justify-between p-3 border-white/5 transition-colors",
-                idx === 0 ? "border-b" : "",
+                "flex items-center justify-between p-3 border-white/5 transition-colors relative",
+                idx === 0 ? "border-b rounded-t-xl" : "rounded-b-xl",
                 isWinner ? "bg-yellow-500/5" : "bg-transparent"
               )}
             >
@@ -232,8 +232,8 @@ function BracketSet({ set, isFirstRound, isLastRound, hideConnectors }: { set: S
                 
                 <div className="relative group/player min-w-0">
                   <span className={clsx(
-                    "text-xs font-black truncate block transition-all duration-300 group-hover/player:text-white cursor-help uppercase tracking-wider",
-                    isWinner ? "text-yellow-400" : "text-gray-400"
+                    "text-[13px] font-black truncate block transition-all duration-300 group-hover/player:text-white cursor-help uppercase tracking-wider",
+                    isWinner ? "text-yellow-400" : "text-gray-300"
                   )}>
                     {entrant?.name || 'TBD'}
                   </span>
