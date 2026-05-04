@@ -1110,86 +1110,119 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
           </div>
         ) : activeTab === 'betting' ? (
           <div className="flex-1 flex flex-col min-h-0 overflow-y-auto p-4 md:p-6 custom-scrollbar space-y-8">
-             {/* Create New Market Section */}
-             <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                <h3 className="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2">
-                   <Coins size={16} className="text-blue-400" /> Crea Nuovo Mercato
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   <div className="space-y-4">
-                      <div>
-                         <label className="text-[10px] font-black text-gray-500 uppercase block mb-1.5">Torneo</label>
-                         <select 
-                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-blue-500"
-                            value={newMarket.tournament_slug}
-                            onChange={(e) => setNewMarket({...newMarket, tournament_slug: e.target.value})}
-                         >
-                            <option value="">Seleziona Torneo...</option>
-                            {tournaments.map(t => (
-                               <option key={t.slug} value={t.slug}>{t.name}</option>
-                            ))}
-                         </select>
-                      </div>
-                      <div>
-                         <label className="text-[10px] font-black text-gray-500 uppercase block mb-1.5">Titolo Mercato</label>
-                         <input 
-                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-blue-500"
-                            placeholder="Es: Vincitore Finale"
-                            value={newMarket.title}
-                            onChange={(e) => setNewMarket({...newMarket, title: e.target.value})}
-                         />
-                      </div>
-                      <div>
-                         <label className="text-[10px] font-black text-gray-500 uppercase block mb-1.5">Tipo</label>
-                         <select 
-                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-blue-500"
-                            value={newMarket.type}
-                            onChange={(e) => setNewMarket({...newMarket, type: e.target.value})}
-                         >
-                            <option value="winner">Vincitore Torneo</option>
-                            <option value="match">Singolo Match</option>
-                         </select>
-                      </div>
-                   </div>
-                   <div className="space-y-4">
-                      <label className="text-[10px] font-black text-gray-500 uppercase block">Opzioni</label>
-                      {newMarket.options.map((opt, idx) => (
-                         <div key={idx} className="flex gap-2">
-                            <input 
-                               className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-blue-500"
-                               placeholder={`Opzione ${idx+1}`}
-                               value={opt.label}
-                               onChange={(e) => {
-                                  const opts = [...newMarket.options];
-                                  opts[idx].label = e.target.value;
-                                  setNewMarket({...newMarket, options: opts});
-                               }}
-                            />
-                            {newMarket.options.length > 2 && (
-                               <button 
-                                  onClick={() => setNewMarket({...newMarket, options: newMarket.options.filter((_, i) => i !== idx)})}
-                                  className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
-                               >
-                                  <Trash2 size={16} />
-                               </button>
-                            )}
-                         </div>
-                      ))}
-                      <button 
-                         onClick={() => setNewMarket({...newMarket, options: [...newMarket.options, { id: 'opt'+(newMarket.options.length+1), label: '', total_bet: 0 }]})}
-                         className="w-full py-2 border border-dashed border-white/10 rounded-xl text-xs text-gray-400 hover:bg-white/5 transition-colors"
-                      >
-                         + Aggiungi Opzione
-                      </button>
-                      <button 
-                         onClick={handleCreateMarket}
-                         className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-blue-600/20 transition-all mt-4"
-                      >
-                         Crea Mercato
-                      </button>
-                   </div>
-                </div>
-             </div>
+              {/* Create New Market Section */}
+              <div className="glass-card p-6 md:p-8 rounded-[2rem] border-white/10 bg-white/[0.03] shadow-2xl relative overflow-hidden group">
+                 <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
+                    <Coins size={120} />
+                 </div>
+                 
+                 <h3 className="text-xl font-black text-white mb-8 flex items-center gap-3">
+                    <div className="p-2 bg-blue-500/20 rounded-xl border border-blue-500/30">
+                       <Coins size={24} className="text-blue-400" />
+                    </div>
+                    <span>Crea Nuovo Mercato</span>
+                 </h3>
+
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                    <div className="space-y-6">
+                       <div className="group/field">
+                          <label className="text-[11px] font-black text-blue-400 uppercase tracking-widest block mb-2 px-1">Torneo di Riferimento</label>
+                          <div className="relative">
+                             <select 
+                                className="w-full bg-black/60 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer"
+                                value={newMarket.tournament_slug}
+                                onChange={(e) => setNewMarket({...newMarket, tournament_slug: e.target.value})}
+                             >
+                                <option value="" className="bg-[#0f1423]">Seleziona un torneo attivo...</option>
+                                {tournaments.map(t => (
+                                   <option key={t.slug} value={t.slug} className="bg-[#0f1423]">{t.name}</option>
+                                ))}
+                             </select>
+                             <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+                                <Search size={16} />
+                             </div>
+                          </div>
+                       </div>
+
+                       <div className="group/field">
+                          <label className="text-[11px] font-black text-blue-400 uppercase tracking-widest block mb-2 px-1">Titolo del Mercato</label>
+                          <input 
+                             className="w-full bg-black/60 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-gray-600"
+                             placeholder="Es: Vincitore Finale, Vincitore Match 1..."
+                             value={newMarket.title}
+                             onChange={(e) => setNewMarket({...newMarket, title: e.target.value})}
+                          />
+                       </div>
+
+                       <div className="group/field">
+                          <label className="text-[11px] font-black text-blue-400 uppercase tracking-widest block mb-2 px-1">Tipologia di Scommessa</label>
+                          <div className="relative">
+                             <select 
+                                className="w-full bg-black/60 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer"
+                                value={newMarket.type}
+                                onChange={(e) => setNewMarket({...newMarket, type: e.target.value})}
+                             >
+                                <option value="winner" className="bg-[#0f1423]">🏆 Vincitore Torneo</option>
+                                <option value="match" className="bg-[#0f1423]">⚔️ Vincitore Match</option>
+                                <option value="score" className="bg-[#0f1423]">📊 Punteggio Finale Match</option>
+                             </select>
+                             <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+                                <Zap size={16} />
+                             </div>
+                          </div>
+                       </div>
+                    </div>
+
+                    <div className="space-y-6">
+                       <div>
+                          <label className="text-[11px] font-black text-blue-400 uppercase tracking-widest block mb-2 px-1 flex justify-between">
+                             <span>Opzioni Scommettibili</span>
+                             <span className="text-gray-500 font-normal lowercase tracking-normal">{newMarket.options.length} opzioni</span>
+                          </label>
+                          <div className="space-y-3 max-h-[250px] overflow-y-auto pr-2 elegant-scrollbar">
+                             {newMarket.options.map((opt, idx) => (
+                                <div key={idx} className="flex gap-3 group/opt">
+                                   <div className="relative flex-1">
+                                      <input 
+                                         className="w-full bg-black/40 border border-white/5 rounded-xl px-5 py-3 text-sm text-white outline-none focus:border-white/20 transition-all"
+                                         placeholder={`Inserisci opzione ${idx+1}...`}
+                                         value={opt.label}
+                                         onChange={(e) => {
+                                            const opts = [...newMarket.options];
+                                            opts[idx].label = e.target.value;
+                                            setNewMarket({...newMarket, options: opts});
+                                         }}
+                                      />
+                                   </div>
+                                   {newMarket.options.length > 2 && (
+                                      <button 
+                                         onClick={() => setNewMarket({...newMarket, options: newMarket.options.filter((_, i) => i !== idx)})}
+                                         className="p-3 text-gray-600 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                                      >
+                                         <Trash2 size={18} />
+                                      </button>
+                                   )}
+                                </div>
+                             ))}
+                          </div>
+                          
+                          <button 
+                             onClick={() => setNewMarket({...newMarket, options: [...newMarket.options, { id: 'opt'+Date.now(), label: '', total_bet: 0 }]})}
+                             className="w-full mt-4 py-3 border border-dashed border-white/10 rounded-2xl text-xs font-bold text-gray-500 hover:text-white hover:border-white/30 hover:bg-white/5 transition-all flex items-center justify-center gap-2"
+                          >
+                             <Plus size={14} /> Aggiungi Opzione
+                          </button>
+                       </div>
+
+                       <button 
+                          onClick={handleCreateMarket}
+                          className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-2xl font-black uppercase text-xs tracking-[0.2em] shadow-xl shadow-blue-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] mt-2 border border-white/10"
+                       >
+                          Pubblica Mercato
+                       </button>
+                    </div>
+                 </div>
+              </div>
 
              {/* Existing Markets Section */}
              <div className="space-y-4">

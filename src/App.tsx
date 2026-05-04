@@ -319,6 +319,7 @@ function App() {
                 <Route path="/tornei/:slug" element={<TournamentDetail />} />
                 <Route path="/tornei/:slug/regolamento" element={<TournamentRegolamento />} />
                 <Route path="/tornei/:slug/scommetti" element={<BettingPage />} />
+                <Route path="/tornei/tournament/:slug/scommetti" element={<BettingPage />} />
                 <Route path="/tornei/tournament/:slug" element={<TournamentDetail />} />
                 <Route path="/tornei/tournament/:slug/regolamento" element={<TournamentRegolamento />} />
                 <Route path="/admin/overlays" element={<Home onSelectCiv={handleSelectCiv} onCompareCivs={handleCompare} />} />
