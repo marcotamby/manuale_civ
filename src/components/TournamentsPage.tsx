@@ -886,13 +886,15 @@ export function TournamentsPage() {
                         <button 
                           onClick={() => {
                             // Se è un torneo che possiamo renderizzare internamente, andiamo alla pagina di dettaglio
-                            const canRenderInternal = (t.events?.length > 0 || t.config.source === 'challonge' || t.config.source === 'startgg') && !t.config.slug.startsWith('tb-');
+                            const hasInternalSlug = t.slug && !t.config.slug.startsWith('tb-');
+                            const isRenderableSource = t.config.source === 'challonge' || t.config.source === 'startgg';
                             
-                            if (canRenderInternal) {
+                            if (hasInternalSlug && isRenderableSource) {
                               navigate(`/tornei/${t.slug}`);
                             } else if (t.config.directLink) {
                               window.open(t.config.directLink, '_blank');
                             } else {
+                              // Feedback visivo se non c'è nulla da mostrare
                               setBracketErrorId(t.id);
                               setTimeout(() => setBracketErrorId(null), 3000);
                             }
