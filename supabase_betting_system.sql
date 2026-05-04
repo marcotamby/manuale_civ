@@ -48,18 +48,23 @@ ALTER TABLE user_bets ENABLE ROW LEVEL SECURITY;
 ALTER TABLE betting_notifications ENABLE ROW LEVEL SECURITY;
 
 -- Markets are public
+DROP POLICY IF EXISTS "Markets are public" ON betting_markets;
 CREATE POLICY "Markets are public" ON betting_markets FOR SELECT USING (true);
 
 -- Users can only see their own bets
+DROP POLICY IF EXISTS "Users can see their own bets" ON user_bets;
 CREATE POLICY "Users can see their own bets" ON user_bets FOR SELECT USING (auth.uid() = user_id);
 
 -- Users can insert bets
+DROP POLICY IF EXISTS "Users can insert bets" ON user_bets;
 CREATE POLICY "Users can insert bets" ON user_bets FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- Users can see their own notifications
+DROP POLICY IF EXISTS "Users can see their own notifications" ON betting_notifications;
 CREATE POLICY "Users can see their own notifications" ON betting_notifications FOR SELECT USING (auth.uid() = user_id);
 
 -- Users can update their notifications (to mark as read)
+DROP POLICY IF EXISTS "Users can update their own notifications" ON betting_notifications;
 CREATE POLICY "Users can update their own notifications" ON betting_notifications FOR UPDATE USING (auth.uid() = user_id);
 
 -- Function to handle sheep balance on bet placement
@@ -72,7 +77,6 @@ BEGIN
     WHERE id = NEW.user_id;
     
     -- Update total bet in market options
-    -- Note: This is a simplified totalizer logic. In a real app, you'd want to handle this more robustly.
     UPDATE betting_markets
     SET options = (
         SELECT jsonb_agg(
@@ -88,8 +92,9 @@ BEGIN
 
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS on_bet_placed ON user_bets;
 CREATE TRIGGER on_bet_placed
     AFTER INSERT ON user_bets
     FOR EACH ROW

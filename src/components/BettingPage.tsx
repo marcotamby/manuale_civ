@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
-import { Loader2, ArrowLeft, Trophy, Users, TrendingUp, AlertCircle, Plus, X, Zap } from 'lucide-react';
+import { fetchTournament } from '../services/startgg';
+import { Loader2, ArrowLeft, Trophy, Users, TrendingUp, AlertCircle, Plus, X, Zap, ChevronDown } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { clsx } from 'clsx';
 
@@ -37,6 +38,7 @@ export function BettingPage() {
   const [myBets, setMyBets] = useState<any[]>([]);
   const [showAdminTools, setShowAdminTools] = useState(false);
   const [isCreatingMarket, setIsCreatingMarket] = useState(false);
+  const [participants, setParticipants] = useState<string[]>([]);
   const [adminForm, setAdminForm] = useState({
     title: '',
     description: '',
@@ -64,6 +66,20 @@ export function BettingPage() {
         .maybeSingle();
         
       setTournament(tourney);
+
+      // Fetch participants for admin tools
+      try {
+        const startggData = await fetchTournament(cleanSlug);
+        if (startggData?.events) {
+          const names = new Set<string>();
+          startggData.events.forEach((e: any) => {
+            e.entrants?.nodes?.forEach((n: any) => names.add(n.name));
+          });
+          setParticipants(Array.from(names).sort());
+        }
+      } catch (e) {
+        console.warn("Could not fetch entrants for dropdowns", e);
+      }
 
       // Load Markets
       const { data: marketData } = await supabase
@@ -180,17 +196,17 @@ export function BettingPage() {
             Social Betting:<br/>
             {tournament?.name || (slug?.replace(/-/g, ' ')) || 'Torneo'}
            </h1>
-           <div className="flex flex-col gap-4">
-             <p className="text-[#00f2ff] font-serif italic text-lg flex items-center gap-2 drop-shadow-[0_0_10px_rgba(0,242,255,0.3)]">
+            <div className="flex flex-col gap-4">
+             <p className="text-sky-400/90 font-serif italic text-lg flex items-center gap-2 drop-shadow-[0_0_10px_rgba(56,189,248,0.2)]">
               Il mercato delle pecore è aperto! 🐑
              </p>
-             <div className="group relative">
-               <div className="bg-[#111218] border border-red-500/30 p-3 rounded-xl flex items-center gap-3 text-red-400 text-[10px] font-bold uppercase tracking-widest cursor-help transition-all duration-300 max-h-[40px] hover:max-h-[200px] overflow-hidden">
+             <div className="group relative max-w-[500px]">
+               <div className="bg-[#111218]/90 border border-red-500/20 p-2.5 rounded-xl flex items-center gap-3 text-red-400/80 text-[10px] font-bold uppercase tracking-widest cursor-help transition-all duration-500 max-h-[36px] hover:max-h-[200px] overflow-hidden backdrop-blur-sm">
                 <AlertCircle size={14} className="shrink-0" />
-                <span className="whitespace-nowrap group-hover:whitespace-normal transition-all duration-300">
-                  Il sistema di Social Betting è un gioco di simulazione puramente gratuito e non costituisce attività di gioco d'azzardo. Le "Pecore" sono punti virtuali privi di valore economico, non convertibili e non scambiabili.
+                <span className="truncate group-hover:whitespace-normal transition-all duration-500">
+                  Il sistema di Social Betting è un gioco di simulazione puramente gratuito.
                   <span className="opacity-0 group-hover:opacity-100 transition-opacity ml-1">
-                    Partecipando, l'utente accetta che si tratti di una funzionalità ad esclusivo scopo di intrattenimento e competizione sociale.
+                    Non costituisce attività di gioco d'azzardo. Le "Pecore" sono punti virtuali privi di valore economico.
                   </span>
                 </span>
                </div>
@@ -236,20 +252,23 @@ export function BettingPage() {
               <div className="space-y-6">
                 <div>
                   <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Tipo di Scommessa</label>
-                  <select 
-                    value={adminForm.type}
-                    onChange={(e) => {
-                      const type = e.target.value;
-                      let newOpts = ['', ''];
-                      if (type === 'Tournament Winner') newOpts = ['Team 1', 'Team 2', 'Team 3'];
-                      setAdminForm({...adminForm, type, options: newOpts});
-                    }}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-cyan-500 transition-all appearance-none cursor-pointer"
-                  >
-                    <option value="Tournament Winner" className="bg-[#111218]">Vincitore Torneo</option>
-                    <option value="Match Winner" className="bg-[#111218]">Vincitore Match</option>
-                    <option value="Final Score" className="bg-[#111218]">Punteggio Finale Match</option>
-                  </select>
+                  <div className="relative">
+                    <select 
+                      value={adminForm.type}
+                      onChange={(e) => {
+                        const type = e.target.value;
+                        let newOpts = ['', ''];
+                        if (type === 'Tournament Winner') newOpts = ['Team 1', 'Team 2', 'Team 3'];
+                        setAdminForm({...adminForm, type, options: newOpts});
+                      }}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-cyan-500 transition-all appearance-none cursor-pointer"
+                    >
+                      <option value="Tournament Winner" className="bg-[#111218]">Vincitore Torneo</option>
+                      <option value="Match Winner" className="bg-[#111218]">Vincitore Match</option>
+                      <option value="Final Score" className="bg-[#111218]">Punteggio Finale Match</option>
+                    </select>
+                    <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-cyan-400 pointer-events-none" size={20} />
+                  </div>
                 </div>
 
                 {(adminForm.type === 'Match Winner' || adminForm.type === 'Final Score') && (
@@ -274,23 +293,31 @@ export function BettingPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="text-[10px] font-bold text-gray-500 uppercase mb-2 block tracking-widest">Team A</label>
-                        <input 
-                          type="text"
-                          value={adminForm.teamA}
-                          onChange={(e) => setAdminForm({...adminForm, teamA: e.target.value})}
-                          placeholder="Nome Team A"
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500"
-                        />
+                        <div className="relative">
+                          <select 
+                            value={adminForm.teamA}
+                            onChange={(e) => setAdminForm({...adminForm, teamA: e.target.value})}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 appearance-none cursor-pointer"
+                          >
+                            <option value="">Seleziona Team</option>
+                            {participants.map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
+                          </select>
+                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/50 pointer-events-none" size={16} />
+                        </div>
                       </div>
                       <div>
                         <label className="text-[10px] font-bold text-gray-500 uppercase mb-2 block tracking-widest">Team B</label>
-                        <input 
-                          type="text"
-                          value={adminForm.teamB}
-                          onChange={(e) => setAdminForm({...adminForm, teamB: e.target.value})}
-                          placeholder="Nome Team B"
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500"
-                        />
+                        <div className="relative">
+                          <select 
+                            value={adminForm.teamB}
+                            onChange={(e) => setAdminForm({...adminForm, teamB: e.target.value})}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 appearance-none cursor-pointer"
+                          >
+                            <option value="">Seleziona Team</option>
+                            {participants.map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
+                          </select>
+                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/50 pointer-events-none" size={16} />
+                        </div>
                       </div>
                     </div>
                   </>

@@ -111,13 +111,10 @@ export async function fetchTournament(slug: string): Promise<StartGGTournament |
             id
             name
           }
-          standings(query: { perPage: 3, page: 1 }) {
+          entrants(query: { perPage: 100, page: 1 }) {
             nodes {
-              placement
-              entrant {
-                id
-                name
-              }
+              id
+              name
             }
           }
           phases {
