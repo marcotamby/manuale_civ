@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { fetchPhaseGroupSets, fetchPhaseGroups } from '../services/startgg';
 import type { StartGGPhase, StartGGSet, StartGGPhaseGroup } from '../services/startgg';
-import { Loader2, Trophy } from 'lucide-react';
+import { Loader2, Trophy, Users } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface TournamentBracketProps {
@@ -230,26 +230,43 @@ function BracketSet({ set, isFirstRound, isLastRound, hideConnectors }: { set: S
                   isWinner ? "bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]" : "bg-gray-700"
                 )} />
                 
-                <div className="relative group/player truncate">
+                <div className="relative group/player min-w-0">
                   <span className={clsx(
-                    "text-xs font-bold truncate block",
-                    isWinner ? "text-yellow-100" : "text-gray-400"
+                    "text-xs font-black truncate block transition-all duration-300 group-hover/player:text-white cursor-help uppercase tracking-wider",
+                    isWinner ? "text-yellow-400" : "text-gray-400"
                   )}>
                     {entrant?.name || 'TBD'}
                   </span>
                   
-                  {/* Tooltip for Players (Teams) */}
-                  {entrant && entrant.participants.length > 1 && (
-                    <div className="absolute bottom-full left-0 mb-2 opacity-0 group-hover/player:opacity-100 pointer-events-none transition-opacity z-50">
-                      <div className="glass px-3 py-2 rounded-lg border border-yellow-500/30 shadow-2xl min-w-[150px]">
-                        <p className="text-[9px] font-black text-yellow-500 uppercase tracking-widest mb-1 border-b border-yellow-500/20 pb-1">Componenti Team</p>
-                        <div className="space-y-1">
-                          {entrant.participants.map(p => (
-                            <p key={p.id} className="text-[10px] text-white font-medium">{p.gamerTag}</p>
+                  {/* Tooltip for Players (Teams) - Premium Design */}
+                  {entrant && entrant.participants && entrant.participants.length > 0 && (
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 opacity-0 group-hover/player:opacity-100 pointer-events-none transition-all duration-300 translate-y-2 group-hover/player:translate-y-0 z-[100] w-[220px]">
+                      <div className="bg-[#0a0f1a]/95 backdrop-blur-xl border border-yellow-500/30 rounded-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_20px_rgba(234,179,8,0.1)] overflow-hidden">
+                        {/* Background Decoration */}
+                        <div className="absolute top-0 right-0 -mr-4 -mt-4 w-16 h-16 bg-yellow-500/10 rounded-full blur-2xl" />
+                        
+                        <div className="flex items-center gap-2 mb-3 border-b border-white/10 pb-2 relative z-10">
+                          <div className="w-6 h-6 rounded-lg bg-yellow-500/20 flex items-center justify-center">
+                            <Users size={12} className="text-yellow-500" />
+                          </div>
+                          <span className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.2em]">Team Members</span>
+                        </div>
+                        
+                        <div className="space-y-2 relative z-10">
+                          {entrant.participants.map((p: any) => (
+                            <div key={p.id} className="flex flex-col">
+                              <div className="flex items-center gap-1.5">
+                                {p.player?.prefix && (
+                                  <span className="text-[8px] font-bold text-gray-500 uppercase px-1 bg-white/5 rounded leading-tight">{p.player.prefix}</span>
+                                )}
+                                <span className="text-xs text-white font-black uppercase tracking-wide">{p.gamerTag}</span>
+                              </div>
+                            </div>
                           ))}
                         </div>
                       </div>
-                      <div className="w-2 h-2 glass border-r border-b border-yellow-500/30 rotate-45 mx-auto -mt-1 bg-[#1a2542]" />
+                      {/* Arrow */}
+                      <div className="w-3 h-3 bg-[#0a0f1a] border-r border-b border-yellow-500/30 rotate-45 mx-auto -mt-1.5 relative z-0" />
                     </div>
                   )}
                 </div>

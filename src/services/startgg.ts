@@ -177,7 +177,11 @@ export async function fetchPhaseGroupSets(phaseGroupId: string): Promise<StartGG
                 id
                 name
                 participants {
+                  id
                   gamerTag
+                  player {
+                    prefix
+                  }
                 }
               }
               standing {
