@@ -67,6 +67,7 @@ export interface StartGGStanding {
 export interface StartGGEvent {
   id: string;
   name: string;
+  slug?: string;
   videogame: {
     id: number;
     name: string;
