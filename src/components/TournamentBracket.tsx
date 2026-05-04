@@ -64,9 +64,9 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-20">
+      <main className="flex-1 max-w-full flex justify-center py-20">
         <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
-      </div>
+      </main>
     );
   }
 
@@ -238,9 +238,9 @@ function BracketSet({ set, isFirstRound, isLastRound, hideConnectors }: { set: S
                     {entrant?.name || 'TBD'}
                   </span>
                   
-                  {/* Tooltip for Players (Teams) - Premium Design */}
+                  {/* Tooltip for Players (Teams) - Premium Design (Right Positioned) */}
                   {entrant && entrant.participants && entrant.participants.length > 0 && (
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 opacity-0 group-hover/player:opacity-100 pointer-events-none transition-all duration-300 translate-y-2 group-hover/player:translate-y-0 z-[100] w-[220px]">
+                    <div className="absolute left-full top-1/2 -translate-y-1/2 ml-6 opacity-0 group-hover/player:opacity-100 pointer-events-none transition-all duration-300 -translate-x-2 group-hover/player:translate-x-0 z-[100] w-[220px]">
                       <div className="bg-[#0a0f1a]/95 backdrop-blur-xl border border-yellow-500/30 rounded-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_20px_rgba(234,179,8,0.1)] overflow-hidden">
                         {/* Background Decoration */}
                         <div className="absolute top-0 right-0 -mr-4 -mt-4 w-16 h-16 bg-yellow-500/10 rounded-full blur-2xl" />
@@ -265,8 +265,8 @@ function BracketSet({ set, isFirstRound, isLastRound, hideConnectors }: { set: S
                           ))}
                         </div>
                       </div>
-                      {/* Arrow */}
-                      <div className="w-3 h-3 bg-[#0a0f1a] border-r border-b border-yellow-500/30 rotate-45 mx-auto -mt-1.5 relative z-0" />
+                      {/* Arrow (Pointing Left) */}
+                      <div className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-3 h-3 bg-[#0a0f1a] border-l border-b border-yellow-500/30 rotate-45 z-0" />
                     </div>
                   )}
                 </div>

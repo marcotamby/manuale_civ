@@ -268,7 +268,7 @@ export function TournamentDetail() {
       )}
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-full overflow-hidden">
+      <main className="flex-1 max-w-full">
         {selectedPhase ? (
           <TournamentBracket phase={selectedPhase} />
         ) : (
