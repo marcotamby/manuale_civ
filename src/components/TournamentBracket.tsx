@@ -207,7 +207,7 @@ function BracketSet({ set, isFirstRound, isLastRound, hideConnectors }: { set: S
         <div className="absolute right-[-24px] top-1/2 -translate-y-[1px] w-6 h-[2px] bg-gradient-to-r from-yellow-500/60 to-transparent transition-all duration-300 group-hover/set:from-yellow-400"></div>
       )}
 
-      <div className="glass rounded-xl border border-white/5 hover:border-yellow-500/40 transition-all duration-300 w-full shadow-lg relative z-10">
+      <div className="glass rounded-xl border border-white/5 hover:border-yellow-500/40 transition-all duration-300 w-full shadow-lg relative z-10 hover:z-[110]">
         <div className="flex flex-col">
         {set.slots.map((slot, idx) => {
           const isWinner = slot.standing?.stats.score.value !== null && 
@@ -238,35 +238,33 @@ function BracketSet({ set, isFirstRound, isLastRound, hideConnectors }: { set: S
                     {entrant?.name || 'TBD'}
                   </span>
                   
-                  {/* Tooltip for Players (Teams) - Premium Design (Right Positioned) */}
+                  {/* Tooltip for Players (Teams) - Premium Design (Right Positioned, Discrete) */}
                   {entrant && entrant.participants && entrant.participants.length > 0 && (
-                    <div className="absolute left-full top-1/2 -translate-y-1/2 ml-6 opacity-0 group-hover/player:opacity-100 pointer-events-none transition-all duration-300 -translate-x-2 group-hover/player:translate-x-0 z-[100] w-[220px]">
-                      <div className="bg-[#0a0f1a]/95 backdrop-blur-xl border border-yellow-500/30 rounded-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_20px_rgba(234,179,8,0.1)] overflow-hidden">
+                    <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 opacity-0 group-hover/player:opacity-100 pointer-events-none transition-all duration-300 -translate-x-2 group-hover/player:translate-x-0 z-[150] w-[180px]">
+                      <div className="bg-[#0a0f1a]/95 backdrop-blur-xl border border-yellow-500/30 rounded-xl p-3 shadow-[0_15px_40px_rgba(0,0,0,0.6),0_0_15px_rgba(234,179,8,0.1)] overflow-hidden">
                         {/* Background Decoration */}
-                        <div className="absolute top-0 right-0 -mr-4 -mt-4 w-16 h-16 bg-yellow-500/10 rounded-full blur-2xl" />
+                        <div className="absolute top-0 right-0 -mr-3 -mt-3 w-12 h-12 bg-yellow-500/5 rounded-full blur-xl" />
                         
-                        <div className="flex items-center gap-2 mb-3 border-b border-white/10 pb-2 relative z-10">
-                          <div className="w-6 h-6 rounded-lg bg-yellow-500/20 flex items-center justify-center">
-                            <Users size={12} className="text-yellow-500" />
-                          </div>
-                          <span className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.2em]">Team Members</span>
+                        <div className="flex items-center gap-2 mb-2 border-b border-white/5 pb-1.5 relative z-10">
+                          <Users size={10} className="text-yellow-500/70" />
+                          <span className="text-[9px] font-black text-yellow-500/80 uppercase tracking-[0.2em]">Team Info</span>
                         </div>
                         
-                        <div className="space-y-2 relative z-10">
+                        <div className="space-y-1.5 relative z-10">
                           {entrant.participants.map((p: any) => (
                             <div key={p.id} className="flex flex-col">
                               <div className="flex items-center gap-1.5">
                                 {p.player?.prefix && (
-                                  <span className="text-[8px] font-bold text-gray-500 uppercase px-1 bg-white/5 rounded leading-tight">{p.player.prefix}</span>
+                                  <span className="text-[7px] font-bold text-gray-500 uppercase px-0.5 bg-white/5 rounded leading-tight">{p.player.prefix}</span>
                                 )}
-                                <span className="text-xs text-white font-black uppercase tracking-wide">{p.gamerTag}</span>
+                                <span className="text-[11px] text-gray-200 font-bold uppercase tracking-tight">{p.gamerTag}</span>
                               </div>
                             </div>
                           ))}
                         </div>
                       </div>
                       {/* Arrow (Pointing Left) */}
-                      <div className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-3 h-3 bg-[#0a0f1a] border-l border-b border-yellow-500/30 rotate-45 z-0" />
+                      <div className="absolute top-1/2 -left-1 w-2.5 h-2.5 bg-[#0a0f1a] border-l border-b border-yellow-500/30 rotate-45 z-0 -translate-y-1/2" />
                     </div>
                   )}
                 </div>
