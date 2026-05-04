@@ -189,9 +189,9 @@ export function TournamentDetail() {
               <div className="flex flex-wrap gap-6 text-gray-400 text-sm font-medium mb-8">
                 <div className="flex items-center gap-2">
                   <span className={`w-2 h-2 rounded-full animate-pulse ${
-                    tournament.db?.status === 'Concluso' ? 'bg-red-500' : 
-                    tournament.db?.status === 'In corso' ? 'bg-green-500' : 
-                    tournament.db?.status === 'Programmato' ? 'bg-blue-500' : 'bg-yellow-500'
+                    (tournament.db?.status === 'Concluso') ? 'bg-red-500' : 
+                    (tournament.db?.status === 'Programmato') ? 'bg-blue-500' : 
+                    'bg-green-500'
                   }`}></span>
                   {tournament.db?.status || 'In corso'}
                 </div>
