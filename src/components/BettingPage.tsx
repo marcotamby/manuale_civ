@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
-import { Loader2, ArrowLeft, Trophy, Users, TrendingUp, AlertCircle, Plus, X } from 'lucide-react';
+import { Loader2, ArrowLeft, Trophy, Users, TrendingUp, AlertCircle, Plus, X, Zap } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { clsx } from 'clsx';
 
