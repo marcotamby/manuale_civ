@@ -66,7 +66,7 @@ export function BettingPage() {
           .select('sheep_balance')
           .eq('id', user.id)
           .single();
-        setSheepBalance(profile?.sheep_balance || 0);
+        setSheepBalance(profile?.sheep_balance ?? 100);
       }
 
       // Load Leaderboard

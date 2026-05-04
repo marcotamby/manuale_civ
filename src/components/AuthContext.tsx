@@ -192,7 +192,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
              is_streamer: data.is_streamer,
              can_manage_tournaments: data.can_manage_tournaments,
              can_manage_civs: data.can_manage_civs,
-             can_manage_buildorders: data.can_manage_buildorders
+             can_manage_buildorders: data.can_manage_buildorders,
+             sheep_balance: data.sheep_balance ?? 100
            }));
         }
       } else if (error && error.code === 'PGRST116') {

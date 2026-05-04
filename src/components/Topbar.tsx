@@ -337,7 +337,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
             {/* Sheep Balance (PC) */}
             {isAuthenticated && (
               <div className="flex items-center gap-2 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">
-                <span className="text-[11px] font-black text-white">{user?.sheep_balance || 0}</span>
+                <span className="text-[11px] font-black text-white">{user?.sheep_balance ?? 100}</span>
                 <span className="text-xs">🐑</span>
               </div>
             )}
