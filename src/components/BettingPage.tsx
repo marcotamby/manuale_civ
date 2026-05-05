@@ -456,7 +456,6 @@ export function BettingPage() {
                       return;
                     }
                     
-                    setIsCreatingMarket(true);
                     setPublishStatus('loading');
                     try {
                       const optionsWithMeta = finalOptions.map(label => ({
@@ -502,7 +501,7 @@ export function BettingPage() {
                       toast.error(err.message);
                       setTimeout(() => setPublishStatus('idle'), 3000);
                     } finally {
-                      setIsCreatingMarket(false);
+                      // Status is handled by the try/catch
                     }
                   }}
                   disabled={publishStatus === 'loading'}
