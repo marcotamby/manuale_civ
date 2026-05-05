@@ -158,29 +158,28 @@ export function BettingPage() {
     try {
       // ULTRA-ROBUST USER IDENTIFICATION
       let finalUserId = user?.id;
-      let finalUserEmail = user?.email;
+      let finalUserEmail = user?.email || '';
 
-      if (!finalUserId || !finalUserEmail) {
-        console.log('🔄 AuthContext incomplete, fetching from Supabase directly...');
+      if (!finalUserId) {
         const { data: { user: sbUser } } = await supabase.auth.getUser();
         if (sbUser) {
           finalUserId = sbUser.id;
-          finalUserEmail = sbUser.email;
+          if (!finalUserEmail) finalUserEmail = sbUser.email || '';
         }
       }
 
-      // If we still have no ID but we have email, let's fetch the profile ID
+      // Final attempt: lookup by email if ID is still missing
       if (!finalUserId && finalUserEmail) {
-        const { data: prof } = await supabase.from('profiles').select('id').eq('email', finalUserEmail).single();
+        const { data: prof } = await supabase
+          .from('profiles')
+          .select('id')
+          .ilike('email', finalUserEmail)
+          .maybeSingle();
         finalUserId = prof?.id;
       }
 
-      if (typeof window !== 'undefined') {
-        window.alert(`DIAGNOSTICA:\nID: ${finalUserId || 'NON TROVATO'}\nEmail: ${finalUserEmail || 'NON TROVATA'}`);
-      }
-
       if (!finalUserId) {
-        const msg = "SESSIONE NON VALIDA! Per favore ricarica (F5) o riesegui il login.";
+        const msg = "IDENTIFICAZIONE FALLITA! Per favore ricarica la pagina o prova a sloggare e riloggare.";
         toast.error(msg);
         setPlacingBetId(null);
         return;
