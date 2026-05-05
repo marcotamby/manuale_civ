@@ -264,14 +264,30 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
         (window as any).refreshNotificationCount?.();
     };
 
+    const [localUnreadBets, setLocalUnreadBets] = useState(0);
+    
     useEffect(() => {
         if (isOpen && user?.email) {
             fetchMySuggestions();
             fetchQaNotifications();
             fetchUserBets();
-            markAllBetsAsRead();
+            fetchUnreadBetCount();
         }
     }, [isOpen, user?.email, user?.id]);
+
+    const fetchUnreadBetCount = async () => {
+        if (!user?.email) return;
+        try {
+            const { count } = await supabase
+                .from('betting_notifications')
+                .select('*', { count: 'exact', head: true })
+                .ilike('user_email', user.email)
+                .eq('is_read', false);
+            setLocalUnreadBets(count || 0);
+        } catch (err) {
+            console.error('Error fetching unread count:', err);
+        }
+    };
 
     const markAllBetsAsRead = async () => {
         if (!user?.email) return;
@@ -282,6 +298,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                 .ilike('user_email', user.email)
                 .eq('is_read', false);
             
+            setLocalUnreadBets(0);
             // Refresh topbar to clear the badge
             (window as any).refreshNotificationCount?.();
         } catch (err) {
@@ -609,11 +626,20 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                         <section>
                             <div className="flex items-center justify-between mb-4">
                                 <button 
-                                    onClick={() => setShowHistory(!showHistory)}
-                                    className="flex items-center gap-2 text-gray-400 tracking-widest uppercase text-xs font-bold hover:text-white transition-colors"
+                                    onClick={() => {
+                                        const next = !showHistory;
+                                        setShowHistory(next);
+                                        if (next && localUnreadBets > 0) markAllBetsAsRead();
+                                    }}
+                                    className="flex items-center gap-2 text-gray-400 tracking-widest uppercase text-xs font-bold hover:text-white transition-colors relative"
                                 >
                                     <History size={14} />
                                     <span>Cronologia Scommesse</span>
+                                    {localUnreadBets > 0 && (
+                                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[9px] font-black text-white shadow-lg ring-1 ring-black animate-pulse">
+                                            {localUnreadBets}
+                                        </span>
+                                    )}
                                     <ChevronDown size={14} className={clsx("transition-transform", showHistory && "rotate-180")} />
                                 </button>
                                 <button 
