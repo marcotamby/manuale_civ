@@ -106,7 +106,7 @@ export function BettingPage() {
       const { data: marketData, error: marketError } = await supabase
         .from('betting_markets')
         .select('*')
-        .eq('tournament_slug', cleanSlug)
+        .or(`tournament_slug.eq.${cleanSlug},tournament_slug.eq.${cleanSlug}/,tournament_slug.ilike.%${cleanSlug}%`)
         .order('created_at', { ascending: true });
       
       if (marketError) console.error('❌ Error fetching markets:', marketError);
