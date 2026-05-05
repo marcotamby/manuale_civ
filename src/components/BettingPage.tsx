@@ -40,6 +40,7 @@ export function BettingPage() {
   const [showAdminTools, setShowAdminTools] = useState(false);
   const [publishStatus, setPublishStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [marketToDelete, setMarketToDelete] = useState<string | null>(null);
+  const [settleConfirm, setSettleConfirm] = useState<{ marketId: string, optionId: string, optionLabel: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [participantsByLevel, setParticipantsByLevel] = useState<{ [level: string]: string[] }>({ 'High Elo': [], 'Low Elo': [] });
   const [adminForm, setAdminForm] = useState({
@@ -203,9 +204,6 @@ export function BettingPage() {
     }
   };
 
-  const handleDeleteMarket = async (marketId: string) => {
-    setMarketToDelete(marketId);
-  };
 
   const executeDeleteMarket = async () => {
     if (!marketToDelete) return;
@@ -251,7 +249,6 @@ export function BettingPage() {
   };
 
   const handleSettleMarket = async (marketId: string, winnerOptionId: string) => {
-    if (!window.confirm('Sei sicuro di voler assegnare la vittoria? Questa azione è irreversibile.')) return;
     try {
       const { error } = await supabase.rpc('settle_betting_market', {
         p_market_id: marketId,
@@ -259,6 +256,7 @@ export function BettingPage() {
       });
       if (error) throw error;
       toast.success('Mercato liquidato e vincite assegnate!');
+      setSettleConfirm(null);
       loadData(true);
     } catch (err: any) {
       toast.error(`Errore: ${err.message}`);
@@ -319,32 +317,32 @@ export function BettingPage() {
            </div>
         </div>
 
-        <div className="flex flex-col md:flex-row items-start gap-6 self-start mt-0 md:mt-10">
-            {/* Top Leaderboard */}
-            <div className="bg-[#111218]/40 border border-white/5 backdrop-blur-sm p-4 rounded-3xl hidden xl:block">
-              <div className="flex items-center gap-3 mb-3 px-1">
-                <Users size={14} className="text-blue-400" />
-                <span className="text-[10px] font-black text-white uppercase tracking-widest">Migliori Pastori</span>
+        <div className="flex flex-col md:flex-row items-center gap-4 self-center md:self-start mt-4 md:mt-10">
+            {isAuthenticated && (
+              <div className="bg-white/5 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-white/10 flex items-center gap-3 transition-all hover:bg-white/10 group">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Il Tuo Gregge:</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl font-black text-white">{sheepBalance}</span>
+                  <span className="text-lg group-hover:animate-bounce">🐑</span>
+                </div>
               </div>
-              <div className="flex gap-2">
+            )}
+
+            {/* Top Leaderboard */}
+            <div className="bg-[#111218]/40 border border-white/5 backdrop-blur-sm p-2.5 px-4 rounded-2xl hidden xl:flex items-center gap-4">
+              <div className="flex items-center gap-2 shrink-0">
+                <Users size={12} className="text-blue-400" />
+                <span className="text-[9px] font-black text-white/60 uppercase tracking-widest">Migliori Pastori</span>
+              </div>
+              <div className="flex gap-3">
                 {leaderboard.slice(0, 3).map((u, i) => (
-                  <div key={u.username} className="flex flex-col items-center px-3 py-2 bg-white/5 rounded-xl border border-white/5 min-w-[80px]">
-                    <span className="text-[9px] font-bold text-gray-500 uppercase mb-1">{i === 0 ? "🥇" : i === 1 ? "🥈" : "🥉"} {u.username.substring(0, 6)}</span>
-                    <span className="text-xs font-black text-blue-400">{u.sheep_balance}</span>
+                  <div key={u.username} className="flex items-center gap-2 bg-white/5 px-2 py-1 rounded-lg border border-white/5">
+                    <span className="text-[9px] font-bold text-gray-400 uppercase">{i === 0 ? "🥇" : i === 1 ? "🥈" : "🥉"} {u.username.substring(0, 4)}</span>
+                    <span className="text-[10px] font-black text-blue-400">{u.sheep_balance}</span>
                   </div>
                 ))}
               </div>
             </div>
-
-            {isAuthenticated && (
-              <div className="bg-gradient-to-br from-blue-600/20 to-indigo-600/20 px-8 py-5 rounded-[2rem] border border-blue-500/30 shadow-[0_0_40px_rgba(59,130,246,0.15)] flex flex-col items-center gap-1 transition-transform hover:scale-105 backdrop-blur-md">
-                <span className="text-[10px] font-black text-blue-400/80 uppercase tracking-[0.2em] whitespace-nowrap mb-1">Il Tuo Gregge</span>
-                <div className="flex items-center gap-3">
-                  <span className="text-4xl font-black text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">{sheepBalance}</span>
-                  <span className="text-3xl animate-bounce" style={{ animationDuration: '2s' }}>🐑</span>
-                </div>
-              </div>
-            )}
         </div>
       </div>
 
@@ -659,8 +657,8 @@ export function BettingPage() {
                   {/* Market Header */}
                   <div className="p-6 md:p-8 bg-gradient-to-br from-[#1a1c25] to-[#111218] border-b border-white/5">
                     <div className="flex flex-col gap-4">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[10px] font-black text-cyan-400/70 uppercase tracking-[0.2em]">{market.type}</span>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <span className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em]">{market.type}</span>
                         <div className={clsx(
                           "px-3 py-1 rounded-lg text-[10px] font-black uppercase border",
                           market.status === 'open' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-red-500/10 border-red-500/20 text-red-400"
@@ -685,15 +683,15 @@ export function BettingPage() {
                         )}
                         {isAdmin && (
                           <button
-                            onClick={() => handleDeleteMarket(market.id)}
-                            className="text-red-500/30 hover:text-red-500 transition-colors"
+                            onClick={() => setMarketToDelete(market.id)}
+                            className="text-red-500/60 hover:text-red-400 transition-colors p-1"
                             title="Elimina scommessa"
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={16} />
                           </button>
                         )}
                       </div>
-                      <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-none">{market.title}</h3>
+                      <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-none mt-2">{market.title}</h3>
                     </div>
                   </div>
 
@@ -758,7 +756,11 @@ export function BettingPage() {
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       e.preventDefault();
-                                      handleSettleMarket(market.id, opt.id);
+                                      setSettleConfirm({ 
+                                        marketId: market.id, 
+                                        optionId: opt.id, 
+                                        optionLabel: opt.label 
+                                      });
                                     }}
                                     className="px-2.5 py-1.5 bg-gradient-to-b from-slate-200 to-slate-400 text-slate-900 border border-white/30 rounded-lg text-[9px] font-black uppercase tracking-wider hover:from-white hover:to-slate-300 transition-all cursor-pointer whitespace-nowrap shadow-sm"
                                   >
@@ -902,6 +904,43 @@ export function BettingPage() {
               >
                 {isDeleting ? <Loader2 size={16} className="animate-spin" /> : 'Sì, Elimina'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Premium Settlement Confirmation Overlay */}
+      {settleConfirm && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-xl" onClick={() => setSettleConfirm(null)} />
+          <div className="relative bg-[#111218] border border-white/10 rounded-[2.5rem] p-8 md:p-12 max-w-lg w-full shadow-2xl animate-in zoom-in-95 duration-300">
+            <div className="flex flex-col items-center text-center space-y-6">
+              <div className="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center border border-yellow-500/20 shadow-[0_0_40px_rgba(234,179,8,0.1)]">
+                <Trophy size={40} className="text-yellow-500" />
+              </div>
+              
+              <div className="space-y-2">
+                <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Conferma Vincitore</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  Stai per dichiarare <span className="text-yellow-500 font-bold">"{settleConfirm.optionLabel}"</span> come vincitore. 
+                  Tutte le scommesse su questa opzione verranno liquidate. L'azione è irreversibile.
+                </p>
+              </div>
+
+              <div className="flex flex-col w-full gap-3 pt-4">
+                <button
+                  onClick={() => handleSettleMarket(settleConfirm.marketId, settleConfirm.optionId)}
+                  className="w-full py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-black font-black uppercase tracking-widest rounded-2xl transition-all shadow-lg active:scale-95"
+                >
+                  Conferma Vittoria
+                </button>
+                <button
+                  onClick={() => setSettleConfirm(null)}
+                  className="w-full py-4 bg-white/5 hover:bg-white/10 text-gray-400 font-bold uppercase tracking-widest rounded-2xl transition-all border border-white/5"
+                >
+                  Annulla
+                </button>
+              </div>
             </div>
           </div>
         </div>
