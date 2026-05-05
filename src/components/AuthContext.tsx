@@ -209,19 +209,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
              sheep_balance: data.sheep_balance ?? 100
            }));
         }
-      } else if (error && error.code === 'PGRST116') {
+      } else {
         // Profile doesn't exist yet, create it with local values
         const email = userEmail.toLowerCase();
-        const rank = localStorage.getItem(`auth_user_rank_${email}`) || 'Unranked';
-        const nickname = localStorage.getItem(`auth_user_nickname_${email}`) || '';
-                await supabase
-           .from('profiles')
-           .upsert({ 
-             email, 
-             nickname, 
-             rank,
-             avatar_url: user?.avatar_url || null 
-           });
+        const rank = localStorage.getItem(`auth_user_rank_${email}`) || localStorage.getItem('auth_user_rank') || 'Unranked';
+        const nickname = localStorage.getItem(`auth_user_nickname_${email}`) || localStorage.getItem('auth_user_nickname') || '';
+        
+        const { data: newProfile } = await supabase
+          .from('profiles')
+          .upsert({ 
+            email, 
+            nickname, 
+            rank,
+            avatar_url: user?.avatar_url || null,
+            sheep_balance: 100
+          })
+          .select()
+          .maybeSingle();
+
+        if (newProfile) {
+          setUser(prev => prev ? ({ ...prev, id: newProfile.id, sheep_balance: 100 }) : null);
+        }
       }
     } catch (err) {
       console.error('Error syncing profile:', err);
