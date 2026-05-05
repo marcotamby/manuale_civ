@@ -355,6 +355,9 @@ export function BettingPage() {
                             )}
                           >
                             <div className="flex justify-between items-center relative z-10">
+                              <div className="flex flex-col min-w-0">
+                                <span className={clsx(
+                                  "text-sm font-black uppercase tracking-tight leading-tight mb-1",
                                   isSelected ? "text-white" : "text-gray-300"
                                 )}>
                                   {opt.label}
