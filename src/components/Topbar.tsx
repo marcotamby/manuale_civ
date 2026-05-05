@@ -143,15 +143,13 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
       const { count, error } = await supabase
         .from('betting_notifications')
         .select('*', { count: 'exact', head: true })
-        .or(`user_email.ilike.${email},user_id.eq.${user.id}`)
+        .ilike('user_email', email)
         .eq('is_read', false); 
-      
-      console.log('📊 NOTIFICATION DB RESULT:', { email, userId: user.id, count, error });
       
       if (!error) {
         setBetUnreadCount(count || 0);
       } else {
-        console.error('❌ ERRORE SUPABASE NOTIFICHE:', error);
+        console.error('❌ NOTIFICATION ERROR:', error);
       }
     } catch (e) {
       console.error('Error fetching betting notifications:', e);

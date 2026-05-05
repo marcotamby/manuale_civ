@@ -130,14 +130,17 @@ export function BettingPage() {
         }
       }
 
-      // Load Leaderboard
-      const { data: topPastors } = await supabase
-        .from('profiles')
-        .select('username, sheep_balance')
-        .order('sheep_balance', { ascending: false })
-        .limit(5);
-      setLeaderboard(topPastors || []);
-
+      // Load Leaderboard - Silent fail if RLS prevents reading other profiles
+      try {
+        const { data: topPastors } = await supabase
+          .from('profiles')
+          .select('username, sheep_balance')
+          .order('sheep_balance', { ascending: false })
+          .limit(5);
+        if (topPastors) setLeaderboard(topPastors);
+      } catch (e) {
+        console.log('Leaderboard hidden by security policy');
+      }
     } catch (err) {
       console.error('Error loading betting data:', err);
     } finally {
