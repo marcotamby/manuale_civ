@@ -275,11 +275,6 @@ export function BettingPage() {
     return Math.max(1.01, rawOdds).toFixed(2);
   };
 
-    } catch (err: any) {
-      toast.error(`Errore: ${err.message}`);
-    }
-  };
-
   const handleSettleMarket = async (marketId: string, winnerOptionId: string) => {
     try {
       const marketToSettle = markets.find(m => m.id === marketId);
