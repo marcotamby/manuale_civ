@@ -876,17 +876,17 @@ export function BettingPage() {
                                  });
                                  setShowAdminTools(true);
                                }}
-                               className="text-cyan-400/60 hover:text-cyan-400 transition-colors p-1 shrink-0"
+                               className="text-cyan-400/60 hover:text-cyan-400 transition-all p-2.5 shrink-0 relative z-50 hover:scale-125 active:scale-90"
                                title="Modifica scommessa"
                              >
-                               <Edit2 size={14} />
+                               <Edit2 size={20} />
                              </button>
                              <button
                                onClick={() => setMarketToDelete(market.id)}
-                               className="text-red-500/60 hover:text-red-400 transition-colors p-1 shrink-0"
+                               className="text-red-500/60 hover:text-red-400 transition-all p-2.5 shrink-0 relative z-50 hover:scale-125 active:scale-90"
                                title="Elimina scommessa"
                              >
-                               <Trash2 size={14} />
+                               <Trash2 size={20} />
                              </button>
                            </div>
                          )}
