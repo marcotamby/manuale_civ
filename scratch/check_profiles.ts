@@ -1,25 +1,13 @@
-
-import { createClient } from '@supabase/supabase-backend-js';
+import { createClient } from '@supabase/supabase-api';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+const supabase = createClient(process.env.VITE_SUPABASE_URL!, process.env.VITE_SUPABASE_ANON_KEY!);
 
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-async function checkProfiles() {
-    console.log('🔍 Checking profiles...');
-    const { data, error } = await supabase
-        .from('profiles')
-        .select('id, email, nickname')
-        .limit(10);
-    
-    if (error) {
-        console.error('❌ Error fetching profiles:', error);
-    } else {
-        console.log('✅ Found profiles:', data);
-    }
+async function check() {
+    const { data, error } = await supabase.from('profiles').select('*').limit(10);
+    if (error) console.error(error);
+    else console.log(JSON.stringify(data, null, 2));
 }
 
-checkProfiles();
+check();

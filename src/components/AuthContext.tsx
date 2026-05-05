@@ -148,8 +148,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase
         .from('profiles')
         .select('id, nickname, rank, avatar_url, role, is_streamer, can_manage_tournaments, can_manage_civs, can_manage_buildorders, sheep_balance')
-        .eq('email', userEmail.toLowerCase())
-        .single();
+        .ilike('email', userEmail)
+        .maybeSingle();
       
       if (!error && data) {
         const email = userEmail.toLowerCase();
