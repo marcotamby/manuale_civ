@@ -125,8 +125,17 @@ export function BettingPage() {
           .eq('email', finalUserEmail)
           .maybeSingle();
 
-        if (profile && (!silent || sheepBalance === 0)) {
-          setSheepBalance(profile.sheep_balance ?? 0);
+        console.log('🔍 DB BALANCE (user_profiles):', profile?.sheep_balance);
+        console.log('🔍 CONTEXT BALANCE (profiles):', user?.sheep_balance);
+
+        // Priority to user_profiles if found, else context balance
+        const dbBalance = profile?.sheep_balance ?? 0;
+        const contextBalance = user?.sheep_balance ?? 0;
+        
+        if (!silent || sheepBalance === 0) {
+          // If DB has 0 but context has more, it might be an out-of-sync situation from tests
+          const finalBalance = (dbBalance === 0 && contextBalance > 0) ? contextBalance : dbBalance;
+          setSheepBalance(finalBalance);
         }
       }
 
