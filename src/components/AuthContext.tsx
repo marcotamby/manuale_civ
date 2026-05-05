@@ -389,6 +389,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
   const closeLoginModal = () => setIsLoginModalOpen(false);
 
+  const refreshUser = async () => {
+    if (user?.email) {
+      await syncProfileWithSupabase(user.email);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       isAuthenticated,

@@ -145,6 +145,8 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     const [showSaveSuccess, setShowSaveSuccess] = useState(false);
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+    const [userBets, setUserBets] = useState<any[]>([]);
+    const [isBetsLoading, setIsBetsLoading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Sync local state ONLY when modal opens
@@ -266,8 +268,35 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
             fetchMySuggestions();
             fetchQaNotifications();
             fetchBetNotifications();
+            fetchUserBets();
         }
     }, [isOpen, user?.email, user?.id]);
+
+    const fetchUserBets = async () => {
+        if (!user?.id) return;
+        try {
+            setIsBetsLoading(true);
+            const { data: bets, error } = await supabase
+                .from('user_bets')
+                .select(`
+                    *,
+                    betting_markets (
+                        title,
+                        status,
+                        options
+                    )
+                `)
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
+            
+            if (error) throw error;
+            setUserBets(bets || []);
+        } catch (err) {
+            console.error('Error fetching user bets:', err);
+        } finally {
+            setIsBetsLoading(false);
+        }
+    };
 
     const fetchQaNotifications = async () => {
         if (!user?.email) return;
@@ -498,6 +527,63 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                 <TrendingUp size={14} /> Scommetti
                             </button>
                         </div>
+                    </section>
+
+                    {/* Le Tue Scommesse (Nuova Sezione) */}
+                    <section>
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2 text-blue-400 tracking-widest uppercase text-xs font-bold">
+                                <TrendingUp size={14} />
+                                <span>Le Tue Scommesse Attive</span>
+                            </div>
+                        </div>
+
+                        {isBetsLoading ? (
+                            <div className="flex items-center justify-center py-6 bg-white/[0.02] rounded-xl border border-white/5">
+                                <Loader2 size={20} className="animate-spin text-blue-500/50" />
+                            </div>
+                        ) : userBets.length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {userBets.map((bet) => {
+                                    const market = bet.betting_markets;
+                                    const option = market?.options?.find((o: any) => o.id === bet.option_id);
+                                    const isSettled = market?.status === 'settled';
+
+                                    return (
+                                        <div key={bet.id} className="bg-white/[0.03] p-4 rounded-xl border border-white/5 hover:border-blue-500/20 transition-all group">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <div className="min-w-0">
+                                                    <p className="text-[9px] text-gray-500 font-black uppercase truncate tracking-widest">{market?.title || 'Mercato'}</p>
+                                                    <h5 className="text-sm font-black text-white uppercase truncate tracking-tight">{option?.label || 'Opzione'}</h5>
+                                                </div>
+                                                <span className={clsx(
+                                                    "text-[8px] px-2 py-0.5 rounded font-black uppercase tracking-widest",
+                                                    isSettled ? "bg-gray-500/10 text-gray-500" : "bg-blue-500/10 text-blue-400"
+                                                )}>
+                                                    {isSettled ? 'Conclusa' : 'In Corso'}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
+                                                <div className="flex items-center gap-1">
+                                                    <span className="text-[10px] text-gray-500 font-bold uppercase">Puntata:</span>
+                                                    <span className="text-xs font-black text-blue-400">{bet.amount} 🐑</span>
+                                                </div>
+                                                {isSettled && bet.status === 'won' && (
+                                                    <div className="flex items-center gap-1 text-green-400">
+                                                        <Trophy size={10} />
+                                                        <span className="text-xs font-black">+{bet.payout}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div className="text-center py-8 bg-white/[0.02] rounded-xl border border-dashed border-white/10">
+                                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Non hai ancora scommesso su nulla.</p>
+                            </div>
+                        )}
                     </section>
 
                     {/* Notifiche Scommesse */}

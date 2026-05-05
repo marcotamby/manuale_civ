@@ -28,7 +28,7 @@ interface LeaderboardUser {
 export function BettingPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { user, isAuthenticated, isAdmin } = useAuth();
+  const { user, isAuthenticated, refreshUser, isAdmin } = useAuth();
   const [loading, setLoading] = useState(true);
   const [markets, setMarkets] = useState<Market[]>([]);
   const [tournament, setTournament] = useState<any>(null);
@@ -198,7 +198,8 @@ export function BettingPage() {
 
 
       toast.success('I tuoi scout hanno portato le pecore al mercato!');
-      loadData(); // Refresh balance and markets
+      refreshUser(); // Update sheep balance in topbar
+      loadData();    // Update markets total bet
       setSelectedBets(prev => {
         const next = { ...prev };
         delete next[marketId];
@@ -593,9 +594,9 @@ export function BettingPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 px-4 md:px-0">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 md:px-0">
         {/* Main Betting Area */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-12">
           {markets.length === 0 ? (
             <div className="bg-[#111218] p-12 rounded-[2.5rem] border border-slate-400/20 text-center flex flex-col items-center">
               <AlertCircle size={48} className="mb-4 text-gray-600" />
@@ -610,7 +611,7 @@ export function BettingPage() {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {markets.map((market) => (
                 <div key={market.id} className="bg-[#111218] rounded-[2.5rem] border border-slate-400/20 overflow-hidden group hover:border-slate-400/40 transition-all duration-500 shadow-2xl flex flex-col h-full">
                   {/* Market Header */}
@@ -776,50 +777,6 @@ export function BettingPage() {
                   </div>
                 </div>
               ))}
-            </div>
-          )}
-        </div>
-
-        {/* Sidebar: My Bets */}
-        <div className="space-y-8">
-          {isAuthenticated && myBets.length > 0 && (
-            <div className="bg-[#111218] p-6 rounded-[2rem] border border-slate-400/20 shadow-xl backdrop-blur-sm">
-              <h4 className="text-blue-400 font-black uppercase tracking-tight mb-6 flex items-center gap-3 text-sm">
-                <TrendingUp size={18} /> Le Tue Scommesse
-              </h4>
-              <div className="space-y-4">
-                {myBets.map((bet) => {
-                  const market = markets.find(m => m.id === bet.market_id);
-                  const option = market?.options.find(o => o.id === bet.option_id);
-                  
-                  return (
-                    <div key={bet.id} className="p-4 bg-white/5 border border-white/5 rounded-2xl group hover:border-blue-500/30 transition-all">
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest truncate max-w-[120px]">{market?.title || 'Mercato'}</span>
-                        <span className={clsx(
-                          "text-[9px] font-black uppercase px-2 py-0.5 rounded",
-                          bet.status === 'won' ? "bg-green-500/20 text-green-400" :
-                          bet.status === 'lost' ? "bg-red-500/20 text-red-400" : "bg-blue-500/20 text-blue-400"
-                        )}>
-                          {bet.status === 'won' ? 'Vinta' : bet.status === 'lost' ? 'Persa' : 'In corso'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-end">
-                        <div className="min-w-0">
-                          <p className="text-xs font-bold text-white uppercase truncate">{option?.label || 'Opzione'}</p>
-                          <p className="text-[10px] text-blue-400 font-black">{bet.amount} 🐑</p>
-                        </div>
-                        {bet.status === 'won' && (
-                          <div className="text-right shrink-0">
-                            <p className="text-[8px] font-black text-green-400 uppercase">Premio</p>
-                            <p className="text-xs font-black text-green-400">+{bet.payout} 🐑</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
             </div>
           )}
         </div>
