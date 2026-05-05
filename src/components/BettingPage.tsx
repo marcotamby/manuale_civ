@@ -466,8 +466,7 @@ export function BettingPage() {
                         status: 'open'
                       };
                       
-                      window.alert('DEBUG: Invio payload a Supabase...');
-                      console.log('🚀 Publishing Market Payload:', payload);
+                      console.log('🚀 Final Betting Payload:', payload);
 
                       const { error } = await supabase
                         .from('betting_markets')
