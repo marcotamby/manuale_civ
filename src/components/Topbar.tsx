@@ -132,22 +132,22 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
   };
 
   const fetchBetUnreadCount = async () => {
-    if (!isAuthenticated || !user?.id) {
+    if (!isAuthenticated || !user?.email) {
       setBetUnreadCount(0);
       return;
     }
 
     try {
-      console.log('🔍 Fetching bet notifications for user ID:', user.id);
+      console.log('🔍 Fetching bet notifications for user Email:', user.email);
       const { count, error } = await supabase
         .from('betting_notifications')
         .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
+        .eq('user_email', user.email)
         .eq('is_read', false)
         .ilike('message', 'I tuoi scout sono tornati!%'); 
       
       if (!error) {
-        console.log('🔔 Betting Notifications Count:', count, 'for user:', user.id);
+        console.log('🔔 Betting Notifications Count for', user.email, ':', count);
         setBetUnreadCount(count || 0);
       } else {
         console.error('❌ Betting Notifications Error:', error);
