@@ -156,27 +156,31 @@ export function BettingPage() {
 
     setPlacingBetId(marketId);
     try {
-      // Get ID from context or session only. No more manual profile lookups.
+      // AGGRESSIVE SESSION RECOVERY
       let finalUserId = user?.id;
       if (!finalUserId) {
-        const { data: { session } } = await supabase.auth.getSession();
-        finalUserId = session?.user?.id;
+        console.log('🔄 AuthContext ID missing, trying direct session...');
+        const { data: sessionData } = await supabase.auth.getSession();
+        finalUserId = sessionData?.session?.user?.id;
       }
 
-      // If we STILL have no ID, we'll try to insert with null and let DB handle it 
-      // or fail with a clear message.
+      if (!finalUserId) {
+        const msg = "SESSIONE NON TROVATA! Per favore ricarica la pagina o rifai il login.";
+        if (typeof window !== 'undefined') window.alert(`❌ ${msg}`);
+        toast.error(msg);
+        setPlacingBetId(null);
+        return;
+      }
+
       const betData: any = {
+        user_id: finalUserId,
         market_id: marketId,
         option_id: bet.optionId,
         amount: bet.amount
       };
 
-      if (finalUserId) {
-        betData.user_id = finalUserId;
-      }
-      console.log('🎲 Attempting to place bet with data:', betData);
-      console.log('🚀 Sending bet to Supabase...');
-      if (typeof window !== 'undefined') window.alert(`DEBUG: Invio bet per user: ${finalUserId || 'NULL'}`);
+      console.log('🎲 Finalizing bet with User ID:', finalUserId);
+      if (typeof window !== 'undefined') window.alert(`DEBUG: Invio bet per user: ${finalUserId}`);
       
       const { data: insertData, error: insertError } = await supabase
         .from('user_bets')
