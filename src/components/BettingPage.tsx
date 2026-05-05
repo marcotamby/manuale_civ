@@ -6,7 +6,7 @@ import { useAuth } from './AuthContext';
 import { fetchTournament } from '../services/startgg';
 import { Loader2, ArrowLeft, Trophy, Users, TrendingUp, AlertCircle, Plus, X, Zap, ChevronDown } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { clsx } from 'clsx';
+import clsx from 'clsx';
 
 interface Market {
   id: string;
@@ -459,7 +459,7 @@ export function BettingPage() {
                     setPublishStatus('loading');
                     try {
                       const optionsWithMeta = finalOptions.map(label => ({
-                        id: Math.random().toString(36).substr(2, 9),
+                        id: Math.random().toString(36).substring(2, 11),
                         label,
                         total_bet: 0
                       }));
