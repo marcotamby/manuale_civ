@@ -1171,7 +1171,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                   </div>
                 </div>
               )}
-           ) : activeTab === 'betting' ? (
+            </div>
+          </div>
+        ) : activeTab === 'betting' ? (
           <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-10 custom-scrollbar">
               {/* New Market Creation Form */}
               <div className="bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 relative overflow-hidden group">
@@ -1347,9 +1349,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                            {isFetchingParticipants ? <Loader2 size={20} className="animate-spin" /> : <Zap size={20} />}
                            Pubblica Mercato Ora
                         </button>
-                    </div>
                   </div>
               </div>
+            </div>
 
              {/* Existing Markets Section */}
              <div className="space-y-6">
@@ -1419,7 +1421,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                    ))}
                 </div>
              </div>
-          </div>
+           </div>
         ) : (
           /* Q&A Tab Content */
           <div className="space-y-8 overflow-y-auto px-4 md:px-6 py-4 max-h-[70vh]">
