@@ -11,6 +11,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 
 // Use the real Google Client ID directly to avoid Vercel environment variable issues
 const GOOGLE_CLIENT_ID = "403799038562-p202o225j2vf0k72fbjbmeqgrntmr6su.apps.googleusercontent.com";
+console.log("Manuale Civ v0.1.0-beta - Social Betting Refined");
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
