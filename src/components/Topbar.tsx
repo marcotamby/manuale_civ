@@ -146,8 +146,9 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
         .ilike('user_email', email)
         .eq('is_read', false); 
       
+      console.log('📊 NOTIFICATION DB RESULT:', { email, count, error });
+      
       if (!error) {
-        console.log('🔔 CONTEGGIO TROVATO:', count);
         setBetUnreadCount(count || 0);
       } else {
         console.error('❌ ERRORE SUPABASE:', error);

@@ -279,15 +279,12 @@ export function BettingPage() {
       await loadData(false);
       
       // Update global context again just to be 100% sure the Topbar is in sync
-       if (user && user.email) {
-          const { data: p } = await supabase.from('profiles').select('sheep_balance').ilike('email', user.email).maybeSingle();
-          if (p) setUser({ ...user, sheep_balance: p.sheep_balance });
-       }
-
-       // Trigger notification badge update globally
-       if ((window as any).refreshNotificationCount) {
-         (window as any).refreshNotificationCount();
-       }
+       // Trigger notification badge update globally with a small delay for DB consistency
+       setTimeout(() => {
+         if ((window as any).refreshNotificationCount) {
+           (window as any).refreshNotificationCount();
+         }
+       }, 1000);
     } catch (err: any) {
       toast.error(`Errore: ${err.message}`);
     }
@@ -618,20 +615,23 @@ export function BettingPage() {
                       if (error) throw error;
                       
                       setPublishStatus('success');
-                      await loadData();
-                      setAdminForm({
-                        title: '',
-                        description: '',
-                        type: 'Match Winner',
-                        eventLevel: 'High Elo',
-                        teamA: '',
-                        teamB: '',
-                        options: ['', '']
-                      });
+                      toast.success('Scommessa pubblicata!');
+                      await loadData(true);
                       
-                      setTimeout(() => setPublishStatus('idle'), 3000);
+                      setTimeout(() => {
+                        setShowAdminModal(false);
+                        setAdminForm({
+                          title: '',
+                          description: '',
+                          type: 'Match Winner',
+                          eventLevel: 'High Elo',
+                          teamA: '',
+                          teamB: '',
+                          options: ['', '']
+                        });
+                        setPublishStatus('idle');
+                      }, 2000);
                     } catch (err: any) {
-                      console.error('❌ Error publishing market:', err);
                       setPublishStatus('error');
                       toast.error(err.message);
                       setTimeout(() => setPublishStatus('idle'), 3000);
