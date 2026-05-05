@@ -510,6 +510,7 @@ export function BettingPage() {
                           </div>
                         ))}
                       </div>
+                    ) : adminForm.type === 'Final Score' ? (
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {['2-0', '2-1', '1-2', '0-2', '3-0', '3-1', '3-2', '2-3', '1-3', '0-3'].map((score) => {
                           const isSelected = adminForm.options.some(o => o.startsWith(score));

@@ -143,8 +143,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
         .from('betting_notifications')
         .select('*', { count: 'exact', head: true })
         .eq('user_email', user.email)
-        .eq('is_read', false)
-        .ilike('message', 'I tuoi scout sono tornati!%'); 
+        .eq('is_read', false); 
       
       if (!error) {
         console.log('🔔 Betting Notifications Count for', user.email, ':', count);
