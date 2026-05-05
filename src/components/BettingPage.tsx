@@ -37,7 +37,6 @@ export function BettingPage() {
   const [placingBetId, setPlacingBetId] = useState<string | null>(null);
   const [myBets, setMyBets] = useState<any[]>([]);
   const [showAdminTools, setShowAdminTools] = useState(false);
-  const [isCreatingMarket, setIsCreatingMarket] = useState(false);
   const [publishStatus, setPublishStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [participantsByLevel, setParticipantsByLevel] = useState<{ [level: string]: string[] }>({ 'High Elo': [], 'Low Elo': [] });
   const [adminForm, setAdminForm] = useState({
@@ -50,6 +49,8 @@ export function BettingPage() {
     options: ['', '']
   });
 
+  const cleanSlug = (slug || '').split('?')[0].trim().replace(/\/$/, '');
+
   useEffect(() => {
     loadData();
   }, [slug, user]);
@@ -58,7 +59,6 @@ export function BettingPage() {
     setLoading(true);
     try {
       // Load Tournament
-      const cleanSlug = (slug || '').split('?')[0].trim().replace(/\/$/, '');
       
       const { data: tourney } = await supabase
         .from('tournaments')
