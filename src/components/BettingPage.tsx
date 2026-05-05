@@ -619,7 +619,7 @@ export function BettingPage() {
                       await loadData(true);
                       
                       setTimeout(() => {
-                        setShowAdminModal(false);
+                        setShowAdminTools(false);
                         setAdminForm({
                           title: '',
                           description: '',
