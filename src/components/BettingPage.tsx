@@ -165,27 +165,28 @@ export function BettingPage() {
 
     setPlacingBetId(marketId);
     try {
-      // Get the best ID possible, but don't block
+      // Get ID from context or session only. No more manual profile lookups.
       let finalUserId = user?.id;
       if (!finalUserId) {
         const { data: { session } } = await supabase.auth.getSession();
         finalUserId = session?.user?.id;
       }
-      
-      // If still no ID, try to find by email one last time
-      if (!finalUserId && user?.email) {
-        const { data: profile } = await supabase.from('profiles').select('id').eq('email', user.email.toLowerCase()).maybeSingle();
-        finalUserId = profile?.id;
+
+      // If we STILL have no ID, we'll try to insert with null and let DB handle it 
+      // or fail with a clear message.
+      const betData: any = {
+        market_id: marketId,
+        option_id: bet.optionId,
+        amount: bet.amount
+      };
+
+      if (finalUserId) {
+        betData.user_id = finalUserId;
       }
 
       const { error: insertError } = await supabase
         .from('user_bets')
-        .insert({
-          user_id: finalUserId,
-          market_id: marketId,
-          option_id: bet.optionId,
-          amount: bet.amount
-        });
+        .insert(betData);
 
       if (insertError) {
         console.error('❌ Betting Error:', insertError);
