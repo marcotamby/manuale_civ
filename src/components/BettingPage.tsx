@@ -736,15 +736,30 @@ export function BettingPage() {
                                   )}>{opt.total_bet || 0} 🐑</span>
                                 </div>
                               </div>
-                              <div className="flex flex-col items-end shrink-0 ml-4">
-                                <span className={clsx(
-                                  "text-[9px] font-black uppercase tracking-widest mb-0.5",
-                                  isSelected ? "text-blue-200" : "text-blue-400"
-                                )}>Quota</span>
-                                <span className={clsx(
-                                  "text-xl font-black",
-                                  isSelected ? "text-white" : "text-white"
-                                )}>{odds}</span>
+                              <div className="flex items-center gap-3 shrink-0 ml-4">
+                                <div className="flex flex-col items-end">
+                                  <span className={clsx(
+                                    "text-[9px] font-black uppercase tracking-widest mb-0.5",
+                                    isSelected ? "text-blue-200" : "text-blue-400"
+                                  )}>Quota</span>
+                                  <span className={clsx(
+                                    "text-xl font-black",
+                                    isSelected ? "text-white" : "text-white"
+                                  )}>{odds}</span>
+                                </div>
+                                {isAdmin && market.status === 'closed' && !isWinner && market.winner_option_id === null && (
+                                  <div
+                                    role="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      e.preventDefault();
+                                      handleSettleMarket(market.id, opt.id);
+                                    }}
+                                    className="px-2.5 py-1.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/30 rounded-lg text-[9px] font-black uppercase tracking-wider hover:bg-yellow-500 hover:text-black transition-all cursor-pointer whitespace-nowrap"
+                                  >
+                                    Vincitore
+                                  </div>
+                                )}
                               </div>
                             </div>
                             
@@ -752,18 +767,6 @@ export function BettingPage() {
                               <div className="absolute top-2 right-2">
                                 <Trophy size={14} className="text-yellow-500" />
                               </div>
-                            )}
-                            
-                            {isAdmin && market.status === 'closed' && !isWinner && market.winner_option_id === null && (
-                               <button 
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleSettleMarket(market.id, opt.id);
-                                  }}
-                                  className="absolute top-1/2 -translate-y-1/2 right-2 px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white rounded-lg text-[10px] font-black uppercase shadow-lg shadow-green-600/20 transition-all"
-                               >
-                                  🏆 Vincitore
-                               </button>
                             )}
                           </button>
                         );
