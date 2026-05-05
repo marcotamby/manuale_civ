@@ -140,11 +140,22 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
     try {
       const email = user.email.toLowerCase().trim();
       
+      // DEBUG: Vediamo TUTTE le notifiche esistenti per capire cosa c'è nel DB
+      const { data: allNotifs, error: debugError } = await supabase
+        .from('betting_notifications')
+        .select('*')
+        .limit(10);
+      
+      console.log('🚨 DEBUG - TUTTE LE NOTIFICHE NEL DB:', allNotifs);
+      if (debugError) console.error('🚨 DEBUG - ERRORE DB:', debugError);
+
       const { count, error } = await supabase
         .from('betting_notifications')
         .select('*', { count: 'exact', head: true })
-        .ilike('user_email', `%${email}%`) // Use wildcard to catch any spacing issues
+        .ilike('user_email', `%${email}%`)
         .eq('is_read', false); 
+      
+      console.log('📊 CONTEGGIO FINALE PER', email, ':', count);
       
       if (!error) {
         setBetUnreadCount(count || 0);
