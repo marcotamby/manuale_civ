@@ -156,44 +156,25 @@ export function BettingPage() {
 
     setPlacingBetId(marketId);
     try {
-      // ULTRA-ROBUST USER IDENTIFICATION
-      let finalUserId = user?.id;
-      let finalUserEmail = user?.email || '';
+      // USE EMAIL IDENTIFICATION (Same as build order votes)
+      const finalUserEmail = user?.email || localStorage.getItem('auth_user_email');
 
-      if (!finalUserId) {
-        const { data: { user: sbUser } } = await supabase.auth.getUser();
-        if (sbUser) {
-          finalUserId = sbUser.id;
-          if (!finalUserEmail) finalUserEmail = sbUser.email || '';
-        }
-      }
-
-      // Final attempt: lookup by email if ID is still missing
-      if (!finalUserId && finalUserEmail) {
-        const { data: prof } = await supabase
-          .from('profiles')
-          .select('id')
-          .ilike('email', finalUserEmail)
-          .maybeSingle();
-        finalUserId = prof?.id;
-      }
-
-      if (!finalUserId) {
-        const msg = "IDENTIFICAZIONE FALLITA! Per favore ricarica la pagina o prova a sloggare e riloggare.";
+      if (!finalUserEmail) {
+        const msg = "IDENTIFICAZIONE FALLITA! Per favore rifai il login.";
         toast.error(msg);
         setPlacingBetId(null);
         return;
       }
 
       const betData: any = {
-        user_id: finalUserId,
+        user_email: finalUserEmail,
         market_id: marketId,
         option_id: bet.optionId,
         amount: bet.amount
       };
 
-      console.log('🎲 Finalizing bet with User ID:', finalUserId);
-      if (typeof window !== 'undefined') window.alert(`DEBUG: Invio bet per user: ${finalUserId}`);
+      console.log('🎲 Placing bet for email:', finalUserEmail);
+      console.log('🚀 Sending bet to Supabase...');
       
       const { data: insertData, error: insertError } = await supabase
         .from('user_bets')
