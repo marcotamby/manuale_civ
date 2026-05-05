@@ -36,7 +36,6 @@ export function BettingPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([]);
   const [selectedBets, setSelectedBets] = useState<{ [marketId: string]: { optionId: string, amount: number } }>({});
   const [placingBetId, setPlacingBetId] = useState<string | null>(null);
-  const [myBets, setMyBets] = useState<any[]>([]);
   const [showAdminTools, setShowAdminTools] = useState(false);
   const [publishStatus, setPublishStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [marketToDelete, setMarketToDelete] = useState<string | null>(null);
@@ -103,7 +102,8 @@ export function BettingPage() {
         console.warn("Could not fetch entrants for dropdowns", e);
       }
 
-      // Load Markets
+      try {
+        // Load Markets
       console.log('🔍 Fetching markets for slug:', cleanSlug);
       const { data: marketData, error: marketError } = await supabase
         .from('betting_markets')
@@ -134,16 +134,7 @@ export function BettingPage() {
         .limit(5);
       setLeaderboard(topPastors || []);
 
-      // Load My Bets
-      if (user && marketData && marketData.length > 0) {
-        const { data: userBets } = await supabase
-          .from('user_bets')
-          .select('*')
-          .in('market_id', marketData.map(m => m.id))
-          .order('created_at', { ascending: false });
-        setMyBets(userBets || []);
       }
-
     } catch (err) {
       console.error('Error loading betting data:', err);
     } finally {

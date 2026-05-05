@@ -5,7 +5,7 @@ import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
 import { supabase } from '../lib/supabaseClient';
 import type { Suggestion } from './AdminDashboardModal';
-import { clsx } from 'clsx';
+import clsx from 'clsx';
 
 interface ProfileModalProps {
     isOpen: boolean;
