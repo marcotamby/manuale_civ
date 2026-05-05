@@ -728,15 +728,12 @@ export function BettingPage() {
                                 )}>
                                   {opt.label}
                                 </span>
-                                <div className="flex items-center gap-2">
-                                  <span className={clsx(
-                                    "text-[10px] font-bold uppercase tracking-widest",
-                                    isSelected ? "text-emerald-400/80" : "text-gray-400"
-                                  )}>Puntata:</span>
-                                  <span className={clsx(
-                                    "text-sm font-black drop-shadow-[0_0_5px_rgba(0,0,0,0.5)]",
-                                    isSelected ? "text-emerald-400" : "text-cyan-400"
-                                  )}>{opt.total_bet || 0} 🐑</span>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Pecore Puntate:</span>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-xs font-black text-blue-400 leading-none">{opt.total_bet || 0}</span>
+                                    <span className="text-[10px] leading-none mb-0.5">🐑</span>
+                                  </div>
                                 </div>
                               </div>
                               <div className="flex items-center gap-3 shrink-0 ml-4">
