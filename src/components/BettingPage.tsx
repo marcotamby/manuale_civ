@@ -120,23 +120,13 @@ export function BettingPage() {
       const finalUserEmail = user?.email || localStorage.getItem('auth_user_email');
       if (finalUserEmail) {
         const { data: profile } = await supabase
-          .from('user_profiles')
+          .from('profiles')
           .select('sheep_balance')
-          .eq('email', finalUserEmail)
+          .ilike('email', finalUserEmail)
           .maybeSingle();
 
-        console.log('🔍 DB BALANCE (user_profiles):', profile?.sheep_balance);
-        console.log('🔍 CONTEXT BALANCE (profiles):', user?.sheep_balance);
-
-        // Priority to user_profiles if found, else context balance
-        const dbBalance = profile?.sheep_balance ?? 0;
-        const contextBalance = user?.sheep_balance ?? 0;
-        
-        // Only update balance if it's NOT a silent update (background refresh)
-        // OR if it's the very first load (balance is 0)
-        if (!silent || sheepBalance === 0) {
-          const finalBalance = (dbBalance === 0 && contextBalance > 0) ? contextBalance : dbBalance;
-          setSheepBalance(finalBalance);
+        if (profile && (!silent || sheepBalance === 0)) {
+          setSheepBalance(profile.sheep_balance ?? 0);
         }
       }
 
