@@ -300,18 +300,20 @@ export function BettingPage() {
             {tournament?.name || (slug?.replace(/-/g, ' ')) || 'Torneo'}
            </h1>
             <div className="flex flex-col gap-4">
-             <p className="text-sky-400/90 font-serif italic text-lg flex items-center gap-2 drop-shadow-[0_0_10px_rgba(56,189,248,0.2)]">
+             <p className="text-slate-300/80 font-serif italic text-lg flex items-center gap-2">
               Il mercato delle pecore è aperto! 🐑
              </p>
              <div className="group relative max-w-[500px]">
-               <div className="bg-[#111218]/90 border border-red-500/20 p-2.5 rounded-xl flex items-center gap-3 text-red-400/80 text-[10px] font-bold uppercase tracking-widest cursor-help transition-all duration-500 max-h-[36px] hover:max-h-[200px] overflow-hidden backdrop-blur-sm">
-                <AlertCircle size={14} className="shrink-0" />
-                <span className="truncate group-hover:whitespace-normal transition-all duration-500">
-                  Il sistema di Social Betting è un gioco di simulazione puramente gratuito.
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity ml-1">
-                    Non costituisce attività di gioco d'azzardo. Le "Pecore" sono punti virtuali privi di valore economico.
-                  </span>
-                </span>
+               <div className="bg-[#111218]/90 border border-white/10 p-2.5 rounded-xl flex items-start gap-3 text-gray-500 text-[10px] font-bold uppercase tracking-widest cursor-help backdrop-blur-sm">
+                <AlertCircle size={14} className="shrink-0 mt-0.5" />
+                <div className="flex flex-col">
+                  <span>Disclaimer</span>
+                  <div className="overflow-hidden transition-all duration-500 ease-in-out max-h-0 group-hover:max-h-[100px] opacity-0 group-hover:opacity-100">
+                    <p className="text-[9px] text-gray-500 normal-case tracking-normal font-normal mt-1.5 leading-relaxed">
+                      Il sistema di Social Betting è un gioco di simulazione puramente gratuito. Non costituisce attività di gioco d'azzardo. Le "Pecore" sono punti virtuali privi di valore economico.
+                    </p>
+                  </div>
+                </div>
                </div>
              </div>
            </div>
@@ -645,7 +647,7 @@ export function BettingPage() {
                 <div className="flex justify-end">
                   <button 
                     onClick={() => setShowAdminTools(true)}
-                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black uppercase tracking-[0.2em] rounded-xl transition-all shadow-lg active:scale-95 flex items-center gap-2"
+                    className="px-6 py-3 bg-gradient-to-b from-slate-200 to-slate-400 hover:from-white hover:to-slate-300 text-slate-900 font-black uppercase tracking-[0.2em] rounded-xl transition-all shadow-lg active:scale-95 flex items-center gap-2 border border-white/20"
                   >
                     <Plus size={16} strokeWidth={3} /> Nuova Scommessa
                   </button>
@@ -657,41 +659,39 @@ export function BettingPage() {
                   {/* Market Header */}
                   <div className="p-6 md:p-8 bg-gradient-to-br from-[#1a1c25] to-[#111218] border-b border-white/5">
                     <div className="flex flex-col gap-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-black text-cyan-400/70 uppercase tracking-[0.25em]">{market.type}</span>
-                        <div className="flex items-center gap-3">
-                          <div className={clsx(
-                            "px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border",
-                            market.status === 'open' ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : "bg-red-500/10 border-red-500/30 text-red-400"
-                          )}>
-                            {market.status === 'open' ? 'Aperto' : 'Chiuso'}
-                          </div>
-                          {isAdmin && market.status === 'open' && (
-                             <button 
-                               onClick={() => handleCloseMarket(market.id)}
-                               className="px-3 py-1 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg text-[10px] font-black uppercase hover:bg-red-500 transition-all hover:text-white"
-                             >
-                               Chiudi Bet
-                             </button>
-                          )}
-                          {isAdmin && market.status === 'closed' && market.winner_option_id === null && (
-                             <button 
-                               onClick={() => handleReopenMarket(market.id)}
-                               className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-[10px] font-black uppercase hover:bg-emerald-500 transition-all hover:text-white"
-                             >
-                               Riapri Bet
-                             </button>
-                          )}
-                          {isAdmin && (
-                            <button
-                              onClick={() => handleDeleteMarket(market.id)}
-                              className="text-red-500/30 hover:text-red-500 transition-colors"
-                              title="Elimina scommessa"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          )}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[10px] font-black text-cyan-400/70 uppercase tracking-[0.2em]">{market.type}</span>
+                        <div className={clsx(
+                          "px-3 py-1 rounded-lg text-[10px] font-black uppercase border",
+                          market.status === 'open' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-red-500/10 border-red-500/20 text-red-400"
+                        )}>
+                          {market.status === 'open' ? 'Bet Aperta' : 'Bet Chiusa'}
                         </div>
+                        {isAdmin && market.status === 'open' && (
+                           <button 
+                             onClick={() => handleCloseMarket(market.id)}
+                             className="px-3 py-1 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg text-[10px] font-black uppercase hover:bg-red-500 transition-all hover:text-white"
+                           >
+                             Chiudi Bet
+                           </button>
+                        )}
+                        {isAdmin && market.status === 'closed' && market.winner_option_id === null && (
+                           <button 
+                             onClick={() => handleReopenMarket(market.id)}
+                             className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-[10px] font-black uppercase hover:bg-emerald-500 transition-all hover:text-white"
+                           >
+                             Riapri Bet
+                           </button>
+                        )}
+                        {isAdmin && (
+                          <button
+                            onClick={() => handleDeleteMarket(market.id)}
+                            className="text-red-500/30 hover:text-red-500 transition-colors"
+                            title="Elimina scommessa"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
                       </div>
                       <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-none">{market.title}</h3>
                     </div>
@@ -706,12 +706,17 @@ export function BettingPage() {
                         const odds = calculateOdds(market.options, opt.id);
 
                         return (
-                          <button
+                          <div
                             key={opt.id}
-                            disabled={market.status !== 'open' || !isAuthenticated}
-                            onClick={() => setSelectedBets({ ...selectedBets, [market.id]: { optionId: opt.id, amount: selectedBets[market.id]?.amount || 10 } })}
+                            role={market.status === 'open' && isAuthenticated ? 'button' : undefined}
+                            onClick={() => {
+                              if (market.status === 'open' && isAuthenticated) {
+                                setSelectedBets({ ...selectedBets, [market.id]: { optionId: opt.id, amount: selectedBets[market.id]?.amount || 10 } });
+                              }
+                            }}
                             className={clsx(
                               "relative p-2.5 px-3 rounded-xl border transition-all duration-300 text-left group/opt overflow-hidden",
+                              market.status === 'open' && isAuthenticated ? "cursor-pointer" : "",
                               isSelected ? "bg-emerald-500/10 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]" : 
                               isWinner ? "bg-emerald-600/20 border-emerald-500" :
                               "bg-white/5 border-white/5 hover:border-white/10 hover:bg-white/[0.06]"
@@ -748,17 +753,17 @@ export function BettingPage() {
                                   )}>{odds}</span>
                                 </div>
                                 {isAdmin && market.status === 'closed' && !isWinner && market.winner_option_id === null && (
-                                  <div
-                                    role="button"
+                                  <button
+                                    type="button"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       e.preventDefault();
                                       handleSettleMarket(market.id, opt.id);
                                     }}
-                                    className="px-2.5 py-1.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/30 rounded-lg text-[9px] font-black uppercase tracking-wider hover:bg-yellow-500 hover:text-black transition-all cursor-pointer whitespace-nowrap"
+                                    className="px-2.5 py-1.5 bg-gradient-to-b from-slate-200 to-slate-400 text-slate-900 border border-white/30 rounded-lg text-[9px] font-black uppercase tracking-wider hover:from-white hover:to-slate-300 transition-all cursor-pointer whitespace-nowrap shadow-sm"
                                   >
                                     Vincitore
-                                  </div>
+                                  </button>
                                 )}
                               </div>
                             </div>
@@ -768,7 +773,7 @@ export function BettingPage() {
                                 <Trophy size={14} className="text-yellow-500" />
                               </div>
                             )}
-                          </button>
+                          </div>
                         );
                       })}
                     </div>
