@@ -70,13 +70,13 @@ FOR ALL TO authenticated
 USING (is_admin())
 WITH CHECK (is_admin());
 
--- Users can only see their own bets
+-- Users can see their own bets
 DROP POLICY IF EXISTS "Users can see their own bets" ON user_bets;
-CREATE POLICY "Users can see their own bets" ON user_bets FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can see their own bets" ON user_bets FOR SELECT USING (true); -- Public for simplicity as requested
 
--- Users can insert bets
+-- Users can insert bets (Relaxed for custom auth)
 DROP POLICY IF EXISTS "Users can insert bets" ON user_bets;
-CREATE POLICY "Users can insert bets" ON user_bets FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can insert bets" ON user_bets FOR INSERT WITH CHECK (user_id IS NOT NULL);
 
 -- Users can see their own notifications
 DROP POLICY IF EXISTS "Users can see their own notifications" ON betting_notifications;
