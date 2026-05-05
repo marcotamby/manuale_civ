@@ -269,8 +269,25 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
             fetchMySuggestions();
             fetchQaNotifications();
             fetchUserBets();
+            markAllBetsAsRead();
         }
     }, [isOpen, user?.email, user?.id]);
+
+    const markAllBetsAsRead = async () => {
+        if (!user?.email) return;
+        try {
+            await supabase
+                .from('betting_notifications')
+                .update({ is_read: true })
+                .ilike('user_email', user.email)
+                .eq('is_read', false);
+            
+            // Refresh topbar to clear the badge
+            (window as any).refreshNotificationCount?.();
+        } catch (err) {
+            console.error('Error marking all bets as read:', err);
+        }
+    };
 
     const { activeBets, historyBets } = useMemo(() => {
         const active = userBets.filter(b => b.betting_markets?.status === 'open' || (b.status === 'pending' && b.betting_markets?.status !== 'settled'));
