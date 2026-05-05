@@ -286,7 +286,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                         options
                     )
                 `)
-                .eq('user_email', user.email)
+                .ilike('user_email', user.email)
                 .order('created_at', { ascending: false });
             
             if (error) throw error;
@@ -370,7 +370,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
             const { data } = await supabase
                 .from('betting_notifications')
                 .select('*')
-                .eq('user_email', user.email)
+                .ilike('user_email', user.email)
                 .order('created_at', { ascending: false })
                 .limit(20);
             setBetNotifications(data || []);
