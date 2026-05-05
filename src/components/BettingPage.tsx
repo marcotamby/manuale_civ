@@ -668,15 +668,15 @@ export function BettingPage() {
                                       setAdminForm({ ...adminForm, options: newOpts });
                                     }}
                                     className={clsx(
-                                      "flex-1 py-1.5 rounded-lg text-[8px] font-black uppercase transition-all border",
+                                      "flex-1 py-3 rounded-xl text-[10px] font-black uppercase transition-all border shadow-sm",
                                       opt.weight === v 
-                                        ? "bg-cyan-500 border-cyan-400 text-black" 
-                                        : "bg-white/5 border-white/10 text-gray-600 hover:border-white/20"
+                                        ? "bg-cyan-500 border-cyan-400 text-black shadow-cyan-500/20" 
+                                        : "bg-white/5 border-white/10 text-gray-400 hover:border-white/30"
                                     )}
                                   >
-                                    <div className="flex flex-col items-center py-1">
-                                      <span className="text-[10px] font-black leading-none mb-1">{v === 500 ? 'Under' : v === 1000 ? 'Sfav.' : v === 2000 ? 'Eq.' : v === 5000 ? 'Fav.' : 'Top'}</span>
-                                      <span className="text-[8px] font-bold opacity-50">{v}</span>
+                                    <div className="flex flex-col items-center gap-1">
+                                      <span className="text-xs font-black tracking-tight">{v === 500 ? 'Under' : v === 1000 ? 'Sfav.' : v === 2000 ? 'Eq.' : v === 5000 ? 'Fav.' : 'Top'}</span>
+                                      <span className="text-[10px] font-bold opacity-40">{v}</span>
                                     </div>
                                   </button>
                                 ))}
