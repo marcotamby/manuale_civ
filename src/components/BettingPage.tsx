@@ -459,7 +459,7 @@ export function BettingPage() {
                     setPublishStatus('loading');
                     try {
                       const optionsWithMeta = finalOptions.map(label => ({
-                        id: crypto.randomUUID(),
+                        id: Math.random().toString(36).substr(2, 9),
                         label,
                         total_bet: 0
                       }));
@@ -496,6 +496,7 @@ export function BettingPage() {
                       
                       setTimeout(() => setPublishStatus('idle'), 3000);
                     } catch (err: any) {
+                      console.error('❌ Error publishing market:', err);
                       setPublishStatus('error');
                       toast.error(err.message);
                       setTimeout(() => setPublishStatus('idle'), 3000);
@@ -503,6 +504,7 @@ export function BettingPage() {
                       setIsCreatingMarket(false);
                     }
                   }}
+                  disabled={publishStatus === 'loading'}
                   className={clsx(
                     "w-full py-4 rounded-xl font-black text-xs uppercase tracking-[0.3em] transition-all duration-500 relative overflow-hidden group",
                     publishStatus === 'success' ? "bg-green-500 text-black" :
