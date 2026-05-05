@@ -365,7 +365,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
                     {user?.avatar_url ? <img src={user.avatar_url} alt="" className="w-full h-full object-cover" /> : <User size={14} className="text-yellow-500" />}
                   </div>
                   {notificationCount > 0 && (
-                    <span className="absolute -top-2 -right-2 z-[100] flex h-5 w-5 items-center justify-center rounded-full bg-yellow-500 text-[10px] font-black text-black shadow-[0_0_15px_rgba(234,179,8,0.6)] border-2 border-[#0d1424]">
+                    <span className="absolute -top-1.5 -right-1.5 z-50 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-red-600 text-[9px] font-bold text-white shadow-[0_0_10px_rgba(220,38,38,0.4)] ring-2 ring-[#0d1424]">
                       {notificationCount}
                     </span>
                   )}

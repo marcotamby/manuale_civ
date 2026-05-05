@@ -635,28 +635,22 @@ export function BettingPage() {
                       setPublishStatus('error');
                       toast.error(err.message);
                       setTimeout(() => setPublishStatus('idle'), 3000);
-                    } finally {
-                      // Status is handled by the try/catch
                     }
                   }}
-                  disabled={publishStatus === 'loading'}
+                  disabled={publishStatus === 'loading' || publishStatus === 'success'}
                   className={clsx(
-                    "w-full py-4 rounded-xl font-black text-xs uppercase tracking-[0.3em] transition-all duration-500 relative overflow-hidden group",
-                    publishStatus === 'success' ? "bg-green-500 text-black" :
-                    publishStatus === 'error' ? "bg-red-500 text-white" :
-                    "bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)]"
+                    "w-full py-4 rounded-xl font-black text-xs uppercase tracking-[0.3em] transition-all duration-500 shadow-xl flex items-center justify-center gap-3",
+                    publishStatus === 'success' ? "bg-green-500 text-black shadow-green-900/20" : 
+                    "bg-cyan-500 hover:bg-cyan-400 text-black active:scale-[0.98]"
                   )}
                 >
-                  <div className="relative z-10 flex items-center justify-center gap-3">
-                    {publishStatus === 'loading' && <Loader2 size={16} className="animate-spin" />}
-                    {publishStatus === 'success' && <Trophy size={16} className="animate-bounce" />}
-                    <span>
-                      {publishStatus === 'loading' ? 'Invio in corso...' :
-                       publishStatus === 'success' ? 'Scommessa Pubblicata!' :
-                       publishStatus === 'error' ? 'Errore!' :
-                       'Pubblica Scommessa'}
-                    </span>
-                  </div>
+                  {publishStatus === 'loading' ? (
+                    <><div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" /> INVIO...</>
+                  ) : publishStatus === 'success' ? (
+                    <>PUBBLICATA! ✅</>
+                  ) : (
+                    <>PUBBLICA SCOMMESSA</>
+                  )}
                 </button>
               </div>
             </div>
