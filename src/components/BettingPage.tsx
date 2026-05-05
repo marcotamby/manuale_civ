@@ -165,10 +165,18 @@ export function BettingPage() {
 
     setPlacingBetId(marketId);
     try {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      const finalUserId = user?.id || authUser?.id;
+
+      if (!finalUserId) {
+        toast.error('Sessione scaduta. Effettua nuovamente il login.');
+        return;
+      }
+
       const { error } = await supabase
         .from('user_bets')
         .insert({
-          user_id: user?.id,
+          user_id: finalUserId,
           market_id: marketId,
           option_id: bet.optionId,
           amount: bet.amount
@@ -596,8 +604,8 @@ export function BettingPage() {
                   <div className="p-6 md:p-8 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-white/5">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1 min-w-0">
-                        <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-2 block truncate">{market.type}</span>
-                        <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter truncate">{market.title}</h3>
+                        <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-2 block">{market.type}</span>
+                        <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-tight break-words">{market.title}</h3>
                       </div>
                       <div className="flex items-center gap-3 ml-4">
                         <div className={clsx(
@@ -643,7 +651,7 @@ export function BettingPage() {
                             <div className="flex justify-between items-center relative z-10">
                               <div className="flex flex-col min-w-0">
                                 <span className={clsx(
-                                  "text-base font-black uppercase tracking-tight truncate mb-1",
+                                  "text-base font-black uppercase tracking-tight leading-tight mb-1",
                                   isSelected ? "text-white" : "text-gray-300"
                                 )}>
                                   {opt.label}
