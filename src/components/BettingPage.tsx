@@ -36,6 +36,7 @@ export function BettingPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([]);
   const [selectedBets, setSelectedBets] = useState<{ [marketId: string]: { optionId: string, amount: number } }>({});
   const [placingBetId, setPlacingBetId] = useState<string | null>(null);
+  const [successBetId, setSuccessBetId] = useState<string | null>(null);
   const [showAdminTools, setShowAdminTools] = useState(false);
   const [publishStatus, setPublishStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [marketToDelete, setMarketToDelete] = useState<string | null>(null);
@@ -60,8 +61,6 @@ export function BettingPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      // Load Tournament
-      
       const { data: tourney } = await supabase
         .from('tournaments')
         .select('*')
@@ -70,7 +69,6 @@ export function BettingPage() {
         
       setTournament(tourney);
 
-      // Fetch participants for admin tools
       try {
         const startggData = await fetchTournament(cleanSlug);
         if (startggData?.events) {
@@ -86,7 +84,6 @@ export function BettingPage() {
                 if (!mapping[level].includes(n.name)) mapping[level].push(n.name);
               });
             } else if (!level && e.entrants?.nodes) {
-              // Fallback: if no level in name, add to both if empty or handle as generic
               e.entrants.nodes.forEach((n: any) => {
                 if (!mapping['High Elo'].includes(n.name)) mapping['High Elo'].push(n.name);
                 if (!mapping['Low Elo'].includes(n.name)) mapping['Low Elo'].push(n.name);
@@ -102,8 +99,6 @@ export function BettingPage() {
         console.warn("Could not fetch entrants for dropdowns", e);
       }
 
-      // Load Markets
-      console.log('🔍 Fetching markets for slug:', cleanSlug);
       const { data: marketData, error: marketError } = await supabase
         .from('betting_markets')
         .select('*')
@@ -111,11 +106,9 @@ export function BettingPage() {
         .order('created_at', { ascending: true });
       
       if (marketError) console.error('❌ Error fetching markets:', marketError);
-      console.log('📊 Markets found:', marketData?.length || 0, marketData);
       
       setMarkets(marketData || []);
 
-      // Load Balance if auth
       if (user?.email) {
         const { data: profile } = await supabase
           .from('profiles')
@@ -125,7 +118,6 @@ export function BettingPage() {
         setSheepBalance(profile?.sheep_balance ?? 100);
       }
 
-      // Load Leaderboard
       const { data: topPastors } = await supabase
         .from('profiles')
         .select('username, sheep_balance')
@@ -141,8 +133,6 @@ export function BettingPage() {
   };
 
   const handlePlaceBet = async (marketId: string) => {
-    if (typeof window !== 'undefined') window.alert('DEBUG: handlePlaceBet iniziata!');
-    console.log('DEBUG: Inizio handlePlaceBet per market:', marketId);
     const bet = selectedBets[marketId];
     if (!bet || !bet.optionId || bet.amount <= 0) {
       toast.error('Inserisci un ammontare valido di pecore!');
@@ -156,12 +146,9 @@ export function BettingPage() {
 
     setPlacingBetId(marketId);
     try {
-      // USE EMAIL IDENTIFICATION (Same as build order votes)
       const finalUserEmail = user?.email || localStorage.getItem('auth_user_email');
-
       if (!finalUserEmail) {
-        const msg = "IDENTIFICAZIONE FALLITA! Per favore rifai il login.";
-        toast.error(msg);
+        toast.error("Identificazione fallita! Per favore rifai il login.");
         setPlacingBetId(null);
         return;
       }
@@ -173,40 +160,31 @@ export function BettingPage() {
         amount: bet.amount
       };
 
-      console.log('🎲 Placing bet for email:', finalUserEmail);
-      console.log('🚀 Sending bet to Supabase...');
-      
-      const { data: insertData, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from('user_bets')
-        .insert(betData)
-        .select();
+        .insert(betData);
 
-      if (insertError) {
-        console.error('❌ DATABASE INSERT FAILED:', insertError);
-        const msg = `ERRORE DB [${insertError.code}]: ${insertError.message}`;
-        if (typeof window !== 'undefined') window.alert(msg);
-        setPlacingBetId(null);
-        return;
-      }
-
-      console.log('✅ INSERT SUCCESSFUL:', insertData);
-      if (typeof window !== 'undefined') window.alert(`✅ SUCCESSO! Bet ID: ${insertData?.[0]?.id || 'Mancante'}`);
+      if (insertError) throw insertError;
       
       toast.success('I tuoi scout hanno portato le pecore al mercato! 🐑');
       
-      // MUST await these to ensure consistency before clearing UI
-      console.log('🔄 Syncing user profile and market data...');
       await refreshUser(); 
-      await loadData();    
+      await loadData();
       
-      setSelectedBets(prev => {
-        const next = { ...prev };
-        delete next[marketId];
-        return next;
-      });
+      setSuccessBetId(marketId);
+      setTimeout(() => setSuccessBetId(null), 3000);
+      
+      setTimeout(() => {
+        setSelectedBets(prev => {
+          const next = { ...prev };
+          delete next[marketId];
+          return next;
+        });
+      }, 1500);
+
     } catch (err: any) {
       console.error('❌ CRITICAL ERROR:', err);
-      toast.error(`Errore critico: ${err.message}`);
+      toast.error(err.message || 'Errore durante la scommessa');
     } finally {
       setPlacingBetId(null);
     }
@@ -242,8 +220,6 @@ export function BettingPage() {
     const optionPool = options.find(o => o.id === optionId)?.total_bet || 0;
     
     if (totalPool === 0 || optionPool === 0) return '---';
-    
-    // Totalizer odds: Total Pool / Selection Pool
     const odds = totalPool / optionPool;
     return odds.toFixed(2);
   };
@@ -257,7 +233,6 @@ export function BettingPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in duration-700">
-      {/* Header Section */}
       <div className="flex flex-col md:flex-row items-start justify-between mb-12 gap-10 px-4 md:px-0">
         <div className="relative flex-1">
            <button 
@@ -270,41 +245,9 @@ export function BettingPage() {
             Social Betting:<br/>
             {tournament?.name || (slug?.replace(/-/g, ' ')) || 'Torneo'}
            </h1>
-            <div className="flex flex-col gap-4">
-             <p className="text-sky-400/90 font-serif italic text-lg flex items-center gap-2 drop-shadow-[0_0_10px_rgba(56,189,248,0.2)]">
-              Il mercato delle pecore è aperto! 🐑
-             </p>
-             <div className="group relative max-w-[500px]">
-               <div className="bg-[#111218]/90 border border-red-500/20 p-2.5 rounded-xl flex items-center gap-3 text-red-400/80 text-[10px] font-bold uppercase tracking-widest cursor-help transition-all duration-500 max-h-[36px] hover:max-h-[200px] overflow-hidden backdrop-blur-sm">
-                <AlertCircle size={14} className="shrink-0" />
-                <span className="truncate group-hover:whitespace-normal transition-all duration-500">
-                  Il sistema di Social Betting è un gioco di simulazione puramente gratuito.
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity ml-1">
-                    Non costituisce attività di gioco d'azzardo. Le "Pecore" sono punti virtuali privi di valore economico.
-                  </span>
-                </span>
-               </div>
-             </div>
-           </div>
         </div>
 
         <div className="flex flex-col md:flex-row items-start gap-6 self-start mt-0 md:mt-10">
-            {/* Top Leaderboard */}
-            <div className="bg-[#111218]/40 border border-white/5 backdrop-blur-sm p-4 rounded-3xl hidden xl:block">
-              <div className="flex items-center gap-3 mb-3 px-1">
-                <Users size={14} className="text-blue-400" />
-                <span className="text-[10px] font-black text-white uppercase tracking-widest">Migliori Pastori</span>
-              </div>
-              <div className="flex gap-2">
-                {leaderboard.slice(0, 3).map((u, i) => (
-                  <div key={u.username} className="flex flex-col items-center px-3 py-2 bg-white/5 rounded-xl border border-white/5 min-w-[80px]">
-                    <span className="text-[9px] font-bold text-gray-500 uppercase mb-1">{i === 0 ? "🥇" : i === 1 ? "🥈" : "🥉"} {u.username.substring(0, 6)}</span>
-                    <span className="text-xs font-black text-blue-400">{u.sheep_balance}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {isAuthenticated && (
               <div className="bg-gradient-to-br from-blue-600/20 to-indigo-600/20 px-8 py-5 rounded-[2rem] border border-blue-500/30 shadow-[0_0_40px_rgba(59,130,246,0.15)] flex flex-col items-center gap-1 transition-transform hover:scale-105 backdrop-blur-md">
                 <span className="text-[10px] font-black text-blue-400/80 uppercase tracking-[0.2em] whitespace-nowrap mb-1">Il Tuo Gregge</span>
@@ -317,9 +260,8 @@ export function BettingPage() {
         </div>
       </div>
 
-      {/* Admin Market Creation Tools */}
       {isAdmin && showAdminTools && (
-        <div className="mb-12 bg-[#111218] border border-cyan-500/30 rounded-3xl overflow-hidden shadow-[0_0_80px_rgba(6,182,212,0.15)] animate-in slide-in-from-top-4 duration-500 px-4 md:px-0">
+        <div className="mb-12 bg-[#111218] border border-cyan-500/30 rounded-3xl overflow-hidden shadow-[0_0_80px_rgba(6,182,212,0.15)] px-4 md:px-0">
           <div className="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-cyan-500/10 via-transparent to-transparent">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 flex items-center justify-center border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
@@ -329,14 +271,12 @@ export function BettingPage() {
                 <h2 className="text-2xl font-black text-white tracking-tight uppercase">
                   Nuova Scommessa
                 </h2>
-                <p className="text-xs text-cyan-400/60 font-bold uppercase tracking-widest">{tournament?.name}</p>
               </div>
             </div>
             <button onClick={() => setShowAdminTools(false)} className="p-2 text-gray-400 hover:text-white transition-colors">
               <X size={24} />
             </button>
           </div>
-
           <div className="p-8 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-6">
@@ -360,234 +300,6 @@ export function BettingPage() {
                     <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-cyan-400 pointer-events-none" size={20} />
                   </div>
                 </div>
-
-                <div>
-                  <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Livello Evento</label>
-                  <div className="flex gap-2">
-                    {['High Elo', 'Low Elo'].map(lvl => (
-                      <button
-                        key={lvl}
-                        onClick={() => setAdminForm({...adminForm, eventLevel: lvl})}
-                        className={clsx(
-                          "flex-1 py-3 rounded-xl border transition-all font-black text-[10px] uppercase tracking-widest",
-                          adminForm.eventLevel === lvl ? "bg-cyan-500 border-cyan-400 text-black shadow-[0_0_15px_rgba(6,182,212,0.3)]" : "bg-white/5 border-white/10 text-gray-500"
-                        )}
-                      >
-                        {lvl}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {(adminForm.type === 'Match Winner' || adminForm.type === 'Final Score') && (
-                  <>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-[10px] font-bold text-gray-500 uppercase mb-2 block tracking-widest">Team A</label>
-                        <div className="relative">
-                          <select 
-                            value={adminForm.teamA}
-                            onChange={(e) => setAdminForm({...adminForm, teamA: e.target.value})}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 appearance-none cursor-pointer"
-                          >
-                            <option value="" className="bg-[#111218] text-white/50">Seleziona Team</option>
-                            {(participantsByLevel[adminForm.eventLevel] || []).map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
-                          </select>
-                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/50 pointer-events-none" size={16} />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="text-[10px] font-bold text-gray-500 uppercase mb-2 block tracking-widest">Team B</label>
-                        <div className="relative">
-                          <select 
-                            value={adminForm.teamB}
-                            onChange={(e) => setAdminForm({...adminForm, teamB: e.target.value})}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 appearance-none cursor-pointer"
-                          >
-                            <option value="" className="bg-[#111218] text-white/50">Seleziona Team</option>
-                            {(participantsByLevel[adminForm.eventLevel] || []).map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
-                          </select>
-                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/50 pointer-events-none" size={16} />
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                <div>
-                  <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Titolo della Scommessa</label>
-                  <input 
-                    type="text" 
-                    value={adminForm.title}
-                    onChange={(e) => setAdminForm({...adminForm, title: e.target.value})}
-                    placeholder="Esempio: Vincitore del Torneo"
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-cyan-500 transition-all placeholder:text-white/20"
-                  />
-                  <button 
-                    onClick={() => {
-                      let generated = "";
-                      const prefix = `[${adminForm.eventLevel}] `;
-                      if (adminForm.type === 'Match Winner') generated = `${prefix}${adminForm.teamA} vs ${adminForm.teamB}`;
-                      else if (adminForm.type === 'Final Score') generated = `${prefix}Punteggio: ${adminForm.teamA} vs ${adminForm.teamB}`;
-                      else generated = `${prefix}Vincitore Torneo: ${tournament?.name || (slug?.replace(/-/g, ' ')) || 'Torneo'}`;
-                      setAdminForm({...adminForm, title: generated});
-                    }}
-                    className="mt-2 text-[9px] font-black text-cyan-400/60 uppercase tracking-widest hover:text-cyan-400 transition-colors"
-                  >
-                    Auto-genera Titolo
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                <div>
-                  <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Opzioni di Scommessa</label>
-                  <div className="space-y-3">
-                    {adminForm.type === 'Match Winner' ? (
-                      <div className="grid grid-cols-2 gap-3">
-                        {[adminForm.teamA || 'Team A', adminForm.teamB || 'Team B'].map((name, i) => (
-                          <div key={i} className="p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-xl text-center text-cyan-400 font-black uppercase text-xs">
-                            {name}
-                          </div>
-                        ))}
-                      </div>
-                    ) : adminForm.type === 'Final Score' ? (
-                      <div className="grid grid-cols-2 gap-3">
-                        {['2-0', '2-1', '1-2', '0-2'].map((score) => (
-                          <button
-                            key={score}
-                            onClick={() => {
-                              const label = `${score} (${adminForm.teamA} vs ${adminForm.teamB})`;
-                              if (!adminForm.options.includes(label)) {
-                                setAdminForm({...adminForm, options: [...adminForm.options, label].filter(o => o !== '')});
-                              }
-                            }}
-                            className="p-3 bg-white/5 border border-white/10 rounded-xl text-white text-xs font-bold hover:border-cyan-500 transition-all"
-                          >
-                            {score}
-                          </button>
-                        ))}
-                      </div>
-                    ) : (
-                      adminForm.options.map((opt, idx) => (
-                        <div key={idx} className="flex gap-2">
-                          <div className="relative flex-grow">
-                            <select 
-                              value={opt}
-                              onChange={(e) => {
-                                const newOpts = [...adminForm.options];
-                                newOpts[idx] = e.target.value;
-                                setAdminForm({...adminForm, options: newOpts});
-                              }}
-                              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 appearance-none cursor-pointer"
-                            >
-                               <option value="" className="bg-[#111218] text-white/50">Seleziona Team</option>
-                              {(participantsByLevel[adminForm.eventLevel] || []).map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
-                            </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/50 pointer-events-none" size={16} />
-                          </div>
-                          {adminForm.options.length > 2 && (
-                            <button 
-                              onClick={() => setAdminForm({...adminForm, options: adminForm.options.filter((_, i) => i !== idx)})}
-                              className="p-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors"
-                            >
-                              <X size={20} />
-                            </button>
-                          )}
-                        </div>
-                      ))
-                    )}
-                    
-                    {adminForm.type === 'Tournament Winner' && (
-                      <button 
-                        onClick={() => setAdminForm({...adminForm, options: [...adminForm.options, '']})}
-                        className="w-full py-3 border-2 border-dashed border-white/10 rounded-xl text-gray-500 hover:border-cyan-500/50 hover:text-cyan-500 transition-all text-[10px] font-black uppercase tracking-widest"
-                      >
-                        + Aggiungi Team
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                <button 
-                  onClick={async () => {
-                    let finalOptions = adminForm.options;
-                    if (adminForm.type === 'Match Winner') {
-                      finalOptions = [adminForm.teamA || 'Team A', adminForm.teamB || 'Team B'];
-                    }
-                    
-                    if (!adminForm.title || finalOptions.some(o => !o)) {
-                      toast.error('Compila tutti i campi!');
-                      return;
-                    }
-                    
-                    setPublishStatus('loading');
-                    try {
-                      const optionsWithMeta = finalOptions.map(label => ({
-                        id: Math.random().toString(36).substring(2, 11),
-                        label,
-                        total_bet: 0
-                      }));
-
-                      const payload = {
-                        tournament_slug: cleanSlug,
-                        title: adminForm.title,
-                        description: adminForm.description,
-                        type: adminForm.type,
-                        options: optionsWithMeta,
-                        status: 'open'
-                      };
-                      
-                      console.log('📝 Saving market with slug:', cleanSlug);
-                      console.log('🚀 Final Betting Payload:', payload);
-
-                      const { error } = await supabase
-                        .from('betting_markets')
-                        .insert(payload);
-
-                      if (error) throw error;
-                      
-                      setPublishStatus('success');
-                      await loadData();
-                      setAdminForm({
-                        title: '',
-                        description: '',
-                        type: 'Match Winner',
-                        eventLevel: 'High Elo',
-                        teamA: '',
-                        teamB: '',
-                        options: ['', '']
-                      });
-                      
-                      setTimeout(() => setPublishStatus('idle'), 3000);
-                    } catch (err: any) {
-                      console.error('❌ Error publishing market:', err);
-                      setPublishStatus('error');
-                      toast.error(err.message);
-                      setTimeout(() => setPublishStatus('idle'), 3000);
-                    } finally {
-                      // Status is handled by the try/catch
-                    }
-                  }}
-                  disabled={publishStatus === 'loading'}
-                  className={clsx(
-                    "w-full py-4 rounded-xl font-black text-xs uppercase tracking-[0.3em] transition-all duration-500 relative overflow-hidden group",
-                    publishStatus === 'success' ? "bg-green-500 text-black" :
-                    publishStatus === 'error' ? "bg-red-500 text-white" :
-                    "bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)]"
-                  )}
-                >
-                  <div className="relative z-10 flex items-center justify-center gap-3">
-                    {publishStatus === 'loading' && <Loader2 size={16} className="animate-spin" />}
-                    {publishStatus === 'success' && <Trophy size={16} className="animate-bounce" />}
-                    <span>
-                      {publishStatus === 'loading' ? 'Invio in corso...' :
-                       publishStatus === 'success' ? 'Scommessa Pubblicata!' :
-                       publishStatus === 'error' ? 'Errore!' :
-                       'Pubblica Scommessa'}
-                    </span>
-                  </div>
-                </button>
               </div>
             </div>
           </div>
@@ -595,7 +307,6 @@ export function BettingPage() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 md:px-0">
-        {/* Main Betting Area */}
         <div className="lg:col-span-12">
           {markets.length === 0 ? (
             <div className="bg-[#111218] p-12 rounded-[2.5rem] border border-slate-400/20 text-center flex flex-col items-center">
@@ -611,39 +322,21 @@ export function BettingPage() {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {markets.map((market) => (
-                <div key={market.id} className="bg-[#111218] rounded-[2.5rem] border border-slate-400/20 overflow-hidden group hover:border-slate-400/40 transition-all duration-500 shadow-2xl flex flex-col h-full">
-                  {/* Market Header */}
-                  <div className="p-6 md:p-8 bg-gradient-to-br from-[#1a1c25] to-[#111218] border-b border-white/5">
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-black text-cyan-400/70 uppercase tracking-[0.25em]">{market.type}</span>
-                        <div className="flex items-center gap-3">
-                          <div className={clsx(
-                            "px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border",
-                            market.status === 'open' ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : "bg-red-500/10 border-red-500/30 text-red-400"
-                          )}>
-                            {market.status === 'open' ? 'Aperto' : 'Chiuso'}
-                          </div>
-                          {isAdmin && (
-                            <button
-                              onClick={() => handleDeleteMarket(market.id)}
-                              className="text-red-500/30 hover:text-red-500 transition-colors"
-                              title="Elimina scommessa"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                      <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-none">{market.title}</h3>
+                <div key={market.id} className="bg-[#111218] rounded-[2rem] border border-slate-400/20 overflow-hidden shadow-2xl flex flex-col h-full">
+                  <div className="p-6 bg-gradient-to-br from-[#1a1c25] to-[#111218] border-b border-white/5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[8px] font-black text-cyan-400/50 uppercase tracking-[0.3em]">{market.type}</span>
+                      {isAdmin && (
+                        <button onClick={() => handleDeleteMarket(market.id)} className="text-white/10 hover:text-red-500 transition-colors"><Trash2 size={12} /></button>
+                      )}
                     </div>
+                    <h3 className="text-lg font-black text-white uppercase tracking-tighter leading-tight mt-2">{market.title}</h3>
                   </div>
 
-                  {/* Options */}
-                  <div className="p-6 md:p-8 space-y-6 flex-grow flex flex-col">
-                    <div className="grid grid-cols-1 gap-4">
+                  <div className="p-6 flex-grow flex flex-col gap-4">
+                    <div className="grid grid-cols-1 gap-2">
                       {market.options.map((opt: any) => {
                         const isSelected = selectedBets[market.id]?.optionId === opt.id;
                         const isWinner = market.winner_option_id === opt.id;
@@ -655,16 +348,13 @@ export function BettingPage() {
                             disabled={market.status !== 'open' || !isAuthenticated}
                             onClick={() => setSelectedBets({ ...selectedBets, [market.id]: { optionId: opt.id, amount: selectedBets[market.id]?.amount || 10 } })}
                             className={clsx(
-                              "relative p-5 rounded-2xl border transition-all duration-300 text-left group/opt overflow-hidden",
-                              isSelected ? "bg-emerald-500/10 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.1)] scale-[1.01]" : 
+                              "relative p-3.5 rounded-xl border transition-all duration-300 text-left group/opt overflow-hidden",
+                              isSelected ? "bg-emerald-500/10 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]" : 
                               isWinner ? "bg-emerald-600/20 border-emerald-500" :
-                              "bg-white/5 border-white/5 hover:border-white/20 hover:bg-white/[0.08]"
+                              "bg-white/5 border-white/5 hover:border-white/10 hover:bg-white/[0.06]"
                             )}
                           >
                             <div className="flex justify-between items-center relative z-10">
-                              <div className="flex flex-col min-w-0">
-                                <span className={clsx(
-                                  "text-base font-black uppercase tracking-tight leading-tight mb-1",
                                   isSelected ? "text-white" : "text-gray-300"
                                 )}>
                                   {opt.label}
@@ -742,10 +432,21 @@ export function BettingPage() {
                             
                             <button
                               onClick={() => handlePlaceBet(market.id)}
-                              disabled={placingBetId === market.id}
-                              className="px-6 bg-emerald-500 text-black font-black uppercase text-[10px] tracking-widest rounded-xl hover:bg-emerald-400 active:scale-95 transition-all shadow-lg shadow-emerald-900/20 flex items-center justify-center min-w-[120px]"
+                              disabled={placingBetId === market.id || successBetId === market.id}
+                              className={clsx(
+                                "px-6 font-black uppercase text-[10px] tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center min-w-[140px]",
+                                successBetId === market.id 
+                                  ? "bg-green-500 text-black shadow-green-900/40" 
+                                  : "bg-emerald-500 text-black hover:bg-emerald-400 shadow-emerald-900/20 active:scale-95"
+                              )}
                             >
-                              {placingBetId === market.id ? <Loader2 size={16} className="animate-spin" /> : 'SCOMMETTI'}
+                              {placingBetId === market.id ? (
+                                <Loader2 size={16} className="animate-spin" />
+                              ) : successBetId === market.id ? (
+                                "BET INVIATA! ✅"
+                              ) : (
+                                "SCOMMETTI"
+                              )}
                             </button>
                           </div>
 
