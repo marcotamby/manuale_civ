@@ -270,7 +270,6 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
         if (isOpen && user?.email) {
             fetchMySuggestions();
             fetchQaNotifications();
-            fetchBetNotifications();
             fetchUserBets();
         }
     }, [isOpen, user?.email, user?.id]);
@@ -400,37 +399,6 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
             console.error('Error fetching QA notifications:', err);
         } finally {
             setIsQaLoading(false);
-        }
-    };
-
-    const fetchBetNotifications = async () => {
-        if (!user?.email) return;
-        try {
-            setIsBetLoading(true);
-            const { data } = await supabase
-                .from('betting_notifications')
-                .select('*')
-                .ilike('user_email', user.email)
-                .order('created_at', { ascending: false })
-                .limit(20);
-            setBetNotifications(data || []);
-        } catch (err) {
-            console.error('Error fetching bet notifications:', err);
-        } finally {
-            setIsBetLoading(false);
-        }
-    };
-
-    const markBetAsRead = async (id: string) => {
-        try {
-            await supabase
-                .from('betting_notifications')
-                .update({ is_read: true })
-                .eq('id', id);
-            setBetNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
-            (window as any).refreshNotificationCount?.();
-        } catch (err) {
-            console.error('Error marking bet notif as read:', err);
         }
     };
 
@@ -691,58 +659,6 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                             )}
                         </section>
                     )}
-
-                    {/* Notifiche Scommesse */}
-                    <section>
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center gap-2 text-purple-400 tracking-widest uppercase text-xs font-bold">
-                                <History size={14} />
-                                <span>Mercato delle Pecore</span>
-                            </div>
-                        </div>
-
-                        {isBetLoading ? (
-                            <div className="flex items-center justify-center py-6 bg-white/[0.02] rounded-xl border border-white/5">
-                                <Loader2 size={20} className="animate-spin text-purple-500/50" />
-                            </div>
-                        ) : betNotifications.length > 0 ? (
-                            <div className="space-y-2">
-                                {betNotifications.map((notif) => (
-                                    <div 
-                                        key={notif.id}
-                                        onClick={() => markBetAsRead(notif.id)}
-                                        className={clsx(
-                                            "group p-4 rounded-xl border transition-all cursor-pointer flex items-start gap-4",
-                                            !notif.is_read 
-                                                ? "bg-purple-600/10 border-purple-500/30 hover:bg-purple-600/15 hover:border-purple-500/40" 
-                                                : "bg-white/[0.02] border-white/5 opacity-60 hover:bg-white/[0.04]"
-                                        )}
-                                    >
-                                        <div className={clsx(
-                                            "mt-1.5 h-2 w-2 rounded-full shrink-0",
-                                            !notif.is_read ? "bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]" : "bg-gray-700"
-                                        )} />
-                                        <div className="flex-1 min-w-0">
-                                            <p className={clsx(
-                                                "text-sm",
-                                                !notif.is_read ? "text-white font-bold" : "text-gray-400"
-                                            )}>
-                                                {notif.message}
-                                            </p>
-                                            <p className="text-[10px] text-gray-500 mt-1 uppercase font-bold tracking-tighter">
-                                                {new Date(notif.created_at).toLocaleString('it-IT')}
-                                            </p>
-                                        </div>
-                                        {!notif.is_read && <AlertTriangle size={14} className="text-purple-400 animate-pulse mt-1" />}
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-6 bg-white/[0.02] rounded-xl border border-white/5">
-                                <p className="text-sm text-gray-500">Nessuna notifica dal mercato delle pecore.</p>
-                            </div>
-                        )}
-                    </section>
 
                     {/* Le Tue Notifiche (Q&A) */}
                     <section>

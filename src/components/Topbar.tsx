@@ -28,6 +28,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
   const [notificationCount, setNotificationCount] = useState(0);
   const [qaUnreadCount, setQaUnreadCount] = useState(0);
   const [betUnreadCount, setBetUnreadCount] = useState(0);
+  const [wonBetsCount, setWonBetsCount] = useState(0);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const fetchPendingCount = async () => {
@@ -150,6 +151,25 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
     }
   };
 
+  const fetchWonBetsCount = async () => {
+    if (!isAuthenticated || !user?.email) {
+      setWonBetsCount(0);
+      return;
+    }
+
+    try {
+      const { count, error } = await supabase
+        .from('user_bets')
+        .select('*', { count: 'exact', head: true })
+        .ilike('user_email', user.email)
+        .eq('status', 'won');
+      
+      if (!error) setWonBetsCount(count || 0);
+    } catch (e) {
+      console.error('Error fetching won bets count:', e);
+    }
+  };
+
   const calculateNotifications = () => {
     if (!isAuthenticated || !user?.email) {
       setNotificationCount(0);
@@ -184,6 +204,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
   useEffect(() => {
     fetchQaUnreadCount();
     fetchBetUnreadCount();
+    fetchWonBetsCount();
   }, [isAuthenticated, user?.email, user?.id, civilizations, refreshTrigger]);
 
   useEffect(() => {
@@ -193,6 +214,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
       fetchPendingCount();
       fetchQaUnreadCount();
       fetchBetUnreadCount();
+      fetchWonBetsCount();
       setRefreshTrigger(prev => prev + 1);
     };
 
@@ -354,6 +376,11 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
                 >
                   <div className="w-7 h-7 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30 overflow-hidden relative">
                     {user?.avatar_url ? <img src={user.avatar_url} alt="" className="w-full h-full object-cover" /> : <User size={14} className="text-yellow-500" />}
+                    {wonBetsCount > 0 && (
+                      <span className="absolute -top-1 -right-1 z-20 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-600 text-[8px] font-black text-white shadow-[0_0_8px_rgba(16,185,129,0.6)] ring-1 ring-black animate-pulse">
+                        {wonBetsCount}
+                      </span>
+                    )}
                   </div>
                   {notificationCount > 0 && (
                     <span className="absolute -top-1 -left-1 z-10 flex h-3 w-3 items-center justify-center rounded-full bg-red-600 text-[8px] font-black text-white shadow-[0_0_5px_rgba(220,38,38,0.5)] ring-1 ring-black">
@@ -455,9 +482,14 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
                 {/* 2. Profilo */}
                 <button 
                   onClick={() => (window as any).openProfileModal?.()} 
-                  className="w-10 h-10 bg-[#0d1424] rounded-xl border border-yellow-500/30 flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-lg"
+                  className="w-10 h-10 bg-[#0d1424] rounded-xl border border-yellow-500/30 flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-lg relative"
                 >
                   <User size={20} className="text-yellow-500" />
+                  {wonBetsCount > 0 && (
+                    <span className="absolute -top-1 -right-1 z-20 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-600 text-[9px] font-black text-white shadow-[0_0_8px_rgba(16,185,129,0.6)] ring-1 ring-black">
+                      {wonBetsCount}
+                    </span>
+                  )}
                 </button>
 
                 {/* 3. ESCI (Rightmost) */}
