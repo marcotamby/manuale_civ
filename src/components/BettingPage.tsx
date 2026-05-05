@@ -6,7 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { fetchTournament } from '../services/startgg';
-import { Loader2, ArrowLeft, Trophy, Users, AlertCircle, Plus, X, Zap, ChevronDown, Trash2 } from 'lucide-react';
+import { Loader2, ArrowLeft, Trophy, Users, AlertCircle, Plus, X, Zap, ChevronDown, Trash2, Edit2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import clsx from 'clsx';
 
@@ -756,7 +756,7 @@ export function BettingPage() {
                           eventLevel: 'High Elo',
                           teamA: '',
                           teamB: '',
-                          options: [{ label: '', weight: 100 }]
+                          options: [{ label: '', weight: 100 }, { label: '', weight: 100 }]
                         });
                         setPublishStatus('idle');
                       }, 2000);
