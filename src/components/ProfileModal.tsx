@@ -289,8 +289,20 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                 .ilike('user_email', user.email)
                 .order('created_at', { ascending: false });
             
-            if (error) throw error;
-            setUserBets(bets || []);
+            // If the join fails due to schema cache, try a simple fetch
+            if (error) {
+                console.warn('Join query failed, trying simple fetch:', error.message);
+                const { data: simpleBets, error: simpleError } = await supabase
+                    .from('user_bets')
+                    .select('*')
+                    .ilike('user_email', user.email)
+                    .order('created_at', { ascending: false });
+                
+                if (simpleError) throw simpleError;
+                setUserBets(simpleBets || []);
+            } else {
+                setUserBets(bets || []);
+            }
         } catch (err) {
             console.error('Error fetching user bets:', err);
         } finally {
