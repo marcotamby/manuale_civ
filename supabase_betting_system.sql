@@ -55,9 +55,20 @@ BEGIN
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin', 'owner', 'superadmin'))
     OR 
     (auth.jwt() ->> 'email' = 'marco.tamborrino.94@gmail.com')
+    OR
+    (EXISTS (SELECT 1 FROM profiles WHERE email = auth.jwt() ->> 'email' AND role = 'admin'))
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Allow public access to profiles for custom auth
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Anyone can see profiles" ON profiles;
+CREATE POLICY "Anyone can see profiles" ON profiles FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Anyone can create profile" ON profiles;
+CREATE POLICY "Anyone can create profile" ON profiles FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Anyone can update own profile" ON profiles;
+CREATE POLICY "Anyone can update own profile" ON profiles FOR UPDATE USING (true);
 
 -- Markets are public
 DROP POLICY IF EXISTS "Markets are public" ON betting_markets;
