@@ -5,7 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { fetchTournament } from '../services/startgg';
-import { Loader2, ArrowLeft, Trophy, Users, TrendingUp, AlertCircle, Plus, X, Zap, ChevronDown } from 'lucide-react';
+import { Loader2, ArrowLeft, Trophy, Users, TrendingUp, AlertCircle, Plus, X, Zap, ChevronDown, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import clsx from 'clsx';
 
@@ -185,6 +185,23 @@ export function BettingPage() {
       toast.error(`Errore nel piazzare la scommessa: ${err.message}`);
     } finally {
       setPlacingBetId(null);
+    }
+  };
+
+  const handleDeleteMarket = async (marketId: string) => {
+    if (!window.confirm('Sei sicuro di voler eliminare questa scommessa? Questa azione è irreversibile.')) return;
+
+    try {
+      const { error } = await supabase
+        .from('betting_markets')
+        .delete()
+        .eq('id', marketId);
+
+      if (error) throw error;
+      toast.success('Scommessa eliminata con successo.');
+      loadData();
+    } catch (err: any) {
+      toast.error(`Errore durante l'eliminazione: ${err.message}`);
     }
   };
 
@@ -555,11 +572,22 @@ export function BettingPage() {
                       <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-2 block">{market.type}</span>
                       <h3 className="text-2xl font-black text-white uppercase tracking-tighter">{market.title}</h3>
                     </div>
-                    <div className={clsx(
-                      "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
-                      market.status === 'open' ? "bg-green-500/10 border-green-500/30 text-green-400" : "bg-red-500/10 border-red-500/30 text-red-400"
-                    )}>
-                      {market.status === 'open' ? 'Aperto' : 'Chiuso'}
+                    <div className="flex items-center gap-3">
+                      <div className={clsx(
+                        "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
+                        market.status === 'open' ? "bg-green-500/10 border-green-500/30 text-green-400" : "bg-red-500/10 border-red-500/30 text-red-400"
+                      )}>
+                        {market.status === 'open' ? 'Aperto' : 'Chiuso'}
+                      </div>
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleDeleteMarket(market.id)}
+                          className="p-2 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                          title="Elimina scommessa"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
                     </div>
                   </div>
                   {market.description && <p className="text-gray-400 text-sm font-medium italic">{market.description}</p>}
