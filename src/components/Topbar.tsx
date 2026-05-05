@@ -138,18 +138,19 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
     }
 
     try {
-      console.log('🔍 Fetching bet notifications for user Email:', user.email);
+      const email = user.email.toLowerCase();
+      console.log('🔍 FETCH NOTIFICHE PER:', email);
       const { count, error } = await supabase
         .from('betting_notifications')
         .select('*', { count: 'exact', head: true })
-        .eq('user_email', user.email)
+        .ilike('user_email', email)
         .eq('is_read', false); 
       
       if (!error) {
-        console.log('🔔 Betting Notifications Count for', user.email, ':', count);
+        console.log('🔔 CONTEGGIO TROVATO:', count);
         setBetUnreadCount(count || 0);
       } else {
-        console.error('❌ Betting Notifications Error:', error);
+        console.error('❌ ERRORE SUPABASE:', error);
       }
     } catch (e) {
       console.error('Error fetching betting notifications:', e);
@@ -208,6 +209,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
   }, [favorites, civilizations, isAuthenticated, user?.email, refreshTrigger, qaUnreadCount, betUnreadCount]);
 
   const location = useLocation();
+  console.log('💎 TOPBAR RENDER - Notification Count:', notificationCount);
   const isSpecialPage = isHome || location.pathname.includes('/tornei') || location.pathname === '/faq' || location.pathname === '/privacy' || location.pathname.startsWith('/civ/') || location.pathname.startsWith('/compare');
 
   return (
@@ -362,7 +364,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
                     {user?.avatar_url ? <img src={user.avatar_url} alt="" className="w-full h-full object-cover" /> : <User size={14} className="text-yellow-500" />}
                   </div>
                   {notificationCount > 0 && (
-                    <span className="absolute -top-1 -right-1 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[9px] font-black text-white shadow-[0_0_8px_rgba(220,38,38,0.6)] ring-2 ring-[#0d1424]">
+                    <span className="absolute -top-2 -right-2 z-[100] flex h-5 w-5 items-center justify-center rounded-full bg-yellow-500 text-[10px] font-black text-black shadow-[0_0_15px_rgba(234,179,8,0.6)] border-2 border-[#0d1424]">
                       {notificationCount}
                     </span>
                   )}
