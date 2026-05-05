@@ -228,6 +228,33 @@ export function BettingPage() {
     }
   };
 
+  const handleCloseMarket = async (id: string) => {
+    try {
+      const { error } = await supabase.from('betting_markets').update({ status: 'closed' }).eq('id', id);
+      if (error) throw error;
+      toast.success('Mercato chiuso con successo.');
+      loadData(true);
+    } catch (err: any) {
+      toast.error(`Errore: ${err.message}`);
+    }
+  };
+
+  const handleSettleMarket = async (marketId: string, winnerOptionId: string) => {
+    if (!window.confirm('Sei sicuro di voler assegnare la vittoria? Questa azione è irreversibile.')) return;
+    try {
+      const { error } = await supabase.rpc('settle_betting_market', {
+        p_market_id: marketId,
+        p_winner_option_id: winnerOptionId
+      });
+      if (error) throw error;
+      toast.success('Mercato liquidato e vincite assegnate!');
+      loadData(true);
+    } catch (err: any) {
+      toast.error(`Errore: ${err.message}`);
+    }
+  };
+
+
   const calculateOdds = (options: any[], optionId: string) => {
     const totalPool = options.reduce((sum, opt) => sum + (opt.total_bet || 0), 0);
     const optionPool = options.find(o => o.id === optionId)?.total_bet || 0;
@@ -602,8 +629,19 @@ export function BettingPage() {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {markets.map((market) => (
+            <div className="space-y-6">
+              {isAdmin && !showAdminTools && (
+                <div className="flex justify-end">
+                  <button 
+                    onClick={() => setShowAdminTools(true)}
+                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black uppercase tracking-[0.2em] rounded-xl transition-all shadow-lg active:scale-95 flex items-center gap-2"
+                  >
+                    <Plus size={16} strokeWidth={3} /> Nuova Scommessa
+                  </button>
+                </div>
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {markets.map((market) => (
                 <div key={market.id} className="bg-[#111218] rounded-[2.5rem] border border-slate-400/20 overflow-hidden group hover:border-slate-400/40 transition-all duration-500 shadow-2xl flex flex-col h-full">
                   {/* Market Header */}
                   <div className="p-6 md:p-8 bg-gradient-to-br from-[#1a1c25] to-[#111218] border-b border-white/5">
@@ -617,6 +655,14 @@ export function BettingPage() {
                           )}>
                             {market.status === 'open' ? 'Aperto' : 'Chiuso'}
                           </div>
+                          {isAdmin && market.status === 'open' && (
+                             <button 
+                               onClick={() => handleCloseMarket(market.id)}
+                               className="px-3 py-1 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg text-[10px] font-black uppercase hover:bg-red-500 transition-all hover:text-white"
+                             >
+                               Chiudi Bet
+                             </button>
+                          )}
                           {isAdmin && (
                             <button
                               onClick={() => handleDeleteMarket(market.id)}
@@ -687,6 +733,18 @@ export function BettingPage() {
                               <div className="absolute top-2 right-2">
                                 <Trophy size={14} className="text-yellow-500" />
                               </div>
+                            )}
+                            
+                            {isAdmin && market.status === 'closed' && !isWinner && market.winner_option_id === null && (
+                               <button 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleSettleMarket(market.id, opt.id);
+                                  }}
+                                  className="absolute top-1/2 -translate-y-1/2 right-2 px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white rounded-lg text-[10px] font-black uppercase shadow-lg shadow-green-600/20 opacity-0 group-hover/opt:opacity-100 transition-all scale-90 group-hover/opt:scale-100"
+                               >
+                                  Vincitore
+                               </button>
                             )}
                           </button>
                         );
@@ -786,9 +844,10 @@ export function BettingPage() {
                 </div>
               ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
+    </div>
 
       {/* Premium Delete Confirmation Modal */}
       {marketToDelete && (

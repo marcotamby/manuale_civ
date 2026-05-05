@@ -1,32 +1,16 @@
-
 import sys
 
-def check_brackets(filename):
+def check_braces(filename):
     with open(filename, 'r', encoding='utf-8') as f:
         content = f.read()
     
-    stack = []
-    brackets = {'(': ')', '{': '}', '[': ']'}
+    # We will do a simple count just to see if there is a mismatch
+    # ignoring strings/comments is hard in simple regex but let's just count first
     
-    for i, char in enumerate(content):
-        if char in brackets:
-            stack.append((char, i))
-        elif char in brackets.values():
-            if not stack:
-                print(f"Unexpected closing bracket {char} at index {i}")
-                return False
-            opening, pos = stack.pop()
-            if brackets[opening] != char:
-                print(f"Mismatched bracket {char} at index {i} (matches {opening} at {pos})")
-                return False
+    open_braces = content.count('{')
+    close_braces = content.count('}')
     
-    if stack:
-        for char, pos in stack:
-            print(f"Unclosed bracket {char} at index {pos}")
-        return False
+    print(f"{{ count: {open_braces}")
+    print(f"}} count: {close_braces}")
     
-    print("All brackets match!")
-    return True
-
-if __name__ == "__main__":
-    check_brackets(sys.argv[1])
+check_braces(r'c:\Users\marco\OneDrive\Desktop\manualeciv\src\components\AdminDashboardModal.tsx')
