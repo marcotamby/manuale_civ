@@ -43,6 +43,7 @@ export function BettingPage() {
   const [marketToDelete, setMarketToDelete] = useState<string | null>(null);
   const [settleConfirm, setSettleConfirm] = useState<{ marketId: string, optionId: string, optionLabel: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [editingMarketId, setEditingMarketId] = useState<string | null>(null);
   const [participantsByLevel, setParticipantsByLevel] = useState<{ [level: string]: string[] }>({ 'High Elo': [], 'Low Elo': [] });
   const [adminForm, setAdminForm] = useState({
     title: '',
@@ -51,7 +52,7 @@ export function BettingPage() {
     eventLevel: 'High Elo',
     teamA: '',
     teamB: '',
-    options: [{ label: '', weight: 100 }, { label: '', weight: 100 }]
+    options: [{ label: '', weight: 100 }]
   });
 
   const cleanSlug = (slug || '').split('?')[0].trim().replace(/\/$/, '');
@@ -392,16 +393,27 @@ export function BettingPage() {
               <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 flex items-center justify-center border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
                 <Zap className="text-cyan-400" size={24} fill="currentColor" />
               </div>
-              <div>
-                <h2 className="text-2xl font-black text-white tracking-tight uppercase">
-                  Nuova Scommessa
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
+                  {editingMarketId ? 'Modifica Scommessa' : 'Nuova Scommessa'}
                 </h2>
-                <p className="text-xs text-cyan-400/60 font-bold uppercase tracking-widest">{tournament?.name}</p>
+                <button onClick={() => {
+                  setShowAdminTools(false);
+                  setEditingMarketId(null);
+                  setAdminForm({
+                    title: '',
+                    description: '',
+                    type: 'Match Winner',
+                    eventLevel: 'High Elo',
+                    teamA: '',
+                    teamB: '',
+                    options: [{ label: '', weight: 100 }]
+                  });
+                }} className="text-gray-500 hover:text-white transition-colors ml-4">
+                  <X size={24} />
+                </button>
               </div>
             </div>
-            <button onClick={() => setShowAdminTools(false)} className="p-2 text-gray-400 hover:text-white transition-colors">
-              <X size={24} />
-            </button>
           </div>
 
           <div className="p-8 space-y-8">
@@ -523,11 +535,11 @@ export function BettingPage() {
                             </div>
                             <div className="flex gap-2">
                               {[
-                                { l: 'Under', v: 50, color: 'text-gray-400' },
-                                { l: 'Sfav.', v: 75, color: 'text-blue-400' },
-                                { l: 'Eq.', v: 100, color: 'text-white' },
-                                { l: 'Fav.', v: 200, color: 'text-yellow-400' },
-                                { l: 'Top', v: 500, color: 'text-red-400' }
+                                { l: 'Under', v: 50 },
+                                { l: 'Sfav.', v: 75 },
+                                { l: 'Eq.', v: 100 },
+                                { l: 'Fav.', v: 200 },
+                                { l: 'Top', v: 500 }
                               ].map(w => (
                                 <button
                                   key={w.v}
@@ -547,6 +559,24 @@ export function BettingPage() {
                                   {w.l}
                                 </button>
                               ))}
+                            </div>
+                            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/5">
+                               <label className="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex-1">Status Opzione:</label>
+                               <button
+                                 onClick={() => {
+                                   const newOpts = [...adminForm.options];
+                                   newOpts[i] = { ...newOpts[i], is_disabled: !newOpts[i]?.is_disabled };
+                                   setAdminForm({ ...adminForm, options: newOpts });
+                                 }}
+                                 className={clsx(
+                                   "px-3 py-1.5 rounded-lg text-[8px] font-black uppercase transition-all border",
+                                   adminForm.options[i]?.is_disabled 
+                                     ? "bg-red-500/20 border-red-500 text-red-400" 
+                                     : "bg-emerald-500/20 border-emerald-500 text-emerald-400"
+                                 )}
+                               >
+                                 {adminForm.options[i]?.is_disabled ? 'Eliminato / Disabilitato' : 'Attivo'}
+                               </button>
                             </div>
                           </div>
                         ))}
@@ -633,6 +663,24 @@ export function BettingPage() {
                                 ))}
                               </div>
                             </div>
+                            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/5">
+                               <label className="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex-1">Status Opzione:</label>
+                               <button
+                                 onClick={() => {
+                                   const newOpts = [...adminForm.options];
+                                   newOpts[idx] = { ...newOpts[idx], is_disabled: !newOpts[idx]?.is_disabled };
+                                   setAdminForm({ ...adminForm, options: newOpts });
+                                 }}
+                                 className={clsx(
+                                   "px-3 py-1.5 rounded-lg text-[8px] font-black uppercase transition-all border",
+                                   adminForm.options[idx]?.is_disabled 
+                                     ? "bg-red-500/20 border-red-500 text-red-400" 
+                                     : "bg-emerald-500/20 border-emerald-500 text-emerald-400"
+                                 )}
+                               >
+                                 {adminForm.options[idx]?.is_disabled ? 'Eliminato / Disabilitato' : 'Attivo'}
+                               </button>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -654,8 +702,8 @@ export function BettingPage() {
                     let finalOptions: any[] = adminForm.options;
                     if (adminForm.type === 'Match Winner') {
                       finalOptions = [
-                        { label: adminForm.teamA || 'Team A', weight: adminForm.options[0]?.weight || 100 },
-                        { label: adminForm.teamB || 'Team B', weight: adminForm.options[1]?.weight || 100 }
+                        { label: adminForm.teamA || 'Team A', weight: adminForm.options[0]?.weight || 100, is_disabled: adminForm.options[0]?.is_disabled },
+                        { label: adminForm.teamB || 'Team B', weight: adminForm.options[1]?.weight || 100, is_disabled: adminForm.options[1]?.is_disabled }
                       ];
                     }
                     
@@ -666,12 +714,18 @@ export function BettingPage() {
                     
                     setPublishStatus('loading');
                     try {
-                      const optionsWithMeta = finalOptions.map(opt => ({
-                        id: Math.random().toString(36).substring(2, 11),
-                        label: typeof opt === 'string' ? opt : opt.label,
-                        initial_weight: typeof opt === 'string' ? 100 : opt.weight,
-                        total_bet: 0
-                      }));
+                      const optionsWithMeta = finalOptions.map((opt, idx) => {
+                        // Preserve original ID if editing, otherwise generate new
+                        const existingOpt = editingMarketId ? markets.find(m => m.id === editingMarketId)?.options[idx] : null;
+                        
+                        return {
+                          id: (opt as any).id || existingOpt?.id || Math.random().toString(36).substring(2, 11),
+                          label: typeof opt === 'string' ? opt : opt.label,
+                          initial_weight: typeof opt === 'string' ? 100 : opt.weight,
+                          is_disabled: (opt as any).is_disabled || false,
+                          total_bet: (opt as any).total_bet || existingOpt?.total_bet || 0
+                        };
+                      });
 
                       const payload = {
                         tournament_slug: cleanSlug,
@@ -679,24 +733,22 @@ export function BettingPage() {
                         description: adminForm.description,
                         type: adminForm.type,
                         options: optionsWithMeta,
-                        status: 'open'
+                        status: editingMarketId ? (markets.find(m => m.id === editingMarketId)?.status || 'open') : 'open'
                       };
                       
-                      console.log('📝 Saving market with slug:', cleanSlug);
-                      console.log('🚀 Final Betting Payload:', payload);
-
-                      const { error } = await supabase
-                        .from('betting_markets')
-                        .insert(payload);
+                      const { error } = editingMarketId 
+                        ? await supabase.from('betting_markets').update(payload).eq('id', editingMarketId)
+                        : await supabase.from('betting_markets').insert(payload);
 
                       if (error) throw error;
                       
                       setPublishStatus('success');
-                      toast.success('Scommessa pubblicata!');
+                      toast.success(editingMarketId ? 'Scommessa aggiornata!' : 'Scommessa pubblicata!');
                       await loadData(true);
                       
                       setTimeout(() => {
                         setShowAdminTools(false);
+                        setEditingMarketId(null);
                         setAdminForm({
                           title: '',
                           description: '',
@@ -704,7 +756,7 @@ export function BettingPage() {
                           eventLevel: 'High Elo',
                           teamA: '',
                           teamB: '',
-                          options: [{ label: '', weight: 100 }, { label: '', weight: 100 }]
+                          options: [{ label: '', weight: 100 }]
                         });
                         setPublishStatus('idle');
                       }, 2000);
@@ -769,39 +821,52 @@ export function BettingPage() {
                   {/* Market Header */}
                   <div className="p-6 md:p-8 bg-gradient-to-br from-[#1a1c25] to-[#111218] border-b border-white/5 min-h-[160px] md:min-h-[180px] flex flex-col">
                     <div className="flex flex-col gap-4 h-full">
-                      <div className="flex items-center gap-2 flex-nowrap">
-                        <span className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.15em] shrink-0">{market.type}</span>
-                        <div className={clsx(
-                          "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase border shrink-0",
-                          market.status === 'open' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-red-500/10 border-red-500/20 text-red-400"
-                        )}>
-                          {market.status === 'open' ? 'Bet Aperta' : 'Bet Chiusa'}
+                      <div className="flex items-center justify-between gap-2 flex-nowrap">
+                        <div className="flex items-center gap-2 flex-nowrap">
+                          <span className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.15em] shrink-0">{market.type}</span>
+                          <div className={clsx(
+                            "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase border shrink-0",
+                            market.status === 'open' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-red-500/10 border-red-500/20 text-red-400"
+                          )}>
+                            {market.status === 'open' ? 'Bet Aperta' : 'Bet Chiusa'}
+                          </div>
                         </div>
-                        {isAdmin && market.status === 'open' && (
-                           <button 
-                             onClick={() => handleCloseMarket(market.id)}
-                             className="px-2.5 py-1 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg text-[9px] font-black uppercase hover:bg-red-500 transition-all hover:text-white shrink-0"
-                           >
-                             Chiudi Bet
-                           </button>
-                        )}
-                        {isAdmin && market.status === 'closed' && market.winner_option_id === null && (
-                           <button 
-                             onClick={() => handleReopenMarket(market.id)}
-                             className="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-[9px] font-black uppercase hover:bg-emerald-500 transition-all hover:text-white shrink-0"
-                           >
-                             Riapri Bet
-                           </button>
-                        )}
                         {isAdmin && (
-                          <button
-                            onClick={() => setMarketToDelete(market.id)}
-                            className="text-red-500/60 hover:text-red-400 transition-colors p-1 shrink-0"
-                            title="Elimina scommessa"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        )}
+                           <div className="flex items-center gap-1">
+                             <button
+                               onClick={() => {
+                                 setEditingMarketId(market.id);
+                                 setAdminForm({
+                                   title: market.title,
+                                   description: market.description || '',
+                                   type: market.type,
+                                   eventLevel: 'High Elo',
+                                   teamA: market.type === 'Match Winner' || market.type === 'Final Score' ? (market.options[0]?.label?.split(' (')[1]?.split(' vs ')[0] || market.options[0]?.label || '') : '',
+                                   teamB: market.type === 'Match Winner' || market.type === 'Final Score' ? (market.options[0]?.label?.split(' vs ')[1]?.split(')')[0] || market.options[1]?.label || '') : '',
+                                   options: market.options.map((o: any) => ({ 
+                                     id: o.id,
+                                     label: o.label, 
+                                     weight: o.initial_weight || 100,
+                                     is_disabled: o.is_disabled || false,
+                                     total_bet: o.total_bet || 0
+                                   }))
+                                 });
+                                 setShowAdminTools(true);
+                               }}
+                               className="text-cyan-400/60 hover:text-cyan-400 transition-colors p-1 shrink-0"
+                               title="Modifica scommessa"
+                             >
+                               <Edit2 size={14} />
+                             </button>
+                             <button
+                               onClick={() => setMarketToDelete(market.id)}
+                               className="text-red-500/60 hover:text-red-400 transition-colors p-1 shrink-0"
+                               title="Elimina scommessa"
+                             >
+                               <Trash2 size={14} />
+                             </button>
+                           </div>
+                         )}
                       </div>
                       <div className="flex-grow flex flex-col justify-end mt-2">
                         <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-tight">{market.title}</h3>
@@ -820,20 +885,26 @@ export function BettingPage() {
                         return (
                           <div
                             key={opt.id}
-                            role={market.status === 'open' && isAuthenticated ? 'button' : undefined}
+                            role={market.status === 'open' && isAuthenticated && !opt.is_disabled ? 'button' : undefined}
                             onClick={() => {
-                              if (market.status === 'open' && isAuthenticated) {
+                              if (market.status === 'open' && isAuthenticated && !opt.is_disabled) {
                                 setSelectedBets({ ...selectedBets, [market.id]: { optionId: opt.id, amount: selectedBets[market.id]?.amount || 10 } });
                               }
                             }}
                             className={clsx(
                               "relative p-2.5 px-3 rounded-xl border transition-all duration-300 text-left group/opt overflow-hidden",
-                              market.status === 'open' && isAuthenticated ? "cursor-pointer" : "",
+                              market.status === 'open' && isAuthenticated && !opt.is_disabled ? "cursor-pointer" : "opacity-70",
                               isSelected ? "bg-emerald-500/10 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]" : 
                               isWinner ? "bg-emerald-600/20 border-emerald-500" :
+                              opt.is_disabled ? "bg-red-500/5 border-red-500/20 grayscale" :
                               "bg-white/5 border-white/5 hover:border-white/10 hover:bg-white/[0.06]"
                             )}
                           >
+                            {opt.is_disabled && (
+                               <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-20 backdrop-blur-[1px]">
+                                 <span className="bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-tighter">Eliminato / Disabilitato</span>
+                               </div>
+                             )}
                             <div className="flex justify-between items-center relative z-10">
                               <div className="flex flex-col min-w-0">
                                 <span className={clsx(
