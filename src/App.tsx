@@ -1,5 +1,5 @@
-// Manual Build Trigger - 2026-04-23 12:00 - VERCEL PRO ACTIVE
-// Triggering build - UI removal verification
+// Manual Build Trigger - 2026-05-05 14:15 - FORCED REDEPLOY
+// Social betting refinements finalized.
 import { useState, useEffect, useRef } from 'react';
 import { Home as HomeIcon } from 'lucide-react';
 import { Sidebar } from './components/Sidebar';
