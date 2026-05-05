@@ -304,18 +304,7 @@ export function BettingPage() {
   };
 
 
-  const calculateOdds = (options: any[], optionId: string) => {
-    // We sum REAL bets + INITIAL virtual weight
-    const totalPool = options.reduce((sum, opt) => sum + (opt.total_bet || 0) + (opt.initial_weight || 100), 0);
-    const targetOpt = options.find(o => o.id === optionId);
-    const optionPool = (targetOpt?.total_bet || 0) + (targetOpt?.initial_weight || 100);
-    
-    if (totalPool === 0 || optionPool === 0) return '---';
-    
-    // Totalizer odds: Total Pool / Selection Pool
-    const odds = totalPool / optionPool;
-    return odds.toFixed(2);
-  };
+
 
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
