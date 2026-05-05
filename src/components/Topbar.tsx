@@ -138,6 +138,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
     }
 
     try {
+      console.log('🔍 Fetching bet notifications for user ID:', user.id);
       const { count, error } = await supabase
         .from('betting_notifications')
         .select('*', { count: 'exact', head: true })
@@ -362,7 +363,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
                     {user?.avatar_url ? <img src={user.avatar_url} alt="" className="w-full h-full object-cover" /> : <User size={14} className="text-yellow-500" />}
                   </div>
                   {notificationCount > 0 && (
-                    <span className="absolute -top-1 -left-1 z-10 flex h-3 w-3 items-center justify-center rounded-full bg-red-600 text-[8px] font-black text-white shadow-[0_0_5px_rgba(220,38,38,0.5)] ring-1 ring-black">
+                    <span className="absolute -top-1 -right-1 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[9px] font-black text-white shadow-[0_0_8px_rgba(220,38,38,0.6)] ring-2 ring-[#0d1424]">
                       {notificationCount}
                     </span>
                   )}
