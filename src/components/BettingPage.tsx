@@ -103,7 +103,7 @@ export function BettingPage() {
       const { data: marketData } = await supabase
         .from('betting_markets')
         .select('*')
-        .eq('tournament_slug', slug)
+        .eq('tournament_slug', cleanSlug)
         .order('created_at', { ascending: true });
       setMarkets(marketData || []);
 
@@ -474,6 +474,7 @@ export function BettingPage() {
 
                       if (error) throw error;
                       toast.success('Scommessa pubblicata!');
+                      await loadData();
                       setAdminForm({
                         title: '',
                         description: '',
