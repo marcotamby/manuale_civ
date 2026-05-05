@@ -272,6 +272,12 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
         }
     }, [isOpen, user?.email, user?.id]);
 
+    const { activeBets, historyBets } = useMemo(() => {
+        const active = userBets.filter(b => b.betting_markets?.status === 'open' || (b.status === 'pending' && b.betting_markets?.status !== 'settled'));
+        const history = userBets.filter(b => b.betting_markets?.status === 'settled' || b.status === 'won' || b.status === 'lost');
+        return { activeBets: active, historyBets: history };
+    }, [userBets]);
+
     const fetchUserBets = async () => {
         if (!user?.email) return;
         try {
@@ -541,7 +547,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                         </div>
                     </section>
 
-                    {/* Le Tue Scommesse (Nuova Sezione) */}
+                    {/* Le Tue Scommesse Attive */}
                     <section>
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2 text-blue-400 tracking-widest uppercase text-xs font-bold">
@@ -554,25 +560,21 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                             <div className="flex items-center justify-center py-6 bg-white/[0.02] rounded-xl border border-white/5">
                                 <Loader2 size={20} className="animate-spin text-blue-500/50" />
                             </div>
-                        ) : userBets.length > 0 ? (
+                        ) : activeBets.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                {userBets.map((bet) => {
+                                {activeBets.map((bet) => {
                                     const market = bet.betting_markets;
                                     const option = market?.options?.find((o: any) => o.id === bet.option_id);
-                                    const isSettled = market?.status === 'settled';
-
+                                    
                                     return (
-                                        <div key={bet.id} className="bg-white/[0.03] p-4 rounded-xl border border-white/5 hover:border-blue-500/20 transition-all group">
+                                        <div key={bet.id} className="bg-white/[0.03] p-4 rounded-xl border border-blue-500/10 hover:border-blue-500/30 transition-all group shadow-lg">
                                             <div className="flex justify-between items-start mb-2">
                                                 <div className="min-w-0">
                                                     <p className="text-[9px] text-gray-500 font-black uppercase truncate tracking-widest">{market?.title || 'Mercato'}</p>
                                                     <h5 className="text-sm font-black text-white uppercase truncate tracking-tight">{option?.label || 'Opzione'}</h5>
                                                 </div>
-                                                <span className={clsx(
-                                                    "text-[8px] px-2 py-0.5 rounded font-black uppercase tracking-widest",
-                                                    isSettled ? "bg-gray-500/10 text-gray-500" : "bg-blue-500/10 text-blue-400"
-                                                )}>
-                                                    {isSettled ? 'Conclusa' : 'In Corso'}
+                                                <span className="text-[8px] px-2 py-0.5 rounded font-black uppercase tracking-widest bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                                    In Corso
                                                 </span>
                                             </div>
                                             <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
@@ -580,10 +582,65 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                                     <span className="text-[10px] text-gray-500 font-bold uppercase">Puntata:</span>
                                                     <span className="text-xs font-black text-blue-400">{bet.amount} 🐑</span>
                                                 </div>
-                                                {isSettled && bet.status === 'won' && (
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div className="text-center py-6 bg-white/[0.02] rounded-xl border border-dashed border-white/10">
+                                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Nessuna scommessa attiva.</p>
+                            </div>
+                        )}
+                    </section>
+
+                    {/* Cronologia Scommesse */}
+                    {historyBets.length > 0 && (
+                        <section>
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-2 text-gray-400 tracking-widest uppercase text-xs font-bold">
+                                    <History size={14} />
+                                    <span>Cronologia Scommesse</span>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 opacity-80">
+                                {historyBets.map((bet) => {
+                                    const market = bet.betting_markets;
+                                    const option = market?.options?.find((o: any) => o.id === bet.option_id);
+                                    const isWin = bet.status === 'won';
+                                    const isLoss = bet.status === 'lost';
+
+                                    return (
+                                        <div key={bet.id} className="bg-white/[0.02] p-4 rounded-xl border border-white/5 hover:border-white/10 transition-all grayscale-[0.5] hover:grayscale-0">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <div className="min-w-0">
+                                                    <p className="text-[9px] text-gray-600 font-bold uppercase truncate tracking-widest">{market?.title || 'Mercato'}</p>
+                                                    <h5 className="text-sm font-bold text-gray-300 uppercase truncate tracking-tight">{option?.label || 'Opzione'}</h5>
+                                                </div>
+                                                <span className={clsx(
+                                                    "text-[8px] px-2 py-0.5 rounded font-black uppercase tracking-widest border",
+                                                    isWin ? "bg-green-500/10 text-green-400 border-green-500/20" : 
+                                                    isLoss ? "bg-red-500/10 text-red-400 border-red-500/20" : 
+                                                    "bg-gray-500/10 text-gray-500 border-white/5"
+                                                )}>
+                                                    {isWin ? 'Vinta' : isLoss ? 'Persa' : 'Conclusa'}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
+                                                <div className="flex items-center gap-1">
+                                                    <span className="text-[10px] text-gray-600 font-bold uppercase">Puntata:</span>
+                                                    <span className="text-xs font-bold text-gray-400">{bet.amount} 🐑</span>
+                                                </div>
+                                                {isWin && (
                                                     <div className="flex items-center gap-1 text-green-400">
                                                         <Trophy size={10} />
                                                         <span className="text-xs font-black">+{bet.payout}</span>
+                                                    </div>
+                                                )}
+                                                {isLoss && (
+                                                    <div className="text-red-500 text-[10px] font-black uppercase tracking-tighter">
+                                                        Persa
                                                     </div>
                                                 )}
                                             </div>
@@ -591,12 +648,8 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                     );
                                 })}
                             </div>
-                        ) : (
-                            <div className="text-center py-8 bg-white/[0.02] rounded-xl border border-dashed border-white/10">
-                                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Non hai ancora scommesso su nulla.</p>
-                            </div>
-                        )}
-                    </section>
+                        </section>
+                    )}
 
                     {/* Notifiche Scommesse */}
                     <section>
