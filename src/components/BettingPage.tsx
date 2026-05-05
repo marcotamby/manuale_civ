@@ -58,8 +58,8 @@ export function BettingPage() {
     loadData();
   }, [slug, user]);
 
-  const loadData = async () => {
-    setLoading(true);
+  const loadData = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       // Load Tournament
       
@@ -182,7 +182,7 @@ export function BettingPage() {
       if (insertError) throw insertError;
       
       await refreshUser(); 
-      await loadData();    
+      await loadData(true);    
 
       setSuccessBetId(marketId);
       setTimeout(() => setSuccessBetId(null), 3000);
@@ -633,8 +633,8 @@ export function BettingPage() {
                   </div>
 
                   {/* Options */}
-                  <div className="p-5 md:p-6 space-y-4 flex-grow flex flex-col">
-                    <div className="grid grid-cols-1 gap-2.5">
+                  <div className="p-4 md:p-5 space-y-3 flex-grow flex flex-col">
+                    <div className="grid grid-cols-1 gap-2">
                       {market.options.map((opt: any) => {
                         const isSelected = selectedBets[market.id]?.optionId === opt.id;
                         const isWinner = market.winner_option_id === opt.id;
@@ -646,7 +646,7 @@ export function BettingPage() {
                             disabled={market.status !== 'open' || !isAuthenticated}
                             onClick={() => setSelectedBets({ ...selectedBets, [market.id]: { optionId: opt.id, amount: selectedBets[market.id]?.amount || 10 } })}
                             className={clsx(
-                              "relative p-3.5 rounded-xl border transition-all duration-300 text-left group/opt overflow-hidden",
+                              "relative p-2.5 px-3 rounded-xl border transition-all duration-300 text-left group/opt overflow-hidden",
                               isSelected ? "bg-emerald-500/10 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]" : 
                               isWinner ? "bg-emerald-600/20 border-emerald-500" :
                               "bg-white/5 border-white/5 hover:border-white/10 hover:bg-white/[0.06]"
@@ -655,18 +655,18 @@ export function BettingPage() {
                             <div className="flex justify-between items-center relative z-10">
                               <div className="flex flex-col min-w-0">
                                 <span className={clsx(
-                                  "text-sm font-black uppercase tracking-tight leading-tight mb-1",
-                                  isSelected ? "text-white" : "text-gray-300"
+                                  "text-sm font-black uppercase tracking-tight leading-none mb-1.5",
+                                  isSelected ? "text-white" : "text-gray-200"
                                 )}>
                                   {opt.label}
                                 </span>
                                 <div className="flex items-center gap-2">
                                   <span className={clsx(
-                                    "text-[9px] font-bold uppercase tracking-widest",
-                                    isSelected ? "text-emerald-400/60" : "text-gray-500"
+                                    "text-[10px] font-bold uppercase tracking-widest",
+                                    isSelected ? "text-emerald-400/80" : "text-gray-400"
                                   )}>Puntata:</span>
                                   <span className={clsx(
-                                    "text-[10px] font-black",
+                                    "text-sm font-black drop-shadow-[0_0_5px_rgba(0,0,0,0.5)]",
                                     isSelected ? "text-emerald-400" : "text-cyan-400"
                                   )}>{opt.total_bet || 0} 🐑</span>
                                 </div>
