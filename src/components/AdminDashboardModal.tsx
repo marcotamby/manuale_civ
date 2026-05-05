@@ -1171,7 +1171,6 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                   </div>
                 </div>
               )}
-            </div>
            ) : activeTab === 'betting' ? (
           <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-10 custom-scrollbar">
               {/* New Market Creation Form */}

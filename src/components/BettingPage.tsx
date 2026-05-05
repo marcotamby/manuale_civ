@@ -214,7 +214,6 @@ export function BettingPage() {
       setIsDeleting(false);
     }
   };
-  };
 
   const calculateOdds = (options: any[], optionId: string) => {
     const totalPool = options.reduce((sum, opt) => sum + (opt.total_bet || 0), 0);
@@ -236,7 +235,8 @@ export function BettingPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in duration-700">
-      {/* Header Se      <div className="flex flex-col md:flex-row items-start justify-between mb-12 gap-10 px-4 md:px-0">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row items-start justify-between mb-12 gap-10 px-4 md:px-0">
         <div className="relative flex-1">
            <button 
             onClick={() => navigate('/tornei')}
