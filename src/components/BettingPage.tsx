@@ -510,22 +510,32 @@ export function BettingPage() {
                           </div>
                         ))}
                       </div>
-                    ) : adminForm.type === 'Final Score' ? (
-                      <div className="grid grid-cols-2 gap-3">
-                        {['2-0', '2-1', '1-2', '0-2'].map((score) => (
-                          <button
-                            key={score}
-                            onClick={() => {
-                              const label = `${score} (${adminForm.teamA} vs ${adminForm.teamB})`;
-                              if (!adminForm.options.includes(label)) {
-                                setAdminForm({...adminForm, options: [...adminForm.options, label].filter(o => o !== '')});
-                              }
-                            }}
-                            className="p-3 bg-white/5 border border-white/10 rounded-xl text-white text-xs font-bold hover:border-cyan-500 transition-all"
-                          >
-                            {score}
-                          </button>
-                        ))}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {['2-0', '2-1', '1-2', '0-2', '3-0', '3-1', '3-2', '2-3', '1-3', '0-3'].map((score) => {
+                          const isSelected = adminForm.options.some(o => o.startsWith(score));
+                          return (
+                            <button
+                              key={score}
+                              type="button"
+                              onClick={() => {
+                                const label = `${score} (${adminForm.teamA || 'A'} vs ${adminForm.teamB || 'B'})`;
+                                if (isSelected) {
+                                  setAdminForm({...adminForm, options: adminForm.options.filter(o => !o.startsWith(score))});
+                                } else {
+                                  setAdminForm({...adminForm, options: [...adminForm.options.filter(o => o !== ''), label]});
+                                }
+                              }}
+                              className={clsx(
+                                "p-3 border rounded-xl text-[10px] font-black uppercase transition-all",
+                                isSelected 
+                                  ? "bg-cyan-500 border-cyan-400 text-black shadow-[0_0_10px_rgba(6,182,212,0.3)]" 
+                                  : "bg-white/5 border-white/10 text-white hover:border-cyan-500/50"
+                              )}
+                            >
+                              {score}
+                            </button>
+                          );
+                        })}
                       </div>
                     ) : (
                       adminForm.options.map((opt, idx) => (
