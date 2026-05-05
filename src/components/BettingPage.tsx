@@ -117,14 +117,17 @@ export function BettingPage() {
       
       setMarkets(marketData || []);
 
-      // Load Balance if auth
-      if (user?.email) {
+      const finalUserEmail = user?.email || localStorage.getItem('auth_user_email');
+      if (finalUserEmail) {
         const { data: profile } = await supabase
-          .from('profiles')
+          .from('user_profiles')
           .select('sheep_balance')
-          .ilike('email', user.email)
+          .eq('email', finalUserEmail)
           .maybeSingle();
-        setSheepBalance(profile?.sheep_balance ?? 100);
+
+        if (profile && (!silent || sheepBalance === 0)) {
+          setSheepBalance(profile.sheep_balance ?? 0);
+        }
       }
 
       // Load Leaderboard
@@ -182,10 +185,11 @@ export function BettingPage() {
 
       if (insertError) throw insertError;
       
-      // Update local balance immediately instead of triggering global refresh
-      setSheepBalance(prev => prev - bet.amount);
+      // Update local balance immediately (optimistic update)
+      const amountToDeduct = bet.amount;
+      setSheepBalance(prev => prev - amountToDeduct);
       
-      // Load data silently in background
+      // Load other data (markets, leaderboard) but don't overwrite balance yet
       loadData(true);    
 
       setSuccessBetId(marketId);
