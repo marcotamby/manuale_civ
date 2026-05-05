@@ -273,7 +273,16 @@ export function BettingPage() {
       if (error) throw error;
       toast.success('Mercato liquidato e vincite assegnate!');
       setSettleConfirm(null);
-      loadData(true);
+      
+      // Force a full data reload (not silent) to see the new balance 
+      // and update the global context so the Topbar reflects winnings
+      await loadData(false);
+      
+      // Update global context again just to be 100% sure the Topbar is in sync
+      if (user && user.email) {
+         const { data: p } = await supabase.from('profiles').select('sheep_balance').ilike('email', user.email).maybeSingle();
+         if (p) setUser({ ...user, sheep_balance: p.sheep_balance });
+      }
     } catch (err: any) {
       toast.error(`Errore: ${err.message}`);
     }
@@ -783,11 +792,7 @@ export function BettingPage() {
                               </div>
                             </div>
                             
-                            {isWinner && (
-                              <div className="absolute top-2 right-2">
-                                <Trophy size={14} className="text-yellow-500" />
-                              </div>
-                            )}
+
                           </div>
                         );
                       })}
