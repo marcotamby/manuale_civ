@@ -143,9 +143,11 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id)
         .eq('is_read', false)
-        .like('message', 'I tuoi scout sono tornati!%'); // Solo vincite generano il numerino
+        .ilike('message', 'I tuoi scout sono tornati!%'); 
       
-      if (!error) setBetUnreadCount(count || 0);
+      if (!error) {
+        setBetUnreadCount(count || 0);
+      }
     } catch (e) {
       console.error('Error fetching betting notifications:', e);
     }

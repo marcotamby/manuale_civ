@@ -279,10 +279,15 @@ export function BettingPage() {
       await loadData(false);
       
       // Update global context again just to be 100% sure the Topbar is in sync
-      if (user && user.email) {
-         const { data: p } = await supabase.from('profiles').select('sheep_balance').ilike('email', user.email).maybeSingle();
-         if (p) setUser({ ...user, sheep_balance: p.sheep_balance });
-      }
+       if (user && user.email) {
+          const { data: p } = await supabase.from('profiles').select('sheep_balance').ilike('email', user.email).maybeSingle();
+          if (p) setUser({ ...user, sheep_balance: p.sheep_balance });
+       }
+
+       // Trigger notification badge update globally
+       if ((window as any).refreshNotificationCount) {
+         (window as any).refreshNotificationCount();
+       }
     } catch (err: any) {
       toast.error(`Errore: ${err.message}`);
     }
@@ -839,6 +844,7 @@ export function BettingPage() {
                             </div>
                             
                             <button
+                              type="button"
                               onClick={() => handlePlaceBet(market.id)}
                               disabled={placingBetId === market.id || successBetId === market.id}
                               className={clsx(
