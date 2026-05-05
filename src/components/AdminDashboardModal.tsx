@@ -1421,8 +1421,6 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                 </div>
              </div>
           </div>
-      </div>
-          </div>
         ) : (
           /* Q&A Tab Content */
           <div className="space-y-8 overflow-y-auto px-4 md:px-6 py-4 max-h-[70vh]">
