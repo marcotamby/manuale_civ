@@ -165,11 +165,25 @@ export function BettingPage() {
 
     setPlacingBetId(marketId);
     try {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      const finalUserId = user?.id || authUser?.id;
+      // Prioritize context user ID, then session, then fallback for dev
+      let finalUserId = user?.id;
+      
+      if (!finalUserId) {
+        const { data: { session } } = await supabase.auth.getSession();
+        finalUserId = session?.user?.id;
+      }
+
+      // Local dev bypass if still no ID
+      if (!finalUserId && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+        console.log('🧪 Local dev: Using fallback ID for betting');
+        // We'll try to find a real ID from profiles if possible, or just alert
+        const { data: profile } = await supabase.from('profiles').select('id').eq('email', user?.email || '').maybeSingle();
+        finalUserId = profile?.id;
+      }
 
       if (!finalUserId) {
-        toast.error('Sessione scaduta. Effettua nuovamente il login.');
+        toast.error('Sessione non valida. Prova a ricaricare la pagina.');
+        setPlacingBetId(null);
         return;
       }
 
