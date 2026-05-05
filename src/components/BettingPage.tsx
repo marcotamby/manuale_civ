@@ -275,8 +275,17 @@ export function BettingPage() {
     return Math.max(1.01, rawOdds).toFixed(2);
   };
 
+    } catch (err: any) {
+      toast.error(`Errore: ${err.message}`);
+    }
+  };
+
   const handleSettleMarket = async (marketId: string, winnerOptionId: string) => {
     try {
+      const marketToSettle = markets.find(m => m.id === marketId);
+      const winnerOption = marketToSettle?.options.find((o: any) => o.id === winnerOptionId);
+      const winnerName = winnerOption?.label;
+
       const { error } = await supabase.rpc('settle_betting_market', {
         p_market_id: marketId,
         p_winner_option_id: winnerOptionId
@@ -284,23 +293,40 @@ export function BettingPage() {
       if (error) throw error;
       toast.success('Mercato liquidato e vincite assegnate!');
       setSettleConfirm(null);
+
+      // AUTO-UPDATE TOURNAMENT WINNER WEIGHTS
+      if (marketToSettle?.type === 'Match Winner' && winnerName) {
+        const tourneyWinnerMarket = markets.find(m => m.type === 'Tournament Winner');
+        if (tourneyWinnerMarket) {
+          const updatedOptions = tourneyWinnerMarket.options.map((opt: any) => {
+            // If this team is the one who just won the match, promote its weight
+            if (winnerName.includes(opt.label) || opt.label.includes(winnerName)) {
+              let newWeight = Number(opt.initial_weight);
+              if (newWeight <= 500) newWeight = 1000;
+              else if (newWeight <= 1000) newWeight = 2000;
+              else if (newWeight <= 2000) newWeight = 5000;
+              else if (newWeight <= 5000) newWeight = 15000;
+              
+              return { ...opt, initial_weight: newWeight };
+            }
+            return opt;
+          });
+
+          await supabase
+            .from('betting_markets')
+            .update({ options: updatedOptions })
+            .eq('id', tourneyWinnerMarket.id);
+            
+          toast.info(`Aggiornate quote Vincitore Torneo per ${winnerName}`);
+        }
+      }
       
-      // Force a full data reload (not silent) to see the new balance 
-      // and update the global context so the Topbar reflects winnings
       await loadData(false);
       
-      // CRITICAL: Update global AuthContext user so Topbar updates IMMEDIATELY
       if (user?.email) {
         const { data: p } = await supabase.from('profiles').select('sheep_balance').ilike('email', user.email).maybeSingle();
         if (p) setUser({ ...user, sheep_balance: p.sheep_balance });
       }
-      
-      // Trigger notification badge update globally
-      setTimeout(() => {
-        if ((window as any).refreshNotificationCount) {
-          (window as any).refreshNotificationCount();
-        }
-      }, 500);
     } catch (err: any) {
       toast.error(`Errore: ${err.message}`);
     }
@@ -637,7 +663,7 @@ export function BettingPage() {
                             <div className="flex items-center gap-2">
                               <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap mr-2">Quota Iniziale:</span>
                               <div className="flex flex-1 gap-1">
-                                {[50, 100, 250, 1000, 2500].map(v => (
+                                {[500, 1000, 2000, 5000, 15000].map(v => (
                                   <button
                                     key={v}
                                     type="button"
@@ -653,9 +679,9 @@ export function BettingPage() {
                                         : "bg-white/5 border-white/10 text-gray-600 hover:border-white/20"
                                     )}
                                   >
-                                    <div className="flex flex-col items-center">
-                                      <span className="text-[7px] leading-none mb-0.5">{v === 50 ? 'Under' : v === 100 ? 'Sfav.' : v === 250 ? 'Eq.' : v === 1000 ? 'Fav.' : 'Top'}</span>
-                                      <span className="text-[6px] opacity-40">{v}</span>
+                                    <div className="flex flex-col items-center py-1">
+                                      <span className="text-[10px] font-black leading-none mb-1">{v === 500 ? 'Under' : v === 1000 ? 'Sfav.' : v === 2000 ? 'Eq.' : v === 5000 ? 'Fav.' : 'Top'}</span>
+                                      <span className="text-[8px] font-bold opacity-50">{v}</span>
                                     </div>
                                   </button>
                                 ))}
