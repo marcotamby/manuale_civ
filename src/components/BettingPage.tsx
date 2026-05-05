@@ -179,12 +179,33 @@ export function BettingPage() {
         console.log('📡 Checked Supabase session:', finalUserId);
       }
 
-      // ULTIMATE FALLBACK: Search profiles table by email (handles custom Google login mismatch)
+      // ULTIMATE FALLBACK: Search or CREATE profile by email
       if (!finalUserId && user?.email) {
         console.log('🔍 Searching profile by email:', user.email);
         const { data: profile } = await supabase.from('profiles').select('id').eq('email', user.email.toLowerCase()).maybeSingle();
-        finalUserId = profile?.id;
-        console.log('📂 Profile lookup result:', finalUserId);
+        
+        if (profile) {
+          finalUserId = profile.id;
+        } else {
+          console.log('✨ Profile not found, creating on the fly...');
+          const { data: newProfile, error: createError } = await supabase
+            .from('profiles')
+            .insert({
+              email: user.email.toLowerCase(),
+              nickname: user.email.split('@')[0],
+              sheep_balance: 100,
+              role: 'user'
+            })
+            .select('id')
+            .single();
+            
+          if (!createError && newProfile) {
+            finalUserId = newProfile.id;
+          } else {
+            console.error('❌ Failed to create profile:', createError);
+          }
+        }
+        console.log('📂 Profile ID result:', finalUserId);
       }
 
       // Local dev absolute bypass
