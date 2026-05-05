@@ -38,6 +38,7 @@ export function BettingPage() {
   const [myBets, setMyBets] = useState<any[]>([]);
   const [showAdminTools, setShowAdminTools] = useState(false);
   const [isCreatingMarket, setIsCreatingMarket] = useState(false);
+  const [publishStatus, setPublishStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [participantsByLevel, setParticipantsByLevel] = useState<{ [level: string]: string[] }>({ 'High Elo': [], 'Low Elo': [] });
   const [adminForm, setAdminForm] = useState({
     title: '',
@@ -100,11 +101,16 @@ export function BettingPage() {
       }
 
       // Load Markets
-      const { data: marketData } = await supabase
+      console.log('🔍 Fetching markets for slug:', cleanSlug);
+      const { data: marketData, error: marketError } = await supabase
         .from('betting_markets')
         .select('*')
         .eq('tournament_slug', cleanSlug)
         .order('created_at', { ascending: true });
+      
+      if (marketError) console.error('❌ Error fetching markets:', marketError);
+      console.log('📊 Markets found:', marketData?.length || 0, marketData);
+      
       setMarkets(marketData || []);
 
       // Load Balance if auth
@@ -448,8 +454,9 @@ export function BettingPage() {
                       toast.error('Compila tutti i campi!');
                       return;
                     }
-
+                    
                     setIsCreatingMarket(true);
+                    setPublishStatus('loading');
                     try {
                       const optionsWithMeta = finalOptions.map(label => ({
                         id: crypto.randomUUID(),
@@ -473,7 +480,8 @@ export function BettingPage() {
                         .insert(payload);
 
                       if (error) throw error;
-                      toast.success('Scommessa pubblicata!');
+                      
+                      setPublishStatus('success');
                       await loadData();
                       setAdminForm({
                         title: '',
@@ -484,18 +492,33 @@ export function BettingPage() {
                         teamB: '',
                         options: ['', '']
                       });
-                      setShowAdminTools(false);
-                      loadData();
+                      
+                      setTimeout(() => setPublishStatus('idle'), 3000);
                     } catch (err: any) {
+                      setPublishStatus('error');
                       toast.error(err.message);
+                      setTimeout(() => setPublishStatus('idle'), 3000);
                     } finally {
                       setIsCreatingMarket(false);
                     }
                   }}
-                  disabled={isCreatingMarket}
-                  className="w-full py-5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:brightness-110 text-white font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3"
+                  className={clsx(
+                    "w-full py-4 rounded-xl font-black text-xs uppercase tracking-[0.3em] transition-all duration-500 relative overflow-hidden group",
+                    publishStatus === 'success' ? "bg-green-500 text-black" :
+                    publishStatus === 'error' ? "bg-red-500 text-white" :
+                    "bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)]"
+                  )}
                 >
-                  {isCreatingMarket ? <Loader2 size={20} className="animate-spin" /> : 'Pubblica Scommessa Ora'}
+                  <div className="relative z-10 flex items-center justify-center gap-3">
+                    {publishStatus === 'loading' && <Loader2 size={16} className="animate-spin" />}
+                    {publishStatus === 'success' && <Trophy size={16} className="animate-bounce" />}
+                    <span>
+                      {publishStatus === 'loading' ? 'Invio in corso...' :
+                       publishStatus === 'success' ? 'Scommessa Pubblicata!' :
+                       publishStatus === 'error' ? 'Errore!' :
+                       'Pubblica Scommessa'}
+                    </span>
+                  </div>
                 </button>
               </div>
             </div>
