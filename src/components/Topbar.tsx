@@ -465,7 +465,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
               
               <div className="flex items-center gap-2">
                 {/* Sheep Balance (Mobile) */}
-                <div className="flex items-center gap-1.5 bg-blue-500/10 px-2.5 py-1.5 rounded-xl border border-blue-500/20 shadow-lg">
+                <div className="h-10 px-3 bg-[#0d1424] rounded-xl border border-yellow-500/30 flex items-center gap-2 shadow-lg">
                   <span className="text-[10px] font-black text-white leading-none">{user?.sheep_balance ?? 100}</span>
                   <span className="text-xs leading-none">🐑</span>
                 </div>
