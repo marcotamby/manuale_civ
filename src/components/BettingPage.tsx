@@ -156,17 +156,31 @@ export function BettingPage() {
 
     setPlacingBetId(marketId);
     try {
-      // AGGRESSIVE SESSION RECOVERY
+      // ULTRA-ROBUST USER IDENTIFICATION
       let finalUserId = user?.id;
-      if (!finalUserId) {
-        console.log('🔄 AuthContext ID missing, trying direct session...');
-        const { data: sessionData } = await supabase.auth.getSession();
-        finalUserId = sessionData?.session?.user?.id;
+      let finalUserEmail = user?.email;
+
+      if (!finalUserId || !finalUserEmail) {
+        console.log('🔄 AuthContext incomplete, fetching from Supabase directly...');
+        const { data: { user: sbUser } } = await supabase.auth.getUser();
+        if (sbUser) {
+          finalUserId = sbUser.id;
+          finalUserEmail = sbUser.email;
+        }
+      }
+
+      // If we still have no ID but we have email, let's fetch the profile ID
+      if (!finalUserId && finalUserEmail) {
+        const { data: prof } = await supabase.from('profiles').select('id').eq('email', finalUserEmail).single();
+        finalUserId = prof?.id;
+      }
+
+      if (typeof window !== 'undefined') {
+        window.alert(`DIAGNOSTICA:\nID: ${finalUserId || 'NON TROVATO'}\nEmail: ${finalUserEmail || 'NON TROVATA'}`);
       }
 
       if (!finalUserId) {
-        const msg = "SESSIONE NON TROVATA! Per favore ricarica la pagina o rifai il login.";
-        if (typeof window !== 'undefined') window.alert(`❌ ${msg}`);
+        const msg = "SESSIONE NON VALIDA! Per favore ricarica (F5) o riesegui il login.";
         toast.error(msg);
         setPlacingBetId(null);
         return;
