@@ -179,25 +179,25 @@ export function BettingPage() {
         console.log('📡 Checked Supabase session:', finalUserId);
       }
 
-      // Local dev bypass/lookup
-      if (!finalUserId && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-        console.log('🧪 Local dev: Searching profile for fallback...');
-        const { data: profile } = await supabase.from('profiles').select('id').eq('email', user?.email || 'admin@localhost').maybeSingle();
+      // ULTIMATE FALLBACK: Search profiles table by email (handles custom Google login mismatch)
+      if (!finalUserId && user?.email) {
+        console.log('🔍 Searching profile by email:', user.email);
+        const { data: profile } = await supabase.from('profiles').select('id').eq('email', user.email.toLowerCase()).maybeSingle();
         finalUserId = profile?.id;
         console.log('📂 Profile lookup result:', finalUserId);
       }
 
+      // Local dev absolute bypass
+      if (!finalUserId && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+        finalUserId = '00000000-0000-0000-0000-000000000000';
+        console.log('🛠️ Local dev MOCK ID applied');
+      }
+
       if (!finalUserId) {
-        // Ultimate fallback for local testing UI flow
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-          finalUserId = '00000000-0000-0000-0000-000000000000';
-          console.log('🛠️ Using MOCK UUID for local testing');
-        } else {
-          console.error('❌ NO USER ID FOUND! Betting aborted.');
-          toast.error('Sessione non valida. Effettua il login o ricarica.');
-          setPlacingBetId(null);
-          return;
-        }
+        console.error('❌ NO USER ID FOUND! Betting aborted.');
+        toast.error('Sessione non valida. Effettua il login o ricarica.');
+        setPlacingBetId(null);
+        return;
       }
 
       console.log('🚀 Placing bet with ID:', finalUserId);
