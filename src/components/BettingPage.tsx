@@ -250,11 +250,13 @@ export function BettingPage() {
   // Market status management is now handled inline in the render logic or via Edit modal
   
   const calculateOdds = (options: any[], optionId: string) => {
-    // Only count virtual weights of ACTIVE options in the total pool
-    const totalRealBets = options.reduce((sum, opt) => sum + (opt.total_bet || 0), 0);
+    // 1. Total Real Money in the pool (all teams)
+    const totalRealBets = options.reduce((sum, opt) => sum + (Number(opt.total_bet) || 0), 0);
+    
+    // 2. Total Virtual Weights only for ACTIVE teams
     const totalActiveWeights = options.reduce((sum, opt) => {
       if (opt.is_disabled) return sum;
-      return sum + (opt.initial_weight || 100);
+      return sum + (Number(opt.initial_weight) || 100);
     }, 0);
     
     const totalPool = totalRealBets + totalActiveWeights;
@@ -262,13 +264,14 @@ export function BettingPage() {
     const option = options.find(o => o.id === optionId);
     if (!option || option.is_disabled) return '---';
 
-    const optionRealBets = option.total_bet || 0;
-    const optionWeight = option.initial_weight || 100;
+    const optionRealBets = Number(option.total_bet) || 0;
+    const optionWeight = Number(option.initial_weight) || 100;
     const optionTotal = optionRealBets + optionWeight;
 
-    if (optionTotal === 0) return '1.00';
+    if (optionTotal <= 0) return '---';
     
     const rawOdds = totalPool / optionTotal;
+    // Cap at 1.01 to avoid odds lower than 1
     return Math.max(1.01, rawOdds).toFixed(2);
   };
 
@@ -847,6 +850,7 @@ export function BettingPage() {
                              )}
                              <button
                                onClick={() => {
+                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                                  setEditingMarketId(market.id);
                                  setAdminForm({
                                    title: market.title,
