@@ -657,7 +657,7 @@ export function BettingPage() {
                   {/* Market Header */}
                   <div className="p-6 md:p-8 bg-gradient-to-br from-[#1a1c25] to-[#111218] border-b border-white/5">
                     <div className="flex flex-col gap-4">
-                      <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
+                      <div className="flex items-center gap-2 flex-nowrap overflow-hidden">
                         <span className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.15em] shrink-0">{market.type}</span>
                         <div className={clsx(
                           "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase border shrink-0",
