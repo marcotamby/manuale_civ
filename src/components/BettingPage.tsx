@@ -141,6 +141,8 @@ export function BettingPage() {
   };
 
   const handlePlaceBet = async (marketId: string) => {
+    if (typeof window !== 'undefined') window.alert('DEBUG: handlePlaceBet iniziata!');
+    console.log('DEBUG: Inizio handlePlaceBet per market:', marketId);
     const bet = selectedBets[marketId];
     if (!bet || !bet.optionId || bet.amount <= 0) {
       toast.error('Inserisci un ammontare valido di pecore!');
