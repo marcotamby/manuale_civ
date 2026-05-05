@@ -336,10 +336,10 @@ export function BettingPage() {
            </div>
         </div>
 
-        <div className="flex flex-col md:flex-row items-center gap-4 self-center md:self-start mt-4 md:mt-10">
+        <div className="flex flex-col md:flex-row items-stretch gap-4 self-stretch md:self-start mt-4 md:mt-10">
             {isAuthenticated && (
-              <div className="bg-white/5 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-white/10 flex items-center gap-3 transition-all hover:bg-white/10 group">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Il Tuo Gregge:</span>
+              <div className="bg-[#111218]/80 backdrop-blur-md px-6 h-14 rounded-2xl border border-white/10 flex items-center gap-3 transition-all hover:bg-[#1a1c25] group flex-1">
+                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest whitespace-nowrap">Il Tuo Gregge:</span>
                 <div className="flex items-center gap-2">
                   <span className="text-xl font-black text-white">{sheepBalance}</span>
                   <span className="text-lg group-hover:animate-bounce">🐑</span>
@@ -348,10 +348,10 @@ export function BettingPage() {
             )}
 
             {/* Top Leaderboard */}
-            <div className="bg-[#111218]/40 border border-white/5 backdrop-blur-sm p-2.5 px-4 rounded-2xl hidden xl:flex items-center gap-4">
+            <div className="bg-[#111218]/80 backdrop-blur-md px-6 h-14 rounded-2xl border border-white/10 flex items-center gap-6 transition-all hover:bg-[#1a1c25] group flex-[1.4]">
               <div className="flex items-center gap-2 shrink-0">
-                <Users size={12} className="text-blue-400" />
-                <span className="text-[9px] font-black text-white/60 uppercase tracking-widest">Migliori Pastori</span>
+                <Users size={16} className="text-blue-400" />
+                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Migliori Pastori</span>
               </div>
               <div className="flex gap-3">
                 {leaderboard.slice(0, 3).map((u, i) => (
