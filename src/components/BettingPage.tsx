@@ -615,31 +615,30 @@ export function BettingPage() {
               {markets.map((market) => (
                 <div key={market.id} className="bg-[#111218] rounded-[2.5rem] border border-slate-400/20 overflow-hidden group hover:border-slate-400/40 transition-all duration-500 shadow-2xl flex flex-col h-full">
                   {/* Market Header */}
-                  <div className="p-6 md:p-8 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-white/5">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1 min-w-0">
-                        <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-2 block">{market.type}</span>
-                        <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-tight break-words">{market.title}</h3>
-                      </div>
-                      <div className="flex items-center gap-3 ml-4">
-                        <div className={clsx(
-                          "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
-                          market.status === 'open' ? "bg-green-500/10 border-green-500/30 text-green-400" : "bg-red-500/10 border-red-500/30 text-red-400"
-                        )}>
-                          {market.status === 'open' ? 'Aperto' : 'Chiuso'}
+                  <div className="p-6 md:p-8 bg-gradient-to-br from-[#1a1c25] to-[#111218] border-b border-white/5">
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black text-cyan-400/70 uppercase tracking-[0.25em]">{market.type}</span>
+                        <div className="flex items-center gap-3">
+                          <div className={clsx(
+                            "px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border",
+                            market.status === 'open' ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : "bg-red-500/10 border-red-500/30 text-red-400"
+                          )}>
+                            {market.status === 'open' ? 'Aperto' : 'Chiuso'}
+                          </div>
+                          {isAdmin && (
+                            <button
+                              onClick={() => handleDeleteMarket(market.id)}
+                              className="text-red-500/30 hover:text-red-500 transition-colors"
+                              title="Elimina scommessa"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          )}
                         </div>
-                        {isAdmin && (
-                          <button
-                            onClick={() => handleDeleteMarket(market.id)}
-                            className="p-2 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
-                            title="Elimina scommessa"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        )}
                       </div>
+                      <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-none">{market.title}</h3>
                     </div>
-                    {market.description && <p className="text-gray-400 text-sm font-medium italic line-clamp-2">{market.description}</p>}
                   </div>
 
                   {/* Options */}
@@ -657,8 +656,8 @@ export function BettingPage() {
                             onClick={() => setSelectedBets({ ...selectedBets, [market.id]: { optionId: opt.id, amount: selectedBets[market.id]?.amount || 10 } })}
                             className={clsx(
                               "relative p-5 rounded-2xl border transition-all duration-300 text-left group/opt overflow-hidden",
-                              isSelected ? "bg-blue-600 border-blue-400 shadow-[0_0_30px_rgba(59,130,246,0.3)] scale-[1.02]" : 
-                              isWinner ? "bg-green-600/20 border-green-500" :
+                              isSelected ? "bg-emerald-500/10 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.1)] scale-[1.01]" : 
+                              isWinner ? "bg-emerald-600/20 border-emerald-500" :
                               "bg-white/5 border-white/5 hover:border-white/20 hover:bg-white/[0.08]"
                             )}
                           >
@@ -670,9 +669,15 @@ export function BettingPage() {
                                 )}>
                                   {opt.label}
                                 </span>
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Puntata:</span>
-                                  <span className="text-[10px] text-blue-400 font-black">{opt.total_bet || 0} 🐑</span>
+                                <div className="flex items-center gap-2">
+                                  <span className={clsx(
+                                    "text-[9px] font-bold uppercase tracking-widest",
+                                    isSelected ? "text-emerald-400/60" : "text-gray-500"
+                                  )}>Puntata:</span>
+                                  <span className={clsx(
+                                    "text-[10px] font-black",
+                                    isSelected ? "text-emerald-400" : "text-cyan-400"
+                                  )}>{opt.total_bet || 0} 🐑</span>
                                 </div>
                               </div>
                               <div className="flex flex-col items-end shrink-0 ml-4">
@@ -700,71 +705,72 @@ export function BettingPage() {
                     {/* Bet Input Area - INTEGRATED */}
                     {selectedBets[market.id] && market.status === 'open' && (
                       <div className="mt-auto pt-6 border-t border-white/5 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        <div className="flex items-stretch gap-3">
-                          <div className="flex-grow flex items-center bg-black/40 border border-white/10 rounded-xl overflow-hidden h-14 group/input">
-                            <button 
-                              onClick={() => {
-                                const current = selectedBets[market.id].amount;
-                                if (current > 1) setSelectedBets({ ...selectedBets, [market.id]: { ...selectedBets[market.id], amount: current - 1 } });
-                              }}
-                              className="w-12 h-full flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-all"
-                            >
-                              <div className="w-5 h-5 flex items-center justify-center font-black">-</div>
-                            </button>
-                            <div className="flex-grow flex items-center justify-center gap-2 px-2">
-                              <input
-                                type="number"
-                                min="1"
-                                max={sheepBalance}
-                                value={selectedBets[market.id].amount}
-                                onChange={(e) => {
-                                  const val = parseInt(e.target.value) || 0;
-                                  setSelectedBets({ ...selectedBets, [market.id]: { ...selectedBets[market.id], amount: val } });
+                        <div className="flex flex-col gap-3">
+                          <div className="flex items-stretch gap-2">
+                            <div className="flex-grow flex items-center bg-black/40 border border-white/10 rounded-xl overflow-hidden h-12">
+                              <button 
+                                onClick={() => {
+                                  const current = selectedBets[market.id].amount;
+                                  if (current > 1) setSelectedBets({ ...selectedBets, [market.id]: { ...selectedBets[market.id], amount: current - 1 } });
                                 }}
-                                className="w-16 bg-transparent text-center text-white font-black text-xl outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                              />
-                              <span className="text-xl">🐑</span>
+                                className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-all font-black"
+                              >
+                                -
+                              </button>
+                              <div className="flex-grow flex items-center justify-center gap-1.5 px-1">
+                                <input
+                                  type="number"
+                                  value={selectedBets[market.id].amount}
+                                  onChange={(e) => {
+                                    const val = parseInt(e.target.value) || 0;
+                                    setSelectedBets({ ...selectedBets, [market.id]: { ...selectedBets[market.id], amount: val } });
+                                  }}
+                                  className="w-12 bg-transparent text-center text-white font-black text-lg outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                />
+                                <span className="text-sm">🐑</span>
+                              </div>
+                              <button 
+                                onClick={() => {
+                                  const current = selectedBets[market.id].amount;
+                                  if (current < sheepBalance) setSelectedBets({ ...selectedBets, [market.id]: { ...selectedBets[market.id], amount: current + 1 } });
+                                }}
+                                className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-all font-black"
+                              >
+                                +
+                              </button>
+                            </div>
+                            
+                            <button
+                              onClick={() => handlePlaceBet(market.id)}
+                              disabled={placingBetId === market.id}
+                              className="px-6 bg-emerald-500 text-black font-black uppercase text-[10px] tracking-widest rounded-xl hover:bg-emerald-400 active:scale-95 transition-all shadow-lg shadow-emerald-900/20 flex items-center justify-center min-w-[120px]"
+                            >
+                              {placingBetId === market.id ? <Loader2 size={16} className="animate-spin" /> : 'SCOMMETTI'}
+                            </button>
+                          </div>
+
+                          <div className="flex justify-between items-center px-1">
+                            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
+                              <span className="text-gray-500">Vincita:</span>
+                              <span className="text-emerald-400 font-black text-xs">
+                                {(() => {
+                                  const odds = calculateOdds(market.options, selectedBets[market.id].optionId);
+                                  if (odds === '---') return '---';
+                                  return Math.floor(selectedBets[market.id].amount * parseFloat(odds));
+                                })()} 🐑
+                              </span>
                             </div>
                             <button 
-                              onClick={() => {
-                                const current = selectedBets[market.id].amount;
-                                if (current < sheepBalance) setSelectedBets({ ...selectedBets, [market.id]: { ...selectedBets[market.id], amount: current + 1 } });
-                              }}
-                              className="w-12 h-full flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-all"
+                              onClick={() => setSelectedBets(prev => {
+                                const next = { ...prev };
+                                delete next[market.id];
+                                return next;
+                              })}
+                              className="text-[9px] font-black text-gray-600 hover:text-gray-400 uppercase tracking-widest underline underline-offset-4"
                             >
-                              <div className="w-5 h-5 flex items-center justify-center font-black">+</div>
+                              Annulla
                             </button>
                           </div>
-                          
-                          <button
-                            onClick={() => handlePlaceBet(market.id)}
-                            disabled={placingBetId === market.id}
-                            className="px-6 h-14 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-black uppercase text-[11px] tracking-widest rounded-xl hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-blue-900/20 flex items-center justify-center"
-                          >
-                            {placingBetId === market.id ? <Loader2 size={18} className="animate-spin" /> : 'SCOMMETTI'}
-                          </button>
-                        </div>
-                        <div className="flex justify-between items-center mt-3 px-1">
-                          <div className="flex items-center gap-1.5 text-[9px] text-gray-500 font-bold uppercase tracking-widest">
-                            <TrendingUp size={12} /> Vincita: 
-                            <span className="text-green-400">
-                              {(() => {
-                                const odds = calculateOdds(market.options, selectedBets[market.id].optionId);
-                                if (odds === '---') return '---';
-                                return Math.floor(selectedBets[market.id].amount * parseFloat(odds));
-                              })()} 🐑
-                            </span>
-                          </div>
-                          <button 
-                            onClick={() => setSelectedBets(prev => {
-                              const next = { ...prev };
-                              delete next[market.id];
-                              return next;
-                            })}
-                            className="text-[9px] font-black text-gray-600 hover:text-gray-400 uppercase tracking-widest"
-                          >
-                            Annulla
-                          </button>
                         </div>
                       </div>
                     )}
