@@ -531,10 +531,10 @@ export function BettingPage() {
                             <div className="flex gap-2">
                               {[
                                 { l: 'Under', v: 50 },
-                                { l: 'Sfav.', v: 75 },
-                                { l: 'Eq.', v: 100 },
-                                { l: 'Fav.', v: 300 },
-                                { l: 'Top', v: 1000 }
+                                { l: 'Sfav.', v: 100 },
+                                { l: 'Eq.', v: 250 },
+                                { l: 'Fav.', v: 1000 },
+                                { l: 'Top', v: 2500 }
                               ].map(w => (
                                 <button
                                   key={w.v}
