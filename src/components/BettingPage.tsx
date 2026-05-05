@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Force build trigger - 2026-05-05 09:05
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 // Force deploy update for betting favoritism weights 🐑
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
@@ -414,9 +414,9 @@ export function BettingPage() {
                       value={adminForm.type}
                       onChange={(e) => {
                         const type = e.target.value;
-                        let newOpts = ['', ''];
-                        if (type === 'Tournament Winner') newOpts = ['Team 1', 'Team 2', 'Team 3'];
-                        setAdminForm({...adminForm, type, options: newOpts});
+                        let newOpts = [{ label: '', weight: 100 }, { label: '', weight: 100 }];
+                        if (type === 'Tournament Winner') newOpts = [{ label: 'Team 1', weight: 100 }, { label: 'Team 2', weight: 100 }, { label: 'Team 3', weight: 100 }];
+                        setAdminForm({...adminForm, type, options: (newOpts as any)});
                       }}
                       className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-cyan-500 transition-all appearance-none cursor-pointer"
                     >
@@ -651,12 +651,15 @@ export function BettingPage() {
 
                 <button 
                   onClick={async () => {
-                    let finalOptions = adminForm.options;
+                    let finalOptions: any[] = adminForm.options;
                     if (adminForm.type === 'Match Winner') {
-                      finalOptions = [adminForm.teamA || 'Team A', adminForm.teamB || 'Team B'];
+                      finalOptions = [
+                        { label: adminForm.teamA || 'Team A', weight: adminForm.options[0]?.weight || 100 },
+                        { label: adminForm.teamB || 'Team B', weight: adminForm.options[1]?.weight || 100 }
+                      ];
                     }
                     
-                    if (!adminForm.title || finalOptions.some(o => !o)) {
+                    if (!adminForm.title || finalOptions.some(o => !o || (typeof o === 'string' ? !o : !o.label))) {
                       toast.error('Compila tutti i campi!');
                       return;
                     }
