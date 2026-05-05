@@ -182,12 +182,18 @@ export function BettingPage() {
 
       if (insertError) throw insertError;
       
-      await refreshUser(); 
-      await loadData(true);    
+      // Update local balance immediately instead of triggering global refresh
+      setSheepBalance(prev => prev - bet.amount);
+      
+      // Load data silently in background
+      loadData(true);    
 
       setSuccessBetId(marketId);
+      
+      // Keep success message on button for 3 seconds
       setTimeout(() => setSuccessBetId(null), 3000);
 
+      // Clear the input/selection area after 1.5s
       setTimeout(() => {
         setSelectedBets(prev => {
           const next = { ...prev };
