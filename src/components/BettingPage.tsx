@@ -116,12 +116,12 @@ export function BettingPage() {
       setMarkets(marketData || []);
 
       // Load Balance if auth
-      if (user) {
+      if (user?.email) {
         const { data: profile } = await supabase
           .from('profiles')
           .select('sheep_balance')
-          .eq('id', user.id)
-          .single();
+          .ilike('email', user.email)
+          .maybeSingle();
         setSheepBalance(profile?.sheep_balance ?? 100);
       }
 
