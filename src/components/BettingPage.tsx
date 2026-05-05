@@ -249,6 +249,28 @@ export function BettingPage() {
 
   // Market status management is now handled inline in the render logic or via Edit modal
   
+  const calculateOdds = (options: any[], optionId: string) => {
+    // Only count virtual weights of ACTIVE options in the total pool
+    const totalRealBets = options.reduce((sum, opt) => sum + (opt.total_bet || 0), 0);
+    const totalActiveWeights = options.reduce((sum, opt) => {
+      if (opt.is_disabled) return sum;
+      return sum + (opt.initial_weight || 100);
+    }, 0);
+    
+    const totalPool = totalRealBets + totalActiveWeights;
+
+    const option = options.find(o => o.id === optionId);
+    if (!option || option.is_disabled) return '---';
+
+    const optionRealBets = option.total_bet || 0;
+    const optionWeight = option.initial_weight || 100;
+    const optionTotal = optionRealBets + optionWeight;
+
+    if (optionTotal === 0) return '1.00';
+    
+    const rawOdds = totalPool / optionTotal;
+    return Math.max(1.01, rawOdds).toFixed(2);
+  };
 
   const handleSettleMarket = async (marketId: string, winnerOptionId: string) => {
     try {
@@ -519,8 +541,8 @@ export function BettingPage() {
                                 { l: 'Under', v: 50 },
                                 { l: 'Sfav.', v: 75 },
                                 { l: 'Eq.', v: 100 },
-                                { l: 'Fav.', v: 200 },
-                                { l: 'Top', v: 500 }
+                                { l: 'Fav.', v: 300 },
+                                { l: 'Top', v: 1000 }
                               ].map(w => (
                                 <button
                                   key={w.v}
