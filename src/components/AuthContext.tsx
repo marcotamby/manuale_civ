@@ -147,67 +147,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, nickname, rank, avatar_url, role, is_streamer, can_manage_tournaments, can_manage_civs, can_manage_buildorders, sheep_balance')
+        .select('nickname, rank, avatar_url, role, is_streamer, can_manage_tournaments, can_manage_civs, can_manage_buildorders, sheep_balance')
         .ilike('email', userEmail)
         .maybeSingle();
       
       if (!error && data) {
         const email = userEmail.toLowerCase();
+        const currentRank = data.rank || 'Unranked';
+        const currentNickname = data.nickname || '';
         
-        // Use DB values as truth if they exist, but allow local to override if DB is empty
-        const currentRank = data.rank || localStorage.getItem(`auth_user_rank_${email}`) || 'Unranked';
-        const currentNickname = data.nickname || localStorage.getItem(`auth_user_nickname_${email}`) || '';
-        
-        localStorage.setItem(`auth_user_rank_${email}`, currentRank);
-        localStorage.setItem(`auth_user_nickname_${email}`, currentNickname);
-        
-        // Update user state using functional update to access prev state
-        setUser(prev => {
-          if (!prev) return null;
-          const dbAvatar = data.avatar_url;
-          const currentAvatar = prev?.avatar_url;
-          
-          // CRITICAL: Prioritize DB avatar. If it exists, use it.
-          // Don't let session/Google avatar overwrite it.
-          const finalAvatar = dbAvatar || currentAvatar;
-
-          const updated = { 
-            ...prev, 
-            rank: currentRank, 
-            avatar_url: finalAvatar,
-            role: data.role, 
-            is_streamer: data.is_streamer,
-            can_manage_tournaments: data.can_manage_tournaments,
-            can_manage_civs: data.can_manage_civs,
-            can_manage_buildorders: data.can_manage_buildorders,
-            sheep_balance: data.sheep_balance ?? 100,
-            id: data.id
-          };
-          checkRoles(updated);
-          return updated;
-        });
-        
-        // Update auth_user in localStorage
         const storedUser = localStorage.getItem('auth_user');
         if (storedUser) {
            const parsed = JSON.parse(storedUser);
-           const dbAvatar = data.avatar_url;
-           const sessionAvatar = parsed.avatar_url;
-           const finalAvatar = dbAvatar || sessionAvatar;
-
-           localStorage.setItem('auth_user', JSON.stringify({ 
+           const updated = { 
              ...parsed, 
-             id: data.id,
              rank: currentRank, 
              nickname: currentNickname, 
              role: data.role, 
              is_streamer: data.is_streamer,
-             avatar_url: finalAvatar,
+             avatar_url: data.avatar_url || parsed.avatar_url,
              can_manage_tournaments: data.can_manage_tournaments,
              can_manage_civs: data.can_manage_civs,
              can_manage_buildorders: data.can_manage_buildorders,
              sheep_balance: data.sheep_balance ?? 100
-           }));
+           };
+           localStorage.setItem('auth_user', JSON.stringify(updated));
+           localStorage.setItem(`auth_user_${email}`, JSON.stringify(updated));
+           setUser(updated);
+           checkRoles(updated);
         }
       } else {
         // Profile doesn't exist yet, create it with local values
@@ -228,7 +195,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .maybeSingle();
 
         if (newProfile) {
-          setUser(prev => prev ? ({ ...prev, id: newProfile.id, sheep_balance: 100 }) : null);
+          setUser(prev => prev ? ({ ...prev, sheep_balance: 100 }) : null);
         }
       }
     } catch (err) {
