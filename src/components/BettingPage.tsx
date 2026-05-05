@@ -39,6 +39,8 @@ export function BettingPage() {
   const [myBets, setMyBets] = useState<any[]>([]);
   const [showAdminTools, setShowAdminTools] = useState(false);
   const [publishStatus, setPublishStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [marketToDelete, setMarketToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [participantsByLevel, setParticipantsByLevel] = useState<{ [level: string]: string[] }>({ 'High Elo': [], 'Low Elo': [] });
   const [adminForm, setAdminForm] = useState({
     title: '',
@@ -189,20 +191,29 @@ export function BettingPage() {
   };
 
   const handleDeleteMarket = async (marketId: string) => {
-    if (!window.confirm('Sei sicuro di voler eliminare questa scommessa? Questa azione è irreversibile.')) return;
+    setMarketToDelete(marketId);
+  };
+
+  const executeDeleteMarket = async () => {
+    if (!marketToDelete) return;
+    setIsDeleting(true);
 
     try {
       const { error } = await supabase
         .from('betting_markets')
         .delete()
-        .eq('id', marketId);
+        .eq('id', marketToDelete);
 
       if (error) throw error;
       toast.success('Scommessa eliminata con successo.');
+      setMarketToDelete(null);
       loadData();
     } catch (err: any) {
       toast.error(`Errore durante l'eliminazione: ${err.message}`);
+    } finally {
+      setIsDeleting(false);
     }
+  };
   };
 
   const calculateOdds = (options: any[], optionId: string) => {
@@ -225,8 +236,7 @@ export function BettingPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in duration-700">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row items-start justify-between mb-12 gap-6 px-4 md:px-0">
+      {/* Header Se      <div className="flex flex-col md:flex-row items-start justify-between mb-12 gap-10 px-4 md:px-0">
         <div className="relative flex-1">
            <button 
             onClick={() => navigate('/tornei')}
@@ -234,7 +244,7 @@ export function BettingPage() {
            >
             <ArrowLeft size={16} /> Torna ai Tornei
            </button>
-           <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-white to-slate-400 uppercase tracking-tighter mb-4 leading-none">
+           <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-white to-slate-400 uppercase tracking-tighter mb-4 leading-tight">
             Social Betting:<br/>
             {tournament?.name || (slug?.replace(/-/g, ' ')) || 'Torneo'}
            </h1>
@@ -256,13 +266,29 @@ export function BettingPage() {
            </div>
         </div>
 
-        <div className="flex flex-col items-end gap-4 self-start mt-0 md:mt-10">
+        <div className="flex flex-col md:flex-row items-start gap-6 self-start mt-0 md:mt-10">
+            {/* Top Leaderboard */}
+            <div className="bg-[#111218]/40 border border-white/5 backdrop-blur-sm p-4 rounded-3xl hidden xl:block">
+              <div className="flex items-center gap-3 mb-3 px-1">
+                <Users size={14} className="text-blue-400" />
+                <span className="text-[10px] font-black text-white uppercase tracking-widest">Migliori Pastori</span>
+              </div>
+              <div className="flex gap-2">
+                {leaderboard.slice(0, 3).map((u, i) => (
+                  <div key={u.username} className="flex flex-col items-center px-3 py-2 bg-white/5 rounded-xl border border-white/5 min-w-[80px]">
+                    <span className="text-[9px] font-bold text-gray-500 uppercase mb-1">{i === 0 ? "🥇" : i === 1 ? "🥈" : "🥉"} {u.username.substring(0, 6)}</span>
+                    <span className="text-xs font-black text-blue-400">{u.sheep_balance}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {isAuthenticated && (
-              <div className="bg-[#111218] px-6 py-3 rounded-2xl border-slate-400/20 shadow-[0_0_30px_rgba(59,130,246,0.1)] flex items-center gap-4 h-[56px] transition-transform hover:scale-105">
-                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest whitespace-nowrap">Il Tuo Gregge</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-black text-white">{sheepBalance}</span>
-                  <span className="text-2xl animate-bounce" style={{ animationDuration: '2s' }}>🐑</span>
+              <div className="bg-gradient-to-br from-blue-600/20 to-indigo-600/20 px-8 py-5 rounded-[2rem] border border-blue-500/30 shadow-[0_0_40px_rgba(59,130,246,0.15)] flex flex-col items-center gap-1 transition-transform hover:scale-105 backdrop-blur-md">
+                <span className="text-[10px] font-black text-blue-400/80 uppercase tracking-[0.2em] whitespace-nowrap mb-1">Il Tuo Gregge</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-4xl font-black text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">{sheepBalance}</span>
+                  <span className="text-3xl animate-bounce" style={{ animationDuration: '2s' }}>🐑</span>
                 </div>
               </div>
             )}
@@ -546,9 +572,9 @@ export function BettingPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 md:px-0">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 px-4 md:px-0">
         {/* Main Betting Area */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="lg:col-span-3">
           {markets.length === 0 ? (
             <div className="bg-[#111218] p-12 rounded-[2.5rem] border border-slate-400/20 text-center flex flex-col items-center">
               <AlertCircle size={48} className="mb-4 text-gray-600" />
@@ -563,135 +589,176 @@ export function BettingPage() {
               )}
             </div>
           ) : (
-            markets.map((market) => (
-              <div key={market.id} className="bg-[#111218] rounded-[2.5rem] border border-slate-400/20 overflow-hidden group hover:border-slate-400/40 transition-all duration-500 shadow-2xl">
-                {/* Market Header */}
-                <div className="p-6 md:p-8 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-white/5">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-2 block">{market.type}</span>
-                      <h3 className="text-2xl font-black text-white uppercase tracking-tighter">{market.title}</h3>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className={clsx(
-                        "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
-                        market.status === 'open' ? "bg-green-500/10 border-green-500/30 text-green-400" : "bg-red-500/10 border-red-500/30 text-red-400"
-                      )}>
-                        {market.status === 'open' ? 'Aperto' : 'Chiuso'}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {markets.map((market) => (
+                <div key={market.id} className="bg-[#111218] rounded-[2.5rem] border border-slate-400/20 overflow-hidden group hover:border-slate-400/40 transition-all duration-500 shadow-2xl flex flex-col h-full">
+                  {/* Market Header */}
+                  <div className="p-6 md:p-8 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-white/5">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-2 block truncate">{market.type}</span>
+                        <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter truncate">{market.title}</h3>
                       </div>
-                      {isAdmin && (
-                        <button
-                          onClick={() => handleDeleteMarket(market.id)}
-                          className="p-2 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
-                          title="Elimina scommessa"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      )}
+                      <div className="flex items-center gap-3 ml-4">
+                        <div className={clsx(
+                          "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
+                          market.status === 'open' ? "bg-green-500/10 border-green-500/30 text-green-400" : "bg-red-500/10 border-red-500/30 text-red-400"
+                        )}>
+                          {market.status === 'open' ? 'Aperto' : 'Chiuso'}
+                        </div>
+                        {isAdmin && (
+                          <button
+                            onClick={() => handleDeleteMarket(market.id)}
+                            className="p-2 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                            title="Elimina scommessa"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
                     </div>
+                    {market.description && <p className="text-gray-400 text-sm font-medium italic line-clamp-2">{market.description}</p>}
                   </div>
-                  {market.description && <p className="text-gray-400 text-sm font-medium italic">{market.description}</p>}
-                </div>
 
-                {/* Options */}
-                <div className="p-6 md:p-8 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {market.options.map((opt: any) => {
-                      const isSelected = selectedBets[market.id]?.optionId === opt.id;
-                      const isWinner = market.winner_option_id === opt.id;
-                      const odds = calculateOdds(market.options, opt.id);
+                  {/* Options */}
+                  <div className="p-6 md:p-8 space-y-6 flex-grow flex flex-col">
+                    <div className="grid grid-cols-1 gap-4">
+                      {market.options.map((opt: any) => {
+                        const isSelected = selectedBets[market.id]?.optionId === opt.id;
+                        const isWinner = market.winner_option_id === opt.id;
+                        const odds = calculateOdds(market.options, opt.id);
 
-                      return (
-                        <button
-                          key={opt.id}
-                          disabled={market.status !== 'open' || !isAuthenticated}
-                          onClick={() => setSelectedBets({ ...selectedBets, [market.id]: { optionId: opt.id, amount: selectedBets[market.id]?.amount || 10 } })}
-                          className={clsx(
-                            "relative p-6 rounded-2xl border transition-all duration-300 text-left group/opt overflow-hidden",
-                            isSelected ? "bg-blue-600/20 border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.2)]" : 
-                            isWinner ? "bg-green-600/20 border-green-500" :
-                            "bg-white/5 border-white/5 hover:border-white/20 hover:bg-white/[0.08]"
-                          )}
-                        >
-                          <div className="flex justify-between items-center relative z-10">
-                            <div className="flex flex-col">
-                              <span className={clsx(
-                                "text-lg font-black uppercase tracking-tight",
-                                isSelected ? "text-white" : "text-gray-300"
-                              )}>
-                                {opt.label}
-                              </span>
-                              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-                                Puntata Totale: {opt.total_bet || 0} 🐑
-                              </span>
+                        return (
+                          <button
+                            key={opt.id}
+                            disabled={market.status !== 'open' || !isAuthenticated}
+                            onClick={() => setSelectedBets({ ...selectedBets, [market.id]: { optionId: opt.id, amount: selectedBets[market.id]?.amount || 10 } })}
+                            className={clsx(
+                              "relative p-5 rounded-2xl border transition-all duration-300 text-left group/opt overflow-hidden",
+                              isSelected ? "bg-blue-600 border-blue-400 shadow-[0_0_30px_rgba(59,130,246,0.3)] scale-[1.02]" : 
+                              isWinner ? "bg-green-600/20 border-green-500" :
+                              "bg-white/5 border-white/5 hover:border-white/20 hover:bg-white/[0.08]"
+                            )}
+                          >
+                            <div className="flex justify-between items-center relative z-10">
+                              <div className="flex flex-col min-w-0">
+                                <span className={clsx(
+                                  "text-base font-black uppercase tracking-tight truncate mb-1",
+                                  isSelected ? "text-white" : "text-gray-300"
+                                )}>
+                                  {opt.label}
+                                </span>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Puntata:</span>
+                                  <span className="text-[10px] text-blue-400 font-black">{opt.total_bet || 0} 🐑</span>
+                                </div>
+                              </div>
+                              <div className="flex flex-col items-end shrink-0 ml-4">
+                                <span className={clsx(
+                                  "text-[9px] font-black uppercase tracking-widest mb-0.5",
+                                  isSelected ? "text-blue-200" : "text-blue-400"
+                                )}>Quota</span>
+                                <span className={clsx(
+                                  "text-xl font-black",
+                                  isSelected ? "text-white" : "text-white"
+                                )}>{odds}</span>
+                              </div>
                             </div>
-                            <div className="flex flex-col items-end">
-                              <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Quota</span>
-                              <span className="text-2xl font-black text-white">{odds}</span>
+                            
+                            {isWinner && (
+                              <div className="absolute top-2 right-2">
+                                <Trophy size={14} className="text-yellow-500" />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Bet Input Area - INTEGRATED */}
+                    {selectedBets[market.id] && market.status === 'open' && (
+                      <div className="mt-auto pt-6 border-t border-white/5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <div className="flex items-stretch gap-3">
+                          <div className="flex-grow flex items-center bg-black/40 border border-white/10 rounded-xl overflow-hidden h-14 group/input">
+                            <button 
+                              onClick={() => {
+                                const current = selectedBets[market.id].amount;
+                                if (current > 1) setSelectedBets({ ...selectedBets, [market.id]: { ...selectedBets[market.id], amount: current - 1 } });
+                              }}
+                              className="w-12 h-full flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-all"
+                            >
+                              <div className="w-5 h-5 flex items-center justify-center font-black">-</div>
+                            </button>
+                            <div className="flex-grow flex items-center justify-center gap-2 px-2">
+                              <input
+                                type="number"
+                                min="1"
+                                max={sheepBalance}
+                                value={selectedBets[market.id].amount}
+                                onChange={(e) => {
+                                  const val = parseInt(e.target.value) || 0;
+                                  setSelectedBets({ ...selectedBets, [market.id]: { ...selectedBets[market.id], amount: val } });
+                                }}
+                                className="w-16 bg-transparent text-center text-white font-black text-xl outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              />
+                              <span className="text-xl">🐑</span>
                             </div>
+                            <button 
+                              onClick={() => {
+                                const current = selectedBets[market.id].amount;
+                                if (current < sheepBalance) setSelectedBets({ ...selectedBets, [market.id]: { ...selectedBets[market.id], amount: current + 1 } });
+                              }}
+                              className="w-12 h-full flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-all"
+                            >
+                              <div className="w-5 h-5 flex items-center justify-center font-black">+</div>
+                            </button>
                           </div>
                           
-                          {/* Win Badge */}
-                          {isWinner && (
-                            <div className="absolute top-2 right-2">
-                              <Trophy size={16} className="text-yellow-500" />
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Bet Input Area */}
-                  {selectedBets[market.id] && market.status === 'open' && (
-                    <div className="mt-8 p-6 bg-[#111218] border border-slate-400/20 rounded-3xl animate-in slide-in-from-top-4 duration-300">
-                      <div className="flex flex-col md:flex-row items-center gap-6">
-                        <div className="flex-grow w-full">
-                          <label className="block text-[10px] font-black text-blue-400 uppercase tracking-widest mb-3">Quante pecore vuoi inviare?</label>
-                          <div className="relative">
-                            <input
-                              type="number"
-                              min="1"
-                              max={sheepBalance}
-                              value={selectedBets[market.id].amount}
-                              onChange={(e) => setSelectedBets({ ...selectedBets, [market.id]: { ...selectedBets[market.id], amount: parseInt(e.target.value) || 0 } })}
-                              className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white font-black text-xl outline-none focus:border-blue-500 transition-all"
-                            />
-                            <span className="absolute right-6 top-1/2 -translate-y-1/2 text-2xl">🐑</span>
-                          </div>
+                          <button
+                            onClick={() => handlePlaceBet(market.id)}
+                            disabled={placingBetId === market.id}
+                            className="px-6 h-14 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-black uppercase text-[11px] tracking-widest rounded-xl hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-blue-900/20 flex items-center justify-center"
+                          >
+                            {placingBetId === market.id ? <Loader2 size={18} className="animate-spin" /> : 'SCOMMETTI'}
+                          </button>
                         </div>
-                        <button
-                          onClick={() => handlePlaceBet(market.id)}
-                          disabled={placingBetId === market.id}
-                          className="w-full md:w-auto h-full px-10 py-5 bg-gradient-to-b from-blue-400 to-blue-600 text-white font-black uppercase tracking-widest rounded-2xl hover:brightness-110 active:scale-95 transition-all shadow-xl shadow-blue-900/20 flex items-center justify-center gap-3"
-                        >
-                          {placingBetId === market.id ? <Loader2 size={20} className="animate-spin" /> : 'Scommetti Ora'}
-                        </button>
+                        <div className="flex justify-between items-center mt-3 px-1">
+                          <div className="flex items-center gap-1.5 text-[9px] text-gray-500 font-bold uppercase tracking-widest">
+                            <TrendingUp size={12} /> Vincita: 
+                            <span className="text-green-400">{Math.floor(selectedBets[market.id].amount * parseFloat(calculateOdds(market.options, selectedBets[market.id].optionId) || '0'))} 🐑</span>
+                          </div>
+                          <button 
+                            onClick={() => setSelectedBets(prev => {
+                              const next = { ...prev };
+                              delete next[market.id];
+                              return next;
+                            })}
+                            className="text-[9px] font-black text-gray-600 hover:text-gray-400 uppercase tracking-widest"
+                          >
+                            Annulla
+                          </button>
+                        </div>
                       </div>
-                      <p className="mt-4 text-[11px] text-gray-500 italic flex items-center gap-2">
-                        <TrendingUp size={14} /> Possibile vincita stimata: {Math.floor(selectedBets[market.id].amount * parseFloat(calculateOdds(market.options, selectedBets[market.id].optionId) || '0'))} 🐑
-                      </p>
-                    </div>
-                  )}
+                    )}
 
-                  {!isAuthenticated && (
-                    <div className="mt-6 text-center p-4 bg-yellow-500/5 border border-yellow-500/10 rounded-2xl">
-                      <p className="text-yellow-500/80 text-xs font-bold uppercase tracking-widest">Effettua il login per iniziare a scommettere le tue pecore!</p>
-                    </div>
-                  )}
+                    {!isAuthenticated && (
+                      <div className="mt-auto pt-6 text-center">
+                        <p className="text-yellow-500/50 text-[10px] font-black uppercase tracking-[0.15em] border border-yellow-500/10 py-3 rounded-xl bg-yellow-500/5">Effettua il login per scommettere</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
 
-        {/* Sidebar: Leaderboard & Rules */}
+        {/* Sidebar: My Bets */}
         <div className="space-y-8">
-          {/* My Bets Section */}
           {isAuthenticated && myBets.length > 0 && (
-            <div className="bg-[#111218] p-8 rounded-[2.5rem] border border-slate-400/20">
-              <h4 className="text-blue-400 font-black uppercase tracking-tighter mb-6 flex items-center gap-3">
-                <TrendingUp size={20} /> Le Tue Scommesse
+            <div className="bg-[#111218] p-6 rounded-[2rem] border border-slate-400/20 shadow-xl backdrop-blur-sm">
+              <h4 className="text-blue-400 font-black uppercase tracking-tight mb-6 flex items-center gap-3 text-sm">
+                <TrendingUp size={18} /> Le Tue Scommesse
               </h4>
               <div className="space-y-4">
                 {myBets.map((bet) => {
@@ -699,26 +766,26 @@ export function BettingPage() {
                   const option = market?.options.find(o => o.id === bet.option_id);
                   
                   return (
-                    <div key={bet.id} className="p-4 bg-black/40 border border-white/10 rounded-2xl">
+                    <div key={bet.id} className="p-4 bg-white/5 border border-white/5 rounded-2xl group hover:border-blue-500/30 transition-all">
                       <div className="flex justify-between items-start mb-2">
-                        <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{market?.title}</span>
+                        <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest truncate max-w-[120px]">{market?.title || 'Mercato'}</span>
                         <span className={clsx(
-                          "text-[10px] font-black uppercase px-2 py-0.5 rounded",
+                          "text-[9px] font-black uppercase px-2 py-0.5 rounded",
                           bet.status === 'won' ? "bg-green-500/20 text-green-400" :
                           bet.status === 'lost' ? "bg-red-500/20 text-red-400" : "bg-blue-500/20 text-blue-400"
                         )}>
-                          {bet.status === 'won' ? 'Vinta' : bet.status === 'lost' ? 'Persa' : 'In attesa'}
+                          {bet.status === 'won' ? 'Vinta' : bet.status === 'lost' ? 'Persa' : 'In corso'}
                         </span>
                       </div>
                       <div className="flex justify-between items-end">
-                        <div>
-                          <p className="text-sm font-bold text-white uppercase tracking-tight">{option?.label}</p>
-                          <p className="text-xs text-blue-400 font-bold">{bet.amount} 🐑</p>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-white uppercase truncate">{option?.label || 'Opzione'}</p>
+                          <p className="text-[10px] text-blue-400 font-black">{bet.amount} 🐑</p>
                         </div>
                         {bet.status === 'won' && (
-                          <div className="text-right">
-                            <p className="text-[10px] font-black text-green-400 uppercase">Premio</p>
-                            <p className="text-sm font-black text-green-400">+{bet.payout} 🐑</p>
+                          <div className="text-right shrink-0">
+                            <p className="text-[8px] font-black text-green-400 uppercase">Premio</p>
+                            <p className="text-xs font-black text-green-400">+{bet.payout} 🐑</p>
                           </div>
                         )}
                       </div>
@@ -728,37 +795,39 @@ export function BettingPage() {
               </div>
             </div>
           )}
+        </div>
+      </div>
 
-          {/* Leaderboard */}
-          <div className="bg-[#111218] p-8 rounded-[2.5rem] border border-slate-400/20 relative overflow-hidden">
-            <h4 className="text-xl font-black text-white uppercase tracking-tighter mb-6 relative z-10 flex items-center gap-3">
-              <Users size={20} className="text-blue-400" />
-              I Migliori Pastori
-            </h4>
-            <div className="space-y-4 relative z-10">
-              {leaderboard.map((u, i) => (
-                <div key={u.username} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 hover:border-white/20 transition-all">
-                  <div className="flex items-center gap-4">
-                    <span className={clsx(
-                      "w-8 h-8 rounded-full flex items-center justify-center font-black text-xs",
-                      i === 0 ? "bg-yellow-500 text-black" : 
-                      i === 1 ? "bg-slate-300 text-black" : 
-                      i === 2 ? "bg-amber-700 text-white" : "bg-white/10 text-gray-400"
-                    )}>
-                      {i + 1}
-                    </span>
-                    <span className="font-bold text-white uppercase tracking-tight">{u.username}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-black text-blue-400">{u.sheep_balance}</span>
-                    <span>🐑</span>
-                  </div>
-                </div>
-              ))}
+      {/* Premium Delete Confirmation Modal */}
+      {marketToDelete && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
+          <div className="bg-[#111218] border border-red-500/20 p-8 rounded-[2.5rem] max-w-md w-full shadow-[0_0_100px_rgba(239,68,68,0.1)] animate-in zoom-in-95 duration-300 text-center">
+            <div className="w-20 h-20 bg-red-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-red-500/20">
+              <Trash2 className="text-red-500" size={40} />
+            </div>
+            <h3 className="text-2xl font-black text-white uppercase tracking-tighter mb-4">Elimina Scommessa?</h3>
+            <p className="text-gray-400 text-sm font-medium leading-relaxed mb-8">
+              Stai per rimuovere definitivamente questo mercato dal torneo. Tutte le puntate degli utenti verranno perse e l'azione non può essere annullata.
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setMarketToDelete(null)}
+                disabled={isDeleting}
+                className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-white font-black uppercase text-xs tracking-widest rounded-2xl transition-all border border-white/5"
+              >
+                Annulla
+              </button>
+              <button
+                onClick={executeDeleteMarket}
+                disabled={isDeleting}
+                className="flex-1 py-4 bg-red-600 hover:bg-red-500 text-white font-black uppercase text-xs tracking-widest rounded-2xl transition-all shadow-lg shadow-red-600/20 flex items-center justify-center gap-2"
+              >
+                {isDeleting ? <Loader2 size={16} className="animate-spin" /> : 'Sì, Elimina'}
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
