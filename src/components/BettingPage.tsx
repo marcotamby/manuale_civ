@@ -52,7 +52,7 @@ export function BettingPage() {
     eventLevel: 'High Elo',
     teamA: '',
     teamB: '',
-    options: [{ label: '', weight: 100 }]
+    options: [{ label: '', weight: 100, is_disabled: false }] as any[]
   });
 
   const cleanSlug = (slug || '').split('?')[0].trim().replace(/\/$/, '');
@@ -247,27 +247,8 @@ export function BettingPage() {
     }
   };
 
-  const handleCloseMarket = async (id: string) => {
-    try {
-      const { error } = await supabase.from('betting_markets').update({ status: 'closed' }).eq('id', id);
-      if (error) throw error;
-      toast.success('Mercato chiuso con successo.');
-      loadData(true);
-    } catch (err: any) {
-      toast.error(`Errore: ${err.message}`);
-    }
-  };
-
-  const handleReopenMarket = async (id: string) => {
-    try {
-      const { error } = await supabase.from('betting_markets').update({ status: 'open' }).eq('id', id);
-      if (error) throw error;
-      toast.success('Mercato riaperto con successo.');
-      loadData(true);
-    } catch (err: any) {
-      toast.error(`Errore: ${err.message}`);
-    }
-  };
+  // Market status management is now handled inline in the render logic or via Edit modal
+  
 
   const handleSettleMarket = async (marketId: string, winnerOptionId: string) => {
     try {
@@ -828,11 +809,30 @@ export function BettingPage() {
                             "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase border shrink-0",
                             market.status === 'open' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-red-500/10 border-red-500/20 text-red-400"
                           )}>
-                            {market.status === 'open' ? 'Bet Aperta' : 'Bet Chiusa'}
+                             {market.status === 'open' ? 'Bet Aperta' : 'Bet Chiusa'}
                           </div>
                         </div>
                         {isAdmin && (
                            <div className="flex items-center gap-1">
+                             {market.status === 'open' ? (
+                               <button 
+                                 onClick={() => {
+                                   supabase.from('betting_markets').update({ status: 'closed' }).eq('id', market.id).then(() => loadData(true));
+                                 }}
+                                 className="px-2.5 py-1 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg text-[9px] font-black uppercase hover:bg-red-500 transition-all hover:text-white shrink-0"
+                               >
+                                 Chiudi
+                               </button>
+                             ) : market.winner_option_id === null && (
+                               <button 
+                                 onClick={() => {
+                                   supabase.from('betting_markets').update({ status: 'open' }).eq('id', market.id).then(() => loadData(true));
+                                 }}
+                                 className="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-[9px] font-black uppercase hover:bg-emerald-500 transition-all hover:text-white shrink-0"
+                               >
+                                 Riapri
+                               </button>
+                             )}
                              <button
                                onClick={() => {
                                  setEditingMarketId(market.id);
