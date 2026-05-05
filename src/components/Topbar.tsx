@@ -146,7 +146,10 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
         .ilike('message', 'I tuoi scout sono tornati!%'); 
       
       if (!error) {
+        console.log('🔔 Betting Notifications Count:', count, 'for user:', user.id);
         setBetUnreadCount(count || 0);
+      } else {
+        console.error('❌ Betting Notifications Error:', error);
       }
     } catch (e) {
       console.error('Error fetching betting notifications:', e);

@@ -57,7 +57,7 @@ export function BettingPage() {
 
   useEffect(() => {
     loadData();
-  }, [slug, user]);
+  }, [slug]); // Don't trigger on user change to avoid balance-update loop
 
   const loadData = async (silent = false) => {
     if (!silent) setLoading(true);
