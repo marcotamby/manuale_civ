@@ -576,12 +576,12 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                             
                                             return (
                                                 <div key={bet.id} className="bg-white/[0.03] p-4 rounded-xl border border-blue-500/10 hover:border-blue-500/30 transition-all group shadow-lg">
-                                                    <div className="flex justify-between items-start mb-2">
+                                                    <div className="flex justify-between items-center mb-2 gap-4">
                                                         <div className="min-w-0">
-                                                            <p className="text-[9px] text-gray-500 font-black uppercase truncate tracking-widest">{market?.title || 'Mercato'}</p>
+                                                            <p className="text-[9px] text-gray-500 font-black uppercase truncate tracking-widest leading-tight">{market?.title || 'Mercato'}</p>
                                                             <h5 className="text-sm font-black text-white uppercase truncate tracking-tight">{option?.label || 'Opzione'}</h5>
                                                         </div>
-                                                        <span className="text-[8px] px-2 py-0.5 rounded font-black uppercase tracking-widest bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                                        <span className="text-[8px] px-2 py-1 rounded font-black uppercase tracking-widest bg-blue-500/10 text-blue-400 border border-blue-500/20 leading-none shrink-0">
                                                             In Corso
                                                         </span>
                                                     </div>
@@ -636,13 +636,13 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
 
                                     return (
                                         <div key={bet.id} className="bg-white/[0.02] p-4 rounded-xl border border-white/5 hover:border-white/10 transition-all grayscale-[0.5] hover:grayscale-0">
-                                            <div className="flex justify-between items-start mb-2">
+                                            <div className="flex justify-between items-center mb-2 gap-4">
                                                 <div className="min-w-0">
-                                                    <p className="text-[9px] text-gray-600 font-bold uppercase truncate tracking-widest">{market?.title || 'Mercato'}</p>
+                                                    <p className="text-[9px] text-gray-600 font-bold uppercase truncate tracking-widest leading-tight">{market?.title || 'Mercato'}</p>
                                                     <h5 className="text-sm font-bold text-gray-300 uppercase truncate tracking-tight">{option?.label || 'Opzione'}</h5>
                                                 </div>
                                                 <span className={clsx(
-                                                    "text-[8px] px-2 py-0.5 rounded font-black uppercase tracking-widest border",
+                                                    "text-[8px] px-2 py-1 rounded font-black uppercase tracking-widest border leading-none shrink-0",
                                                     isWin ? "bg-green-500/10 text-green-400 border-green-500/20" : 
                                                     isLoss ? "bg-red-500/10 text-red-400 border-red-500/20" : 
                                                     "bg-gray-500/10 text-gray-500 border-white/5"
