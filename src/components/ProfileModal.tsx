@@ -147,6 +147,9 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     const [isUploading, setIsUploading] = useState(false);
     const [userBets, setUserBets] = useState<any[]>([]);
     const [isBetsLoading, setIsBetsLoading] = useState(false);
+    const [showActiveBets, setShowActiveBets] = useState(true);
+    const [showHistory, setShowHistory] = useState(false);
+    const [isArchiving, setIsArchiving] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Sync local state ONLY when modal opens
@@ -277,6 +280,25 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
         const history = userBets.filter(b => b.betting_markets?.status === 'settled' || b.status === 'won' || b.status === 'lost');
         return { activeBets: active, historyBets: history };
     }, [userBets]);
+
+    const handleArchiveHistory = async () => {
+        if (!user?.email || !window.confirm('Vuoi davvero archiviare tutta la cronologia? Le scommesse concluse verranno rimosse permanentemente dalla vista.')) return;
+        try {
+            setIsArchiving(true);
+            const { error } = await supabase
+                .from('user_bets')
+                .delete()
+                .ilike('user_email', user.email)
+                .neq('status', 'pending');
+            
+            if (error) throw error;
+            setUserBets(prev => prev.filter(b => b.status === 'pending'));
+        } catch (err) {
+            console.error('Error archiving history:', err);
+        } finally {
+            setIsArchiving(false);
+        }
+    };
 
     const fetchUserBets = async () => {
         if (!user?.email) return;
@@ -534,9 +556,6 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                     <span className="text-4xl font-black text-white">{user?.sheep_balance ?? 100}</span>
                                     <span className="text-3xl animate-bounce duration-2000">🐑</span>
                                 </div>
-                                <p className="text-[10px] text-gray-500 italic mt-1 uppercase font-bold tracking-tighter">
-                                    Le tue risorse per il social betting
-                                </p>
                             </div>
                             <button 
                                 onClick={() => { navigate('/tornei'); onClose(); }}
@@ -549,47 +568,55 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
 
                     {/* Le Tue Scommesse Attive */}
                     <section>
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center gap-2 text-blue-400 tracking-widest uppercase text-xs font-bold">
+                        <button 
+                            onClick={() => setShowActiveBets(!showActiveBets)}
+                            className="w-full flex items-center justify-between mb-4 group/h"
+                        >
+                            <div className="flex items-center gap-2 text-blue-400 tracking-widest uppercase text-xs font-bold group-hover/h:text-blue-300 transition-colors">
                                 <TrendingUp size={14} />
-                                <span>Le Tue Scommesse Attive</span>
+                                <span>Le Tue Scommesse Attive ({activeBets.length})</span>
                             </div>
-                        </div>
+                            <ChevronDown size={16} className={clsx("text-gray-500 transition-transform duration-300", showActiveBets && "rotate-180")} />
+                        </button>
 
-                        {isBetsLoading ? (
-                            <div className="flex items-center justify-center py-6 bg-white/[0.02] rounded-xl border border-white/5">
-                                <Loader2 size={20} className="animate-spin text-blue-500/50" />
-                            </div>
-                        ) : activeBets.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                {activeBets.map((bet) => {
-                                    const market = bet.betting_markets;
-                                    const option = market?.options?.find((o: any) => o.id === bet.option_id);
-                                    
-                                    return (
-                                        <div key={bet.id} className="bg-white/[0.03] p-4 rounded-xl border border-blue-500/10 hover:border-blue-500/30 transition-all group shadow-lg">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <div className="min-w-0">
-                                                    <p className="text-[9px] text-gray-500 font-black uppercase truncate tracking-widest">{market?.title || 'Mercato'}</p>
-                                                    <h5 className="text-sm font-black text-white uppercase truncate tracking-tight">{option?.label || 'Opzione'}</h5>
+                        {showActiveBets && (
+                            <div className="animate-in slide-in-from-top-2 duration-300">
+                                {isBetsLoading ? (
+                                    <div className="flex items-center justify-center py-6 bg-white/[0.02] rounded-xl border border-white/5">
+                                        <Loader2 size={20} className="animate-spin text-blue-500/50" />
+                                    </div>
+                                ) : activeBets.length > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        {activeBets.map((bet) => {
+                                            const market = bet.betting_markets;
+                                            const option = market?.options?.find((o: any) => o.id === bet.option_id);
+                                            
+                                            return (
+                                                <div key={bet.id} className="bg-white/[0.03] p-4 rounded-xl border border-blue-500/10 hover:border-blue-500/30 transition-all group shadow-lg">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <div className="min-w-0">
+                                                            <p className="text-[9px] text-gray-500 font-black uppercase truncate tracking-widest">{market?.title || 'Mercato'}</p>
+                                                            <h5 className="text-sm font-black text-white uppercase truncate tracking-tight">{option?.label || 'Opzione'}</h5>
+                                                        </div>
+                                                        <span className="text-[8px] px-2 py-0.5 rounded font-black uppercase tracking-widest bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                                            In Corso
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
+                                                        <div className="flex items-center gap-1">
+                                                            <span className="text-[10px] text-gray-500 font-bold uppercase">Puntata:</span>
+                                                            <span className="text-xs font-black text-blue-400">{bet.amount} 🐑</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <span className="text-[8px] px-2 py-0.5 rounded font-black uppercase tracking-widest bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                                                    In Corso
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
-                                                <div className="flex items-center gap-1">
-                                                    <span className="text-[10px] text-gray-500 font-bold uppercase">Puntata:</span>
-                                                    <span className="text-xs font-black text-blue-400">{bet.amount} 🐑</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ) : (
-                            <div className="text-center py-6 bg-white/[0.02] rounded-xl border border-dashed border-white/10">
-                                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Nessuna scommessa attiva.</p>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-6 bg-white/[0.02] rounded-xl border border-dashed border-white/10">
+                                        <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Nessuna scommessa attiva.</p>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </section>
@@ -598,13 +625,26 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                     {historyBets.length > 0 && (
                         <section>
                             <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-2 text-gray-400 tracking-widest uppercase text-xs font-bold">
+                                <button 
+                                    onClick={() => setShowHistory(!showHistory)}
+                                    className="flex items-center gap-2 text-gray-400 tracking-widest uppercase text-xs font-bold hover:text-white transition-colors"
+                                >
                                     <History size={14} />
                                     <span>Cronologia Scommesse</span>
-                                </div>
+                                    <ChevronDown size={14} className={clsx("transition-transform", showHistory && "rotate-180")} />
+                                </button>
+                                <button 
+                                    onClick={handleArchiveHistory}
+                                    disabled={isArchiving}
+                                    className="text-[9px] text-gray-500 hover:text-red-400 transition-colors uppercase font-black tracking-widest flex items-center gap-1.5"
+                                >
+                                    {isArchiving ? <Loader2 size={10} className="animate-spin" /> : <TrashIcon size={10} />}
+                                    Archivia Cronologia
+                                </button>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 opacity-80">
+                            {showHistory && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 opacity-80 animate-in slide-in-from-top-2 duration-300">
                                 {historyBets.map((bet) => {
                                     const market = bet.betting_markets;
                                     const option = market?.options?.find((o: any) => o.id === bet.option_id);
@@ -648,6 +688,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                     );
                                 })}
                             </div>
+                            )}
                         </section>
                     )}
 
