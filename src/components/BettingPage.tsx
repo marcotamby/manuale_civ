@@ -176,6 +176,8 @@ export function BettingPage() {
       }
       console.log('🎲 Attempting to place bet with data:', betData);
       console.log('🚀 Sending bet to Supabase...');
+      if (typeof window !== 'undefined') window.alert(`DEBUG: Invio bet per user: ${finalUserId || 'NULL'}`);
+      
       const { data: insertData, error: insertError } = await supabase
         .from('user_bets')
         .insert(betData)
@@ -184,14 +186,14 @@ export function BettingPage() {
       if (insertError) {
         console.error('❌ DATABASE INSERT FAILED:', insertError);
         const msg = `ERRORE DB [${insertError.code}]: ${insertError.message}`;
-        toast.error(msg);
-        // Fallback alert if toast is hidden
         if (typeof window !== 'undefined') window.alert(msg);
         setPlacingBetId(null);
         return;
       }
 
       console.log('✅ INSERT SUCCESSFUL:', insertData);
+      if (typeof window !== 'undefined') window.alert(`✅ SUCCESSO! Bet ID: ${insertData?.[0]?.id || 'Mancante'}`);
+      
       toast.success('I tuoi scout hanno portato le pecore al mercato! 🐑');
       
       // MUST await these to ensure consistency before clearing UI
