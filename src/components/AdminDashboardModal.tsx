@@ -51,9 +51,14 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     tournament_slug: '',
     title: '',
     description: '',
-    options: [{ id: 'opt1', label: '', total_bet: 0 }, { id: 'opt2', label: '', total_bet: 0 }],
-    type: 'winner'
+    type: 'Match Winner',
+    eventLevel: 'High Elo',
+    teamA: '',
+    teamB: '',
+    options: ['', '']
   });
+  const [participantsByLevel, setParticipantsByLevel] = useState<{ [level: string]: string[] }>({ 'High Elo': [], 'Low Elo': [] });
+  const [isFetchingParticipants, setIsFetchingParticipants] = useState(false);
   const [users, setUsers] = useState<any[]>([]);
   const [userSearch, setUserSearch] = useState('');
   const [userLoading, setUserLoading] = useState(false);
@@ -257,14 +262,71 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     }
   };
 
+  const fetchParticipantsForAdmin = async (slug: string) => {
+    if (!slug) return;
+    setIsFetchingParticipants(true);
+    try {
+      const { fetchTournament } = await import('../services/startgg');
+      const startggData = await fetchTournament(slug);
+      if (startggData?.events) {
+        const mapping: { [level: string]: string[] } = { 'High Elo': [], 'Low Elo': [] };
+        startggData.events.forEach((e: any) => {
+          const eventName = e.name.toLowerCase();
+          let level = '';
+          if (eventName.includes('high')) level = 'High Elo';
+          else if (eventName.includes('low')) level = 'Low Elo';
+          
+          if (level && e.entrants?.nodes) {
+            e.entrants.nodes.forEach((n: any) => {
+              if (!mapping[level].includes(n.name)) mapping[level].push(n.name);
+            });
+          } else if (!level && e.entrants?.nodes) {
+            e.entrants.nodes.forEach((n: any) => {
+              if (!mapping['High Elo'].includes(n.name)) mapping['High Elo'].push(n.name);
+              if (!mapping['Low Elo'].includes(n.name)) mapping['Low Elo'].push(n.name);
+            });
+          }
+        });
+        setParticipantsByLevel({
+          'High Elo': mapping['High Elo'].sort(),
+          'Low Elo': mapping['Low Elo'].sort()
+        });
+      }
+    } catch (e) {
+      console.warn("Could not fetch entrants for admin dropdowns", e);
+    } finally {
+      setIsFetchingParticipants(false);
+    }
+  };
+
   const handleCreateMarket = async () => {
-    if (!newMarket.tournament_slug || !newMarket.title || newMarket.options.some(o => !o.label)) {
+    let finalOptions = newMarket.options;
+    if (newMarket.type === 'Match Winner') {
+      finalOptions = [newMarket.teamA || 'Team A', newMarket.teamB || 'Team B'];
+    }
+
+    if (!newMarket.tournament_slug || !newMarket.title || finalOptions.some(o => !o)) {
       setToast({ isVisible: true, message: 'Compila tutti i campi obbligatori', type: 'error' });
       return;
     }
 
     try {
-      const { error } = await supabase.from('betting_markets').insert([newMarket]);
+      const optionsWithMeta = finalOptions.map(label => ({
+        id: Math.random().toString(36).substring(2, 11),
+        label,
+        total_bet: 0
+      }));
+
+      const payload = {
+        tournament_slug: newMarket.tournament_slug,
+        title: newMarket.title,
+        description: newMarket.description,
+        type: newMarket.type,
+        options: optionsWithMeta,
+        status: 'open'
+      };
+
+      const { error } = await supabase.from('betting_markets').insert([payload]);
       if (error) throw error;
       setToast({ isVisible: true, message: 'Mercato creato con successo!', type: 'success' });
       fetchTournamentsAndMarkets();
@@ -272,8 +334,11 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
         tournament_slug: '',
         title: '',
         description: '',
-        options: [{ id: 'opt1', label: '', total_bet: 0 }, { id: 'opt2', label: '', total_bet: 0 }],
-        type: 'winner'
+        type: 'Match Winner',
+        eventLevel: 'High Elo',
+        teamA: '',
+        teamB: '',
+        options: ['', '']
       });
     } catch (err: any) {
       setToast({ isVisible: true, message: 'Errore: ' + err.message, type: 'error' });
@@ -1107,169 +1172,246 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                 </div>
               )}
             </div>
-          </div>
-        ) : activeTab === 'betting' ? (
-          <div className="flex-1 flex flex-col min-h-0 overflow-y-auto p-4 md:p-6 custom-scrollbar space-y-8">
-              {/* Create New Market Section */}
-              <div className="glass-card p-6 md:p-8 rounded-[2rem] border-white/10 bg-white/[0.03] shadow-2xl relative overflow-hidden group">
-                 <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
-                    <Coins size={120} />
-                 </div>
-                 
-                 <h3 className="text-xl font-black text-white mb-8 flex items-center gap-3">
-                    <div className="p-2 bg-blue-500/20 rounded-xl border border-blue-500/30">
-                       <Coins size={24} className="text-blue-400" />
-                    </div>
-                    <span>Crea Nuovo Mercato</span>
-                 </h3>
+           ) : activeTab === 'betting' ? (
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-10 custom-scrollbar">
+              {/* New Market Creation Form */}
+              <div className="bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
+                      <Coins size={160} />
+                  </div>
+                  
+                  <div className="flex items-center gap-4 mb-8">
+                      <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20">
+                          <Plus size={24} className="text-white" />
+                      </div>
+                      <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Crea Nuovo Mercato</h3>
+                  </div>
 
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
                     <div className="space-y-6">
-                       <div className="group/field">
-                          <label className="text-[11px] font-black text-blue-400 uppercase tracking-widest block mb-2 px-1">Torneo di Riferimento</label>
-                          <div className="relative">
-                             <select 
-                                className="w-full bg-black/60 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer"
-                                value={newMarket.tournament_slug}
-                                onChange={(e) => setNewMarket({...newMarket, tournament_slug: e.target.value})}
-                             >
-                                <option value="" className="bg-[#0f1423]">Seleziona un torneo attivo...</option>
-                                {tournaments.map(t => (
-                                   <option key={t.slug} value={t.slug} className="bg-[#0f1423]">{t.name}</option>
-                                ))}
-                             </select>
-                             <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-                                <Search size={16} />
-                             </div>
-                          </div>
-                       </div>
+                        <div className="group/field">
+                           <label className="text-[11px] font-black text-blue-400 uppercase tracking-widest block mb-2 px-1">Torneo di Riferimento</label>
+                           <div className="relative">
+                              <select 
+                                 className="w-full bg-black/60 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer"
+                                 value={newMarket.tournament_slug}
+                                 onChange={(e) => {
+                                    setNewMarket({...newMarket, tournament_slug: e.target.value});
+                                    fetchParticipantsForAdmin(e.target.value);
+                                 }}
+                              >
+                                 <option value="" className="bg-[#0f1423]">Seleziona un torneo attivo...</option>
+                                 {tournaments.map(t => (
+                                    <option key={t.slug} value={t.slug} className="bg-[#0f1423]">{t.name}</option>
+                                 ))}
+                              </select>
+                              <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+                                 <Search size={16} />
+                              </div>
+                           </div>
+                        </div>
 
-                       <div className="group/field">
-                          <label className="text-[11px] font-black text-blue-400 uppercase tracking-widest block mb-2 px-1">Titolo del Mercato</label>
-                          <input 
-                             className="w-full bg-black/60 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-gray-600"
-                             placeholder="Es: Vincitore Finale, Vincitore Match 1..."
-                             value={newMarket.title}
-                             onChange={(e) => setNewMarket({...newMarket, title: e.target.value})}
-                          />
-                       </div>
-
-                       <div className="group/field">
-                          <label className="text-[11px] font-black text-blue-400 uppercase tracking-widest block mb-2 px-1">Tipologia di Scommessa</label>
-                          <div className="relative">
-                             <select 
-                                className="w-full bg-black/60 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer"
-                                value={newMarket.type}
-                                onChange={(e) => setNewMarket({...newMarket, type: e.target.value})}
-                             >
-                                <option value="winner" className="bg-[#0f1423]">🏆 Vincitore Torneo</option>
-                                <option value="match" className="bg-[#0f1423]">⚔️ Vincitore Match</option>
-                                <option value="score" className="bg-[#0f1423]">📊 Punteggio Finale Match</option>
-                             </select>
-                             <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-                                <Zap size={16} />
-                             </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="group/field">
+                            <label className="text-[11px] font-black text-blue-400 uppercase tracking-widest block mb-2 px-1">Tipologia</label>
+                            <select 
+                               className="w-full bg-black/60 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/50 transition-all appearance-none cursor-pointer"
+                               value={newMarket.type}
+                               onChange={(e) => setNewMarket({...newMarket, type: e.target.value})}
+                            >
+                               <option value="Match Winner" className="bg-[#0f1423]">⚔️ Vincitore Match</option>
+                               <option value="Final Score" className="bg-[#0f1423]">📊 Punteggio Finale</option>
+                               <option value="Tournament Winner" className="bg-[#0f1423]">🏆 Vincitore Torneo</option>
+                            </select>
                           </div>
-                       </div>
+                          <div className="group/field">
+                            <label className="text-[11px] font-black text-blue-400 uppercase tracking-widest block mb-2 px-1">Livello Evento</label>
+                            <select 
+                               className="w-full bg-black/60 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/50 transition-all appearance-none cursor-pointer"
+                               value={newMarket.eventLevel}
+                               onChange={(e) => setNewMarket({...newMarket, eventLevel: e.target.value})}
+                            >
+                               <option value="High Elo" className="bg-[#0f1423]">💎 High Elo</option>
+                               <option value="Low Elo" className="bg-[#0f1423]">🌱 Low Elo</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {newMarket.type === 'Match Winner' || newMarket.type === 'Final Score' ? (
+                          <div className="grid grid-cols-2 gap-4 p-4 bg-blue-500/5 border border-blue-500/10 rounded-2xl">
+                             <div className="space-y-2">
+                                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-1">Team A / Player 1</label>
+                                <select 
+                                   className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-blue-500/30 transition-all"
+                                   value={newMarket.teamA}
+                                   onChange={(e) => setNewMarket({...newMarket, teamA: e.target.value})}
+                                >
+                                   <option value="">Seleziona...</option>
+                                   {participantsByLevel[newMarket.eventLevel].map(p => (
+                                      <option key={p} value={p}>{p}</option>
+                                   ))}
+                                </select>
+                             </div>
+                             <div className="space-y-2">
+                                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-1">Team B / Player 2</label>
+                                <select 
+                                   className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-blue-500/30 transition-all"
+                                   value={newMarket.teamB}
+                                   onChange={(e) => setNewMarket({...newMarket, teamB: e.target.value})}
+                                >
+                                   <option value="">Seleziona...</option>
+                                   {participantsByLevel[newMarket.eventLevel].map(p => (
+                                      <option key={p} value={p}>{p}</option>
+                                   ))}
+                                </select>
+                             </div>
+                             <button 
+                                onClick={() => {
+                                  if (newMarket.teamA && newMarket.teamB) {
+                                    setNewMarket({...newMarket, title: `[${newMarket.eventLevel}] ${newMarket.teamA} vs ${newMarket.teamB}`});
+                                  }
+                                }}
+                                className="col-span-2 py-2 text-[10px] font-black text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-widest"
+                             >
+                                ✨ Genera Titolo Automaticamente
+                             </button>
+                          </div>
+                        ) : null}
+
+                        <div className="group/field">
+                           <label className="text-[11px] font-black text-blue-400 uppercase tracking-widest block mb-2 px-1">Titolo del Mercato</label>
+                           <input 
+                              className="w-full bg-black/60 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-gray-600"
+                              placeholder="Es: [High Elo] Team A vs Team B"
+                              value={newMarket.title}
+                              onChange={(e) => setNewMarket({...newMarket, title: e.target.value})}
+                           />
+                        </div>
                     </div>
 
                     <div className="space-y-6">
-                       <div>
-                          <label className="text-[11px] font-black text-blue-400 uppercase tracking-widest block mb-2 px-1 flex justify-between">
-                             <span>Opzioni Scommettibili</span>
-                             <span className="text-gray-500 font-normal lowercase tracking-normal">{newMarket.options.length} opzioni</span>
-                          </label>
-                          <div className="space-y-3 max-h-[250px] overflow-y-auto pr-2 elegant-scrollbar">
-                             {newMarket.options.map((opt, idx) => (
-                                <div key={idx} className="flex gap-3 group/opt">
-                                   <div className="relative flex-1">
+                        {newMarket.type === 'Tournament Winner' || newMarket.type === 'Final Score' ? (
+                          <div>
+                             <label className="text-[11px] font-black text-blue-400 uppercase tracking-widest block mb-2 px-1 flex justify-between">
+                                <span>Opzioni Personalizzate</span>
+                                <span className="text-gray-500 font-normal lowercase tracking-normal">{newMarket.options.length} opzioni</span>
+                             </label>
+                             <div className="space-y-3 max-h-[250px] overflow-y-auto pr-2 elegant-scrollbar">
+                                {newMarket.options.map((opt, idx) => (
+                                   <div key={idx} className="flex gap-3 group/opt">
                                       <input 
-                                         className="w-full bg-black/40 border border-white/5 rounded-xl px-5 py-3 text-sm text-white outline-none focus:border-white/20 transition-all"
+                                         className="flex-1 bg-black/40 border border-white/5 rounded-xl px-5 py-3 text-sm text-white outline-none focus:border-white/20 transition-all"
                                          placeholder={`Inserisci opzione ${idx+1}...`}
-                                         value={opt.label}
+                                         value={opt}
                                          onChange={(e) => {
                                             const opts = [...newMarket.options];
-                                            opts[idx].label = e.target.value;
+                                            opts[idx] = e.target.value;
                                             setNewMarket({...newMarket, options: opts});
                                          }}
                                       />
-                                   </div>
-                                   {newMarket.options.length > 2 && (
                                       <button 
-                                         onClick={() => setNewMarket({...newMarket, options: newMarket.options.filter((_, i) => i !== idx)})}
+                                         onClick={() => {
+                                           const opts = newMarket.options.filter((_, i) => i !== idx);
+                                           setNewMarket({...newMarket, options: opts.length > 0 ? opts : ['']});
+                                         }}
                                          className="p-3 text-gray-600 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
                                       >
                                          <Trash2 size={18} />
                                       </button>
-                                   )}
-                                </div>
-                             ))}
+                                   </div>
+                                ))}
+                             </div>
+                             <button 
+                                onClick={() => setNewMarket({...newMarket, options: [...newMarket.options, '']})}
+                                className="w-full mt-4 py-3 border border-dashed border-white/10 rounded-2xl text-xs font-bold text-gray-500 hover:text-white transition-all flex items-center justify-center gap-2"
+                             >
+                                <Plus size={14} /> Aggiungi Opzione
+                             </button>
                           </div>
-                          
-                          <button 
-                             onClick={() => setNewMarket({...newMarket, options: [...newMarket.options, { id: 'opt'+Date.now(), label: '', total_bet: 0 }]})}
-                             className="w-full mt-4 py-3 border border-dashed border-white/10 rounded-2xl text-xs font-bold text-gray-500 hover:text-white hover:border-white/30 hover:bg-white/5 transition-all flex items-center justify-center gap-2"
-                          >
-                             <Plus size={14} /> Aggiungi Opzione
-                          </button>
-                       </div>
+                        ) : (
+                          <div className="p-6 bg-green-500/5 border border-green-500/10 rounded-3xl text-center space-y-4">
+                             <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto">
+                                <Check size={24} className="text-green-400" />
+                             </div>
+                             <div>
+                                <h4 className="text-white font-bold mb-1 uppercase tracking-tighter">Opzioni Automatiche</h4>
+                                <p className="text-xs text-gray-400">Le opzioni di scommessa verranno generate automaticamente dai nomi dei due team selezionati.</p>
+                             </div>
+                          </div>
+                        )}
 
-                       <button 
-                          onClick={handleCreateMarket}
-                          className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-2xl font-black uppercase text-xs tracking-[0.2em] shadow-xl shadow-blue-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] mt-2 border border-white/10"
-                       >
-                          Pubblica Mercato
-                       </button>
+                        <button 
+                           onClick={handleCreateMarket}
+                           disabled={isFetchingParticipants}
+                           className="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-3xl font-black uppercase text-sm tracking-[0.2em] shadow-2xl shadow-blue-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] mt-4 border border-white/10 flex items-center justify-center gap-3"
+                        >
+                           {isFetchingParticipants ? <Loader2 size={20} className="animate-spin" /> : <Zap size={20} />}
+                           Pubblica Mercato Ora
+                        </button>
                     </div>
-                 </div>
+                  </div>
               </div>
 
              {/* Existing Markets Section */}
-             <div className="space-y-4">
-                <h3 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                   <Gavel size={16} className="text-yellow-500" /> Mercati Attivi
+             <div className="space-y-6">
+                <h3 className="text-lg font-black text-white uppercase tracking-tighter flex items-center gap-3">
+                   <div className="w-8 h-8 bg-yellow-500/10 rounded-lg flex items-center justify-center border border-yellow-500/20">
+                    <Gavel size={18} className="text-yellow-500" />
+                   </div>
+                   Mercati Attivi
                 </h3>
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-6">
                    {markets.map(m => (
-                      <div key={m.id} className="bg-black/40 border border-white/10 rounded-2xl p-5 hover:border-blue-500/30 transition-all">
-                         <div className="flex justify-between items-start mb-4">
+                      <div key={m.id} className="bg-black/60 border border-white/5 rounded-3xl p-6 hover:border-blue-500/30 transition-all group/market">
+                         <div className="flex justify-between items-start mb-6">
                             <div>
-                               <div className="flex items-center gap-2 mb-1">
-                                  <span className="text-[10px] px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black uppercase tracking-tighter">{m.tournament_slug}</span>
-                                  <span className={`text-[10px] px-2 py-0.5 border rounded font-black uppercase tracking-tighter ${m.status === 'open' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
-                                     {m.status}
+                               <div className="flex items-center gap-2 mb-2">
+                                  <span className="text-[9px] px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-lg font-black uppercase tracking-widest">{m.tournament_slug}</span>
+                                  <span className={`text-[9px] px-2 py-0.5 border rounded-lg font-black uppercase tracking-widest ${m.status === 'open' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
+                                     {m.status === 'open' ? 'Aperto' : 'Chiuso'}
                                   </span>
+                                  <span className="text-[9px] px-2 py-0.5 bg-white/5 text-gray-400 border border-white/10 rounded-lg font-black uppercase tracking-widest">{m.type}</span>
                                </div>
-                               <h4 className="text-lg font-bold text-white">{m.title}</h4>
+                               <h4 className="text-xl font-black text-white uppercase tracking-tighter">{m.title}</h4>
                             </div>
                             <div className="flex gap-2">
                                {m.status === 'open' && (
                                   <button 
                                      onClick={() => handleCloseMarket(m.id)}
-                                     className="px-3 py-1.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg text-[10px] font-black uppercase hover:bg-red-500/20 transition-colors"
+                                     className="px-4 py-2 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl text-[10px] font-black uppercase hover:bg-red-500 transition-all hover:text-white"
                                   >
                                      Chiudi Bet
                                   </button>
                                )}
+                               <button
+                                 onClick={() => {
+                                   if (window.confirm('Eliminare definitivamente questa scommessa?')) {
+                                     supabase.from('betting_markets').delete().eq('id', m.id).then(() => fetchTournamentsAndMarkets());
+                                   }
+                                 }}
+                                 className="p-2 text-gray-600 hover:text-red-500 transition-colors"
+                               >
+                                 <Trash2 size={16} />
+                               </button>
                             </div>
                          </div>
                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                             {m.options.map((opt: any) => (
-                               <div key={opt.id} className="bg-white/5 border border-white/5 p-3 rounded-xl flex justify-between items-center group">
-                                  <div>
-                                     <div className="text-xs text-white font-bold">{opt.label}</div>
-                                     <div className="text-[10px] text-gray-500 font-mono">{opt.total_bet} 🐑</div>
+                               <div key={opt.id} className="bg-white/5 border border-white/5 p-4 rounded-2xl flex justify-between items-center group/opt relative overflow-hidden">
+                                  <div className="relative z-10">
+                                     <div className="text-sm text-white font-black uppercase tracking-tighter">{opt.label}</div>
+                                     <div className="text-[10px] text-blue-400 font-mono mt-1">{opt.total_bet} 🐑</div>
                                   </div>
                                   {m.status === 'closed' && (
                                      <button 
                                         onClick={() => handleSettleMarket(m.id, opt.id)}
-                                        className="px-3 py-1 bg-green-600 hover:bg-green-500 text-white rounded-lg text-[10px] font-black uppercase shadow-lg shadow-green-600/20 opacity-0 group-hover:opacity-100 transition-all"
+                                        className="relative z-20 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-xl text-[10px] font-black uppercase shadow-lg shadow-green-600/20 opacity-0 group-hover/opt:opacity-100 transition-all scale-90 group-hover/opt:scale-100"
                                      >
                                         Vincitore
                                      </button>
                                   )}
                                   {m.status === 'settled' && m.winner_option_id === opt.id && (
-                                     <span className="text-yellow-500 drop-shadow-[0_0_5px_rgba(234,179,8,0.5)]">🏆</span>
+                                     <div className="absolute right-4 text-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.5)] scale-125">🏆</div>
                                   )}
                                </div>
                             ))}
@@ -1278,6 +1420,8 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                    ))}
                 </div>
              </div>
+          </div>
+      </div>
           </div>
         ) : (
           /* Q&A Tab Content */
