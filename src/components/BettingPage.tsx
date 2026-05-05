@@ -164,64 +164,20 @@ export function BettingPage() {
     }
 
     setPlacingBetId(marketId);
-    console.log('🎰 Attempting to place bet. Current user state:', { 
-      isAuthenticated, 
-      contextUserId: user?.id, 
-      email: user?.email 
-    });
-
     try {
+      // Get the best ID possible, but don't block
       let finalUserId = user?.id;
-      
       if (!finalUserId) {
         const { data: { session } } = await supabase.auth.getSession();
         finalUserId = session?.user?.id;
-        console.log('📡 Checked Supabase session:', finalUserId);
       }
-
-      // ULTIMATE FALLBACK: Search or CREATE profile by email
+      
+      // If still no ID, try to find by email one last time
       if (!finalUserId && user?.email) {
-        console.log('🔍 Searching profile by email:', user.email);
         const { data: profile } = await supabase.from('profiles').select('id').eq('email', user.email.toLowerCase()).maybeSingle();
-        
-        if (profile) {
-          finalUserId = profile.id;
-        } else {
-          console.log('✨ Profile not found, creating on the fly...');
-          const { data: newProfile, error: createError } = await supabase
-            .from('profiles')
-            .insert({
-              email: user.email.toLowerCase(),
-              nickname: user.email.split('@')[0],
-              sheep_balance: 100,
-              role: 'user'
-            })
-            .select('id')
-            .single();
-            
-          if (!createError && newProfile) {
-            finalUserId = newProfile.id;
-          } else {
-            console.error('❌ Failed to create profile:', createError);
-          }
-        }
-        console.log('📂 Profile ID result:', finalUserId);
+        finalUserId = profile?.id;
       }
 
-      // Local dev absolute bypass
-      if (!finalUserId && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-        finalUserId = '00000000-0000-0000-0000-000000000000';
-        console.log('🛠️ Local dev MOCK ID applied');
-      }
-
-      if (!finalUserId) {
-        console.error('❌ NO USER ID FOUND! Email:', user?.email);
-        toast.error(`Sessione non valida per: ${user?.email || 'utente anonimo'}. Ricarica la pagina.`);
-        setPlacingBetId(null);
-        return;
-      }
-
-      console.log('🚀 Placing bet with ID:', finalUserId);
       const { error: insertError } = await supabase
         .from('user_bets')
         .insert({
@@ -232,8 +188,8 @@ export function BettingPage() {
         });
 
       if (insertError) {
-        console.error('❌ Insert Error:', insertError);
-        toast.error(`Errore database: ${insertError.message}`);
+        console.error('❌ Betting Error:', insertError);
+        toast.error(`Errore DB: ${insertError.message} (${insertError.code})`);
         setPlacingBetId(null);
         return;
       }
