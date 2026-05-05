@@ -33,6 +33,7 @@ interface AuthContextType {
   updateRank: (rank: string) => void;
   updateProfile: (data: { rank?: string; nickname?: string; avatar_url?: string | null }) => void;
   refreshUser: () => Promise<void>;
+  setUser: (user: UserData | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -392,7 +393,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       toggleFavorite,
       updateRank,
       updateProfile,
-      refreshUser
+      refreshUser,
+      setUser
     }}>
       {children}
     </AuthContext.Provider>
