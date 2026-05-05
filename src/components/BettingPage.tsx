@@ -312,7 +312,7 @@ export function BettingPage() {
             .update({ options: updatedOptions })
             .eq('id', tourneyWinnerMarket.id);
             
-          toast.info(`Aggiornate quote Vincitore Torneo per ${winnerName}`);
+          toast(`Quote Vincitore Torneo aggiornate per ${winnerName}`, { icon: '📈' });
         }
       }
       
