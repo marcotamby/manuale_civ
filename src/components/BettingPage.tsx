@@ -802,8 +802,8 @@ export function BettingPage() {
                   {/* Market Header */}
                   <div className="p-6 md:p-8 bg-gradient-to-br from-[#1a1c25] to-[#111218] border-b border-white/5 min-h-[160px] md:min-h-[180px] flex flex-col">
                     <div className="flex flex-col gap-4 h-full">
-                      <div className="flex items-center justify-between gap-2 flex-nowrap">
-                        <div className="flex items-center gap-2 flex-nowrap">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
                           <span className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.15em] shrink-0">{market.type}</span>
                           <div className={clsx(
                             "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase border shrink-0",
@@ -812,14 +812,15 @@ export function BettingPage() {
                              {market.status === 'open' ? 'Bet Aperta' : 'Bet Chiusa'}
                           </div>
                         </div>
+                        
                         {isAdmin && (
-                           <div className="flex items-center gap-1">
+                           <div className="flex items-center gap-2">
                              {market.status === 'open' ? (
                                <button 
                                  onClick={() => {
                                    supabase.from('betting_markets').update({ status: 'closed' }).eq('id', market.id).then(() => loadData(true));
                                  }}
-                                 className="px-2.5 py-1 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg text-[9px] font-black uppercase hover:bg-red-500 transition-all hover:text-white shrink-0"
+                                 className="px-2.5 py-1 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg text-[9px] font-black uppercase hover:bg-red-500 transition-all hover:text-white"
                                >
                                  Chiudi
                                </button>
@@ -828,7 +829,7 @@ export function BettingPage() {
                                  onClick={() => {
                                    supabase.from('betting_markets').update({ status: 'open' }).eq('id', market.id).then(() => loadData(true));
                                  }}
-                                 className="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-[9px] font-black uppercase hover:bg-emerald-500 transition-all hover:text-white shrink-0"
+                                 className="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-[9px] font-black uppercase hover:bg-emerald-500 transition-all hover:text-white"
                                >
                                  Riapri
                                </button>
