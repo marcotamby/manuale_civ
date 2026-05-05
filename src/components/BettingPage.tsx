@@ -188,10 +188,16 @@ export function BettingPage() {
       }
 
       if (!finalUserId) {
-        console.error('❌ NO USER ID FOUND! Betting aborted.');
-        toast.error('Sessione non valida. Effettua il login o ricarica.');
-        setPlacingBetId(null);
-        return;
+        // Ultimate fallback for local testing UI flow
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          finalUserId = '00000000-0000-0000-0000-000000000000';
+          console.log('🛠️ Using MOCK UUID for local testing');
+        } else {
+          console.error('❌ NO USER ID FOUND! Betting aborted.');
+          toast.error('Sessione non valida. Effettua il login o ricarica.');
+          setPlacingBetId(null);
+          return;
+        }
       }
 
       console.log('🚀 Placing bet with ID:', finalUserId);
@@ -755,7 +761,13 @@ export function BettingPage() {
                         <div className="flex justify-between items-center mt-3 px-1">
                           <div className="flex items-center gap-1.5 text-[9px] text-gray-500 font-bold uppercase tracking-widest">
                             <TrendingUp size={12} /> Vincita: 
-                            <span className="text-green-400">{Math.floor(selectedBets[market.id].amount * parseFloat(calculateOdds(market.options, selectedBets[market.id].optionId) || '0'))} 🐑</span>
+                            <span className="text-green-400">
+                              {(() => {
+                                const odds = calculateOdds(market.options, selectedBets[market.id].optionId);
+                                if (odds === '---') return '---';
+                                return Math.floor(selectedBets[market.id].amount * parseFloat(odds));
+                              })()} 🐑
+                            </span>
                           </div>
                           <button 
                             onClick={() => setSelectedBets(prev => {
