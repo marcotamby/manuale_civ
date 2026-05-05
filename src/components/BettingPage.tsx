@@ -164,29 +164,37 @@ export function BettingPage() {
     }
 
     setPlacingBetId(marketId);
+    console.log('🎰 Attempting to place bet. Current user state:', { 
+      isAuthenticated, 
+      contextUserId: user?.id, 
+      email: user?.email 
+    });
+
     try {
-      // Prioritize context user ID, then session, then fallback for dev
       let finalUserId = user?.id;
       
       if (!finalUserId) {
         const { data: { session } } = await supabase.auth.getSession();
         finalUserId = session?.user?.id;
+        console.log('📡 Checked Supabase session:', finalUserId);
       }
 
-      // Local dev bypass if still no ID
+      // Local dev bypass/lookup
       if (!finalUserId && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-        console.log('🧪 Local dev: Using fallback ID for betting');
-        // We'll try to find a real ID from profiles if possible, or just alert
-        const { data: profile } = await supabase.from('profiles').select('id').eq('email', user?.email || '').maybeSingle();
+        console.log('🧪 Local dev: Searching profile for fallback...');
+        const { data: profile } = await supabase.from('profiles').select('id').eq('email', user?.email || 'admin@localhost').maybeSingle();
         finalUserId = profile?.id;
+        console.log('📂 Profile lookup result:', finalUserId);
       }
 
       if (!finalUserId) {
-        toast.error('Sessione non valida. Prova a ricaricare la pagina.');
+        console.error('❌ NO USER ID FOUND! Betting aborted.');
+        toast.error('Sessione non valida. Effettua il login o ricarica.');
         setPlacingBetId(null);
         return;
       }
 
+      console.log('🚀 Placing bet with ID:', finalUserId);
       const { error } = await supabase
         .from('user_bets')
         .insert({
