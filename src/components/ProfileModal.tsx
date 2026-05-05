@@ -290,6 +290,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     };
 
     const markAllBetsAsRead = async () => {
+        console.log('🔔 MARKING ALL BETS AS READ NOW!');
         if (!user?.email) return;
         try {
             await supabase
