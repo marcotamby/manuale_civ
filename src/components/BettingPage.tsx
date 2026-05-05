@@ -217,7 +217,7 @@ export function BettingPage() {
         return;
       }
 
-      if (error) throw error;
+
 
       toast.success('I tuoi scout hanno portato le pecore al mercato!');
       loadData(); // Refresh balance and markets
