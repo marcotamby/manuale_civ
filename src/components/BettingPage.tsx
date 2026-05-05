@@ -28,7 +28,7 @@ interface LeaderboardUser {
 export function BettingPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { user, isAuthenticated, isAdmin } = useAuth();
+  const { user, isAuthenticated, isAdmin, setUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [markets, setMarkets] = useState<Market[]>([]);
   const [tournament, setTournament] = useState<any>(null);
@@ -197,7 +197,13 @@ export function BettingPage() {
       
       // Update local balance immediately (optimistic update)
       const amountToDeduct = bet.amount;
-      setSheepBalance(prev => prev - amountToDeduct);
+      const newBalance = sheepBalance - amountToDeduct;
+      setSheepBalance(newBalance);
+      
+      // Sync with global AuthContext immediately so Topbar updates
+      if (user) {
+        setUser({ ...user, sheep_balance: newBalance });
+      }
       
       // Load other data (markets, leaderboard) but don't overwrite balance yet
       loadData(true);    
