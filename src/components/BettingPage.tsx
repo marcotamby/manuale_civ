@@ -598,32 +598,76 @@ export function BettingPage() {
                         ))}
                       </div>
                     ) : adminForm.type === 'Final Score' ? (
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {['2-0', '2-1', '1-2', '0-2', '3-0', '3-1', '3-2', '2-3', '1-3', '0-3'].map((score) => {
-                          const isSelected = adminForm.options.some(o => o.label.startsWith(score));
-                          return (
-                            <button
-                              key={score}
-                              type="button"
-                              onClick={() => {
-                                const label = `${score} (${adminForm.teamA || 'A'} vs ${adminForm.teamB || 'B'})`;
-                                if (isSelected) {
-                                  setAdminForm({...adminForm, options: adminForm.options.filter(o => !o.label.startsWith(score))});
-                                } else {
-                                  setAdminForm({...adminForm, options: [...adminForm.options.filter(o => o.label !== ''), { label, weight: 100 }]});
-                                }
-                              }}
-                              className={clsx(
-                                "p-3 border rounded-xl text-[10px] font-black uppercase transition-all",
-                                isSelected 
-                                  ? "bg-cyan-500 border-cyan-400 text-black shadow-[0_0_10px_rgba(6,182,212,0.3)]" 
-                                  : "bg-white/5 border-white/10 text-white hover:border-cyan-500/50"
-                              )}
-                            >
-                              {score}
-                            </button>
-                          );
-                        })}
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                          {['2-0', '2-1', '1-2', '0-2', '3-0', '3-1', '3-2', '2-3', '1-3', '0-3'].map((score) => {
+                            const label = `${score} (${adminForm.teamA || 'A'} vs ${adminForm.teamB || 'B'})`;
+                            const isSelected = adminForm.options.some(o => o.label === label);
+                            return (
+                              <button
+                                key={score}
+                                type="button"
+                                onClick={() => {
+                                  if (isSelected) {
+                                    setAdminForm({...adminForm, options: adminForm.options.filter(o => o.label !== label)});
+                                  } else {
+                                    setAdminForm({...adminForm, options: [...adminForm.options.filter(o => o.label !== ''), { label, weight: 1000 }]});
+                                  }
+                                }}
+                                className={clsx(
+                                  "py-2 border rounded-lg text-[9px] font-black uppercase transition-all",
+                                  isSelected 
+                                    ? "bg-cyan-500 border-cyan-400 text-black" 
+                                    : "bg-white/5 border-white/10 text-white/40 hover:text-white"
+                                )}
+                              >
+                                {score}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        
+                        <div className="space-y-3 pt-4 border-t border-white/5">
+                          {adminForm.options.map((opt, idx) => (
+                            <div key={idx} className="bg-white/[0.02] border border-white/5 rounded-xl p-3 flex flex-col gap-3">
+                              <div className="flex justify-between items-center">
+                                <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">{opt.label.split(' (')[0]}</span>
+                                <button 
+                                  onClick={() => setAdminForm({...adminForm, options: adminForm.options.filter((_, i) => i !== idx)})}
+                                  className="text-red-500/50 hover:text-red-500"
+                                >
+                                  <X size={14} />
+                                </button>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="flex flex-1 gap-1">
+                                  {[500, 1000, 2000, 5000, 15000].map(v => (
+                                    <button
+                                      key={v}
+                                      type="button"
+                                      onClick={() => {
+                                        const newOpts = [...adminForm.options];
+                                        newOpts[idx] = { ...newOpts[idx], weight: v };
+                                        setAdminForm({ ...adminForm, options: newOpts });
+                                      }}
+                                      className={clsx(
+                                        "flex-1 py-2 rounded-lg transition-all border",
+                                        opt.weight === v 
+                                          ? "bg-cyan-500 border-cyan-400 text-black" 
+                                          : "bg-white/5 border-white/10 text-gray-500"
+                                      )}
+                                    >
+                                      <div className="flex flex-col items-center">
+                                        <span className="text-[8px] font-black leading-none">{v === 500 ? 'U' : v === 1000 ? 'S' : v === 2000 ? 'E' : v === 5000 ? 'F' : 'T'}</span>
+                                        <span className="text-[6px] opacity-40 font-bold mt-0.5">{v}</span>
+                                      </div>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     ) : (
                       <div className="space-y-4">
