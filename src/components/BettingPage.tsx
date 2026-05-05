@@ -132,8 +132,9 @@ export function BettingPage() {
         const dbBalance = profile?.sheep_balance ?? 0;
         const contextBalance = user?.sheep_balance ?? 0;
         
+        // Only update balance if it's NOT a silent update (background refresh)
+        // OR if it's the very first load (balance is 0)
         if (!silent || sheepBalance === 0) {
-          // If DB has 0 but context has more, it might be an out-of-sync situation from tests
           const finalBalance = (dbBalance === 0 && contextBalance > 0) ? contextBalance : dbBalance;
           setSheepBalance(finalBalance);
         }
