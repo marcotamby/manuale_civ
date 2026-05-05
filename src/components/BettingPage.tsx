@@ -173,32 +173,38 @@ export function BettingPage() {
         betData.user_id = finalUserId;
       }
       console.log('🎲 Attempting to place bet with data:', betData);
-      const { error: insertError } = await supabase
+      console.log('🚀 Sending bet to Supabase...');
+      const { data: insertData, error: insertError } = await supabase
         .from('user_bets')
-        .insert(betData);
+        .insert(betData)
+        .select();
 
       if (insertError) {
-        console.error('❌ Betting Error Detail:', {
-          error: insertError,
-          sentData: betData
-        });
-        toast.error(`Errore DB: ${insertError.message} (${insertError.code})`);
+        console.error('❌ DATABASE INSERT FAILED:', insertError);
+        const msg = `ERRORE DB [${insertError.code}]: ${insertError.message}`;
+        toast.error(msg);
+        // Fallback alert if toast is hidden
+        if (typeof window !== 'undefined') window.alert(msg);
         setPlacingBetId(null);
         return;
       }
 
-
-
-      toast.success('I tuoi scout hanno portato le pecore al mercato!');
-      refreshUser(); // Update sheep balance in topbar
-      loadData();    // Update markets total bet
+      console.log('✅ INSERT SUCCESSFUL:', insertData);
+      toast.success('I tuoi scout hanno portato le pecore al mercato! 🐑');
+      
+      // MUST await these to ensure consistency before clearing UI
+      console.log('🔄 Syncing user profile and market data...');
+      await refreshUser(); 
+      await loadData();    
+      
       setSelectedBets(prev => {
         const next = { ...prev };
         delete next[marketId];
         return next;
       });
     } catch (err: any) {
-      toast.error(`Errore nel piazzare la scommessa: ${err.message}`);
+      console.error('❌ CRITICAL ERROR:', err);
+      toast.error(`Errore critico: ${err.message}`);
     } finally {
       setPlacingBetId(null);
     }
