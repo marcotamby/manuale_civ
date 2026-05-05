@@ -273,7 +273,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     }, [isOpen, user?.email, user?.id]);
 
     const fetchUserBets = async () => {
-        if (!user?.id) return;
+        if (!user?.email) return;
         try {
             setIsBetsLoading(true);
             const { data: bets, error } = await supabase
@@ -286,7 +286,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                         options
                     )
                 `)
-                .eq('user_id', user.id)
+                .eq('user_email', user.email)
                 .order('created_at', { ascending: false });
             
             if (error) throw error;
@@ -364,13 +364,13 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     };
 
     const fetchBetNotifications = async () => {
-        if (!user?.id) return;
+        if (!user?.email) return;
         try {
             setIsBetLoading(true);
             const { data } = await supabase
                 .from('betting_notifications')
                 .select('*')
-                .eq('user_id', user.id)
+                .eq('user_email', user.email)
                 .order('created_at', { ascending: false })
                 .limit(20);
             setBetNotifications(data || []);
