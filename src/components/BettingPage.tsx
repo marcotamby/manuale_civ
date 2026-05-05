@@ -194,14 +194,14 @@ export function BettingPage() {
       }
 
       if (!finalUserId) {
-        console.error('❌ NO USER ID FOUND! Betting aborted.');
-        toast.error('Sessione non valida. Effettua il login o ricarica.');
+        console.error('❌ NO USER ID FOUND! Email:', user?.email);
+        toast.error(`Sessione non valida per: ${user?.email || 'utente anonimo'}. Ricarica la pagina.`);
         setPlacingBetId(null);
         return;
       }
 
       console.log('🚀 Placing bet with ID:', finalUserId);
-      const { error } = await supabase
+      const { error: insertError } = await supabase
         .from('user_bets')
         .insert({
           user_id: finalUserId,
@@ -209,6 +209,13 @@ export function BettingPage() {
           option_id: bet.optionId,
           amount: bet.amount
         });
+
+      if (insertError) {
+        console.error('❌ Insert Error:', insertError);
+        toast.error(`Errore database: ${insertError.message}`);
+        setPlacingBetId(null);
+        return;
+      }
 
       if (error) throw error;
 
