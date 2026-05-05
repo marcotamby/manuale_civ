@@ -50,7 +50,7 @@ export function BettingPage() {
     eventLevel: 'High Elo',
     teamA: '',
     teamB: '',
-    options: ['', '']
+    options: [{ label: '', weight: 100 }, { label: '', weight: 100 }]
   });
 
   const cleanSlug = (slug || '').split('?')[0].trim().replace(/\/$/, '');
@@ -300,8 +300,10 @@ export function BettingPage() {
 
 
   const calculateOdds = (options: any[], optionId: string) => {
-    const totalPool = options.reduce((sum, opt) => sum + (opt.total_bet || 0), 0);
-    const optionPool = options.find(o => o.id === optionId)?.total_bet || 0;
+    // We sum REAL bets + INITIAL virtual weight
+    const totalPool = options.reduce((sum, opt) => sum + (opt.total_bet || 0) + (opt.initial_weight || 100), 0);
+    const targetOpt = options.find(o => o.id === optionId);
+    const optionPool = (targetOpt?.total_bet || 0) + (targetOpt?.initial_weight || 100);
     
     if (totalPool === 0 || optionPool === 0) return '---';
     
@@ -508,17 +510,50 @@ export function BettingPage() {
                   <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Opzioni di Scommessa</label>
                   <div className="space-y-3">
                     {adminForm.type === 'Match Winner' ? (
-                      <div className="grid grid-cols-2 gap-3">
-                        {[adminForm.teamA || 'Team A', adminForm.teamB || 'Team B'].map((name, i) => (
-                          <div key={i} className="p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-xl text-center text-cyan-400 font-black uppercase text-xs">
-                            {name}
+                      <div className="grid grid-cols-1 gap-4">
+                        {[
+                          { key: 'teamA', label: adminForm.teamA || 'Team A' },
+                          { key: 'teamB', label: adminForm.teamB || 'Team B' }
+                        ].map((team, i) => (
+                          <div key={i} className="bg-cyan-500/5 border border-cyan-500/20 rounded-xl p-4">
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="text-xs font-black text-white uppercase tracking-tight">{team.label}</span>
+                              <span className="text-[10px] font-bold text-cyan-400/60 uppercase">Peso Iniziale</span>
+                            </div>
+                            <div className="flex gap-2">
+                              {[
+                                { l: 'Under', v: 50, color: 'text-gray-400' },
+                                { l: 'Sfav.', v: 75, color: 'text-blue-400' },
+                                { l: 'Eq.', v: 100, color: 'text-white' },
+                                { l: 'Fav.', v: 200, color: 'text-yellow-400' },
+                                { l: 'Top', v: 500, color: 'text-red-400' }
+                              ].map(w => (
+                                <button
+                                  key={w.v}
+                                  type="button"
+                                  onClick={() => {
+                                    const newOpts = [...adminForm.options];
+                                    newOpts[i] = { ...newOpts[i], weight: w.v };
+                                    setAdminForm({ ...adminForm, options: newOpts });
+                                  }}
+                                  className={clsx(
+                                    "flex-1 py-2 rounded-lg text-[9px] font-black uppercase transition-all border",
+                                    adminForm.options[i]?.weight === w.v 
+                                      ? "bg-cyan-500 border-cyan-400 text-black shadow-lg" 
+                                      : "bg-white/5 border-white/10 text-gray-500 hover:border-white/20"
+                                  )}
+                                >
+                                  {w.l}
+                                </button>
+                              ))}
+                            </div>
                           </div>
                         ))}
                       </div>
                     ) : adminForm.type === 'Final Score' ? (
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {['2-0', '2-1', '1-2', '0-2', '3-0', '3-1', '3-2', '2-3', '1-3', '0-3'].map((score) => {
-                          const isSelected = adminForm.options.some(o => o.startsWith(score));
+                          const isSelected = adminForm.options.some(o => o.label.startsWith(score));
                           return (
                             <button
                               key={score}
@@ -526,9 +561,9 @@ export function BettingPage() {
                               onClick={() => {
                                 const label = `${score} (${adminForm.teamA || 'A'} vs ${adminForm.teamB || 'B'})`;
                                 if (isSelected) {
-                                  setAdminForm({...adminForm, options: adminForm.options.filter(o => !o.startsWith(score))});
+                                  setAdminForm({...adminForm, options: adminForm.options.filter(o => !o.label.startsWith(score))});
                                 } else {
-                                  setAdminForm({...adminForm, options: [...adminForm.options.filter(o => o !== ''), label]});
+                                  setAdminForm({...adminForm, options: [...adminForm.options.filter(o => o.label !== ''), { label, weight: 100 }]});
                                 }
                               }}
                               className={clsx(
@@ -544,38 +579,67 @@ export function BettingPage() {
                         })}
                       </div>
                     ) : (
-                      adminForm.options.map((opt, idx) => (
-                        <div key={idx} className="flex gap-2">
-                          <div className="relative flex-grow">
-                            <select 
-                              value={opt}
-                              onChange={(e) => {
-                                const newOpts = [...adminForm.options];
-                                newOpts[idx] = e.target.value;
-                                setAdminForm({...adminForm, options: newOpts});
-                              }}
-                              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 appearance-none cursor-pointer"
-                            >
-                               <option value="" className="bg-[#111218] text-white/50">Seleziona Team</option>
-                              {(participantsByLevel[adminForm.eventLevel] || []).map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
-                            </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/50 pointer-events-none" size={16} />
+                      <div className="space-y-4">
+                        {adminForm.options.map((opt, idx) => (
+                          <div key={idx} className="bg-white/[0.02] border border-white/5 rounded-xl p-3 space-y-3">
+                            <div className="flex gap-2">
+                              <div className="relative flex-grow">
+                                <select 
+                                  value={opt.label}
+                                  onChange={(e) => {
+                                    const newOpts = [...adminForm.options];
+                                    newOpts[idx] = { ...newOpts[idx], label: e.target.value };
+                                    setAdminForm({...adminForm, options: newOpts});
+                                  }}
+                                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 appearance-none cursor-pointer"
+                                >
+                                  <option value="" className="bg-[#111218] text-white/50">Seleziona Team</option>
+                                  {(participantsByLevel[adminForm.eventLevel] || []).map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
+                                </select>
+                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/50 pointer-events-none" size={16} />
+                              </div>
+                              {adminForm.options.length > 2 && (
+                                <button 
+                                  onClick={() => setAdminForm({...adminForm, options: adminForm.options.filter((_, i) => i !== idx)})}
+                                  className="p-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors"
+                                >
+                                  <X size={20} />
+                                </button>
+                              )}
+                            </div>
+                            
+                            <div className="flex items-center gap-2">
+                              <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap mr-2">Quota Iniziale:</span>
+                              <div className="flex flex-1 gap-1">
+                                {[50, 100, 200, 500].map(v => (
+                                  <button
+                                    key={v}
+                                    type="button"
+                                    onClick={() => {
+                                      const newOpts = [...adminForm.options];
+                                      newOpts[idx] = { ...newOpts[idx], weight: v };
+                                      setAdminForm({ ...adminForm, options: newOpts });
+                                    }}
+                                    className={clsx(
+                                      "flex-1 py-1.5 rounded-lg text-[8px] font-black uppercase transition-all border",
+                                      opt.weight === v 
+                                        ? "bg-cyan-500 border-cyan-400 text-black" 
+                                        : "bg-white/5 border-white/10 text-gray-600 hover:border-white/20"
+                                    )}
+                                  >
+                                    {v === 50 ? 'Under' : v === 100 ? 'Eq' : v === 200 ? 'Fav' : 'Top'}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
                           </div>
-                          {adminForm.options.length > 2 && (
-                            <button 
-                              onClick={() => setAdminForm({...adminForm, options: adminForm.options.filter((_, i) => i !== idx)})}
-                              className="p-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors"
-                            >
-                              <X size={20} />
-                            </button>
-                          )}
-                        </div>
-                      ))
+                        ))}
+                      </div>
                     )}
                     
                     {adminForm.type === 'Tournament Winner' && (
                       <button 
-                        onClick={() => setAdminForm({...adminForm, options: [...adminForm.options, '']})}
+                        onClick={() => setAdminForm({...adminForm, options: [...adminForm.options, { label: '', weight: 100 }]})}
                         className="w-full py-3 border-2 border-dashed border-white/10 rounded-xl text-gray-500 hover:border-cyan-500/50 hover:text-cyan-500 transition-all text-[10px] font-black uppercase tracking-widest"
                       >
                         + Aggiungi Team
@@ -598,9 +662,10 @@ export function BettingPage() {
                     
                     setPublishStatus('loading');
                     try {
-                      const optionsWithMeta = finalOptions.map(label => ({
+                      const optionsWithMeta = finalOptions.map(opt => ({
                         id: Math.random().toString(36).substring(2, 11),
-                        label,
+                        label: typeof opt === 'string' ? opt : opt.label,
+                        initial_weight: typeof opt === 'string' ? 100 : opt.weight,
                         total_bet: 0
                       }));
 
@@ -635,7 +700,7 @@ export function BettingPage() {
                           eventLevel: 'High Elo',
                           teamA: '',
                           teamB: '',
-                          options: ['', '']
+                          options: [{ label: '', weight: 100 }, { label: '', weight: 100 }]
                         });
                         setPublishStatus('idle');
                       }, 2000);
