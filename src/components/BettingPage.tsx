@@ -680,8 +680,8 @@ export function BettingPage() {
                 {markets.map((market) => (
                 <div key={market.id} className="bg-[#111218] rounded-[2.5rem] border border-slate-400/20 overflow-hidden group hover:border-slate-400/40 transition-all duration-500 shadow-2xl flex flex-col h-full">
                   {/* Market Header */}
-                  <div className="p-6 md:p-8 bg-gradient-to-br from-[#1a1c25] to-[#111218] border-b border-white/5">
-                    <div className="flex flex-col gap-4">
+                  <div className="p-6 md:p-8 bg-gradient-to-br from-[#1a1c25] to-[#111218] border-b border-white/5 min-h-[160px] md:min-h-[180px] flex flex-col">
+                    <div className="flex flex-col gap-4 h-full">
                       <div className="flex items-center gap-2 flex-nowrap">
                         <span className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.15em] shrink-0">{market.type}</span>
                         <div className={clsx(
@@ -716,7 +716,9 @@ export function BettingPage() {
                           </button>
                         )}
                       </div>
-                      <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-none mt-2">{market.title}</h3>
+                      <div className="flex-grow flex flex-col justify-end mt-2">
+                        <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-tight">{market.title}</h3>
+                      </div>
                     </div>
                   </div>
 

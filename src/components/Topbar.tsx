@@ -200,7 +200,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
     return () => {
       (window as any).refreshNotificationCount = undefined;
     };
-  }, [favorites, civilizations, isAuthenticated, user?.email, refreshTrigger, qaUnreadCount]);
+  }, [favorites, civilizations, isAuthenticated, user?.email, refreshTrigger, qaUnreadCount, betUnreadCount]);
 
   const location = useLocation();
   const isSpecialPage = isHome || location.pathname.includes('/tornei') || location.pathname === '/faq' || location.pathname === '/privacy' || location.pathname.startsWith('/civ/') || location.pathname.startsWith('/compare');
