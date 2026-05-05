@@ -301,8 +301,8 @@ export function BettingPage() {
              <p className="text-slate-300/80 font-serif italic text-lg flex items-center gap-2">
               Il mercato delle pecore è aperto! 🐑
              </p>
-             <div className="group relative max-w-[500px]">
-               <div className="bg-[#111218]/90 border border-white/10 p-2.5 rounded-xl flex items-start gap-3 text-gray-500 text-[10px] font-bold uppercase tracking-widest cursor-help backdrop-blur-sm">
+             <div className="group relative max-w-[500px] -ml-0.5">
+               <div className="bg-[#111218]/90 border border-white/10 p-2.5 px-3 rounded-xl flex items-start gap-3 text-gray-500 text-[10px] font-bold uppercase tracking-widest cursor-help backdrop-blur-sm">
                 <AlertCircle size={14} className="shrink-0 mt-0.5" />
                 <div className="flex flex-col">
                   <span>Disclaimer</span>
@@ -657,10 +657,10 @@ export function BettingPage() {
                   {/* Market Header */}
                   <div className="p-6 md:p-8 bg-gradient-to-br from-[#1a1c25] to-[#111218] border-b border-white/5">
                     <div className="flex flex-col gap-4">
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <span className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em]">{market.type}</span>
+                      <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
+                        <span className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.15em] shrink-0">{market.type}</span>
                         <div className={clsx(
-                          "px-3 py-1 rounded-lg text-[10px] font-black uppercase border",
+                          "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase border shrink-0",
                           market.status === 'open' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-red-500/10 border-red-500/20 text-red-400"
                         )}>
                           {market.status === 'open' ? 'Bet Aperta' : 'Bet Chiusa'}
@@ -668,7 +668,7 @@ export function BettingPage() {
                         {isAdmin && market.status === 'open' && (
                            <button 
                              onClick={() => handleCloseMarket(market.id)}
-                             className="px-3 py-1 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg text-[10px] font-black uppercase hover:bg-red-500 transition-all hover:text-white"
+                             className="px-2.5 py-1 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg text-[9px] font-black uppercase hover:bg-red-500 transition-all hover:text-white shrink-0"
                            >
                              Chiudi Bet
                            </button>
@@ -676,7 +676,7 @@ export function BettingPage() {
                         {isAdmin && market.status === 'closed' && market.winner_option_id === null && (
                            <button 
                              onClick={() => handleReopenMarket(market.id)}
-                             className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-[10px] font-black uppercase hover:bg-emerald-500 transition-all hover:text-white"
+                             className="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-[9px] font-black uppercase hover:bg-emerald-500 transition-all hover:text-white shrink-0"
                            >
                              Riapri Bet
                            </button>
@@ -684,10 +684,10 @@ export function BettingPage() {
                         {isAdmin && (
                           <button
                             onClick={() => setMarketToDelete(market.id)}
-                            className="text-red-500/60 hover:text-red-400 transition-colors p-1"
+                            className="text-red-500/60 hover:text-red-400 transition-colors p-1 shrink-0"
                             title="Elimina scommessa"
                           >
-                            <Trash2 size={16} />
+                            <Trash2 size={14} />
                           </button>
                         )}
                       </div>
