@@ -134,7 +134,6 @@ export function BettingPage() {
         .limit(5);
       setLeaderboard(topPastors || []);
 
-      }
     } catch (err) {
       console.error('Error loading betting data:', err);
     } finally {
