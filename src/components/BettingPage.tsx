@@ -102,8 +102,7 @@ export function BettingPage() {
         console.warn("Could not fetch entrants for dropdowns", e);
       }
 
-      try {
-        // Load Markets
+      // Load Markets
       console.log('🔍 Fetching markets for slug:', cleanSlug);
       const { data: marketData, error: marketError } = await supabase
         .from('betting_markets')
