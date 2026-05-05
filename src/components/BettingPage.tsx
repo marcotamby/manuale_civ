@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Force build trigger - 2026-05-05 09:05
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+// Force deploy update for betting favoritism weights 🐑
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
