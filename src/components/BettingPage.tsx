@@ -281,13 +281,18 @@ export function BettingPage() {
       // and update the global context so the Topbar reflects winnings
       await loadData(false);
       
-      // Update global context again just to be 100% sure the Topbar is in sync
-       // Trigger notification badge update globally with a small delay for DB consistency
-       setTimeout(() => {
-         if ((window as any).refreshNotificationCount) {
-           (window as any).refreshNotificationCount();
-         }
-       }, 1000);
+      // CRITICAL: Update global AuthContext user so Topbar updates IMMEDIATELY
+      if (user?.email) {
+        const { data: p } = await supabase.from('profiles').select('sheep_balance').ilike('email', user.email).maybeSingle();
+        if (p) setUser({ ...user, sheep_balance: p.sheep_balance });
+      }
+      
+      // Trigger notification badge update globally
+      setTimeout(() => {
+        if ((window as any).refreshNotificationCount) {
+          (window as any).refreshNotificationCount();
+        }
+      }, 500);
     } catch (err: any) {
       toast.error(`Errore: ${err.message}`);
     }

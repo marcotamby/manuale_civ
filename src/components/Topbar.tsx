@@ -138,12 +138,12 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
     }
 
     try {
-      const email = user.email.toLowerCase();
+      const email = user.email.toLowerCase().trim();
       
       const { count, error } = await supabase
         .from('betting_notifications')
         .select('*', { count: 'exact', head: true })
-        .ilike('user_email', email)
+        .ilike('user_email', `%${email}%`) // Use wildcard to catch any spacing issues
         .eq('is_read', false); 
       
       if (!error) {
