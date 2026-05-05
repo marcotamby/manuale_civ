@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, User, Heart, MessageSquare, Trophy, ExternalLink, Loader2, ChevronDown, LogOut, Camera, Trash2 as TrashIcon, TrendingUp, History, AlertTriangle } from 'lucide-react';
+import { X, User, Heart, MessageSquare, Trophy, ExternalLink, Loader2, ChevronDown, LogOut, Camera, Trash2 as TrashIcon, TrendingUp, History } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
 import { supabase } from '../lib/supabaseClient';
@@ -134,8 +134,6 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     const [qaNotifications, setQaNotifications] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isQaLoading, setIsQaLoading] = useState(false);
-    const [isBetLoading, setIsBetLoading] = useState(false);
-    const [betNotifications, setBetNotifications] = useState<any[]>([]);
     const [qaUpdateTrigger, setQaUpdateTrigger] = useState(0);
     
     // Local state for pending changes
