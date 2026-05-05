@@ -196,6 +196,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
            localStorage.setItem('auth_user', JSON.stringify({ 
              ...parsed, 
+             id: data.id,
              rank: currentRank, 
              nickname: currentNickname, 
              role: data.role, 
