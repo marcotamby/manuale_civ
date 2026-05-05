@@ -139,19 +139,19 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
 
     try {
       const email = user.email.toLowerCase();
-      console.log('🔍 FETCH NOTIFICHE PER:', email);
+      
       const { count, error } = await supabase
         .from('betting_notifications')
         .select('*', { count: 'exact', head: true })
-        .ilike('user_email', email)
+        .or(`user_email.ilike.${email},user_id.eq.${user.id}`)
         .eq('is_read', false); 
       
-      console.log('📊 NOTIFICATION DB RESULT:', { email, count, error });
+      console.log('📊 NOTIFICATION DB RESULT:', { email, userId: user.id, count, error });
       
       if (!error) {
         setBetUnreadCount(count || 0);
       } else {
-        console.error('❌ ERRORE SUPABASE:', error);
+        console.error('❌ ERRORE SUPABASE NOTIFICHE:', error);
       }
     } catch (e) {
       console.error('Error fetching betting notifications:', e);
