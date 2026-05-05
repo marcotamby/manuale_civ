@@ -465,7 +465,7 @@ export function BettingPage() {
                       }));
 
                       const payload = {
-                        tournament_slug: tournament?.slug || (slug || '').split('?')[0].trim().replace(/\/$/, ''),
+                        tournament_slug: cleanSlug,
                         title: adminForm.title,
                         description: adminForm.description,
                         type: adminForm.type,
@@ -473,6 +473,7 @@ export function BettingPage() {
                         status: 'open'
                       };
                       
+                      console.log('📝 Saving market with slug:', cleanSlug);
                       console.log('🚀 Final Betting Payload:', payload);
 
                       const { error } = await supabase
