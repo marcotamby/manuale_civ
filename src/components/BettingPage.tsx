@@ -172,13 +172,16 @@ export function BettingPage() {
       if (finalUserId) {
         betData.user_id = finalUserId;
       }
-
+      console.log('🎲 Attempting to place bet with data:', betData);
       const { error: insertError } = await supabase
         .from('user_bets')
         .insert(betData);
 
       if (insertError) {
-        console.error('❌ Betting Error:', insertError);
+        console.error('❌ Betting Error Detail:', {
+          error: insertError,
+          sentData: betData
+        });
         toast.error(`Errore DB: ${insertError.message} (${insertError.code})`);
         setPlacingBetId(null);
         return;
