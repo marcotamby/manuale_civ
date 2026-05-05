@@ -239,6 +239,17 @@ export function BettingPage() {
     }
   };
 
+  const handleReopenMarket = async (id: string) => {
+    try {
+      const { error } = await supabase.from('betting_markets').update({ status: 'open' }).eq('id', id);
+      if (error) throw error;
+      toast.success('Mercato riaperto con successo.');
+      loadData(true);
+    } catch (err: any) {
+      toast.error(`Errore: ${err.message}`);
+    }
+  };
+
   const handleSettleMarket = async (marketId: string, winnerOptionId: string) => {
     if (!window.confirm('Sei sicuro di voler assegnare la vittoria? Questa azione è irreversibile.')) return;
     try {
@@ -663,6 +674,14 @@ export function BettingPage() {
                                Chiudi Bet
                              </button>
                           )}
+                          {isAdmin && market.status === 'closed' && market.winner_option_id === null && (
+                             <button 
+                               onClick={() => handleReopenMarket(market.id)}
+                               className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-[10px] font-black uppercase hover:bg-emerald-500 transition-all hover:text-white"
+                             >
+                               Riapri Bet
+                             </button>
+                          )}
                           {isAdmin && (
                             <button
                               onClick={() => handleDeleteMarket(market.id)}
@@ -741,9 +760,9 @@ export function BettingPage() {
                                     e.stopPropagation();
                                     handleSettleMarket(market.id, opt.id);
                                   }}
-                                  className="absolute top-1/2 -translate-y-1/2 right-2 px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white rounded-lg text-[10px] font-black uppercase shadow-lg shadow-green-600/20 opacity-0 group-hover/opt:opacity-100 transition-all scale-90 group-hover/opt:scale-100"
+                                  className="absolute top-1/2 -translate-y-1/2 right-2 px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white rounded-lg text-[10px] font-black uppercase shadow-lg shadow-green-600/20 transition-all"
                                >
-                                  Vincitore
+                                  🏆 Vincitore
                                </button>
                             )}
                           </button>
