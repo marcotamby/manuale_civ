@@ -637,7 +637,7 @@ export function BettingPage() {
                             <div className="flex items-center gap-2">
                               <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap mr-2">Quota Iniziale:</span>
                               <div className="flex flex-1 gap-1">
-                                {[50, 100, 200, 500].map(v => (
+                                {[50, 100, 250, 1000, 2500].map(v => (
                                   <button
                                     key={v}
                                     type="button"
@@ -653,7 +653,10 @@ export function BettingPage() {
                                         : "bg-white/5 border-white/10 text-gray-600 hover:border-white/20"
                                     )}
                                   >
-                                    {v === 50 ? 'Under' : v === 100 ? 'Eq' : v === 200 ? 'Fav' : 'Top'}
+                                    <div className="flex flex-col items-center">
+                                      <span className="text-[7px] leading-none mb-0.5">{v === 50 ? 'Under' : v === 100 ? 'Sfav.' : v === 250 ? 'Eq.' : v === 1000 ? 'Fav.' : 'Top'}</span>
+                                      <span className="text-[6px] opacity-40">{v}</span>
+                                    </div>
                                   </button>
                                 ))}
                               </div>
