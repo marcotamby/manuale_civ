@@ -926,6 +926,7 @@ export function BettingPage() {
               )}
             </div>
           ) : (
+            <div className="space-y-6">
               <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
                 <div className="relative w-full md:w-72">
                   <button
@@ -1265,10 +1266,10 @@ export function BettingPage() {
                     )}
                   </div>
                 </div>
-              ))})()}
+                ))})()}
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
     </div>
 
