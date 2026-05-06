@@ -1,6 +1,6 @@
 // Deployment trigger: 2026-04-24 10:15
 import { useState, useEffect } from 'react';
-import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, Trophy, BookOpen, Zap, Edit2, Check, Trash2 } from 'lucide-react';
+import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, Trophy, BookOpen, Zap, Edit2, Check, Trash2, Plus, Minus } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
@@ -1150,14 +1150,32 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                           <span className="text-xl">🐑</span>
                           <span className="text-xl font-black text-white">{p.sheep_balance || 0}</span>
                         </div>
-                        <div className="flex items-center gap-2 bg-white/5 p-1 rounded-lg border border-white/10">
+                        <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10">
+                          <button
+                            onClick={() => {
+                              const current = perUserRefillAmounts[p.email] ?? 100;
+                              setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: Math.max(0, current - 10) });
+                            }}
+                            className="p-1.5 hover:bg-white/10 rounded-lg text-cyan-400 transition-colors"
+                          >
+                            <Minus size={12} />
+                          </button>
                            <input
                             type="number"
                             value={perUserRefillAmounts[p.email] ?? 100}
                             onChange={(e) => setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: Number(e.target.value) })}
-                            className="w-16 bg-transparent text-xs text-white font-bold text-center outline-none"
+                            className="w-12 bg-transparent text-xs text-white font-bold text-center outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             title="Importo personalizzato"
                           />
+                          <button
+                            onClick={() => {
+                              const current = perUserRefillAmounts[p.email] ?? 100;
+                              setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: (perUserRefillAmounts[p.email] ?? 100) + 10 });
+                            }}
+                            className="p-1.5 hover:bg-white/10 rounded-lg text-cyan-400 transition-colors"
+                          >
+                            <Plus size={12} />
+                          </button>
                         </div>
                       </div>
                       
