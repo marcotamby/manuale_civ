@@ -43,9 +43,9 @@ function App() {
 
   const isFaq = location.pathname === '/faq';
   const isPrivacy = location.pathname === '/privacy';
-  const isTournaments = location.pathname.includes('/tornei');
+  const isTournamentsSection = location.pathname.includes('/tornei') || location.pathname.includes('/tournament/');
   
-  const currentPage = isHome ? 'home' : isCompare ? 'compare' : isCiv ? 'civ' : isFaq ? 'faq' : isPrivacy ? 'privacy' : isTournaments ? 'tornei' : 'home';
+  const currentPage = isHome ? 'home' : isCompare ? 'compare' : isCiv ? 'civ' : isFaq ? 'faq' : isPrivacy ? 'privacy' : isTournamentsSection ? 'tornei' : 'home';
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false);
@@ -148,7 +148,7 @@ function App() {
     touchStartX.current = null;
 
     // If swipe right and sidebar is closed, open it
-    const canShowSidebar = currentPage !== 'home' || favorites.length > 0;
+    const canShowSidebar = (currentPage !== 'home' || favorites.length > 0) && !isTournamentsSection;
     if (diffX > 60 && startX < 50 && !isSidebarOpen && canShowSidebar) {
       setIsSidebarOpen(true);
     }
@@ -239,6 +239,7 @@ function App() {
             onClose={() => setIsSidebarOpen(false)}
             onOpen={() => setIsSidebarOpen(true)}
             currentPage={currentPage}
+            hideOnMobile={isTournamentsSection}
           />
         )}
 
@@ -254,7 +255,7 @@ function App() {
                   <HomeIcon size={20} />
                 </button>
 
-                {!location.pathname.includes('/tornei') && !location.pathname.includes('/tournament/') && (
+                {!isTournamentsSection && (
                   <button
                     onClick={() => setIsSidebarOpen(true)}
                     className="md:hidden p-2 glass rounded-lg hover:bg-white/10 transition-colors"
