@@ -19,7 +19,6 @@ interface Market {
   status: string;
   winner_option_id: string;
   type: string;
-  event_level?: string;
 }
 
 interface LeaderboardUser {
@@ -925,7 +924,6 @@ export function BettingPage() {
                         title: adminForm.title,
                         description: adminForm.description,
                         type: adminForm.type,
-                        event_level: adminForm.eventLevel,
                         options: optionsWithMeta,
                         status: editingMarketId ? (markets.find(m => m.id === editingMarketId)?.status || 'open') : 'open'
                       };
@@ -1016,8 +1014,8 @@ export function BettingPage() {
                     if (filterCategory === 'all') return true;
                     if (filterCategory === 'open') return market.status === 'open';
                     if (filterCategory === 'closed') return market.status !== 'open';
-                    if (filterCategory === 'high') return market.event_level === 'High Elo' || (market.title.toLowerCase().includes('high elo') && !market.event_level);
-                    if (filterCategory === 'low') return market.event_level === 'Low Elo' || (market.title.toLowerCase().includes('low elo') && !market.event_level);
+                    if (filterCategory === 'high') return market.title.toLowerCase().includes('high elo');
+                    if (filterCategory === 'low') return market.title.toLowerCase().includes('low elo');
                     if (filterCategory === 'tournament') return market.type === 'Tournament Winner';
                     if (filterCategory === 'match') return market.type === 'Match Winner';
                     if (filterCategory === 'score') return market.type === 'Final Score';
@@ -1078,7 +1076,7 @@ export function BettingPage() {
                                    title: market.title,
                                    description: market.description || '',
                                    type: market.type,
-                                   eventLevel: market.event_level || (market.title.toLowerCase().includes('low elo') ? 'Low Elo' : 'High Elo'),
+                                   eventLevel: 'High Elo',
                                    teamA: market.type === 'Match Winner' || market.type === 'Final Score' ? (market.options[0]?.label?.split(' (')[1]?.split(' vs ')[0] || market.options[0]?.label || '') : '',
                                    teamB: market.type === 'Match Winner' || market.type === 'Final Score' ? (market.options[0]?.label?.split(' vs ')[1]?.split(')')[0] || market.options[1]?.label || '') : '',
                                    options: market.options.map((o: any) => ({ 
@@ -1288,7 +1286,8 @@ export function BettingPage() {
                     )}
                   </div>
                 </div>
-              }))})()}
+                ))})()}
+              </div>
             </div>
           )}
       </div>

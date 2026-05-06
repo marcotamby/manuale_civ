@@ -1,6 +1,6 @@
 // Deployment trigger: 2026-04-24 10:15
 import { useState, useEffect } from 'react';
-import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, Trophy, BookOpen, Zap, Edit2, Check, Trash2, Coins, RotateCcw } from 'lucide-react';
+import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, Trophy, BookOpen, Zap, Edit2, Check, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
@@ -44,7 +44,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [editingBOs, setEditingBOs] = useState<Record<string, any>>({});
   const [expandedSugg, setExpandedSugg] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'proposte' | 'qa' | 'users' | 'pecore'>('proposte');
+  const [activeTab, setActiveTab] = useState<'proposte' | 'qa' | 'users'>('proposte');
   const [users, setUsers] = useState<any[]>([]);
   const [userSearch, setUserSearch] = useState('');
   const [userLoading, setUserLoading] = useState(false);
@@ -577,15 +577,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                   Permessi
                 </button>
               )}
-              {isSuperAdmin && (
-                <button
-                  onClick={() => setActiveTab('pecore')}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'pecore' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
-                >
-                  <Coins size={14} />
-                  Pecore
-                </button>
-              )}
+
             </div>
             <button
               onClick={onClose}
@@ -1042,83 +1034,6 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                   </div>
                 </div>
               )}
-          </div>
-        ) : activeTab === 'pecore' && isSuperAdmin ? (
-          <div className="flex-1 flex flex-col min-h-0 bg-black/20">
-            <div className="p-4 md:p-6 border-b border-white/5 space-y-4">
-              <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-                <div className="relative w-full md:w-96">
-                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                  <input
-                    type="text"
-                    placeholder="Cerca pastore per email o nickname..."
-                    value={userSearch}
-                    onChange={(e) => setUserSearch(e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:border-blue-500 outline-none transition-all"
-                  />
-                </div>
-                <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-                  Gestione Saldo Pecore
-                </div>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {users
-                  .filter(u => !userSearch || 
-                    u.email?.toLowerCase().includes(userSearch.toLowerCase()) || 
-                    u.nickname?.toLowerCase().includes(userSearch.toLowerCase())
-                  )
-                  .sort((a, b) => (a.sheep_balance || 0) - (b.sheep_balance || 0))
-                  .map(u => (
-                    <div key={u.id} className="bg-white/[0.03] border border-white/5 rounded-2xl p-5 flex items-center justify-between group hover:bg-white/[0.05] transition-all">
-                      <div className="flex items-center gap-4 min-w-0">
-                        <div className="w-10 h-10 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-500 font-black shrink-0">
-                          {u.nickname?.[0]?.toUpperCase() || u.email?.[0]?.toUpperCase()}
-                        </div>
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-sm font-bold text-white truncate">{u.nickname || 'Pastore'}</span>
-                          <span className="text-[10px] text-gray-500 truncate">{u.email}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-4">
-                        <div className="flex flex-col items-end">
-                          <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-0.5">Saldo</span>
-                          <div className="flex items-center gap-1.5 text-yellow-500">
-                            <Coins size={12} />
-                            <span className="text-lg font-black tracking-tighter">{u.sheep_balance ?? 0}</span>
-                          </div>
-                        </div>
-
-                        <div className="flex gap-2">
-                          <button
-                            onClick={async () => {
-                              const newBalance = (u.sheep_balance || 0) + 1000;
-                              const { error } = await supabase.from('profiles').update({ sheep_balance: newBalance }).eq('id', u.id);
-                              if (!error) setUsers(prev => prev.map(usr => usr.id === u.id ? { ...usr, sheep_balance: newBalance } : usr));
-                            }}
-                            className="p-2 bg-blue-600/20 text-blue-400 rounded-lg border border-blue-500/20 hover:bg-blue-600 hover:text-white transition-all shadow-lg shadow-blue-600/10"
-                            title="Ricarica +1000"
-                          >
-                            <Zap size={16} />
-                          </button>
-                          <button
-                            onClick={async () => {
-                              const { error } = await supabase.from('profiles').update({ sheep_balance: 1000 }).eq('id', u.id);
-                              if (!error) setUsers(prev => prev.map(usr => usr.id === u.id ? { ...usr, sheep_balance: 1000 } : usr));
-                            }}
-                            className="p-2 bg-white/5 text-gray-400 rounded-lg border border-white/10 hover:bg-white/10 hover:text-white transition-all"
-                            title="Reset a 1000"
-                          >
-                            <RotateCcw size={16} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-              </div>
             </div>
           </div>
         ) : (
