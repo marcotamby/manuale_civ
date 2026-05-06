@@ -519,7 +519,7 @@ export function FAQPage() {
               </p>
             </>
           )}
-        </section>
+        </div>
 
         <div className="space-y-12 pb-12">
           {sections.map((section, sIdx) => (
