@@ -1208,10 +1208,13 @@ export function BettingPage() {
                             <div className="flex-grow flex items-center bg-black/40 border border-white/10 rounded-xl overflow-hidden h-12">
                               <button 
                                 onClick={() => {
-                                  const current = selectedBets[market.id].amount;
-                                  if (current > 1) setSelectedBets({ ...selectedBets, [market.id]: { ...selectedBets[market.id], amount: current - 1 } });
+                                  setSelectedBets(prev => {
+                                    const current = Number(prev[market.id]?.amount || 0);
+                                    if (current <= 1) return prev;
+                                    return { ...prev, [market.id]: { ...prev[market.id], amount: current - 1 } };
+                                  });
                                 }}
-                                className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-all font-black"
+                                className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-all font-black text-xl"
                               >
                                 -
                               </button>
@@ -1221,18 +1224,21 @@ export function BettingPage() {
                                   value={selectedBets[market.id].amount}
                                   onChange={(e) => {
                                     const val = parseInt(e.target.value) || 0;
-                                    setSelectedBets({ ...selectedBets, [market.id]: { ...selectedBets[market.id], amount: val } });
+                                    setSelectedBets(prev => ({ ...prev, [market.id]: { ...prev[market.id], amount: val } }));
                                   }}
-                                  className="w-12 bg-transparent text-center text-white font-black text-lg outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                  className="w-16 bg-transparent text-center text-white font-black text-lg outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />
                                 <span className="text-sm">🐑</span>
                               </div>
                               <button 
                                 onClick={() => {
-                                  const current = selectedBets[market.id].amount;
-                                  if (current < sheepBalance) setSelectedBets({ ...selectedBets, [market.id]: { ...selectedBets[market.id], amount: current + 1 } });
+                                  setSelectedBets(prev => {
+                                    const current = Number(prev[market.id]?.amount || 0);
+                                    // Removed restrictive sheepBalance check to ensure button always works; validation happens on submit
+                                    return { ...prev, [market.id]: { ...prev[market.id], amount: current + 1 } };
+                                  });
                                 }}
-                                className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-all font-black"
+                                className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-all font-black text-xl"
                               >
                                 +
                               </button>
