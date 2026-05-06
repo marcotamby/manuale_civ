@@ -29,7 +29,7 @@ interface LeaderboardUser {
 export function BettingPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { user, isAuthenticated, isAdmin, setUser } = useAuth();
+  const { user, isAuthenticated, isAdmin, canManageTournaments, setUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [markets, setMarkets] = useState<Market[]>([]);
   const [tournament, setTournament] = useState<any>(null);
@@ -514,7 +514,7 @@ export function BettingPage() {
       </div>
 
       {/* Admin Market Creation Tools */}
-      {isAdmin && showAdminTools && (
+      {canManageTournaments && showAdminTools && (
         <div className="mb-12 bg-[#111218] border border-cyan-500/30 rounded-3xl overflow-hidden shadow-[0_0_80px_rgba(6,182,212,0.15)] animate-in slide-in-from-top-4 duration-500 px-4 md:px-0">
           <div className="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-cyan-500/10 via-transparent to-transparent">
             <div className="flex items-center gap-4">
@@ -969,7 +969,7 @@ export function BettingPage() {
             <div className="bg-[#111218] p-12 rounded-[2.5rem] border border-slate-400/20 text-center flex flex-col items-center">
               <AlertCircle size={48} className="mb-4 text-gray-600" />
               <h3 className="text-xl font-bold text-white mb-6 uppercase tracking-tighter">Nessuna Scommessa Aperta</h3>
-              {isAdmin && (
+              {canManageTournaments && (
                 <button 
                   onClick={() => setShowAdminTools(true)}
                   className="px-8 py-4 bg-gradient-to-b from-slate-200 to-slate-400 hover:from-white hover:to-slate-300 text-slate-900 font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl active:scale-95 flex items-center gap-3 border border-white/20"
@@ -980,7 +980,7 @@ export function BettingPage() {
             </div>
           ) : (
             <div className="space-y-6">
-                {isAdmin && !showAdminTools && (
+                {canManageTournaments && !showAdminTools && (
                   <div className="flex justify-end mb-4">
                     <button 
                       onClick={() => setShowAdminTools(true)}
@@ -1028,7 +1028,7 @@ export function BettingPage() {
                           </div>
                         </div>
                         
-                        {isAdmin && (
+                        {canManageTournaments && (
                            <div className="flex items-center gap-2">
                              {market.status === 'open' ? (
                                <button 
@@ -1149,7 +1149,7 @@ export function BettingPage() {
                                     isSelected ? "text-white" : "text-white"
                                   )}>{odds}</span>
                                 </div>
-                                {isAdmin && market.status === 'closed' && !isWinner && market.winner_option_id === null && (
+                                {canManageTournaments && market.status === 'closed' && !isWinner && market.winner_option_id === null && (
                                   <button
                                     type="button"
                                     onClick={(e) => {
