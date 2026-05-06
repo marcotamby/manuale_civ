@@ -82,7 +82,14 @@ export function BettingPage() {
         supabase.removeChannel(channel);
       };
     }
-  }, [slug]); // Don't trigger on user change to avoid balance-update loop
+  }, [slug, user?.email]); // Re-run when slug or user changes to ensure correct balance loading
+  
+  // Sync local sheepBalance state whenever the AuthContext balance changes
+  useEffect(() => {
+    if (user?.sheep_balance !== undefined) {
+      setSheepBalance(Number(user.sheep_balance));
+    }
+  }, [user?.sheep_balance]);
 
   const loadData = async (silent = false) => {
     if (!silent) setLoading(true);
@@ -142,7 +149,14 @@ export function BettingPage() {
       
       setMarkets(marketData || []);
 
-      const finalUserEmail = user?.email || localStorage.getItem('auth_user_email');
+      let finalUserEmail = user?.email;
+      if (!finalUserEmail) {
+        try {
+          const storedUser = localStorage.getItem('auth_user');
+          if (storedUser) finalUserEmail = JSON.parse(storedUser).email;
+        } catch (e) { /* ignore */ }
+      }
+      
       if (finalUserEmail) {
         const { data: profile } = await supabase
           .from('profiles')
@@ -151,7 +165,7 @@ export function BettingPage() {
           .maybeSingle();
 
         if (profile && (!silent || sheepBalance === 0)) {
-          setSheepBalance(profile.sheep_balance ?? 0);
+          setSheepBalance(Number(profile.sheep_balance ?? 0));
         }
       }
 
@@ -205,7 +219,7 @@ export function BettingPage() {
       return;
     }
 
-    if (bet.amount > sheepBalance) {
+    if (Number(bet.amount) > Number(sheepBalance)) {
       toast.error('Il tuo gregge non è abbastanza grande per questa scommessa!');
       return;
     }
@@ -507,7 +521,7 @@ export function BettingPage() {
               <div className="bg-[#111218]/80 backdrop-blur-md px-6 h-14 rounded-2xl border border-white/10 flex items-center gap-3 transition-all hover:bg-[#1a1c25] group flex-1">
                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest whitespace-nowrap">Il Tuo Gregge:</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-xl font-black text-white">{sheepBalance}</span>
+                   <span className="text-xl font-black text-white">{sheepBalance}</span>
                   <span className="text-lg group-hover:animate-bounce">🐑</span>
                 </div>
               </div>
