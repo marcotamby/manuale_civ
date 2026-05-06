@@ -991,7 +991,7 @@ export function BettingPage() {
                   </div>
                 )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 -ml-1">
                 {(() => {
                   const filtered = markets.filter(market => {
                     if (filterCategory === 'all') return true;
