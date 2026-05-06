@@ -402,7 +402,7 @@ export function BettingPage() {
                </div>
                <div className="w-px h-8 bg-white/10" />
                <div className="flex flex-col">
-                 <span className="text-[10px] font-black text-emerald-400/60 uppercase tracking-[0.2em]">Pecore nel Pool</span>
+                 <span className="text-[10px] font-black text-emerald-400/60 uppercase tracking-[0.2em]">Pecore totali</span>
                  <span className="text-xl font-black text-white tabular-nums">{totalStats.sheep.toLocaleString()} 🐑</span>
                </div>
              </div>
