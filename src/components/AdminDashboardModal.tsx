@@ -1109,7 +1109,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
         ) : activeTab === 'pecore' && isSuperAdmin ? (
           <div className="flex-1 flex flex-col min-h-0 bg-[#0d1424]">
             {/* Pecore Tab Content */}
-            <div className="p-4 md:p-6 border-b border-white/5 space-y-4 bg-gradient-to-b from-blue-500/5 to-transparent">
+            <div className="p-4 md:p-6 md:pr-10 border-b border-white/5 space-y-4 bg-gradient-to-b from-blue-500/5 to-transparent">
               <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                 <div className="relative w-full md:w-96">
                   <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
@@ -1145,12 +1145,12 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                     </div>
                     
                     <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-2 shrink-0">
                           <span className="text-xl">🐑</span>
                           <span className="text-xl font-black text-white">{p.sheep_balance || 0}</span>
                         </div>
-                        <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10">
+                        <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10 ml-auto">
                           <button
                             onClick={() => {
                               const current = perUserRefillAmounts[p.email] ?? 100;
