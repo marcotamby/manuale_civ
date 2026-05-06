@@ -64,7 +64,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [deleteSuccess, setDeleteSuccess] = useState(false);
   const [allProfiles, setAllProfiles] = useState<any[]>([]);
   const [isRefilling, setIsRefilling] = useState<string | null>(null);
-  const [refillAmount, setRefillAmount] = useState<number>(100);
+  const [perUserRefillAmounts, setPerUserRefillAmounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (isOpen) {
@@ -1121,20 +1121,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                     className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:border-cyan-500 outline-none transition-all placeholder:text-gray-600"
                   />
                 </div>
-                <div className="flex items-center gap-3 bg-black/40 p-2 rounded-2xl border border-white/5">
-                  <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest pl-2">Importo Refill:</span>
-                  <input
-                    type="number"
-                    value={refillAmount}
-                    onChange={(e) => setRefillAmount(Number(e.target.value))}
-                    className="w-20 bg-white/5 border border-white/10 rounded-lg py-1.5 px-3 text-sm text-white font-bold text-center focus:border-cyan-500 outline-none"
-                  />
-                  <button
-                    onClick={() => setRefillAmount(100)}
-                    className="px-3 py-1.5 bg-cyan-500/10 text-cyan-400 rounded-lg text-[10px] font-bold border border-cyan-500/20 hover:bg-cyan-500/20"
-                  >
-                    Set +100
-                  </button>
+                <div className="flex items-center gap-3 bg-cyan-500/5 px-4 py-2 rounded-2xl border border-cyan-500/10">
+                  <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">Totale Pastori:</span>
+                  <span className="text-sm font-black text-white">{allProfiles.length}</span>
                 </div>
               </div>
             </div>
@@ -1155,21 +1144,37 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                       </div>
                     </div>
                     
-                    <div className="flex items-center justify-between bg-black/40 p-3 rounded-xl border border-white/5">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl">🐑</span>
-                        <span className="text-xl font-black text-white">{p.sheep_balance || 0}</span>
+                    <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">🐑</span>
+                          <span className="text-xl font-black text-white">{p.sheep_balance || 0}</span>
+                        </div>
+                        <div className="flex items-center gap-2 bg-white/5 p-1 rounded-lg border border-white/10">
+                           <input
+                            type="number"
+                            value={perUserRefillAmounts[p.email] ?? 100}
+                            onChange={(e) => setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: Number(e.target.value) })}
+                            className="w-16 bg-transparent text-xs text-white font-bold text-center outline-none"
+                            title="Importo personalizzato"
+                          />
+                        </div>
                       </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleSheepRefill(p.email, refillAmount)}
-                          disabled={isRefilling === p.email}
-                          className="flex items-center gap-2 px-4 py-2 bg-cyan-600/20 text-cyan-400 rounded-lg text-[11px] font-black border border-cyan-500/30 hover:bg-cyan-600/40 transition-all uppercase tracking-tighter active:scale-95"
-                        >
-                          {isRefilling === p.email ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />}
-                          Ricarica +{refillAmount}
-                        </button>
-                      </div>
+                      
+                      <button
+                        onClick={() => handleSheepRefill(p.email, perUserRefillAmounts[p.email] ?? 100)}
+                        disabled={isRefilling === p.email}
+                        className="w-full flex items-center justify-center gap-2 py-3 bg-cyan-500/10 text-cyan-400 rounded-xl text-xs font-black border border-cyan-500/20 hover:bg-cyan-500/20 transition-all uppercase tracking-widest active:scale-95 group/btn"
+                      >
+                        {isRefilling === p.email ? (
+                          <Loader2 size={16} className="animate-spin" />
+                        ) : (
+                          <>
+                            <Zap size={14} className="group-hover/btn:fill-cyan-400 transition-all" />
+                            <span>Ricarica +{perUserRefillAmounts[p.email] ?? 100}</span>
+                          </>
+                        )}
+                      </button>
                     </div>
                   </div>
                 ))}
