@@ -1144,13 +1144,13 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                       </div>
                     </div>
                     
-                    <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-4">
-                      <div className="flex items-center justify-between gap-4">
+                    <div className="bg-black/40 p-4 rounded-xl border border-white/5 flex flex-col gap-4">
+                      <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2 shrink-0">
                           <span className="text-xl">🐑</span>
                           <span className="text-xl font-black text-white">{p.sheep_balance || 0}</span>
                         </div>
-                        <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10 ml-auto">
+                        <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10 shrink-0">
                           <button
                             onClick={() => {
                               const current = perUserRefillAmounts[p.email] ?? 100;
