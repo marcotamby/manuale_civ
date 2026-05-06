@@ -45,6 +45,8 @@ export function BettingPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [editingMarketId, setEditingMarketId] = useState<string | null>(null);
   const [participantsByLevel, setParticipantsByLevel] = useState<{ [level: string]: string[] }>({ 'High Elo': [], 'Low Elo': [] });
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [totalStats, setTotalStats] = useState({ count: 0, sheep: 0 });
   const [adminForm, setAdminForm] = useState({
     title: '',
     description: '',
@@ -59,6 +61,24 @@ export function BettingPage() {
 
   useEffect(() => {
     loadData();
+    
+    // Real-time subscription for automatic updates
+    if (cleanSlug) {
+      const channel = supabase
+        .channel('betting_updates')
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'user_bets' 
+        }, () => {
+          loadData(true);
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
   }, [slug]); // Don't trigger on user change to avoid balance-update loop
 
   const loadData = async (silent = false) => {
@@ -142,6 +162,23 @@ export function BettingPage() {
         if (topPastors) setLeaderboard(topPastors);
       } catch (e) {
         console.log('Leaderboard hidden by security policy');
+      }
+
+      // Calculate Total Stats
+      if (marketData && marketData.length > 0) {
+        const totalSheep = marketData.reduce((acc, m) => 
+          acc + (m.options?.reduce((sum: number, opt: any) => sum + (Number(opt.total_bet) || 0), 0) || 0)
+        , 0);
+
+        const marketIds = marketData.map(m => m.id);
+        const { count } = await supabase
+          .from('user_bets')
+          .select('*', { count: 'exact', head: true })
+          .in('market_id', marketIds);
+
+        setTotalStats({ count: count || 0, sheep: totalSheep });
+      } else {
+        setTotalStats({ count: 0, sheep: 0 });
       }
     } catch (err) {
       console.error('Error loading betting data:', err);
@@ -356,13 +393,33 @@ export function BettingPage() {
              <p className="text-slate-300/80 font-serif italic text-lg flex items-center gap-2">
               Il mercato delle pecore è aperto! 🐑
              </p>
+
+             {/* Real-time Total Recap */}
+             <div className="flex items-center gap-6 my-2 animate-in fade-in slide-in-from-left duration-1000 delay-300">
+               <div className="flex flex-col">
+                 <span className="text-[10px] font-black text-blue-400/60 uppercase tracking-[0.2em]">Puntate Totali</span>
+                 <span className="text-xl font-black text-white tabular-nums">{totalStats.count}</span>
+               </div>
+               <div className="w-px h-8 bg-white/10" />
+               <div className="flex flex-col">
+                 <span className="text-[10px] font-black text-emerald-400/60 uppercase tracking-[0.2em]">Pecore nel Pool</span>
+                 <span className="text-xl font-black text-white tabular-nums">{totalStats.sheep.toLocaleString()} 🐑</span>
+               </div>
+             </div>
+
              <div className="group relative max-w-[500px] -ml-0.5">
-               <div className="bg-[#111218]/90 border border-white/10 p-2.5 px-3 rounded-xl flex items-start gap-3 text-gray-500 text-[10px] font-bold uppercase tracking-widest cursor-help backdrop-blur-sm">
+               <div 
+                 onClick={() => setShowDisclaimer(!showDisclaimer)}
+                 className="bg-[#111218]/90 border border-white/10 p-2.5 px-3 rounded-xl flex items-start gap-3 text-gray-500 text-[10px] font-bold uppercase tracking-widest cursor-pointer md:cursor-help backdrop-blur-sm transition-colors hover:border-white/20"
+               >
                 <AlertCircle size={14} className="shrink-0 mt-0.5" />
-                <div className="flex flex-col">
+                <div className="flex flex-col w-full">
                   <span>Disclaimer</span>
-                  <div className="overflow-hidden transition-all duration-500 ease-in-out max-h-0 group-hover:max-h-[100px] opacity-0 group-hover:opacity-100">
-                    <p className="text-[9px] text-gray-500 normal-case tracking-normal font-normal mt-1.5 leading-relaxed">
+                  <div className={clsx(
+                    "overflow-hidden transition-all duration-500 ease-in-out opacity-0 group-hover:opacity-100 group-hover:max-h-[100px]",
+                    showDisclaimer ? "max-h-[100px] opacity-100 mt-1.5" : "max-h-0"
+                  )}>
+                    <p className="text-[9px] text-gray-500 normal-case tracking-normal font-normal leading-relaxed">
                       Il sistema di Social Betting è un gioco di simulazione puramente gratuito. Non costituisce attività di gioco d'azzardo. Le "Pecore" sono punti virtuali privi di valore economico.
                     </p>
                   </div>
