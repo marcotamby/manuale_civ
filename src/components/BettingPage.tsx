@@ -409,7 +409,7 @@ export function BettingPage() {
                </div>
              </div>
 
-              <div className="group relative w-full md:max-w-[320px]">
+              <div className="group relative w-full md:max-w-[320px] -ml-1">
                 <div 
                   onClick={() => setShowDisclaimer(!showDisclaimer)}
                   className="w-full bg-[#111218]/90 border border-white/10 p-2.5 px-3 rounded-xl flex items-start gap-3 text-gray-500 text-[10px] font-bold uppercase tracking-widest cursor-pointer md:cursor-help backdrop-blur-sm transition-colors hover:border-white/20"
@@ -430,7 +430,7 @@ export function BettingPage() {
               </div>
 
               {/* Real-time Filter Dropdown - Moved here for better proximity */}
-              <div className="relative w-full md:max-w-[320px] mt-2">
+              <div className="relative w-full md:max-w-[320px] mt-2 -ml-1">
                 <button
                   onClick={() => setShowFilterDropdown(!showFilterDropdown)}
                   className="w-full bg-[#111218]/80 backdrop-blur-xl border border-white/10 px-6 py-3 rounded-2xl flex items-center justify-between group transition-all hover:border-cyan-500/50 shadow-xl"
