@@ -44,7 +44,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [editingBOs, setEditingBOs] = useState<Record<string, any>>({});
   const [expandedSugg, setExpandedSugg] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'proposte' | 'qa' | 'users'>('proposte');
+  const [activeTab, setActiveTab] = useState<'proposte' | 'qa' | 'users' | 'pecore'>('proposte');
   const [users, setUsers] = useState<any[]>([]);
   const [userSearch, setUserSearch] = useState('');
   const [userLoading, setUserLoading] = useState(false);
@@ -63,7 +63,6 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
   const [allProfiles, setAllProfiles] = useState<any[]>([]);
-  const [userSearch, setUserSearch] = useState('');
   const [isRefilling, setIsRefilling] = useState<string | null>(null);
 
   useEffect(() => {
