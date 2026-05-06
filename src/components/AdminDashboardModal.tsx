@@ -979,8 +979,20 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                         .map(u => (
                           <div key={u.id} className={`bg-white/[0.03] border rounded-2xl p-5 flex flex-col gap-4 group hover:bg-white/[0.05] transition-all ${u.role === 'admin' ? 'border-yellow-500/20' : 'border-white/5'}`}>
                             <div className="flex items-center gap-4">
-                              <div className={`w-12 h-12 rounded-full flex items-center justify-center border text-xl font-bold shrink-0 ${u.role === 'admin' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
-                                {u.nickname?.[0]?.toUpperCase() || u.email?.[0]?.toUpperCase() || 'U'}
+                              <div className={`w-12 h-12 rounded-full flex items-center justify-center border text-xl font-bold shrink-0 overflow-hidden ${u.role === 'admin' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
+                                {u.avatar_url ? (
+                                  <img 
+                                    src={u.avatar_url} 
+                                    alt={u.nickname || u.email} 
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).style.display = 'none';
+                                      (e.target as HTMLImageElement).parentElement!.innerHTML = `<span>${u.nickname?.[0]?.toUpperCase() || u.email?.[0]?.toUpperCase() || 'U'}</span>`;
+                                    }}
+                                  />
+                                ) : (
+                                  <span>{u.nickname?.[0]?.toUpperCase() || u.email?.[0]?.toUpperCase() || 'U'}</span>
+                                )}
                               </div>
                               <div className="flex flex-col min-w-0 flex-1">
                                 <div className="flex items-center gap-2">
@@ -1135,8 +1147,21 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                   .map(p => (
                   <div key={p.email} className="bg-white/[0.03] border border-white/5 rounded-2xl p-5 flex flex-col gap-4 hover:border-cyan-500/30 transition-all group">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold border border-cyan-500/20 group-hover:scale-110 transition-transform">
-                        {p.nickname?.[0] || p.email?.[0]}
+                      <div className="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold border border-cyan-500/20 group-hover:scale-110 transition-transform overflow-hidden">
+                        {p.avatar_url ? (
+                          <img 
+                            src={p.avatar_url} 
+                            alt={p.nickname || p.email} 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // Fallback if image fails to load
+                              (e.target as HTMLImageElement).style.display = 'none';
+                              (e.target as HTMLImageElement).parentElement!.innerHTML = `<span>${p.nickname?.[0] || p.email?.[0]}</span>`;
+                            }}
+                          />
+                        ) : (
+                          <span>{p.nickname?.[0] || p.email?.[0]}</span>
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-white font-bold truncate">{p.nickname || 'Anonimo'}</p>
