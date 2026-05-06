@@ -42,6 +42,8 @@ export function PrivacyPage() {
             <ul className="list-disc ml-6 mt-2 space-y-1">
               <li>Identificare l'autore delle proposte di modifica inviate.</li>
               <li>Gestire la tua lista personalizzata di civiltà preferite.</li>
+              <li>Gestire il tuo saldo punti ("Pecore") e le attività correlate alla community.</li>
+              <li>Gestire i permessi e i ruoli per i collaboratori del sito (Staff).</li>
               <li>Prevenire abusi o spam sul sistema delle modifiche.</li>
             </ul>
             <p className="mt-2 text-white italic underline font-medium">Non vendiamo, cediamo o condividiamo i tuoi dati con terze parti per scopi commerciali o pubblicitari.</p>
@@ -89,7 +91,7 @@ export function PrivacyPage() {
 
           <section className="pt-8 border-t border-[#D4AF37]/20">
             <p className="text-xs text-gray-500 italic">
-              Ultimo aggiornamento: 24 Aprile 2026. ManualeCiv è un progetto amatoriale dedicato alla community di Age of Empires IV.
+              Ultimo aggiornamento: 6 Maggio 2026. ManualeCiv è un progetto amatoriale dedicato alla community di Age of Empires IV.
             </p>
           </section>
         </div>
