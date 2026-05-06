@@ -50,15 +50,14 @@ export function BettingPage() {
   const [totalStats, setTotalStats] = useState({ count: 0, sheep: 0, pastori: 0 });
   const [filterCategory, setFilterCategory] = useState('all');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
-  const [adminForm, setAdminForm] = useState({
-    title: '',
-    description: '',
-    type: 'Match Winner',
-    eventLevel: 'High Elo',
-    teamA: '',
-    teamB: '',
     options: [{ label: '', weight: 100, is_disabled: false }] as any[]
   });
+  const [adminTab, setAdminTab] = useState<'create' | 'users' | 'bets'>('create');
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [recentBets, setRecentBets] = useState<any[]>([]);
+  const [refillAmount, setRefillAmount] = useState(500);
+  const [isRefilling, setIsRefilling] = useState<string | null>(null);
+  const [searchUser, setSearchUser] = useState('');
 
   const cleanSlug = (slug || '').split('?')[0].trim().replace(/\/$/, '');
 
@@ -190,6 +189,25 @@ export function BettingPage() {
         setTotalStats({ count: count || 0, sheep: totalSheep, pastori: pastoriCount });
       } else {
         setTotalStats({ count: 0, sheep: 0, pastori: 0 });
+      }
+
+      // Admin Data
+      if (canManageTournaments) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, username, email, sheep_balance')
+          .order('username', { ascending: true });
+        if (profiles) setAllUsers(profiles);
+
+        if (marketData && marketData.length > 0) {
+          const { data: bets } = await supabase
+            .from('user_bets')
+            .select('*, profiles(username)')
+            .in('market_id', marketData.map(m => m.id))
+            .order('created_at', { ascending: false })
+            .limit(100);
+          if (bets) setRecentBets(bets);
+        }
       }
     } catch (err) {
       console.error('Error loading betting data:', err);
@@ -375,6 +393,37 @@ export function BettingPage() {
     }
   };
 
+  const handleRefill = async (userId: string, email: string) => {
+    setIsRefilling(userId);
+    try {
+      const { error } = await supabase.rpc('execute_sql', {
+        sql_query: `UPDATE profiles SET sheep_balance = sheep_balance + ${refillAmount} WHERE id = '${userId}';`
+      });
+
+      if (error) {
+        // Fallback if execute_sql is not available
+        const { error: upError } = await supabase
+          .from('profiles')
+          .update({ sheep_balance: allUsers.find(u => u.id === userId).sheep_balance + refillAmount })
+          .eq('id', userId);
+        if (upError) throw upError;
+      }
+
+      // Add notification
+      await supabase.from('betting_notifications').insert({
+        user_id: userId,
+        message: `I tuoi scout hanno trovato un nuovo gregge! Ti sono state accreditate ${refillAmount} 🐑 dal Gran Pastore.`
+      });
+
+      toast.success(`Rifornimento di ${refillAmount} 🐑 completato per ${email}!`);
+      loadData(true);
+    } catch (err: any) {
+      toast.error(`Errore rifornimento: ${err.message}`);
+    } finally {
+      setIsRefilling(null);
+    }
+  };
+
 
 
 
@@ -534,36 +583,58 @@ export function BettingPage() {
       {/* Admin Market Creation Tools */}
       {canManageTournaments && showAdminTools && (
         <div className="mb-12 bg-[#111218] border border-cyan-500/30 rounded-3xl overflow-hidden shadow-[0_0_80px_rgba(6,182,212,0.15)] animate-in slide-in-from-top-4 duration-500 px-4 md:px-0">
-          <div className="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-cyan-500/10 via-transparent to-transparent">
+          <div className="px-8 py-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-cyan-500/10 via-transparent to-transparent">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 flex items-center justify-center border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
                 <Zap className="text-cyan-400" size={24} fill="currentColor" />
               </div>
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
-                  {editingMarketId ? 'Modifica Scommessa' : 'Nuova Scommessa'}
+                  Pannello Admin
                 </h2>
                 <button onClick={() => {
                   setShowAdminTools(false);
                   setEditingMarketId(null);
-                  setAdminForm({
-                    title: '',
-                    description: '',
-                    type: 'Match Winner',
-                    eventLevel: 'High Elo',
-                    teamA: '',
-                    teamB: '',
-                    options: [{ label: '', weight: 100 }]
-                  });
-                }} className="text-gray-500 hover:text-white transition-colors ml-4">
+                  setAdminTab('create');
+                }} className="text-gray-500 hover:text-white transition-colors ml-4 md:hidden">
                   <X size={24} />
                 </button>
               </div>
             </div>
+
+            <div className="flex bg-white/5 p-1 rounded-xl border border-white/10 w-full md:w-auto">
+              {[
+                { id: 'create', label: 'Crea/Modifica', icon: Plus },
+                { id: 'users', label: 'Gestione Utenti', icon: Users },
+                { id: 'bets', label: 'Ultime Puntate', icon: Trophy }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setAdminTab(tab.id as any)}
+                  className={clsx(
+                    "flex-1 md:flex-none px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all",
+                    adminTab === tab.id ? "bg-cyan-500 text-black shadow-lg" : "text-gray-500 hover:text-white"
+                  )}
+                >
+                  <tab.icon size={14} />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </button>
+              ))}
+            </div>
+
+            <button onClick={() => {
+              setShowAdminTools(false);
+              setEditingMarketId(null);
+              setAdminTab('create');
+            }} className="hidden md:block text-gray-500 hover:text-white transition-colors">
+              <X size={24} />
+            </button>
           </div>
 
-          <div className="p-8 space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="p-8">
+            {adminTab === 'create' && (
+              <div className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-6">
                 <div>
                   <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Tipo di Scommessa</label>
@@ -976,7 +1047,139 @@ export function BettingPage() {
                   )}
                 </button>
               </div>
-            </div>
+            )}
+
+            {adminTab === 'users' && (
+              <div className="space-y-6">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+                  <div className="relative w-full md:w-96">
+                    <Filter size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                    <input
+                      type="text"
+                      value={searchUser}
+                      onChange={(e) => setSearchUser(e.target.value)}
+                      placeholder="Cerca pastore per nome o email..."
+                      className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-6 py-3 text-white text-sm focus:border-cyan-500 outline-none transition-all"
+                    />
+                  </div>
+                  <div className="flex items-center gap-4 bg-white/5 p-2 rounded-xl border border-white/10">
+                    <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-2">Ammontare Rifornimento:</span>
+                    <div className="flex items-center bg-black/40 rounded-lg overflow-hidden border border-white/10 h-10">
+                       {[100, 500, 1000, 5000].map(amt => (
+                         <button 
+                           key={amt}
+                           onClick={() => setRefillAmount(amt)}
+                           className={clsx(
+                             "px-3 h-full text-[10px] font-black transition-all border-r border-white/5 last:border-0",
+                             refillAmount === amt ? "bg-cyan-500 text-black" : "text-gray-400 hover:text-white"
+                           )}
+                         >
+                           {amt}
+                         </button>
+                       ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-black/40 border border-white/5 rounded-2xl overflow-hidden">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-white/10 bg-white/5">
+                        <th className="px-6 py-4 text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em]">Pastore</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em]">Email</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em]">Saldo Attuale</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] text-right">Azioni</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {allUsers
+                        .filter(u => u.username?.toLowerCase().includes(searchUser.toLowerCase()) || u.email?.toLowerCase().includes(searchUser.toLowerCase()))
+                        .map(u => (
+                        <tr key={u.id} className="hover:bg-white/5 transition-colors">
+                          <td className="px-6 py-4">
+                            <span className="text-sm font-black text-white uppercase">{u.username || '---'}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-xs text-gray-500">{u.email}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-black text-emerald-400">{u.sheep_balance}</span>
+                              <span className="text-xs">🐑</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <button
+                              onClick={() => handleRefill(u.id, u.email)}
+                              disabled={isRefilling === u.id}
+                              className="px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500 hover:text-black rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50"
+                            >
+                              {isRefilling === u.id ? <Loader2 size={12} className="animate-spin" /> : `Rifornisci +${refillAmount}`}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {adminTab === 'bets' && (
+              <div className="space-y-6">
+                 <div className="bg-black/40 border border-white/5 rounded-2xl overflow-hidden">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-white/10 bg-white/5">
+                        <th className="px-6 py-4 text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em]">Pastore</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em]">Mercato</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em]">Puntata</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em]">Data</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] text-right">Stato</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {recentBets.map(bet => {
+                        const market = markets.find(m => m.id === bet.market_id);
+                        const option = market?.options.find((o: any) => o.id === bet.option_id);
+                        return (
+                        <tr key={bet.id} className="hover:bg-white/5 transition-colors">
+                          <td className="px-6 py-4">
+                            <span className="text-sm font-black text-white uppercase">{(bet.profiles as any)?.username || '---'}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex flex-col">
+                              <span className="text-[10px] text-gray-500 uppercase font-bold tracking-tighter truncate max-w-[200px]">{market?.title}</span>
+                              <span className="text-xs font-black text-white uppercase">{option?.label}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-1">
+                              <span className="text-sm font-black text-blue-400">{bet.amount}</span>
+                              <span className="text-xs">🐑</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-[10px] text-gray-500 uppercase">{new Date(bet.created_at).toLocaleString()}</span>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                             <span className={clsx(
+                               "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase border",
+                               bet.status === 'won' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" :
+                               bet.status === 'lost' ? "bg-red-500/10 border-red-500/20 text-red-400" :
+                               "bg-blue-500/10 border-blue-500/20 text-blue-400"
+                             )}>
+                               {bet.status}
+                             </span>
+                          </td>
+                        </tr>
+                      )})}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
           </div>
         </div>
       )}
