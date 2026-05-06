@@ -64,6 +64,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [deleteSuccess, setDeleteSuccess] = useState(false);
   const [allProfiles, setAllProfiles] = useState<any[]>([]);
   const [isRefilling, setIsRefilling] = useState<string | null>(null);
+  const [refillAmount, setRefillAmount] = useState<number>(100);
 
   useEffect(() => {
     if (isOpen) {
@@ -593,14 +594,14 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 md:p-6 border-b border-[#D4AF37]/20 bg-gradient-to-r from-[#0d1424] to-[#1a1c32] rounded-t-2xl shrink-0 gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20 text-blue-400">
-              {activeTab === 'proposte' ? <Inbox size={24} /> : activeTab === 'users' ? <ShieldCheck size={24} /> : <MessageSquare size={24} />}
+              {activeTab === 'proposte' ? <Inbox size={24} /> : activeTab === 'users' ? <ShieldCheck size={24} /> : activeTab === 'pecore' ? <span className="text-2xl">🐑</span> : <MessageSquare size={24} />}
             </div>
             <div>
               <h2 className="text-lg md:text-xl font-bold text-white uppercase tracking-wider">
-                {activeTab === 'proposte' ? 'Gestione Proposte' : activeTab === 'users' ? 'Gestione Permessi' : 'Gestione Q&A'}
+                {activeTab === 'proposte' ? 'Gestione Proposte' : activeTab === 'users' ? 'Gestione Permessi' : activeTab === 'pecore' ? 'Gestione Pecore' : 'Gestione Q&A'}
               </h2>
               <p className="text-[10px] md:text-xs text-gray-400">
-                {activeTab === 'proposte' ? 'Revisiona i suggerimenti della community' : activeTab === 'users' ? 'Gestisci i ruoli e i permessi del team' : 'Modera le domande e risposte degli utenti'}
+                {activeTab === 'proposte' ? 'Revisiona i suggerimenti della community' : activeTab === 'users' ? 'Gestisci i ruoli e i permessi del team' : activeTab === 'pecore' ? 'Ricarica il saldo delle pecore agli utenti' : 'Modera le domande e risposte degli utenti'}
               </p>
             </div>
           </div>
@@ -642,7 +643,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                   onClick={() => setActiveTab('pecore')}
                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'pecore' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
                 >
-                  <Coins size={14} />
+                  <span className="text-sm">🐑</span>
                   Pecore
                 </button>
               )}
@@ -1106,19 +1107,34 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
             </div>
           </div>
         ) : activeTab === 'pecore' && isSuperAdmin ? (
-          <div className="flex-1 flex flex-col min-h-0 bg-black/20">
+          <div className="flex-1 flex flex-col min-h-0 bg-[#0d1424]">
             {/* Pecore Tab Content */}
-            <div className="p-4 md:p-6 border-b border-white/5 space-y-4">
+            <div className="p-4 md:p-6 border-b border-white/5 space-y-4 bg-gradient-to-b from-blue-500/5 to-transparent">
               <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                 <div className="relative w-full md:w-96">
-                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
                   <input
                     type="text"
                     placeholder="Cerca utente per email o nickname..."
                     value={userSearch}
                     onChange={(e) => setUserSearch(e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:border-blue-500 outline-none transition-all"
+                    className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:border-cyan-500 outline-none transition-all placeholder:text-gray-600"
                   />
+                </div>
+                <div className="flex items-center gap-3 bg-black/40 p-2 rounded-2xl border border-white/5">
+                  <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest pl-2">Importo Refill:</span>
+                  <input
+                    type="number"
+                    value={refillAmount}
+                    onChange={(e) => setRefillAmount(Number(e.target.value))}
+                    className="w-20 bg-white/5 border border-white/10 rounded-lg py-1.5 px-3 text-sm text-white font-bold text-center focus:border-cyan-500 outline-none"
+                  />
+                  <button
+                    onClick={() => setRefillAmount(100)}
+                    className="px-3 py-1.5 bg-cyan-500/10 text-cyan-400 rounded-lg text-[10px] font-bold border border-cyan-500/20 hover:bg-cyan-500/20"
+                  >
+                    Set +100
+                  </button>
                 </div>
               </div>
             </div>
@@ -1128,9 +1144,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                 {allProfiles
                   .filter(p => !userSearch || p.email?.toLowerCase().includes(userSearch.toLowerCase()) || p.nickname?.toLowerCase().includes(userSearch.toLowerCase()))
                   .map(p => (
-                  <div key={p.email} className="bg-white/[0.03] border border-white/5 rounded-2xl p-5 flex flex-col gap-4">
+                  <div key={p.email} className="bg-white/[0.03] border border-white/5 rounded-2xl p-5 flex flex-col gap-4 hover:border-cyan-500/30 transition-all group">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 font-bold border border-blue-500/20">
+                      <div className="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold border border-cyan-500/20 group-hover:scale-110 transition-transform">
                         {p.nickname?.[0] || p.email?.[0]}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -1141,23 +1157,17 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                     
                     <div className="flex items-center justify-between bg-black/40 p-3 rounded-xl border border-white/5">
                       <div className="flex items-center gap-2">
-                        <Coins size={16} className="text-yellow-500" />
+                        <span className="text-xl">🐑</span>
                         <span className="text-xl font-black text-white">{p.sheep_balance || 0}</span>
                       </div>
                       <div className="flex gap-2">
                         <button
-                          onClick={() => handleSheepRefill(p.email, 100)}
+                          onClick={() => handleSheepRefill(p.email, refillAmount)}
                           disabled={isRefilling === p.email}
-                          className="px-3 py-1.5 bg-yellow-600/20 text-yellow-500 rounded-lg text-[10px] font-bold border border-yellow-500/30 hover:bg-yellow-600/40"
+                          className="flex items-center gap-2 px-4 py-2 bg-cyan-600/20 text-cyan-400 rounded-lg text-[11px] font-black border border-cyan-500/30 hover:bg-cyan-600/40 transition-all uppercase tracking-tighter active:scale-95"
                         >
-                          +100
-                        </button>
-                        <button
-                          onClick={() => handleSheepRefill(p.email, 500)}
-                          disabled={isRefilling === p.email}
-                          className="px-3 py-1.5 bg-yellow-600/20 text-yellow-500 rounded-lg text-[10px] font-bold border border-yellow-500/30 hover:bg-yellow-600/40"
-                        >
-                          +500
+                          {isRefilling === p.email ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />}
+                          Ricarica +{refillAmount}
                         </button>
                       </div>
                     </div>

@@ -469,13 +469,13 @@ export function BettingPage() {
                    <div className="absolute top-full left-0 w-full mt-2 bg-[#111218] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                      {[
                        { id: 'all', label: 'Tutte le Scommesse' },
+                       { id: 'open', label: 'Bet Aperte' },
+                       { id: 'closed', label: 'Bet Chiuse' },
                        { id: 'high', label: 'High Elo' },
                        { id: 'low', label: 'Low Elo' },
                        { id: 'tournament', label: 'Vincitore Torneo' },
                        { id: 'match', label: 'Vincitore Match' },
-                       { id: 'score', label: 'Punteggio Finale' },
-                       { id: 'open', label: 'Bet Aperte' },
-                       { id: 'closed', label: 'Bet Chiuse' }
+                       { id: 'score', label: 'Punteggio Finale' }
                      ].map((opt) => (
                        <button
                          key={opt.id}
@@ -1014,8 +1014,8 @@ export function BettingPage() {
                     if (filterCategory === 'all') return true;
                     if (filterCategory === 'open') return market.status === 'open';
                     if (filterCategory === 'closed') return market.status !== 'open';
-                    if (filterCategory === 'high') return market.title.toLowerCase().includes('high elo');
-                    if (filterCategory === 'low') return market.title.toLowerCase().includes('low elo');
+                    if (filterCategory === 'high') return market.title.includes('[High Elo]');
+                    if (filterCategory === 'low') return market.title.includes('[Low Elo]');
                     if (filterCategory === 'tournament') return market.type === 'Tournament Winner';
                     if (filterCategory === 'match') return market.type === 'Match Winner';
                     if (filterCategory === 'score') return market.type === 'Final Score';
