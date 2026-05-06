@@ -452,6 +452,8 @@ export function BettingPage() {
                    <Filter size={16} className="text-cyan-400" />
                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
                      {filterCategory === 'all' ? 'Filtra Scommesse' :
+                      filterCategory === 'open' ? 'Bet Aperte' :
+                      filterCategory === 'closed' ? 'Bet Chiuse' :
                       filterCategory === 'high' ? 'High Elo' :
                       filterCategory === 'low' ? 'Low Elo' :
                       filterCategory === 'tournament' ? 'Vincitore Torneo' :
@@ -467,6 +469,8 @@ export function BettingPage() {
                    <div className="absolute top-full left-0 w-full mt-2 bg-[#111218] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                      {[
                        { id: 'all', label: 'Tutte le Scommesse' },
+                       { id: 'open', label: 'Bet Aperte' },
+                       { id: 'closed', label: 'Bet Chiuse' },
                        { id: 'high', label: 'High Elo' },
                        { id: 'low', label: 'Low Elo' },
                        { id: 'tournament', label: 'Vincitore Torneo' },
@@ -1008,6 +1012,8 @@ export function BettingPage() {
                 {(() => {
                   const filtered = markets.filter(market => {
                     if (filterCategory === 'all') return true;
+                    if (filterCategory === 'open') return market.status === 'open';
+                    if (filterCategory === 'closed') return market.status !== 'open';
                     if (filterCategory === 'high') return market.title.includes('[High Elo]');
                     if (filterCategory === 'low') return market.title.includes('[Low Elo]');
                     if (filterCategory === 'tournament') return market.type === 'Tournament Winner';
