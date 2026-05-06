@@ -379,7 +379,7 @@ export function BettingPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in duration-700">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row items-start justify-between mb-12 gap-10 px-4 md:px-0">
+      <div className="flex flex-col md:flex-row items-start justify-between mb-8 gap-10 px-4 md:px-0">
         <div className="relative flex-1">
            <button 
             onClick={() => navigate('/tornei')}
@@ -427,6 +427,59 @@ export function BettingPage() {
                   </div>
                 </div>
                </div>
+             </div>
+
+             {/* Real-time Filter Dropdown - Moved here for better proximity */}
+             <div className="relative w-full md:w-72 mt-2">
+               <button
+                 onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                 className="w-full bg-[#111218]/80 backdrop-blur-xl border border-white/10 px-6 py-3 rounded-2xl flex items-center justify-between group transition-all hover:border-cyan-500/50 shadow-xl"
+               >
+                 <div className="flex items-center gap-3">
+                   <Filter size={16} className="text-cyan-400" />
+                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                     {filterCategory === 'all' ? 'Filtra Scommesse' :
+                      filterCategory === 'high' ? 'High Elo' :
+                      filterCategory === 'low' ? 'Low Elo' :
+                      filterCategory === 'tournament' ? 'Vincitore Torneo' :
+                      filterCategory === 'match' ? 'Vincitore Match' : 'Punteggio Finale'}
+                   </span>
+                 </div>
+                 <ChevronDown size={16} className={clsx("text-gray-600 transition-transform duration-300", showFilterDropdown && "rotate-180")} />
+               </button>
+
+               {showFilterDropdown && (
+                 <>
+                   <div className="fixed inset-0 z-40" onClick={() => setShowFilterDropdown(false)} />
+                   <div className="absolute top-full left-0 w-full mt-2 bg-[#111218] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                     {[
+                       { id: 'all', label: 'Tutte le Scommesse' },
+                       { id: 'high', label: 'High Elo' },
+                       { id: 'low', label: 'Low Elo' },
+                       { id: 'tournament', label: 'Vincitore Torneo' },
+                       { id: 'match', label: 'Vincitore Match' },
+                       { id: 'score', label: 'Punteggio Finale' }
+                     ].map((opt) => (
+                       <button
+                         key={opt.id}
+                         onClick={() => {
+                           setFilterCategory(opt.id);
+                           setShowFilterDropdown(false);
+                         }}
+                         className="w-full px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-colors group"
+                       >
+                         <span className={clsx(
+                           "text-[10px] font-bold uppercase tracking-widest transition-colors",
+                           filterCategory === opt.id ? "text-cyan-400" : "text-gray-500 group-hover:text-white"
+                         )}>
+                           {opt.label}
+                         </span>
+                         {filterCategory === opt.id && <Check size={14} className="text-cyan-400" />}
+                       </button>
+                     ))}
+                   </div>
+                 </>
+               )}
              </div>
            </div>
         </div>
@@ -927,68 +980,16 @@ export function BettingPage() {
             </div>
           ) : (
             <div className="space-y-6">
-              <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
-                <div className="relative w-full md:w-72">
-                  <button
-                    onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                    className="w-full bg-[#111218]/80 backdrop-blur-xl border border-white/10 px-6 py-3.5 rounded-2xl flex items-center justify-between group transition-all hover:border-cyan-500/50 shadow-xl"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Filter size={16} className="text-cyan-400" />
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
-                        {filterCategory === 'all' ? 'Tutte le Scommesse' :
-                         filterCategory === 'high' ? 'High Elo' :
-                         filterCategory === 'low' ? 'Low Elo' :
-                         filterCategory === 'tournament' ? 'Vincitore Torneo' :
-                         filterCategory === 'match' ? 'Vincitore Match' : 'Punteggio Finale'}
-                      </span>
-                    </div>
-                    <ChevronDown size={16} className={clsx("text-gray-600 transition-transform duration-300", showFilterDropdown && "rotate-180")} />
-                  </button>
-
-                  {showFilterDropdown && (
-                    <>
-                      <div className="fixed inset-0 z-40" onClick={() => setShowFilterDropdown(false)} />
-                      <div className="absolute top-full left-0 w-full mt-2 bg-[#111218] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                        {[
-                          { id: 'all', label: 'Tutte le Scommesse' },
-                          { id: 'high', label: 'High Elo' },
-                          { id: 'low', label: 'Low Elo' },
-                          { id: 'tournament', label: 'Vincitore Torneo' },
-                          { id: 'match', label: 'Vincitore Match' },
-                          { id: 'score', label: 'Punteggio Finale' }
-                        ].map((opt) => (
-                          <button
-                            key={opt.id}
-                            onClick={() => {
-                              setFilterCategory(opt.id);
-                              setShowFilterDropdown(false);
-                            }}
-                            className="w-full px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-colors group"
-                          >
-                            <span className={clsx(
-                              "text-[10px] font-bold uppercase tracking-widest transition-colors",
-                              filterCategory === opt.id ? "text-cyan-400" : "text-gray-500 group-hover:text-white"
-                            )}>
-                              {opt.label}
-                            </span>
-                            {filterCategory === opt.id && <Check size={14} className="text-cyan-400" />}
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-
                 {isAdmin && !showAdminTools && (
-                  <button 
-                    onClick={() => setShowAdminTools(true)}
-                    className="w-full md:w-auto px-6 py-3.5 bg-gradient-to-b from-slate-200 to-slate-400 hover:from-white hover:to-slate-300 text-slate-900 font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 border border-white/20"
-                  >
-                    <Plus size={16} strokeWidth={3} /> Nuova Scommessa
-                  </button>
+                  <div className="flex justify-end mb-4">
+                    <button 
+                      onClick={() => setShowAdminTools(true)}
+                      className="w-full md:w-auto px-6 py-3.5 bg-gradient-to-b from-slate-200 to-slate-400 hover:from-white hover:to-slate-300 text-slate-900 font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 border border-white/20"
+                    >
+                      <Plus size={16} strokeWidth={3} /> Nuova Scommessa
+                    </button>
+                  </div>
                 )}
-              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {(() => {
