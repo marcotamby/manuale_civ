@@ -29,7 +29,7 @@ interface LeaderboardUser {
 export function BettingPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { user, isAuthenticated, isAdmin, canManageTournaments, setUser } = useAuth();
+  const { user, isAuthenticated, canManageTournaments, setUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [markets, setMarkets] = useState<Market[]>([]);
   const [tournament, setTournament] = useState<any>(null);
