@@ -6,7 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { fetchTournament } from '../services/startgg';
-import { Loader2, ArrowLeft, Trophy, Users, AlertCircle, Plus, X, Zap, ChevronDown, Trash2, Edit2 } from 'lucide-react';
+import { Loader2, ArrowLeft, Trophy, Users, AlertCircle, Plus, X, Zap, ChevronDown, Trash2, Edit2, Filter, Check } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import clsx from 'clsx';
 
@@ -47,6 +47,8 @@ export function BettingPage() {
   const [participantsByLevel, setParticipantsByLevel] = useState<{ [level: string]: string[] }>({ 'High Elo': [], 'Low Elo': [] });
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [totalStats, setTotalStats] = useState({ count: 0, sheep: 0 });
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [adminForm, setAdminForm] = useState({
     title: '',
     description: '',
@@ -924,19 +926,91 @@ export function BettingPage() {
               )}
             </div>
           ) : (
-            <div className="space-y-6">
-              {isAdmin && !showAdminTools && (
-                <div className="flex justify-end">
+              <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
+                <div className="relative w-full md:w-72">
+                  <button
+                    onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                    className="w-full bg-[#111218]/80 backdrop-blur-xl border border-white/10 px-6 py-3.5 rounded-2xl flex items-center justify-between group transition-all hover:border-cyan-500/50 shadow-xl"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Filter size={16} className="text-cyan-400" />
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                        {filterCategory === 'all' ? 'Tutte le Scommesse' :
+                         filterCategory === 'high' ? 'High Elo' :
+                         filterCategory === 'low' ? 'Low Elo' :
+                         filterCategory === 'tournament' ? 'Vincitore Torneo' :
+                         filterCategory === 'match' ? 'Vincitore Match' : 'Punteggio Finale'}
+                      </span>
+                    </div>
+                    <ChevronDown size={16} className={clsx("text-gray-600 transition-transform duration-300", showFilterDropdown && "rotate-180")} />
+                  </button>
+
+                  {showFilterDropdown && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setShowFilterDropdown(false)} />
+                      <div className="absolute top-full left-0 w-full mt-2 bg-[#111218] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                        {[
+                          { id: 'all', label: 'Tutte le Scommesse' },
+                          { id: 'high', label: 'High Elo' },
+                          { id: 'low', label: 'Low Elo' },
+                          { id: 'tournament', label: 'Vincitore Torneo' },
+                          { id: 'match', label: 'Vincitore Match' },
+                          { id: 'score', label: 'Punteggio Finale' }
+                        ].map((opt) => (
+                          <button
+                            key={opt.id}
+                            onClick={() => {
+                              setFilterCategory(opt.id);
+                              setShowFilterDropdown(false);
+                            }}
+                            className="w-full px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-colors group"
+                          >
+                            <span className={clsx(
+                              "text-[10px] font-bold uppercase tracking-widest transition-colors",
+                              filterCategory === opt.id ? "text-cyan-400" : "text-gray-500 group-hover:text-white"
+                            )}>
+                              {opt.label}
+                            </span>
+                            {filterCategory === opt.id && <Check size={14} className="text-cyan-400" />}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {isAdmin && !showAdminTools && (
                   <button 
                     onClick={() => setShowAdminTools(true)}
-                    className="px-6 py-3 bg-gradient-to-b from-slate-200 to-slate-400 hover:from-white hover:to-slate-300 text-slate-900 font-black uppercase tracking-[0.2em] rounded-xl transition-all shadow-lg active:scale-95 flex items-center gap-2 border border-white/20"
+                    className="w-full md:w-auto px-6 py-3.5 bg-gradient-to-b from-slate-200 to-slate-400 hover:from-white hover:to-slate-300 text-slate-900 font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 border border-white/20"
                   >
                     <Plus size={16} strokeWidth={3} /> Nuova Scommessa
                   </button>
-                </div>
-              )}
+                )}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {markets.map((market) => (
+                {(() => {
+                  const filtered = markets.filter(market => {
+                    if (filterCategory === 'all') return true;
+                    if (filterCategory === 'high') return market.title.includes('[High Elo]');
+                    if (filterCategory === 'low') return market.title.includes('[Low Elo]');
+                    if (filterCategory === 'tournament') return market.type === 'Tournament Winner';
+                    if (filterCategory === 'match') return market.type === 'Match Winner';
+                    if (filterCategory === 'score') return market.type === 'Final Score';
+                    return true;
+                  });
+
+                  if (filtered.length === 0) {
+                    return (
+                      <div className="col-span-full py-20 text-center bg-white/5 rounded-[2.5rem] border border-dashed border-white/10">
+                        <Filter size={40} className="mx-auto mb-4 text-gray-700" />
+                        <p className="text-gray-500 font-bold uppercase tracking-widest text-xs">Nessuna scommessa trovata per questo filtro</p>
+                      </div>
+                    );
+                  }
+
+                  return filtered.map((market) => (
                 <div key={market.id} className="bg-[#111218] rounded-[2.5rem] border border-slate-400/20 overflow-hidden group hover:border-slate-400/40 transition-all duration-500 shadow-2xl flex flex-col h-full">
                   {/* Market Header */}
                   <div className="p-6 md:p-8 bg-gradient-to-br from-[#1a1c25] to-[#111218] border-b border-white/5 min-h-[160px] md:min-h-[180px] flex flex-col">
@@ -1191,7 +1265,7 @@ export function BettingPage() {
                     )}
                   </div>
                 </div>
-              ))}
+              ))})()}
             </div>
           </div>
         )}
