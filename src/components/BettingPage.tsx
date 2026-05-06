@@ -46,7 +46,7 @@ export function BettingPage() {
   const [editingMarketId, setEditingMarketId] = useState<string | null>(null);
   const [participantsByLevel, setParticipantsByLevel] = useState<{ [level: string]: string[] }>({ 'High Elo': [], 'Low Elo': [] });
   const [showDisclaimer, setShowDisclaimer] = useState(false);
-  const [totalStats, setTotalStats] = useState({ count: 0, sheep: 0 });
+  const [totalStats, setTotalStats] = useState({ count: 0, sheep: 0, pastori: 0 });
   const [filterCategory, setFilterCategory] = useState('all');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [adminForm, setAdminForm] = useState({
@@ -178,9 +178,17 @@ export function BettingPage() {
           .select('*', { count: 'exact', head: true })
           .in('market_id', marketIds);
 
-        setTotalStats({ count: count || 0, sheep: totalSheep });
+        // Calculate unique users (pastori)
+        const { data: uniqueUsers } = await supabase
+          .from('user_bets')
+          .select('user_email')
+          .in('market_id', marketIds);
+        
+        const pastoriCount = new Set(uniqueUsers?.map(u => u.user_email)).size;
+
+        setTotalStats({ count: count || 0, sheep: totalSheep, pastori: pastoriCount });
       } else {
-        setTotalStats({ count: 0, sheep: 0 });
+        setTotalStats({ count: 0, sheep: 0, pastori: 0 });
       }
     } catch (err) {
       console.error('Error loading betting data:', err);
@@ -401,6 +409,11 @@ export function BettingPage() {
                <div className="flex flex-col">
                  <span className="text-[10px] font-black text-blue-400/60 uppercase tracking-[0.2em]">Puntate Totali</span>
                  <span className="text-xl font-black text-white tabular-nums">{totalStats.count}</span>
+               </div>
+               <div className="w-px h-8 bg-white/10" />
+               <div className="flex flex-col">
+                 <span className="text-[10px] font-black text-amber-400/60 uppercase tracking-[0.2em]">Pastori</span>
+                 <span className="text-xl font-black text-white tabular-nums">{totalStats.pastori}</span>
                </div>
                <div className="w-px h-8 bg-white/10" />
                <div className="flex flex-col">
