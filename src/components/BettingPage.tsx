@@ -409,32 +409,32 @@ export function BettingPage() {
                </div>
              </div>
 
-             <div className="group relative max-w-[500px] -ml-0.5">
-               <div 
-                 onClick={() => setShowDisclaimer(!showDisclaimer)}
-                 className="bg-[#111218]/90 border border-white/10 p-2.5 px-3 rounded-xl flex items-start gap-3 text-gray-500 text-[10px] font-bold uppercase tracking-widest cursor-pointer md:cursor-help backdrop-blur-sm transition-colors hover:border-white/20"
-               >
-                <AlertCircle size={14} className="shrink-0 mt-0.5" />
-                <div className="flex flex-col w-full">
-                  <span>Disclaimer</span>
-                  <div className={clsx(
-                    "overflow-hidden transition-all duration-500 ease-in-out opacity-0 group-hover:opacity-100 group-hover:max-h-[100px]",
-                    showDisclaimer ? "max-h-[100px] opacity-100 mt-1.5" : "max-h-0"
-                  )}>
-                    <p className="text-[9px] text-gray-500 normal-case tracking-normal font-normal leading-relaxed">
-                      Il sistema di Social Betting è un gioco di simulazione puramente gratuito. Non costituisce attività di gioco d'azzardo. Le "Pecore" sono punti virtuali privi di valore economico.
-                    </p>
-                  </div>
+              <div className="group relative w-full md:max-w-[320px]">
+                <div 
+                  onClick={() => setShowDisclaimer(!showDisclaimer)}
+                  className="w-full bg-[#111218]/90 border border-white/10 p-2.5 px-3 rounded-xl flex items-start gap-3 text-gray-500 text-[10px] font-bold uppercase tracking-widest cursor-pointer md:cursor-help backdrop-blur-sm transition-colors hover:border-white/20"
+                >
+                 <AlertCircle size={14} className="shrink-0 mt-0.5" />
+                 <div className="flex flex-col w-full">
+                   <span>Disclaimer</span>
+                   <div className={clsx(
+                     "overflow-hidden transition-all duration-500 ease-in-out opacity-0 group-hover:opacity-100 group-hover:max-h-[100px]",
+                     showDisclaimer ? "max-h-[100px] opacity-100 mt-1.5" : "max-h-0"
+                   )}>
+                     <p className="text-[9px] text-gray-500 normal-case tracking-normal font-normal leading-relaxed">
+                       Il sistema di Social Betting è un gioco di simulazione puramente gratuito. Non costituisce attività di gioco d'azzardo. Le "Pecore" sono punti virtuali privi di valore economico.
+                     </p>
+                   </div>
+                 </div>
                 </div>
-               </div>
-             </div>
+              </div>
 
-             {/* Real-time Filter Dropdown - Moved here for better proximity */}
-             <div className="relative w-full md:w-72 mt-2">
-               <button
-                 onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                 className="w-full bg-[#111218]/80 backdrop-blur-xl border border-white/10 px-6 py-3 rounded-2xl flex items-center justify-between group transition-all hover:border-cyan-500/50 shadow-xl"
-               >
+              {/* Real-time Filter Dropdown - Moved here for better proximity */}
+              <div className="relative w-full md:max-w-[320px] mt-2">
+                <button
+                  onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                  className="w-full bg-[#111218]/80 backdrop-blur-xl border border-white/10 px-6 py-3 rounded-2xl flex items-center justify-between group transition-all hover:border-cyan-500/50 shadow-xl"
+                >
                  <div className="flex items-center gap-3">
                    <Filter size={16} className="text-cyan-400" />
                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
