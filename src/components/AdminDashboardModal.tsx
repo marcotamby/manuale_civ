@@ -1109,19 +1109,19 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
         ) : activeTab === 'pecore' && isSuperAdmin ? (
           <div className="flex-1 flex flex-col min-h-0 bg-[#0d1424]">
             {/* Pecore Tab Content */}
-            <div className="p-4 md:p-6 md:pr-10 border-b border-white/5 space-y-4 bg-gradient-to-b from-blue-500/5 to-transparent">
-              <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-                <div className="relative w-full md:w-96">
+            <div className="p-4 md:p-6 border-b border-white/5 space-y-4 bg-gradient-to-b from-blue-500/5 to-transparent">
+              <div className="flex items-center justify-between gap-4">
+                <div className="relative w-80">
                   <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
                   <input
                     type="text"
-                    placeholder="Cerca utente per email o nickname..."
+                    placeholder="Cerca utente per email..."
                     value={userSearch}
                     onChange={(e) => setUserSearch(e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:border-cyan-500 outline-none transition-all placeholder:text-gray-600"
+                    className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs text-white focus:border-cyan-500 outline-none transition-all placeholder:text-gray-600"
                   />
                 </div>
-                <div className="flex items-center gap-3 bg-cyan-500/5 px-4 py-2 rounded-2xl border border-cyan-500/10">
+                <div className="flex items-center gap-3 bg-cyan-500/5 px-4 py-2.5 rounded-xl border border-cyan-500/10 shrink-0">
                   <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">Totale Pastori:</span>
                   <span className="text-sm font-black text-white">{allProfiles.length}</span>
                 </div>
@@ -1144,13 +1144,13 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                       </div>
                     </div>
                     
-                    <div className="bg-black/40 p-4 rounded-xl border border-white/5 flex flex-col gap-4 w-full overflow-hidden">
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="flex items-center gap-2 flex-1">
+                    <div className="bg-black/40 p-4 rounded-xl border border-white/5 flex flex-col items-stretch gap-4 w-full">
+                      <div className="flex items-center justify-between gap-2 w-full">
+                        <div className="flex items-center gap-2 shrink-0">
                           <span className="text-xl">🐑</span>
                           <span className="text-xl font-black text-white">{p.sheep_balance || 0}</span>
                         </div>
-                        <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10 shrink-0">
+                        <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10 shrink-0 ml-auto">
                           <button
                             onClick={() => {
                               const current = perUserRefillAmounts[p.email] ?? 100;
