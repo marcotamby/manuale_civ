@@ -1170,7 +1170,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                           <button
                             onClick={() => {
                               const current = perUserRefillAmounts[p.email] ?? 100;
-                              setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: (perUserRefillAmounts[p.email] ?? 100) + 10 });
+                              setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: current + 10 });
                             }}
                             className="p-1.5 hover:bg-white/10 rounded-lg text-cyan-400 transition-colors"
                           >
