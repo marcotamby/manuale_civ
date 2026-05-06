@@ -1,6 +1,6 @@
 // Deployment trigger: 2026-04-24 10:15
 import { useState, useEffect } from 'react';
-import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, Trophy, BookOpen, Zap, Edit2, Check, Trash2 } from 'lucide-react';
+import { MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, Trophy, BookOpen, Zap, Edit2, Check, Trash2, Coins } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
@@ -62,6 +62,26 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [inlineToast, setInlineToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
+  const [allProfiles, setAllProfiles] = useState<any[]>([]);
+  const [userSearch, setUserSearch] = useState('');
+  const [isRefilling, setIsRefilling] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchSuggestions();
+      fetchQA();
+      if (isSuperAdmin) {
+        fetchUsers();
+        fetchProfiles();
+      }
+    }
+  }, [isOpen, isSuperAdmin]);
+
+  useEffect(() => {
+    if (activeTab === 'pecore') {
+      fetchProfiles();
+    }
+  }, [activeTab]);
 
   const getYoutubeId = (url: string) => {
     if (!url) return null;
@@ -87,6 +107,47 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       setToast({ isVisible: true, message: 'Errore nel caricamento delle proposte', type: 'error' });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchProfiles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('sheep_balance', { ascending: false });
+
+      if (error) throw error;
+      setAllProfiles(data || []);
+    } catch (err: any) {
+      console.error('Error fetching profiles:', err);
+    }
+  };
+
+  const handleSheepRefill = async (email: string, amount: number, isSet: boolean = false) => {
+    try {
+      setIsRefilling(email);
+      const profile = allProfiles.find(p => p.email === email);
+      if (!profile) return;
+
+      const newBalance = isSet ? amount : (profile.sheep_balance || 0) + amount;
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ sheep_balance: newBalance })
+        .eq('email', email);
+
+      if (error) throw error;
+      
+      setAllProfiles(allProfiles.map(p => 
+        p.email === email ? { ...p, sheep_balance: newBalance } : p
+      ));
+      
+      setToast({ isVisible: true, message: `Bilancio aggiornato per ${profile.nickname || email}`, type: 'success' });
+    } catch (err: any) {
+      setToast({ isVisible: true, message: `Errore: ${err.message}`, type: 'error' });
+    } finally {
+      setIsRefilling(null);
     }
   };
 
@@ -577,6 +638,15 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                   Permessi
                 </button>
               )}
+              {isSuperAdmin && (
+                <button
+                  onClick={() => setActiveTab('pecore')}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'pecore' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                >
+                  <Coins size={14} />
+                  Pecore
+                </button>
+              )}
 
             </div>
             <button
@@ -1034,6 +1104,67 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        ) : activeTab === 'pecore' && isSuperAdmin ? (
+          <div className="flex-1 flex flex-col min-h-0 bg-black/20">
+            {/* Pecore Tab Content */}
+            <div className="p-4 md:p-6 border-b border-white/5 space-y-4">
+              <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div className="relative w-full md:w-96">
+                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <input
+                    type="text"
+                    placeholder="Cerca utente per email o nickname..."
+                    value={userSearch}
+                    onChange={(e) => setUserSearch(e.target.value)}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:border-blue-500 outline-none transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {allProfiles
+                  .filter(p => !userSearch || p.email?.toLowerCase().includes(userSearch.toLowerCase()) || p.nickname?.toLowerCase().includes(userSearch.toLowerCase()))
+                  .map(p => (
+                  <div key={p.email} className="bg-white/[0.03] border border-white/5 rounded-2xl p-5 flex flex-col gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 font-bold border border-blue-500/20">
+                        {p.nickname?.[0] || p.email?.[0]}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-bold truncate">{p.nickname || 'Anonimo'}</p>
+                        <p className="text-[10px] text-gray-500 truncate">{p.email}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between bg-black/40 p-3 rounded-xl border border-white/5">
+                      <div className="flex items-center gap-2">
+                        <Coins size={16} className="text-yellow-500" />
+                        <span className="text-xl font-black text-white">{p.sheep_balance || 0}</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleSheepRefill(p.email, 100)}
+                          disabled={isRefilling === p.email}
+                          className="px-3 py-1.5 bg-yellow-600/20 text-yellow-500 rounded-lg text-[10px] font-bold border border-yellow-500/30 hover:bg-yellow-600/40"
+                        >
+                          +100
+                        </button>
+                        <button
+                          onClick={() => handleSheepRefill(p.email, 500)}
+                          disabled={isRefilling === p.email}
+                          className="px-3 py-1.5 bg-yellow-600/20 text-yellow-500 rounded-lg text-[10px] font-bold border border-yellow-500/30 hover:bg-yellow-600/40"
+                        >
+                          +500
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         ) : (
