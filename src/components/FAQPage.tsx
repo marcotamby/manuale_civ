@@ -489,7 +489,7 @@ export function FAQPage() {
           </div>
         </div>
 
-        <section className="mb-12 glass p-6 md:p-8 rounded-3xl border border-white/5 relative group">
+        <div className="bg-[#0f0f0f]/95 backdrop-blur-2xl p-6 md:p-8 rounded-2xl border border-[#D4AF37]/30 shadow-2xl shadow-black/50 mb-12 relative group">
           {isEditing ? (
             <div className="space-y-4 relative z-10">
               <div className="relative">

@@ -5,7 +5,7 @@ export function PrivacyPage() {
 
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full lg:bg-transparent bg-[#0a0a0b] text-gray-300 relative z-10 elegant-scrollbar">
-      <div className="max-w-4xl mx-auto glass p-8 rounded-2xl border border-[#D4AF37]/30 shadow-2xl">
+      <div className="max-w-4xl mx-auto bg-[#0f0f0f]/95 backdrop-blur-2xl p-8 rounded-2xl border border-[#D4AF37]/30 shadow-2xl shadow-black/50">
         <button 
           onClick={() => navigate('/')}
           className="mb-8 flex items-center gap-2 text-yellow-500 hover:text-yellow-400 transition-colors"
