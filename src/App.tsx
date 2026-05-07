@@ -28,6 +28,7 @@ import { BettingPage } from './components/BettingPage';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { usePresence } from './components/PresenceContext';
+import { ClassificaPage } from './components/ClassificaPage';
 
 function App() {
   const navigate = useNavigate();
@@ -44,8 +45,9 @@ function App() {
   const isFaq = location.pathname === '/faq';
   const isPrivacy = location.pathname === '/privacy';
   const isTournamentsSection = location.pathname.includes('/tornei') || location.pathname.includes('/tournament/');
-  
-  const currentPage = isHome ? 'home' : isCompare ? 'compare' : isCiv ? 'civ' : isFaq ? 'faq' : isPrivacy ? 'privacy' : isTournamentsSection ? 'tornei' : 'home';
+  const isClassifica = location.pathname === '/classifica';
+
+  const currentPage = isHome ? 'home' : isCompare ? 'compare' : isCiv ? 'civ' : isFaq ? 'faq' : isPrivacy ? 'privacy' : isTournamentsSection ? 'tornei' : isClassifica ? 'classifica' : 'home';
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false);
@@ -314,6 +316,7 @@ function App() {
                 <Route path="/compare/:civ1Id/:civ2Id" element={<CompareView civIds={compareIds} onClose={() => navigate('/')} />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/faq" element={<FAQPage />} />
+                <Route path="/classifica" element={<ClassificaPage />} />
                 <Route path="/tornei" element={<TournamentsPage />} />
                 <Route path="/tornei/:slug" element={<TournamentDetail />} />
                 <Route path="/tornei/:slug/regolamento" element={<TournamentRegolamento />} />
