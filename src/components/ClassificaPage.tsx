@@ -401,7 +401,7 @@ export function ClassificaPage() {
             href={aoeUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-blue-400 hover:text-blue-300 cursor-pointer hover:underline"
+            className="font-medium text-amber-400 hover:text-amber-300 cursor-pointer hover:underline"
           >
             {aoeUserName}
           </a>
@@ -472,7 +472,7 @@ export function ClassificaPage() {
             {discordUrl ? (
               <a
                 href={discordUrl}
-                className="font-medium text-blue-400 hover:text-blue-300 cursor-pointer"
+                className="font-medium text-amber-400 hover:text-amber-300 cursor-pointer"
               >
                 {rowData?.discord_name || 'Unknown'}
               </a>
@@ -643,7 +643,7 @@ export function ClassificaPage() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#050505]">
+    <div className="w-full min-h-screen bg-[#000000]">
       {/* Header */}
       <div className="bg-gradient-to-b from-neutral-900 to-transparent pt-8 pb-6 px-6 md:px-20 border-b border-white/10">
         <div className="flex items-center gap-3 mb-2">

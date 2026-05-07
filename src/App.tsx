@@ -198,7 +198,7 @@ function App() {
 
   return (
     <div
-      className="flex flex-col h-screen w-full bg-[#0a0a0b] text-white overflow-hidden selection:bg-yellow-500/30"
+      className="flex flex-col h-screen w-full bg-[#000000] text-white overflow-hidden selection:bg-yellow-500/30"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
