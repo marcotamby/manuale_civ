@@ -261,7 +261,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
               </>
             )}
             <div className="w-px h-3 bg-white/10"></div>
-            <Link to="/classifica" className="flex items-center gap-2 text-yellow-400 hover:text-yellow-300 transition-colors text-[13px] font-bold uppercase tracking-wider">
+            <Link to="/classifica" className="flex items-center gap-2 text-pink-400 hover:text-pink-300 transition-colors text-[13px] font-bold uppercase tracking-wider">
               <Award size={14} /> Classifica
             </Link>
          </div>
