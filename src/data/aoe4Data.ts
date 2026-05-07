@@ -1321,5 +1321,17 @@ export const civilizationsData: Civilization[] = [
       { id: "temple-sun", imageId: "temple-of-the-sun-3", name: "Tempio del Sole", age: 4, type: "Technology", description: "Grants powerful global togglable buffs." },
       { id: "zhuxi-library", imageId: "zhu-xis-library-3", name: "Biblioteca di Zhu Xi", age: 4, type: "Technology", description: "Access to powerful unique upgrades." }
     ]
+  },
+  {
+    id: "jin-dynasty",
+    name: "Dinastia Jin",
+    flag: "/civs/Jin Dynasty.png",
+    difficulty: "Difficile",
+    primaryColor: "#d4af37",
+    shortDescription: "Una civiltà focalizzata su potenti unità d'élite e una solida economia.",
+    passiveBonuses: ["Bonus economici e militari unici."],
+    uniqueUnits: [],
+    technologies: [],
+    landmarks: []
   }
 ];

@@ -138,7 +138,8 @@
             'zhuxi': "Zhu Xis Legacy.webp",
             'tughlaq': 'Tughlaq Dynasty.webp',
             'sengoku': 'Sengoku Daimyo.webp',
-            'macedonian': 'Macedonian Dynasty.webp'
+            'macedonian': 'Macedonian Dynasty.webp',
+            'jin-dynasty': 'Jin Dynasty.png'
         };
 
         const { createClient } = window.supabase;
@@ -173,8 +174,9 @@
 
         function getCivUrl(id) {
             if (!id) return '';
+            if (id.startsWith('/') || id.includes('.png') || id.includes('.webp')) return id;
             const filename = civMap[id] || id + '.webp';
-            return `/civs/${filename}`;
+            return filename.startsWith('/') ? filename : `/civs/${filename}`;
         }
 
         function getMapUrl(name) {

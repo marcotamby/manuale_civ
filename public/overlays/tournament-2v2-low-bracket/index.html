@@ -179,6 +179,7 @@
 
         function getCivFlagUrl(id) {
             if (!id) return '';
+            if (id.startsWith('/') || id.includes('.webp') || id.includes('.png')) return id;
             const mapping = {
                 'abbasid': 'Abbasid Dynasty',
                 'ayyubids': 'Ayyubids',
@@ -201,10 +202,14 @@
                 'macedonian': 'Macedonian Dynasty',
                 'sengoku': 'Sengoku Daimyo',
                 'templar': 'Knights Templar',
-                'tughlaq': 'Tughlaq Dynasty'
+                'tughlaq': 'Tughlaq Dynasty',
+                'jin-dynasty': '/civs/Jin Dynasty.png'
             };
-            const name = mapping[id.toLowerCase()] || id;
-            return `/civs/${name}.webp`;
+            const mapped = mapping[id.toLowerCase()];
+            if (mapped) {
+                return mapped.startsWith('/') ? mapped : `/civs/${mapped}.webp`;
+            }
+            return `/civs/${id}.webp`;
         }
 
         function updateLines(state) {

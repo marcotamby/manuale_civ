@@ -273,6 +273,7 @@
 
         function getCivFlagUrl(id) {
             if (!id) return '';
+            if (id.startsWith('/') || id.includes('.png') || id.includes('.webp')) return id;
             const mapping = {
                 'abbasid': 'Abbasid Dynasty', 'ayyubids': 'Ayyubids', 'byzantines': 'Byzantines',
                 'chinese': 'Chinese', 'delhi': 'Delhi Sultanate', 'english': 'English',
@@ -282,10 +283,14 @@
                 'rus': 'Rus', 'zhuxi': 'Zhu Xis Legacy',
                 'goldenhorde': 'Golden Horde', 'lancaster': 'House of Lancaster',
                 'templar': 'Knights Templar', 'macedonian': 'Macedonian Dynasty',
-                'sengoku': 'Sengoku Daimyo', 'tughlaq': 'Tughlaq Dynasty'
+                'sengoku': 'Sengoku Daimyo', 'tughlaq': 'Tughlaq Dynasty',
+                'jin-dynasty': '/civs/Jin Dynasty.png'
             };
-            const name = mapping[id.toLowerCase()] || id;
-            return `/civs/${name}.png`;
+            const mapped = mapping[id.toLowerCase()];
+            if (mapped) {
+                return mapped.startsWith('/') ? mapped : `/civs/${mapped}.png`;
+            }
+            return `/civs/${id}.png`;
         }
 
         function getMapUrl(name) {
