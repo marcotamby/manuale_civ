@@ -4,7 +4,7 @@ import { useCivData } from './CivContext';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Link, useLocation } from 'react-router-dom';
-import { Coffee, Radio as _Radio, HelpCircle, LogOut, Trophy, Monitor } from 'lucide-react';
+import { Coffee, Radio as _Radio, HelpCircle, LogOut, Trophy, Monitor, Award } from 'lucide-react';
 import { usePresence } from './PresenceContext';
 
 export type FilterType = 'Tutte' | 'Fanteria' | 'Cavalleria' | 'Arcieri' | 'Assedio';
@@ -220,7 +220,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
 
   const location = useLocation();
   console.log('💎 TOPBAR RENDER - Notification Count:', notificationCount);
-  const isSpecialPage = isHome || location.pathname.includes('/tornei') || location.pathname === '/faq' || location.pathname === '/privacy' || location.pathname.startsWith('/civ/') || location.pathname.startsWith('/compare');
+  const isSpecialPage = isHome || location.pathname.includes('/tornei') || location.pathname === '/faq' || location.pathname === '/privacy' || location.pathname === '/classifica' || location.pathname.startsWith('/civ/') || location.pathname.startsWith('/compare');
 
   return (
     <div className="w-full flex flex-col shrink-0 z-[100] relative select-none">
@@ -260,6 +260,10 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
                 </button>
               </>
             )}
+            <div className="w-px h-3 bg-white/10"></div>
+            <Link to="/classifica" className="flex items-center gap-2 text-violet-400 hover:text-violet-300 transition-colors text-[13px] font-bold uppercase tracking-wider">
+              <Award size={14} /> Classifica
+            </Link>
          </div>
 
          {/* Right Side: Auth & Presence */}
