@@ -274,8 +274,8 @@ export function ClassificaPage() {
           <span>{label}</span>
           {helpText && (
             <span className="relative inline-flex items-center group" onClick={e => e.stopPropagation()}>
-              <span className="w-4 h-4 rounded-full bg-slate-800 text-slate-300 text-[10px] font-bold flex items-center justify-center cursor-help">?</span>
-              <div className="pointer-events-none absolute left-1/2 top-full mb-2 hidden w-[220px] -translate-x-1/2 rounded border border-slate-700 bg-slate-950 p-2 text-xs text-white whitespace-pre-line shadow-lg group-hover:block z-50">
+              <span className="w-4 h-4 rounded-full bg-neutral-800 text-neutral-300 text-[10px] font-bold flex items-center justify-center cursor-help">?</span>
+              <div className="pointer-events-none absolute left-1/2 top-full mb-2 hidden w-[220px] -translate-x-1/2 rounded border border-neutral-700 bg-neutral-950 p-2 text-xs text-white whitespace-pre-line shadow-lg group-hover:block z-50">
                 {helpText}
               </div>
             </span>
@@ -591,7 +591,7 @@ export function ClassificaPage() {
 
     return (
       <div>
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between px-4 py-4 border-b border-white/10 bg-slate-950/40">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between px-4 py-4 border-b border-white/10 bg-neutral-950/40">
           <div className="text-sm text-gray-300">
             {filteredData.length} righe trovate
           </div>
@@ -601,14 +601,14 @@ export function ClassificaPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cerca per Utente Discord o Utente Aoe"
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/90 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20"
+              className="w-full rounded-2xl border border-white/10 bg-neutral-950/90 px-4 py-3 text-sm text-white placeholder:text-neutral-500 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20"
             />
           </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/10 bg-white/5 sticky top-0">
+              <tr className="border-b border-white/10 bg-white/[0.03] sticky top-0">
                 {allKeys.map(key => (
                   <th
                     key={key}
@@ -643,9 +643,9 @@ export function ClassificaPage() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#0d1424]">
+    <div className="w-full min-h-screen bg-[#050505]">
       {/* Header */}
-      <div className="bg-gradient-to-b from-slate-900 to-transparent pt-8 pb-6 px-6 md:px-20 border-b border-white/10">
+      <div className="bg-gradient-to-b from-neutral-900 to-transparent pt-8 pb-6 px-6 md:px-20 border-b border-white/10">
         <div className="flex items-center gap-3 mb-2">
           <Award size={32} className="text-amber-400" />
           <h1 className="text-3xl md:text-4xl font-black text-white uppercase tracking-wider">Classifica</h1>
