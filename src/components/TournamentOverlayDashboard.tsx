@@ -106,7 +106,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
         </div>
 
         {isOpen && (
-          <div className={`absolute z-[1000] ${align === 'right' ? 'right-0' : 'left-0'} mt-2 bg-[#0d111a] border border-white/20 rounded-2xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-150 ${isSm ? 'min-w-[150px]' : 'min-w-[200px]'}`}>
+          <div className={`absolute z-[1000] ${align === 'right' ? 'right-0' : 'left-0'} ${openUp ? 'bottom-full mb-2' : 'top-full mt-2'} bg-[#0d111a] border border-white/20 rounded-2xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-150 ${isSm ? 'min-w-[150px]' : 'min-w-[200px]'}`}>
              <div 
                onClick={() => { onChange(''); setIsOpen(false); }}
                className="flex items-center gap-4 px-4 py-3 hover:bg-blue-600/10 transition-all cursor-pointer group border-b border-white/5"
@@ -179,7 +179,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
     </button>
   );
 
-  const renderMatchInputs = (matchId: string, label: string) => {
+  const renderMatchInputs = (matchId: string, label: string, align: 'left' | 'right' = 'right', openUp = false) => {
     const match = state.bracket[matchId] || { p1: '', p2: '', p1Civ: '', p2Civ: '', w: 0 };
     
     return (
@@ -207,7 +207,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                 >
                   W
                 </button>
-                <CustomCivSelect isSm={true} showName={false} align="right" value={match[cKey]} onChange={(val) => setState({ ...state, bracket: { ...state.bracket, [matchId]: { ...match, [cKey]: val } } })} />
+                <CustomCivSelect isSm={true} showName={false} align={align} openUp={openUp} value={match[cKey]} onChange={(val) => setState({ ...state, bracket: { ...state.bracket, [matchId]: { ...match, [cKey]: val } } })} />
               </div>
             );
           })}
@@ -323,21 +323,21 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
             <div className="grid grid-cols-3 gap-12 items-stretch">
               <div className="space-y-4 flex flex-col justify-between">
                 <h4 className="text-center text-[10px] font-black text-blue-400 uppercase tracking-[0.5em] pb-2 border-b border-blue-400/20 mb-4">Quarti di Finale</h4>
-                {renderMatchInputs('q1', 'Match #01')}
-                {renderMatchInputs('q2', 'Match #02')}
-                {renderMatchInputs('q3', 'Match #03')}
-                {renderMatchInputs('q4', 'Match #04')}
+                {renderMatchInputs('q1', 'Match #01', 'left')}
+                {renderMatchInputs('q2', 'Match #02', 'left')}
+                {renderMatchInputs('q3', 'Match #03', 'left', true)}
+                {renderMatchInputs('q4', 'Match #04', 'left', true)}
               </div>
               <div className="flex flex-col justify-around py-10">
                 <h4 className="text-center text-[10px] font-black text-blue-400 uppercase tracking-[0.5em] pb-2 border-b border-blue-400/20 mb-4">Semifinale</h4>
                 <div className="space-y-24">
-                  {renderMatchInputs('s1', 'semifinale #01')}
-                  {renderMatchInputs('s2', 'semifinale #02')}
+                  {renderMatchInputs('s1', 'semifinale #01', 'left')}
+                  {renderMatchInputs('s2', 'semifinale #02', 'left', true)}
                 </div>
               </div>
               <div className="flex flex-col justify-center">
                 <h4 className="text-center text-[11px] font-black text-yellow-500 uppercase tracking-[0.5em] pb-2 border-b border-yellow-500/20 mb-6">Finale</h4>
-                {renderMatchInputs('f', 'Finale')}
+                {renderMatchInputs('f', 'Finale', 'right', true)}
               </div>
             </div>
             <div className="flex justify-center pt-12 border-t border-white/5"><SaveButton className="px-20 py-4" /></div>
