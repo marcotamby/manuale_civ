@@ -401,7 +401,7 @@ export function ClassificaPage() {
             href={aoeUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-amber-400 hover:text-amber-300 cursor-pointer hover:underline"
+            className="font-medium text-blue-400 hover:text-blue-300 cursor-pointer hover:underline"
           >
             {aoeUserName}
           </a>
@@ -472,7 +472,7 @@ export function ClassificaPage() {
             {discordUrl ? (
               <a
                 href={discordUrl}
-                className="font-medium text-amber-400 hover:text-amber-300 cursor-pointer"
+                className="font-medium text-blue-400 hover:text-blue-300 cursor-pointer"
               >
                 {rowData?.discord_name || 'Unknown'}
               </a>
@@ -601,7 +601,7 @@ export function ClassificaPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cerca per Utente Discord o Utente Aoe"
-              className="w-full rounded-2xl border border-white/10 bg-neutral-950/90 px-4 py-3 text-sm text-white placeholder:text-neutral-500 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20"
+              className="w-full rounded-2xl border border-white/10 bg-neutral-950/90 px-4 py-3 text-sm text-white placeholder:text-neutral-500 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400/20"
             />
           </div>
         </div>
@@ -664,7 +664,7 @@ export function ClassificaPage() {
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 md:px-6 py-4 font-bold uppercase tracking-wider text-sm border-b-2 transition-all ${activeTab === tab.id
-              ? 'border-amber-400 text-amber-400'
+              ? 'border-slate-300 text-white'
               : 'border-transparent text-gray-400 hover:text-white'
               }`}
           >
@@ -678,7 +678,7 @@ export function ClassificaPage() {
         {loading ? (
           <div className="text-center py-12">
             <div className="inline-block">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-400"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-400"></div>
             </div>
             <p className="mt-4 text-gray-400">Loading leaderboards...</p>
           </div>
