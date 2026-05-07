@@ -2,7 +2,7 @@
 // Force build trigger - 2026-05-05 09:05
 import { useState, useEffect } from 'react';
 // Force deploy update for betting favoritism weights 🐑
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { fetchTournament } from '../services/startgg';
@@ -30,6 +30,7 @@ interface LeaderboardUser {
 export function BettingPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, isAuthenticated, canManageTournaments, setUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [markets, setMarkets] = useState<Market[]>([]);
@@ -404,12 +405,25 @@ export function BettingPage() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row items-start justify-between mb-8 gap-10 px-4 md:px-0">
         <div className="relative flex-1">
-           <button 
-            onClick={() => navigate('/tornei')}
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-4 text-xs font-black uppercase tracking-widest"
-           >
-            <ArrowLeft size={16} /> Torna ai Tornei
-           </button>
+           <div className="flex flex-col gap-3 mb-6">
+             <button 
+              onClick={() => navigate('/tornei')}
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-xs font-black uppercase tracking-widest"
+             >
+              <ArrowLeft size={16} /> Torna ai Tornei
+             </button>
+             <button 
+              onClick={() => {
+                const tournamentPath = location.pathname.includes('/tournament/') 
+                  ? `/tornei/tournament/${slug}` 
+                  : `/tornei/${slug}`;
+                navigate(`${tournamentPath}${location.search}`);
+              }}
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-xs font-black uppercase tracking-widest"
+             >
+              <Trophy size={16} className="text-yellow-500/80" /> Vai al tabellone
+             </button>
+           </div>
            <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-white to-slate-400 uppercase tracking-tighter mb-4 leading-tight">
             Social Betting:<br/>
             {tournament?.name || (slug?.replace(/-/g, ' ')) || 'Torneo'}
