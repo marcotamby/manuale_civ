@@ -419,9 +419,9 @@ export function BettingPage() {
                   : `/tornei/${slug}`;
                 navigate(`${tournamentPath}${location.search}`);
               }}
-              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-xs font-black uppercase tracking-widest"
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-all hover:translate-x-1 group text-xs font-black uppercase tracking-widest hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
              >
-              <Trophy size={16} className="text-yellow-500/80" /> Vai al tabellone
+              <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" /> Vai al tabellone
              </button>
            </div>
            <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-white to-slate-400 uppercase tracking-tighter mb-4 leading-tight">
