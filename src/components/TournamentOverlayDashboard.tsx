@@ -69,7 +69,7 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
     setShowResetConfirm(false);
   };
 
-  const CustomCivSelect = ({ value, onChange, isSm = false, showName = true, align = 'left' }: { value: string, onChange: (val: string) => void, isSm?: boolean, showName?: boolean, align?: 'left' | 'right' }) => {
+  const CustomCivSelect = ({ value, onChange, isSm = false, showName = true, align = 'left', openUp = false }: { value: string, onChange: (val: string) => void, isSm?: boolean, showName?: boolean, align?: 'left' | 'right', openUp?: boolean }) => {
     const [isOpen, setIsOpen] = useState(false);
     const selectedCiv = civilizationsData.find(c => c.id === value);
     const dropdownRef = useRef<HTMLDivElement>(null);
