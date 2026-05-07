@@ -20,6 +20,7 @@ export function TournamentDetail() {
   const [selectedPhase, setSelectedPhase] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [detailError, setDetailError] = useState<string | null>(null);
+  const [hasMarkets, setHasMarkets] = useState(false);
 
   useEffect(() => {
     async function loadTournament() {
@@ -100,6 +101,14 @@ export function TournamentDetail() {
             throw fetchErr;
           }
         }
+
+        // Check for betting markets
+        const { count: marketCount } = await supabase
+          .from('betting_markets')
+          .select('*', { count: 'exact', head: true })
+          .or(`tournament_slug.eq.${cleanSlug},tournament_slug.ilike.${cleanSlug},tournament_slug.ilike.%${cleanSlug}%`);
+        
+        setHasMarkets((marketCount || 0) > 0);
       } catch (err: any) {
         console.error("Detail load error:", err);
         setDetailError(err.message || "Impossibile caricare i dettagli del torneo.");
@@ -169,13 +178,24 @@ export function TournamentDetail() {
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0b] via-[#0a0a0b]/60 to-transparent"></div>
         
         <div className="absolute bottom-0 left-0 right-0 max-w-7xl mx-auto px-4 pb-8 md:pb-12">
-          <button 
-            onClick={() => navigate('/tornei')}
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6 group text-sm uppercase tracking-widest font-bold"
-          >
-            <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
-            Torna ai tornei
-          </button>
+          <div className="flex flex-col gap-3 mb-8">
+            <button 
+              onClick={() => navigate('/tornei')}
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
+            >
+              <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" />
+              Torna ai tornei
+            </button>
+            {hasMarkets && (
+              <button 
+                onClick={() => navigate(`/tornei/tournament/${slug}/scommetti${window.location.search}`)}
+                className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
+              >
+                <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" />
+                Vai alle scommesse
+              </button>
+            )}
+          </div>
           
           <div className="flex items-end gap-6">
             <div className="hidden md:block w-32 h-32 rounded-2xl glass border border-yellow-500/30 overflow-hidden shrink-0 shadow-2xl">
