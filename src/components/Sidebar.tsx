@@ -6,11 +6,11 @@ import { Home as HomeIcon, Heart, ChevronLeft, ChevronRight } from 'lucide-react
 interface SidebarProps {
   selectedCiv: string;
   onSelectCiv: (civId: string) => void;
-  onSelectPage: (page: 'home' | 'civ' | 'compare' | 'faq' | 'tornei' | 'privacy') => void;
+  onSelectPage: (page: 'home' | 'civ' | 'compare' | 'faq' | 'tornei' | 'privacy' | 'classifica') => void;
   isOpen: boolean;
   onClose: () => void;
   onOpen?: () => void;
-  currentPage: 'home' | 'civ' | 'compare' | 'faq' | 'tornei' | 'privacy';
+  currentPage: 'home' | 'civ' | 'compare' | 'faq' | 'tornei' | 'privacy' | 'classifica';
   hideOnMobile?: boolean;
 }
 

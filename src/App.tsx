@@ -236,6 +236,9 @@ function App() {
               if (page === 'home') navigate('/');
               else if (page === 'compare') navigate('/compare');
               else if (page === 'faq') navigate('/faq');
+              else if (page === 'classifica') navigate('/classifica');
+              else if (page === 'tornei') navigate('/tornei');
+              else if (page === 'privacy') navigate('/privacy');
             }}
             isOpen={isSidebarOpen}
             onClose={() => setIsSidebarOpen(false)}
