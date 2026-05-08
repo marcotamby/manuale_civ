@@ -3868,17 +3868,12 @@ export const civilizationsData: Civilization[] = [
     "passiveBonuses": [
       "Può posizionare le reliquie in avamposti e fortezze aumentandone così del 25% la corazza, 25% i danni, 25% gittata e del 20% il campo visivo. Le reliquie possono essere posizionate nei moli per aumentare del 5% la velocità d'attacco delle navi (cumulabile fino al 25%. Le reliquie posizionate in questo modo continueranno a generare oro.",
       "Le costruzioni realizzate all'interno dell'aria d'influenza di un centro città ottengono \"Riparazioni di emergenza\" che può essere attivata per riparare la costruzione selezionata di 150 punti al secondo per un totale di 20 secondi",
-      "Riparazioni d'emergenza: una capacità attiva che permette agli edifici nel raggio di influenza dei centri città di ripararsi automaticamente senza spendere risorse.",
-      "I costi per fortificare le torri e le fortezze è ridotto del 20%. Il campo visivo è aumentato del 20%",
       "I prelati possono usare l'abilità \" Ispirazione sacra\" sugli abitanti del villaggio per aumentarne la velocità di raccolta del 35% per 30 secondi",
       "Passaggio in IV età scontato del 10% se si sceglie il Palazzo di Svevia.",
       "Velocità di movimento della fanteria aumentata del +5% in età oscura e +10% dall'età feudale.",
       "La capacità di trasporto degli abitanti è del +40% rispetto alle altre civiltà"
     ],
     "uniqueUnits": [
-      "Landsknecht - (Età 3)",
-      "Prelato - (Età 1)",
-      "Man-at-Arms - (Età 2)",
       {
         "id": "prelate",
         "age": 1,
