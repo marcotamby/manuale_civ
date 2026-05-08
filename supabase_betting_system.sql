@@ -1,4 +1,4 @@
--- 1. Profiles update
+-- 1. Aggiornamento Profili
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS sheep_balance INTEGER DEFAULT 100;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'user';
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_streamer BOOLEAN DEFAULT FALSE;
@@ -7,13 +7,13 @@ ALTER TABLE profiles ADD COLUMN IF NOT EXISTS can_manage_civs BOOLEAN DEFAULT FA
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS can_manage_buildorders BOOLEAN DEFAULT FALSE;
 ALTER TABLE profiles ALTER COLUMN avatar_url TYPE TEXT;
 
--- 2. Betting Markets table
+-- 2. Tabella Mercati (Betting Markets)
 CREATE TABLE IF NOT EXISTS betting_markets (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     tournament_slug TEXT REFERENCES tournaments(slug) ON DELETE CASCADE,
     title TEXT NOT NULL,
     description TEXT,
-    options JSONB NOT NULL, -- e.g. [{"id": "opt1", "label": "Team A", "total_bet": 1000}, {"id": "opt2", "label": "Team B", "total_bet": 500}]
+    options JSONB NOT NULL, -- Struttura: [{"id": "...", "label": "...", "initial_weight": 100}]
     status TEXT DEFAULT 'open', -- open, closed, settled, cancelled
     winner_option_id TEXT,
     type TEXT NOT NULL, -- winner, match, series_result
@@ -21,24 +21,25 @@ CREATE TABLE IF NOT EXISTS betting_markets (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. User Bets table
+-- 3. Tabella Scommesse Utente (User Bets)
 CREATE TABLE IF NOT EXISTS user_bets (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_email TEXT NOT NULL, -- Usiamo email come identificatore principale
     market_id UUID REFERENCES betting_markets(id) ON DELETE CASCADE,
     option_id TEXT NOT NULL,
     amount INTEGER NOT NULL CHECK (amount > 0),
-    payout INTEGER,
+    payout INTEGER DEFAULT 0,
+    is_paid BOOLEAN DEFAULT FALSE,
     status TEXT DEFAULT 'pending', -- pending, won, lost, cancelled
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. Betting Notifications table
+-- 4. Tabella Notifiche (Betting Notifications)
 CREATE TABLE IF NOT EXISTS betting_notifications (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_email TEXT NOT NULL, -- Allineato al frontend
     message TEXT NOT NULL,
-    is_read BOOLEAN DEFAULT FALSE,
+    is_read BOOLEAN DEFAULT FALSE, -- Allineato al frontend
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -47,79 +48,42 @@ ALTER TABLE betting_markets ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_bets ENABLE ROW LEVEL SECURITY;
 ALTER TABLE betting_notifications ENABLE ROW LEVEL SECURITY;
 
--- Helper function to check if user is admin (bypasses RLS on profiles)
+-- Helper function per verificare se l'utente è admin
 CREATE OR REPLACE FUNCTION is_admin() 
 RETURNS boolean AS $$
 BEGIN
   RETURN (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin', 'owner', 'superadmin'))
-    OR 
-    (auth.jwt() ->> 'email' = 'marco.tamborrino.94@gmail.com')
-    OR
-    (EXISTS (SELECT 1 FROM profiles WHERE email = auth.jwt() ->> 'email' AND role = 'admin'))
+    EXISTS (SELECT 1 FROM profiles WHERE email = auth.jwt() ->> 'email' AND role IN ('admin', 'owner', 'superadmin'))
+    OR (auth.jwt() ->> 'email' = 'marco.tamborrino.94@gmail.com')
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Allow public access to profiles for custom auth
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Anyone can see profiles" ON profiles;
-CREATE POLICY "Anyone can see profiles" ON profiles FOR SELECT USING (true);
-DROP POLICY IF EXISTS "Anyone can create profile" ON profiles;
-CREATE POLICY "Anyone can create profile" ON profiles FOR INSERT WITH CHECK (true);
-DROP POLICY IF EXISTS "Anyone can update own profile" ON profiles;
-CREATE POLICY "Anyone can update own profile" ON profiles FOR UPDATE USING (true);
-
--- Markets are public
+-- Policy per Mercati (Pubblici in lettura, Admin in scrittura)
 DROP POLICY IF EXISTS "Markets are public" ON betting_markets;
 CREATE POLICY "Markets are public" ON betting_markets FOR SELECT USING (true);
-
--- Admins can manage markets
 DROP POLICY IF EXISTS "Admins can manage markets" ON betting_markets;
-CREATE POLICY "Admins can manage markets" ON betting_markets 
-FOR ALL TO authenticated
-USING (is_admin())
-WITH CHECK (is_admin());
+CREATE POLICY "Admins can manage markets" ON betting_markets FOR ALL TO authenticated USING (is_admin());
 
--- Users can see their own bets
+-- Policy per Scommesse (Sola lettura e inserimento)
 DROP POLICY IF EXISTS "Users can see their own bets" ON user_bets;
-CREATE POLICY "Users can see their own bets" ON user_bets FOR SELECT USING (true); -- Public for simplicity as requested
-
--- Users can insert bets (Relaxed for custom auth)
+CREATE POLICY "Users can see their own bets" ON user_bets FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Users can insert bets" ON user_bets;
-CREATE POLICY "Users can insert bets" ON user_bets FOR INSERT WITH CHECK (user_id IS NOT NULL);
+CREATE POLICY "Users can insert bets" ON user_bets FOR INSERT WITH CHECK (true);
 
--- Users can see their own notifications
+-- Policy per Notifiche
 DROP POLICY IF EXISTS "Users can see their own notifications" ON betting_notifications;
-CREATE POLICY "Users can see their own notifications" ON betting_notifications FOR SELECT USING (auth.uid() = user_id);
-
--- Users can update their notifications (to mark as read)
+CREATE POLICY "Users can see their own notifications" ON betting_notifications FOR SELECT USING (auth.jwt() ->> 'email' = user_email);
 DROP POLICY IF EXISTS "Users can update their own notifications" ON betting_notifications;
-CREATE POLICY "Users can update their own notifications" ON betting_notifications FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can update their own notifications" ON betting_notifications FOR UPDATE USING (auth.jwt() ->> 'email' = user_email);
 
--- Function to handle sheep balance on bet placement
+-- 6. Trigger per detrarre il saldo al piazzamento della scommessa
 CREATE OR REPLACE FUNCTION handle_new_bet() 
 RETURNS TRIGGER AS $$
 BEGIN
-    -- Deduct sheep from profile
     UPDATE profiles 
     SET sheep_balance = sheep_balance - NEW.amount
-    WHERE id = NEW.user_id;
-    
-    -- Update total bet in market options
-    UPDATE betting_markets
-    SET options = (
-        SELECT jsonb_agg(
-            CASE 
-                WHEN (opt->>'id') = NEW.option_id THEN 
-                    opt || jsonb_build_object('total_bet', (COALESCE((opt->>'total_bet')::int, 0) + NEW.amount))
-                ELSE opt 
-            END
-        )
-        FROM jsonb_array_elements(options) AS opt
-    )
-    WHERE id = NEW.market_id;
-
+    WHERE email = NEW.user_email;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -130,58 +94,61 @@ CREATE TRIGGER on_bet_placed
     FOR EACH ROW
     EXECUTE FUNCTION handle_new_bet();
 
--- Function to settle a betting market
+-- 7. Funzione RPC per la liquidazione (Pari-Mutuel)
 CREATE OR REPLACE FUNCTION settle_betting_market(p_market_id UUID, p_winner_option_id TEXT)
 RETURNS void AS $$
 DECLARE
-    total_pool INTEGER;
-    winner_pool INTEGER;
-    v_bet RECORD;
-    payout_amount INTEGER;
+    v_total_real_bets BIGINT;
+    v_winning_real_bets BIGINT;
+    v_total_initial_weights BIGINT := 0;
+    v_winning_initial_weight BIGINT := 0;
+    v_total_pool BIGINT;
+    v_winning_pool BIGINT;
+    v_market_options JSONB;
+    v_market_title TEXT;
+    v_opt JSONB;
 BEGIN
-    -- 1. Get total pool and winner pool
-    SELECT 
-        SUM((opt->>'total_bet')::int) INTO total_pool
-    FROM betting_markets, jsonb_array_elements(options) AS opt
-    WHERE id = p_market_id;
+    SELECT options, title INTO v_market_options, v_market_title FROM betting_markets WHERE id = p_market_id;
+    
+    -- Calcolo Virtual Weights
+    FOR v_opt IN SELECT * FROM jsonb_array_elements(v_market_options)
+    LOOP
+        v_total_initial_weights := v_total_initial_weights + COALESCE((v_opt->>'initial_weight')::BIGINT, 100);
+        IF v_opt->>'id' = p_winner_option_id THEN
+            v_winning_initial_weight := COALESCE((v_opt->>'initial_weight')::BIGINT, 100);
+        END IF;
+    END LOOP;
 
-    SELECT 
-        SUM((opt->>'total_bet')::int) INTO winner_pool
-    FROM betting_markets, jsonb_array_elements(options) AS opt
-    WHERE id = p_market_id AND (opt->>'id') = p_winner_option_id;
+    -- Calcolo Reale
+    SELECT COALESCE(SUM(amount), 0) INTO v_total_real_bets FROM user_bets WHERE market_id = p_market_id;
+    SELECT COALESCE(SUM(amount), 0) INTO v_winning_real_bets FROM user_bets WHERE market_id = p_market_id AND option_id = p_winner_option_id;
 
-    -- 2. If no bets on winner, maybe refund or keep? Let's keep it simple: no winner_pool = no payouts.
-    IF winner_pool IS NULL OR winner_pool = 0 THEN
-        UPDATE user_bets SET status = 'lost' WHERE market_id = p_market_id;
-    ELSE
-        -- 3. Iterate over winning bets and pay out
-        FOR v_bet IN SELECT * FROM user_bets WHERE market_id = p_market_id AND option_id = p_winner_option_id LOOP
-            payout_amount := floor((v_bet.amount::float / winner_pool::float) * total_pool::float);
-            
-            -- Update bet
-            UPDATE user_bets SET status = 'won', payout = payout_amount WHERE id = v_bet.id;
-            
-            -- Update profile
-            UPDATE profiles SET sheep_balance = sheep_balance + payout_amount WHERE id = v_bet.user_id;
-            
-            -- Notify user
-            INSERT INTO betting_notifications (user_id, message)
-            VALUES (v_bet.user_id, 'I tuoi scout sono tornati! Hai vinto ' || payout_amount || ' 🐑 nel mercato ' || (SELECT title FROM betting_markets WHERE id = p_market_id) || '!');
-        END LOOP;
+    v_total_pool := v_total_real_bets + v_total_initial_weights;
+    v_winning_pool := v_winning_real_bets + v_winning_initial_weight;
 
-        -- 4. Mark other bets as lost
-        UPDATE user_bets SET status = 'lost' WHERE market_id = p_market_id AND option_id != p_winner_option_id;
+    IF v_winning_pool > 0 THEN
+        -- Paga Vincitori
+        UPDATE profiles
+        SET sheep_balance = sheep_balance + FLOOR((b.amount::NUMERIC * v_total_pool::NUMERIC) / v_winning_pool::NUMERIC)::BIGINT
+        FROM user_bets b
+        WHERE profiles.email = b.user_email AND b.market_id = p_market_id AND b.option_id = p_winner_option_id AND b.is_paid = false;
+
+        -- Notifiche
+        INSERT INTO betting_notifications (user_email, message, is_read)
+        SELECT b.user_email, 'I tuoi scout sono tornati! Hai vinto ' || FLOOR((b.amount::NUMERIC * v_total_pool::NUMERIC) / v_winning_pool::NUMERIC)::BIGINT || ' 🐑 nel mercato ' || v_market_title || '!', false
+        FROM user_bets b WHERE b.market_id = p_market_id AND b.option_id = p_winner_option_id AND b.is_paid = false;
+
+        INSERT INTO betting_notifications (user_email, message, is_read)
+        SELECT b.user_email, 'Il lupo ha decimato il tuo gregge... Hai perso la scommessa nel mercato ' || v_market_title, false
+        FROM user_bets b WHERE b.market_id = p_market_id AND b.option_id != p_winner_option_id AND b.is_paid = false;
+
+        -- Aggiorna Scommesse
+        UPDATE user_bets SET status = 'won', is_paid = true, payout = FLOOR((amount::NUMERIC * v_total_pool::NUMERIC) / v_winning_pool::NUMERIC)::BIGINT 
+        WHERE market_id = p_market_id AND option_id = p_winner_option_id;
         
-        -- Notify losers
-        FOR v_bet IN SELECT * FROM user_bets WHERE market_id = p_market_id AND option_id != p_winner_option_id LOOP
-            INSERT INTO betting_notifications (user_id, message)
-            VALUES (v_bet.user_id, 'Il lupo ha decimato il tuo gregge... Hai perso la scommessa nel mercato ' || (SELECT title FROM betting_markets WHERE id = p_market_id) || '.');
-        END LOOP;
+        UPDATE user_bets SET status = 'lost', is_paid = true WHERE market_id = p_market_id AND option_id != p_winner_option_id;
     END IF;
 
-    -- 5. Update market status
-    UPDATE betting_markets 
-    SET status = 'settled', winner_option_id = p_winner_option_id 
-    WHERE id = p_market_id;
+    UPDATE betting_markets SET status = 'settled', winner_option_id = p_winner_option_id WHERE id = p_market_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

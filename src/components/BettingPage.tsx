@@ -1041,9 +1041,12 @@ export function BettingPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 -ml-1">
                 {(() => {
                     const filtered = markets.filter(market => {
+                      // Hide settled markets from the main view as they are visible in profile history
+                      if (market.status === 'settled') return false;
+                      
                       if (filterCategory === 'all') return true;
                       if (filterCategory === 'open') return market.status === 'open';
-                      if (filterCategory === 'closed') return market.status !== 'open';
+                      if (filterCategory === 'closed') return market.status === 'closed';
                       if (filterCategory === 'high') {
                         return market.event_level === 'High Elo' || market.title.toLowerCase().includes('high');
                       }
