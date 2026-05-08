@@ -42,7 +42,9 @@ async function syncAllData() {
                 technologies: civ.technologies,
                 landmarks: civ.landmarks,
                 videos: civ.videos || [],
-                build_orders: civ.buildOrders || []
+                build_orders: civ.buildOrders || [],
+                strengths: civ.strengths || [],
+                weaknesses: civ.weaknesses || []
             }, {
                 onConflict: 'id'
             });

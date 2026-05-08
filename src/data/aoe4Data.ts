@@ -1323,15 +1323,93 @@ export const civilizationsData: Civilization[] = [
     ]
   },
   {
-    id: "jin-dynasty",
+    id: "jindynasty",
     name: "Dinastia Jin",
     flag: "/civs/Jin Dynasty.png",
     difficulty: "Difficile",
-    primaryColor: "#d4af37",
-    shortDescription: "Una civiltà focalizzata su potenti unità d'élite e una solida economia.",
-    passiveBonuses: ["Bonus economici e militari unici."],
-    uniqueUnits: [],
+    primaryColor: "#059669",
+    shortDescription: "Una civiltà focalizzata sulla mobilità estrema, la cavalleria pesante e una complessa gestione economica dei cavalli e dei tributi.",
+    passiveBonuses: [
+      "Radici Nomadi: Inizia con due Renne sotto il Centro Città nell'Età I.",
+      "Cittadini a Cavallo: Unità economica costosa ma significativamente più veloce nel movimento (1.62 m/s) e nella raccolta.",
+      "Meccanica dei Pascoli (Grasslands): Edifici unici che generano cavalli passivamente; la cavalleria vicina ottiene salute bonus e i cavalli possono essere consumati per addestramento istantaneo.",
+      "Stati Tributari: Gli Emissari possono stabilire tributi presso i Posti di Scambio (Trading Posts) per generare risorse costanti.",
+      "Corruzione: Gli Emissari hanno l'abilità attiva di corrompere le unità nemiche sul campo di battaglia.",
+      "Meng'an Mouke: Potenziamento difensivo che genera automaticamente cavalieri difensori contro i nemici vicini."
+    ],
+    uniqueUnits: [
+      {
+        id: "mounted-villager",
+        name: "Mounted Villager",
+        type: "Worker",
+        age: 1,
+        stats: { attack: 0, armor: 0, speed: 1.62, health: 75 },
+        strengths: ["Mobilità", "Raccolta rapida"],
+        weaknesses: ["Costo in Oro", "Vulnerabilità"],
+        description: "Abitante a cavallo estremamente veloce, ideale per espandersi rapidamente sulla mappa."
+      },
+      {
+        id: "mohe-tribesman",
+        name: "Mohe Tribesman",
+        type: "Cavalry",
+        age: 2,
+        stats: { attack: 8, armor: 0, speed: 1.62, health: 110 },
+        strengths: ["Economico", "Mobilità"],
+        weaknesses: ["Arcieri", "Lancieri"],
+        description: "Cavalleria leggera con arco. Sostituisce l'arciere a cavallo standard; è molto economica e rapida da produrre."
+      },
+      {
+        id: "iron-pagoda",
+        name: "Iron Pagoda",
+        type: "Cavalry",
+        age: 3,
+        stats: { attack: 24, armor: 6, speed: 1.25, health: 320 },
+        strengths: ["Danni ad area", "Resistenza estrema"],
+        weaknesses: ["Lancieri", "Balestrieri"],
+        description: "Cavalleria pesante d'élite dotata di armatura elevatissima e attacco splash."
+      },
+      {
+        id: "bed-crossbow",
+        name: "Bed Crossbow",
+        type: "Siege",
+        age: 2,
+        stats: { attack: 30, armor: 0, speed: 0.88, health: 120 },
+        strengths: ["Fanteria"],
+        weaknesses: ["Cavalleria", "Springald"],
+        description: "Unità d'assedio anti-fanteria disponibile precocemente nell'Età II."
+      },
+      {
+        id: "emissary",
+        name: "Emissary",
+        type: "Religious",
+        age: 3,
+        stats: { attack: 0, armor: 0, speed: 1.25, health: 100 },
+        strengths: ["Corruzione", "Tributi"],
+        weaknesses: ["Tutto"],
+        description: "Unità di supporto per la gestione diplomatica (tributi) e la corruzione nemica."
+      },
+      {
+        id: "zhanma-swordsman",
+        name: "Zhanma Swordsman",
+        type: "Infantry",
+        age: 4,
+        stats: { attack: 15, armor: 4, speed: 1.12, health: 180 },
+        strengths: ["Anti-cavalleria"],
+        weaknesses: ["Arcieri", "Balestrieri"],
+        description: "Potente fanteria corazzata specializzata nel contrastare la cavalleria nemica."
+      }
+    ],
     technologies: [],
-    landmarks: []
+    landmarks: [
+      { id: "town-center", imageId: "town-center-1", name: "Centro Città", age: 1, type: "Economic", description: "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse." },
+      { id: "flower-pagoda", name: "Flower Pagoda", age: 2, type: "Economic", description: "Permette di piantare Giardini di Fiori che migliorano la raccolta e la velocità di attacco nelle vicinanze." },
+      { id: "great-pasture", name: "Great Pasture", age: 2, type: "Military", description: "Focalizzato sul potenziamento della produzione di cavalleria e della gestione dei cavalli." },
+      { id: "dragon-pavilion", name: "Dragon Pavilion", age: 3, type: "Military", description: "Fornisce bonus militari offensivi e sblocca tecnologie d'élite." },
+      { id: "mountain-hall", name: "Mountain Hall", age: 3, type: "Defensive", description: "Landmark difensivo che aumenta notevolmente la resistenza degli edifici." },
+      { id: "great-wall-bastion", name: "Great Wall Bastion", age: 4, type: "Defensive", description: "Una massiccia fortificazione che funge da pilastro difensivo." },
+      { id: "pagoda-forest", name: "Pagoda Forest", age: 4, type: "Economic", description: "Genera risorse e fornisce benefici culturali o religiosi." }
+    ],
+    strengths: ["Mobilità estrema", "Cavalleria pesante inarrestabile", "Assedio precoce", "Corruzione nemica"],
+    weaknesses: ["Economia iniziale costosa", "Gestione complessa dei cavalli", "Vulnerabilità alle interruzioni commerciali"]
   }
 ];
