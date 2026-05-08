@@ -9,7 +9,6 @@ function getYoutubeId(url: string) {
 
 async function getYoutubeData(videoId: string) {
   const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
-  
   try {
     const response = await fetch(videoUrl, {
       headers: {
@@ -18,12 +17,9 @@ async function getYoutubeData(videoId: string) {
         'Cookie': 'CONSENT=YES+cb.20220301-11-p0.it+FX+917',
       }
     });
-
     const html = await response.text();
-    
     let description = "";
-    const descMatch = html.match(/"shortDescription":"([\s\S]*?)",/) || 
-                     html.match(/meta name="description" content="([\s\S]*?)"/);
+    const descMatch = html.match(/"shortDescription":"([\s\S]*?)",/) || html.match(/meta name="description" content="([\s\S]*?)"/);
     if (descMatch) description = descMatch[1].substring(0, 5000);
 
     let transcript = "";
@@ -33,9 +29,7 @@ async function getYoutubeData(videoId: string) {
         const playerResponse = JSON.parse(playerResponseMatch[1]);
         const captionTracks = playerResponse?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
         if (captionTracks && captionTracks.length > 0) {
-          const track = captionTracks.find((t: any) => t.languageCode === 'it') || 
-                        captionTracks.find((t: any) => t.languageCode === 'en') || 
-                        captionTracks[0];
+          const track = captionTracks.find((t: any) => t.languageCode === 'it') || captionTracks.find((t: any) => t.languageCode === 'en') || captionTracks[0];
           if (track && track.baseUrl) {
             const capRes = await fetch(track.baseUrl);
             const capXml = await capRes.text();
@@ -44,20 +38,14 @@ async function getYoutubeData(videoId: string) {
         }
       } catch (e) {}
     }
-
-    return {
-      combinedText: `DESCRIZIONE:\n${description}\n\nTRASCRIZIONE:\n${transcript}`
-    };
-  } catch (error) {
-    throw new Error("Errore YouTube");
-  }
+    return { combinedText: `DESCRIZIONE:\n${description}\n\nTRASCRIZIONE:\n${transcript}` };
+  } catch (error) { throw new Error("Errore YouTube"); }
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
@@ -67,40 +55,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) throw new Error('API Key mancante su Vercel');
+    if (!apiKey) throw new Error('GEMINI_API_KEY non trovata nelle variabili di ambiente di Vercel.');
 
     const { combinedText } = await getYoutubeData(videoId);
-    if (combinedText.length < 20) throw new Error("Dati video non recuperabili.");
+    if (combinedText.length < 20) throw new Error("YouTube ha bloccato il server. Riprova tra poco.");
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    
-    // TENTATIVO 1: Gemini 1.5 Flash
-    // TENTATIVO 2: Gemini Pro (fallback)
-    let boData = null;
     const modelNames = ["gemini-3-flash", "gemini-1.5-flash", "gemini-pro"];
-    
+    let lastError = "";
+
     for (const modelName of modelNames) {
       try {
-        console.log(`Tentativo con modello: ${modelName}`);
         const model = genAI.getGenerativeModel({ model: modelName });
-        const prompt = `Analizza questo testo di un video AoE4 ed estrai il Build Order in JSON (description, steps: {time, action, note}).\n\n${combinedText.substring(0, 20000)}`;
-        
-        const result = await model.generateContent(prompt);
+        const result = await model.generateContent(`Estrai Build Order JSON da questo testo:\n\n${combinedText.substring(0, 20000)}`);
         const responseText = result.response.text();
         const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          boData = JSON.parse(jsonMatch[0]);
-          break; // Se funziona, usciamo dal loop
-        }
-      } catch (err) {
-        console.error(`Fallito modello ${modelName}:`, err);
-        continue; // Prova il prossimo
+        if (jsonMatch) return res.status(200).json(JSON.parse(jsonMatch[0]));
+      } catch (err: any) {
+        lastError = err.message || "Errore sconosciuto";
+        console.error(`Errore con ${modelName}:`, lastError);
       }
     }
 
-    if (!boData) throw new Error("Tutti i modelli IA hanno fallito. Controlla la tua API Key.");
-
-    return res.status(200).json(boData);
+    throw new Error(`Tutti i modelli hanno fallito. Ultimo errore di Google: "${lastError}"`);
 
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
