@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "backup": "npx tsx scripts/backup_supabase.ts"
+    "backup": "npx tsx scripts/backup_all.ts",
+    "restore": "npx tsx scripts/restore_ultimate.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

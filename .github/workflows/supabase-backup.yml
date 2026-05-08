@@ -4,6 +4,9 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 on:
+  push:
+    branches:
+      - main
   schedule:
     - cron: '0 3 * * *' # Esegue tutti i giorni alle 03:00 UTC
   workflow_dispatch: # Permette l'avvio manuale dal sito GitHub se necessario
@@ -42,12 +45,12 @@ jobs:
           git config --global user.name "GitHub Action Backup Bot"
           git config --global user.email "action@github.com"
           
-          git add backups/*.json --force
+          git add backups/ --force
           
           # Evita errore se non ci sono modifiche
           if git diff --staged --quiet; then
             echo "Nessun nuovo dato nel backup di oggi. Commit skippato."
           else
-            git commit -m "📦 Salvataggio automatico database Supabase [skip ci]"
+            git commit -m "📦 Salvataggio automatico database e storage Supabase [skip ci]"
             git push origin main
           fi
