@@ -206,6 +206,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     }
   };
 
+  const handleAIAnalysis = async () => {
     if (!showManualInput && !editedBO.source) {
       toast.error("Inserisci prima un link YouTube o usa l'inserimento manuale");
       return;
