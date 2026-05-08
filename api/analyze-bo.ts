@@ -7,28 +7,38 @@ function getYoutubeId(url: string) {
 }
 
 async function getYoutubeData(videoId: string) {
-  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+  // Usiamo l'URL embed che è il più "gentile" con i server
+  const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+  
   try {
-    const response = await fetch(videoUrl, {
+    const response = await fetch(embedUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 10; SM-G960U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.43 Mobile Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept-Language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7',
-        'Cookie': 'CONSENT=YES+cb.20220301-11-p0.it+FX+917',
       }
     });
-    const html = await response.text();
-    let description = "";
-    const descMatch = html.match(/"shortDescription":"([\s\S]*?)",/) || html.match(/meta name="description" content="([\s\S]*?)"/);
-    if (descMatch) description = descMatch[1].substring(0, 5000);
 
+    const html = await response.text();
+    
+    // 1. Cerchiamo la descrizione (nascosta nell'embed o fallback su watch)
+    let description = "";
+    const descMatch = html.match(/"shortDescription":"([\s\S]*?)"/);
+    if (descMatch) description = descMatch[1].substring(0, 3000);
+
+    // 2. Cerchiamo i sottotitoli (il cuore del Build Order)
     let transcript = "";
-    const playerResponseMatch = html.match(/ytInitialPlayerResponse\s*=\s*({.+?});/);
-    if (playerResponseMatch) {
+    // Cerchiamo la configurazione delle didascalie nel codice dell'embed
+    const captionMatch = html.match(/"captionTracks":\s*(\[.+?\])/);
+    
+    if (captionMatch) {
       try {
-        const playerResponse = JSON.parse(playerResponseMatch[1]);
-        const captionTracks = playerResponse?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
+        const captionTracks = JSON.parse(captionMatch[1]);
         if (captionTracks && captionTracks.length > 0) {
-          const track = captionTracks.find((t: any) => t.languageCode === 'it') || captionTracks.find((t: any) => t.languageCode === 'en') || captionTracks[0];
+          // Preferenza: it, poi en, poi qualsiasi cosa
+          const track = captionTracks.find((t: any) => t.languageCode?.startsWith('it')) || 
+                        captionTracks.find((t: any) => t.languageCode?.startsWith('en')) || 
+                        captionTracks[0];
+          
           if (track && track.baseUrl) {
             const capRes = await fetch(track.baseUrl);
             const capXml = await capRes.text();
@@ -37,8 +47,19 @@ async function getYoutubeData(videoId: string) {
         }
       } catch (e) {}
     }
+
+    // Se l'embed non ha dato frutti, facciamo un tentativo rapido sulla pagina normale per la descrizione
+    if (!transcript && !description) {
+      const watchRes = await fetch(`https://www.youtube.com/watch?v=${videoId}`);
+      const watchHtml = await watchRes.text();
+      const watchDescMatch = watchHtml.match(/"shortDescription":"([\s\S]*?)"/);
+      if (watchDescMatch) description = watchDescMatch[1].substring(0, 5000);
+    }
+
     return { combinedText: `DESCRIZIONE:\n${description}\n\nTRASCRIZIONE:\n${transcript}` };
-  } catch (error) { throw new Error("Errore YouTube"); }
+  } catch (error) {
+    throw new Error("Errore collegamento YouTube");
+  }
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -55,14 +76,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) throw new Error('API Key mancante su Vercel');
+    if (!apiKey) throw new Error('API Key mancante');
 
     const { combinedText } = await getYoutubeData(videoId);
-    if (combinedText.length < 20) throw new Error("Dati video non recuperabili.");
+    
+    // Se abbiamo almeno 20 caratteri, proviamo. Gemini è bravo anche con poco.
+    if (combinedText.length < 20) throw new Error("YouTube sta bloccando le richieste. Riprova tra qualche minuto.");
 
-    // MODELLI DALLA TUA LISTA: gemini-2.5-flash è il più bilanciato
     const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-flash-latest"];
-    let lastError = "";
+    let boData = null;
 
     for (const model of models) {
       try {
@@ -71,27 +93,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: `Analizza questo testo di un video di Age of Empires IV ed estrai un Build Order strutturato in JSON.\n\nISTRUZIONI:\n- Restituisci JSON: { "description": "...", "steps": [{ "time": "MM:SS", "action": "...", "note": "..." }] }\n- Se trovi il BO nella descrizione, usalo come fonte primaria.\n\nTESTO VIDEO:\n${combinedText.substring(0, 30000)}` }] }]
+            contents: [{ parts: [{ text: `Estrai il Build Order da questo testo AoE4 in JSON (description, steps: {time, action, note}). Sii preciso con i tempi MM:SS.\n\n${combinedText}` }] }]
           })
         });
 
         const data = await response.json();
-        if (data.error) {
-          lastError = data.error.message;
-          continue;
-        }
-
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (text) {
+        if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+          const text = data.candidates[0].content.parts[0].text;
           const jsonMatch = text.match(/\{[\s\S]*\}/);
-          if (jsonMatch) return res.status(200).json(JSON.parse(jsonMatch[0]));
+          if (jsonMatch) {
+            boData = JSON.parse(jsonMatch[0]);
+            break;
+          }
         }
-      } catch (err: any) {
-        lastError = err.message;
-      }
+      } catch (e) {}
     }
 
-    throw new Error(`Errore IA: ${lastError}`);
+    if (!boData) throw new Error("L'IA non è riuscita a estrarre dati validi. Forse il video non contiene un Build Order chiaro.");
+
+    return res.status(200).json(boData);
 
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
