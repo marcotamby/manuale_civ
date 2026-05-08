@@ -127,7 +127,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             text: `Sei un esperto di Age of Empires 4. Analizza il seguente testo (descrizione e trascrizione) ed estrai il Build Order strutturato.
             
             REGOLE MANDATORIE:
-            1. Rispondi SEMPRE in ITALIANO. Se la fonte è in inglese, traduci accuratamente termini come "Villagers" (Villaggi), "Gold" (Oro), "Food" (Cibo), ecc.
+            1. Rispondi SEMPRE in ITALIANO. Se la fonte è in inglese, traduci accuratamente i termini: "Villagers" diventa "vili" o "abitanti", "Gold" diventa "oro", "Food" diventa "cibo", "Wood" diventa "legna".
             2. Restituisci SOLO un JSON valido.
             3. Il JSON deve avere: "description" (breve riassunto della strategia in italiano), e "steps" (array di oggetti {time, action, note}).
             4. Il campo "time" deve essere "MM:SS" (es. "0:45"). USA I TIMESTAMP [MM:SS] PRESENTI NEL TESTO.
