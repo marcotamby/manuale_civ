@@ -1048,10 +1048,12 @@ export function BettingPage() {
                       if (filterCategory === 'open') return market.status === 'open';
                       if (filterCategory === 'closed') return market.status === 'closed';
                       if (filterCategory === 'high') {
-                        return market.event_level === 'High Elo' || market.title.toLowerCase().includes('high');
+                        return (market.event_level === 'High Elo' || market.title.toLowerCase().includes('high')) && 
+                               !(market.event_level === 'Low Elo' || market.title.toLowerCase().includes('low'));
                       }
                       if (filterCategory === 'low') {
-                        return market.event_level === 'Low Elo' || market.title.toLowerCase().includes('low');
+                        return (market.event_level === 'Low Elo' || market.title.toLowerCase().includes('low')) && 
+                               !(market.event_level === 'High Elo' || market.title.toLowerCase().includes('high'));
                       }
                       if (filterCategory === 'tournament') return market.type === 'Tournament Winner';
                       if (filterCategory === 'match') return market.type === 'Match Winner';
