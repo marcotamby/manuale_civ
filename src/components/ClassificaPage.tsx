@@ -44,7 +44,7 @@ export function ClassificaPage() {
   const [soloData, setSoloData] = useState<Player[]>([]);
   const [teamData, setTeamData] = useState<Player[]>([]);
   const [eloData, setEloData] = useState<PlayerMode[]>([]);
-  const [sortColumn, setSortColumn] = useState<string>('rating');
+  const [sortColumn, setSortColumn] = useState<string>('_scudi_totali');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -662,7 +662,11 @@ export function ClassificaPage() {
         ].map(tab => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => {
+              setActiveTab(tab.id);
+              setSortColumn(tab.id === 'elo' ? '_scudi_totali' : 'rating');
+              setSortDirection('desc');
+            }}
             className={`px-4 md:px-6 py-4 font-bold uppercase tracking-wider text-sm border-b-2 transition-all ${activeTab === tab.id
               ? 'border-slate-300 text-white'
               : 'border-transparent text-gray-400 hover:text-white'
