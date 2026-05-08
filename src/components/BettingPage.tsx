@@ -219,11 +219,6 @@ export function BettingPage() {
       return;
     }
 
-    if (Number(bet.amount) > Number(sheepBalance)) {
-      toast.error('Il tuo gregge non è abbastanza grande per questa scommessa!');
-      return;
-    }
-
     setPlacingBetId(marketId);
     try {
       // USE EMAIL IDENTIFICATION (Same as build order votes)
@@ -232,6 +227,22 @@ export function BettingPage() {
       if (!finalUserEmail) {
         const msg = "IDENTIFICAZIONE FALLITA! Per favore rifai il login.";
         toast.error(msg);
+        setPlacingBetId(null);
+        return;
+      }
+
+      // Fetch latest balance from server to be sure
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('sheep_balance')
+        .ilike('email', finalUserEmail)
+        .maybeSingle();
+      
+      const currentBalance = Number(profile?.sheep_balance ?? 0);
+      setSheepBalance(currentBalance); // Sync local state
+
+      if (Number(bet.amount) > currentBalance) {
+        toast.error(`Il tuo gregge non è abbastanza grande! Hai solo ${currentBalance} pecore.`);
         setPlacingBetId(null);
         return;
       }
@@ -1253,11 +1264,20 @@ export function BettingPage() {
                               </button>
                               <div className="flex-grow flex items-center justify-center gap-1.5 px-1">
                                 <input
-                                  type="number"
-                                  value={selectedBets[market.id].amount}
+                                  type="text"
+                                  inputMode="numeric"
+                                  pattern="[0-9]*"
+                                  value={selectedBets[market.id].amount === 0 ? '' : selectedBets[market.id].amount}
                                   onChange={(e) => {
-                                    const val = parseInt(e.target.value) || 0;
-                                    setSelectedBets(prev => ({ ...prev, [market.id]: { ...prev[market.id], amount: val } }));
+                                    const val = e.target.value;
+                                    if (val === '') {
+                                      setSelectedBets(prev => ({ ...prev, [market.id]: { ...prev[market.id], amount: 0 } }));
+                                      return;
+                                    }
+                                    const parsed = parseInt(val.replace(/\D/g, ''));
+                                    if (!isNaN(parsed)) {
+                                      setSelectedBets(prev => ({ ...prev, [market.id]: { ...prev[market.id], amount: parsed } }));
+                                    }
                                   }}
                                   className="w-16 bg-transparent text-center text-white font-black text-lg outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />

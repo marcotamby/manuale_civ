@@ -77,20 +77,37 @@ CREATE POLICY "Users can see their own notifications" ON betting_notifications F
 DROP POLICY IF EXISTS "Users can update their own notifications" ON betting_notifications;
 CREATE POLICY "Users can update their own notifications" ON betting_notifications FOR UPDATE USING (auth.jwt() ->> 'email' = user_email);
 
--- 6. Trigger per detrarre il saldo al piazzamento della scommessa
+-- 6. Trigger per detrarre il saldo al piazzamento della scommessa con VALIDAZIONE
 CREATE OR REPLACE FUNCTION handle_new_bet() 
 RETURNS TRIGGER AS $$
+DECLARE
+    v_balance INTEGER;
 BEGIN
+    -- Recupera il saldo attuale con blocco per evitare race conditions
+    SELECT sheep_balance INTO v_balance 
+    FROM profiles 
+    WHERE email = NEW.user_email
+    FOR UPDATE;
+
+    IF v_balance IS NULL THEN
+        RAISE EXCEPTION 'Profilo non trovato per l''email %', NEW.user_email;
+    END IF;
+
+    IF v_balance < NEW.amount THEN
+        RAISE EXCEPTION 'GREGGE INSUFFICIENTE! Hai % pecore, ma ne servono % per questa scommessa.', v_balance, NEW.amount;
+    END IF;
+
     UPDATE profiles 
     SET sheep_balance = sheep_balance - NEW.amount
     WHERE email = NEW.user_email;
+    
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 DROP TRIGGER IF EXISTS on_bet_placed ON user_bets;
 CREATE TRIGGER on_bet_placed
-    AFTER INSERT ON user_bets
+    BEFORE INSERT ON user_bets -- Cambiato in BEFORE per bloccare l'inserimento se il saldo è insufficiente
     FOR EACH ROW
     EXECUTE FUNCTION handle_new_bet();
 
