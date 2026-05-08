@@ -130,8 +130,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             1. Rispondi SEMPRE in ITALIANO. Se la fonte è in inglese, traduci accuratamente i termini: "Villagers" diventa "vili" o "abitanti", "Gold" diventa "oro", "Food" diventa "cibo", "Wood" diventa "legna".
             2. Restituisci SOLO un JSON valido.
             3. Il JSON deve avere: "description" (breve riassunto della strategia in italiano), e "steps" (array di oggetti {time, action, note}).
-            4. Il campo "time" deve essere "MM:SS" (es. "0:45"). USA I TIMESTAMP [MM:SS] PRESENTI NEL TESTO.
-            5. Ogni "action" e "note" deve essere in ITALIANO.
+            4. Sii ESTREMAMENTE DETTAGLIATO. Non comprimere il video: estrai passaggi per tutta la durata del Build Order (fino alla transizione all'Età dei Castelli o fine Feudale).
+            5. Genera ALMENO 15-20 passaggi se il video è lungo. Non saltare i timestamp.
+            6. Il campo "time" deve essere "MM:SS" (es. "0:45"). USA I TIMESTAMP [MM:SS] PRESENTI NEL TESTO.
+            7. Ogni "action" e "note" deve essere in ITALIANO.
             
             TESTO DA ANALIZZARE:
             ${textToAnalyze.substring(0, 35000)}` 
