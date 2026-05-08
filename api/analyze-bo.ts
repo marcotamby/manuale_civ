@@ -1,133 +1,116 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Funzione per estrarre l'ID video
 function getYoutubeId(url: string) {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
   return (match && match[2].length === 11) ? match[2] : null;
 }
 
-// Funzione robusta per recuperare la trascrizione o la descrizione
 async function getYoutubeData(videoId: string) {
+  // Proviamo l'URL embed che è più leggero e meno protetto
   const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
   
   try {
     const response = await fetch(videoUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 10; SM-G960U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.43 Mobile Safari/537.36',
         'Accept-Language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Cookie': 'CONSENT=YES+cb.20220301-11-p0.it+FX+917', // Bypass consenso cookie
       }
     });
 
     const html = await response.text();
     
-    // 1. Tenta di estrarre la descrizione (molto utile se il BO è scritto lì)
-    const descriptionMatch = html.match(/"shortDescription":"([\s\S]*?)","isCrawlable"/);
-    const description = descriptionMatch ? JSON.parse(`"${descriptionMatch[1]}"`) : "";
+    // Fallback descrizione più robusto
+    let description = "";
+    const descMatch = html.match(/"shortDescription":"([\s\S]*?)",/) || 
+                     html.match(/meta name="description" content="([\s\S]*?)"/) ||
+                     html.match(/meta property="og:description" content="([\s\S]*?)"/);
+    
+    if (descMatch) {
+      try {
+        description = descMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
+      } catch (e) {
+        description = descMatch[1];
+      }
+    }
 
-    // 2. Tenta di estrarre i sottotitoli dal file JSON interno di YouTube (ytInitialPlayerResponse)
+    // Ricerca sottotitoli migliorata
     let transcript = "";
-    const playerResponseMatch = html.match(/ytInitialPlayerResponse\s*=\s*({.+?});/);
+    const jsonRegex = /ytInitialPlayerResponse\s*=\s*({.+?});/;
+    const playerResponseMatch = html.match(jsonRegex);
     
     if (playerResponseMatch) {
-      const playerResponse = JSON.parse(playerResponseMatch[1]);
-      const captionTracks = playerResponse?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
-      
-      if (captionTracks && captionTracks.length > 0) {
-        // Preferenza: Italiano, poi Inglese, poi il primo disponibile
-        const track = captionTracks.find((t: any) => t.languageCode === 'it') || 
-                      captionTracks.find((t: any) => t.languageCode === 'en') || 
-                      captionTracks[0];
+      try {
+        const playerResponse = JSON.parse(playerResponseMatch[1]);
+        const captionTracks = playerResponse?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
         
-        if (track && track.baseUrl) {
-          const captionResponse = await fetch(track.baseUrl);
-          const captionXml = await captionResponse.text();
-          // Pulizia XML semplice per estrarre solo il testo
-          transcript = captionXml
-            .replace(/<[^>]*>/g, ' ')
-            .replace(/&amp;/g, '&')
-            .replace(/&lt;/g, '<')
-            .replace(/&gt;/g, '>')
-            .replace(/&quot;/g, '"')
-            .replace(/&#39;/g, "'")
-            .replace(/\s+/g, ' ')
-            .trim();
+        if (captionTracks && captionTracks.length > 0) {
+          const track = captionTracks.find((t: any) => t.languageCode === 'it') || 
+                        captionTracks.find((t: any) => t.languageCode === 'en') || 
+                        captionTracks[0];
+          
+          if (track && track.baseUrl) {
+            const capRes = await fetch(track.baseUrl);
+            const capXml = await capRes.text();
+            transcript = capXml.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+          }
         }
+      } catch (e) {
+        console.error("Errore parsing JSON YouTube:", e);
       }
     }
 
     return {
-      description,
-      transcript,
-      combinedText: `DESCRIZIONE VIDEO:\n${description}\n\nTRASCRIZIONE VIDEO:\n${transcript}`
+      combinedText: `TITOLO/DESCRIZIONE:\n${description}\n\nTRASCRIZIONE:\n${transcript}`
     };
 
   } catch (error) {
-    console.error("Errore recupero dati YouTube:", error);
-    throw new Error("Impossibile recuperare i dati del video. YouTube potrebbe aver bloccato la richiesta.");
+    throw new Error("Errore di connessione a YouTube.");
   }
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+  res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { youtubeUrl } = req.body;
-  if (!youtubeUrl) return res.status(400).json({ error: 'URL YouTube mancante' });
+  if (!youtubeUrl) return res.status(400).json({ error: 'URL mancante' });
 
   const videoId = getYoutubeId(youtubeUrl);
-  if (!videoId) return res.status(400).json({ error: 'ID video non valido' });
+  if (!videoId) return res.status(400).json({ error: 'ID non valido' });
 
   try {
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) throw new Error('GEMINI_API_KEY non configurata');
+    if (!apiKey) throw new Error('GEMINI_API_KEY mancante');
 
-    // Recupero dati (Sottotitoli + Descrizione)
     const { combinedText } = await getYoutubeData(videoId);
 
-    if (combinedText.length < 50) {
-      throw new Error("Dati insufficienti nel video (niente sottotitoli e descrizione troppo breve)");
+    // Se abbiamo almeno qualcosa (anche solo la descrizione), proviamo a mandare a Gemini
+    if (combinedText.length < 30) {
+      throw new Error("YouTube ha bloccato la richiesta (Bot Protection). Prova tra qualche minuto o con un altro video.");
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const prompt = `
-      Analizza questi dati estratti da un video di Age of Empires IV (trascrizione e/o descrizione).
-      Estrai un Build Order strutturato.
-      
-      ISTRUZIONI:
-      - Identifica la strategia principale.
-      - Estrai una lista di azioni strutturate per: Minutaggio (formato MM:SS), Descrizione Azione (es. 6 villi al cibo), e Note Aggiuntive.
-      - Se trovi il Build Order scritto nella descrizione, usalo come fonte primaria.
-      - Se non sei sicuro di un dato, lascia il campo vuoto invece di inventare.
-      - Restituisci il risultato ESCLUSIVAMENTE in formato JSON:
-      {
-        "description": "Breve descrizione della strategia e dei suoi obiettivi",
-        "steps": [
-          { "time": "00:00", "action": "Azione...", "note": "Nota..." }
-        ]
-      }
-
-      DATI VIDEO:
-      ${combinedText.substring(0, 30000)} 
-    `;
+    const prompt = `Analizza i dati di questo video AoE4 ed estrai il Build Order in JSON.\n\n${combinedText}`;
 
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    const boData = JSON.parse(jsonMatch ? jsonMatch[0] : responseText);
-
-    return res.status(200).json(boData);
+    
+    if (!jsonMatch) throw new Error("L'IA non è riuscita a generare un formato valido.");
+    
+    return res.status(200).json(JSON.parse(jsonMatch[0]));
 
   } catch (error: any) {
-    console.error('Errore analisi:', error);
     return res.status(500).json({ error: error.message });
   }
 }
