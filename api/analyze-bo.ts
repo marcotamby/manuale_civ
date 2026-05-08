@@ -88,7 +88,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
-  const { youtubeUrl, rawText } = req.body;
+  let body = req.body;
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch (e) {}
+  }
+  const { youtubeUrl, rawText } = body || {};
   
   try {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -114,7 +118,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (!textToAnalyze || textToAnalyze.length < 20) {
-      throw new Error("Impossibile recuperare dati dal video. Usa l'inserimento manuale.");
+      const errorMsg = rawText 
+        ? "La trascrizione fornita è troppo breve o non valida per l'analisi." 
+        : "Impossibile recuperare dati dal video automaticamente. Usa l'inserimento manuale incollando la trascrizione.";
+      throw new Error(errorMsg);
     }
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
