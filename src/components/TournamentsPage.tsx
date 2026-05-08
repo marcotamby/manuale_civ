@@ -812,7 +812,6 @@ export function TournamentsPage() {
                         </Link>
                       )}
                     </div>
-                </div>
 
                 <div className="p-6 flex flex-col flex-grow bg-[#121620] relative z-10 -mt-px">
                     <span className="text-xs font-bold text-yellow-500/50 uppercase mb-1 tracking-widest">Organizzato da {t.config.organizer}</span>
