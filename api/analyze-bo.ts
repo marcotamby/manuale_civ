@@ -135,7 +135,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             
             REGOLE DI STILE MANDATORIE:
             1. LINGUA: Italiano tecnico. Traduci tutto dall'inglese.
-            2. TERMINI: Usa "vili/abitanti", "oro", "legna", "cibo", "Monumento", "Centro Città".
+            2. TERMINI: Usa "villi/abitanti", "oro", "legna", "cibo", "Monumento", "Centro Città".
             3. MAIUSCOLE: Usa le maiuscole SOLO all'inizio della frase e per i nomi propri degli edifici (es: Caserma, Centro Città). NON usare maiuscole a caso nel mezzo della frase per enfatizzare parole.
             4. AZIONI: Sii diretto e schematico.
             
