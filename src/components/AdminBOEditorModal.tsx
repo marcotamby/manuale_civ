@@ -658,28 +658,28 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
             </label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                 <div className="flex flex-col gap-4">
-                  <div className="flex gap-3">
-                    <input
-                      type="text"
-                      disabled={showManualInput}
-                      value={editedBO.source || ''}
-                      onChange={e => setEditedBO(prev => ({ ...prev, source: e.target.value }))}
-                      placeholder={showManualInput ? "Analisi manuale attiva..." : "https://www.youtube.com/watch?v=..."}
-                      className={`flex-1 bg-black/40 border-2 border-white/10 rounded-xl px-4 py-3 text-sm text-red-200 focus:border-red-500/50 outline-none transition-all ${showManualInput ? 'opacity-30' : ''}`}
-                    />
-                    <button
-                      onClick={handleAIAnalysis}
-                      disabled={isAnalyzing || (!showManualInput && !editedBO.source) || (showManualInput && !manualText)}
-                      className={`px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 shadow-lg hover:shadow-purple-500/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${isAnalyzing ? 'animate-pulse' : ''}`}
-                    >
-                      {isAnalyzing ? (
-                        <Loader2 size={14} className="animate-spin" />
-                      ) : (
-                        <BrainCircuit size={14} />
-                      )}
-                      {isAnalyzing ? 'Analisi...' : 'Analizza con IA'}
-                    </button>
-                  </div>
+                    <div className="flex gap-3">
+                      <input
+                        type="text"
+                        disabled={showManualInput}
+                        value={editedBO.source || ''}
+                        onChange={e => setEditedBO(prev => ({ ...prev, source: e.target.value }))}
+                        placeholder={showManualInput ? "Analisi manuale attiva..." : "https://www.youtube.com/watch?v=..."}
+                        className={`flex-1 bg-black/40 border-2 border-white/10 rounded-xl px-4 py-3 text-sm text-red-200 focus:border-red-500/50 outline-none transition-all ${showManualInput ? 'opacity-30' : ''}`}
+                      />
+                      <button
+                        onClick={handleAIAnalysis}
+                        disabled={isAnalyzing || (!showManualInput && !editedBO.source) || (showManualInput && !manualText)}
+                        className={`px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 shadow-lg hover:shadow-purple-500/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${isAnalyzing ? 'animate-pulse' : ''}`}
+                      >
+                        {isAnalyzing ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          <BrainCircuit size={14} />
+                        )}
+                        {isAnalyzing ? 'Analisi...' : 'Analizza con IA'}
+                      </button>
+                    </div>
                   
                   <div className="flex items-center gap-4">
                     <button 
@@ -705,13 +705,15 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                       <div className="flex items-start gap-2 p-3 bg-cyan-500/10 border border-cyan-500/20 rounded-lg">
                         <AlertTriangle size={12} className="text-cyan-400 mt-0.5 shrink-0" />
                         <p className="text-[9px] text-cyan-400/80 leading-relaxed">
-                          <b>TIP:</b> Se l'automatico fallisce, vai su YouTube, clicca su "Altro" -> "Mostra trascrizione", copiala tutta e incollala qui. L'IA la ripulirà per te!
+                          <b>TIP:</b> Se l'automatico fallisce, vai su YouTube, clicca su "Altro", poi su "Mostra trascrizione", copiala tutta e incollala qui. L'IA la ripulirà per te!
                         </p>
                       </div>
                     </div>
                   )}
                 </div>
-                {!showManualInput && <p className="text-[10px] text-gray-500 italic">Incolla l'URL completo del video e premi 'Analizza con IA' per generare una bozza automatica.</p>}
+                {!showManualInput && (
+                  <p className="text-[10px] text-gray-500 italic">Incolla l'URL completo del video e premi 'Analizza con IA' per generare una bozza automatica.</p>
+                )}
               {editedBO.source && getYoutubeId(editedBO.source) && (
                 <div className="relative aspect-video rounded-2xl overflow-hidden border-2 border-red-500/20 group">
                   <img
@@ -815,8 +817,8 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                         />
                       </div>
                       <div className="md:col-span-10">
-                        <label className="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Azione Principalle</label>
-                        <input
+                         <label className="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Azione Principale</label>
+                         <input
                           type="text"
                           value={step.action}
                           onChange={e => {
