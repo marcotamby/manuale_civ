@@ -40,9 +40,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // 1. Recupera la trascrizione del video
+    // 1. Recupera la trascrizione del video con fallback su più lingue
     console.log(`Recupero trascrizione per video: ${videoId}`);
-    const transcriptItems = await YoutubeTranscript.fetchTranscript(videoId);
+    
+    let transcriptItems;
+    try {
+      // Prova prima in italiano
+      transcriptItems = await YoutubeTranscript.fetchTranscript(videoId, { lang: 'it' });
+    } catch (e) {
+      try {
+        // Fallback su inglese (molti video AoE4 sono in inglese)
+        console.log("Sottotitoli italiani non trovati, provo in inglese...");
+        transcriptItems = await YoutubeTranscript.fetchTranscript(videoId, { lang: 'en' });
+      } catch (e2) {
+        // Fallback finale: lascia decidere alla libreria (spesso prende i generati automaticamente)
+        console.log("Sottotitoli inglesi non trovati, provo fallback automatico...");
+        transcriptItems = await YoutubeTranscript.fetchTranscript(videoId);
+      }
+    }
+
+    if (!transcriptItems || transcriptItems.length === 0) {
+      throw new Error('Nessuna trascrizione recuperata (potrebbe essere disabilitata o non disponibile in questo momento)');
+    }
+
     const fullText = transcriptItems.map(item => item.text).join(' ');
 
     if (!fullText || fullText.length < 100) {
