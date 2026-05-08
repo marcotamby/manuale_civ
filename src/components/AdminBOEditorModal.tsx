@@ -120,19 +120,14 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!dragState) return;
-      const deltaX = e.clientX - dragState.startX;
       const deltaY = e.clientY - dragState.startY;
-      const containerWidth = 400;
       const containerHeight = 120;
-      const deltaPercentX = (deltaX / containerWidth) * 100;
       const deltaPercentY = (deltaY / containerHeight) * 100;
       
-      let newPosX = Math.max(0, Math.min(100, dragState.startPosX - (deltaPercentX * 0.5)));
       let newPosY = Math.max(0, Math.min(100, dragState.startPosY - (deltaPercentY * 0.5)));
       
       setEditedBO(prev => ({ 
         ...prev, 
-        banner_position_x: Math.round(newPosX),
         banner_position: Math.round(newPosY) 
       }));
     };
@@ -159,11 +154,11 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const startDrag = (e: React.MouseEvent, currentPosX: number, currentPosY: number) => {
+  const startDrag = (e: React.MouseEvent, currentPosY: number) => {
     setDragState({ 
       startX: e.clientX, 
       startY: e.clientY, 
-      startPosX: currentPosX, 
+      startPosX: 50, 
       startPosY: currentPosY 
     });
   };
@@ -499,13 +494,13 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                       <img 
                         src={editedBO.banner_url} 
                         className={`w-full h-full object-cover select-none transition-transform duration-300 ${dragState ? 'cursor-grabbing' : 'cursor-grab hover:scale-105'}`} 
-                        style={{ objectPosition: `${editedBO.banner_position_x ?? 50}% ${editedBO.banner_position ?? 50}%` }} 
-                        onMouseDown={(e) => startDrag(e, editedBO.banner_position_x ?? 50, editedBO.banner_position ?? 50)} 
+                        style={{ objectPosition: `50% ${editedBO.banner_position ?? 50}%` }} 
+                        onMouseDown={(e) => startDrag(e, editedBO.banner_position ?? 50)} 
                         alt="Preview" 
                       />
                       <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity pointer-events-none ${dragState ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                         <div className="bg-yellow-500 text-black px-4 py-2 rounded-xl text-[10px] font-black uppercase flex items-center gap-2 shadow-2xl scale-90 group-hover:scale-100 transition-transform">
-                          <MousePointer2 size={12} /> {dragState ? 'Rilascia per confermare' : 'Trascina per posizionare'}
+                          <MousePointer2 size={12} /> {dragState ? 'Rilascia per confermare' : 'Trascina Verticalmente'}
                         </div>
                       </div>
                     </>
