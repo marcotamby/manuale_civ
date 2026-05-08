@@ -2,7 +2,7 @@
 // Force build trigger - 2026-05-05 09:05
 import { useState, useEffect } from 'react';
 // Force deploy update for betting favoritism weights 🐑
-import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
+import { useParams, useLocation, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { fetchTournament } from '../services/startgg';
@@ -29,7 +29,6 @@ interface LeaderboardUser {
 
 export function BettingPage() {
   const { slug } = useParams();
-  const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated, canManageTournaments, setUser } = useAuth();
   const [loading, setLoading] = useState(true);
