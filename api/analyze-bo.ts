@@ -153,8 +153,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         generationConfig: {
           temperature: 0.2,
           topP: 0.8,
-          topK: 40,
-          responseMimeType: "application/json"
+          topK: 40
         }
       })
     });
