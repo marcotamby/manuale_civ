@@ -83,6 +83,195 @@ export const unitsList: Unit[] = []; // Pulled units logic could be here but for
 
 export const civilizationsData: Civilization[] = [
   {
+    "id": "abbasid",
+    "name": "Abbasidi",
+    "flag": "/civs/Abbasid Dynasty.webp",
+    "difficulty": "Medio",
+    "shortDescription": "La Dinastia Abbaside persegue una fiorente Età dell'Oro concentrando gli edifici attorno alla propria Casa della Sapienza, il che permette di sbloccare significativi vantaggi economici. La Casa della Sapienza guida inoltre il progresso attraverso le varie età e garantisce l'accesso a tecnologie avanzate. Le unità di cammelli abbasidi sono esperte nel contrastare la cavalleria nemica.",
+    "passiveBonuses": [
+      "Casa della Sapienza: non costruiscono landmarks per avanzare di epoca, ma scelgono delle \"Ali\" dalla Casa della Saggezza. Questo permette di ricercare tecnologie uniche man mano che si progredisce di età.",
+      "Raccolgono dai cespugli di bacche il 30% più velocemente.",
+      "Età dell'Oro: costruendo edifici all'interno dell'influenza della Casa della Sapienza, si sbloccano livelli di Età dell'Oro che forniscono bonus globali (velocità di raccolta +15%, velocità di ricerca +50%, e velocità di produzione +20% ai livelli massimi).",
+      "La fanteria può costruire Arieti, Torri d'Assedio, Mangani e Springalde direttamente sul campo senza aver bisogno della tech \"Ingegneria d'Assedio\".",
+      "I porti costano il 50% in meno.",
+      "Non possono raccogliere carne dai cinghiali.",
+      "Le unità a cammello riducono il danno dei cavalieri nemici vicini del 20%."
+    ],
+    "uniqueUnits": [
+      {
+        "id": "camel-archer",
+        "age": 2,
+        "name": "Camel Archer",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.62,
+          "attack": 11,
+          "health": 150
+        },
+        "imageId": "camel-archer-2",
+        "strengths": [
+          "Cavalry",
+          "Archers"
+        ],
+        "weaknesses": [
+          "Knights",
+          "Horsemen"
+        ],
+        "description": "Mobile ranged unit that debuffs nearby horse cavalry."
+      },
+      {
+        "id": "ghulam",
+        "age": 3,
+        "name": "Ghulam",
+        "type": "Infantry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.12,
+          "attack": 20,
+          "health": 195
+        },
+        "imageId": "ghulam-3",
+        "strengths": [
+          "Light Infantry",
+          "Archers"
+        ],
+        "weaknesses": [
+          "Knights",
+          "Crossbowmen"
+        ],
+        "description": "Tough infantry that delivers a rapid double-strike attack."
+      },
+      {
+        "id": "camel-rider",
+        "age": 3,
+        "name": "Camel Rider",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.62,
+          "attack": 15,
+          "health": 210
+        },
+        "imageId": "camel-rider-3",
+        "strengths": [
+          "Cavalry"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Crossbowmen"
+        ],
+        "description": "Mobile melee unit that debuffs nearby horse cavalry."
+      }
+    ],
+    "technologies": [
+      {
+        "id": "fresh-foodstuffs",
+        "name": "Fresh Foodstuffs",
+        "age": 2,
+        "description": "Reduces the cost of Villagers by 50%.",
+        "building": "House of Wisdom"
+      },
+      {
+        "id": "camel-support",
+        "name": "Camel Support",
+        "age": 3,
+        "description": "Camels increase the armor of nearby infantry by +2.",
+        "building": "House of Wisdom"
+      }
+    ],
+    "landmarks": [
+      {
+        "id": "house-of-wisdom",
+        "name": "House of Wisdom",
+        "age": 1,
+        "description": "The unique building of the Abbasids used for aging up and researching unique technologies.",
+        "type": "Economic"
+      }
+    ],
+    "buildOrders": [
+      {
+        "id": "3tc-boom",
+        "steps": [
+          {
+            "note": "mandare l'esploratore a prendere più pecore possibili",
+            "time": "00:00",
+            "action": "Tutti gli abitanti alle pecore e radunare i nuovi abitanti alle pecore fino ad averne 7 "
+          },
+          {
+            "note": "",
+            "time": "00:45",
+            "action": "Radunare i nuovi abitanti all'oro fino ad averne 3 "
+          },
+          {
+            "note": "",
+            "time": "1:30",
+            "action": "radunare i nuovi abitanti alla legna fino ad averne 3"
+          },
+          {
+            "note": "costruire la casa della sapienza con un abitante che sta radunando oro",
+            "time": "2:10",
+            "action": "Appena abbiamo 200 di cibo e 100 d'oro passare di età con \"ALA ECONOMICA\""
+          },
+          {
+            "note": "",
+            "time": "2:20",
+            "action": "Nel momento in cui si sta passando bisogna lasciare solo 4 al cibo e 5 all'oro, il resto alla legna"
+          },
+          {
+            "note": "",
+            "time": "3:10",
+            "action": "una volta ottenuti 150 d'oro mandare i 5 villi alla pietra"
+          },
+          {
+            "note": "",
+            "time": "4:00 ",
+            "action": "arrivare ad 8 villi alla legna e poi 8 alla pietra"
+          },
+          {
+            "note": "",
+            "time": "4:10",
+            "action": "fare tecnologie mezzaluna fertile e prodotti alimentari fresca"
+          },
+          {
+            "note": "",
+            "time": "5:40",
+            "action": "arrivare a 490 di pietra e mettere giù il secondo tc con gli abitanti della pietra in più radunare di nuoov i villi al cibo"
+          },
+          {
+            "note": "",
+            "time": "6:00",
+            "action": "mettere giù il terzo tc con gli abitanti della legna."
+          },
+          {
+            "note": "N.B SE il tuo avversario sta pushando meglio truppare anzichè andare in terza",
+            "time": "6:40 ",
+            "action": "finita la costruzione dei tc radunare 2 tc al cibo e 1 tc all'oro fino ai castelli"
+          }
+        ],
+        "title": "3 TC boom (Team games/1v1)",
+        "source": "https://www.youtube.com/watch?v=49K_Ig-uJOo",
+        "banner_url": "",
+        "difficulty": 2,
+        "author_rank": "Conqueror 2",
+        "description": "In questa build si vedrà come realizzare 3 tc in 6 minuti per poi esplodere economicamente e demolire l'avversario.  (Vedere il video allegato per una dimostrazione pratica della build)",
+        "author_nickname": "AXL/Jeiden"
+      }
+    ],
+    "strengths": [
+      "Migliore civiltà per il boom economico in team games (multi-TC): grazie all'Ala Economica, possono costruire centri città e fattorie scontati. Questo, insieme alla tech \"Fresh food stuff\", rende gli Abbasidi i re delle civiltà da boom.",
+      "I loro cammelli non solo spaventano la cavalleria nemica (riducendone il danno), ma possono fornire bonus di armatura e danno alla fanteria vicina tramite tecnologie uniche.",
+      "Possiedono i Ghulam, una fanteria pesante con un attacco doppio che annienta le unità leggere e resiste molto bene sotto il fuoco delle frecce."
+    ],
+    "weaknesses": [
+      "Inizio lento: poiché i loro bonus scalano con il numero di edifici (Età dell'Oro), sono inizialmente vulnerabili alle civiltà che aggrediscono molto presto (come Mongoli o Inglesi).",
+      "La Casa della Sapienza è il cuore della civiltà. Se viene distrutta, l'avanzamento tecnologico e i bonus dell'Età dell'Oro si fermano.",
+      "Una volta finiti i cespugli di bacche, se non hanno effettuato correttamente la transizione alle fattorie, possono raccogliere sì cibo dai cervi ma non dai cinghiali.",
+      "Prevedibilità: spesso sono costretti a giocare in modo difensivo per proteggere il loro boom economico, rendendo i loro movimenti iniziali facili da leggere per un avversario esperto."
+    ],
+    "primaryColor": "#1f2937"
+  },
+  {
     "id": "chinese",
     "name": "Cinesi",
     "flag": "/civs/Chinese.webp",
@@ -634,68 +823,241 @@ export const civilizationsData: Civilization[] = [
   {
     "id": "jin-dynasty",
     "name": "Dinastia Jin",
-    "flag": "/flags/Jin Dynasty.png",
+    "flag": "/civs/Jin Dynasty.webp",
     "difficulty": "Difficile",
-    "shortDescription": "Civiltà basata sull'amministrazione imperiale e sulla potenza della polvere da sparo, capace di evolversi attraverso diverse ere amministrative per sbloccare potenti bonus economici e militari.",
+    "shortDescription": "Una civiltà nomade e imperiale che domina con la sua cavalleria d'élite e la potenza d'assedio superiore. I Jin eccellono nel controllo della mappa grazie ai villaggi a cavallo e ai tributari che potenziano la loro economia.",
     "passiveBonuses": [
-      "Sistema di Amministrazione: Gestisci funzionari imperiali per raccogliere tasse e supervisionare la produzione.",
-      "Mura della Grande Muraglia: Difese superiori e bonus di sorveglianza.",
-      "Padrone della Polvere da Sparo: Unità d'assedio e di fanteria a distanza potenziate.",
-      "Economia Dinastica: Bonus unici basati sulla dinastia attiva."
+      "Villaggi a Cavallo: Può addestrare fino a 20 villaggi a cavallo che raccolgono risorse e si muovono più velocemente dei villaggi standard.",
+      "Pascoli (Grasslands): Permette di costruire un Pascolo in una posizione strategica al passaggio di epoca per la produzione rapida di cavalleria.",
+      "Meng'an Mouke: Le Stalle di Guerra costruite vicino ai Pascoli producono cavalleria rapidamente utilizzando i cavalli disponibili.",
+      "Emissari: Può addestrare fino a 2 Emissari per stabilire Tributari negli insediamenti commerciali neutrali e corrompere unità nemiche.",
+      "Tributari: Generano una rendita passiva di Cibo e migliorano del 15% il reddito d'oro dei Mercanti.",
+      "Esperienza d'Assedio: Accesso all'Officina Meccanica già nell'Età Feudale; le Bed Crossbows sostituiscono le Springald."
     ],
     "uniqueUnits": [
       {
-        "id": "jin-handcannoneer",
-        "age": 4,
-        "name": "Handcannoneer di Jin",
-        "type": "Ranged",
+        "id": "emissary",
+        "age": 1,
+        "name": "Emissary",
+        "type": "Worker",
         "stats": {
-          "armor": 2,
-          "speed": 1.12,
-          "attack": 35,
-          "health": 150
+          "armor": 0,
+          "speed": 1.25,
+          "attack": 0,
+          "health": 100
         },
         "strengths": [
-          "Danni elevati",
-          "Armatura"
+          "Support",
+          "Diplomacy"
         ],
         "weaknesses": [
-          "Costo elevato",
-          "Lento"
+          "Combat Units"
         ],
-        "description": "Potente fanteria a distanza con polvere da sparo."
+        "description": "Non-combat support unit that can establish Tributaries and bribe enemy units."
+      },
+      {
+        "id": "mounted-villager",
+        "age": 1,
+        "name": "Mounted Villager",
+        "type": "Worker",
+        "stats": {
+          "armor": 0,
+          "speed": 1.42,
+          "attack": 6,
+          "health": 85
+        },
+        "strengths": [
+          "Speed",
+          "Economy"
+        ],
+        "weaknesses": [
+          "Archers",
+          "Early Raids"
+        ],
+        "description": "High-speed economic unit that collects resources and repairs buildings faster than standard villagers."
+      },
+      {
+        "id": "reindeer-trader",
+        "age": 1,
+        "name": "Reindeer Trader",
+        "type": "Worker",
+        "stats": {
+          "armor": 0,
+          "speed": 1.1,
+          "attack": 0,
+          "health": 100
+        },
+        "strengths": [
+          "Trading"
+        ],
+        "weaknesses": [
+          "Cavalry"
+        ],
+        "description": "Unique trader that costs food and gold instead of just gold."
+      },
+      {
+        "id": "mohe-tribesman",
+        "age": 2,
+        "name": "Mohe Tribesman",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.625,
+          "attack": 11,
+          "health": 90
+        },
+        "strengths": [
+          "Light Infantry"
+        ],
+        "weaknesses": [
+          "Heavy Cavalry",
+          "Spearmen"
+        ],
+        "description": "Fast and cheap ranged cavalry, excellent against light infantry."
+      },
+      {
+        "id": "bed-crossbow",
+        "age": 2,
+        "name": "Bed Crossbow",
+        "type": "Siege",
+        "stats": {
+          "armor": 0,
+          "speed": 0.75,
+          "attack": 40,
+          "health": 132
+        },
+        "strengths": [
+          "Infantry",
+          "Light Units"
+        ],
+        "weaknesses": [
+          "Cavalry",
+          "Melee Units"
+        ],
+        "description": "Anti-infantry siege unit that replaces the Springald. Bolts pierce through multiple units."
+      },
+      {
+        "id": "zhanma-swordsman",
+        "age": 3,
+        "name": "Zhanma Swordsman",
+        "type": "Infantry",
+        "stats": {
+          "armor": 8,
+          "speed": 1.12,
+          "attack": 23,
+          "health": 250
+        },
+        "strengths": [
+          "Cavalry"
+        ],
+        "weaknesses": [
+          "Ranged Units",
+          "Crossbowmen"
+        ],
+        "description": "Elite armored infantry armed with a greatsword. Extremely effective against cavalry."
+      },
+      {
+        "id": "iron-pagoda",
+        "age": 3,
+        "name": "Iron Pagoda",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 10,
+          "speed": 1.38,
+          "attack": 26,
+          "health": 290
+        },
+        "strengths": [
+          "Melee Infantry",
+          "Splash Damage"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Crossbowmen"
+        ],
+        "description": "Heavy armored cavalry that deals splash damage."
+      },
+      {
+        "id": "eruptor",
+        "age": 4,
+        "name": "Eruptor",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 53,
+          "health": 155
+        },
+        "strengths": [
+          "Single Target",
+          "Heavy Units"
+        ],
+        "weaknesses": [
+          "Swarm Units",
+          "Cavalry"
+        ],
+        "description": "Powerful gunpowder unit with high single-target damage."
       }
     ],
     "technologies": [],
     "landmarks": [
       {
-        "id": "imperial-palace-jin",
+        "id": "flower-pagoda",
         "age": 2,
-        "name": "Palazzo Imperiale",
+        "name": "Flower Pagoda",
         "type": "Economic",
-        "description": "Centro amministrativo che aumenta la raccolta di tasse."
+        "description": "Consente di piantare un Flower Garden che aumenta la velocità di raccolta e la velocità d'attacco delle unità vicine."
       },
       {
-        "id": "iron-foundry",
-        "age": 3,
-        "name": "Fonderia di Ferro",
+        "id": "great-pasture",
+        "age": 2,
+        "name": "Great Pasture",
         "type": "Military",
-        "description": "Produce unità d'assedio più velocemente."
+        "description": "Agisce contemporaneamente come Stalla di Guerra e Pascolo (Grassland)."
+      },
+      {
+        "id": "dragon-pavilion",
+        "age": 3,
+        "name": "Dragon Pavilion",
+        "type": "Economic",
+        "description": "Riduce il costo degli Emissari del 33% e ne genera uno gratuitamente. Aggiunge Bed Crossbows ai Centri Città."
+      },
+      {
+        "id": "mountain-hall",
+        "age": 3,
+        "name": "Mountain Hall",
+        "type": "Religious",
+        "description": "Agisce come Monastero. Genera Karma raccogliendo risorse vicine, sbloccando benedizioni globali."
+      },
+      {
+        "id": "great-wall-bastion",
+        "age": 4,
+        "name": "Great Wall Bastion",
+        "type": "Defensive",
+        "description": "Funge da Mastio dotato di 4 Bed Crossbows. Aumenta il danno di tutte le Bed Crossbows dell'esercito."
+      },
+      {
+        "id": "pagoda-forest",
+        "age": 4,
+        "name": "Pagoda Forest",
+        "type": "Economic",
+        "description": "Genera periodicamente piccole pagode che producono Legno e rallentano i nemici."
       }
     ],
     "videos": [],
     "buildOrders": [],
     "strengths": [
-      "Forte economia tardiva",
-      "Difese eccellenti",
-      "Superiorità nell'assedio"
+      "Mobilità Superiore: I villaggi a cavallo e la cavalleria precoce permettono un controllo della mappa eccellente.",
+      "Economia Flessibile: I Tributari e i villaggi a cavallo scalano l'economia in modo unico.",
+      "Potenza d'Assedio: Le Bed Crossbows dominano le masse di fanteria nemica.",
+      "Unità d'Elite: Iron Pagoda e Zhanma Swordsman sono tra le unità da mischia più forti del gioco."
     ],
     "weaknesses": [
-      "Inizio vulnerabile",
-      "Dipendenza dai funzionari",
-      "Costo tecnologico elevato"
+      "Costi Elevati: Le unità d'élite richiedono un massiccio investimento in risorse.",
+      "Dipendenza Strutturale: La perdita dei Pascoli o degli Emissari paralizza la produzione e l'economia.",
+      "Vulnerabilità Iniziale: I villaggi a cavallo sono costosi da rimpiazzare se persi precocemente."
     ],
-    "primaryColor": "#94a3b8"
+    "primaryColor": "#b45309"
   },
   {
     "id": "orderofthedragon",
@@ -6595,30 +6957,5 @@ export const civilizationsData: Civilization[] = [
       "Hanno costantemente bisogno di oro e quindi di difenderlo a tutti i costi, vederselo negare potrebbe essere fatale."
     ],
     "primaryColor": "#3b82f6"
-  },
-  {
-    "id": "jin-dynasty",
-    "name": "Dinastia Jin",
-    "flag": "/civs/Jin Dynasty.webp",
-    "difficulty": "Difficile",
-    "shortDescription": "Una civiltà focalizzata su potenti unità d'élite e una solida difesa interna.",
-    "passiveBonuses": [
-      "Unità d'élite: Accesso a truppe altamente specializzate.",
-      "Difesa Avanzata: Strutture difensive potenziate."
-    ],
-    "uniqueUnits": [],
-    "technologies": [],
-    "landmarks": [],
-    "videos": [],
-    "buildOrders": [],
-    "strengths": [
-      "Potenti unità d'élite",
-      "Ottima difesa"
-    ],
-    "weaknesses": [
-      "Lenta espansione",
-      "Costi elevati"
-    ],
-    "primaryColor": "#d4af37"
   }
 ];

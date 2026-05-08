@@ -98,7 +98,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     sengoku: "#e11d48",
     templar: "#dc2626",
     tughlaq: "#94a3b8",
-    zhuxi: "#16a34a"
+    zhuxi: "#16a34a",
+    "jin-dynasty": "#b45309"
   };
 
   const themeColor = civ?.primaryColor || THEME_COLORS[civId] || '#d4af37';
