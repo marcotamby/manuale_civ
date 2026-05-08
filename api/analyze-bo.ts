@@ -126,20 +126,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           parts: [{ 
             text: `Sei un esperto di Age of Empires 4. Analizza il seguente testo (descrizione e trascrizione) ed estrai il Build Order strutturato completo seguendo lo stile del sito "Manuale Civ".
             
-            GUIDA DI STILE E TERMINOLOGIA (MANDATORIA):
-            1. LINGUA: Italiano tecnico.
-            2. UNITÀ: Usa "vili" o "abitanti". "Scout" diventa "Esploratore".
-            3. RISORSE: "Cibo", "Legna", "Oro", "Pietra".
-            4. EDIFICI: Iniziale maiuscola (es. Caserma, Poligono di Tiro, Centro Città).
-            5. MONUMENTI: Usa il termine "Monumento" per indicare i Landmark del passaggio di età.
-            6. AZIONI: Sii diretto. Es: "Sposta 3 vili dall'oro al cibo", "Inizia produzione costante di Lancieri".
-            7. NOTE: Devono essere suggerimenti tattici brevi (es: "Assicurati di non avere vili inattivi", "Costruisci case vicino al Centro Città").
+            REGOLE DI STILE MANDATORIE:
+            1. LINGUA: Italiano tecnico. Traduci tutto dall'inglese.
+            2. TERMINI: Usa "vili/abitanti", "oro", "legna", "cibo", "Monumento", "Centro Città".
+            3. MAIUSCOLE: Usa le maiuscole SOLO all'inizio della frase e per i nomi propri degli edifici (es: Caserma, Centro Città). NON usare maiuscole a caso nel mezzo della frase per enfatizzare parole.
+            4. AZIONI: Sii diretto e schematico.
             
-            REGOLE DI ESTRAZIONE:
-            - NON RIASSUMERE. Copri l'intera timeline fino alla fine del testo.
-            - Estrai ALMENO 30 step se il video supera i 10 minuti.
+            REGOLE DI ESTRAZIONE (CRITICHE):
+            - COPRI TUTTA LA TIMELINE: Se la trascrizione arriva a 15-20 minuti, il tuo JSON deve arrivare a quel minutaggio. NON FERMARTI AI PRIMI 5 MINUTI.
+            - NON RIASSUMERE: Estrai ogni passaggio rilevante. Mi aspetto 30-50 step per video lunghi.
             - JSON valido con campi "description" e "steps" [{time, action, note}].
-            - Usa timestamp [MM:SS] precisi.
+            - Usa i timestamp [MM:SS] presenti nel testo.
             
             TESTO DA ANALIZZARE:
             ${textToAnalyze.substring(0, 60000)}` 

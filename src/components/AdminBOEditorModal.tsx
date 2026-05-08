@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, X, Loader2, Play, Map, Plus, Clock, Zap, Upload, MousePointer2, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2, ChevronUp, ChevronDown, AlertTriangle, BrainCircuit } from 'lucide-react';
+import { Save, X, Loader2, Play, Map, Plus, Clock, Zap, Upload, MousePointer2, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2, ChevronUp, ChevronDown, AlertTriangle, BrainCircuit, FileText } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { usePresence } from './PresenceContext';
@@ -75,7 +75,6 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
           map: ''
         });
       }
-      // Set initial data after a short delay to ensure editedBO is populated
       setTimeout(() => {
         initialDataRef.current = JSON.stringify(boIndex !== null && civ.buildOrders?.[boIndex] ? { ...civ.buildOrders[boIndex] } : {
           id: editedBO.id,
@@ -100,14 +99,13 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     }
   }, [isOpen, boIndex, civ.id]);
 
-  // Handle Dragging logic for banner position
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!dragState) return;
       const deltaX = e.clientX - dragState.startX;
       const deltaY = e.clientY - dragState.startY;
-      const containerWidth = 400; // Approx width of preview
-      const containerHeight = 120; // Approx height of preview
+      const containerWidth = 400;
+      const containerHeight = 120;
       const deltaPercentX = (deltaX / containerWidth) * 100;
       const deltaPercentY = (deltaY / containerHeight) * 100;
       
@@ -133,7 +131,6 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     };
   }, [dragState]);
 
-  // Handle Click Outside for Map Dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (mapDropdownRef.current && !mapDropdownRef.current.contains(event.target as Node)) {
@@ -164,7 +161,6 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
 
   const getYoutubeId = (url: string) => {
     if (!url) return null;
-    // Regex aggiornata per supportare YouTube e Invidious (yewtu.be)
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|yewtu.be\/watch\?v=)([^#&?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
@@ -207,20 +203,20 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     }
   };
 
-  const handleAIAnalysis = async () => {
-    if (!showManualInput && !editedBO.source) {
-      toast.error("Inserisci prima un link YouTube o usa l'inserimento manuale");
+  const handleAIAnalysis = async (useManual: boolean = false) => {
+    if (!useManual && !editedBO.source) {
+      toast.error("Inserisci prima un link video guida");
       return;
     }
 
-    if (showManualInput && !manualText.trim()) {
+    if (useManual && !manualText.trim()) {
       toast.error("Incolla prima il testo della trascrizione");
       return;
     }
 
-    const videoId = !showManualInput ? getYoutubeId(editedBO.source || '') : null;
-    if (!showManualInput && !videoId) {
-      toast.error("Link YouTube non valido");
+    const videoId = !useManual ? getYoutubeId(editedBO.source || '') : null;
+    if (!useManual && !videoId) {
+      toast.error("Link video non valido");
       return;
     }
 
@@ -232,8 +228,8 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          youtubeUrl: showManualInput ? null : editedBO.source,
-          rawText: showManualInput ? manualText : null
+          youtubeUrl: useManual ? null : editedBO.source,
+          rawText: useManual ? manualText : null
         }),
       });
 
@@ -244,7 +240,6 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
 
       const data = await response.json();
       
-      // Popolamento campi
       setEditedBO(prev => ({
         ...prev,
         description: data.description || prev.description,
@@ -255,7 +250,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     } catch (err: any) {
       console.error('AI Analysis Error:', err);
       toast.error(`Errore IA: ${err.message}`);
-      if (!showManualInput) {
+      if (!useManual) {
         toast((t) => (
           <span className="text-xs">
             YouTube blocca il server? 
@@ -362,7 +357,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar space-y-10">
           
-          {/* Top Section: Title & Difficulty */}
+          {/* Top Section */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-8 space-y-6">
               <div>
@@ -406,121 +401,41 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                   <div className="relative" ref={mapDropdownRef}>
                     <button
                       type="button"
-                      onClick={() => {
-                        setIsMapDropdownOpen(!isMapDropdownOpen);
-                        if (!isMapDropdownOpen) setMapSearch('');
-                      }}
-                      className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 text-white focus:border-cyan-500/50 outline-none transition-all flex items-center justify-between group hover:bg-white/10"
+                      onClick={() => setIsMapDropdownOpen(!isMapDropdownOpen)}
+                      className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 text-white flex items-center justify-between group hover:bg-white/10 transition-all outline-none"
                     >
                       <span className={editedBO.map ? 'text-white font-bold' : 'text-white/20'}>
                         {editedBO.map || 'Seleziona una mappa...'}
                       </span>
                       <ChevronDown size={18} className={`text-cyan-500 transition-transform duration-300 ${isMapDropdownOpen ? 'rotate-180' : ''}`} />
                     </button>
-
                     {isMapDropdownOpen && (
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1c23] border border-cyan-500/30 rounded-xl overflow-hidden z-[7000] shadow-[0_10px_40px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 duration-200 flex flex-col">
-                        {/* Search Input inside Dropdown */}
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1c23] border border-cyan-500/30 rounded-xl overflow-hidden z-[7000] shadow-2xl flex flex-col animate-in fade-in slide-in-from-top-2 duration-200">
                         <div className="p-3 bg-black/40 border-b border-white/5">
-                          <div className="relative">
-                            <input 
-                              type="text"
-                              placeholder="Cerca mappa..."
-                              autoFocus
-                              className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-3 py-2 text-xs text-white focus:border-cyan-500/50 outline-none placeholder:text-white/20"
-                              value={mapSearch}
-                              onChange={(e) => setMapSearch(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  e.preventDefault();
-                                  if (mapSearch.trim()) {
-                                    const currentMaps = editedBO.map ? editedBO.map.split(', ').map(m => m.trim()) : [];
-                                    const newMaps = currentMaps.includes(mapSearch) 
-                                      ? currentMaps.filter(m => m !== mapSearch)
-                                      : [...currentMaps, mapSearch];
-                                    setEditedBO(prev => ({ ...prev, map: newMaps.join(', ') }));
-                                    setMapSearch('');
-                                  }
-                                }
-                              }}
-                            />
-                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20">
-                              <Map size={14} />
-                            </div>
-                          </div>
+                          <input 
+                            type="text"
+                            placeholder="Cerca mappa..."
+                            autoFocus
+                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none"
+                            value={mapSearch}
+                            onChange={(e) => setMapSearch(e.target.value)}
+                          />
                         </div>
-
                         <div className="max-h-64 overflow-y-auto custom-scrollbar">
-                          {/* Categories (only if no search or matching) */}
-                          {(!mapSearch || CATEGORY_MAPS.some(c => c.toLowerCase().includes(mapSearch.toLowerCase()))) && (
-                            <div className="p-1">
-                               {CATEGORY_MAPS.filter((c: string) => !mapSearch || c.toLowerCase().includes(mapSearch.toLowerCase())).map((mapName) => (
-                                <button
-                                  key={mapName}
-                                  type="button"
-                                  onClick={() => {
-                                    const currentMaps = editedBO.map ? editedBO.map.split(', ').map(m => m.trim()) : [];
-                                    const isSelected = currentMaps.includes(mapName);
-                                    const newMaps = isSelected 
-                                      ? currentMaps.filter(m => m !== mapName)
-                                      : [...currentMaps, mapName];
-                                    setEditedBO(prev => ({ ...prev, map: newMaps.join(', ') }));
-                                  }}
-                                  className={`w-full px-4 py-2.5 text-sm text-left transition-colors flex items-center justify-between group/item ${
-                                    editedBO.map?.split(', ').includes(mapName)
-                                      ? 'bg-cyan-500/20 text-cyan-400 font-black' 
-                                      : 'text-cyan-300 hover:bg-white/5 hover:text-cyan-200'
-                                  }`}
-                                >
-                                  {mapName}
-                                  {editedBO.map?.split(', ').includes(mapName) && <CheckCircle2 size={14} className="text-cyan-500" />}
-                                </button>
-                              ))}
-                              <div className="h-px bg-white/5 my-1" />
-                            </div>
-                          )}
-
-                          {/* All Maps */}
                           {ALL_MAPS.filter((m: string) => !mapSearch || m.toLowerCase().includes(mapSearch.toLowerCase())).map((mapName) => (
                             <button
                               key={mapName}
-                              type="button"
                               onClick={() => {
                                 const currentMaps = editedBO.map ? editedBO.map.split(', ').map(m => m.trim()) : [];
-                                const isSelected = currentMaps.includes(mapName);
-                                const newMaps = isSelected 
-                                  ? currentMaps.filter(m => m !== mapName)
-                                  : [...currentMaps, mapName];
+                                const newMaps = currentMaps.includes(mapName) ? currentMaps.filter(m => m !== mapName) : [...currentMaps, mapName];
                                 setEditedBO(prev => ({ ...prev, map: newMaps.join(', ') }));
                               }}
-                              className={`w-full px-4 py-2.5 text-sm text-left transition-colors flex items-center justify-between group/item ${
-                                editedBO.map?.split(', ').includes(mapName)
-                                  ? 'bg-cyan-500/20 text-cyan-400 font-black' 
-                                  : 'text-gray-400 hover:bg-white/5 hover:text-white'
-                              }`}
+                              className={`w-full px-4 py-2.5 text-sm text-left flex items-center justify-between ${editedBO.map?.split(', ').includes(mapName) ? 'bg-cyan-500/20 text-cyan-400 font-black' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
                             >
                               {mapName}
-                              {editedBO.map?.split(', ').includes(mapName) && <CheckCircle2 size={14} className="text-cyan-500" />}
+                              {editedBO.map?.split(', ').includes(mapName) && <CheckCircle2 size={14} />}
                             </button>
                           ))}
-
-                          {mapSearch && !ALL_MAPS.some(m => m.toLowerCase().includes(mapSearch.toLowerCase())) && !CATEGORY_MAPS.some(c => c.toLowerCase().includes(mapSearch.toLowerCase())) && (
-                            <div className="p-4 text-center">
-                               <p className="text-[10px] text-gray-500 uppercase font-bold mb-2">Nessuna mappa trovata</p>
-                               <button 
-                                 onClick={() => {
-                                   const currentMaps = editedBO.map ? editedBO.map.split(', ').map(m => m.trim()) : [];
-                                   if (!currentMaps.includes(mapSearch)) {
-                                     setEditedBO(prev => ({ ...prev, map: [...currentMaps, mapSearch].join(', ') }));
-                                   }
-                                   setMapSearch('');
-                                 }}
-                                 className="text-xs font-black text-cyan-400 hover:text-cyan-300 flex items-center justify-center gap-2 w-full"
-                               >
-                                 Usa "{mapSearch}" <CheckCircle2 size={12} />
-                               </button>
-                            </div>
-                          )}
                         </div>
                       </div>
                     )}
@@ -535,29 +450,16 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                     <User size={14} /> Autore
                   </label>
                   <div className="bg-white/5 border-2 border-white/10 rounded-2xl p-4 space-y-4">
-                    <div className="space-y-3">
-                      <input
-                        type="text"
-                        value={editedBO.author_nickname || ''}
-                        onChange={e => setEditedBO(prev => ({ ...prev, author_nickname: e.target.value }))}
-                        placeholder="Nickname..."
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:border-cyan-500/50 outline-none"
-                      />
-                      <input
-                        type="text"
-                        value={editedBO.author_rank || ''}
-                        onChange={e => setEditedBO(prev => ({ ...prev, author_rank: e.target.value }))}
-                        placeholder="Rank (es. Diamond III)..."
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:border-cyan-500/50 outline-none"
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      value={editedBO.author_nickname || ''}
+                      onChange={e => setEditedBO(prev => ({ ...prev, author_nickname: e.target.value }))}
+                      placeholder="Nickname..."
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none"
+                    />
                     <button
-                      onClick={() => setEditedBO(prev => ({ 
-                        ...prev, 
-                        author_nickname: user?.nickname || '', 
-                        author_rank: user?.rank || '' 
-                      }))}
-                      className="w-full py-2.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 rounded-xl hover:bg-cyan-500/20 transition-all text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"
+                      onClick={() => setEditedBO(prev => ({ ...prev, author_nickname: user?.nickname || '', author_rank: user?.rank || '' }))}
+                      className="w-full py-2.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 rounded-xl text-[10px] font-black uppercase flex items-center justify-center gap-2"
                     >
                       <Shield size={14} /> Firma come {user?.nickname?.split(' ')[0] || 'Admin'}
                     </button>
@@ -578,63 +480,17 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                   value={editedBO.banner_url || ''}
                   onChange={e => setEditedBO(prev => ({ ...prev, banner_url: e.target.value }))}
                   placeholder="URL Immagine..."
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs text-cyan-200 focus:border-cyan-500/50 outline-none transition-all"
+                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs text-white outline-none"
                 />
-                <div className="relative">
-                  <input
-                    type="file"
-                    id="bo-banner-upload"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                  />
-                  <label
-                    htmlFor="bo-banner-upload"
-                    className={`flex items-center justify-center gap-3 w-full py-6 border-2 border-dashed rounded-2xl transition-all cursor-pointer ${
-                      uploading ? 'bg-white/5 border-white/10 opacity-50' : 'bg-yellow-500/5 border-yellow-500/20 hover:border-yellow-500/50 hover:bg-yellow-500/10'
-                    }`}
-                  >
-                    {uploading ? (
-                      <Loader2 className="text-cyan-400 animate-spin" size={24} />
-                    ) : (
-                      <>
-                        <Upload className="text-yellow-500" size={24} />
-                        <span className="text-xs font-black text-yellow-500 uppercase tracking-widest">Carica copertina</span>
-                      </>
-                    )}
-                  </label>
-                </div>
+                <label className={`flex flex-col items-center justify-center gap-2 w-full py-6 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${uploading ? 'opacity-50' : 'hover:bg-yellow-500/5 hover:border-yellow-500/30'}`}>
+                  <input type="file" className="hidden" onChange={handleFileUpload} />
+                  {uploading ? <Loader2 className="animate-spin text-cyan-400" /> : <><Upload className="text-yellow-500" /> <span className="text-[10px] font-black uppercase">Carica Immagine</span></>}
+                </label>
               </div>
               <div className="md:col-span-7">
-                {editedBO.banner_url ? (
-                  <div className="space-y-3">
-                    <div 
-                      className="relative w-full aspect-[21/6] rounded-2xl overflow-hidden border-2 border-white/20 cursor-move group shadow-2xl"
-                      onMouseDown={(e) => startDrag(e, editedBO.banner_position_x ?? 50, editedBO.banner_position ?? 50)}
-                    >
-                      <img
-                        src={editedBO.banner_url}
-                        alt="Preview"
-                        className="w-full h-full object-cover select-none pointer-events-none"
-                        style={{ objectPosition: `${editedBO.banner_position_x ?? 50}% ${editedBO.banner_position ?? 50}%` }}
-                      />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 pointer-events-none">
-                        <div className="bg-yellow-500 text-black px-3 py-1.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2 shadow-xl">
-                          <MousePointer2 size={12} /> Trascina per inquadrare
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center text-[10px] font-bold text-gray-500 uppercase">
-                      <span>Preview Inquadratura</span>
-                      <button onClick={() => setEditedBO(prev => ({ ...prev, banner_url: '' }))} className="text-red-400 hover:text-red-300 transition-colors">Rimuovi Immagine</button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="w-full aspect-[21/6] bg-black/40 border-2 border-dashed border-white/5 rounded-2xl flex flex-col items-center justify-center text-gray-600">
-                    <MoveVertical size={32} className="mb-2 opacity-20" />
-                    <span className="text-[10px] uppercase font-bold tracking-widest opacity-40">Nessun Banner Caricato</span>
-                  </div>
-                )}
+                <div className="relative w-full aspect-[21/6] rounded-2xl overflow-hidden border-2 border-white/10 bg-black/40">
+                  {editedBO.banner_url && <img src={editedBO.banner_url} className="w-full h-full object-cover" style={{ objectPosition: `${editedBO.banner_position_x ?? 50}% ${editedBO.banner_position ?? 50}%` }} onMouseDown={(e) => startDrag(e, editedBO.banner_position_x ?? 50, editedBO.banner_position ?? 50)} />}
+                </div>
               </div>
             </div>
           </div>
@@ -642,90 +498,83 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
           {/* Description */}
           <div>
             <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-4">
-              <Zap size={14} className="animate-pulse" /> Descrizione e Strategia Generale
+              <Zap size={14} className="animate-pulse" /> Descrizione Strategia
             </label>
             <textarea
               value={editedBO.description}
               onChange={e => setEditedBO(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="Descrivi l'obiettivo di questo build order, i punti di forza e quando usarlo..."
-              className="w-full bg-white/5 border-2 border-white/10 rounded-2xl px-6 py-4 text-white focus:border-cyan-500/50 focus:bg-white/10 transition-all outline-none placeholder:text-white/20 min-h-[150px] resize-y"
+              placeholder="Spiega l'obiettivo della build..."
+              className="w-full bg-white/5 border-2 border-white/10 rounded-2xl px-6 py-4 text-white outline-none min-h-[120px]"
             />
           </div>
 
           {/* YouTube Section */}
-          <div className="bg-red-500/5 border border-red-500/20 rounded-3xl p-6">
-             <label className="flex items-center gap-2 text-[10px] font-black text-red-500 uppercase tracking-[0.2em] mb-4">
-              <Youtube size={16} /> Video Tutorial (YouTube)
-            </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                <div className="flex flex-col gap-4">
-                    <div className="flex gap-3">
-                      <input
-                        type="text"
-                        disabled={showManualInput}
-                        value={editedBO.source || ''}
-                        onChange={e => setEditedBO(prev => ({ ...prev, source: e.target.value }))}
-                        placeholder={showManualInput ? "Analisi manuale attiva..." : "https://www.youtube.com/watch?v=..."}
-                        className={`flex-1 bg-black/40 border-2 border-white/10 rounded-xl px-4 py-3 text-sm text-red-200 focus:border-red-500/50 outline-none transition-all ${showManualInput ? 'opacity-30' : ''}`}
-                      />
-                      <button
-                        onClick={handleAIAnalysis}
-                        disabled={isAnalyzing || (!showManualInput && !editedBO.source) || (showManualInput && !manualText)}
-                        className={`px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 shadow-lg hover:shadow-purple-500/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${isAnalyzing ? 'animate-pulse' : ''}`}
-                      >
-                        {isAnalyzing ? (
-                          <Loader2 size={14} className="animate-spin" />
-                        ) : (
-                          <BrainCircuit size={14} />
-                        )}
-                        {isAnalyzing ? 'Analisi...' : 'Analizza con IA'}
-                      </button>
-                    </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <button 
-                      onClick={() => setShowManualInput(!showManualInput)}
-                      className={`text-[10px] font-black uppercase tracking-tighter transition-all flex items-center gap-2 ${showManualInput ? 'text-cyan-400' : 'text-gray-500 hover:text-white'}`}
-                    >
-                      {showManualInput ? <BrainCircuit size={14} /> : <Zap size={14} />}
-                      {showManualInput ? 'Nascondi Inserimento Manuale' : 'Usa Inserimento Manuale'}
-                    </button>
-                    {showManualInput && (
-                      <span className="text-[10px] text-cyan-400/50 animate-pulse font-bold uppercase">Modalità Assistita Attiva</span>
-                    )}
-                  </div>
+          <div className="bg-red-500/5 border border-red-500/20 rounded-3xl p-8 space-y-8">
+            <div>
+              <label className="flex items-center gap-2 text-xs font-black text-red-500 uppercase tracking-[0.2em] mb-4">
+                <Youtube size={16} /> Link Video Guida
+              </label>
+              <div className="flex gap-4">
+                <input
+                  type="text"
+                  value={editedBO.source || ''}
+                  onChange={e => setEditedBO(prev => ({ ...prev, source: e.target.value }))}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  className="flex-1 bg-black/40 border-2 border-white/10 rounded-2xl px-6 py-4 text-sm text-red-200 outline-none focus:border-red-500/50 transition-all"
+                />
+                <button
+                  onClick={() => handleAIAnalysis(false)}
+                  disabled={isAnalyzing || !editedBO.source}
+                  className="px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 shadow-lg active:scale-95 disabled:opacity-30"
+                >
+                  {isAnalyzing ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} fill="currentColor" />}
+                  Analizza Link Video
+                </button>
+              </div>
+            </div>
 
-                  {showManualInput && (
-                    <div className="space-y-3 animate-in slide-in-from-top-2 duration-300">
-                      <textarea
-                        value={manualText}
-                        onChange={(e) => setManualText(e.target.value)}
-                        placeholder="Incolla qui la descrizione del video o la trascrizione copiata da YouTube..."
-                        className="w-full h-32 bg-cyan-500/5 border border-cyan-500/30 rounded-xl p-4 text-xs text-cyan-100 focus:border-cyan-500/50 outline-none placeholder:text-cyan-500/20 resize-none"
-                      />
-                      <div className="flex items-start gap-2 p-3 bg-cyan-500/10 border border-cyan-500/20 rounded-lg">
-                        <AlertTriangle size={12} className="text-cyan-400 mt-0.5 shrink-0" />
-                        <p className="text-[9px] text-cyan-400/80 leading-relaxed">
-                          <b>TIP:</b> Se l'automatico fallisce, vai su YouTube, clicca su "Altro", poi su "Mostra trascrizione", copiala tutta e incollala qui. L'IA la ripulirà per te!
-                        </p>
-                      </div>
-                    </div>
-                  )}
+            <div className="h-px bg-white/5 w-full" />
+
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-xl font-black text-white uppercase tracking-tight flex items-center gap-2">
+                    <FileText className="text-cyan-400" size={20} />
+                    Inserimento Manuale Trascrizione
+                  </h3>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase">Usa questa opzione se l'analisi automatica del link fallisce</p>
                 </div>
-                {!showManualInput && (
-                  <p className="text-[10px] text-gray-500 italic">Incolla l'URL completo del video e premi 'Analizza con IA' per generare una bozza automatica.</p>
-                )}
-              {editedBO.source && getYoutubeId(editedBO.source) && (
-                <div className="relative aspect-video rounded-2xl overflow-hidden border-2 border-red-500/20 group">
-                  <img
-                    src={`https://img.youtube.com/vi/${getYoutubeId(editedBO.source)}/maxresdefault.jpg`}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
+                <button 
+                  onClick={() => setShowManualInput(!showManualInput)}
+                  className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${showManualInput ? 'bg-cyan-500 text-black' : 'bg-white/5 text-gray-500 hover:text-white'}`}
+                >
+                  {showManualInput ? 'Nascondi Box' : 'Apri Box Trascrizione'}
+                </button>
+              </div>
+
+              {showManualInput && (
+                <div className="space-y-4 animate-in slide-in-from-top-4 duration-300">
+                  <textarea
+                    value={manualText}
+                    onChange={(e) => setManualText(e.target.value)}
+                    placeholder="Incolla qui la trascrizione completa del video..."
+                    className="w-full h-48 bg-black/60 border-2 border-cyan-500/20 rounded-2xl p-6 text-sm text-cyan-100 outline-none focus:border-cyan-500/50 transition-all placeholder:text-cyan-500/20"
                   />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                    <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center shadow-xl">
-                      <Play size={24} className="text-white fill-white ml-1" />
+                  <div className="flex justify-between items-center bg-cyan-500/5 border border-cyan-500/20 rounded-2xl p-4">
+                    <div className="flex items-center gap-3">
+                      <AlertTriangle className="text-cyan-400" size={20} />
+                      <p className="text-[10px] text-cyan-400/80 font-medium leading-relaxed max-w-md">
+                        Copia la trascrizione da YouTube (clicca sui tre puntini sotto il video → Mostra trascrizione) e incollala qui sopra.
+                      </p>
                     </div>
+                    <button
+                      onClick={() => handleAIAnalysis(true)}
+                      disabled={isAnalyzing || !manualText.trim()}
+                      className="px-10 py-5 bg-cyan-500 hover:bg-cyan-400 text-black rounded-2xl font-black text-sm uppercase tracking-widest flex items-center gap-3 shadow-[0_0_30px_rgba(6,182,212,0.3)] active:scale-95 disabled:opacity-30 transition-all"
+                    >
+                      {isAnalyzing ? <Loader2 size={20} className="animate-spin" /> : <BrainCircuit size={20} />}
+                      Analizza Trascrizione con IA
+                    </button>
                   </div>
                 </div>
               )}
@@ -740,7 +589,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
               </label>
               <button
                 onClick={() => setEditedBO(prev => ({ ...prev, steps: [...(prev.steps || []), { time: '00:00', action: '', note: '' }] }))}
-                className="bg-cyan-500 hover:bg-cyan-400 text-black px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] flex items-center gap-2"
+                className="bg-cyan-500 hover:bg-cyan-400 text-black px-4 py-2 rounded-xl text-[10px] font-black uppercase flex items-center gap-2"
               >
                 <Plus size={14} strokeWidth={3} /> Aggiungi Passaggio
               </button>
@@ -748,171 +597,34 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
 
             <div className="space-y-4">
               {(editedBO.steps || []).map((step, idx) => (
-                <div 
-                  key={idx} 
-                  draggable
-                  onDragStart={() => handleDragStart(idx)}
-                  onDragOver={(e) => handleDragOver(e, idx)}
-                  onDragEnd={handleDragEnd}
-                  className={`group relative bg-white/5 border rounded-2xl p-6 transition-all animate-in slide-in-from-top-4 duration-300 flex items-start gap-4 ${
-                    draggedStepIndex === idx 
-                      ? 'border-dashed border-cyan-500 bg-cyan-500/10 shadow-[0_0_40px_rgba(6,182,212,0.3)] scale-[0.98]' 
-                      : droppedIndex === idx
-                        ? 'border-green-500 bg-green-500/5 shadow-[0_0_20px_rgba(34,197,94,0.2)] scale-[1.01]'
-                        : 'border-white/10 hover:border-cyan-500/30'
-                  }`}
-                >
-                  {draggedStepIndex === idx && (
-                    <div className="absolute inset-0 bg-cyan-500/5 rounded-2xl flex items-center justify-center z-20 pointer-events-none">
-                      <div className="bg-cyan-500 text-black px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl flex items-center gap-2">
-                        <MoveVertical size={14} />
-                        Spostamento in corso...
-                      </div>
-                    </div>
-                  )}
-                  {/* Drag Handle & Reorder Buttons */}
+                <div key={idx} draggable onDragStart={() => handleDragStart(idx)} onDragOver={(e) => handleDragOver(e, idx)} onDragEnd={handleDragEnd} className="group relative bg-white/5 border border-white/10 rounded-2xl p-6 flex items-start gap-4 hover:border-cyan-500/30 transition-all">
                   <div className="flex flex-col items-center gap-1 mt-1">
-                    <button
-                      onClick={() => moveStep(idx, idx - 1)}
-                      disabled={idx === 0}
-                      className="p-1 text-gray-600 hover:text-cyan-400 disabled:opacity-0 transition-colors"
-                    >
-                      <ChevronUp size={20} />
-                    </button>
-                    <div className="cursor-grab active:cursor-grabbing p-1 text-gray-700 hover:text-cyan-400 transition-colors">
-                      <MoveVertical size={18} />
-                    </div>
-                    <button
-                      onClick={() => moveStep(idx, idx + 1)}
-                      disabled={idx === editedBO.steps.length - 1}
-                      className="p-1 text-gray-600 hover:text-cyan-400 disabled:opacity-0 transition-colors"
-                    >
-                      <ChevronDown size={20} />
-                    </button>
+                    <button onClick={() => moveStep(idx, idx - 1)} disabled={idx === 0} className="p-1 text-gray-600 hover:text-cyan-400 disabled:opacity-0"><ChevronUp size={20} /></button>
+                    <div className="cursor-grab active:cursor-grabbing p-1 text-gray-700 hover:text-cyan-400"><MoveVertical size={18} /></div>
+                    <button onClick={() => moveStep(idx, idx + 1)} disabled={idx === editedBO.steps.length - 1} className="p-1 text-gray-600 hover:text-cyan-400 disabled:opacity-0"><ChevronDown size={20} /></button>
                   </div>
-
                   <div className="flex-1">
-                    <button
-                      onClick={() => {
-                        const newSteps = [...editedBO.steps];
-                        newSteps.splice(idx, 1);
-                        setEditedBO(prev => ({ ...prev, steps: newSteps }));
-                      }}
-                      className="absolute -top-3 -right-3 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:scale-110 shadow-lg z-10"
-                    >
-                      <X size={16} />
-                    </button>
-
+                    <button onClick={() => setEditedBO(prev => ({ ...prev, steps: prev.steps.filter((_, i) => i !== idx) }))} className="absolute -top-3 -right-3 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-10"><X size={16} /></button>
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                      <div className="md:col-span-2">
-                         <label className="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Tempo</label>
-                         <input
-                          type="text"
-                          value={step.time}
-                          onChange={e => {
-                            const newSteps = [...editedBO.steps];
-                            newSteps[idx].time = e.target.value;
-                            setEditedBO(prev => ({ ...prev, steps: newSteps }));
-                          }}
-                          className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-2.5 text-center font-mono text-cyan-400 font-bold focus:border-cyan-500 outline-none"
-                        />
-                      </div>
-                      <div className="md:col-span-10">
-                         <label className="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Azione Principale</label>
-                         <input
-                          type="text"
-                          value={step.action}
-                          onChange={e => {
-                            const newSteps = [...editedBO.steps];
-                            newSteps[idx].action = e.target.value;
-                            setEditedBO(prev => ({ ...prev, steps: newSteps }));
-                          }}
-                          placeholder="Cosa fare in questo momento..."
-                          className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white font-bold focus:border-cyan-500 outline-none"
-                        />
-                      </div>
-                      <div className="md:col-span-12">
-                        <label className="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Note / Dettagli</label>
-                        <textarea
-                          value={step.note || ''}
-                          onChange={e => {
-                            const newSteps = [...editedBO.steps];
-                            newSteps[idx].note = e.target.value;
-                            setEditedBO(prev => ({ ...prev, steps: newSteps }));
-                          }}
-                          placeholder="Dettagli extra (es. numero villaggi sull'oro)..."
-                          className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-xs text-gray-400 italic focus:border-cyan-500 outline-none resize-y min-h-[60px]"
-                        />
-                      </div>
+                      <div className="md:col-span-2"><input type="text" value={step.time} onChange={e => { const s = [...editedBO.steps]; s[idx].time = e.target.value; setEditedBO(p => ({ ...p, steps: s })); }} className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-2.5 text-center font-mono text-cyan-400 font-bold outline-none" /></div>
+                      <div className="md:col-span-10"><input type="text" value={step.action} onChange={e => { const s = [...editedBO.steps]; s[idx].action = e.target.value; setEditedBO(p => ({ ...p, steps: s })); }} placeholder="Azione..." className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white font-bold outline-none" /></div>
+                      <div className="md:col-span-12"><textarea value={step.note || ''} onChange={e => { const s = [...editedBO.steps]; s[idx].note = e.target.value; setEditedBO(p => ({ ...p, steps: s })); }} placeholder="Note..." className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-2 text-xs text-gray-400 italic outline-none resize-none" /></div>
                     </div>
                   </div>
                 </div>
               ))}
-              {(!editedBO.steps || editedBO.steps.length === 0) && (
-                <div className="py-20 bg-white/[0.02] border-2 border-dashed border-white/5 rounded-3xl flex flex-col items-center justify-center text-gray-600">
-                  <Clock size={48} className="mb-4 opacity-20" />
-                  <p className="text-sm font-bold uppercase tracking-widest opacity-40">Nessun passaggio inserito</p>
-                  <button
-                    onClick={() => setEditedBO(prev => ({ ...prev, steps: [{ time: '00:00', action: '', note: '' }] }))}
-                    className="mt-6 text-cyan-500 hover:text-cyan-400 font-black text-xs uppercase tracking-tighter"
-                  >
-                    + Clicca per aggiungere il primo step
-                  </button>
-                </div>
-              )}
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-8 py-6 border-t border-white/5 bg-black/40 flex justify-end items-center gap-4">
-          <button
-            onClick={onClose}
-            className="px-6 py-3 text-sm font-bold text-gray-400 hover:text-white transition-colors"
-          >
-            Annulla
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={isSaving || showSuccess}
-            className={`px-10 py-4 ${showSuccess ? 'bg-green-600' : 'bg-gradient-to-r from-cyan-600 to-blue-600'} text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-3 ${isSaving || showSuccess ? 'opacity-80 cursor-not-allowed' : ''}`}
-          >
-            {isSaving ? <Loader2 size={18} className="animate-spin" /> : showSuccess ? <CheckCircle2 size={18} /> : <Save size={18} />}
-            {isSaving ? 'Salvataggio...' : showSuccess ? (boIndex !== null ? 'Salvato!' : 'Pubblicato!') : (boIndex !== null ? 'Salva Build Order' : 'Pubblica Build Order')}
+        <div className="px-8 py-6 border-t border-white/5 bg-black/40 flex justify-end gap-4">
+          <button onClick={onClose} className="px-6 py-3 text-sm font-bold text-gray-400 hover:text-white transition-colors">Annulla</button>
+          <button onClick={handleSave} disabled={isSaving || showSuccess} className={`px-10 py-4 ${showSuccess ? 'bg-green-600' : 'bg-gradient-to-r from-cyan-600 to-blue-600'} text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:-translate-y-0.5 transition-all`}>
+            {isSaving ? <Loader2 className="animate-spin" /> : showSuccess ? <CheckCircle2 /> : <Save />}
+            {isSaving ? 'Salvataggio...' : showSuccess ? 'Fatto!' : 'Salva Build Order'}
           </button>
         </div>
-
-        {/* Exit Confirmation Modal */}
-        {showExitConfirm && (
-          <div className="absolute inset-0 z-[7000] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-            <div className="bg-[#1a1c23] border border-red-500/30 rounded-3xl p-8 max-w-md w-full shadow-[0_0_50px_rgba(239,68,68,0.2)] animate-in zoom-in-95 duration-200">
-              <div className="w-16 h-16 rounded-2xl bg-red-500/20 flex items-center justify-center border border-red-500/30 mb-6 mx-auto">
-                <AlertTriangle className="text-red-400" size={32} />
-              </div>
-              <h3 className="text-xl font-black text-white text-center mb-2 uppercase tracking-tight">Modifiche non salvate</h3>
-              <p className="text-gray-400 text-center mb-8 text-sm">
-                Ci sono modifiche non salvate. Sei sicuro di voler uscire? I progressi andranno perduti.
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                <button 
-                  onClick={() => setShowExitConfirm(false)}
-                  className="py-3.5 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-bold transition-all border border-white/10 text-sm"
-                >
-                  Continua Modifica
-                </button>
-                <button 
-                  onClick={() => {
-                    setShowExitConfirm(false);
-                    onClose();
-                  }}
-                  className="py-3.5 bg-red-600 hover:bg-red-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-red-600/20 text-sm uppercase tracking-widest"
-                >
-                  Esci
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
