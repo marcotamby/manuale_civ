@@ -124,13 +124,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       body: JSON.stringify({
         contents: [{ 
           parts: [{ 
-            text: `Sei un esperto di Age of Empires 4. Analizza il seguente testo (che contiene descrizione e trascrizione con tempi) ed estrai il Build Order strutturato.
+            text: `Sei un esperto di Age of Empires 4. Analizza il seguente testo (descrizione e trascrizione) ed estrai il Build Order strutturato.
             
-            REGOLE:
-            1. Restituisci SOLO un JSON valido.
-            2. Il JSON deve avere: "description" (testo), e "steps" (array di oggetti {time, action, note}).
-            3. Il campo "time" deve essere nel formato "MM:SS" (es. "0:45", "2:30"). USA I TIMESTAMP PRESENTI NELLA TRASCRIZIONE.
-            4. Se un'azione dura molto, indica il tempo di inizio.
+            REGOLE MANDATORIE:
+            1. Rispondi SEMPRE in ITALIANO. Se la fonte è in inglese, traduci accuratamente termini come "Villagers" (Villaggi), "Gold" (Oro), "Food" (Cibo), ecc.
+            2. Restituisci SOLO un JSON valido.
+            3. Il JSON deve avere: "description" (breve riassunto della strategia in italiano), e "steps" (array di oggetti {time, action, note}).
+            4. Il campo "time" deve essere "MM:SS" (es. "0:45"). USA I TIMESTAMP [MM:SS] PRESENTI NEL TESTO.
+            5. Ogni "action" e "note" deve essere in ITALIANO.
             
             TESTO DA ANALIZZARE:
             ${textToAnalyze.substring(0, 35000)}` 
