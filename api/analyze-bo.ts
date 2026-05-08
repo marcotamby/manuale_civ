@@ -124,20 +124,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       body: JSON.stringify({
         contents: [{ 
           parts: [{ 
-            text: `Sei un esperto di Age of Empires 4. Analizza il seguente testo (descrizione e trascrizione) ed estrai il Build Order strutturato.
+            text: `Sei un esperto di Age of Empires 4. Analizza il seguente testo (descrizione e trascrizione) ed estrai il Build Order strutturato completo.
             
             REGOLE MANDATORIE:
-            1. Rispondi SEMPRE in ITALIANO. Se la fonte è in inglese, traduci accuratamente i termini: "Villagers" diventa "vili" o "abitanti", "Gold" diventa "oro", "Food" diventa "cibo", "Wood" diventa "legna".
-            2. Restituisci SOLO un JSON valido.
-            3. Il JSON deve avere: "description" (breve riassunto della strategia in italiano), e "steps" (array di oggetti {time, action, note}).
-            4. Sii ESTREMAMENTE DETTAGLIATO e COPRI TUTTA LA DURATA DELLA TRASCRIZIONE. Non fermarti ai primi 4 minuti: estrai passaggi fino alla fine del testo fornito (anche se il video dura 15-20 minuti).
-            5. Ogni volta che nella trascrizione viene menzionata una nuova azione o un nuovo obiettivo temporale, crea uno step. Se il video prosegue fino a 10, 15 o 20 minuti, i tuoi step devono arrivare a quel minutaggio.
-            6. Genera ALMENO 20-30 passaggi per video lunghi.
-            7. Il campo "time" deve essere "MM:SS" (es. "0:45"). USA I TIMESTAMP [MM:SS] PRESENTI NEL TESTO.
-            8. Ogni "action" e "note" deve essere in ITALIANO.
+            1. Rispondi SEMPRE in ITALIANO. Usa termini come "vili/abitanti", "oro", "legna", "cibo".
+            2. Restituisci SOLO un JSON valido con campi "description" e "steps" [{time, action, note}].
+            3. NON RIASSUMERE. NON FERMARTI AI PRIMI MINUTI.
+            4. Devi mappare TUTTA la trascrizione, dall'inizio alla FINE. Se il testo arriva a 15 minuti, l'ultimo tuo step deve essere a 15 minuti.
+            5. Crea un nuovo step per ogni azione significativa (es. muovere vili, costruire edifici, ricercare tecnologie).
+            6. Se il video è lungo, mi aspetto ALMENO 30-40 passaggi nel JSON.
+            7. Il campo "time" deve essere "MM:SS" preso dai timestamp [MM:SS] presenti nel testo.
             
             TESTO DA ANALIZZARE:
-            ${textToAnalyze.substring(0, 35000)}` 
+            ${textToAnalyze.substring(0, 60000)}` 
           }] 
         }]
       })
