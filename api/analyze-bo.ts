@@ -77,7 +77,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // TENTATIVO 1: Gemini 1.5 Flash
     // TENTATIVO 2: Gemini Pro (fallback)
     let boData = null;
-    const modelNames = ["gemini-1.5-flash", "gemini-pro"];
+    const modelNames = ["gemini-3-flash", "gemini-1.5-flash", "gemini-pro"];
     
     for (const modelName of modelNames) {
       try {
