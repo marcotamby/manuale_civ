@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, X, Loader2, Map, Plus, Clock, Zap, Upload, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2, ChevronUp, ChevronDown, AlertTriangle, BrainCircuit, FileText } from 'lucide-react';
+import { Save, X, Loader2, Map, Plus, Clock, Zap, Upload, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2, ChevronUp, ChevronDown, AlertTriangle, BrainCircuit, FileText, PlayCircle } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { usePresence } from './PresenceContext';
@@ -49,7 +49,9 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
   const [mapSearch, setMapSearch] = useState('');
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState(0);
   const [manualText, setManualText] = useState('');
+  const [videoAddedStatus, setVideoAddedStatus] = useState(false);
   const initialDataRef = useRef<string>('');
   const mapDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -97,6 +99,23 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
       });
     }
   }, [isOpen, boIndex, civ.id]);
+
+  useEffect(() => {
+    let interval: any;
+    if (isAnalyzing) {
+      setAnalysisProgress(0);
+      interval = setInterval(() => {
+        setAnalysisProgress(prev => {
+          if (prev >= 95) return 95;
+          return prev + Math.random() * 5;
+        });
+      }, 800);
+    } else {
+      setAnalysisProgress(0);
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isAnalyzing]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -245,12 +264,13 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
         steps: data.steps && data.steps.length > 0 ? data.steps : prev.steps
       }));
 
+      setAnalysisProgress(100);
       toast.success("Analisi completata! Controlla i campi popolati.");
     } catch (err: any) {
       console.error('AI Analysis Error:', err);
       toast.error(`Errore IA: ${err.message}`);
     } finally {
-      setIsAnalyzing(false);
+      setTimeout(() => setIsAnalyzing(false), 500);
     }
   };
 
@@ -314,6 +334,8 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
   };
 
   if (!isOpen) return null;
+
+  const currentYoutubeId = getYoutubeId(editedBO.source || '');
 
   return (
     <div className="fixed inset-0 z-[6000] flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
@@ -493,8 +515,8 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
 
           {/* YouTube Section */}
           <div className="bg-red-500/5 border border-red-500/20 rounded-3xl p-8 space-y-8">
-            <div>
-              <label className="flex items-center gap-2 text-xs font-black text-red-500 uppercase tracking-[0.2em] mb-4">
+            <div className="space-y-6">
+              <label className="flex items-center gap-2 text-xs font-black text-red-500 uppercase tracking-[0.2em]">
                 <Youtube size={16} /> Link Video Guida
               </label>
               <div className="flex gap-4">
@@ -507,19 +529,41 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                 />
                 <button
                   onClick={() => {
-                    if (getYoutubeId(editedBO.source || '')) {
-                      toast.success("Video aggiunto correttamente! Apparirà nel Build Order.");
+                    if (currentYoutubeId) {
+                      setVideoAddedStatus(true);
+                      setTimeout(() => setVideoAddedStatus(false), 3000);
                     } else {
                       toast.error("Link video non valido");
                     }
                   }}
                   disabled={!editedBO.source}
-                  className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 border border-white/10 transition-all active:scale-95"
+                  className={`px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 transition-all active:scale-95 border-2 ${
+                    videoAddedStatus 
+                    ? 'bg-green-600 border-green-400 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]' 
+                    : 'bg-[#FF0000] border-[#FF0000] text-white hover:bg-[#CC0000] hover:border-[#CC0000] shadow-[0_0_20px_rgba(255,0,0,0.2)]'
+                  }`}
                 >
-                  <CheckCircle2 size={14} className="text-green-500" />
-                  Aggiungi Video Guida
+                  {videoAddedStatus ? (
+                    <><CheckCircle2 size={14} strokeWidth={3} /> Video Aggiunto!</>
+                  ) : (
+                    <><PlayCircle size={14} /> Aggiungi Video Guida</>
+                  )}
                 </button>
               </div>
+
+              {/* Video Preview inside Modal */}
+              {currentYoutubeId && (
+                <div className="mt-4 animate-in fade-in zoom-in-95 duration-500">
+                   <div className="relative aspect-video w-full max-w-2xl mx-auto rounded-2xl overflow-hidden border-2 border-red-500/30 shadow-2xl group">
+                     <iframe
+                        src={`https://www.youtube.com/embed/${currentYoutubeId}`}
+                        className="w-full h-full"
+                        allowFullScreen
+                     />
+                     <div className="absolute top-4 left-4 px-3 py-1 bg-red-600 text-white text-[10px] font-black uppercase rounded-lg shadow-lg">Preview Live</div>
+                   </div>
+                </div>
+              )}
             </div>
 
             <div className="h-px bg-white/5 w-full" />
@@ -541,6 +585,23 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                   placeholder="Incolla qui la trascrizione completa del video..."
                   className="w-full min-h-[180px] bg-black/60 border-2 border-cyan-500/20 rounded-2xl p-6 text-sm text-cyan-100 outline-none focus:border-cyan-500/50 transition-all placeholder:text-cyan-500/20 resize-y"
                 />
+                
+                {/* AI Progress Bar */}
+                {isAnalyzing && (
+                  <div className="space-y-2 animate-in fade-in duration-300">
+                    <div className="flex justify-between items-end">
+                      <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">Analisi in corso con Gemini 2.5...</span>
+                      <span className="text-[10px] font-black text-cyan-400">{Math.round(analysisProgress)}%</span>
+                    </div>
+                    <div className="h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
+                      <div 
+                        className="h-full bg-gradient-to-r from-cyan-600 to-blue-500 transition-all duration-500 ease-out shadow-[0_0_15px_rgba(6,182,212,0.5)]"
+                        style={{ width: `${analysisProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex justify-end items-center">
                   <button
                     onClick={() => handleAIAnalysis(true)}
