@@ -551,16 +551,16 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                 </button>
               </div>
 
-              {/* Video Preview inside Modal */}
+              {/* Video Preview inside Modal - Smaller version */}
               {currentYoutubeId && (
-                <div className="mt-4 animate-in fade-in zoom-in-95 duration-500">
-                   <div className="relative aspect-video w-full max-w-2xl mx-auto rounded-2xl overflow-hidden border-2 border-red-500/30 shadow-2xl group">
+                <div className="mt-4 animate-in fade-in zoom-in-95 duration-500 flex justify-start">
+                   <div className="relative aspect-video w-full max-w-[320px] rounded-xl overflow-hidden border border-red-500/30 shadow-xl group">
                      <iframe
                         src={`https://www.youtube.com/embed/${currentYoutubeId}`}
                         className="w-full h-full"
                         allowFullScreen
                      />
-                     <div className="absolute top-4 left-4 px-3 py-1 bg-red-600 text-white text-[10px] font-black uppercase rounded-lg shadow-lg">Preview Live</div>
+                     <div className="absolute top-2 left-2 px-2 py-0.5 bg-red-600 text-white text-[8px] font-black uppercase rounded shadow-lg">Preview</div>
                    </div>
                 </div>
               )}

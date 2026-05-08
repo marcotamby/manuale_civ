@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
-import { Trash2, Plus, User, CheckCircle, XCircle, X, Upload, Loader2, MousePointer2, MoveVertical, Map, ChevronUp, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { Trash2, Plus, User, CheckCircle, XCircle, X, Upload, Loader2, MousePointer2, MoveVertical, Map, ChevronUp, ChevronDown, CheckCircle2, Sparkles } from 'lucide-react';
 import type { ToastType } from './Toast';
 import { CATEGORY_MAPS } from './AdminBOEditorModal';
 import { AOE4_MAPS as ALL_MAPS } from '../data/aoe4Maps';
@@ -34,6 +34,9 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
   const [dragState, setDragState] = useState<{ startY: number; startPos: number } | null>(null);
   const [isMapDropdownOpen, setIsMapDropdownOpen] = useState(false);
   const [mapSearch, setMapSearch] = useState('');
+  const [transcript, setTranscript] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState(0);
   const mapDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -132,8 +135,69 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
     setBannerUrl('');
     setBannerPosition(50);
     setMap('');
+    setMap('');
     setIsSigned(false);
+    setTranscript('');
+    setIsAnalyzing(false);
+    setAnalysisProgress(0);
   }, [user?.email]);
+
+  const handleAIAnalysis = async () => {
+    if (!transcript.trim()) {
+      setToast({ isVisible: true, message: 'Incolla prima il testo della trascrizione', type: 'error' });
+      return;
+    }
+
+    try {
+      setIsAnalyzing(true);
+      setAnalysisProgress(10);
+      
+      const progressInterval = setInterval(() => {
+        setAnalysisProgress(prev => (prev < 90 ? prev + 5 : prev));
+      }, 1000);
+
+      const response = await fetch('/api/analyze-bo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          youtubeUrl: null,
+          rawText: transcript 
+        }),
+      });
+
+      clearInterval(progressInterval);
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.details || error.error || 'Errore durante l\'analisi');
+      }
+
+      const data = await response.json();
+      
+      if (data.title) setTitle(data.title);
+      if (data.description) setDescription(data.description);
+      if (data.steps && data.steps.length > 0) {
+        // AI usually returns lowercase actions/notes as requested in admin, but let's be safe
+        const formattedSteps = data.steps.map((s: any) => ({
+          time: s.time || '',
+          action: s.action || '',
+          note: s.note || ''
+        }));
+        setBoSteps(formattedSteps);
+      }
+
+      setAnalysisProgress(100);
+      setToast({ isVisible: true, message: 'Analisi completata! Campi popolati.', type: 'success' });
+    } catch (err: any) {
+      console.error('AI Analysis Error:', err);
+      setToast({ isVisible: true, message: `Errore IA: ${err.message}`, type: 'error' });
+    } finally {
+      setTimeout(() => {
+        setIsAnalyzing(false);
+        setAnalysisProgress(0);
+      }, 500);
+    }
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -608,6 +672,87 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* AI TRANSCRIPTION ANALYSIS SECTION */}
+            <div className="bg-gradient-to-br from-blue-900/20 via-[#1a1c23] to-cyan-900/10 rounded-3xl border-2 border-blue-500/20 p-6 space-y-4 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-3xl pointer-events-none" />
+              
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-black text-blue-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                  <Sparkles size={16} className="text-blue-400 animate-pulse" />
+                  Analisi con Intelligenza Artificiale
+                </label>
+                {isAnalyzing && (
+                  <div className="flex items-center gap-2">
+                    <Loader2 size={12} className="animate-spin text-blue-400" />
+                    <span className="text-[9px] font-black text-blue-400/60 uppercase tracking-widest">Elaborazione in corso...</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-end justify-between">
+                  <h4 className="text-sm font-bold text-white/80">Inserimento manuale trascrizione</h4>
+                  <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Copia qui il testo del video</span>
+                </div>
+                
+                <textarea
+                  value={transcript}
+                  onChange={(e) => setTranscript(e.target.value)}
+                  placeholder="Incolla qui la trascrizione del video o i tuoi appunti grezzi..."
+                  className="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-sm text-gray-300 placeholder:text-gray-700 focus:border-blue-500/30 outline-none transition-all min-h-[140px] resize-y shadow-inner"
+                />
+
+                {isAnalyzing && (
+                  <div className="relative pt-1">
+                    <div className="flex mb-2 items-center justify-between">
+                      <div>
+                        <span className="text-[10px] font-black inline-block py-1 px-2 uppercase rounded-full text-blue-400 bg-blue-500/10 tracking-widest">
+                          {analysisProgress < 100 ? 'Analisi Trascrizione...' : 'Analisi Completata'}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[10px] font-black inline-block text-blue-400">
+                          {analysisProgress}%
+                        </span>
+                      </div>
+                    </div>
+                    <div className="overflow-hidden h-1.5 mb-4 text-xs flex rounded-full bg-blue-500/10 border border-blue-500/20">
+                      <div 
+                        style={{ width: `${analysisProgress}%` }}
+                        className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-blue-600 to-cyan-500 transition-all duration-500 ease-out relative"
+                      >
+                        <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.2)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0.2)_75%,transparent_75%,transparent)] bg-[length:20px_20px] animate-[progress-bar-stripes_1s_linear_infinite]" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleAIAnalysis}
+                  disabled={isAnalyzing || !transcript.trim()}
+                  className={`w-full py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
+                    isAnalyzing 
+                      ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' 
+                      : 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white border border-white/10 shadow-blue-600/20'
+                  }`}
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      Analisi in corso...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={14} fill="currentColor" />
+                      Analizza trascrizione con IA
+                    </>
+                  )}
+                </button>
+                <p className="text-[9px] text-gray-500 font-medium text-center uppercase tracking-widest">L'IA popolerà automaticamente il titolo, la descrizione e tutti i passaggi qui sotto</p>
+              </div>
             </div>
 
             <div className="space-y-2">
