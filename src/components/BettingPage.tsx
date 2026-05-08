@@ -2,7 +2,7 @@
 // Force build trigger - 2026-05-05 09:05
 import { useState, useEffect } from 'react';
 // Force deploy update for betting favoritism weights 🐑
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { fetchTournament } from '../services/startgg';
@@ -406,23 +406,20 @@ export function BettingPage() {
       <div className="flex flex-col md:flex-row items-start justify-between mb-8 gap-10 px-4 md:px-0">
         <div className="relative flex-1">
            <div className="flex flex-col gap-3 mb-6">
-             <button 
-              onClick={() => navigate('/tornei')}
+             <Link 
+              to="/tornei"
               className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-xs font-black uppercase tracking-widest hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
              >
               <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" /> Torna ai Tornei
-             </button>
-             <button 
-              onClick={() => {
-                const tournamentPath = location.pathname.includes('/tournament/') 
-                  ? `/tornei/tournament/${slug}` 
-                  : `/tornei/${slug}`;
-                navigate(`${tournamentPath}${location.search}`);
-              }}
+             </Link>
+             <Link 
+              to={location.pathname.includes('/tournament/') 
+                ? `/tornei/tournament/${slug}${location.search}` 
+                : `/tornei/${slug}${location.search}`}
               className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-xs font-black uppercase tracking-widest hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
              >
               <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" /> Vai al tabellone
-             </button>
+             </Link>
            </div>
            <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-white to-slate-400 uppercase tracking-tighter mb-4 leading-tight">
             Social Betting:<br/>

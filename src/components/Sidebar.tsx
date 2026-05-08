@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { useCivData } from './CivContext';
 import { useAuth } from './AuthContext';
 import { Home as HomeIcon, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -77,13 +78,14 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
         {/* Main Navigation - Hide on Home */}
         {currentPage !== 'home' && (
           <div className="flex flex-col gap-4 mb-4 shrink-0 w-full pr-1">
-            <button
+            <Link
+              to="/"
               onClick={() => onSelectPage('home')}
               title="Torna alla Home"
               className="w-full aspect-square rounded-xl bg-white/5 backdrop-blur-sm flex items-center justify-center text-yellow-500 border border-white/10 hover:border-white/30 hover:bg-white/10 transition-all group"
             >
               <HomeIcon size={32} />
-            </button>
+            </Link>
           </div>
         )}
 
@@ -99,8 +101,9 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
         {favoriteCivs.length > 0 && (
           <div className="flex flex-col w-full mb-4 pr-1">
             {favoriteCivs.map((civ) => (
-              <button
+              <Link
                 key={`fav-${civ.id}`}
+                to={`/civ/${civ.id}`}
                 onClick={() => {
                   onSelectCiv(civ.id);
                   onSelectPage('civ');
@@ -117,7 +120,7 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
                 <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-[var(--color-brand-dark)] via-[var(--color-brand-dark)]/50 to-transparent pointer-events-none z-10" />
                 <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-[var(--color-brand-dark)] to-transparent pointer-events-none opacity-60" />
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-t from-yellow-400/10 to-transparent transition-opacity" />
-              </button>
+              </Link>
             ))}
           </div>
         )}
@@ -128,8 +131,9 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
         {currentPage !== 'home' && (
           <nav className="flex flex-col w-full pb-52 md:pb-10 pr-1">
             {civilizationsData.map((civ) => (
-              <button
+              <Link
                 key={civ.id}
+                to={`/civ/${civ.id}`}
                 onClick={() => {
                   onSelectCiv(civ.id);
                   onSelectPage('civ');
@@ -156,7 +160,7 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
                 <span className="absolute left-full ml-4 px-3 py-1 bg-gray-900 border border-gray-700 text-white rounded-md text-sm whitespace-nowrap opacity-0 md:group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-lg font-medium">
                   {civ.name}
                 </span>
-              </button>
+              </Link>
             ))}
           </nav>
         )}

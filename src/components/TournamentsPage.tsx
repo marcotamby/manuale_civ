@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament, fetchChallongeData } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
@@ -742,24 +742,48 @@ export function TournamentsPage() {
               <div 
                 className="glass rounded-3xl overflow-hidden border border-white/5 flex flex-col transition-all duration-500 hover:border-white/80 hover:shadow-[0_30px_60px_rgba(0,0,0,0.8)] hover:-translate-y-1 hover:scale-[1.05] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] [backface-visibility:hidden] [transform-style:preserve-3d]"
               >
-                <div 
-                  className="h-48 relative overflow-hidden cursor-pointer" 
-                  onClick={() => {
-                    const canRenderInternal = (t.events?.length > 0 || t.config.source === 'challonge' || t.config.source === 'startgg') && !t.config.slug.startsWith('tb-');
-                    if (canRenderInternal) {
-                      navigate(`/tornei/${t.slug}`);
-                    } else if (t.config.directLink) {
-                      window.open(t.config.directLink, '_blank');
-                    }
-                  }}
-                >
-                    <img 
-                      src={banner} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
-                      alt={t.name} 
-                      style={{ objectPosition: `${t.config?.bannerPositionX || 50}% ${t.config?.bannerPositionY || 50}%` }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0d1424] to-transparent" />
+                {(() => {
+                  const canRenderInternal = (t.events?.length > 0 || t.config.source === 'challonge' || t.config.source === 'startgg') && !t.config.slug.startsWith('tb-');
+                  const bannerContent = (
+                    <>
+                      <img 
+                        src={banner} 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
+                        alt={t.name} 
+                        style={{ objectPosition: `${t.config?.bannerPositionX || 50}% ${t.config?.bannerPositionY || 50}%` }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0d1424] to-transparent" />
+                    </>
+                  );
+
+                  if (canRenderInternal) {
+                    return (
+                      <Link 
+                        to={`/tornei/${t.slug}`}
+                        className="h-48 relative overflow-hidden cursor-pointer block"
+                      >
+                        {bannerContent}
+                      </Link>
+                    );
+                  } else if (t.config.directLink) {
+                    return (
+                      <a 
+                        href={t.config.directLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="h-48 relative overflow-hidden cursor-pointer block"
+                      >
+                        {bannerContent}
+                      </a>
+                    );
+                  } else {
+                    return (
+                      <div className="h-48 relative overflow-hidden">
+                        {bannerContent}
+                      </div>
+                    );
+                  }
+                })()}
                     
                     {/* Status Badges Overlay */}
                     <div className="absolute top-4 right-4 flex flex-col items-end gap-2 z-20">
@@ -779,17 +803,13 @@ export function TournamentsPage() {
                         {status}
                       </div>
 
-                      {/* Social Betting Button */}
                       {(status === 'In corso' || status === 'Programmato') && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/tornei/${t.slug}/scommetti`);
-                          }}
-                          className="mt-2 px-4 py-2 bg-gradient-to-r from-purple-600 via-fuchsia-500 to-indigo-600 text-white font-black uppercase text-[10px] tracking-tighter rounded-lg shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)] transition-all hover:scale-110 active:scale-95 transform -skew-x-12 border border-white/20"
+                        <Link
+                          to={`/tornei/${t.slug}/scommetti`}
+                          className="mt-2 px-4 py-2 bg-gradient-to-r from-purple-600 via-fuchsia-500 to-indigo-600 text-white font-black uppercase text-[10px] tracking-tighter rounded-lg shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)] transition-all hover:scale-110 active:scale-95 transform -skew-x-12 border border-white/20 inline-block text-center"
                         >
                           Scommetti! 🐑
-                        </button>
+                        </Link>
                       )}
                     </div>
                 </div>
@@ -899,43 +919,61 @@ export function TournamentsPage() {
 
                     <div className="mt-auto flex items-center gap-2 pt-4 border-t border-white/5 h-16">
                         {t.config.hasRegolamento && (
-                          <button 
-                            onClick={() => navigate(`/tornei/${t.slug}/regolamento`)} 
+                          <Link 
+                            to={`/tornei/${t.slug}/regolamento`} 
                             className="flex-grow h-full bg-blue-950/40 hover:bg-blue-900/60 border border-blue-500/30 rounded-2xl text-blue-400 text-[10px] font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/reg shadow-lg active:scale-95"
                           >
                             Regolamento <BookOpen size={14} className="group-hover/reg:scale-110 transition-transform" />
-                          </button>
+                          </Link>
                         )}
-                        <button 
-                          onClick={() => {
-                            // Navighiamo internamente SOLO se ci sono eventi caricati o se è un torneo challonge con slug valido
-                            const hasEvents = t.events && t.events.length > 0;
-                            const isChallongeWithSlug = t.config.source === 'challonge' && t.slug && !t.config.slug.startsWith('tb-');
-                            const isStartGGWithEvents = t.config.source === 'startgg' && hasEvents;
-                            
-                            if (isStartGGWithEvents || isChallongeWithSlug) {
-                              navigate(`/tornei/${t.slug}`);
-                            } else if (t.config.directLink) {
-                              window.open(t.config.directLink, '_blank');
-                            } else {
-                              // Feedback visivo "NON DISPONIBILE" dentro il pulsante
-                              setBracketErrorId(t.id);
-                              setTimeout(() => setBracketErrorId(null), 3000);
-                            }
-                          }} 
-                          className={clsx(
+                        {(() => {
+                          const hasEvents = t.events && t.events.length > 0;
+                          const isChallongeWithSlug = t.config.source === 'challonge' && t.slug && !t.config.slug.startsWith('tb-');
+                          const isStartGGWithEvents = t.config.source === 'startgg' && hasEvents;
+                          
+                          const commonClasses = clsx(
                             "flex-grow h-full bg-white/5 hover:bg-white/10 rounded-2xl text-white font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/det shadow-lg active:scale-95",
                             t.config.hasRegolamento ? "text-[10px]" : "text-xs"
-                          )}
-                        >
-                          {bracketErrorId === t.id ? (
-                            <span className="text-red-400 font-black animate-pulse text-[10px] tracking-tight">
-                              NON DISPONIBILE
-                            </span>
-                          ) : (
-                            <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
-                          )}
-                        </button>
+                          );
+
+                          if (isStartGGWithEvents || isChallongeWithSlug) {
+                            return (
+                              <Link to={`/tornei/${t.slug}`} className={commonClasses}>
+                                {bracketErrorId === t.id ? (
+                                  <span className="text-red-400 font-black animate-pulse text-[10px] tracking-tight">
+                                    NON DISPONIBILE
+                                  </span>
+                                ) : (
+                                  <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
+                                )}
+                              </Link>
+                            );
+                          } else if (t.config.directLink) {
+                            return (
+                              <a href={t.config.directLink} target="_blank" rel="noopener noreferrer" className={commonClasses}>
+                                <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
+                              </a>
+                            );
+                          } else {
+                            return (
+                              <button 
+                                onClick={() => {
+                                  setBracketErrorId(t.id);
+                                  setTimeout(() => setBracketErrorId(null), 3000);
+                                }} 
+                                className={commonClasses}
+                              >
+                                {bracketErrorId === t.id ? (
+                                  <span className="text-red-400 font-black animate-pulse text-[10px] tracking-tight">
+                                    NON DISPONIBILE
+                                  </span>
+                                ) : (
+                                  <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
+                                )}
+                              </button>
+                            );
+                          }
+                        })()}
                         {canManageTournaments && (
                           <div className="flex flex-col gap-1 h-full">
                             <button 

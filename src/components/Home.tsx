@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useCivData } from './CivContext';
 import { CustomSelect } from './CustomSelect';
 import { Heart, BarChart2, Zap, Shield } from 'lucide-react';
@@ -149,13 +150,22 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
           const isUnselectable = isCompareMode && isMaxReached && !isSelected;
 
           return (
-            <div
+            <Link
               key={civ.id}
-              onClick={() => handleCardClick(civ.id)}
-              className={`group relative h-36 md:h-52 rounded-xl cursor-pointer overflow-hidden border z-10 box-border will-change-transform ${isSelected
+              to={`/civ/${civ.id}${isBOMode ? '/buildorders' : ''}`}
+              onClick={(e) => {
+                if (isCompareMode) {
+                  e.preventDefault();
+                  handleCardClick(civ.id);
+                } else {
+                  // Call onSelectCiv for any side effects (like analytics or closing menus)
+                  onSelectCiv(civ.id, isBOMode ? 'buildorders' : undefined);
+                }
+              }}
+              className={`group relative h-36 md:h-52 rounded-xl cursor-pointer overflow-hidden border z-10 box-border will-change-transform block ${isSelected
                 ? 'border-blue-400 shadow-[0_0_40px_rgba(59,130,246,0.4)] scale-[1.02] z-20 brightness-110'
                 : isUnselectable
-                  ? 'border-white/5 opacity-40 cursor-not-allowed'
+                  ? 'border-white/5 opacity-40 cursor-not-allowed pointer-events-none'
                   : 'border-[#D4AF37]/30 hover:border-white/80 hover:shadow-[0_50px_100px_rgba(0,0,0,1)] hover:-translate-y-1 hover:scale-110 2xl:hover:scale-[1.25] hover:z-50 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]'
                 }`}
             >
@@ -262,7 +272,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                   {civ.difficulty}
                 </div>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
