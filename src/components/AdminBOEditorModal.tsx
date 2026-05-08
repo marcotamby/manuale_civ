@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, X, Loader2, Play, Map, Plus, Clock, Zap, Upload, MousePointer2, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2, ChevronUp, ChevronDown, AlertTriangle, BrainCircuit, FileText } from 'lucide-react';
+import { Save, X, Loader2, Play, Map, Plus, Clock, Zap, Upload, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2, ChevronUp, ChevronDown, AlertTriangle, BrainCircuit, FileText } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { usePresence } from './PresenceContext';
@@ -250,22 +250,6 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     } catch (err: any) {
       console.error('AI Analysis Error:', err);
       toast.error(`Errore IA: ${err.message}`);
-      if (!useManual) {
-        toast((t) => (
-          <span className="text-xs">
-            YouTube blocca il server? 
-            <button 
-              onClick={() => {
-                setShowManualInput(true);
-                toast.dismiss(t.id);
-              }}
-              className="ml-2 font-black text-cyan-400 underline"
-            >
-              Incolla testo manualmente
-            </button>
-          </span>
-        ), { duration: 6000 });
-      }
     } finally {
       setIsAnalyzing(false);
     }
@@ -489,7 +473,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
               </div>
               <div className="md:col-span-7">
                 <div className="relative w-full aspect-[21/6] rounded-2xl overflow-hidden border-2 border-white/10 bg-black/40">
-                  {editedBO.banner_url && <img src={editedBO.banner_url} className="w-full h-full object-cover" style={{ objectPosition: `${editedBO.banner_position_x ?? 50}% ${editedBO.banner_position ?? 50}%` }} onMouseDown={(e) => startDrag(e, editedBO.banner_position_x ?? 50, editedBO.banner_position ?? 50)} />}
+                  {editedBO.banner_url && <img src={editedBO.banner_url} className="w-full h-full object-cover" style={{ objectPosition: `${editedBO.banner_position_x ?? 50}% ${editedBO.banner_position ?? 50}%` }} onMouseDown={(e) => startDrag(e, editedBO.banner_position_x ?? 50, editedBO.banner_position ?? 50)} alt="Preview" />}
                 </div>
               </div>
             </div>
@@ -597,7 +581,16 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
 
             <div className="space-y-4">
               {(editedBO.steps || []).map((step, idx) => (
-                <div key={idx} draggable onDragStart={() => handleDragStart(idx)} onDragOver={(e) => handleDragOver(e, idx)} onDragEnd={handleDragEnd} className="group relative bg-white/5 border border-white/10 rounded-2xl p-6 flex items-start gap-4 hover:border-cyan-500/30 transition-all">
+                <div 
+                  key={idx} 
+                  draggable 
+                  onDragStart={() => handleDragStart(idx)} 
+                  onDragOver={(e) => handleDragOver(e, idx)} 
+                  onDragEnd={handleDragEnd} 
+                  className={`group relative bg-white/5 border rounded-2xl p-6 flex items-start gap-4 transition-all ${
+                    droppedIndex === idx ? 'border-green-500 bg-green-500/5' : 'border-white/10 hover:border-cyan-500/30'
+                  }`}
+                >
                   <div className="flex flex-col items-center gap-1 mt-1">
                     <button onClick={() => moveStep(idx, idx - 1)} disabled={idx === 0} className="p-1 text-gray-600 hover:text-cyan-400 disabled:opacity-0"><ChevronUp size={20} /></button>
                     <div className="cursor-grab active:cursor-grabbing p-1 text-gray-700 hover:text-cyan-400"><MoveVertical size={18} /></div>
@@ -619,12 +612,27 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
 
         {/* Footer */}
         <div className="px-8 py-6 border-t border-white/5 bg-black/40 flex justify-end gap-4">
-          <button onClick={onClose} className="px-6 py-3 text-sm font-bold text-gray-400 hover:text-white transition-colors">Annulla</button>
-          <button onClick={handleSave} disabled={isSaving || showSuccess} className={`px-10 py-4 ${showSuccess ? 'bg-green-600' : 'bg-gradient-to-r from-cyan-600 to-blue-600'} text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:-translate-y-0.5 transition-all`}>
+          <button onClick={handleClose} className="px-6 py-3 text-sm font-bold text-gray-400 hover:text-white transition-colors">Annulla</button>
+          <button onClick={handleSave} disabled={isSaving || showSuccess} className={`px-10 py-4 ${showSuccess ? 'bg-green-600' : 'bg-gradient-to-r from-cyan-600 to-blue-600'} text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-3`}>
             {isSaving ? <Loader2 className="animate-spin" /> : showSuccess ? <CheckCircle2 /> : <Save />}
             {isSaving ? 'Salvataggio...' : showSuccess ? 'Fatto!' : 'Salva Build Order'}
           </button>
         </div>
+
+        {/* Exit Confirmation Modal */}
+        {showExitConfirm && (
+          <div className="absolute inset-0 z-[7000] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
+            <div className="bg-[#1a1c23] border border-red-500/30 rounded-3xl p-8 max-w-md w-full text-center">
+              <AlertTriangle className="text-red-400 mx-auto mb-6" size={48} />
+              <h3 className="text-xl font-black text-white uppercase mb-2">Modifiche non salvate</h3>
+              <p className="text-gray-400 text-sm mb-8">Uscire senza salvare? I progressi andranno perduti.</p>
+              <div className="grid grid-cols-2 gap-4">
+                <button onClick={() => setShowExitConfirm(false)} className="py-3 bg-white/5 rounded-xl text-white font-bold">Annulla</button>
+                <button onClick={() => { setShowExitConfirm(false); onClose(); }} className="py-3 bg-red-600 rounded-xl text-white font-black uppercase">Esci</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
