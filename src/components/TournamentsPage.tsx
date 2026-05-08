@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament, fetchChallongeData } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
@@ -69,7 +69,7 @@ export function TournamentsPage() {
   const [bracketErrorId, setBracketErrorId] = useState<string | null>(null);
   const [returnPath, setReturnPath] = useState<string | null>(null);
   const regSectionRef = useRef<HTMLDivElement>(null);
-  
+  const navigate = useNavigate();
 
   const loadTournaments = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
