@@ -124,7 +124,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       throw new Error(errorMsg);
     }
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -142,24 +142,66 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             REGOLE DI ESTRAZIONE (CRITICHE):
             - COPRI TUTTA LA TIMELINE: Se la trascrizione arriva a 15-20 minuti, il tuo JSON deve arrivare a quel minutaggio. NON FERMARTI AI PRIMI 5 MINUTI.
             - NON RIASSUMERE: Estrai ogni passaggio rilevante. Mi aspetto 30-50 step per video lunghi.
-            - JSON valido con campi "description" e "steps" [{time, action, note}].
+            - Rispondi ESCLUSIVAMENTE con un oggetto JSON valido.
+            - Campi richiesti: "title" (string), "description" (string), "steps" (array di oggetti {time: string, action: string, note: string}).
             - Usa i timestamp [MM:SS] presenti nel testo.
             
             TESTO DA ANALIZZARE:
             ${textToAnalyze.substring(0, 60000)}` 
           }] 
-        }]
+        }],
+        generationConfig: {
+          temperature: 0.2,
+          topP: 0.8,
+          topK: 40,
+          responseMimeType: "application/json"
+        }
       })
     });
 
     const data = await response.json();
-    const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (resultText) {
-      const jsonMatch = resultText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) return res.status(200).json(JSON.parse(jsonMatch[0]));
+    
+    if (data.error) {
+      throw new Error(`Gemini API Error: ${data.error.message}`);
     }
 
-    throw new Error("L'IA non è riuscita a generare un JSON valido.");
+    const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!resultText) {
+      throw new Error("L'IA non ha restituito alcun contenuto.");
+    }
+
+    try {
+      // Robust JSON extraction
+      let jsonString = resultText.trim();
+      
+      // Remove markdown code blocks if present
+      if (jsonString.includes('```')) {
+        const matches = jsonString.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+        if (matches && matches[1]) {
+          jsonString = matches[1].trim();
+        }
+      }
+
+      // Final attempt to find the JSON object if there's still surrounding text
+      const firstBrace = jsonString.indexOf('{');
+      const lastBrace = jsonString.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace !== -1) {
+        jsonString = jsonString.substring(firstBrace, lastBrace + 1);
+      }
+
+      const parsedData = JSON.parse(jsonString);
+      
+      // Validation of structure
+      if (!parsedData.steps || !Array.isArray(parsedData.steps)) {
+        throw new Error("Il JSON generato non contiene l'array dei passaggi (steps).");
+      }
+
+      return res.status(200).json(parsedData);
+    } catch (e: any) {
+      console.error("JSON Parsing Error. Raw Text:", resultText);
+      throw new Error(`Errore nel parsing dei dati dell'IA: ${e.message}`);
+    }
 
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
