@@ -1,5 +1,4 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
 function getYoutubeId(url: string) {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -55,29 +54,44 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) throw new Error('GEMINI_API_KEY non trovata nelle variabili di ambiente di Vercel.');
+    if (!apiKey) throw new Error('API Key mancante su Vercel');
 
     const { combinedText } = await getYoutubeData(videoId);
-    if (combinedText.length < 20) throw new Error("YouTube ha bloccato il server. Riprova tra poco.");
+    if (combinedText.length < 20) throw new Error("Dati video non recuperabili.");
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const modelNames = ["gemini-3-flash", "gemini-1.5-flash", "gemini-pro"];
+    // CHIAMATA REST DIRETTA A GEMINI (Evitiamo librerie che danno problemi)
+    // Proviamo il modello 3 che vedi tu, se fallisce proviamo 1.5 flash
+    const models = ["gemini-3-flash", "gemini-1.5-flash"];
     let lastError = "";
 
-    for (const modelName of modelNames) {
+    for (const model of models) {
       try {
-        const model = genAI.getGenerativeModel({ model: modelName });
-        const result = await model.generateContent(`Estrai Build Order JSON da questo testo:\n\n${combinedText.substring(0, 20000)}`);
-        const responseText = result.response.text();
-        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) return res.status(200).json(JSON.parse(jsonMatch[0]));
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: `Analizza questo testo AoE4 ed estrai il Build Order in JSON (description, steps: {time, action, note}):\n\n${combinedText.substring(0, 30000)}` }] }]
+          })
+        });
+
+        const data = await response.json();
+        if (data.error) {
+          lastError = `${data.error.status}: ${data.error.message}`;
+          continue;
+        }
+
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) {
+          const jsonMatch = text.match(/\{[\s\S]*\}/);
+          if (jsonMatch) return res.status(200).json(JSON.parse(jsonMatch[0]));
+        }
       } catch (err: any) {
-        lastError = err.message || "Errore sconosciuto";
-        console.error(`Errore con ${modelName}:`, lastError);
+        lastError = err.message;
       }
     }
 
-    throw new Error(`Tutti i modelli hanno fallito. Ultimo errore di Google: "${lastError}"`);
+    throw new Error(`Errore finale Google: ${lastError}`);
 
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
