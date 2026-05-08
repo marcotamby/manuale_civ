@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, X, Loader2, Play, Map, Plus, Clock, Zap, Upload, MousePointer2, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2, ChevronUp, ChevronDown, AlertTriangle } from 'lucide-react';
+import { Save, X, Loader2, Play, Map, Plus, Clock, Zap, Upload, MousePointer2, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2, ChevronUp, ChevronDown, AlertTriangle, BrainCircuit, Sparkles } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { usePresence } from './PresenceContext';
@@ -48,6 +48,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
   const [isMapDropdownOpen, setIsMapDropdownOpen] = useState(false);
   const [mapSearch, setMapSearch] = useState('');
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const initialDataRef = useRef<string>('');
   const mapDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -200,6 +201,51 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
       toast.error(`Errore: ${err.message || 'Salvataggio fallito'}`);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleAIAnalysis = async () => {
+    if (!editedBO.source) {
+      toast.error("Inserisci prima un link YouTube");
+      return;
+    }
+
+    const videoId = getYoutubeId(editedBO.source);
+    if (!videoId) {
+      toast.error("Link YouTube non valido");
+      return;
+    }
+
+    try {
+      setIsAnalyzing(true);
+      const response = await fetch('/api/analyze-bo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ youtubeUrl: editedBO.source }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.details || error.error || 'Errore durante l\'analisi');
+      }
+
+      const data = await response.json();
+      
+      // Popolamento campi
+      setEditedBO(prev => ({
+        ...prev,
+        description: data.description || prev.description,
+        steps: data.steps && data.steps.length > 0 ? data.steps : prev.steps
+      }));
+
+      toast.success("Analisi completata! Controlla i campi popolati.");
+    } catch (err: any) {
+      console.error('AI Analysis Error:', err);
+      toast.error(`Errore IA: ${err.message}`);
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -586,14 +632,28 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
             </label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
               <div className="space-y-4">
-                <input
-                  type="text"
-                  value={editedBO.source || ''}
-                  onChange={e => setEditedBO(prev => ({ ...prev, source: e.target.value }))}
-                  placeholder="https://www.youtube.com/watch?v=..."
-                  className="w-full bg-black/40 border-2 border-white/10 rounded-xl px-4 py-3 text-sm text-red-200 focus:border-red-500/50 outline-none transition-all"
-                />
-                <p className="text-[10px] text-gray-500 italic">Incolla l'URL completo del video per mostrare l'anteprima.</p>
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    value={editedBO.source || ''}
+                    onChange={e => setEditedBO(prev => ({ ...prev, source: e.target.value }))}
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    className="flex-1 bg-black/40 border-2 border-white/10 rounded-xl px-4 py-3 text-sm text-red-200 focus:border-red-500/50 outline-none transition-all"
+                  />
+                  <button
+                    onClick={handleAIAnalysis}
+                    disabled={isAnalyzing || !editedBO.source}
+                    className={`px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 shadow-lg hover:shadow-purple-500/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${isAnalyzing ? 'animate-pulse' : ''}`}
+                  >
+                    {isAnalyzing ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                      <BrainCircuit size={14} />
+                    )}
+                    {isAnalyzing ? 'Analisi...' : 'Analizza con IA'}
+                  </button>
+                </div>
+                <p className="text-[10px] text-gray-500 italic">Incolla l'URL completo del video e premi 'Analizza con IA' per generare una bozza automatica.</p>
               </div>
               {editedBO.source && getYoutubeId(editedBO.source) && (
                 <div className="relative aspect-video rounded-2xl overflow-hidden border-2 border-red-500/20 group">
