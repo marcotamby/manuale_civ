@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, X, Loader2, Map, Plus, Clock, Zap, Upload, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2, ChevronUp, ChevronDown, AlertTriangle, BrainCircuit, FileText, PlayCircle } from 'lucide-react';
+import { Save, X, Loader2, Map, Plus, Clock, Zap, Upload, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2, ChevronUp, ChevronDown, AlertTriangle, BrainCircuit, FileText, PlayCircle, Play } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { usePresence } from './PresenceContext';
@@ -551,19 +551,28 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                 </button>
               </div>
 
-              {/* Video Preview inside Modal - Smaller version */}
-              {currentYoutubeId && (
-                <div className="mt-4 animate-in fade-in zoom-in-95 duration-500 flex justify-start">
-                   <div className="relative aspect-video w-full max-w-[320px] rounded-xl overflow-hidden border border-red-500/30 shadow-xl group">
-                     <iframe
-                        src={`https://www.youtube.com/embed/${currentYoutubeId}`}
-                        className="w-full h-full"
-                        allowFullScreen
-                     />
-                     <div className="absolute top-2 left-2 px-2 py-0.5 bg-red-600 text-white text-[8px] font-black uppercase rounded shadow-lg">Preview</div>
-                   </div>
-                </div>
-              )}
+               {/* Video Preview inside Modal - High Res Thumbnail instead of blurry iframe */}
+               {currentYoutubeId && (
+                 <div className="mt-4 animate-in fade-in zoom-in-95 duration-500 flex justify-start">
+                    <div className="relative aspect-video w-full max-w-[320px] rounded-xl overflow-hidden border-2 border-red-500/30 shadow-[0_0_30px_rgba(239,68,68,0.1)] group cursor-pointer">
+                      <img 
+                        src={`https://img.youtube.com/vi/${currentYoutubeId}/maxresdefault.jpg`} 
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        alt="Video Preview"
+                        onError={(e) => {
+                          // Fallback to hqdefault if maxres isn't available
+                          (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${currentYoutubeId}/hqdefault.jpg`;
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                        <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-transform">
+                          <Play fill="white" className="text-white ml-1" size={24} />
+                        </div>
+                      </div>
+                      <div className="absolute top-2 left-2 px-2 py-0.5 bg-red-600 text-white text-[8px] font-black uppercase rounded shadow-lg">Preview HD</div>
+                    </div>
+                 </div>
+               )}
             </div>
 
             <div className="h-px bg-white/5 w-full" />
