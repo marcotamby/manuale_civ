@@ -506,11 +506,17 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                   className="flex-1 bg-black/40 border-2 border-white/10 rounded-2xl px-6 py-4 text-sm text-red-200 outline-none focus:border-red-500/50 transition-all"
                 />
                 <button
-                  onClick={() => handleAIAnalysis(false)}
-                  disabled={isAnalyzing || !editedBO.source}
-                  className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 shadow-lg active:scale-95 disabled:opacity-30 transition-all"
+                  onClick={() => {
+                    if (getYoutubeId(editedBO.source || '')) {
+                      toast.success("Video aggiunto correttamente! Apparirà nel Build Order.");
+                    } else {
+                      toast.error("Link video non valido");
+                    }
+                  }}
+                  disabled={!editedBO.source}
+                  className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 border border-white/10 transition-all active:scale-95"
                 >
-                  {isAnalyzing ? <Loader2 size={14} className="animate-spin" /> : <Play size={14} fill="currentColor" />}
+                  <CheckCircle2 size={14} className="text-green-500" />
                   Aggiungi Video Guida
                 </button>
               </div>
