@@ -164,7 +164,8 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
 
   const getYoutubeId = (url: string) => {
     if (!url) return null;
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    // Regex aggiornata per supportare YouTube e Invidious (yewtu.be)
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|yewtu.be\/watch\?v=)([^#&?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
   };
@@ -217,7 +218,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
       return;
     }
 
-    const videoId = !showManualInput ? getYoutubeId(editedBO.source) : null;
+    const videoId = !showManualInput ? getYoutubeId(editedBO.source || '') : null;
     if (!showManualInput && !videoId) {
       toast.error("Link YouTube non valido");
       return;
