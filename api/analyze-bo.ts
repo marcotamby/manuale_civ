@@ -124,16 +124,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       body: JSON.stringify({
         contents: [{ 
           parts: [{ 
-            text: `Sei un esperto di Age of Empires 4. Analizza il seguente testo (descrizione e trascrizione) ed estrai il Build Order strutturato completo.
+            text: `Sei un esperto di Age of Empires 4. Analizza il seguente testo (descrizione e trascrizione) ed estrai il Build Order strutturato completo seguendo lo stile del sito "Manuale Civ".
             
-            REGOLE MANDATORIE:
-            1. Rispondi SEMPRE in ITALIANO. Usa termini come "vili/abitanti", "oro", "legna", "cibo".
-            2. Restituisci SOLO un JSON valido con campi "description" e "steps" [{time, action, note}].
-            3. NON RIASSUMERE. NON FERMARTI AI PRIMI MINUTI.
-            4. Devi mappare TUTTA la trascrizione, dall'inizio alla FINE. Se il testo arriva a 15 minuti, l'ultimo tuo step deve essere a 15 minuti.
-            5. Crea un nuovo step per ogni azione significativa (es. muovere vili, costruire edifici, ricercare tecnologie).
-            6. Se il video è lungo, mi aspetto ALMENO 30-40 passaggi nel JSON.
-            7. Il campo "time" deve essere "MM:SS" preso dai timestamp [MM:SS] presenti nel testo.
+            GUIDA DI STILE E TERMINOLOGIA (MANDATORIA):
+            1. LINGUA: Italiano tecnico.
+            2. UNITÀ: Usa "vili" o "abitanti". "Scout" diventa "Esploratore".
+            3. RISORSE: "Cibo", "Legna", "Oro", "Pietra".
+            4. EDIFICI: Iniziale maiuscola (es. Caserma, Poligono di Tiro, Centro Città).
+            5. MONUMENTI: Usa il termine "Monumento" per indicare i Landmark del passaggio di età.
+            6. AZIONI: Sii diretto. Es: "Sposta 3 vili dall'oro al cibo", "Inizia produzione costante di Lancieri".
+            7. NOTE: Devono essere suggerimenti tattici brevi (es: "Assicurati di non avere vili inattivi", "Costruisci case vicino al Centro Città").
+            
+            REGOLE DI ESTRAZIONE:
+            - NON RIASSUMERE. Copri l'intera timeline fino alla fine del testo.
+            - Estrai ALMENO 30 step se il video supera i 10 minuti.
+            - JSON valido con campi "description" e "steps" [{time, action, note}].
+            - Usa timestamp [MM:SS] precisi.
             
             TESTO DA ANALIZZARE:
             ${textToAnalyze.substring(0, 60000)}` 
