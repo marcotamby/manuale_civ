@@ -7,17 +7,28 @@ function getYoutubeId(url: string) {
 }
 
 async function getInvidiousData(videoId: string) {
-  // Proviamo yewtu.be che è una delle istanze Invidious più stabili
   const invidiousUrl = `https://yewtu.be/api/v1/videos/${videoId}`;
+  const captionsUrl = `https://yewtu.be/api/v1/captions/${videoId}`;
   try {
-    const response = await fetch(invidiousUrl);
-    const data = await response.json();
+    const videoRes = await fetch(invidiousUrl);
+    const videoData = await videoRes.json();
+    const description = videoData.description || "";
+
+    let transcript = "";
+    try {
+      const capRes = await fetch(captionsUrl);
+      const capData = await capRes.json();
+      // Prendiamo la prima traccia disponibile (solitamente italiano o inglese)
+      const track = capData.find((c: any) => c.label?.includes('Italian')) || capData[0];
+      if (track) {
+        const textRes = await fetch(`https://yewtu.be${track.url}`);
+        transcript = await textRes.text();
+        // Puliamo un po' il formato VTT/SRT se presente
+        transcript = transcript.replace(/^[0-9:.,\s-->]+$/gm, '').replace(/<[^>]*>/g, '');
+      }
+    } catch (e) {}
     
-    // Invidious fornisce spesso i sottotitoli in modo più pulito
-    const description = data.description || "";
-    // Nota: Invidious API non sempre dà la trascrizione intera in un colpo solo, 
-    // ma la descrizione spesso contiene il BO nei canali pro.
-    return { combinedText: `DESCRIZIONE (INVIDIOUS):\n${description}` };
+    return { combinedText: `DESCRIZIONE (INVIDIOUS):\n${description}\n\nTRASCRIZIONE (INVIDIOUS):\n${transcript}` };
   } catch (e) {
     return null;
   }
