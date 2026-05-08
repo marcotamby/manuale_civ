@@ -6,6 +6,12 @@ function getYoutubeId(url: string) {
   return (match && match[2].length === 11) ? match[2] : null;
 }
 
+function formatTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
 async function getInvidiousData(videoId: string) {
   const invidiousUrl = `https://yewtu.be/api/v1/videos/${videoId}`;
   const captionsUrl = `https://yewtu.be/api/v1/captions/${videoId}`;
@@ -18,13 +24,12 @@ async function getInvidiousData(videoId: string) {
     try {
       const capRes = await fetch(captionsUrl);
       const capData = await capRes.json();
-      // Prendiamo la prima traccia disponibile (solitamente italiano o inglese)
       const track = capData.find((c: any) => c.label?.includes('Italian')) || capData[0];
       if (track) {
         const textRes = await fetch(`https://yewtu.be${track.url}`);
         transcript = await textRes.text();
-        // Puliamo un po' il formato VTT/SRT se presente
-        transcript = transcript.replace(/^[0-9:.,\s-->]+$/gm, '').replace(/<[^>]*>/g, '');
+        // Invidious captions are often VTT. Let's keep the timestamps if possible.
+        // For simplicity, we'll let Gemini handle the VTT format which has [00:00.000 --> 00:00.000]
       }
     } catch (e) {}
     
@@ -58,11 +63,22 @@ async function getYoutubeData(videoId: string) {
         if (track && track.baseUrl) {
           const capRes = await fetch(track.baseUrl);
           const capXml = await capRes.text();
-          transcript = capXml.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+          
+          // ESTRAZIONE INTELLIGENTE: Manteniamo i tempi!
+          // Il formato XML di YouTube è <text start="12.34" dur="2.1">testo</text>
+          const regex = /<text start="([\d.]+)"[^>]*>([\s\S]*?)<\/text>/g;
+          let match;
+          const pieces = [];
+          while ((match = regex.exec(capXml)) !== null) {
+            const start = parseFloat(match[1]);
+            const text = match[2].replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+            pieces.push(`[${formatTime(start)}] ${text}`);
+          }
+          transcript = pieces.join('\n');
         }
       } catch (e) {}
     }
-    return { combinedText: `DESCRIZIONE:\n${description}\n\nTRASCRIZIONE:\n${transcript}` };
+    return { combinedText: `DESCRIZIONE:\n${description}\n\nTRASCRIZIONE CON TIMESTAMP:\n${transcript}` };
   } catch (error) { throw new Error("Errore YouTube"); }
 }
 
@@ -85,22 +101,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     } else if (youtubeUrl) {
       const videoId = getYoutubeId(youtubeUrl);
       if (videoId) {
-        // PROVA 1: YouTube Ufficiale
         try {
           const data = await getYoutubeData(videoId);
-          if (data.combinedText.length > 100) textToAnalyze = data.combinedText;
+          if (data.combinedText.length > 200) textToAnalyze = data.combinedText;
         } catch (e) {}
 
-        // PROVA 2: Invidious (Bypass) se la prima è fallita o povera
-        if (textToAnalyze.length < 100) {
+        if (textToAnalyze.length < 200) {
           const invData = await getInvidiousData(videoId);
           if (invData) textToAnalyze += "\n" + invData.combinedText;
         }
       }
     }
 
-    if (!textToAnalyze || textToAnalyze.length < 10) {
-      throw new Error("Impossibile recuperare dati dal video (YouTube blocca il server). Usa l'inserimento manuale in basso.");
+    if (!textToAnalyze || textToAnalyze.length < 20) {
+      throw new Error("Impossibile recuperare dati dal video. Usa l'inserimento manuale.");
     }
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
@@ -108,7 +122,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: `Estrai il Build Order AoE4 in JSON (description, steps: {time, action, note}).\n\nTESTO:\n${textToAnalyze.substring(0, 30000)}` }] }]
+        contents: [{ 
+          parts: [{ 
+            text: `Sei un esperto di Age of Empires 4. Analizza il seguente testo (che contiene descrizione e trascrizione con tempi) ed estrai il Build Order strutturato.
+            
+            REGOLE:
+            1. Restituisci SOLO un JSON valido.
+            2. Il JSON deve avere: "description" (testo), e "steps" (array di oggetti {time, action, note}).
+            3. Il campo "time" deve essere nel formato "MM:SS" (es. "0:45", "2:30"). USA I TIMESTAMP PRESENTI NELLA TRASCRIZIONE.
+            4. Se un'azione dura molto, indica il tempo di inizio.
+            
+            TESTO DA ANALIZZARE:
+            ${textToAnalyze.substring(0, 35000)}` 
+          }] 
+        }]
       })
     });
 
@@ -119,7 +146,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (jsonMatch) return res.status(200).json(JSON.parse(jsonMatch[0]));
     }
 
-    throw new Error("L'IA non ha trovato un Build Order chiaro in questo video.");
+    throw new Error("L'IA non è riuscita a generare un JSON valido.");
 
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
