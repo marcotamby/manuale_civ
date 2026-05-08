@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, X, Loader2, Map, Plus, Clock, Zap, Upload, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2, ChevronUp, ChevronDown, AlertTriangle, BrainCircuit, FileText, PlayCircle, Play } from 'lucide-react';
+import { Save, X, Loader2, Map, Plus, Clock, Zap, Upload, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2, ChevronUp, ChevronDown, AlertTriangle, BrainCircuit, FileText, PlayCircle, Play, MousePointer2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { usePresence } from './PresenceContext';
@@ -493,8 +493,27 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                 </label>
               </div>
               <div className="md:col-span-7">
-                <div className="relative w-full aspect-[21/6] rounded-2xl overflow-hidden border-2 border-white/10 bg-black/40">
-                  {editedBO.banner_url && <img src={editedBO.banner_url} className="w-full h-full object-cover" style={{ objectPosition: `${editedBO.banner_position_x ?? 50}% ${editedBO.banner_position ?? 50}%` }} onMouseDown={(e) => startDrag(e, editedBO.banner_position_x ?? 50, editedBO.banner_position ?? 50)} alt="Preview" />}
+                <div className={`relative w-full aspect-[21/6] rounded-2xl overflow-hidden border-2 transition-all duration-500 bg-black/40 group ${dragState ? 'border-yellow-500 shadow-[0_0_40px_rgba(234,179,8,0.3)] scale-[1.02]' : 'border-white/10 hover:border-white/20'}`}>
+                  {editedBO.banner_url ? (
+                    <>
+                      <img 
+                        src={editedBO.banner_url} 
+                        className={`w-full h-full object-cover select-none transition-transform duration-300 ${dragState ? 'cursor-grabbing' : 'cursor-grab hover:scale-105'}`} 
+                        style={{ objectPosition: `${editedBO.banner_position_x ?? 50}% ${editedBO.banner_position ?? 50}%` }} 
+                        onMouseDown={(e) => startDrag(e, editedBO.banner_position_x ?? 50, editedBO.banner_position ?? 50)} 
+                        alt="Preview" 
+                      />
+                      <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity pointer-events-none ${dragState ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                        <div className="bg-yellow-500 text-black px-4 py-2 rounded-xl text-[10px] font-black uppercase flex items-center gap-2 shadow-2xl scale-90 group-hover:scale-100 transition-transform">
+                          <MousePointer2 size={12} /> {dragState ? 'Rilascia per confermare' : 'Trascina per posizionare'}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <p className="text-[10px] font-black text-white/10 uppercase tracking-widest">Anteprima non disponibile</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
