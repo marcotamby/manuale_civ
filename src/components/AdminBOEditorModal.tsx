@@ -49,7 +49,6 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
   const [mapSearch, setMapSearch] = useState('');
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [showManualInput, setShowManualInput] = useState(false);
   const [manualText, setManualText] = useState('');
   const initialDataRef = useRef<string>('');
   const mapDropdownRef = useRef<HTMLDivElement>(null);
@@ -509,10 +508,10 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                 <button
                   onClick={() => handleAIAnalysis(false)}
                   disabled={isAnalyzing || !editedBO.source}
-                  className="px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 shadow-lg active:scale-95 disabled:opacity-30"
+                  className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 shadow-lg active:scale-95 disabled:opacity-30 transition-all"
                 >
-                  {isAnalyzing ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} fill="currentColor" />}
-                  Analizza Link Video
+                  {isAnalyzing ? <Loader2 size={14} className="animate-spin" /> : <Play size={14} fill="currentColor" />}
+                  Aggiungi Video Guida
                 </button>
               </div>
             </div>
@@ -526,42 +525,27 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                     <FileText className="text-cyan-400" size={20} />
                     Inserimento Manuale Trascrizione
                   </h3>
-                  <p className="text-[10px] text-gray-500 font-bold uppercase">Usa questa opzione se l'analisi automatica del link fallisce</p>
                 </div>
-                <button 
-                  onClick={() => setShowManualInput(!showManualInput)}
-                  className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${showManualInput ? 'bg-cyan-500 text-black' : 'bg-white/5 text-gray-500 hover:text-white'}`}
-                >
-                  {showManualInput ? 'Nascondi Box' : 'Apri Box Trascrizione'}
-                </button>
               </div>
 
-              {showManualInput && (
-                <div className="space-y-4 animate-in slide-in-from-top-4 duration-300">
-                  <textarea
-                    value={manualText}
-                    onChange={(e) => setManualText(e.target.value)}
-                    placeholder="Incolla qui la trascrizione completa del video..."
-                    className="w-full h-48 bg-black/60 border-2 border-cyan-500/20 rounded-2xl p-6 text-sm text-cyan-100 outline-none focus:border-cyan-500/50 transition-all placeholder:text-cyan-500/20"
-                  />
-                  <div className="flex justify-between items-center bg-cyan-500/5 border border-cyan-500/20 rounded-2xl p-4">
-                    <div className="flex items-center gap-3">
-                      <AlertTriangle className="text-cyan-400" size={20} />
-                      <p className="text-[10px] text-cyan-400/80 font-medium leading-relaxed max-w-md">
-                        Copia la trascrizione da YouTube (clicca sui tre puntini sotto il video → Mostra trascrizione) e incollala qui sopra.
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handleAIAnalysis(true)}
-                      disabled={isAnalyzing || !manualText.trim()}
-                      className="px-10 py-5 bg-cyan-500 hover:bg-cyan-400 text-black rounded-2xl font-black text-sm uppercase tracking-widest flex items-center gap-3 shadow-[0_0_30px_rgba(6,182,212,0.3)] active:scale-95 disabled:opacity-30 transition-all"
-                    >
-                      {isAnalyzing ? <Loader2 size={20} className="animate-spin" /> : <BrainCircuit size={20} />}
-                      Analizza Trascrizione con IA
-                    </button>
-                  </div>
+              <div className="space-y-4">
+                <textarea
+                  value={manualText}
+                  onChange={(e) => setManualText(e.target.value)}
+                  placeholder="Incolla qui la trascrizione completa del video..."
+                  className="w-full min-h-[180px] bg-black/60 border-2 border-cyan-500/20 rounded-2xl p-6 text-sm text-cyan-100 outline-none focus:border-cyan-500/50 transition-all placeholder:text-cyan-500/20 resize-y"
+                />
+                <div className="flex justify-end items-center">
+                  <button
+                    onClick={() => handleAIAnalysis(true)}
+                    disabled={isAnalyzing || !manualText.trim()}
+                    className="px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-black rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 shadow-[0_0_20px_rgba(6,182,212,0.2)] active:scale-95 disabled:opacity-30 transition-all"
+                  >
+                    {isAnalyzing ? <Loader2 size={16} className="animate-spin" /> : <BrainCircuit size={16} />}
+                    Analizza Trascrizione con IA
+                  </button>
                 </div>
-              )}
+              </div>
             </div>
           </div>
 
@@ -612,7 +596,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
 
         {/* Footer */}
         <div className="px-8 py-6 border-t border-white/5 bg-black/40 flex justify-end gap-4">
-          <button onClick={handleClose} className="px-6 py-3 text-sm font-bold text-gray-400 hover:text-white transition-colors">Annulla</button>
+          <button onClick={onClose} className="px-6 py-3 text-sm font-bold text-gray-400 hover:text-white transition-colors">Annulla</button>
           <button onClick={handleSave} disabled={isSaving || showSuccess} className={`px-10 py-4 ${showSuccess ? 'bg-green-600' : 'bg-gradient-to-r from-cyan-600 to-blue-600'} text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-3`}>
             {isSaving ? <Loader2 className="animate-spin" /> : showSuccess ? <CheckCircle2 /> : <Save />}
             {isSaving ? 'Salvataggio...' : showSuccess ? 'Fatto!' : 'Salva Build Order'}
