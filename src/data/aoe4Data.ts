@@ -6599,7 +6599,7 @@ export const civilizationsData: Civilization[] = [
   {
     "id": "jin-dynasty",
     "name": "Dinastia Jin",
-    "flag": "/civs/Jin Dynasty.png",
+    "flag": "/civs/Jin Dynasty.webp",
     "difficulty": "Difficile",
     "shortDescription": "Una civiltà focalizzata su potenti unità d'élite e una solida difesa interna.",
     "passiveBonuses": [
