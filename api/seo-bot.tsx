@@ -59,10 +59,18 @@ export default async function handler(req: Request) {
 
     // Generate dynamic OG image URL
     const base = url.origin;
+    
+    // Prefer .png for flags if it's a relative path from public/civs
+    let finalImage = image;
+    if (!image.startsWith('http') && image.startsWith('/civs/') && image.endsWith('.webp')) {
+      finalImage = image.replace('.webp', '.png');
+    }
+    
+    const encodedImage = finalImage.startsWith('http') ? finalImage : `${base}${finalImage}`;
     const ogImageUrl = new URL(`${base}/api/og`);
     ogImageUrl.searchParams.set('title', title.replace(' | Manuale Civ', ''));
     ogImageUrl.searchParams.set('description', description.length > 100 ? description.substring(0, 97) + '...' : description);
-    ogImageUrl.searchParams.set('image', image.startsWith('http') ? image : `${base}${image}`);
+    ogImageUrl.searchParams.set('image', encodeURI(encodedImage));
     if (subtitle) ogImageUrl.searchParams.set('subtitle', subtitle);
 
     const finalImageUrl = ogImageUrl.toString();
@@ -80,7 +88,7 @@ export default async function handler(req: Request) {
           <meta property="og:image" content="${finalImageUrl}" />
           <meta property="og:image:width" content="1200" />
           <meta property="og:image:height" content="630" />
-          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:card" content="summary" />
           <meta name="twitter:title" content="${title}" />
           <meta name="twitter:description" content="${description}" />
           <meta name="twitter:image" content="${finalImageUrl}" />

@@ -25,40 +25,51 @@ export default async function handler(req: Request) {
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: '#0a0a0b',
-            backgroundImage: `linear-gradient(rgba(10, 10, 11, 0.8), rgba(10, 10, 11, 0.8)), url(${image})`,
+            backgroundImage: `radial-gradient(circle at center, rgba(10, 10, 11, 0.5) 0%, rgba(10, 10, 11, 0.9) 100%), url("${image}")`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             fontFamily: 'sans-serif',
           }}
         >
+          {/* Decorative Border */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 20,
+              border: '1px solid rgba(212, 175, 55, 0.2)',
+              borderRadius: 20,
+            }}
+          />
+
           {/* Logo Area */}
           <div
             style={{
               position: 'absolute',
-              top: 40,
-              left: 60,
+              top: 60,
+              left: 80,
               display: 'flex',
               alignItems: 'center',
-              gap: 10,
+              gap: 12,
             }}
           >
             <div
               style={{
-                width: 40,
-                height: 40,
-                borderRadius: 8,
+                width: 44,
+                height: 44,
+                borderRadius: 10,
                 backgroundColor: '#d4af37',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontWeight: 'bold',
                 color: 'black',
-                fontSize: 24,
+                fontSize: 28,
+                boxShadow: '0 4px 12px rgba(212, 175, 55, 0.3)',
               }}
             >
               M
             </div>
-            <div style={{ color: 'white', fontSize: 24, fontWeight: 'bold', letterSpacing: -1 }}>
+            <div style={{ color: 'white', fontSize: 28, fontWeight: 'bold', letterSpacing: -0.5 }}>
               Manuale Civ
             </div>
           </div>
