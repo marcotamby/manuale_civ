@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 interface SEOProps {
@@ -21,14 +22,19 @@ export function SEO({
 }: SEOProps) {
   const siteTitle = title.includes('Manuale Civ') ? title : `${title} | Manuale Civ`;
 
-  // Dynamic OG image URL
-  const ogImageUrl = new URL('https://manualeciv.it/api/og');
-  ogImageUrl.searchParams.set('title', title.replace(' | Manuale Civ', ''));
-  ogImageUrl.searchParams.set('description', description.length > 100 ? description.substring(0, 97) + '...' : description);
-  ogImageUrl.searchParams.set('image', image.startsWith('http') ? image : `https://manualeciv.it${image}`);
-  if (subtitle) ogImageUrl.searchParams.set('subtitle', subtitle);
-
-  const finalImageUrl = ogImageUrl.toString();
+  // Dynamic OG image URL - Memoized for performance
+  const finalImageUrl = useMemo(() => {
+    try {
+      const ogImageUrl = new URL('https://manualeciv.it/api/og');
+      ogImageUrl.searchParams.set('title', title.replace(' | Manuale Civ', ''));
+      ogImageUrl.searchParams.set('description', description.length > 100 ? description.substring(0, 97) + '...' : description);
+      ogImageUrl.searchParams.set('image', image.startsWith('http') ? image : `https://manualeciv.it${image}`);
+      if (subtitle) ogImageUrl.searchParams.set('subtitle', subtitle);
+      return ogImageUrl.toString();
+    } catch (e) {
+      return image.startsWith('http') ? image : `https://manualeciv.it${image}`;
+    }
+  }, [title, description, image, subtitle]);
 
   return (
     <Helmet>
