@@ -1,5 +1,27 @@
 {
   "rewrites": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(Discordbot|Twitterbot|facebookexternalhit|LinkedInBot|TelegramBot|WhatsApp|Slackbot|Googlebot).*"
+        }
+      ],
+      "destination": "/api/seo-bot?path=/"
+    },
+    {
+      "source": "/civ/:path*",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(Discordbot|Twitterbot|facebookexternalhit|LinkedInBot|TelegramBot|WhatsApp|Slackbot|Googlebot).*"
+        }
+      ],
+      "destination": "/api/seo-bot?path=/civ/:path*"
+    },
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
