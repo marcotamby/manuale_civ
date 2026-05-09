@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import React, { useMemo, memo } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 interface SEOProps {
@@ -11,7 +11,7 @@ interface SEOProps {
   subtitle?: string;
 }
 
-export function SEO({ 
+export const SEO = memo(({ 
   title = 'Manuale Civ - Age of Empires 4 Guides', 
   description = 'Il manuale definitivo per Age of Empires 4. Build order, civiltà, strategie e molto altro.',
   image = 'https://manualeciv.it/header-bg.png', 
@@ -19,7 +19,7 @@ export function SEO({
   type = 'website',
   jsonLd,
   subtitle
-}: SEOProps) {
+}: SEOProps) => {
   const siteTitle = title.includes('Manuale Civ') ? title : `${title} | Manuale Civ`;
 
   // Dynamic OG image URL - Memoized for performance
@@ -64,4 +64,4 @@ export function SEO({
       )}
     </Helmet>
   );
-}
+});
