@@ -31,8 +31,8 @@ async function getInvidiousData(videoId: string) {
         // Invidious captions are often VTT. Let's keep the timestamps if possible.
         // For simplicity, we'll let Gemini handle the VTT format which has [00:00.000 --> 00:00.000]
       }
-    } catch (e) {}
-    
+    } catch (e) { }
+
     return { combinedText: `DESCRIZIONE (INVIDIOUS):\n${description}\n\nTRASCRIZIONE (INVIDIOUS):\n${transcript}` };
   } catch (e) {
     return null;
@@ -57,13 +57,13 @@ async function getYoutubeData(videoId: string) {
     if (captionMatch) {
       try {
         const captionTracks = JSON.parse(captionMatch[1]);
-        const track = captionTracks.find((t: any) => t.languageCode?.startsWith('it')) || 
-                      captionTracks.find((t: any) => t.languageCode?.startsWith('en')) || 
-                      captionTracks[0];
+        const track = captionTracks.find((t: any) => t.languageCode?.startsWith('it')) ||
+          captionTracks.find((t: any) => t.languageCode?.startsWith('en')) ||
+          captionTracks[0];
         if (track && track.baseUrl) {
           const capRes = await fetch(track.baseUrl);
           const capXml = await capRes.text();
-          
+
           // ESTRAZIONE INTELLIGENTE: Manteniamo i tempi!
           // Il formato XML di YouTube è <text start="12.34" dur="2.1">testo</text>
           const regex = /<text start="([\d.]+)"[^>]*>([\s\S]*?)<\/text>/g;
@@ -76,7 +76,7 @@ async function getYoutubeData(videoId: string) {
           }
           transcript = pieces.join('\n');
         }
-      } catch (e) {}
+      } catch (e) { }
     }
     return { combinedText: `DESCRIZIONE:\n${description}\n\nTRASCRIZIONE CON TIMESTAMP:\n${transcript}` };
   } catch (error) { throw new Error("Errore YouTube"); }
@@ -90,10 +90,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   let body = req.body;
   if (typeof body === 'string') {
-    try { body = JSON.parse(body); } catch (e) {}
+    try { body = JSON.parse(body); } catch (e) { }
   }
   const { youtubeUrl, rawText } = body || {};
-  
+
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error('API Key mancante');
@@ -108,7 +108,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         try {
           const data = await getYoutubeData(videoId);
           if (data.combinedText.length > 200) textToAnalyze = data.combinedText;
-        } catch (e) {}
+        } catch (e) { }
 
         if (textToAnalyze.length < 200) {
           const invData = await getInvidiousData(videoId);
@@ -118,8 +118,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (!textToAnalyze || textToAnalyze.length < 20) {
-      const errorMsg = rawText 
-        ? "La trascrizione fornita è troppo breve o non valida per l'analisi." 
+      const errorMsg = rawText
+        ? "La trascrizione fornita è troppo breve o non valida per l'analisi."
         : "Impossibile recuperare dati dal video automaticamente. Usa l'inserimento manuale incollando la trascrizione.";
       throw new Error(errorMsg);
     }
@@ -129,8 +129,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ 
-          parts: [{ 
+        contents: [{
+          parts: [{
             text: `Sei un esperto di Age of Empires 4. Analizza il seguente testo (descrizione e trascrizione) ed estrai il Build Order strutturato completo seguendo lo stile del sito "Manuale Civ".
             
             REGOLE DI STILE MANDATORIE:
@@ -147,8 +147,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             - Usa i timestamp [MM:SS] presenti nel testo.
             
             TESTO DA ANALIZZARE:
-            ${textToAnalyze.substring(0, 60000)}` 
-          }] 
+            ${textToAnalyze.substring(0, 60000)}`
+          }]
         }],
         generationConfig: {
           temperature: 0.2,
@@ -159,13 +159,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     const data = await response.json();
-    
+
     if (data.error) {
       throw new Error(`Gemini API Error: ${data.error.message}`);
     }
 
     const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    
+
     if (!resultText) {
       throw new Error("L'IA non ha restituito alcun contenuto.");
     }
@@ -173,7 +173,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
       // Robust JSON extraction
       let jsonString = resultText.trim();
-      
+
       // Remove markdown code blocks if present
       if (jsonString.includes('```')) {
         const matches = jsonString.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
@@ -190,7 +190,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       const parsedData = JSON.parse(jsonString);
-      
+
       // Validation of structure
       if (!parsedData.steps || !Array.isArray(parsedData.steps)) {
         throw new Error("Il JSON generato non contiene l'array dei passaggi (steps).");

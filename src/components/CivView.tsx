@@ -13,6 +13,7 @@ import { ResourceText } from './ResourceText';
 import { SocialProofPopup } from './SocialProofPopup';
 import { RANK_ICONS } from './ProfileModal';
 import { EditSuggestionForm } from './EditSuggestionForm';
+import { SEO } from './SEO';
 
 const getYoutubeId = (url: string) => {
   if (!url) return null;
@@ -116,7 +117,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   
   const seoDescription = selectedBO
     ? selectedBO.description || `Migliora il tuo gioco con questa build order per ${civ?.name} su Manuale Civ.`
-    : civ?.short_description || `Scopri tutto sulla civiltà ${civ?.name} in Age of Empires 4: unità uniche, monumenti e strategie.`;
+    : civ?.shortDescription || `Scopri tutto sulla civiltà ${civ?.name} in Age of Empires 4: unità uniche, monumenti e strategie.`;
 
   // JSON-LD
   const jsonLd = civ ? {
