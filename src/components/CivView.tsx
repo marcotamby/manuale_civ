@@ -869,17 +869,20 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
     ));
   };
 
-  if (!civ) return <div className="text-gray-400 p-8">Civiltà non trovata.</div>;
-
   return (
-    <div className="flex-1 overflow-y-auto overflow-x-hidden w-full civ-view-container">
+    <div className="flex-1 flex flex-col overflow-hidden">
       <SEO 
         title={seoTitle}
         description={seoDescription}
-        image={selectedBO?.banner_url || civ.flag}
+        image={selectedBO?.banner_url || civ?.flag}
         jsonLd={jsonLd}
         subtitle={selectedBO ? "Build Order" : "Guida Civiltà"}
       />
+      
+      {!civ ? (
+        <div className="text-gray-400 p-8">Civiltà non trovata o caricamento in corso...</div>
+      ) : (
+        <div className="flex-1 overflow-y-auto overflow-x-hidden w-full civ-view-container">
       {/* Unified Cinematic Top Section (Header + Navbar) */}
       <div className="relative bg-[#121212]">
         {/* Unified Cinematic Fading Flag Background - Spans both Header and Navbar */}
@@ -2116,6 +2119,8 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               </button>
             </div>
           </div>
+        </div>
+      )}
         </div>
       )}
     </div>
