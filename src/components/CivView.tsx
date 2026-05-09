@@ -107,6 +107,46 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
   // Find selected BO for overlay
   const selectedBO = civ?.buildOrders?.find(bo => bo.id === selectedBOId);
 
+  // SEO Metadata
+  const seoTitle = selectedBO 
+    ? `Build Order ${civ?.name}: ${selectedBO.title}`
+    : civ 
+      ? `Guida Civiltà ${civ.name} - Strategie e Build Orders`
+      : 'Guida Civiltà Age of Empires 4';
+  
+  const seoDescription = selectedBO
+    ? selectedBO.description || `Migliora il tuo gioco con questa build order per ${civ?.name} su Manuale Civ.`
+    : civ?.short_description || `Scopri tutto sulla civiltà ${civ?.name} in Age of Empires 4: unità uniche, monumenti e strategie.`;
+
+  // JSON-LD
+  const jsonLd = civ ? {
+    "@context": "https://schema.org",
+    "@type": selectedBO ? "HowTo" : "Article",
+    "name": seoTitle,
+    "description": seoDescription,
+    "image": selectedBO?.banner_url || civ.flag,
+    "author": {
+      "@type": "Person",
+      "name": selectedBO?.author_nickname || "Manuale Civ Staff"
+    },
+    ...(selectedBO ? {
+      "step": selectedBO.steps.map((step, index) => ({
+        "@type": "HowToStep",
+        "position": index + 1,
+        "text": `${step.time} - ${step.action} ${step.note ? `(${step.note})` : ''}`
+      }))
+    } : {
+      "publisher": {
+        "@type": "Organization",
+        "name": "Manuale Civ",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://manualeciv.it/favicon.png"
+        }
+      }
+    })
+  } : undefined;
+
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string, type: 'question' | 'answer' } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -825,6 +865,13 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
   return (
     <div className="flex-1 overflow-y-auto overflow-x-hidden w-full civ-view-container">
+      <SEO 
+        title={seoTitle}
+        description={seoDescription}
+        image={selectedBO?.banner_url || civ.flag}
+        jsonLd={jsonLd}
+        subtitle={selectedBO ? "Build Order" : "Guida Civiltà"}
+      />
       {/* Unified Cinematic Top Section (Header + Navbar) */}
       <div className="relative bg-[#121212]">
         {/* Unified Cinematic Fading Flag Background - Spans both Header and Navbar */}

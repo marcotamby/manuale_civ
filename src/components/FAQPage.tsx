@@ -24,6 +24,8 @@ import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
+import { SEO } from './SEO';
+
 
 interface FAQItem {
   id?: string;
@@ -416,8 +418,26 @@ export function FAQPage() {
     );
   }
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": sections.flatMap(s => s.items.map(i => ({
+      "@type": "Question",
+      "name": i.label,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": i.description
+      }
+    })))
+  };
+
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-8 h-full lg:bg-transparent bg-[#0a0a0b] text-gray-300 elegant-scrollbar relative z-10">
+      <SEO 
+        title="FAQ - Domande Frequenti | Manuale Civ"
+        description="Trova risposta a tutte le tue domande su Age of Empires 4 e su come utilizzare al meglio il Manuale delle Civiltà."
+        jsonLd={faqJsonLd}
+      />
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <button 

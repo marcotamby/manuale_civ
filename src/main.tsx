@@ -13,18 +13,22 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 const GOOGLE_CLIENT_ID = "403799038562-p202o225j2vf0k72fbjbmeqgrntmr6su.apps.googleusercontent.com";
 console.log("Manuale Civ v0.1.0-beta - Social Betting Refined");
 
+import { HelmetProvider } from 'react-helmet-async'
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-        <AuthProvider>
-          <PresenceProvider>
-            <CivDataProvider>
-              <App />
-            </CivDataProvider>
-          </PresenceProvider>
-        </AuthProvider>
-      </GoogleOAuthProvider>
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+          <AuthProvider>
+            <PresenceProvider>
+              <CivDataProvider>
+                <App />
+              </CivDataProvider>
+            </PresenceProvider>
+          </AuthProvider>
+        </GoogleOAuthProvider>
+      </BrowserRouter>
+    </HelmetProvider>
   </StrictMode>,
 )

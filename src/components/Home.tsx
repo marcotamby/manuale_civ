@@ -5,6 +5,7 @@ import { useCivData } from './CivContext';
 import { CustomSelect } from './CustomSelect';
 import { Heart, BarChart2, Zap, Shield } from 'lucide-react';
 import { useAuth } from './AuthContext';
+import { SEO } from './SEO';
 
 interface HomeProps {
   onSelectCiv: (civId: string, tab?: string) => void;
@@ -68,6 +69,10 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
 
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 h-full bg-[var(--color-brand-dark)] lg:bg-transparent select-none relative z-10">
+      <SEO 
+        title="Manuale Civ - Age of Empires 4 Guides & Build Orders"
+        description="Scopri le migliori strategie, build order e guide dettagliate per tutte le civiltà di Age of Empires 4. Il manuale definitivo per migliorare il tuo gioco."
+      />
       <header className="mb-4 md:mb-8 flex flex-col gap-2 md:gap-4 shrink-0">
         <div className="flex flex-col md:flex-row md:items-center justify-start gap-3 md:gap-4">
           <div className="hidden lg:block">
