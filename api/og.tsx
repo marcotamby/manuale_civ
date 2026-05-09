@@ -1,11 +1,10 @@
 import { ImageResponse } from '@vercel/og';
-import { NextRequest } from 'next/server';
 
 export const config = {
   runtime: 'edge',
 };
 
-export default async function handler(req: NextRequest) {
+export default async function handler(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
 
@@ -59,7 +58,7 @@ export default async function handler(req: NextRequest) {
             >
               M
             </div>
-            <div style={{ color: 'white', fontSize: 24, fontWeight: 'bold', trackingTight: -1 }}>
+            <div style={{ color: 'white', fontSize: 24, fontWeight: 'bold', letterSpacing: -1 }}>
               Manuale Civ
             </div>
           </div>
