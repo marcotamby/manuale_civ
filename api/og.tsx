@@ -24,76 +24,37 @@ export default async function handler(req: Request) {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#0a0a0b',
-            backgroundImage: `radial-gradient(circle at center, rgba(10, 10, 11, 0.5) 0%, rgba(10, 10, 11, 0.9) 100%), url("${image}")`,
+            backgroundColor: '#121214',
+            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url("${image}")`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             fontFamily: 'sans-serif',
           }}
         >
-          {/* Decorative Border */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: 20,
-              border: '1px solid rgba(212, 175, 55, 0.2)',
-              borderRadius: 20,
-            }}
-          />
-
-          {/* Logo Area */}
-          <div
-            style={{
-              position: 'absolute',
-              top: 60,
-              left: 80,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-            }}
-          >
-            <div
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 10,
-                backgroundColor: '#d4af37',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 'bold',
-                color: 'black',
-                fontSize: 28,
-                boxShadow: '0 4px 12px rgba(212, 175, 55, 0.3)',
-              }}
-            >
-              M
-            </div>
-            <div style={{ color: 'white', fontSize: 28, fontWeight: 'bold', letterSpacing: -0.5 }}>
-              Manuale Civ
-            </div>
-          </div>
-
-          {/* Main Content */}
+          {/* Main Container with Glassmorphism effect for content */}
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '0 80px',
+              backgroundColor: 'rgba(0, 0, 0, 0.6)',
+              padding: '40px 60px',
+              borderRadius: '24px',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              maxWidth: '90%',
               textAlign: 'center',
             }}
           >
             {subtitle && (
               <div
                 style={{
-                  fontSize: 24,
+                  fontSize: 28,
                   fontWeight: 'bold',
                   color: '#d4af37',
                   textTransform: 'uppercase',
-                  letterSpacing: 4,
-                  marginBottom: 20,
+                  letterSpacing: 6,
+                  marginBottom: 16,
                 }}
               >
                 {subtitle}
@@ -101,14 +62,11 @@ export default async function handler(req: Request) {
             )}
             <div
               style={{
-                fontSize: 72,
+                fontSize: 64,
                 fontWeight: 'bold',
                 color: 'white',
                 lineHeight: 1.1,
-                marginBottom: 30,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
+                marginBottom: 24,
               }}
             >
               {title}
@@ -116,8 +74,7 @@ export default async function handler(req: Request) {
             <div
               style={{
                 fontSize: 32,
-                color: '#9ca3af',
-                maxWidth: 800,
+                color: '#e5e7eb',
                 lineHeight: 1.4,
               }}
             >
@@ -125,19 +82,45 @@ export default async function handler(req: Request) {
             </div>
           </div>
 
-          {/* Bottom Badge */}
+          {/* Logo Branding */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 40,
+              left: 60,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+            }}
+          >
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 8,
+                backgroundColor: '#d4af37',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 'bold',
+                color: 'black',
+                fontSize: 22,
+              }}
+            >
+              M
+            </div>
+            <div style={{ color: 'white', fontSize: 22, fontWeight: 'bold' }}>
+              Manuale Civ
+            </div>
+          </div>
+
           <div
             style={{
               position: 'absolute',
               bottom: 40,
               right: 60,
-              display: 'flex',
-              padding: '10px 24px',
-              backgroundColor: 'rgba(212, 175, 55, 0.15)',
-              border: '1px solid rgba(212, 175, 55, 0.3)',
-              borderRadius: 100,
-              color: '#d4af37',
-              fontSize: 20,
+              color: '#9ca3af',
+              fontSize: 18,
               fontWeight: 'bold',
               textTransform: 'uppercase',
               letterSpacing: 2,
