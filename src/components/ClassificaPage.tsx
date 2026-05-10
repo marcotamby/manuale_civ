@@ -610,7 +610,7 @@ export function ClassificaPage() {
           </div>
         </div>
         <div className="overflow-x-auto pb-4">
-          <table className="min-w-full text-sm">
+          <table className="w-max min-w-full text-sm">
             <thead>
               <tr className="border-b border-white/10 bg-white/[0.03] sticky top-0">
                 {allKeys.map((key, i) => (
@@ -618,7 +618,7 @@ export function ClassificaPage() {
                     key={key}
                     onClick={() => handleSort(key)}
                     className={`pl-4 py-3 text-left font-bold text-white uppercase tracking-wider whitespace-nowrap text-xs cursor-pointer select-none ${
-                      i === allKeys.length - 1 ? 'pr-4 min-w-[160px]' : 'pr-4'
+                      key === '_scudi_totali' || i === allKeys.length - 1 ? 'pr-10 min-w-[180px]' : 'pr-4'
                     }`}
                   >
                     <div className="inline-flex items-center gap-2">
@@ -629,8 +629,6 @@ export function ClassificaPage() {
                     </div>
                   </th>
                 ))}
-                {/* Spacer column to prevent clipping */}
-                <th className="w-12 min-w-[48px] border-b border-transparent"></th>
               </tr>
             </thead>
             <tbody>
@@ -640,14 +638,12 @@ export function ClassificaPage() {
                     <td 
                       key={`${idx}-${key}`} 
                       className={`pl-4 py-3 text-white max-w-xs ${
-                        i === allKeys.length - 1 ? 'pr-4' : 'pr-4'
+                        key === '_scudi_totali' || i === allKeys.length - 1 ? 'pr-10' : 'pr-4'
                       }`}
                     >
                       {formatValue(item[key], key, item)}
                     </td>
                   ))}
-                  {/* Spacer cell */}
-                  <td className="w-12 min-w-[48px]"></td>
                 </tr>
               ))}
             </tbody>
