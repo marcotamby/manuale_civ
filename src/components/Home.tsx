@@ -98,11 +98,11 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                   if (isCompareMode) setIsCompareMode(false);
                 }}
                 className={`flex-1 flex items-center justify-center gap-1.5 px-3 md:px-4 h-full rounded-lg text-xs sm:text-sm font-bold transition-all ${isBOMode
-                  ? 'bg-gradient-to-r from-cyan-400/80 to-cyan-600/60 text-white shadow-[0_0_20px_rgba(34,211,238,0.3)] border border-cyan-400/50'
+                  ? 'bg-neutral-950 text-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.15)] border border-cyan-400/40'
                   : 'text-gray-400 hover:text-gray-200'
                   }`}
               >
-                <Zap size={14} fill={isBOMode ? 'white' : 'none'} className={isBOMode ? 'drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]' : ''} />
+                <Zap size={14} fill={isBOMode ? 'currentColor' : 'none'} className={isBOMode ? 'drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]' : ''} />
                 <span className="whitespace-nowrap">Build Orders</span>
               </button>
             </div>
@@ -119,7 +119,9 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                   }
                 }}
                 className={`flex-1 flex items-center justify-center gap-1.5 px-3 md:px-4 h-full rounded-lg text-xs sm:text-sm font-bold transition-all ${isCompareMode
-                  ? selectedForCompare.length === 2 ? 'bg-green-600 text-white shadow-[0_0_15px_rgba(22,163,74,0.4)]' : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                  ? selectedForCompare.length === 2 
+                    ? 'bg-green-600 text-white shadow-[0_0_15px_rgba(22,163,74,0.4)]' 
+                    : 'bg-neutral-950 text-red-400 border border-red-500/40 shadow-[0_0_15px_rgba(239,68,68,0.15)]'
                   : 'text-gray-400 hover:text-gray-200'
                   }`}
               >
@@ -137,11 +139,11 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
               <button
                 onClick={() => setDifficultyFilter(difficultyFilter === 'Preferiti' ? 'Tutte' : 'Preferiti')}
                 className={`flex items-center justify-center px-3 h-full rounded-lg transition-all ${difficultyFilter === 'Preferiti'
-                  ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]'
+                  ? 'bg-neutral-950 text-red-500 border border-red-500/40 shadow-[0_0_15px_rgba(239,68,68,0.15)]'
                   : 'text-gray-400 hover:text-gray-200'
                   }`}
               >
-                <Heart size={16} fill={difficultyFilter === 'Preferiti' ? 'white' : 'none'} />
+                <Heart size={16} fill={difficultyFilter === 'Preferiti' ? 'currentColor' : 'none'} />
               </button>
             </div>
           </div>
