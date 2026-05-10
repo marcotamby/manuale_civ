@@ -6,6 +6,11 @@ function getYoutubeId(url: string) {
   return (match && match[2].length === 11) ? match[2] : null;
 }
 
+function getAoe4Id(url: string) {
+  const match = url.match(/aoe4guides\.com\/builds\/([a-zA-Z0-9]+)/);
+  return match ? match[1] : null;
+}
+
 function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
@@ -82,6 +87,45 @@ async function getYoutubeData(videoId: string) {
   } catch (error) { throw new Error("Errore YouTube"); }
 }
 
+async function getAoe4GuidesData(buildId: string) {
+  const apiUrl = `https://aoe4guides.com/api/builds/${buildId}`;
+  try {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    
+    let schematicText = `FONTE: AOE4 GUIDES\nTITOLO: ${data.title}\n`;
+    schematicText += `DESCRIZIONE GENERALE: ${data.description || 'Nessuna'}\n\n`;
+    schematicText += `PASSI DELLA BUILD ORDER:\n`;
+
+    data.steps?.forEach((ageBlock: any) => {
+      const ageName = ageBlock.age === 0 ? 'Inizio' : `Età ${ageBlock.age}`;
+      schematicText += `\n--- ${ageName} ---\n`;
+      ageBlock.steps?.forEach((step: any) => {
+        // Pulizia icone e HTML
+        let stepDesc = step.description
+          .replace(/<img[^>]+title="([^"]+)"[^>]*>/g, '[$1]')
+          .replace(/&nbsp;/g, ' ')
+          .replace(/<br\s*\/?>/g, '\n')
+          .replace(/<[^>]+>/g, '');
+        
+        const res = [];
+        if (step.food) res.push(`${step.food} Cibo`);
+        if (step.wood) res.push(`${step.wood} Legna`);
+        if (step.gold) res.push(`${step.gold} Oro`);
+        if (step.stone) res.push(`${step.stone} Pietra`);
+        if (step.villagers) res.push(`${step.villagers} Villi totali`);
+        
+        const resStr = res.length > 0 ? ` {Distribuzione: ${res.join(', ')}}` : '';
+        schematicText += `[${step.time}] ${stepDesc}${resStr}\n`;
+      });
+    });
+
+    return { combinedText: schematicText };
+  } catch (error) {
+    return null;
+  }
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -104,6 +148,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       textToAnalyze = rawText;
     } else if (youtubeUrl) {
       const videoId = getYoutubeId(youtubeUrl);
+      const aoeId = getAoe4Id(youtubeUrl);
+
       if (videoId) {
         try {
           const data = await getYoutubeData(videoId);
@@ -114,6 +160,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           const invData = await getInvidiousData(videoId);
           if (invData) textToAnalyze += "\n" + invData.combinedText;
         }
+      } else if (aoeId) {
+        const aoeData = await getAoe4GuidesData(aoeId);
+        if (aoeData) textToAnalyze = aoeData.combinedText;
       }
     }
 
@@ -140,8 +189,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             4. AZIONI: Sii diretto e schematico.
             
             REGOLE DI ESTRAZIONE (CRITICHE):
+            - ESPANSIONE: Se i dati provengono da AOE4 GUIDES (lo vedi nell'intestazione FONTE), i passaggi sono schematici. Il tuo compito è espanderli in frasi complete, precise e dettagliate in italiano. Ad esempio, se leggi "[00:21] 1 [Villager] to [Gold]", scrivi qualcosa come "[00:21] Invia 1 nuovo abitante sull'oro e costruisci un Campo minerario".
             - COPRI TUTTA LA TIMELINE: Se la trascrizione arriva a 15-20 minuti, il tuo JSON deve arrivare a quel minutaggio. NON FERMARTI AI PRIMI 5 MINUTI.
-            - NON RIASSUMERE: Estrai ogni passaggio rilevante. Mi aspetto 30-50 step per video lunghi.
+            - NON RIASSUMERE: Estrai ogni passaggio rilevante. Mi aspetto 30-50 step per guide complete.
             - Rispondi ESCLUSIVAMENTE con un oggetto JSON valido.
             - Campi richiesti: "title" (string), "description" (string), "steps" (array di oggetti {time: string, action: string, note: string}).
             - Usa i timestamp [MM:SS] presenti nel testo.

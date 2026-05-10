@@ -124,6 +124,19 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
     }
   }, [searchParams]);
 
+  const getYoutubeId = (url: string) => {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|yewtu.be\/watch\?v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+
+  const getAoe4Id = (url: string) => {
+    if (!url) return null;
+    const match = url.match(/aoe4guides\.com\/builds\/([a-zA-Z0-9]+)/);
+    return match ? match[1] : null;
+  };
+
   // Clear inputs when user changes
   useEffect(() => {
     setText('');
@@ -143,8 +156,11 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
   }, [user?.email]);
 
   const handleAIAnalysis = async () => {
-    if (!transcript.trim()) {
-      setToast({ isVisible: true, message: 'Incolla prima il testo della trascrizione', type: 'error' });
+    const videoId = getYoutubeId(source);
+    const aoeId = getAoe4Id(source);
+    
+    if (!transcript.trim() && !videoId && !aoeId) {
+      setToast({ isVisible: true, message: 'Incolla la trascrizione o inserisci un link (YouTube/AoE4Guides) nelle fonti', type: 'error' });
       return;
     }
 
@@ -160,8 +176,8 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          youtubeUrl: null,
-          rawText: transcript 
+          youtubeUrl: transcript.trim() ? null : source,
+          rawText: transcript.trim() ? transcript : null 
         }),
       });
 
@@ -732,7 +748,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                 <button
                   type="button"
                   onClick={handleAIAnalysis}
-                  disabled={isAnalyzing || !transcript.trim()}
+                  disabled={isAnalyzing || (!transcript.trim() && !getYoutubeId(source) && !getAoe4Id(source))}
                   className={`w-full py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
                     isAnalyzing 
                       ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' 
@@ -747,7 +763,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                   ) : (
                     <>
                       <Sparkles size={14} fill="currentColor" />
-                      Analizza trascrizione con IA
+                      {transcript.trim() ? 'Analizza trascrizione con IA' : 'Analizza Link dalle Fonti'}
                     </>
                   )}
                 </button>

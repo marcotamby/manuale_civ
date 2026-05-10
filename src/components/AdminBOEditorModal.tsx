@@ -179,6 +179,12 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     return (match && match[2].length === 11) ? match[2] : null;
   };
 
+  const getAoe4Id = (url: string) => {
+    if (!url) return null;
+    const match = url.match(/aoe4guides\.com\/builds\/([a-zA-Z0-9]+)/);
+    return match ? match[1] : null;
+  };
+
   const handleSave = async () => {
     if (!editedBO.title) {
         toast.error("Il titolo è obbligatorio");
@@ -228,8 +234,10 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     }
 
     const videoId = !useManual ? getYoutubeId(editedBO.source || '') : null;
-    if (!useManual && !videoId) {
-      toast.error("Link video non valido");
+    const aoeId = !useManual ? getAoe4Id(editedBO.source || '') : null;
+
+    if (!useManual && !videoId && !aoeId) {
+      toast.error("Link non valido (inserisci un link YouTube o AoE4Guides)");
       return;
     }
 
@@ -538,29 +546,29 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                   type="text"
                   value={editedBO.source || ''}
                   onChange={e => setEditedBO(prev => ({ ...prev, source: e.target.value }))}
-                  placeholder="https://www.youtube.com/watch?v=..."
+                  placeholder="YouTube o AoE4Guides link..."
                   className="flex-1 bg-black/40 border-2 border-white/10 rounded-2xl px-6 py-4 text-sm text-red-200 outline-none focus:border-red-500/50 transition-all"
                 />
                 <button
                   onClick={() => {
-                    if (currentYoutubeId) {
+                    if (currentYoutubeId || getAoe4Id(editedBO.source || '')) {
                       setVideoAddedStatus(true);
                       setTimeout(() => setVideoAddedStatus(false), 3000);
                     } else {
-                      toast.error("Link video non valido");
+                      toast.error("Link non valido");
                     }
                   }}
                   disabled={!editedBO.source}
                   className={`px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 transition-all active:scale-95 border-2 ${
                     videoAddedStatus 
                     ? 'bg-green-600 border-green-400 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]' 
-                    : 'bg-[#FF0000] border-[#FF0000] text-white hover:bg-[#CC0000] hover:border-[#CC0000] shadow-[0_0_20px_rgba(255,0,0,0.2)]'
+                    : 'bg-red-600/20 border-red-500/40 text-red-400 hover:bg-red-500/30 shadow-[0_0_20px_rgba(255,0,0,0.1)]'
                   }`}
                 >
                   {videoAddedStatus ? (
-                    <><CheckCircle2 size={14} strokeWidth={3} /> Video Aggiunto!</>
+                    <><CheckCircle2 size={14} strokeWidth={3} /> Link Aggiunto!</>
                   ) : (
-                    <><PlayCircle size={14} /> Aggiungi Video Guida</>
+                    <><PlayCircle size={14} /> Collega Fonte Guida</>
                   )}
                 </button>
               </div>
