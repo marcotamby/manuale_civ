@@ -606,42 +606,42 @@ export function ClassificaPage() {
           </div>
         </div>
         <div className="overflow-x-auto pb-4">
-          <div className="inline-block min-w-full pr-12">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-white/10 bg-white/[0.03] sticky top-0">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-white/10 bg-white/[0.03] sticky top-0">
+                {allKeys.map((key) => (
+                  <th
+                    key={key}
+                    onClick={() => handleSort(key)}
+                    className="pl-4 py-3 text-left font-bold text-white uppercase tracking-wider whitespace-nowrap text-xs cursor-pointer select-none"
+                  >
+                    <div className={`inline-flex items-center gap-2 ${key === '_scudi_totali' ? 'min-w-[180px] pr-8' : ''}`}>
+                      {renderHeaderLabel(key)}
+                      {sortColumn === key && (
+                        <span className="text-slate-400">{sortDirection === 'desc' ? '↓' : '↑'}</span>
+                      )}
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {sortedData.map((item, idx) => (
+                <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                   {allKeys.map((key) => (
-                    <th
-                      key={key}
-                      onClick={() => handleSort(key)}
-                      className="pl-4 pr-4 py-3 text-left font-bold text-white uppercase tracking-wider whitespace-nowrap text-xs cursor-pointer select-none"
+                    <td 
+                      key={`${idx}-${key}`} 
+                      className="pl-4 py-3 text-white max-w-xs"
                     >
-                      <div className="inline-flex items-center gap-2">
-                        {renderHeaderLabel(key)}
-                        {sortColumn === key && (
-                          <span className="text-slate-400">{sortDirection === 'desc' ? '↓' : '↑'}</span>
-                        )}
+                      <div className={key === '_scudi_totali' ? 'pr-8' : ''}>
+                        {formatValue(item[key], key, item)}
                       </div>
-                    </th>
+                    </td>
                   ))}
                 </tr>
-              </thead>
-              <tbody>
-                {sortedData.map((item, idx) => (
-                  <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    {allKeys.map((key) => (
-                      <td 
-                        key={`${idx}-${key}`} 
-                        className="pl-4 pr-4 py-3 text-white max-w-xs"
-                      >
-                        {formatValue(item[key], key, item)}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     );
