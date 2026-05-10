@@ -606,14 +606,16 @@ export function ClassificaPage() {
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="min-w-full text-sm">
             <thead>
               <tr className="border-b border-white/10 bg-white/[0.03] sticky top-0">
-                {allKeys.map(key => (
+                {allKeys.map((key, i) => (
                   <th
                     key={key}
                     onClick={() => handleSort(key)}
-                    className="px-4 py-3 text-left font-bold text-white uppercase tracking-wider whitespace-nowrap text-xs cursor-pointer select-none"
+                    className={`px-4 py-3 text-left font-bold text-white uppercase tracking-wider whitespace-nowrap text-xs cursor-pointer select-none ${
+                      i === allKeys.length - 1 ? 'pr-8' : ''
+                    }`}
                   >
                     <div className="inline-flex items-center gap-2">
                       {renderHeaderLabel(key)}
@@ -628,8 +630,13 @@ export function ClassificaPage() {
             <tbody>
               {sortedData.map((item, idx) => (
                 <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                  {allKeys.map(key => (
-                    <td key={`${idx}-${key}`} className="px-4 py-3 text-white max-w-xs">
+                  {allKeys.map((key, i) => (
+                    <td 
+                      key={`${idx}-${key}`} 
+                      className={`px-4 py-3 text-white max-w-xs ${
+                        i === allKeys.length - 1 ? 'pr-8' : ''
+                      }`}
+                    >
                       {formatValue(item[key], key, item)}
                     </td>
                   ))}
