@@ -252,16 +252,12 @@ export function ClassificaPage() {
     const orderedRemainingCols = orderedColumns.filter(col => allKeys.includes(col) && !col.startsWith('_'));
 
     // Combine: merged columns + rating (unless ELO) + ordered columns + remaining unspecified columns
-    if (type === 'elo') {
-      allKeys = mergedCols;
-    } else {
-      allKeys = [
-        ...mergedCols,
-        'rating',
-        ...orderedRemainingCols,
-        ...remainingCols.filter(k => k !== 'rating')
-      ];
-    }
+    allKeys = [
+      ...mergedCols,
+      ...(type !== 'elo' ? ['rating'] : []),
+      ...orderedRemainingCols,
+      ...remainingCols.filter(k => k !== 'rating')
+    ];
 
     const headerHelpText: Record<string, string> = {
       _elo_medio_solo_tg: 'Media Elo Team = (rating rm 2vs2 + rating rm 3vs3 + rating rm 4vs4) / 3\n\nMedia Elo = (rating rm 1vs1 + Media Elo Team) / 2',
@@ -610,44 +606,42 @@ export function ClassificaPage() {
           </div>
         </div>
         <div className="overflow-x-auto pb-4">
-          <table className="w-max min-w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/10 bg-white/[0.03] sticky top-0">
-                {allKeys.map((key, i) => (
-                  <th
-                    key={key}
-                    onClick={() => handleSort(key)}
-                    className={`pl-4 py-3 text-left font-bold text-white uppercase tracking-wider whitespace-nowrap text-xs cursor-pointer select-none ${
-                      key === '_scudi_totali' || i === allKeys.length - 1 ? 'pr-10 min-w-[180px]' : 'pr-4'
-                    }`}
-                  >
-                    <div className="inline-flex items-center gap-2">
-                      {renderHeaderLabel(key)}
-                      {sortColumn === key && (
-                        <span className="text-slate-400">{sortDirection === 'desc' ? '↓' : '↑'}</span>
-                      )}
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {sortedData.map((item, idx) => (
-                <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+          <div className="inline-block min-w-full pr-12">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/10 bg-white/[0.03] sticky top-0">
                   {allKeys.map((key, i) => (
-                    <td 
-                      key={`${idx}-${key}`} 
-                      className={`pl-4 py-3 text-white max-w-xs ${
-                        key === '_scudi_totali' || i === allKeys.length - 1 ? 'pr-10' : 'pr-4'
-                      }`}
+                    <th
+                      key={key}
+                      onClick={() => handleSort(key)}
+                      className="pl-4 pr-4 py-3 text-left font-bold text-white uppercase tracking-wider whitespace-nowrap text-xs cursor-pointer select-none"
                     >
-                      {formatValue(item[key], key, item)}
-                    </td>
+                      <div className="inline-flex items-center gap-2">
+                        {renderHeaderLabel(key)}
+                        {sortColumn === key && (
+                          <span className="text-slate-400">{sortDirection === 'desc' ? '↓' : '↑'}</span>
+                        )}
+                      </div>
+                    </th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {sortedData.map((item, idx) => (
+                  <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    {allKeys.map((key, i) => (
+                      <td 
+                        key={`${idx}-${key}`} 
+                        className="pl-4 pr-4 py-3 text-white max-w-xs"
+                      >
+                        {formatValue(item[key], key, item)}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     );
