@@ -167,11 +167,11 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                   onSelectCiv(civ.id, isBOMode ? 'buildorders' : undefined);
                 }
               }}
-              className={`group relative h-36 md:h-52 rounded-xl cursor-pointer overflow-hidden border z-10 box-border will-change-transform block ${isSelected
+              className={`group relative h-36 md:h-52 rounded-xl cursor-pointer overflow-hidden border z-10 box-border will-change-transform block transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] ${isSelected
                 ? 'border-blue-400 shadow-[0_0_40px_rgba(59,130,246,0.4)] scale-[1.02] z-20 brightness-110'
                 : isUnselectable
                   ? 'border-white/5 opacity-40 cursor-not-allowed pointer-events-none'
-                  : 'border-[#D4AF37]/30 hover:border-white/80 hover:shadow-[0_50px_100px_rgba(0,0,0,1)] hover:-translate-y-1 hover:scale-110 2xl:hover:scale-[1.25] hover:z-50 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]'
+                  : 'border-[#D4AF37]/30 hover:border-white/80 hover:shadow-[0_50px_100px_rgba(0,0,0,1)] hover:-translate-y-1 hover:scale-110 2xl:hover:scale-[1.25] hover:z-50'
                 }`}
             >
               {/* Full Cover Flag Background */}
