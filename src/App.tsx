@@ -105,7 +105,14 @@ function App() {
     } else {
       updateActivity({ type: 'viewing', section: currentPage });
     }
-  }, [currentPage, selectedCivId]);
+
+    // Google Analytics Page Tracking
+    if (typeof (window as any).gtag === 'function') {
+      (window as any).gtag('config', 'G-LDSX0LVECH', {
+        page_path: location.pathname + location.search,
+      });
+    }
+  }, [currentPage, selectedCivId, location.pathname, location.search]);
 
   const prevPathRef = useRef(location.pathname);
   useEffect(() => {
