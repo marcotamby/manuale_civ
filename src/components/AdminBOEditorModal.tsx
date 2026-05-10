@@ -179,11 +179,6 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     return (match && match[2].length === 11) ? match[2] : null;
   };
 
-  const getAoe4Id = (url: string) => {
-    if (!url) return null;
-    const match = url.match(/aoe4guides\.com\/builds\/([a-zA-Z0-9]+)/);
-    return match ? match[1] : null;
-  };
 
   const handleSave = async () => {
     if (!editedBO.title) {
