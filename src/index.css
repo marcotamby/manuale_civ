@@ -5,10 +5,10 @@
   --color-brand-gold: #D4AF37;
   --color-brand-blue: #4169E1;
   --color-brand-dark: #121212;
-  --color-brand-card: rgba(30, 40, 60, 0.6);
-  --color-brand-card-hover: rgba(40, 50, 80, 0.8);
-  --color-brand-border: rgba(212, 175, 55, 0.3);
-  --color-brand-border-glow: rgba(212, 175, 55, 0.6);
+  --color-brand-card: rgba(10, 12, 16, 0.85);
+  --color-brand-card-hover: rgba(20, 22, 28, 0.95);
+  --color-brand-border: rgba(212, 175, 55, 0.2);
+  --color-brand-border-glow: rgba(212, 175, 55, 0.5);
   --font-cinzel: 'Cinzel', serif;
   --font-sackers: 'Hanken Grotesk', sans-serif;
 }
