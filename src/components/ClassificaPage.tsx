@@ -605,7 +605,7 @@ export function ClassificaPage() {
             />
           </div>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto pb-4">
           <table className="min-w-full text-sm">
             <thead>
               <tr className="border-b border-white/10 bg-white/[0.03] sticky top-0">
@@ -613,8 +613,8 @@ export function ClassificaPage() {
                   <th
                     key={key}
                     onClick={() => handleSort(key)}
-                    className={`px-4 py-3 text-left font-bold text-white uppercase tracking-wider whitespace-nowrap text-xs cursor-pointer select-none ${
-                      i === allKeys.length - 1 ? 'pr-8' : ''
+                    className={`pl-4 py-3 text-left font-bold text-white uppercase tracking-wider whitespace-nowrap text-xs cursor-pointer select-none ${
+                      i === allKeys.length - 1 ? 'pr-12 min-w-[160px]' : 'pr-4'
                     }`}
                   >
                     <div className="inline-flex items-center gap-2">
@@ -633,8 +633,8 @@ export function ClassificaPage() {
                   {allKeys.map((key, i) => (
                     <td 
                       key={`${idx}-${key}`} 
-                      className={`px-4 py-3 text-white max-w-xs ${
-                        i === allKeys.length - 1 ? 'pr-8' : ''
+                      className={`pl-4 py-3 text-white max-w-xs ${
+                        i === allKeys.length - 1 ? 'pr-12' : 'pr-4'
                       }`}
                     >
                       {formatValue(item[key], key, item)}
