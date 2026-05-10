@@ -610,7 +610,7 @@ export function ClassificaPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/10 bg-white/[0.03] sticky top-0">
-                  {allKeys.map((key, i) => (
+                  {allKeys.map((key) => (
                     <th
                       key={key}
                       onClick={() => handleSort(key)}
@@ -629,7 +629,7 @@ export function ClassificaPage() {
               <tbody>
                 {sortedData.map((item, idx) => (
                   <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    {allKeys.map((key, i) => (
+                    {allKeys.map((key) => (
                       <td 
                         key={`${idx}-${key}`} 
                         className="pl-4 pr-4 py-3 text-white max-w-xs"
