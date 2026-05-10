@@ -252,12 +252,16 @@ export function ClassificaPage() {
     const orderedRemainingCols = orderedColumns.filter(col => allKeys.includes(col) && !col.startsWith('_'));
 
     // Combine: merged columns + rating (unless ELO) + ordered columns + remaining unspecified columns
-    allKeys = [
-      ...mergedCols,
-      ...(type !== 'elo' ? ['rating'] : []),
-      ...orderedRemainingCols,
-      ...remainingCols.filter(k => k !== 'rating')
-    ];
+    if (type === 'elo') {
+      allKeys = mergedCols;
+    } else {
+      allKeys = [
+        ...mergedCols,
+        'rating',
+        ...orderedRemainingCols,
+        ...remainingCols.filter(k => k !== 'rating')
+      ];
+    }
 
     const headerHelpText: Record<string, string> = {
       _elo_medio_solo_tg: 'Media Elo Team = (rating rm 2vs2 + rating rm 3vs3 + rating rm 4vs4) / 3\n\nMedia Elo = (rating rm 1vs1 + Media Elo Team) / 2',
@@ -614,7 +618,7 @@ export function ClassificaPage() {
                     key={key}
                     onClick={() => handleSort(key)}
                     className={`pl-4 py-3 text-left font-bold text-white uppercase tracking-wider whitespace-nowrap text-xs cursor-pointer select-none ${
-                      i === allKeys.length - 1 ? 'pr-12 min-w-[160px]' : 'pr-4'
+                      i === allKeys.length - 1 ? 'pr-4 min-w-[160px]' : 'pr-4'
                     }`}
                   >
                     <div className="inline-flex items-center gap-2">
@@ -625,6 +629,8 @@ export function ClassificaPage() {
                     </div>
                   </th>
                 ))}
+                {/* Spacer column to prevent clipping */}
+                <th className="w-12 min-w-[48px] border-b border-transparent"></th>
               </tr>
             </thead>
             <tbody>
@@ -634,12 +640,14 @@ export function ClassificaPage() {
                     <td 
                       key={`${idx}-${key}`} 
                       className={`pl-4 py-3 text-white max-w-xs ${
-                        i === allKeys.length - 1 ? 'pr-12' : 'pr-4'
+                        i === allKeys.length - 1 ? 'pr-4' : 'pr-4'
                       }`}
                     >
                       {formatValue(item[key], key, item)}
                     </td>
                   ))}
+                  {/* Spacer cell */}
+                  <td className="w-12 min-w-[48px]"></td>
                 </tr>
               ))}
             </tbody>
@@ -699,7 +707,7 @@ export function ClassificaPage() {
             <p className="text-sm mt-2">{error}</p>
           </div>
         ) : (
-          <div className="bg-white/[0.02] border border-white/10 rounded-lg overflow-hidden">
+          <div className="bg-white/[0.02] border border-white/10 rounded-lg">
             {activeTab === 'singolo' && renderTable(soloData, 'singolo')}
             {activeTab === 'team' && renderTable(teamData, 'team')}
             {activeTab === 'elo' && renderTable(eloData, 'elo')}
