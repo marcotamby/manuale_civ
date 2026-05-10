@@ -156,11 +156,8 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
   }, [user?.email]);
 
   const handleAIAnalysis = async () => {
-    const videoId = getYoutubeId(source);
-    const aoeId = getAoe4Id(source);
-    
-    if (!transcript.trim() && !videoId && !aoeId) {
-      setToast({ isVisible: true, message: 'Incolla la trascrizione o inserisci un link (YouTube/AoE4Guides) nelle fonti', type: 'error' });
+    if (!transcript.trim()) {
+      setToast({ isVisible: true, message: 'Incolla prima il testo della trascrizione o il link AoE4Guides', type: 'error' });
       return;
     }
 
@@ -176,8 +173,8 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          youtubeUrl: transcript.trim() ? null : source,
-          rawText: transcript.trim() ? transcript : null 
+          youtubeUrl: null,
+          rawText: transcript 
         }),
       });
 
@@ -748,7 +745,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                 <button
                   type="button"
                   onClick={handleAIAnalysis}
-                  disabled={isAnalyzing || (!transcript.trim() && !getYoutubeId(source) && !getAoe4Id(source))}
+                  disabled={isAnalyzing || !transcript.trim()}
                   className={`w-full py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
                     isAnalyzing 
                       ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20' 
@@ -763,7 +760,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                   ) : (
                     <>
                       <Sparkles size={14} fill="currentColor" />
-                      {transcript.trim() ? 'Analizza trascrizione con IA' : 'Analizza Link dalle Fonti'}
+                      Analizza trascrizione con IA
                     </>
                   )}
                 </button>
@@ -928,7 +925,7 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
                 className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-cyan-500/50 transition-all placeholder:text-white/20"
-                placeholder={section === 'build_order' ? "Link YouTube o guida esterna..." : "es. AoE4 World, Pro Player, Patch Notes..."}
+                placeholder={section === 'build_order' ? "https://www.youtube.com/watch?v=..." : "es. AoE4 World, Pro Player, Patch Notes..."}
               />
             </div>
 

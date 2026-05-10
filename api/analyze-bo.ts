@@ -33,8 +33,6 @@ async function getInvidiousData(videoId: string) {
       if (track) {
         const textRes = await fetch(`https://yewtu.be${track.url}`);
         transcript = await textRes.text();
-        // Invidious captions are often VTT. Let's keep the timestamps if possible.
-        // For simplicity, we'll let Gemini handle the VTT format which has [00:00.000 --> 00:00.000]
       }
     } catch (e) { }
 
@@ -69,8 +67,6 @@ async function getYoutubeData(videoId: string) {
           const capRes = await fetch(track.baseUrl);
           const capXml = await capRes.text();
 
-          // ESTRAZIONE INTELLIGENTE: Manteniamo i tempi!
-          // Il formato XML di YouTube è <text start="12.34" dur="2.1">testo</text>
           const regex = /<text start="([\d.]+)"[^>]*>([\s\S]*?)<\/text>/g;
           let match;
           const pieces = [];
@@ -101,7 +97,6 @@ async function getAoe4GuidesData(buildId: string) {
       const ageName = ageBlock.age === 0 ? 'Inizio' : `Età ${ageBlock.age}`;
       schematicText += `\n--- ${ageName} ---\n`;
       ageBlock.steps?.forEach((step: any) => {
-        // Pulizia icone e HTML
         let stepDesc = step.description
           .replace(/<img[^>]+title="([^"]+)"[^>]*>/g, '[$1]')
           .replace(/&nbsp;/g, ' ')
@@ -126,6 +121,32 @@ async function getAoe4GuidesData(buildId: string) {
   }
 }
 
+async function fetchDataFromUrl(url: string) {
+  const videoId = getYoutubeId(url);
+  const aoeId = getAoe4Id(url);
+  let text = "";
+
+  if (videoId) {
+    try {
+      const data = await getYoutubeData(videoId);
+      if (data && data.combinedText && data.combinedText.length > 200) text = data.combinedText;
+    } catch (e) { }
+
+    if (text.length < 200) {
+      try {
+        const invData = await getInvidiousData(videoId);
+        if (invData && invData.combinedText) text += (text ? "\n" : "") + invData.combinedText;
+      } catch (e) { }
+    }
+  } else if (aoeId) {
+    try {
+      const aoeData = await getAoe4GuidesData(aoeId);
+      if (aoeData && aoeData.combinedText) text = aoeData.combinedText;
+    } catch (e) { }
+  }
+  return text;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -145,31 +166,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let textToAnalyze = "";
 
     if (rawText) {
-      textToAnalyze = rawText;
+      const urlText = await fetchDataFromUrl(rawText.trim());
+      textToAnalyze = urlText || rawText;
     } else if (youtubeUrl) {
-      const videoId = getYoutubeId(youtubeUrl);
-      const aoeId = getAoe4Id(youtubeUrl);
-
-      if (videoId) {
-        try {
-          const data = await getYoutubeData(videoId);
-          if (data.combinedText.length > 200) textToAnalyze = data.combinedText;
-        } catch (e) { }
-
-        if (textToAnalyze.length < 200) {
-          const invData = await getInvidiousData(videoId);
-          if (invData) textToAnalyze += "\n" + invData.combinedText;
-        }
-      } else if (aoeId) {
-        const aoeData = await getAoe4GuidesData(aoeId);
-        if (aoeData) textToAnalyze = aoeData.combinedText;
-      }
+      textToAnalyze = await fetchDataFromUrl(youtubeUrl);
     }
 
     if (!textToAnalyze || textToAnalyze.length < 20) {
       const errorMsg = rawText
         ? "La trascrizione fornita è troppo breve o non valida per l'analisi."
-        : "Impossibile recuperare dati dal video automaticamente. Usa l'inserimento manuale incollando la trascrizione.";
+        : "Impossibile recuperare dati automaticamente. Usa l'inserimento manuale o un link valido.";
       throw new Error(errorMsg);
     }
 
@@ -209,49 +215,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     const data = await response.json();
-
-    if (data.error) {
-      throw new Error(`Gemini API Error: ${data.error.message}`);
-    }
-
+    if (data.error) throw new Error(`Gemini API Error: ${data.error.message}`);
     const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!resultText) {
-      throw new Error("L'IA non ha restituito alcun contenuto.");
-    }
+    if (!resultText) throw new Error("L'IA non ha restituito alcun contenuto.");
 
     try {
-      // Robust JSON extraction
       let jsonString = resultText.trim();
-
-      // Remove markdown code blocks if present
       if (jsonString.includes('```')) {
         const matches = jsonString.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-        if (matches && matches[1]) {
-          jsonString = matches[1].trim();
-        }
+        if (matches && matches[1]) jsonString = matches[1].trim();
       }
-
-      // Final attempt to find the JSON object if there's still surrounding text
       const firstBrace = jsonString.indexOf('{');
       const lastBrace = jsonString.lastIndexOf('}');
-      if (firstBrace !== -1 && lastBrace !== -1) {
-        jsonString = jsonString.substring(firstBrace, lastBrace + 1);
-      }
-
+      if (firstBrace !== -1 && lastBrace !== -1) jsonString = jsonString.substring(firstBrace, lastBrace + 1);
       const parsedData = JSON.parse(jsonString);
-
-      // Validation of structure
-      if (!parsedData.steps || !Array.isArray(parsedData.steps)) {
-        throw new Error("Il JSON generato non contiene l'array dei passaggi (steps).");
-      }
-
+      if (!parsedData.steps || !Array.isArray(parsedData.steps)) throw new Error("JSON invalido.");
       return res.status(200).json(parsedData);
     } catch (e: any) {
-      console.error("JSON Parsing Error. Raw Text:", resultText);
-      throw new Error(`Errore nel parsing dei dati dell'IA: ${e.message}`);
+      throw new Error(`Errore parsing IA: ${e.message}`);
     }
-
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }
