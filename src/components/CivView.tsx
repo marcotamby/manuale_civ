@@ -1339,10 +1339,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                 {/* Proposal / Addition card */}
                 <div 
                   onClick={() => (isAdmin || canManageBuildorders) ? (window as any).openBOEditor?.(civId, null) : navigate(`/civ/${civId}/proponi?section=build_order`)}
-                  className={`glass flex flex-col items-center justify-center p-8 rounded-3xl border border-dashed transition-all group cursor-pointer text-center h-full min-h-[440px] ${
+                  className={`glass flex flex-col items-center justify-center p-8 rounded-3xl border border-dashed transition-all group cursor-pointer text-center h-full min-h-[440px] active:scale-[0.98] active:bg-neutral-950 ${
                     (isAdmin || canManageBuildorders) 
-                      ? 'border-slate-400/30 hover:border-slate-200/60 hover:bg-slate-400/5 shadow-[0_0_30px_rgba(148,163,184,0.1)]' 
-                      : 'border-yellow-500/20 hover:border-yellow-500/40 hover:bg-yellow-500/5 shadow-[0_0_30px_rgba(234,179,8,0.05)]'
+                      ? 'border-slate-400/30 hover:border-slate-200/60 hover:bg-black/40 shadow-[0_0_30px_rgba(148,163,184,0.1)]' 
+                      : 'border-yellow-500/20 hover:border-yellow-500/40 hover:bg-black/40 shadow-[0_0_30px_rgba(234,179,8,0.05)]'
                   }`}
                 >
                   <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 border group-hover:scale-110 transition-transform ${
@@ -1363,10 +1363,10 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl mx-auto">
                 <div 
                   onClick={() => (isAdmin || canManageBuildorders) ? (window as any).openBOEditor?.(civId, null) : navigate(`/civ/${civId}/proponi?section=build_order`)}
-                  className={`glass flex flex-col items-center justify-center p-8 rounded-3xl border border-dashed transition-all group cursor-pointer text-center h-full min-h-[440px] ${
+                  className={`glass flex flex-col items-center justify-center p-8 rounded-3xl border border-dashed transition-all group cursor-pointer text-center h-full min-h-[440px] active:scale-[0.98] active:bg-neutral-950 ${
                     (isAdmin || canManageBuildorders)
-                      ? 'border-slate-400/30 hover:border-slate-200/60 hover:bg-slate-400/5 shadow-[0_0_30px_rgba(148,163,184,0.1)]'
-                      : 'border-yellow-500/20 hover:border-yellow-500/40 hover:bg-yellow-500/5 shadow-[0_0_30px_rgba(234,179,8,0.05)]'
+                      ? 'border-slate-400/30 hover:border-slate-200/60 hover:bg-black/40 shadow-[0_0_30px_rgba(148,163,184,0.1)]'
+                      : 'border-yellow-500/20 hover:border-yellow-500/40 hover:bg-black/40 shadow-[0_0_30px_rgba(234,179,8,0.05)]'
                   }`}
                 >
                   <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 border transition-transform group-hover:scale-110 ${
