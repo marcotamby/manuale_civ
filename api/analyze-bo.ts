@@ -195,12 +195,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             4. AZIONI: Sii diretto e schematico.
             
             REGOLE DI ESTRAZIONE (CRITICHE):
+            - NORMALIZZAZIONE TEMPO (IMPORTANTE): Di norma il Build Order deve iniziare al minuto [00:00]. Se la prima azione di gioco effettiva (es. invio villi, costruzione prima casa) inizia più avanti nel video (es. a 00:45) senza che il testo specifichi esplicitamente un minutaggio diverso, considera quel momento come lo "0" e sottrai quel valore (es. 45 secondi) da tutti i timestamp successivi. Tuttavia, se la trascrizione cita ESPLICITAMENTE un tempo specifico per la prima azione (es. "A 2 minuti fate questo"), mantieni quel timestamp senza forzare lo zero. La build deve comunque essere coerente internamente.
             - ESPANSIONE: Se i dati provengono da AOE4 GUIDES (lo vedi nell'intestazione FONTE), i passaggi sono schematici. Il tuo compito è espanderli in frasi complete, precise e dettagliate in italiano. Ad esempio, se leggi "[00:21] 1 [Villager] to [Gold]", scrivi qualcosa come "[00:21] Invia 1 nuovo abitante sull'oro e costruisci un Campo minerario".
             - COPRI TUTTA LA TIMELINE: Se la trascrizione arriva a 15-20 minuti, il tuo JSON deve arrivare a quel minutaggio. NON FERMARTI AI PRIMI 5 MINUTI.
             - NON RIASSUMERE: Estrai ogni passaggio rilevante. Mi aspetto 30-50 step per guide complete.
             - Rispondi ESCLUSIVAMENTE con un oggetto JSON valido.
             - Campi richiesti: "title" (string), "description" (string), "steps" (array di oggetti {time: string, action: string, note: string}).
-            - Usa i timestamp [MM:SS] presenti nel testo.
+            - Usa i timestamp [MM:SS] presenti nel testo, ma normalizzati come descritto sopra.
             
             TESTO DA ANALIZZARE:
             ${textToAnalyze.substring(0, 60000)}`
