@@ -1,0 +1,93 @@
+[
+  {
+    "id": "ba62279f-3d1b-4d8c-8acc-977348ad4093",
+    "user_email": "contattodisparta@gmail.com",
+    "build_order_id": "bo-1773601206733",
+    "vote": 1,
+    "created_at": "2026-04-21T07:27:48.517681+00:00"
+  },
+  {
+    "id": "374fd6a7-7349-4189-b331-f2d3509e8a30",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "build_order_id": "bo-1773601206733",
+    "vote": 1,
+    "created_at": "2026-04-21T15:04:33.396386+00:00"
+  },
+  {
+    "id": "fe309a01-5d79-4067-976b-09b3733065b3",
+    "user_email": "contattodisparta@gmail.com",
+    "build_order_id": "bo-1776844941665",
+    "vote": 1,
+    "created_at": "2026-04-22T09:07:46.483781+00:00"
+  },
+  {
+    "id": "124c311e-9349-4e76-9b12-7a5b11c7d18f",
+    "user_email": "contattodisparta@gmail.com",
+    "build_order_id": "bo-1776847533661",
+    "vote": 1,
+    "created_at": "2026-04-22T09:07:49.877498+00:00"
+  },
+  {
+    "id": "908b0f3a-2f4d-45c5-a04f-97cca9bcedf4",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "build_order_id": "bo-1776844941665",
+    "vote": 1,
+    "created_at": "2026-04-24T09:19:38.825451+00:00"
+  },
+  {
+    "id": "26df926e-44e5-4709-8b73-c3f75bb473b7",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "build_order_id": "bo-1776847533661",
+    "vote": 1,
+    "created_at": "2026-04-24T09:19:39.314321+00:00"
+  },
+  {
+    "id": "14c37a60-4a2c-4dbb-93b5-f75fe0805d41",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "build_order_id": "bo-1776434335191",
+    "vote": 1,
+    "created_at": "2026-04-30T07:22:24.984069+00:00"
+  },
+  {
+    "id": "8284fa66-eaec-4ed9-85bb-086f993ea8f1",
+    "user_email": "ioelei2501@gmail.com",
+    "build_order_id": "bo-1776844941665",
+    "vote": 1,
+    "created_at": "2026-05-02T12:48:01.690829+00:00"
+  },
+  {
+    "id": "277e82cf-7644-4744-947f-5b57d325fc84",
+    "user_email": "ioelei2501@gmail.com",
+    "build_order_id": "bo-1776847533661",
+    "vote": 1,
+    "created_at": "2026-05-02T12:48:02.849371+00:00"
+  },
+  {
+    "id": "769be4e9-4bbd-4c84-9c5d-4a2618bcaf20",
+    "user_email": "corcionemarioemanuele@gmail.com",
+    "build_order_id": "bo-1773496096706",
+    "vote": 1,
+    "created_at": "2026-05-04T20:18:02.638598+00:00"
+  },
+  {
+    "id": "dd37229a-6c64-48da-aa4e-2e60b6051f61",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "build_order_id": "bo-1776835007314",
+    "vote": 1,
+    "created_at": "2026-05-08T13:47:17.408017+00:00"
+  },
+  {
+    "id": "169b79c3-7cd5-4d17-8f92-d524980fa2cd",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "build_order_id": "bo-fixed-1776702561181-0",
+    "vote": 1,
+    "created_at": "2026-05-08T14:04:49.365438+00:00"
+  },
+  {
+    "id": "872b5f65-acd9-417c-b950-e31b145d529d",
+    "user_email": "corcionemarioemanuele@gmail.com",
+    "build_order_id": "bo-1776835007314",
+    "vote": 1,
+    "created_at": "2026-05-08T14:41:37.43604+00:00"
+  }
+]

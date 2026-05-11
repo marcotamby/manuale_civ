@@ -244,7 +244,8 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
         },
         body: JSON.stringify({ 
           youtubeUrl: useManual ? null : editedBO.source,
-          rawText: useManual ? manualText : null
+          rawText: useManual ? manualText : null,
+          civName: civ.name
         }),
       });
 

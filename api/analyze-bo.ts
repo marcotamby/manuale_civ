@@ -157,7 +157,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (typeof body === 'string') {
     try { body = JSON.parse(body); } catch (e) { }
   }
-  const { youtubeUrl, rawText } = body || {};
+  const { youtubeUrl, rawText, civName } = body || {};
 
   try {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -186,13 +186,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       body: JSON.stringify({
         contents: [{
           parts: [{
-            text: `Sei un esperto di Age of Empires 4. Analizza il seguente testo (descrizione e trascrizione) ed estrai il Build Order strutturato completo seguendo lo stile del sito "Manuale Civ".
+            text: `Sei un esperto di Age of Empires 4. Stai analizzando un Build Order per la civiltà: ${civName || 'Generica'}.
+            Analizza il seguente testo (descrizione e trascrizione) ed estrai il Build Order strutturato completo seguendo lo stile del sito "Manuale Civ".
             
             REGOLE DI STILE MANDATORIE:
             1. LINGUA: Italiano tecnico. Traduci tutto dall'inglese.
             2. TERMINI: Usa "villi/abitanti", "oro", "legna", "cibo", "Monumento", "Centro Città".
             3. MAIUSCOLE: Usa le maiuscole SOLO all'inizio della frase e per i nomi propri degli edifici (es: Caserma, Centro Città). NON usare maiuscole a caso nel mezzo della frase per enfatizzare parole.
             4. AZIONI: Sii diretto e schematico.
+            5. TERMINOLOGIA SPECIFICA: Usa SEMPRE i nomi delle unità, degli edifici e delle meccaniche uniche della civiltà ${civName || ''} (es. Ovoo per i Mongoli, Pozzo Minerario per i Maliani, Cisterna per i Bizantini, ecc.). Sii il più preciso e specifico possibile.
             
             REGOLE DI ESTRAZIONE (CRITICHE):
             - NORMALIZZAZIONE TEMPO (IMPORTANTE): Di norma il Build Order deve iniziare al minuto [00:00]. Se la prima azione di gioco effettiva (es. invio villi, costruzione prima casa) inizia più avanti nel video (es. a 00:45) senza che il testo specifichi esplicitamente un minutaggio diverso, considera quel momento come lo "0" e sottrai quel valore (es. 45 secondi) da tutti i timestamp successivi. Tuttavia, se la trascrizione cita ESPLICITAMENTE un tempo specifico per la prima azione (es. "A 2 minuti fate questo"), mantieni quel timestamp senza forzare lo zero. La build deve comunque essere coerente internamente.

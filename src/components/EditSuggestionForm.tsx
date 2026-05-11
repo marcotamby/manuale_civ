@@ -162,7 +162,8 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           youtubeUrl: null,
-          rawText: transcript 
+          rawText: transcript,
+          civName: civName
         }),
       });
 
