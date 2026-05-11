@@ -191,10 +191,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             
             REGOLE DI STILE MANDATORIE:
             1. LINGUA: Italiano tecnico. Traduci tutto dall'inglese.
-            2. TERMINI: Usa "villi/abitanti", "oro", "legna", "cibo", "Monumento", "Centro Città".
-            3. MAIUSCOLE: Usa le maiuscole SOLO all'inizio della frase e per i nomi propri degli edifici (es: Caserma, Centro Città). NON usare maiuscole a caso nel mezzo della frase per enfatizzare parole.
+            2. TERMINI: Usa "villi/abitanti", "oro", "legna", "cibo", "monumento", "centro città".
+            3. MAIUSCOLE: Usa le maiuscole SOLO all'inizio della frase. Tutti i termini tecnici, nomi di edifici, unità e tecnologie devono avere l'iniziale MINUSCOLA (es: caserma, centro città, monumento, cavaliere). NON usare maiuscole a caso nel mezzo della frase.
             4. AZIONI: Sii diretto e schematico.
-            5. TERMINOLOGIA SPECIFICA: Usa SEMPRE i nomi delle unità, degli edifici e delle meccaniche uniche della civiltà ${civName || ''} (es. Ovoo per i Mongoli, Pozzo Minerario per i Maliani, Cisterna per i Bizantini, ecc.). Sii il più preciso e specifico possibile.
+            5. TERMINOLOGIA SPECIFICA: Usa SEMPRE i nomi delle unità, degli edifici e delle meccaniche uniche della civiltà ${civName || ''} (es. ovoo, pozzo minerario, cisterna, ecc.). Sii il più preciso e specifico possibile, usando sempre l'iniziale minuscola per questi termini.
             
             REGOLE DI ESTRAZIONE (CRITICHE):
             - NORMALIZZAZIONE TEMPO (IMPORTANTE): Di norma il Build Order deve iniziare al minuto [00:00]. Se la prima azione di gioco effettiva (es. invio villi, costruzione prima casa) inizia più avanti nel video (es. a 00:45) senza che il testo specifichi esplicitamente un minutaggio diverso, considera quel momento come lo "0" e sottrai quel valore (es. 45 secondi) da tutti i timestamp successivi. Tuttavia, se la trascrizione cita ESPLICITAMENTE un tempo specifico per la prima azione (es. "A 2 minuti fate questo"), mantieni quel timestamp senza forzare lo zero. La build deve comunque essere coerente internamente.
