@@ -83,10 +83,10 @@ RETURNS TRIGGER AS $$
 DECLARE
     v_balance INTEGER;
 BEGIN
-    -- Recupera il saldo attuale con blocco per evitare race conditions
+    -- Recupera il saldo attuale con blocco per evitare race conditions (case-insensitive)
     SELECT sheep_balance INTO v_balance 
     FROM profiles 
-    WHERE email = NEW.user_email
+    WHERE LOWER(email) = LOWER(NEW.user_email)
     FOR UPDATE;
 
     IF v_balance IS NULL THEN
@@ -99,15 +99,16 @@ BEGIN
 
     UPDATE profiles 
     SET sheep_balance = sheep_balance - NEW.amount
-    WHERE email = NEW.user_email;
+    WHERE LOWER(email) = LOWER(NEW.user_email);
     
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 DROP TRIGGER IF EXISTS on_bet_placed ON user_bets;
+DROP TRIGGER IF EXISTS on_bet_placed_v4 ON user_bets;
 CREATE TRIGGER on_bet_placed
-    BEFORE INSERT ON user_bets -- Cambiato in BEFORE per bloccare l'inserimento se il saldo è insufficiente
+    BEFORE INSERT ON user_bets
     FOR EACH ROW
     EXECUTE FUNCTION handle_new_bet();
 

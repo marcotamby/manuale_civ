@@ -164,7 +164,7 @@ export function BettingPage() {
           .ilike('email', finalUserEmail)
           .maybeSingle();
 
-        if (profile && (!silent || sheepBalance === 0)) {
+        if (profile) {
           setSheepBalance(Number(profile.sheep_balance ?? 0));
         }
       }
