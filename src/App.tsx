@@ -203,6 +203,8 @@ function App() {
     );
   }
 
+  const currentTab = location.pathname.startsWith('/civ/') ? location.pathname.split('/')[3] : undefined;
+
   return (
     <div
       className="flex flex-col h-screen w-full bg-[#000000] text-white overflow-hidden selection:bg-yellow-500/30"
@@ -251,6 +253,7 @@ function App() {
             onClose={() => setIsSidebarOpen(false)}
             onOpen={() => setIsSidebarOpen(true)}
             currentPage={currentPage}
+            currentTab={currentTab}
             hideOnMobile={isTournamentsSection}
           />
         )}

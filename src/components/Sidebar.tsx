@@ -12,10 +12,11 @@ interface SidebarProps {
   onClose: () => void;
   onOpen?: () => void;
   currentPage: 'home' | 'civ' | 'compare' | 'faq' | 'tornei' | 'privacy' | 'classifica';
+  currentTab?: string;
   hideOnMobile?: boolean;
 }
 
-export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClose, onOpen, currentPage, hideOnMobile }: SidebarProps) {
+export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClose, onOpen, currentPage, currentTab, hideOnMobile }: SidebarProps) {
   const { favorites } = useAuth();
   const { civilizations: civilizationsData } = useCivData();
   const touchStartX = useRef<number | null>(null);
@@ -103,9 +104,9 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
             {favoriteCivs.map((civ) => (
               <Link
                 key={`fav-${civ.id}`}
-                to={`/civ/${civ.id}`}
+                to={currentTab ? `/civ/${civ.id}/${currentTab}` : `/civ/${civ.id}`}
                 onClick={() => {
-                  onSelectCiv(civ.id);
+                  onSelectCiv(civ.id, currentTab);
                   onSelectPage('civ');
                 }}
                 title={civ.name}
@@ -133,9 +134,9 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
             {civilizationsData.map((civ) => (
               <Link
                 key={civ.id}
-                to={`/civ/${civ.id}`}
+                to={currentTab ? `/civ/${civ.id}/${currentTab}` : `/civ/${civ.id}`}
                 onClick={() => {
-                  onSelectCiv(civ.id);
+                  onSelectCiv(civ.id, currentTab);
                   onSelectPage('civ');
                   if (window.innerWidth < 768) onClose();
                 }}
