@@ -6,7 +6,7 @@ import { Home as HomeIcon, Heart, ChevronLeft, ChevronRight } from 'lucide-react
 
 interface SidebarProps {
   selectedCiv: string;
-  onSelectCiv: (civId: string) => void;
+  onSelectCiv: (civId: string, tab?: string) => void;
   onSelectPage: (page: 'home' | 'civ' | 'compare' | 'faq' | 'tornei' | 'privacy' | 'classifica') => void;
   isOpen: boolean;
   onClose: () => void;
