@@ -58,6 +58,9 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
           if (draft.nameGuest) newState.p2.name = draft.nameGuest;
           if (draft.hostPicks.length > 0) newState.p1.civId = draft.hostPicks[0];
           if (draft.guestPicks.length > 0) newState.p2.civId = draft.guestPicks[0];
+          if (JSON.stringify(prev) !== JSON.stringify(newState)) {
+             overlayService.updateOverlayState(OVERLAY_ID, newState).catch(console.error);
+          }
           return newState;
         });
       }).catch(err => {
@@ -75,6 +78,9 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
           setState((prev: any) => {
             const newState = { ...prev };
             newState.map = draft.maps[0];
+            if (JSON.stringify(prev) !== JSON.stringify(newState)) {
+               overlayService.updateOverlayState(OVERLAY_ID, newState).catch(console.error);
+            }
             return newState;
           });
         }
@@ -115,6 +121,12 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
   const handleReset = () => {
     setState(DEFAULT_STATE);
     setShowResetConfirm(false);
+    setAutoSyncCiv(false);
+    setAutoSyncMap(false);
+    setDraftCivUrl('');
+    setDraftMapUrl('');
+    setDraftCivStatus(null);
+    setDraftMapStatus(null);
   };
 
   const handleDraftCivImport = async () => {

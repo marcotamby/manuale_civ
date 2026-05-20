@@ -65,6 +65,11 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
               draft.guestPlayers[2] || ''
             ];
           }
+          
+          if (JSON.stringify(prev) !== JSON.stringify(newState)) {
+             overlayService.updateOverlayState('aoe4-match', newState).catch(console.error);
+          }
+          
           return newState;
         });
       }).catch(err => {
@@ -97,6 +102,11 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
               }
             });
             newState.maps = newMaps;
+            
+            if (JSON.stringify(prev) !== JSON.stringify(newState)) {
+               overlayService.updateOverlayState('aoe4-match', newState).catch(console.error);
+            }
+            
             return newState;
           });
         }
@@ -161,6 +171,12 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
       setState(DEFAULT_STATE);
       setIsConfirmingReset(false);
       setShowResetSuccess(true);
+      setAutoSyncCiv(false);
+      setAutoSyncMap(false);
+      setDraftCivUrl('');
+      setDraftMapUrl('');
+      setDraftCivStatus(null);
+      setDraftMapStatus(null);
       setTimeout(() => setShowResetSuccess(false), 3000);
     } catch (error: any) {
       onError(`Errore durante il reset: ${error.message || 'Errore generico'}`);

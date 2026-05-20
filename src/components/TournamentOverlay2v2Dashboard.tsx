@@ -119,6 +119,11 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
           if (draft.guestBans.length > 0) {
             newState.t2 = { ...newState.t2, bans: draft.guestBans };
           }
+          
+          if (JSON.stringify(prev) !== JSON.stringify(newState)) {
+             overlayService.updateOverlayState(overlayId, newState).catch(console.error);
+          }
+          
           return newState;
         });
       }).catch(err => {
@@ -153,6 +158,11 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
               }
             });
             newState.maps = newMaps;
+            
+            if (JSON.stringify(prev) !== JSON.stringify(newState)) {
+               overlayService.updateOverlayState(overlayId, newState).catch(console.error);
+            }
+            
             return newState;
           });
         }
@@ -199,6 +209,12 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
   const handleReset = () => {
     setState(DEFAULT_STATE);
     setShowResetConfirm(false);
+    setAutoSyncCiv(false);
+    setAutoSyncMap(false);
+    setDraftCivUrl('');
+    setDraftMapUrl('');
+    setDraftCivStatus(null);
+    setDraftMapStatus(null);
   };
 
   const CustomCivSelect = ({ value, onChange, isSm = false, showName = true, label = "", align = 'left', openUp = false }: { value: string, onChange: (val: string) => void, isSm?: boolean, showName?: boolean, label?: string, align?: 'left' | 'right', openUp?: boolean }) => {
