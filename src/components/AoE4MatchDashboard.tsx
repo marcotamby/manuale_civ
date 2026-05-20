@@ -28,9 +28,15 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [isConfirmingReset, setIsConfirmingReset] = useState(false);
   const [showResetSuccess, setShowResetSuccess] = useState(false);
-  const [draftUrl, setDraftUrl] = useState('');
-  const [isDraftLoading, setIsDraftLoading] = useState(false);
-  const [draftStatus, setDraftStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [draftCivUrl, setDraftCivUrl] = useState('');
+  const [isDraftCivLoading, setIsDraftCivLoading] = useState(false);
+  const [draftCivStatus, setDraftCivStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const [draftMapUrl, setDraftMapUrl] = useState('');
+  const [isDraftMapLoading, setIsDraftMapLoading] = useState(false);
+  const [draftMapStatus, setDraftMapStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const [mapDraftUrls, setMapDraftUrls] = useState<Record<number, string>>({});
 
   useEffect(() => {
     console.log('Loading initial overlay state...');
@@ -122,12 +128,12 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
     });
   };
 
-  const handleDraftImport = async () => {
-    if (!draftUrl.trim()) return;
-    setIsDraftLoading(true);
-    setDraftStatus(null);
+  const handleDraftCivImport = async () => {
+    if (!draftCivUrl.trim()) return;
+    setIsDraftCivLoading(true);
+    setDraftCivStatus(null);
     try {
-      const draft = await fetchDraft(draftUrl);
+      const draft = await fetchDraft(draftCivUrl);
       
       setState((prev: any) => {
         if (!prev) return prev;
@@ -151,6 +157,34 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
           ];
         }
 
+        return newState;
+      });
+
+      setDraftCivStatus({
+        type: 'success',
+        message: `Nomi team e giocatori importati!`
+      });
+    } catch (err: any) {
+      setDraftCivStatus({
+        type: 'error',
+        message: err.message || 'Errore durante l\'importazione delle civiltà.'
+      });
+    } finally {
+      setIsDraftCivLoading(false);
+    }
+  };
+
+  const handleDraftMapImport = async () => {
+    if (!draftMapUrl.trim()) return;
+    setIsDraftMapLoading(true);
+    setDraftMapStatus(null);
+    try {
+      const draft = await fetchDraft(draftMapUrl);
+      
+      setState((prev: any) => {
+        if (!prev) return prev;
+        const newState = { ...prev };
+
         if (draft.maps.length > 0) {
           const newMaps = [...newState.maps];
           draft.maps.forEach((mapName: string, i: number) => {
@@ -172,21 +206,17 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
         return newState;
       });
 
-      const parts: string[] = [];
-      if (draft.hostPlayers.some((p: string) => p) || draft.guestPlayers.some((p: string) => p)) parts.push('giocatori');
-      if (draft.maps.length) parts.push(`${draft.maps.length} mappe`);
-
-      setDraftStatus({
+      setDraftMapStatus({
         type: 'success',
-        message: `Draft importato! (${parts.join(', ')}). Controlla e salva.`
+        message: `Mappe importate: ${draft.maps.join(', ')}`
       });
     } catch (err: any) {
-      setDraftStatus({
+      setDraftMapStatus({
         type: 'error',
-        message: err.message || 'Errore durante l\'importazione del draft.'
+        message: err.message || 'Errore durante l\'importazione delle mappe.'
       });
     } finally {
-      setIsDraftLoading(false);
+      setIsDraftMapLoading(false);
     }
   };
 
@@ -199,10 +229,37 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
         t2: { ...prev.t2, name: prev.t1.name, players: prev.t1.players }
       };
     });
-    setDraftStatus({
+    setDraftCivStatus({
       type: 'success',
-      message: 'Team invertiti! Controlla e salva.'
+      message: 'Team invertiti! Controlla i campi e salva.'
     });
+  };
+
+  const handleMapDraftImport = async (mIdx: number) => {
+    const url = mapDraftUrls[mIdx];
+    if (!url || !url.trim()) return;
+    try {
+      const draft = await fetchDraft(url);
+      setState((prev: any) => {
+        if (!prev) return prev;
+        const newMaps = [...prev.maps];
+        
+        newMaps[mIdx] = {
+          ...newMaps[mIdx],
+          t1civs: draft.hostPicks.slice(0, 3),
+          t2civs: draft.guestPicks.slice(0, 3)
+        };
+        
+        if (draft.maps.length > 0) {
+          newMaps[mIdx].name = draft.maps[0];
+        }
+        
+        return { ...prev, maps: newMaps };
+      });
+      setMapDraftUrls(prev => ({ ...prev, [mIdx]: '' }));
+    } catch (err: any) {
+      onError(`Errore importazione civiltà game ${mIdx + 1}: ${err.message || 'Errore generico'}`);
+    }
   };
 
   const updatePlayer = (team: 't1' | 't2', index: number, value: string) => {
@@ -318,60 +375,109 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
         </div>
       </div>
 
-      {/* Draft Import Box */}
-      <div className="bg-gradient-to-r from-emerald-500/5 via-[#0a0f1a] to-emerald-500/5 border border-emerald-500/20 rounded-3xl p-6 shadow-2xl shadow-emerald-500/5">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-            <Link2 className="text-emerald-400" size={16} />
+      {/* Double Draft Import Box */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Box 1: Civ */}
+        <div className="bg-gradient-to-r from-emerald-500/5 via-[#0a0f1a] to-emerald-500/5 border border-emerald-500/20 rounded-3xl p-6 shadow-2xl shadow-emerald-500/5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+              <Link2 className="text-emerald-400" size={16} />
+            </div>
+            <div>
+              <label className="text-[12px] font-black text-emerald-400 uppercase tracking-widest block">Importa Draft Civiltà (3v3)</label>
+              <span className="text-[9px] text-gray-500 font-medium">Importa nomi dei team e dei giocatori</span>
+            </div>
           </div>
-          <div>
-            <label className="text-[12px] font-black text-emerald-400 uppercase tracking-widest block">Importa Draft AoE2CM</label>
-            <span className="text-[9px] text-gray-500 font-medium">Incolla un link da aoe2cm.net per compilare automaticamente i campi</span>
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              value={draftCivUrl}
+              onChange={(e) => { setDraftCivUrl(e.target.value); setDraftCivStatus(null); }}
+              placeholder="https://aoe2cm.net/draft/xxxxx"
+              className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-emerald-500/50 outline-none transition-all font-medium tracking-wide shadow-inner placeholder:text-gray-600"
+            />
+            <button
+              onClick={handleDraftCivImport}
+              disabled={isDraftCivLoading || !draftCivUrl.trim()}
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg whitespace-nowrap ${
+                isDraftCivLoading
+                  ? 'bg-gray-800 text-gray-500 cursor-wait'
+                  : !draftCivUrl.trim()
+                    ? 'bg-gray-800/50 text-gray-600 cursor-not-allowed'
+                    : 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-emerald-500/20 hover:shadow-emerald-500/40'
+              }`}
+            >
+              {isDraftCivLoading ? <Loader2 size={14} className="animate-spin" /> : <Link2 size={14} />}
+              {isDraftCivLoading ? 'Caricamento...' : 'Importa'}
+            </button>
           </div>
+          {draftCivStatus && (
+            <div className={`mt-3 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold animate-in fade-in slide-in-from-top-2 duration-300 ${
+              draftCivStatus.type === 'success'
+                ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+                : 'bg-red-500/10 border border-red-500/20 text-red-400'
+            }`}>
+              {draftCivStatus.type === 'success' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
+              <span className="flex-1">{draftCivStatus.message}</span>
+              {draftCivStatus.type === 'success' && (
+                <button
+                  onClick={handleSwapTeams}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300 transition-all font-black text-[10px] uppercase tracking-widest whitespace-nowrap ml-auto"
+                  title="Inverti Team"
+                >
+                  <ArrowLeftRight size={12} />
+                  Inverti Team
+                </button>
+              )}
+            </div>
+          )}
         </div>
-        <div className="flex items-center gap-3">
-          <input
-            type="text"
-            value={draftUrl}
-            onChange={(e) => { setDraftUrl(e.target.value); setDraftStatus(null); }}
-            placeholder="https://aoe2cm.net/draft/xxxxx"
-            className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-emerald-500/50 outline-none transition-all font-medium tracking-wide shadow-inner placeholder:text-gray-600"
-          />
-          <button
-            onClick={handleDraftImport}
-            disabled={isDraftLoading || !draftUrl.trim()}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg whitespace-nowrap ${
-              isDraftLoading
-                ? 'bg-gray-800 text-gray-500 cursor-wait'
-                : !draftUrl.trim()
-                  ? 'bg-gray-800/50 text-gray-600 cursor-not-allowed'
-                  : 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-emerald-500/20 hover:shadow-emerald-500/40'
-            }`}
-          >
-            {isDraftLoading ? <Loader2 size={14} className="animate-spin" /> : <Link2 size={14} />}
-            {isDraftLoading ? 'Caricamento...' : 'Importa'}
-          </button>
-        </div>
-        {draftStatus && (
-          <div className={`mt-3 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold animate-in fade-in slide-in-from-top-2 duration-300 ${
-            draftStatus.type === 'success'
-              ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
-              : 'bg-red-500/10 border border-red-500/20 text-red-400'
-          }`}>
-            {draftStatus.type === 'success' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
-            <span className="flex-1">{draftStatus.message}</span>
-            {draftStatus.type === 'success' && (
-              <button
-                onClick={handleSwapTeams}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300 transition-all font-black text-[10px] uppercase tracking-widest whitespace-nowrap ml-auto"
-                title="Inverti Team"
-              >
-                <ArrowLeftRight size={12} />
-                Inverti Team
-              </button>
-            )}
+
+        {/* Box 2: Mappe */}
+        <div className="bg-gradient-to-r from-blue-500/5 via-[#0a0f1a] to-blue-500/5 border border-blue-500/20 rounded-3xl p-6 shadow-2xl shadow-blue-500/5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+              <MapIcon className="text-blue-400" size={16} />
+            </div>
+            <div>
+              <label className="text-[12px] font-black text-blue-400 uppercase tracking-widest block">Importa Draft Mappe (3v3)</label>
+              <span className="text-[9px] text-gray-500 font-medium">Importa l'elenco delle mappe previste per il match</span>
+            </div>
           </div>
-        )}
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              value={draftMapUrl}
+              onChange={(e) => { setDraftMapUrl(e.target.value); setDraftMapStatus(null); }}
+              placeholder="https://aoe2cm.net/draft/xxxxx"
+              className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-blue-500/50 outline-none transition-all font-medium tracking-wide shadow-inner placeholder:text-gray-600"
+            />
+            <button
+              onClick={handleDraftMapImport}
+              disabled={isDraftMapLoading || !draftMapUrl.trim()}
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg whitespace-nowrap ${
+                isDraftMapLoading
+                  ? 'bg-gray-800 text-gray-500 cursor-wait'
+                  : !draftMapUrl.trim()
+                    ? 'bg-gray-800/50 text-gray-600 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-500 shadow-blue-500/20 hover:shadow-blue-500/40'
+              }`}
+            >
+              {isDraftMapLoading ? <Loader2 size={14} className="animate-spin" /> : <Link2 size={14} />}
+              {isDraftMapLoading ? 'Caricamento...' : 'Importa'}
+            </button>
+          </div>
+          {draftMapStatus && (
+            <div className={`mt-3 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold animate-in fade-in slide-in-from-top-2 duration-300 ${
+              draftMapStatus.type === 'success'
+                ? 'bg-blue-500/10 border border-blue-500/20 text-blue-400'
+                : 'bg-red-500/10 border border-red-500/20 text-red-400'
+            }`}>
+              {draftMapStatus.type === 'success' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
+              <span className="flex-1">{draftMapStatus.message}</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Teams Section */}
@@ -554,6 +660,31 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
                   })}
                 </div>
               </div>
+
+              {/* Inline Map Draft Import */}
+              <div className="mt-6 pt-4 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-2">
+                  <Link2 size={14} className="text-emerald-400" />
+                  <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider">Importa Civiltà Match per questo Game</span>
+                </div>
+                <div className="flex items-center gap-2 flex-1 max-w-md">
+                  <input
+                    type="text"
+                    value={mapDraftUrls[mIdx] || ''}
+                    onChange={(e) => setMapDraftUrls(prev => ({ ...prev, [mIdx]: e.target.value }))}
+                    placeholder="Incolla link draft AoE2CM (es. Game 2)..."
+                    className="flex-1 bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white outline-none focus:border-emerald-500/40"
+                  />
+                  <button
+                    onClick={() => handleMapDraftImport(mIdx)}
+                    disabled={!mapDraftUrls[mIdx] || !mapDraftUrls[mIdx].trim()}
+                    className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-800 disabled:text-gray-600 text-white rounded-lg text-[10px] font-black uppercase tracking-wider transition-all animate-in fade-in"
+                  >
+                    Importa
+                  </button>
+                </div>
+              </div>
+
             </div>
           ))}
         </div>
