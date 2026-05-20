@@ -403,17 +403,19 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                   />
                   <button
                     onClick={handleDraftCivImport}
-                    disabled={isDraftCivLoading || !draftCivUrl.trim()}
+                    disabled={isDraftCivLoading || autoSyncCiv || !draftCivUrl.trim()}
                     className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg whitespace-nowrap ${
-                      isDraftCivLoading
-                        ? 'bg-gray-800 text-gray-500 cursor-wait'
-                        : !draftCivUrl.trim()
-                          ? 'bg-gray-800/50 text-gray-600 cursor-not-allowed'
-                          : 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-emerald-500/20 hover:shadow-emerald-500/40'
+                      autoSyncCiv
+                        ? 'bg-emerald-900/50 text-emerald-400 cursor-default border border-emerald-500/30'
+                        : isDraftCivLoading
+                          ? 'bg-gray-800 text-gray-500 cursor-wait'
+                          : !draftCivUrl.trim()
+                            ? 'bg-gray-800/50 text-gray-600 cursor-not-allowed'
+                            : 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-emerald-500/20 hover:shadow-emerald-500/40'
                     }`}
                   >
-                    {isDraftCivLoading ? <Loader2 size={14} className="animate-spin" /> : <Link2 size={14} />}
-                    {isDraftCivLoading ? 'Caricamento...' : 'Importa'}
+                    {autoSyncCiv ? <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" /> : isDraftCivLoading ? <Loader2 size={14} className="animate-spin" /> : <Link2 size={14} />}
+                    {autoSyncCiv ? 'Auto-Sync' : isDraftCivLoading ? 'Caricamento...' : 'Importa'}
                   </button>
                 </div>
                 <div className="flex items-center gap-2 mt-3 pl-1">
@@ -472,17 +474,19 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                   />
                   <button
                     onClick={handleDraftMapImport}
-                    disabled={isDraftMapLoading || !draftMapUrl.trim()}
+                    disabled={isDraftMapLoading || autoSyncMap || !draftMapUrl.trim()}
                     className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg whitespace-nowrap ${
-                      isDraftMapLoading
-                        ? 'bg-gray-800 text-gray-500 cursor-wait'
-                        : !draftMapUrl.trim()
-                          ? 'bg-gray-800/50 text-gray-600 cursor-not-allowed'
-                          : 'bg-blue-600 text-white hover:bg-blue-500 shadow-blue-500/20 hover:shadow-blue-500/40'
+                      autoSyncMap
+                        ? 'bg-blue-900/50 text-blue-400 cursor-default border border-blue-500/30'
+                        : isDraftMapLoading
+                          ? 'bg-gray-800 text-gray-500 cursor-wait'
+                          : !draftMapUrl.trim()
+                            ? 'bg-gray-800/50 text-gray-600 cursor-not-allowed'
+                            : 'bg-blue-600 text-white hover:bg-blue-500 shadow-blue-500/20 hover:shadow-blue-500/40'
                     }`}
                   >
-                    {isDraftMapLoading ? <Loader2 size={14} className="animate-spin" /> : <Link2 size={14} />}
-                    {isDraftMapLoading ? 'Caricamento...' : 'Importa'}
+                    {autoSyncMap ? <div className="w-2 h-2 rounded-full bg-blue-400 animate-ping" /> : isDraftMapLoading ? <Loader2 size={14} className="animate-spin" /> : <Link2 size={14} />}
+                    {autoSyncMap ? 'Auto-Sync' : isDraftMapLoading ? 'Caricamento...' : 'Importa'}
                   </button>
                 </div>
                 <div className="flex items-center gap-2 mt-3 pl-1">
