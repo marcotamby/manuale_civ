@@ -48,7 +48,7 @@ export const mapAoe2cmCivId = (id: string): string => {
     'sengoku': 'sengoku',
     'knightstemplar': 'templar',
     'templar': 'templar',
-    'jindynasty': 'jin',
+    'jindynasty': 'jin-dynasty',
     'goldenhorde': 'goldenhorde',
     'macedoniandynasty': 'macedonian',
     'macedonian': 'macedonian'
