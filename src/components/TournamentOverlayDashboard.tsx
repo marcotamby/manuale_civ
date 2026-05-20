@@ -45,6 +45,46 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
   const [isDraftMapLoading, setIsDraftMapLoading] = useState(false);
   const [draftMapStatus, setDraftMapStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
+  const [autoSyncCiv, setAutoSyncCiv] = useState(false);
+  const [autoSyncMap, setAutoSyncMap] = useState(false);
+
+  useEffect(() => {
+    if (!autoSyncCiv || !draftCivUrl.trim()) return;
+    const interval = setInterval(() => {
+      fetchDraft(draftCivUrl).then(draft => {
+        setState((prev: any) => {
+          const newState = { ...prev };
+          if (draft.nameHost) newState.p1.name = draft.nameHost;
+          if (draft.nameGuest) newState.p2.name = draft.nameGuest;
+          if (draft.hostPicks.length > 0) newState.p1.civId = draft.hostPicks[0];
+          if (draft.guestPicks.length > 0) newState.p2.civId = draft.guestPicks[0];
+          return newState;
+        });
+      }).catch(err => {
+        console.error("AutoSync 1v1 Civ error:", err);
+      });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [autoSyncCiv, draftCivUrl]);
+
+  useEffect(() => {
+    if (!autoSyncMap || !draftMapUrl.trim()) return;
+    const interval = setInterval(() => {
+      fetchDraft(draftMapUrl).then(draft => {
+        if (draft.maps.length > 0) {
+          setState((prev: any) => {
+            const newState = { ...prev };
+            newState.map = draft.maps[0];
+            return newState;
+          });
+        }
+      }).catch(err => {
+        console.error("AutoSync 1v1 Map error:", err);
+      });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [autoSyncMap, draftMapUrl]);
+
   useEffect(() => {
     overlayService.getOverlayState(OVERLAY_ID)
       .then(savedState => {
@@ -376,6 +416,19 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                     {isDraftCivLoading ? 'Caricamento...' : 'Importa'}
                   </button>
                 </div>
+                <div className="flex items-center gap-2 mt-3 pl-1">
+                  <input
+                    type="checkbox"
+                    id="autoSyncCiv"
+                    checked={autoSyncCiv}
+                    onChange={(e) => setAutoSyncCiv(e.target.checked)}
+                    className="rounded border-white/10 bg-black/40 text-emerald-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                  />
+                  <label htmlFor="autoSyncCiv" className="text-[10px] font-bold text-gray-400 uppercase tracking-wider cursor-pointer flex items-center gap-1.5 select-none">
+                    {autoSyncCiv && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping inline-block" />}
+                    Sincronizzazione in tempo reale (5s)
+                  </label>
+                </div>
                 {draftCivStatus && (
                   <div className={`mt-3 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold animate-in fade-in slide-in-from-top-2 duration-300 ${
                     draftCivStatus.type === 'success'
@@ -431,6 +484,19 @@ export function TournamentOverlayDashboard({ onError }: TournamentOverlayDashboa
                     {isDraftMapLoading ? <Loader2 size={14} className="animate-spin" /> : <Link2 size={14} />}
                     {isDraftMapLoading ? 'Caricamento...' : 'Importa'}
                   </button>
+                </div>
+                <div className="flex items-center gap-2 mt-3 pl-1">
+                  <input
+                    type="checkbox"
+                    id="autoSyncMap"
+                    checked={autoSyncMap}
+                    onChange={(e) => setAutoSyncMap(e.target.checked)}
+                    className="rounded border-white/10 bg-black/40 text-blue-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                  />
+                  <label htmlFor="autoSyncMap" className="text-[10px] font-bold text-gray-400 uppercase tracking-wider cursor-pointer flex items-center gap-1.5 select-none">
+                    {autoSyncMap && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping inline-block" />}
+                    Sincronizzazione in tempo reale (5s)
+                  </label>
                 </div>
                 {draftMapStatus && (
                   <div className={`mt-3 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold animate-in fade-in slide-in-from-top-2 duration-300 ${

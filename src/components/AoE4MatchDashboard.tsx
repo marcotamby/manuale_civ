@@ -38,6 +38,75 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
 
   const [mapDraftUrls, setMapDraftUrls] = useState<Record<number, string>>({});
 
+  const [autoSyncCiv, setAutoSyncCiv] = useState(false);
+  const [autoSyncMap, setAutoSyncMap] = useState(false);
+
+  useEffect(() => {
+    if (!autoSyncCiv || !draftCivUrl.trim()) return;
+    const interval = setInterval(() => {
+      fetchDraft(draftCivUrl).then(draft => {
+        setState((prev: any) => {
+          if (!prev) return prev;
+          const newState = { ...prev };
+          if (draft.nameHost) newState.t1.name = draft.nameHost;
+          if (draft.nameGuest) newState.t2.name = draft.nameGuest;
+
+          if (draft.hostPlayers.some((p: string) => p)) {
+            newState.t1.players = [
+              draft.hostPlayers[0] || '',
+              draft.hostPlayers[1] || '',
+              draft.hostPlayers[2] || ''
+            ];
+          }
+          if (draft.guestPlayers.some((p: string) => p)) {
+            newState.t2.players = [
+              draft.guestPlayers[0] || '',
+              draft.guestPlayers[1] || '',
+              draft.guestPlayers[2] || ''
+            ];
+          }
+          return newState;
+        });
+      }).catch(err => {
+        console.error("AutoSync 3v3 Civ error:", err);
+      });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [autoSyncCiv, draftCivUrl]);
+
+  useEffect(() => {
+    if (!autoSyncMap || !draftMapUrl.trim()) return;
+    const interval = setInterval(() => {
+      fetchDraft(draftMapUrl).then(draft => {
+        if (draft.maps.length > 0) {
+          setState((prev: any) => {
+            if (!prev) return prev;
+            const newState = { ...prev };
+            const newMaps = [...newState.maps];
+            draft.maps.forEach((mapName: string, i: number) => {
+              if (i < newMaps.length) {
+                newMaps[i] = { ...newMaps[i], name: mapName };
+              } else {
+                newMaps.push({
+                  name: mapName,
+                  status: 'pending',
+                  winner: 0,
+                  t1civs: [],
+                  t2civs: []
+                });
+              }
+            });
+            newState.maps = newMaps;
+            return newState;
+          });
+        }
+      }).catch(err => {
+        console.error("AutoSync 3v3 Map error:", err);
+      });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [autoSyncMap, draftMapUrl]);
+
   useEffect(() => {
     console.log('Loading initial overlay state...');
     overlayService.getOverlayState('aoe4-match').then(savedState => {
@@ -411,6 +480,19 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
               {isDraftCivLoading ? 'Caricamento...' : 'Importa'}
             </button>
           </div>
+          <div className="flex items-center gap-2 mt-3 pl-1">
+            <input
+              type="checkbox"
+              id="autoSyncCiv"
+              checked={autoSyncCiv}
+              onChange={(e) => setAutoSyncCiv(e.target.checked)}
+              className="rounded border-white/10 bg-black/40 text-emerald-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+            />
+            <label htmlFor="autoSyncCiv" className="text-[10px] font-bold text-gray-400 uppercase tracking-wider cursor-pointer flex items-center gap-1.5 select-none">
+              {autoSyncCiv && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping inline-block" />}
+              Sincronizzazione in tempo reale (5s)
+            </label>
+          </div>
           {draftCivStatus && (
             <div className={`mt-3 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold animate-in fade-in slide-in-from-top-2 duration-300 ${
               draftCivStatus.type === 'success'
@@ -466,6 +548,19 @@ export function AoE4MatchDashboard({ onError }: AoE4MatchDashboardProps) {
               {isDraftMapLoading ? <Loader2 size={14} className="animate-spin" /> : <Link2 size={14} />}
               {isDraftMapLoading ? 'Caricamento...' : 'Importa'}
             </button>
+          </div>
+          <div className="flex items-center gap-2 mt-3 pl-1">
+            <input
+              type="checkbox"
+              id="autoSyncMap"
+              checked={autoSyncMap}
+              onChange={(e) => setAutoSyncMap(e.target.checked)}
+              className="rounded border-white/10 bg-black/40 text-blue-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+            />
+            <label htmlFor="autoSyncMap" className="text-[10px] font-bold text-gray-400 uppercase tracking-wider cursor-pointer flex items-center gap-1.5 select-none">
+              {autoSyncMap && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping inline-block" />}
+              Sincronizzazione in tempo reale (5s)
+            </label>
           </div>
           {draftMapStatus && (
             <div className={`mt-3 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold animate-in fade-in slide-in-from-top-2 duration-300 ${
