@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, Timer as TimerIcon, Map as MapIcon, RefreshCcw, Plus, Minus, X, ChevronDown, Users, ShieldAlert, Target } from 'lucide-react';
+import { Save, Timer as TimerIcon, Map as MapIcon, RefreshCcw, Plus, Minus, X, ChevronDown, Users, ShieldAlert, Target, Link2, Loader2, CheckCircle2, AlertCircle, ArrowLeftRight } from 'lucide-react';
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
 import { overlayService } from '../services/overlayService';
+import { fetchDraft } from '../utils/draftImporter';
 
 interface TournamentOverlay2v2DashboardProps {
   overlayId: string;
@@ -75,6 +76,9 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [draftUrl, setDraftUrl] = useState('');
+  const [isDraftLoading, setIsDraftLoading] = useState(false);
+  const [draftStatus, setDraftStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const isBracket = overlayId.includes('bracket');
 
@@ -320,8 +324,142 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
     });
   };
 
+  const handleDraftImport = async () => {
+    if (!draftUrl.trim()) return;
+    setIsDraftLoading(true);
+    setDraftStatus(null);
+    try {
+      const draft = await fetchDraft(draftUrl);
+      const newState = { ...state };
+
+      // Update team names
+      if (draft.nameHost) newState.t1 = { ...newState.t1, name: draft.nameHost };
+      if (draft.nameGuest) newState.t2 = { ...newState.t2, name: draft.nameGuest };
+
+      // Update players
+      if (draft.hostPlayers.some((p: string) => p)) {
+        newState.t1 = { ...newState.t1, players: [draft.hostPlayers[0] || '', draft.hostPlayers[1] || ''] };
+      }
+      if (draft.guestPlayers.some((p: string) => p)) {
+        newState.t2 = { ...newState.t2, players: [draft.guestPlayers[0] || '', draft.guestPlayers[1] || ''] };
+      }
+
+      // Update civ picks
+      if (draft.hostPicks.length > 0) {
+        newState.t1 = { ...newState.t1, draftCivs: draft.hostPicks };
+      }
+      if (draft.guestPicks.length > 0) {
+        newState.t2 = { ...newState.t2, draftCivs: draft.guestPicks };
+      }
+
+      // Update bans (high elo mode)
+      if (draft.hostBans.length > 0) {
+        newState.t1 = { ...newState.t1, bans: draft.hostBans };
+      }
+      if (draft.guestBans.length > 0) {
+        newState.t2 = { ...newState.t2, bans: draft.guestBans };
+      }
+
+      // Update maps
+      if (draft.maps.length > 0) {
+        const newMaps = [...newState.maps];
+        draft.maps.forEach((mapName: string, i: number) => {
+          if (i < newMaps.length) {
+            newMaps[i] = { ...newMaps[i], name: mapName };
+          }
+        });
+        newState.maps = newMaps;
+      }
+
+      setState(newState);
+
+      const parts: string[] = [];
+      if (draft.hostPicks.length || draft.guestPicks.length) parts.push(`${draft.hostPicks.length + draft.guestPicks.length} pick`);
+      if (draft.hostBans.length || draft.guestBans.length) parts.push(`${draft.hostBans.length + draft.guestBans.length} ban`);
+      if (draft.maps.length) parts.push(`${draft.maps.length} mappe`);
+
+      setDraftStatus({
+        type: 'success',
+        message: `Draft importato! ${parts.join(', ')}. Controlla i campi e salva.`
+      });
+    } catch (err: any) {
+      setDraftStatus({
+        type: 'error',
+        message: err.message || 'Errore durante l\'importazione del draft.'
+      });
+    } finally {
+      setIsDraftLoading(false);
+    }
+  };
+
+  const handleSwapTeams = () => {
+    const oldT1 = { ...state.t1 };
+    const oldT2 = { ...state.t2 };
+    setState({ ...state, t1: oldT2, t2: oldT1 });
+    setDraftStatus({
+      type: 'success',
+      message: 'Team invertiti! Controlla i campi e salva.'
+    });
+  };
+
   const renderMatchTab = () => (
     <div className="space-y-8 animate-in fade-in slide-in-from-top-4 duration-500">
+      {/* Draft Import Box */}
+      <div className="bg-gradient-to-r from-emerald-500/5 via-[#0a0f1a] to-emerald-500/5 border border-emerald-500/20 rounded-3xl p-6 shadow-2xl shadow-emerald-500/5">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+            <Link2 className="text-emerald-400" size={16} />
+          </div>
+          <div>
+            <label className="text-[12px] font-black text-emerald-400 uppercase tracking-widest block">Importa Draft AoE2CM</label>
+            <span className="text-[9px] text-gray-500 font-medium">Incolla un link da aoe2cm.net per compilare automaticamente i campi</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <input
+            type="text"
+            value={draftUrl}
+            onChange={(e) => { setDraftUrl(e.target.value); setDraftStatus(null); }}
+            placeholder="https://aoe2cm.net/draft/xxxxx"
+            className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-emerald-500/50 outline-none transition-all font-medium tracking-wide shadow-inner placeholder:text-gray-600"
+          />
+          <button
+            onClick={handleDraftImport}
+            disabled={isDraftLoading || !draftUrl.trim()}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg whitespace-nowrap ${
+              isDraftLoading
+                ? 'bg-gray-800 text-gray-500 cursor-wait'
+                : !draftUrl.trim()
+                  ? 'bg-gray-800/50 text-gray-600 cursor-not-allowed'
+                  : 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-emerald-500/20 hover:shadow-emerald-500/40'
+            }`}
+          >
+            {isDraftLoading ? <Loader2 size={14} className="animate-spin" /> : <Link2 size={14} />}
+            {isDraftLoading ? 'Caricamento...' : 'Importa'}
+          </button>
+        </div>
+        {draftStatus && (
+          <div className={`mt-3 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold animate-in fade-in slide-in-from-top-2 duration-300 ${
+            draftStatus.type === 'success'
+              ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+              : 'bg-red-500/10 border border-red-500/20 text-red-400'
+          }`}>
+            {draftStatus.type === 'success' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
+            <span className="flex-1">{draftStatus.message}</span>
+            {draftStatus.type === 'success' && (
+              <button
+                onClick={handleSwapTeams}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300 transition-all font-black text-[10px] uppercase tracking-widest whitespace-nowrap ml-auto"
+                title="Inverti Team 1 e Team 2"
+              >
+                <ArrowLeftRight size={12} />
+                Inverti Team
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
       <div className="grid grid-cols-2 gap-8">
         {[1, 2].map(idx => {
           const t = idx === 1 ? state.t1 : state.t2;
