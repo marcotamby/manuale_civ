@@ -340,7 +340,7 @@
                         container.appendChild(div);
                     });
                 }
-                const expectedTotal = IS_HIGH_ELO ? 9 : 11;
+                const expectedTotal = IS_HIGH_ELO ? 9 : (state.maps?.length === 5 ? 11 : 6);
                 const currentTotal = (civs?.length || 0) + (IS_HIGH_ELO ? (bans?.length || 0) : 0);
                 for(let i = currentTotal; i < expectedTotal; i++) {
                     const div = document.createElement('div');
