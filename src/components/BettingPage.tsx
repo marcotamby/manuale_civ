@@ -555,9 +555,9 @@ export function BettingPage() {
            </div>
         </div>
 
-        <div className="flex flex-col md:flex-row items-stretch gap-4 self-stretch md:self-start mt-4 md:mt-10">
+        <div className="flex flex-col md:flex-row items-start gap-4 self-stretch md:self-start mt-4 md:mt-10 w-full">
             {isAuthenticated && (
-              <div className="bg-[#111218]/80 backdrop-blur-md px-6 h-14 rounded-2xl border border-white/10 flex items-center gap-3 transition-all hover:bg-[#1a1c25] group flex-1">
+              <div className="bg-[#111218]/80 backdrop-blur-md px-6 h-14 rounded-2xl border border-white/10 flex items-center gap-3 transition-all hover:bg-[#1a1c25] group">
                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest whitespace-nowrap">Il Tuo Gregge:</span>
                 <div className="flex items-center gap-2">
                    <span className="text-xl font-black text-white">{sheepBalance}</span>
@@ -567,18 +567,23 @@ export function BettingPage() {
             )}
 
             {/* Top Leaderboard */}
-            <div className="bg-[#111218]/80 backdrop-blur-md px-6 h-14 rounded-2xl border border-white/10 flex items-center gap-6 transition-all hover:bg-[#1a1c25] group flex-[1.4]">
-              <div className="flex items-center gap-2 shrink-0">
+            <div className="bg-[#111218]/80 backdrop-blur-md p-4 rounded-2xl border border-white/10 flex flex-col gap-3 transition-all hover:bg-[#1a1c25] group flex-1 w-full max-w-sm">
+              <div className="flex items-center gap-2 shrink-0 pb-2 border-b border-white/5">
                 <Users size={16} className="text-blue-400" />
                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Migliori Pastori</span>
               </div>
-              <div className="flex gap-3">
-                {leaderboard.slice(0, 5).map((u, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-white/5 px-2 py-1 rounded-lg border border-white/5">
-                    <span className="text-[9px] font-bold text-gray-400 uppercase">{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}°`} {u.nickname.substring(0, 8)}</span>
-                    <span className="text-[10px] font-black text-blue-400">+{u.sheep_balance}</span>
+              <div className="flex flex-col gap-2">
+                {leaderboard.length > 0 ? leaderboard.slice(0, 5).map((u, i) => (
+                  <div key={i} className="flex items-center justify-between bg-white/5 px-3 py-2 rounded-lg border border-white/5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : <span className="text-[10px] text-gray-500 font-bold">{i + 1}°</span>}</span>
+                      <span className="text-[10px] font-bold text-gray-300 uppercase">{u.nickname.substring(0, 15)}</span>
+                    </div>
+                    <span className="text-xs font-black text-blue-400">+{u.sheep_balance}</span>
                   </div>
-                ))}
+                )) : (
+                  <span className="text-[10px] text-gray-500 font-bold uppercase py-2 text-center">Nessuna vincita ancora registrata</span>
+                )}
               </div>
             </div>
         </div>
