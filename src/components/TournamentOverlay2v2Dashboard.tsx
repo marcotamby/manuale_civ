@@ -744,6 +744,7 @@ export function TournamentOverlay2v2Dashboard({ overlayId, mode, onError }: Tour
                 <MultiCivSelect 
                   values={t.draftCivs} 
                   onChange={(vals) => setState({...state, [tKey]: {...t, draftCivs: vals}})}
+                  max={mode === 'high' ? 9 : 11}
                   label="Civ Pickate (Bo3)"
                 />
                 {mode === 'high' && (
