@@ -23,7 +23,7 @@ interface Market {
 }
 
 interface LeaderboardUser {
-  username: string;
+  nickname: string;
   sheep_balance: number;
 }
 
@@ -169,41 +169,59 @@ export function BettingPage() {
         }
       }
 
-      // Load Leaderboard - Silent fail if RLS prevents reading other profiles
-      try {
-        const { data: topPastors } = await supabase
-          .from('profiles')
-          .select('username, sheep_balance')
-          .order('sheep_balance', { ascending: false })
-          .limit(5);
-        if (topPastors) setLeaderboard(topPastors);
-      } catch (e) {
-        console.log('Leaderboard hidden by security policy');
-      }
-
-      // Calculate Total Stats
+      // Calculate Total Stats & Tournament Leaderboard
       if (marketData && marketData.length > 0) {
         const totalSheep = marketData.reduce((acc, m) => 
           acc + (m.options?.reduce((sum: number, opt: any) => sum + (Number(opt.total_bet) || 0), 0) || 0)
         , 0);
 
         const marketIds = marketData.map(m => m.id);
-        const { count } = await supabase
+        const { data: tourneyBets } = await supabase
           .from('user_bets')
-          .select('*', { count: 'exact', head: true })
+          .select('user_email, amount, payout, status')
           .in('market_id', marketIds);
 
-        // Calculate unique users (pastori)
-        const { data: uniqueUsers } = await supabase
-          .from('user_bets')
-          .select('user_email')
-          .in('market_id', marketIds);
-        
-        const pastoriCount = new Set(uniqueUsers?.map(u => u.user_email)).size;
+        if (tourneyBets) {
+          const pastoriCount = new Set(tourneyBets.map(u => u.user_email)).size;
+          setTotalStats({ count: tourneyBets.length, sheep: totalSheep, pastori: pastoriCount });
 
-        setTotalStats({ count: count || 0, sheep: totalSheep, pastori: pastoriCount });
+          // Calcola vincite del torneo
+          const winningsByEmail: Record<string, number> = {};
+          tourneyBets.forEach(bet => {
+            if (bet.status === 'won') {
+              const winAmount = Number(bet.payout) || 0;
+              const profit = winAmount - (Number(bet.amount) || 0);
+              if (profit > 0) {
+                winningsByEmail[bet.user_email] = (winningsByEmail[bet.user_email] || 0) + profit;
+              }
+            }
+          });
+
+          const sortedEmails = Object.entries(winningsByEmail)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5);
+
+          if (sortedEmails.length > 0) {
+            const { data: profiles } = await supabase
+              .from('profiles')
+              .select('email, nickname')
+              .in('email', sortedEmails.map(e => e[0]));
+            
+            const newLeaderboard = sortedEmails.map(([email, profit]) => {
+              const prof = profiles?.find(p => p.email === email);
+              return {
+                nickname: prof?.nickname || 'Anonimo',
+                sheep_balance: profit
+              };
+            });
+            setLeaderboard(newLeaderboard);
+          } else {
+            setLeaderboard([]);
+          }
+        }
       } else {
         setTotalStats({ count: 0, sheep: 0, pastori: 0 });
+        setLeaderboard([]);
       }
     } catch (err) {
       console.error('Error loading betting data:', err);
@@ -555,10 +573,10 @@ export function BettingPage() {
                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Migliori Pastori</span>
               </div>
               <div className="flex gap-3">
-                {leaderboard.slice(0, 3).map((u, i) => (
-                  <div key={u.username} className="flex items-center gap-2 bg-white/5 px-2 py-1 rounded-lg border border-white/5">
-                    <span className="text-[9px] font-bold text-gray-400 uppercase">{i === 0 ? "🥇" : i === 1 ? "🥈" : "🥉"} {u.username.substring(0, 4)}</span>
-                    <span className="text-[10px] font-black text-blue-400">{u.sheep_balance}</span>
+                {leaderboard.slice(0, 5).map((u, i) => (
+                  <div key={i} className="flex items-center gap-2 bg-white/5 px-2 py-1 rounded-lg border border-white/5">
+                    <span className="text-[9px] font-bold text-gray-400 uppercase">{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}°`} {u.nickname.substring(0, 8)}</span>
+                    <span className="text-[10px] font-black text-blue-400">+{u.sheep_balance}</span>
                   </div>
                 ))}
               </div>
