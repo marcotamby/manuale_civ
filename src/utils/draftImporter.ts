@@ -97,7 +97,7 @@ export async function fetchDraft(urlOrId: string): Promise<ParsedDraft> {
     throw new Error('Link del draft non valido.');
   }
 
-  const response = await fetch(`https://aoe2cm.net/api/draft/${draftId}`);
+  const response = await fetch(`https://aoe2cm.net/api/draft/${draftId}?t=${Date.now()}`, { cache: 'no-store' });
   if (!response.ok) {
     throw new Error(`Errore durante il caricamento del draft (${response.status})`);
   }
