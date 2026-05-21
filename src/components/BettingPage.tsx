@@ -37,6 +37,7 @@ export function BettingPage() {
   const [sheepBalance, setSheepBalance] = useState(0);
   const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([]);
   const [selectedBets, setSelectedBets] = useState<{ [marketId: string]: { optionId: string, amount: number } }>({});
+  const [myBets, setMyBets] = useState<any[]>([]);
   const [placingBetId, setPlacingBetId] = useState<string | null>(null);
   const [successBetId, setSuccessBetId] = useState<string | null>(null);
   const [showAdminTools, setShowAdminTools] = useState(false);
@@ -178,10 +179,17 @@ export function BettingPage() {
         const marketIds = marketData.map(m => m.id);
         const { data: tourneyBets } = await supabase
           .from('user_bets')
-          .select('user_email, amount, payout, status')
+          .select('user_email, amount, payout, status, option_id, market_id')
           .in('market_id', marketIds);
 
         if (tourneyBets) {
+          if (finalUserEmail) {
+            const userEmailLower = finalUserEmail.toLowerCase();
+            const myBetsData = tourneyBets.filter(b => b.user_email.toLowerCase() === userEmailLower);
+            setMyBets(myBetsData);
+          } else {
+            setMyBets([]);
+          }
           const pastoriCount = new Set(tourneyBets.map(u => u.user_email)).size;
           setTotalStats({ count: tourneyBets.length, sheep: totalSheep, pastori: pastoriCount });
 
@@ -1190,6 +1198,9 @@ export function BettingPage() {
                         const isSelected = selectedBets[market.id]?.optionId === opt.id;
                         const isWinner = market.winner_option_id === opt.id;
                         const odds = calculateOdds(market.options, opt.id);
+                        
+                        const myBetsOnOption = myBets.filter(b => b.market_id === market.id && b.option_id === opt.id && b.status !== 'cancelled');
+                        const myTotalAmount = myBetsOnOption.reduce((sum, b) => sum + (Number(b.amount) || 0), 0);
 
                         return (
                           <div
@@ -1228,6 +1239,15 @@ export function BettingPage() {
                                     <span className="text-xs font-black text-blue-400 leading-none">{opt.total_bet || 0}</span>
                                     <span className="text-[10px] leading-none mb-0.5">🐑</span>
                                   </div>
+                                  {myTotalAmount > 0 && (
+                                    <div className="flex items-center gap-1.5 ml-3 pl-3 border-l border-white/10">
+                                      <span className="text-[9px] font-bold text-emerald-400/80 uppercase tracking-widest">La tua puntata:</span>
+                                      <div className="flex items-center gap-1">
+                                        <span className="text-xs font-black text-emerald-400 leading-none">{myTotalAmount}</span>
+                                        <span className="text-[10px] leading-none mb-0.5">🐑</span>
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                               <div className="flex items-center gap-3 shrink-0 ml-4">
