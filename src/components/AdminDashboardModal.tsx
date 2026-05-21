@@ -112,13 +112,19 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
   const fetchProfiles = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('sheep_balance', { ascending: false });
+      const [profilesRes, betsRes] = await Promise.all([
+        supabase.from('profiles').select('*').order('sheep_balance', { ascending: false }),
+        supabase.from('user_bets').select('user_email')
+      ]);
 
-      if (error) throw error;
-      setAllProfiles(data || []);
+      if (profilesRes.error) throw profilesRes.error;
+      
+      const bettorEmails = new Set(betsRes.data?.map(b => b.user_email?.toLowerCase()) || []);
+      
+      // Filtriamo per mostrare solo i "pastori" (utenti che hanno scommesso almeno una volta)
+      const filteredProfiles = (profilesRes.data || []).filter(p => p.email && bettorEmails.has(p.email.toLowerCase()));
+      
+      setAllProfiles(filteredProfiles);
     } catch (err: any) {
       console.error('Error fetching profiles:', err);
     }
