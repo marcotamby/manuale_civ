@@ -1,5 +1,6 @@
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
+import { io } from 'socket.io-client';
 
 export interface ParsedDraft {
   nameHost: string;
@@ -97,12 +98,53 @@ export async function fetchDraft(urlOrId: string): Promise<ParsedDraft> {
     throw new Error('Link del draft non valido.');
   }
 
-  const response = await fetch(`https://aoe2cm.net/api/draft/${draftId}?t=${Date.now()}`, { cache: 'no-store' });
-  if (!response.ok) {
-    throw new Error(`Errore durante il caricamento del draft (${response.status})`);
+  let data: any = null;
+
+  try {
+    const response = await fetch(`https://aoe2cm.net/api/draft/${draftId}?t=${Date.now()}`, { cache: 'no-store' });
+    if (response.ok) {
+      data = await response.json();
+    }
+  } catch (err) {
+    console.warn("HTTP fetch failed, will fallback to socket.io", err);
   }
 
-  const data = await response.json();
+  // Fallback a socket.io per i draft in diretta (che restituiscono 404 sull'API REST)
+  if (!data) {
+    data = await new Promise((resolve, reject) => {
+      const socket = io("wss://aoe2cm.net", { query: { draftId }, transports: ['websocket'] });
+      
+      const timeout = setTimeout(() => {
+        socket.disconnect();
+        reject(new Error("Timeout durante il recupero del draft in diretta (Socket.io)"));
+      }, 5000);
+
+      socket.on("draft_state", (state: any) => {
+        clearTimeout(timeout);
+        socket.disconnect();
+        resolve(state);
+      });
+
+      socket.on("connect_error", (err: any) => {
+        clearTimeout(timeout);
+        socket.disconnect();
+        reject(new Error(`Errore di connessione live: ${err.message}`));
+      });
+      
+      socket.on("message", (msg: string) => {
+         if (msg === 'This draft does not exist.') {
+            clearTimeout(timeout);
+            socket.disconnect();
+            reject(new Error("Il draft non esiste."));
+         }
+      });
+    });
+  }
+
+  if (!data) {
+    throw new Error('Impossibile recuperare i dati del draft.');
+  }
+
   const draft = data.draft || data; // handle wrapped response
   
   const events = draft.events || draft.state?.events || [];
