@@ -555,9 +555,9 @@ export function BettingPage() {
            </div>
         </div>
 
-        <div className="flex flex-col md:flex-row items-start gap-4 self-stretch md:self-start mt-4 md:mt-10 w-full">
+        <div className="flex flex-col md:flex-row items-start gap-4 self-stretch md:self-start mt-4 md:mt-10">
             {isAuthenticated && (
-              <div className="bg-[#111218]/80 backdrop-blur-md px-6 h-14 rounded-2xl border border-white/10 flex items-center gap-3 transition-all hover:bg-[#1a1c25] group">
+              <div className="bg-[#111218]/80 backdrop-blur-md px-6 h-14 rounded-2xl border border-white/10 flex items-center gap-3 transition-all hover:bg-[#1a1c25] group flex-1">
                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest whitespace-nowrap">Il Tuo Gregge:</span>
                 <div className="flex items-center gap-2">
                    <span className="text-xl font-black text-white">{sheepBalance}</span>
@@ -567,7 +567,7 @@ export function BettingPage() {
             )}
 
             {/* Top Leaderboard */}
-            <div className="bg-[#111218]/80 backdrop-blur-md p-4 rounded-2xl border border-white/10 flex flex-col gap-3 transition-all hover:bg-[#1a1c25] group flex-1 w-full max-w-sm">
+            <div className="bg-[#111218]/80 backdrop-blur-md p-4 rounded-2xl border border-white/10 flex flex-col gap-3 transition-all hover:bg-[#1a1c25] group flex-[1.4] min-w-[280px]">
               <div className="flex items-center gap-2 shrink-0 pb-2 border-b border-white/5">
                 <Users size={16} className="text-blue-400" />
                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Migliori Pastori</span>
