@@ -256,7 +256,12 @@
             });
         }
 
-        function render(state) {
+        function render(state, backgroundUrl) {
+            if (backgroundUrl) {
+                document.body.style.backgroundImage = `url(${backgroundUrl})`;
+            } else {
+                document.body.style.backgroundImage = "url('../tournament-bg.png')";
+            }
             if (!state || !state.bracket) return;
             const b = state.bracket;
             document.getElementById('bracket-title').innerText = b.title || 'TABELLONE TORNEO 2V2';
@@ -354,15 +359,15 @@
         }
 
         async function init() {
-            const { data } = await client.from('stream_overlays').select('state').eq('id', OVERLAY_ID).single();
-            if (data?.state) render(data.state);
+            const { data } = await client.from('stream_overlays').select('state, background_url').eq('id', OVERLAY_ID).single();
+            if (data) render(data.state, data.background_url);
 
             client.channel('public:stream_overlays')
-                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stream_overlays', filter: `id=eq.${OVERLAY_ID}` }, payload => render(payload.new.state))
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stream_overlays', filter: `id=eq.${OVERLAY_ID}` }, payload => render(payload.new.state, payload.new.background_url))
                 .subscribe();
             
             window.addEventListener('resize', async () => {
-                const { data } = await client.from('stream_overlays').select('state').eq('id', OVERLAY_ID).single();
+                const { data } = await client.from('stream_overlays').select('state, background_url').eq('id', OVERLAY_ID).single();
                 if (data?.state) updateLines(data.state);
             });
         }

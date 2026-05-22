@@ -50,6 +50,16 @@ export const overlayService = {
     return (data as any).icon_url as string | null;
   },
 
+  async getOverlayBackground(id: string = 'aoe4-match'): Promise<string | null> {
+    const { data, error } = await supabase
+      .from('stream_overlays')
+      .select('background_url')
+      .eq('id', id)
+      .single();
+    if (error || !data) return null;
+    return (data as any).background_url as string | null;
+  },
+
   async getOverlayDescription(id: string = 'aoe4-match'): Promise<string | null> {
     const { data, error } = await supabase
       .from('stream_overlays')
@@ -72,6 +82,14 @@ export const overlayService = {
     const { error } = await supabase
       .from('stream_overlays')
       .upsert({ id, icon_url: iconUrl }, { onConflict: 'id' });
+
+    if (error) throw error;
+  },
+
+  async updateOverlayBackground(id: string = 'aoe4-match', backgroundUrl: string) {
+    const { error } = await supabase
+      .from('stream_overlays')
+      .upsert({ id, background_url: backgroundUrl }, { onConflict: 'id' });
 
     if (error) throw error;
   },

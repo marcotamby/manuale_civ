@@ -79,6 +79,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
   
   const [overlayNames, setOverlayNames] = useState<Record<string, string>>({});
   const [overlayIcons, setOverlayIcons] = useState<Record<string, string>>({});
+  const [overlayBackgrounds, setOverlayBackgrounds] = useState<Record<string, string>>({});
   const [overlayDescriptions, setOverlayDescriptions] = useState<Record<string, string>>({});
   const [isEditingName, setIsEditingName] = useState(false);
   const [editNameValue, setEditNameValue] = useState<string>('');
@@ -89,6 +90,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
   const editNameInputRef = useRef<HTMLInputElement>(null);
   const editDescInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const bgInputRef = useRef<HTMLInputElement>(null);
 
   const { overlayId, tab } = useParams();
   const navigate = useNavigate();
@@ -101,6 +103,9 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
         });
         overlayService.getOverlayIcon(ov.id).then(icon => {
           if (icon) setOverlayIcons(prev => ({ ...prev, [ov.id]: icon }));
+        });
+        overlayService.getOverlayBackground(ov.id).then(bg => {
+          if (bg) setOverlayBackgrounds(prev => ({ ...prev, [ov.id]: bg }));
         });
         overlayService.getOverlayDescription(ov.id).then(desc => {
           if (desc !== null && desc !== undefined) {
@@ -144,6 +149,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
 
   const overlayDisplayName = (selectedOverlay && overlayNames[selectedOverlay.id]) ?? selectedOverlay?.name ?? '';
   const overlayDisplayIcon = (selectedOverlay && overlayIcons[selectedOverlay.id]) ?? '';
+  const overlayDisplayBackground = (selectedOverlay && overlayBackgrounds[selectedOverlay.id]) ?? '';
   const overlayDisplayDesc = (selectedOverlay && overlayDescriptions[selectedOverlay.id]) ?? selectedOverlay?.description ?? '';
 
   useEffect(() => {
@@ -243,6 +249,32 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
         setToast({ isVisible: true, message: 'Errore caricamento icona.', type: 'error' });
       } finally {
         if (fileInputRef.current) fileInputRef.current.value = '';
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleBackgroundUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedOverlay) return;
+    
+    // Allow up to 10MB for background image
+    if (file.size > 10240 * 1024) {
+      setToast({ isVisible: true, message: 'Immagine troppo grande (max 10MB)', type: 'error' });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64 = reader.result as string;
+      try {
+        await overlayService.updateOverlayBackground(selectedOverlay.id, base64);
+        setOverlayBackgrounds(prev => ({ ...prev, [selectedOverlay.id]: base64 }));
+        setToast({ isVisible: true, message: 'Background aggiornato! 🖼️', type: 'success' });
+      } catch {
+        setToast({ isVisible: true, message: 'Errore caricamento background.', type: 'error' });
+      } finally {
+        if (bgInputRef.current) bgInputRef.current.value = '';
       }
     };
     reader.readAsDataURL(file);
@@ -435,6 +467,14 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                           <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></div>
                           ANTEPRIMA LIVE (1920x1080)
                         </div>
+                        <button 
+                          onClick={() => bgInputRef.current?.click()}
+                          className="absolute top-6 right-6 z-10 px-4 py-2 bg-black/60 backdrop-blur-md rounded-full border border-white/10 text-[11px] font-black text-gray-300 flex items-center gap-2 hover:bg-white/10 hover:text-white transition-all cursor-pointer"
+                        >
+                          <Upload size={14} className="text-[#D4AF37]" />
+                          CAMBIA SFONDO (MAX 10MB)
+                        </button>
+                        <input type="file" ref={bgInputRef} onChange={handleBackgroundUpload} accept="image/*" className="hidden" />
                         <div className="absolute inset-0 flex items-center justify-center p-6 overflow-hidden">
                           <div className="w-full h-full relative" ref={containerRef}>
                             <iframe 
@@ -446,7 +486,8 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                                 left: '50%',
                                 top: '50%',
                                 transform: `translate(-50%, -50%) scale(${previewScale})`,
-                                transformOrigin: 'center center'
+                                transformOrigin: 'center center',
+                                ...(overlayDisplayBackground && { backgroundImage: `url(${overlayDisplayBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' })
                               }} 
                               title="Overlay Preview" 
                             />

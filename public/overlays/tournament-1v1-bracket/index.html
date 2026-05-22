@@ -261,7 +261,12 @@
             });
         }
 
-        function render(state) {
+        function render(state, backgroundUrl) {
+            if (backgroundUrl) {
+                document.body.style.backgroundImage = `url(${backgroundUrl})`;
+            } else {
+                document.body.style.backgroundImage = "url('../background/background.png')";
+            }
             if (!state) return;
             lastState = state;
 
@@ -319,16 +324,16 @@
         }
 
         async function init() {
-            const { data } = await client.from('stream_overlays').select('state').eq('id', OVERLAY_ID).single();
-            if (data?.state) render(data.state);
+            const { data } = await client.from('stream_overlays').select('state, background_url').eq('id', OVERLAY_ID).single();
+            if (data) render(data.state, data.background_url);
 
             client.channel('public:stream_overlays')
-                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stream_overlays', filter: `id=eq.${OVERLAY_ID}` }, payload => render(payload.new.state))
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stream_overlays', filter: `id=eq.${OVERLAY_ID}` }, payload => render(payload.new.state, payload.new.background_url))
                 .subscribe();
 
             setInterval(async () => {
-                const { data } = await client.from('stream_overlays').select('state').eq('id', OVERLAY_ID).single();
-                if (data?.state) render(data.state);
+                const { data } = await client.from('stream_overlays').select('state, background_url').eq('id', OVERLAY_ID).single();
+                if (data) render(data.state, data.background_url);
             }, 5000);
 
             if (timerInterval) clearInterval(timerInterval);
