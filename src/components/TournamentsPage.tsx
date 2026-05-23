@@ -1357,8 +1357,14 @@ export function TournamentsPage() {
                     <button 
                       onClick={() => {
                         if (editForm.podium.length < 12) {
-                          const nextPlacement = Math.min(3, (editForm.podium.length % 3) + 1);
-                          setEditForm({...editForm, podium: [...editForm.podium, {placement: nextPlacement, entrant: {name: ''}, division: ''}]});
+                          const lastItem = editForm.podium[editForm.podium.length - 1];
+                          const lastDivision = lastItem ? (lastItem.division || '') : '';
+                          const divisionCount = editForm.podium.filter((p: any) => (p.division || '') === lastDivision).length;
+                          const nextPlacement = Math.min(3, divisionCount + 1);
+                          setEditForm({
+                            ...editForm,
+                            podium: [...editForm.podium, { placement: nextPlacement, entrant: { name: '' }, division: lastDivision }]
+                          });
                         }
                       }} 
                       className="text-yellow-500 text-[10px] font-black hover:underline" 
