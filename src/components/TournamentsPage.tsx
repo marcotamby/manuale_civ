@@ -239,7 +239,8 @@ export function TournamentsPage() {
       bannerPositionY: t.config?.bannerPositionY || 50
     });
     setShowEditModal(true);
-    setIsRegEditorExpanded(true);
+    const params = new URLSearchParams(window.location.search);
+    setIsRegEditorExpanded(params.get('target') === 'regolamento');
   }, []);
 
   useEffect(() => {
@@ -1078,7 +1079,7 @@ export function TournamentsPage() {
                                 bannerPositionY: t.config?.bannerPositionY || 50
                               });
                               setShowEditModal(true);
-                              setIsRegEditorExpanded(true);
+                              setIsRegEditorExpanded(false);
                             }} 
                             className="w-14 h-full bg-white/5 hover:bg-white/10 rounded-2xl text-blue-400 transition-all border border-white/5 hover:border-blue-500/30 active:scale-95 shadow-lg flex items-center justify-center shrink-0"
                           >
