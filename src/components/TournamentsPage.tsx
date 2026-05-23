@@ -740,7 +740,7 @@ export function TournamentsPage() {
           return (
             <div key={t.id} className="relative z-10 hover:z-50 group">
               <div 
-                className="glass rounded-3xl overflow-hidden border border-white/5 flex flex-col transition-all duration-500 hover:border-white/80 hover:shadow-[0_30px_60px_rgba(0,0,0,0.8)] hover:-translate-y-1 hover:scale-[1.05] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] [backface-visibility:hidden] [transform-style:preserve-3d]"
+                className="glass rounded-3xl border border-white/5 flex flex-col transition-all duration-500 hover:border-white/80 hover:shadow-[0_30px_60px_rgba(0,0,0,0.8)] hover:-translate-y-1 hover:scale-[1.05] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] [backface-visibility:hidden] [transform-style:preserve-3d]"
               >
                 {(() => {
                   const canRenderInternal = (t.events?.length > 0 || t.config.source === 'challonge' || t.config.source === 'startgg') && !t.config.slug.startsWith('tb-');
@@ -760,7 +760,7 @@ export function TournamentsPage() {
                     return (
                       <Link 
                         to={`/tornei/${t.slug}`}
-                        className="h-48 relative overflow-hidden cursor-pointer block"
+                        className="h-48 relative overflow-hidden cursor-pointer block rounded-t-3xl"
                       >
                         {bannerContent}
                       </Link>
@@ -771,14 +771,14 @@ export function TournamentsPage() {
                         href={t.config.directLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="h-48 relative overflow-hidden cursor-pointer block"
+                        className="h-48 relative overflow-hidden cursor-pointer block rounded-t-3xl"
                       >
                         {bannerContent}
                       </a>
                     );
                   } else {
                     return (
-                      <div className="h-48 relative overflow-hidden">
+                      <div className="h-48 relative overflow-hidden rounded-t-3xl">
                         {bannerContent}
                       </div>
                     );
@@ -813,7 +813,7 @@ export function TournamentsPage() {
                       )}
                     </div>
 
-                <div className="p-6 flex flex-col flex-grow bg-[#121620] relative z-10 -mt-px">
+                <div className="p-6 flex flex-col flex-grow bg-[#121620] relative z-10 -mt-px rounded-b-3xl">
                     <span className="text-xs font-bold text-yellow-500/50 uppercase mb-1 tracking-widest">Organizzato da {t.config.organizer}</span>
                     <div className="relative group/title">
                       <h3 className="text-2xl font-black text-white mb-4 line-clamp-1 group-hover/title:text-yellow-400 transition-colors uppercase tracking-tight">
@@ -868,8 +868,11 @@ export function TournamentsPage() {
                                           {s.entrant?.name || '---'}
                                         </span>
 
-                                        {/* Premium Tooltip (Combined for Name and Players) */}
-                                        <div className="absolute bottom-full left-0 mb-3 px-4 py-2.5 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-2xl opacity-0 group-hover/name:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/name:scale-100 origin-bottom-left z-50">
+                                         {/* Premium Tooltip (Combined for Name and Players) */}
+                                        <div className={clsx(
+                                          "absolute bottom-full mb-3 px-4 py-2.5 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-2xl opacity-0 group-hover/name:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/name:scale-100 z-50",
+                                          sIdx > 0 ? "right-0 origin-bottom-right" : "left-0 origin-bottom-left"
+                                        )}>
                                           <div className="flex flex-col">
                                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 border-b border-white/5 pb-1">
                                               {idx === 0 ? '🏆 Campione' : idx === 1 ? '🥈 Finalista' : '🥉 3° Classificato'}
@@ -893,7 +896,10 @@ export function TournamentsPage() {
                                             )}
                                           </div>
                                           {/* Tooltip Arrow */}
-                                          <div className="absolute top-full left-4 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-800/95"></div>
+                                          <div className={clsx(
+                                            "absolute top-full -mt-1 border-4 border-transparent border-t-slate-800/95",
+                                            sIdx > 0 ? "right-4" : "left-4 -translate-x-1/2"
+                                          )}></div>
                                         </div>
                                       </div>
                                       {sIdx < entries.length - 1 && <span className="text-gray-600 font-black flex-shrink-0 mx-1">&</span>}
