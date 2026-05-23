@@ -29,19 +29,55 @@ export async function sendNewBuildOrderWebhook(params: BuildOrderWebhookParams) 
 
   const boUrl = `https://aoe4guide.it/civ/${params.civId}/buildorders?bo=${params.boId}`;
 
-  // Build a beautiful formatted message. Discord will auto-unfurl the link at the end, 
-  // rendering our optimized OG tags and making the image natively clickable to the site!
-  let messageText = `📢 **Nuovo Build Order Pubblicato!**\n\n`;
-  messageText += `📖 **${params.boTitle}**\n`;
-  messageText += `⚔️ **Civiltà**: *${params.civName}*\n`;
-  messageText += `🏆 **Difficoltà**: *${diffText}*\n`;
-  if (params.map) {
-    messageText += `🗺️ **Mappe Consigliate**: *${params.map}*\n`;
+  // Make description clean and truncated if too long
+  let desc = params.description || '';
+  if (desc.length > 140) {
+    desc = desc.substring(0, 137) + '...';
   }
-  messageText += `\n🔗 **Visualizza la guida completa**: ${boUrl}`;
+
+  const fields = [
+    {
+      name: '⚔️ Civiltà',
+      value: params.civName,
+      inline: true
+    },
+    {
+      name: '🏆 Difficoltà',
+      value: diffText,
+      inline: true
+    }
+  ];
+
+  if (params.map) {
+    fields.push({
+      name: '🗺️ Mappe Consigliate',
+      value: params.map,
+      inline: true
+    });
+  }
+
+  const embed: any = {
+    title: `📖 ${params.boTitle}`,
+    description: desc ? `*${desc}*\n\n[Visualizza il Build Order completo su Manuale Civ](${boUrl})` : `[Visualizza il Build Order completo su Manuale Civ](${boUrl})`,
+    url: boUrl,
+    color: 439924, // Cyan hex #06B6D4 in decimal
+    fields,
+    footer: {
+      text: 'Manuale Civ • Age of Empires IV',
+      icon_url: 'https://aoe4guide.it/favicon.ico'
+    },
+    timestamp: new Date().toISOString()
+  };
+
+  if (params.bannerUrl) {
+    embed.image = {
+      url: params.bannerUrl
+    };
+  }
 
   const payload = {
-    content: messageText
+    content: `📢 **Nuovo Build Order Pubblicato!**`,
+    embeds: [embed]
   };
 
   try {
