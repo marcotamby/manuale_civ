@@ -32,6 +32,7 @@ export default async function handler(req: Request) {
     let ogTitle = '';
     let ogSubtitle = '';
     let ogDescription: string | null = null;
+    let useDirectImage = false;
 
     if (civId) {
       const supabase = createClient(supabaseUrl, supabaseAnonKey);
@@ -53,14 +54,21 @@ export default async function handler(req: Request) {
           const bo = ((civ as any).build_orders as any[]).find((b: any) => b.id === boId);
           if (bo) {
             title = `Build Order ${civ.name}: ${bo.title}`;
-            description = bo.description || `Migliora il tuo gioco con questa build order per ${civ.name}.`;
-            if (bo.banner_url) image = bo.banner_url;
+            
+            // Truncate description to 140 chars for Discord to keep it clean
+            const rawDescription = bo.description || `Migliora il tuo gioco con questa build order per ${civ.name}.`;
+            description = rawDescription.length > 140 ? rawDescription.substring(0, 137) + '...' : rawDescription;
+            
+            if (bo.banner_url) {
+              image = bo.banner_url;
+              useDirectImage = true; // Use the uploaded cover image directly
+            }
             subtitle = 'Build Order';
             
             // Custom OG Image text for build orders to avoid redundancy in Discord embed
             ogTitle = bo.title;
             ogSubtitle = `Build Order ${civ.name}`;
-            ogDescription = ''; // Hide description in image
+            ogDescription = ''; // Hide description in image if fallback is used
           }
         }
       }
@@ -76,22 +84,29 @@ export default async function handler(req: Request) {
     }
     
     const encodedImage = finalImage.startsWith('http') ? finalImage : `${base}${finalImage}`;
-    const ogImageUrl = new URL(`${base}/api/og`);
     
-    const finalOgTitle = ogTitle || title.replace(' | Manuale Civ', '');
-    const finalOgSubtitle = ogSubtitle || subtitle;
-    const finalOgDescription = ogDescription !== null ? ogDescription : (description.length > 100 ? description.substring(0, 97) + '...' : description);
+    let finalImageUrl = '';
+    if (useDirectImage) {
+      // Direct WebP or JPEG link from Supabase/external source, Discord handles WebP perfectly
+      finalImageUrl = encodedImage;
+    } else {
+      const ogImageUrl = new URL(`${base}/api/og`);
+      
+      const finalOgTitle = ogTitle || title.replace(' | Manuale Civ', '');
+      const finalOgSubtitle = ogSubtitle || subtitle;
+      const finalOgDescription = ogDescription !== null ? ogDescription : (description.length > 100 ? description.substring(0, 97) + '...' : description);
 
-    ogImageUrl.searchParams.set('title', finalOgTitle);
-    if (finalOgDescription) {
-      ogImageUrl.searchParams.set('description', finalOgDescription);
-    }
-    ogImageUrl.searchParams.set('image', encodeURI(encodedImage));
-    if (finalOgSubtitle) {
-      ogImageUrl.searchParams.set('subtitle', finalOgSubtitle);
-    }
+      ogImageUrl.searchParams.set('title', finalOgTitle);
+      if (finalOgDescription) {
+        ogImageUrl.searchParams.set('description', finalOgDescription);
+      }
+      ogImageUrl.searchParams.set('image', encodeURI(encodedImage));
+      if (finalOgSubtitle) {
+        ogImageUrl.searchParams.set('subtitle', finalOgSubtitle);
+      }
 
-    const finalImageUrl = ogImageUrl.toString();
+      finalImageUrl = ogImageUrl.toString();
+    }
 
     // Return minimal HTML for bots
     return new Response(
