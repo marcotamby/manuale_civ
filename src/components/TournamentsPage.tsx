@@ -431,7 +431,7 @@ export function TournamentsPage() {
         status: editForm.status,
         podium: editForm.podium.map(p => ({
           ...p,
-          players: p.players ? p.players.filter((name: string) => name.trim() !== '') : []
+          players: p.players ? p.players.map((name: string) => name.trim()).filter((name: string) => name !== '') : []
         })),
         type: editForm.type,
         has_regolamento: editForm.hasRegolamento,
@@ -933,10 +933,10 @@ export function TournamentsPage() {
                                         type="button"
                                         onClick={() => setActiveDivisions(prev => ({ ...prev, [t.id]: divName }))}
                                         className={clsx(
-                                          "py-0.5 px-2 rounded-md text-[8px] font-black uppercase tracking-wider transition-all",
+                                          "py-1 px-3.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all min-w-[70px] text-center",
                                           isActive
                                             ? "bg-gradient-to-b from-slate-100 via-slate-200 to-blue-200 text-slate-900 shadow-[0_0_10px_rgba(191,219,254,0.25)] scale-[1.02]"
-                                            : "text-slate-400 hover:text-white"
+                                            : "text-slate-400 hover:text-white hover:bg-white/5"
                                         )}
                                       >
                                         {divName}
@@ -1435,7 +1435,12 @@ export function TournamentsPage() {
                             type="text" 
                             value={p.players?.join(', ') || ''} 
                             onChange={e => {
-                              const playerList = e.target.value.split(',').map(s => s.trim());
+                              const playerList = e.target.value.split(',').map((s, idx, arr) => {
+                                if (idx === arr.length - 1) {
+                                  return s.replace(/^\s+/, '');
+                                }
+                                return s.trim();
+                              });
                               const np = [...editForm.podium]; 
                               np[i] = { ...p, players: playerList }; 
                               setEditForm({ ...editForm, podium: np });
