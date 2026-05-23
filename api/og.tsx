@@ -10,9 +10,9 @@ export default async function handler(req: Request) {
 
     // ?title=<title>
     const title = searchParams.get('title') || 'Manuale Civ';
-    const description = searchParams.get('description') || 'Age of Empires 4 Guides';
+    const description = searchParams.has('description') ? searchParams.get('description') : 'Age of Empires 4 Guides';
     const image = searchParams.get('image') || 'https://manualeciv.it/header-bg.png';
-    const subtitle = searchParams.get('subtitle') || '';
+    const subtitle = searchParams.has('subtitle') ? searchParams.get('subtitle') : '';
 
     return new ImageResponse(
       (
@@ -66,20 +66,22 @@ export default async function handler(req: Request) {
                 fontWeight: 'bold',
                 color: 'white',
                 lineHeight: 1.1,
-                marginBottom: 24,
+                marginBottom: description ? 24 : 0,
               }}
             >
               {title}
             </div>
-            <div
-              style={{
-                fontSize: 32,
-                color: '#e5e7eb',
-                lineHeight: 1.4,
-              }}
-            >
-              {description}
-            </div>
+            {description && (
+              <div
+                style={{
+                  fontSize: 32,
+                  color: '#e5e7eb',
+                  lineHeight: 1.4,
+                }}
+              >
+                {description}
+              </div>
+            )}
           </div>
 
           {/* Logo Branding */}

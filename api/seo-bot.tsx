@@ -29,6 +29,10 @@ export default async function handler(req: Request) {
     let image = 'https://manualeciv.it/header-bg.png';
     let subtitle = '';
 
+    let ogTitle = '';
+    let ogSubtitle = '';
+    let ogDescription: string | null = null;
+
     if (civId) {
       const supabase = createClient(supabaseUrl, supabaseAnonKey);
       
@@ -46,12 +50,17 @@ export default async function handler(req: Request) {
         subtitle = 'Guida Civiltà';
 
         if (boId && (civ as any).build_orders) {
-          const bo = ((civ as any).build_orders as any[]).find(b => b.id === boId);
+          const bo = ((civ as any).build_orders as any[]).find((b: any) => b.id === boId);
           if (bo) {
             title = `Build Order ${civ.name}: ${bo.title}`;
             description = bo.description || `Migliora il tuo gioco con questa build order per ${civ.name}.`;
             if (bo.banner_url) image = bo.banner_url;
             subtitle = 'Build Order';
+            
+            // Custom OG Image text for build orders to avoid redundancy in Discord embed
+            ogTitle = bo.title;
+            ogSubtitle = `Build Order ${civ.name}`;
+            ogDescription = ''; // Hide description in image
           }
         }
       }
@@ -68,10 +77,19 @@ export default async function handler(req: Request) {
     
     const encodedImage = finalImage.startsWith('http') ? finalImage : `${base}${finalImage}`;
     const ogImageUrl = new URL(`${base}/api/og`);
-    ogImageUrl.searchParams.set('title', title.replace(' | Manuale Civ', ''));
-    ogImageUrl.searchParams.set('description', description.length > 100 ? description.substring(0, 97) + '...' : description);
+    
+    const finalOgTitle = ogTitle || title.replace(' | Manuale Civ', '');
+    const finalOgSubtitle = ogSubtitle || subtitle;
+    const finalOgDescription = ogDescription !== null ? ogDescription : (description.length > 100 ? description.substring(0, 97) + '...' : description);
+
+    ogImageUrl.searchParams.set('title', finalOgTitle);
+    if (finalOgDescription) {
+      ogImageUrl.searchParams.set('description', finalOgDescription);
+    }
     ogImageUrl.searchParams.set('image', encodeURI(encodedImage));
-    if (subtitle) ogImageUrl.searchParams.set('subtitle', subtitle);
+    if (finalOgSubtitle) {
+      ogImageUrl.searchParams.set('subtitle', finalOgSubtitle);
+    }
 
     const finalImageUrl = ogImageUrl.toString();
 
