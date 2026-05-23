@@ -98,7 +98,22 @@ async function getAoe4GuidesData(buildId: string) {
       schematicText += `\n--- ${ageName} ---\n`;
       ageBlock.steps?.forEach((step: any) => {
         let stepDesc = step.description
-          .replace(/<img[^>]+title="([^"]+)"[^>]*>/g, '[$1]')
+          .replace(/<img([^>]+)>/g, (match: string, attrs: string) => {
+            const titleMatch = attrs.match(/title="([^"]+)"/);
+            if (titleMatch && titleMatch[1]) {
+              return `[${titleMatch[1]}]`;
+            }
+            
+            const srcMatch = attrs.match(/src="([^"]+)"/);
+            if (srcMatch && srcMatch[1]) {
+              const url = srcMatch[1];
+              const filename = url.substring(url.lastIndexOf('/') + 1);
+              const nameWithoutExt = filename.substring(0, filename.lastIndexOf('.')) || filename;
+              const cleanName = nameWithoutExt.replace(/[-_]/g, ' ');
+              return `[${cleanName}]`;
+            }
+            return '';
+          })
           .replace(/&nbsp;/g, ' ')
           .replace(/<br\s*\/?>/g, '\n')
           .replace(/<[^>]+>/g, '');
