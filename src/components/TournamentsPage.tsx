@@ -68,6 +68,7 @@ export function TournamentsPage() {
   const [syncStatus, setSyncStatus] = useState<'idle' | 'synced'>('idle');
   const [bracketErrorId, setBracketErrorId] = useState<string | null>(null);
   const [returnPath, setReturnPath] = useState<string | null>(null);
+  const [activeDivisions, setActiveDivisions] = useState<Record<string, string>>({});
   const regSectionRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
@@ -912,23 +913,54 @@ export function TournamentsPage() {
                         // Extract unique divisions, ignoring empty/null values
                         const divisions = Array.from(new Set(podium.map((s: any) => s.division || '').filter(Boolean))) as string[];
 
-                        if (divisions.length > 0) {
+                        if (divisions.length > 1) {
+                          const activeDiv = activeDivisions[t.id] || divisions[0];
+                          const divEntries = podium.filter((s: any) => s.division === activeDiv);
                           return (
                             <div className="space-y-4 overflow-visible flex-grow flex flex-col justify-center">
-                              {divisions.map((divName, divIdx) => {
-                                const divEntries = podium.filter((s: any) => s.division === divName);
-                                return (
-                                  <div key={divIdx} className="space-y-2 border-b border-white/5 pb-3 last:border-0 last:pb-0">
-                                    <p className="text-[9px] font-black text-yellow-500/80 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                                      🏆 {divName}
-                                    </p>
-                                    {[1, 2, 3].map((placement, idx) => {
-                                      const entries = divEntries.filter((s: any) => (s.placement === placement || s.rank === placement));
-                                      const hasData = entries.length > 0;
-                                      return renderStandingRow(entries, idx, hasData);
-                                    })}
-                                  </div>
-                                );
+                              {/* Tab/Segmented control bar */}
+                              <div className="flex gap-1 bg-white/[0.02] p-1 rounded-xl border border-white/5 shadow-inner">
+                                {divisions.map((divName) => {
+                                  const isActive = activeDiv === divName;
+                                  return (
+                                    <button
+                                      key={divName}
+                                      onClick={() => setActiveDivisions(prev => ({ ...prev, [t.id]: divName }))}
+                                      className={clsx(
+                                        "flex-1 py-1.5 px-2 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all truncate",
+                                        isActive
+                                          ? "bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.2)]"
+                                          : "text-slate-400 hover:text-white hover:bg-white/5"
+                                      )}
+                                    >
+                                      {divName}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                              
+                              {/* Active division rows */}
+                              <div className="space-y-2">
+                                {[1, 2, 3].map((placement, idx) => {
+                                  const entries = divEntries.filter((s: any) => (s.placement === placement || s.rank === placement));
+                                  const hasData = entries.length > 0;
+                                  return renderStandingRow(entries, idx, hasData);
+                                })}
+                              </div>
+                            </div>
+                          );
+                        } else if (divisions.length === 1) {
+                          const divName = divisions[0];
+                          const divEntries = podium.filter((s: any) => s.division === divName);
+                          return (
+                            <div className="space-y-2 overflow-visible flex-grow flex flex-col justify-center">
+                              <p className="text-[9px] font-black text-yellow-500/80 uppercase tracking-widest mb-1.5 flex items-center gap-1.5 border-b border-white/5 pb-1">
+                                🏆 {divName}
+                              </p>
+                              {[1, 2, 3].map((placement, idx) => {
+                                const entries = divEntries.filter((s: any) => (s.placement === placement || s.rank === placement));
+                                const hasData = entries.length > 0;
+                                return renderStandingRow(entries, idx, hasData);
                               })}
                             </div>
                           );
@@ -1352,27 +1384,10 @@ export function TournamentsPage() {
                 </div>
 
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center mb-1">
                     <label className="text-[11px] text-yellow-500/80 font-black uppercase tracking-widest ml-1">Podio del Torneo</label>
-                    <button 
-                      onClick={() => {
-                        if (editForm.podium.length < 12) {
-                          const lastItem = editForm.podium[editForm.podium.length - 1];
-                          const lastDivision = lastItem ? (lastItem.division || '') : '';
-                          const divisionCount = editForm.podium.filter((p: any) => (p.division || '') === lastDivision).length;
-                          const nextPlacement = Math.min(3, divisionCount + 1);
-                          setEditForm({
-                            ...editForm,
-                            podium: [...editForm.podium, { placement: nextPlacement, entrant: { name: '' }, division: lastDivision }]
-                          });
-                        }
-                      }} 
-                      className="text-yellow-500 text-[10px] font-black hover:underline" 
-                      hidden={editForm.podium.length >= 12}
-                    >
-                      + AGGIUNGI RIGA
-                    </button>
                   </div>
+                  
                   {editForm.podium.map((p, i) => (
                     <div key={i} className="bg-black/20 p-5 rounded-2xl border border-white/5 space-y-4 relative group/podiumrow">
                     <div className="flex gap-4 items-start w-full">
@@ -1459,6 +1474,26 @@ export function TournamentsPage() {
                       </div>
                     </div>
                   ))}
+
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      if (editForm.podium.length < 12) {
+                        const lastItem = editForm.podium[editForm.podium.length - 1];
+                        const lastDivision = lastItem ? (lastItem.division || '') : '';
+                        const divisionCount = editForm.podium.filter((p: any) => (p.division || '') === lastDivision).length;
+                        const nextPlacement = Math.min(3, divisionCount + 1);
+                        setEditForm({
+                          ...editForm,
+                          podium: [...editForm.podium, { placement: nextPlacement, entrant: { name: '' }, division: lastDivision }]
+                        });
+                      }
+                    }} 
+                    className="w-full py-4 border border-dashed border-white/10 hover:border-yellow-500/50 rounded-2xl text-yellow-500 hover:text-yellow-400 text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 bg-white/[0.01] hover:bg-white/[0.03] active:scale-[0.98]"
+                    hidden={editForm.podium.length >= 12}
+                  >
+                    + AGGIUNGI RIGA AL PODIO
+                  </button>
                 </div>
 
                 <div className="flex gap-4 pt-6 border-t border-white/5">
