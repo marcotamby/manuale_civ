@@ -6,6 +6,7 @@ import { usePresence } from './PresenceContext';
 import type { BuildOrder, Civilization } from '../data/aoe4Data';
 import { toast } from 'react-hot-toast';
 import { AOE4_MAPS as ALL_MAPS } from '../data/aoe4Maps';
+import { sendNewBuildOrderWebhook } from '../utils/discordWebhook';
 
 interface AdminBOEditorModalProps {
   civ: Civilization;
@@ -189,6 +190,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     try {
       setIsSaving(true);
       const currentBOs = [...(civ.buildOrders || [])];
+      const isNew = boIndex === null;
       
       if (boIndex !== null) {
         currentBOs[boIndex] = editedBO;
@@ -204,6 +206,24 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
       if (error) throw error;
 
       setShowSuccess(true);
+
+      if (isNew) {
+        try {
+          await sendNewBuildOrderWebhook({
+            civId: civ.id,
+            civName: civ.name,
+            boId: editedBO.id,
+            boTitle: editedBO.title,
+            difficulty: editedBO.difficulty,
+            description: editedBO.description,
+            map: editedBO.map,
+            bannerUrl: editedBO.banner_url
+          });
+        } catch (webhookErr) {
+          console.error('Failed to trigger Discord webhook:', webhookErr);
+        }
+      }
+
       setTimeout(() => {
         onSave(currentBOs);
         onClose();

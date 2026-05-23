@@ -6,6 +6,7 @@ import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
+import { sendNewBuildOrderWebhook } from '../utils/discordWebhook';
 
 export interface Suggestion {
   id: string;
@@ -397,6 +398,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
     const canManage = (sugg.section === 'build_order' && canManageBuildorders) || (sugg.section !== 'build_order' && canManageCivs);
     if (!isSuperAdmin && !canManage) return;
     try {
+      let justApprovedBO: any = null;
+      let targetCiv: any = null;
+
       if (newStatus === 'implemented') {
         const { data: currentCiv, error: fetchError } = await supabase
           .from('civilizations')
@@ -405,6 +409,8 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
           .single();
 
         if (fetchError) throw fetchError;
+
+        targetCiv = currentCiv;
 
         let updateData: any = null;
         const newLines = sugg.suggestion_text.split('\n').map(s => s.trim()).filter(s => s !== '');
@@ -451,6 +457,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
               author_rank: sugg.user_nickname ? (sugg.user_rank || 'Unranked') : null
             };
             updateData = { build_orders: [...safeArray(currentCiv.build_orders), newBO] };
+            justApprovedBO = newBO;
             break;
           case 'unita':
           case 'tecnologie':
@@ -469,6 +476,23 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
             .eq('id', currentCiv.id);
 
           if (civUpdateError) throw civUpdateError;
+
+          if (justApprovedBO && targetCiv) {
+            try {
+              await sendNewBuildOrderWebhook({
+                civId: targetCiv.id,
+                civName: targetCiv.name,
+                boId: justApprovedBO.id,
+                boTitle: justApprovedBO.title,
+                difficulty: justApprovedBO.difficulty,
+                description: justApprovedBO.description,
+                map: justApprovedBO.map || '',
+                bannerUrl: justApprovedBO.banner_url || ''
+              });
+            } catch (webhookErr) {
+              console.error('Failed to trigger Discord webhook:', webhookErr);
+            }
+          }
         }
       }
 
