@@ -98,7 +98,7 @@ async function getAoe4GuidesData(buildId: string) {
       schematicText += `\n--- ${ageName} ---\n`;
       ageBlock.steps?.forEach((step: any) => {
         let stepDesc = step.description
-          .replace(/<img([^>]+)>/g, (match: string, attrs: string) => {
+          .replace(/<img([^>]+)>/g, (_: string, attrs: string) => {
             const titleMatch = attrs.match(/title="([^"]+)"/);
             if (titleMatch && titleMatch[1]) {
               return `[${titleMatch[1]}]`;
