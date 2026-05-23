@@ -739,9 +739,9 @@ export function TournamentsPage() {
           const podium = t.config.podium || t.events?.[0]?.standings?.nodes || [];
 
           return (
-            <div key={t.id} className="relative z-10 hover:z-50 group">
+            <div key={t.id} className="relative z-10 hover:z-50 group h-full flex flex-col">
               <div 
-                className="glass rounded-3xl border border-white/5 flex flex-col transition-all duration-500 hover:border-white/80 hover:shadow-[0_30px_60px_rgba(0,0,0,0.8)] hover:-translate-y-1 hover:scale-[1.05] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] [backface-visibility:hidden] [transform-style:preserve-3d]"
+                className="glass rounded-3xl border border-white/5 flex flex-col flex-grow h-full transition-all duration-500 hover:border-white/80 hover:shadow-[0_30px_60px_rgba(0,0,0,0.8)] hover:-translate-y-1 hover:scale-[1.05] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] [backface-visibility:hidden] [transform-style:preserve-3d]"
               >
                 {(() => {
                   const canRenderInternal = (t.events?.length > 0 || t.config.source === 'challonge' || t.config.source === 'startgg') && !t.config.slug.startsWith('tb-');
@@ -843,7 +843,7 @@ export function TournamentsPage() {
                       </div>
                     </div>
 
-                    <div className="mb-6 p-4 rounded-2xl bg-white/[0.03] border border-white/5 shadow-inner min-h-[145px] flex flex-col">
+                    <div className="mb-6 p-4 rounded-2xl bg-white/[0.03] border border-white/5 shadow-inner min-h-[145px] flex flex-col flex-grow justify-center">
                       <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent mb-4"></div>
                       <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-3 border-b border-white/5 pb-2">Risultati Finali</p>
                       
@@ -936,7 +936,7 @@ export function TournamentsPage() {
                                       className={clsx(
                                         "flex-1 py-1.5 px-2 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all truncate",
                                         isActive
-                                          ? "bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.2)]"
+                                          ? "bg-gradient-to-b from-slate-100 via-slate-200 to-blue-200 text-slate-900 shadow-[0_0_12px_rgba(191,219,254,0.35)]"
                                           : "text-slate-400 hover:text-white hover:bg-white/5"
                                       )}
                                     >
