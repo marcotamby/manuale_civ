@@ -844,75 +844,106 @@ export function TournamentsPage() {
                     <div className="mb-6 p-4 rounded-2xl bg-white/[0.03] border border-white/5 shadow-inner min-h-[145px] flex flex-col">
                       <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent mb-4"></div>
                       <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-3 border-b border-white/5 pb-2">Risultati Finali</p>
-                      <div className="space-y-2 overflow-visible flex-grow flex flex-col justify-center">
-                        {[1, 2, 3].map((placement, idx) => {
-                          const entries = podium.filter((s: any) => (s.placement === placement || s.rank === placement));
-                          const hasData = entries.length > 0;
-                          
-                          return (
-                            <div key={idx} className="flex justify-between text-sm items-center group/standing relative z-10">
-                              <div className="flex items-center gap-3 flex-1 min-w-0">
-                                <span className={clsx("text-lg flex-shrink-0", !hasData && "opacity-20 grayscale")}>
-                                  {['🥇','🥈','🥉'][idx]}
-                                </span>
-                                {hasData ? (
-                                  <div className="flex items-center gap-x-1.5 flex-1 min-w-0 group/players">
-                                    {entries.map((s, sIdx) => (
-                                      <div key={sIdx} className="relative flex items-center min-w-0 flex-shrink-1 group/name">
-                                        <div className="relative min-w-0 flex-shrink-1">
-                                          <span 
-                                            className={clsx(
-                                              "font-bold transition-colors truncate block cursor-help",
-                                              idx === 0 ? "text-yellow-100" : "text-gray-400",
-                                              s.players && s.players.length > 0 && "decoration-yellow-500/30 underline underline-offset-8 decoration-dotted"
-                                            )}
-                                          >
-                                            {s.entrant?.name || '---'}
-                                          </span>
-
-                                          {/* Premium Tooltip (Combined for Name and Players) */}
-                                          <div className="absolute bottom-full left-0 mb-3 px-4 py-2.5 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-2xl opacity-0 group-hover/name:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/name:scale-100 origin-bottom-left z-50">
-                                            <div className="flex flex-col">
-                                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 border-b border-white/5 pb-1">
-                                                {idx === 0 ? '🏆 Campione' : idx === 1 ? '🥈 Finalista' : '🥉 3° Classificato'}
-                                              </span>
-                                              <span className={clsx("text-sm font-bold text-white", s.players && s.players.length > 0 ? "mb-2" : "mb-0")}>{s.entrant?.name || '---'}</span>
-                                              
-                                              {s.players && s.players.length > 0 && (
-                                                <div className="mt-1 pt-2 border-t border-white/10">
-                                                  <p className="text-[9px] font-black text-yellow-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-                                                    <Users size={10} /> Componenti Team
-                                                  </p>
-                                                  <div className="space-y-1.5">
-                                                    {s.players.map((player: string, pIdx: number) => (
-                                                      <div key={pIdx} className="flex items-center gap-2 text-[11px] text-white/80 font-bold uppercase tracking-tight">
-                                                        <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
-                                                        {player}
-                                                      </div>
-                                                    ))}
-                                                  </div>
-                                                </div>
-                                              )}
-                                            </div>
-                                            {/* Tooltip Arrow */}
-                                            <div className="absolute top-full left-4 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-800/95"></div>
-                                          </div>
-                                        </div>
-                                        {sIdx < entries.length - 1 && <span className="text-gray-600 font-black flex-shrink-0 mx-1">&</span>}
-                                      </div>
-                                    ))}
-                                  </div>
-                                ) : (
-                                  <span className="text-gray-600 italic text-[11px] font-medium tracking-tight">In attesa...</span>
-                                )}
-                              </div>
-                              <span className="text-white/20 font-black italic uppercase text-[9px] group-hover/standing:text-white/40 transition-colors flex-shrink-0 ml-2">
-                                {hasData ? (idx === 0 ? 'WINNER' : `${idx+1}° PLACE`) : '---'}
+                      
+                      {(() => {
+                        const renderStandingRow = (entries: any[], idx: number, hasData: boolean) => (
+                          <div key={idx} className="flex justify-between text-sm items-center group/standing relative z-10">
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <span className={clsx("text-lg flex-shrink-0", !hasData && "opacity-20 grayscale")}>
+                                {['🥇','🥈','🥉'][idx]}
                               </span>
+                              {hasData ? (
+                                <div className="flex items-center gap-x-1.5 flex-1 min-w-0 group/players">
+                                  {entries.map((s, sIdx) => (
+                                    <div key={sIdx} className="relative flex items-center min-w-0 flex-shrink-1 group/name">
+                                      <div className="relative min-w-0 flex-shrink-1">
+                                        <span 
+                                          className={clsx(
+                                            "font-bold transition-colors truncate block cursor-help",
+                                            idx === 0 ? "text-yellow-100" : "text-gray-400",
+                                            s.players && s.players.length > 0 && "decoration-yellow-500/30 underline underline-offset-8 decoration-dotted"
+                                          )}
+                                        >
+                                          {s.entrant?.name || '---'}
+                                        </span>
+
+                                        {/* Premium Tooltip (Combined for Name and Players) */}
+                                        <div className="absolute bottom-full left-0 mb-3 px-4 py-2.5 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-2xl opacity-0 group-hover/name:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/name:scale-100 origin-bottom-left z-50">
+                                          <div className="flex flex-col">
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 border-b border-white/5 pb-1">
+                                              {idx === 0 ? '🏆 Campione' : idx === 1 ? '🥈 Finalista' : '🥉 3° Classificato'}
+                                            </span>
+                                            <span className={clsx("text-sm font-bold text-white", s.players && s.players.length > 0 ? "mb-2" : "mb-0")}>{s.entrant?.name || '---'}</span>
+                                            
+                                            {s.players && s.players.length > 0 && (
+                                              <div className="mt-1 pt-2 border-t border-white/10">
+                                                <p className="text-[9px] font-black text-yellow-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                                                  <Users size={10} /> Componenti Team
+                                                </p>
+                                                <div className="space-y-1.5">
+                                                  {s.players.map((player: string, pIdx: number) => (
+                                                    <div key={pIdx} className="flex items-center gap-2 text-[11px] text-white/80 font-bold uppercase tracking-tight">
+                                                      <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
+                                                      {player}
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            )}
+                                          </div>
+                                          {/* Tooltip Arrow */}
+                                          <div className="absolute top-full left-4 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-800/95"></div>
+                                        </div>
+                                      </div>
+                                      {sIdx < entries.length - 1 && <span className="text-gray-600 font-black flex-shrink-0 mx-1">&</span>}
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="text-gray-600 italic text-[11px] font-medium tracking-tight">In attesa...</span>
+                              )}
+                            </div>
+                            <span className="text-white/20 font-black italic uppercase text-[9px] group-hover/standing:text-white/40 transition-colors flex-shrink-0 ml-2">
+                              {hasData ? (idx === 0 ? 'WINNER' : `${idx+1}° PLACE`) : '---'}
+                            </span>
+                          </div>
+                        );
+
+                        // Extract unique divisions, ignoring empty/null values
+                        const divisions = Array.from(new Set(podium.map((s: any) => s.division || '').filter(Boolean))) as string[];
+
+                        if (divisions.length > 0) {
+                          return (
+                            <div className="space-y-4 overflow-visible flex-grow flex flex-col justify-center">
+                              {divisions.map((divName, divIdx) => {
+                                const divEntries = podium.filter((s: any) => s.division === divName);
+                                return (
+                                  <div key={divIdx} className="space-y-2 border-b border-white/5 pb-3 last:border-0 last:pb-0">
+                                    <p className="text-[9px] font-black text-yellow-500/80 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                                      🏆 {divName}
+                                    </p>
+                                    {[1, 2, 3].map((placement, idx) => {
+                                      const entries = divEntries.filter((s: any) => (s.placement === placement || s.rank === placement));
+                                      const hasData = entries.length > 0;
+                                      return renderStandingRow(entries, idx, hasData);
+                                    })}
+                                  </div>
+                                );
+                              })}
                             </div>
                           );
-                        })}
-                      </div>
+                        } else {
+                          return (
+                            <div className="space-y-2 overflow-visible flex-grow flex flex-col justify-center">
+                              {[1, 2, 3].map((placement, idx) => {
+                                const entries = podium.filter((s: any) => (s.placement === placement || s.rank === placement));
+                                const hasData = entries.length > 0;
+                                return renderStandingRow(entries, idx, hasData);
+                              })}
+                            </div>
+                          );
+                        }
+                      })()}
                     </div>
 
                     <div className="mt-auto flex items-center gap-2 pt-4 border-t border-white/5 h-16">
@@ -1325,13 +1356,13 @@ export function TournamentsPage() {
                     <label className="text-[11px] text-yellow-500/80 font-black uppercase tracking-widest ml-1">Podio del Torneo</label>
                     <button 
                       onClick={() => {
-                        if (editForm.podium.length < 4) {
-                          const nextPlacement = Math.min(3, editForm.podium.length + 1);
-                          setEditForm({...editForm, podium: [...editForm.podium, {placement: nextPlacement, entrant: {name: ''}}]});
+                        if (editForm.podium.length < 12) {
+                          const nextPlacement = Math.min(3, (editForm.podium.length % 3) + 1);
+                          setEditForm({...editForm, podium: [...editForm.podium, {placement: nextPlacement, entrant: {name: ''}, division: ''}]});
                         }
                       }} 
                       className="text-yellow-500 text-[10px] font-black hover:underline" 
-                      hidden={editForm.podium.length >= 4}
+                      hidden={editForm.podium.length >= 12}
                     >
                       + AGGIUNGI RIGA
                     </button>
@@ -1402,6 +1433,24 @@ export function TournamentsPage() {
                           />
                         </div>
                       )}
+
+                      {/* Division/Fascia input */}
+                      <div className="space-y-1.5 pt-3 border-t border-white/5">
+                        <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-2">
+                          🏆 Divisione / Fascia (Opzionale)
+                        </label>
+                        <input 
+                          type="text" 
+                          value={p.division || ''} 
+                          onChange={e => {
+                            const np = [...editForm.podium]; 
+                            np[i] = { ...p, division: e.target.value }; 
+                            setEditForm({ ...editForm, podium: np });
+                          }} 
+                          placeholder="Esempio: Fascia 1 (High Elo), Fascia 2 (Low Elo)" 
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white/60 text-[11px] outline-none focus:border-yellow-500/20 transition-all italic" 
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
