@@ -814,7 +814,7 @@ export function TournamentsPage() {
                       )}
                     </div>
 
-                <div className="p-6 flex flex-col flex-grow bg-[#121620] relative z-10 -mt-px rounded-b-3xl">
+                <div className="p-6 flex flex-col flex-grow bg-[#0a0d14] relative z-10 -mt-px rounded-b-3xl">
                     <span className="text-xs font-bold text-yellow-500/50 uppercase mb-1 tracking-widest">Organizzato da {t.config.organizer}</span>
                     <div className="relative group/title">
                       <h3 className="text-2xl font-black text-white mb-4 line-clamp-1 group-hover/title:text-yellow-400 transition-colors uppercase tracking-tight">
@@ -843,10 +843,7 @@ export function TournamentsPage() {
                       </div>
                     </div>
 
-                    <div className="mb-6 p-4 rounded-2xl bg-white/[0.03] border border-white/5 shadow-inner min-h-[145px] flex flex-col flex-grow justify-center">
-                      <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent mb-4"></div>
-                      <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-3 border-b border-white/5 pb-2">Risultati Finali</p>
-                      
+                    <div className="mb-6 p-4 rounded-2xl bg-white/[0.03] border border-white/5 shadow-inner min-h-[145px] flex flex-col flex-grow justify-center animate-all duration-300">
                       {(() => {
                         const renderStandingRow = (entries: any[], idx: number, hasData: boolean) => (
                           <div key={idx} className="flex justify-between text-sm items-center group/standing relative z-10">
@@ -919,69 +916,56 @@ export function TournamentsPage() {
 
                         // Extract unique divisions, ignoring empty/null values
                         const divisions = Array.from(new Set(podium.map((s: any) => s.division || '').filter(Boolean))) as string[];
+                        const activeDiv = activeDivisions[t.id] || divisions[0];
 
-                        if (divisions.length > 1) {
-                          const activeDiv = activeDivisions[t.id] || divisions[0];
-                          const divEntries = podium.filter((s: any) => s.division === activeDiv);
-                          return (
-                            <div className="space-y-4 overflow-visible flex-grow flex flex-col justify-center">
-                              {/* Tab/Segmented control bar */}
-                              <div className="flex gap-1 bg-white/[0.02] p-1 rounded-xl border border-white/5 shadow-inner">
-                                {divisions.map((divName) => {
-                                  const isActive = activeDiv === divName;
-                                  return (
-                                    <button
-                                      key={divName}
-                                      onClick={() => setActiveDivisions(prev => ({ ...prev, [t.id]: divName }))}
-                                      className={clsx(
-                                        "flex-1 py-1.5 px-2 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all truncate",
-                                        isActive
-                                          ? "bg-gradient-to-b from-slate-100 via-slate-200 to-blue-200 text-slate-900 shadow-[0_0_12px_rgba(191,219,254,0.35)]"
-                                          : "text-slate-400 hover:text-white hover:bg-white/5"
-                                      )}
-                                    >
-                                      {divName}
-                                    </button>
-                                  );
-                                })}
-                              </div>
+                        return (
+                          <>
+                            <div className="flex justify-between items-center mb-3 border-b border-white/5 pb-2 min-h-[28px] overflow-visible">
+                              <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Risultati Finali</p>
                               
-                              {/* Active division rows */}
-                              <div className="space-y-2">
-                                {[1, 2, 3].map((placement, idx) => {
-                                  const entries = divEntries.filter((s: any) => (s.placement === placement || s.rank === placement));
-                                  const hasData = entries.length > 0;
-                                  return renderStandingRow(entries, idx, hasData);
-                                })}
-                              </div>
+                              {divisions.length > 1 && (
+                                <div className="flex gap-1 bg-white/[0.02] p-0.5 rounded-lg border border-white/5 shadow-inner">
+                                  {divisions.map((divName) => {
+                                    const isActive = activeDiv === divName;
+                                    return (
+                                      <button
+                                        key={divName}
+                                        type="button"
+                                        onClick={() => setActiveDivisions(prev => ({ ...prev, [t.id]: divName }))}
+                                        className={clsx(
+                                          "py-0.5 px-2 rounded-md text-[8px] font-black uppercase tracking-wider transition-all",
+                                          isActive
+                                            ? "bg-gradient-to-b from-slate-100 via-slate-200 to-blue-200 text-slate-900 shadow-[0_0_10px_rgba(191,219,254,0.25)] scale-[1.02]"
+                                            : "text-slate-400 hover:text-white"
+                                        )}
+                                      >
+                                        {divName}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              )}
+
+                              {divisions.length === 1 && (
+                                <span className="text-[9px] font-bold text-yellow-500/80 uppercase tracking-widest flex items-center gap-1">
+                                  🏆 {divisions[0]}
+                                </span>
+                              )}
                             </div>
-                          );
-                        } else if (divisions.length === 1) {
-                          const divName = divisions[0];
-                          const divEntries = podium.filter((s: any) => s.division === divName);
-                          return (
-                            <div className="space-y-2 overflow-visible flex-grow flex flex-col justify-center">
-                              <p className="text-[9px] font-black text-yellow-500/80 uppercase tracking-widest mb-1.5 flex items-center gap-1.5 border-b border-white/5 pb-1">
-                                🏆 {divName}
-                              </p>
+
+                            <div className="space-y-2 overflow-visible flex-grow flex flex-col justify-center transition-all duration-300">
                               {[1, 2, 3].map((placement, idx) => {
-                                const entries = divEntries.filter((s: any) => (s.placement === placement || s.rank === placement));
+                                const entries = podium.filter((s: any) => {
+                                  const matchesPlacement = s.placement === placement || s.rank === placement;
+                                  const matchesDivision = divisions.length > 1 ? s.division === activeDiv : true;
+                                  return matchesPlacement && matchesDivision;
+                                });
                                 const hasData = entries.length > 0;
                                 return renderStandingRow(entries, idx, hasData);
                               })}
                             </div>
-                          );
-                        } else {
-                          return (
-                            <div className="space-y-2 overflow-visible flex-grow flex flex-col justify-center">
-                              {[1, 2, 3].map((placement, idx) => {
-                                const entries = podium.filter((s: any) => (s.placement === placement || s.rank === placement));
-                                const hasData = entries.length > 0;
-                                return renderStandingRow(entries, idx, hasData);
-                              })}
-                            </div>
-                          );
-                        }
+                          </>
+                        );
                       })()}
                     </div>
 
@@ -1128,7 +1112,7 @@ export function TournamentsPage() {
             </div>
           )}
 
-          <div className="bg-[#121620] border border-white/10 p-8 rounded-3xl w-full max-w-2xl my-auto shadow-2xl animate-in zoom-in-95 duration-300 relative overflow-hidden">
+          <div className="bg-[#0a0d14] border border-white/10 p-8 rounded-3xl w-full max-w-2xl my-auto shadow-2xl animate-in zoom-in-95 duration-300 relative overflow-hidden">
             
             {/* Header */}
             <div className="flex justify-between items-center mb-8 text-slate-300">
