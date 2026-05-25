@@ -131,6 +131,16 @@ export function TournamentMatchesPage() {
               <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" />
               Torna ai tornei
             </button>
+            
+            {tournament.direct_link && (
+              <button 
+                onClick={() => window.open(tournament.direct_link, '_blank')}
+                className="flex items-center gap-2 text-gray-400 hover:text-red-400 transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.3)] w-fit animate-in fade-in slide-in-from-left-4 duration-500"
+              >
+                <ExternalLink size={16} className="transition-transform duration-300 ease-in-out group-hover:scale-110" />
+                Vai al tabellone
+              </button>
+            )}
           </div>
           
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -153,15 +163,6 @@ export function TournamentMatchesPage() {
                 </div>
               </div>
             </div>
-
-            {tournament.direct_link && (
-              <button 
-                onClick={() => window.open(tournament.direct_link, '_blank')}
-                className="flex items-center gap-2.5 px-6 py-3.5 bg-white/5 hover:bg-red-500/10 rounded-2xl text-white hover:text-red-400 font-black uppercase text-[10px] tracking-[0.2em] transition-all border border-white/5 hover:border-red-500/30 active:scale-95 shadow-2xl group"
-              >
-                Tabellone Ufficiale <ExternalLink size={14} />
-              </button>
-            )}
           </div>
         </div>
       </div>
