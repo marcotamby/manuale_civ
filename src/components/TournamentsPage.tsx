@@ -820,7 +820,7 @@ export function TournamentsPage() {
                       {(status === 'In corso' || status === 'Programmato') && (
                         <Link
                           to={`/tornei/${t.slug}/scommetti`}
-                          className="mt-2 px-4 py-2 bg-gradient-to-r from-purple-600 via-fuchsia-500 to-indigo-600 text-white font-black uppercase text-[10px] tracking-tighter rounded-lg shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)] transition-all hover:scale-110 active:scale-95 transform -skew-x-12 border border-white/20 inline-block text-center"
+                          className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center justify-center gap-2 transition-all bg-purple-600/60 border-purple-500/50 text-slate-100 hover:bg-purple-500/80 hover:scale-105 active:scale-95 hover:border-purple-400/60"
                         >
                           Scommetti! 🐑
                         </Link>
@@ -829,9 +829,9 @@ export function TournamentsPage() {
                       {t.config.vods && t.config.vods.length > 0 && (
                         <Link
                           to={`/tornei/${t.slug}/match`}
-                          className="px-3 py-1.5 bg-red-600/80 hover:bg-red-600 border border-red-500/30 text-white rounded-full text-[10px] font-black uppercase tracking-wider backdrop-blur-md shadow-[0_0_15px_rgba(220,38,38,0.4)] hover:shadow-[0_0_25px_rgba(220,38,38,0.6)] flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 group/vods"
+                          className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center justify-center gap-2 transition-all bg-red-600/60 border-red-500/50 text-slate-100 hover:bg-red-500/80 hover:scale-105 active:scale-95 hover:border-red-400/60 group/vods"
                         >
-                          VODs <Youtube size={12} className="group-hover/vods:scale-110 transition-transform text-white" />
+                          VODs <Youtube size={14} className="group-hover/vods:scale-110 transition-transform text-white" />
                         </Link>
                       )}
                     </div>
