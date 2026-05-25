@@ -825,6 +825,15 @@ export function TournamentsPage() {
                           Scommetti! 🐑
                         </Link>
                       )}
+
+                      {t.config.vods && t.config.vods.length > 0 && (
+                        <Link
+                          to={`/tornei/${t.slug}/match`}
+                          className="px-3 py-1.5 bg-red-600/80 hover:bg-red-600 border border-red-500/30 text-white rounded-full text-[10px] font-black uppercase tracking-wider backdrop-blur-md shadow-[0_0_15px_rgba(220,38,38,0.4)] hover:shadow-[0_0_25px_rgba(220,38,38,0.6)] flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 group/vods"
+                        >
+                          VODs <Youtube size={12} className="group-hover/vods:scale-110 transition-transform text-white" />
+                        </Link>
+                      )}
                     </div>
 
                 <div className="p-6 flex flex-col flex-grow bg-[#0a0d14] relative z-10 -mt-px rounded-b-3xl">
@@ -983,14 +992,6 @@ export function TournamentsPage() {
                     </div>
 
                     <div className="mt-auto flex items-center gap-2 pt-4 border-t border-white/5 h-16">
-                        {t.config.vods && t.config.vods.length > 0 && (
-                          <Link 
-                            to={`/tornei/${t.slug}/match`} 
-                            className="flex-grow h-full bg-red-950/30 hover:bg-red-900/50 border border-red-500/20 hover:border-red-500/50 rounded-2xl text-red-400 hover:text-red-300 text-[10px] font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/vods shadow-lg active:scale-95"
-                          >
-                            VODs <Youtube size={14} className="group-hover/vods:scale-110 transition-transform text-red-500" />
-                          </Link>
-                        )}
                         {t.config.hasRegolamento && (
                           <Link 
                             to={`/tornei/${t.slug}/regolamento`} 
