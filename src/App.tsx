@@ -25,6 +25,7 @@ import { TournamentsPage } from './components/TournamentsPage';
 import { TournamentDetail } from './components/TournamentDetail';
 import { TournamentRegolamento } from './components/TournamentRegolamento';
 import { BettingPage } from './components/BettingPage';
+import { TournamentMatchesPage } from './components/TournamentMatchesPage';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { usePresence } from './components/PresenceContext';
@@ -334,7 +335,9 @@ function App() {
                 <Route path="/tornei/:slug" element={<TournamentDetail />} />
                 <Route path="/tornei/:slug/regolamento" element={<TournamentRegolamento />} />
                 <Route path="/tornei/:slug/scommetti" element={<BettingPage />} />
+                <Route path="/tornei/:slug/match" element={<TournamentMatchesPage />} />
                 <Route path="/tornei/tournament/:slug/scommetti" element={<BettingPage />} />
+                <Route path="/tornei/tournament/:slug/match" element={<TournamentMatchesPage />} />
                 <Route path="/tornei/tournament/:slug" element={<TournamentDetail />} />
                 <Route path="/tornei/tournament/:slug/regolamento" element={<TournamentRegolamento />} />
                 <Route path="/admin/overlays" element={<Home onSelectCiv={handleSelectCiv} onCompareCivs={handleCompare} />} />

@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament, fetchChallongeData } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
-import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, ChevronUp, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink, MoveVertical } from 'lucide-react';
+import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, ChevronUp, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink, MoveVertical, Play } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
@@ -30,6 +30,7 @@ interface TournamentConfig {
   display_order?: number;
   created_at?: string;
   id?: string;
+  vods?: any[];
 }
 
 const TOURNAMENTS: TournamentConfig[] = [];
@@ -59,7 +60,8 @@ export function TournamentsPage() {
     regolamentoContent: '',
     display_order: 0,
     bannerPositionX: 50,
-    bannerPositionY: 50
+    bannerPositionY: 50,
+    vods: [] as any[]
   });
   const [isUploading, setIsUploading] = useState(false);
   const [dragState, setDragState] = useState<{ startX: number; startY: number; startPosX: number; startPosY: number } | null>(null);
@@ -109,7 +111,8 @@ export function TournamentsPage() {
             bannerPositionX: db.banner_position_x || 50,
             bannerPositionY: db.banner_position_y || 50,
             created_at: db.created_at,
-            id: db.id
+            id: db.id,
+            vods: db.vods || []
           };
           dbConfigs.push(configObj);
         });
@@ -236,7 +239,8 @@ export function TournamentsPage() {
       externalUrl: t.config?.externalUrl || '',
       display_order: t.config?.display_order || 0,
       bannerPositionX: t.config?.bannerPositionX || 50,
-      bannerPositionY: t.config?.bannerPositionY || 50
+      bannerPositionY: t.config?.bannerPositionY || 50,
+      vods: t.config?.vods || []
     });
     setShowEditModal(true);
     const params = new URLSearchParams(window.location.search);
@@ -440,7 +444,14 @@ export function TournamentsPage() {
         display_order: editForm.display_order,
         banner_position_x: editForm.bannerPositionX,
         banner_position_y: editForm.bannerPositionY,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        vods: editForm.vods.map(v => ({
+          id: v.id || `vod-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          title: (v.title || '').trim(),
+          url: (v.url || '').trim(),
+          round: (v.round || '').trim(),
+          score: (v.score || '').trim()
+        }))
       };
 
       const { data: existing } = await supabase
@@ -515,7 +526,8 @@ export function TournamentsPage() {
           hasRegolamento: editForm.hasRegolamento,
           regolamentoContent: editForm.regolamentoContent,
           bannerPositionX: editForm.bannerPositionX,
-          bannerPositionY: editForm.bannerPositionY
+          bannerPositionY: editForm.bannerPositionY,
+          vods: editForm.vods
         }
       }) : null);
 
@@ -713,7 +725,8 @@ export function TournamentsPage() {
                 regolamentoContent: '',
                 display_order: 0,
                 bannerPositionX: 50,
-                bannerPositionY: 50
+                bannerPositionY: 50,
+                vods: []
               });
               setShowEditModal(true);
             }} 
@@ -970,6 +983,14 @@ export function TournamentsPage() {
                     </div>
 
                     <div className="mt-auto flex items-center gap-2 pt-4 border-t border-white/5 h-16">
+                        {t.config.vods && t.config.vods.length > 0 && (
+                          <Link 
+                            to={`/tornei/${t.slug}/match`} 
+                            className="flex-grow h-full bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/30 rounded-2xl text-cyan-400 text-[10px] font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/vods shadow-lg active:scale-95"
+                          >
+                            VODs <Play size={14} className="group-hover/vods:scale-110 transition-transform" />
+                          </Link>
+                        )}
                         {t.config.hasRegolamento && (
                           <Link 
                             to={`/tornei/${t.slug}/regolamento`} 
@@ -1060,7 +1081,8 @@ export function TournamentsPage() {
                                 externalUrl: t.config?.externalUrl || '',
                                 display_order: t.config?.display_order || 0,
                                 bannerPositionX: t.config?.bannerPositionX || 50,
-                                bannerPositionY: t.config?.bannerPositionY || 50
+                                bannerPositionY: t.config?.bannerPositionY || 50,
+                                vods: t.config?.vods || []
                               });
                               setShowEditModal(true);
                               setIsRegEditorExpanded(false);
@@ -1154,7 +1176,8 @@ export function TournamentsPage() {
                       regolamentoContent: editingTournament?.config?.regolamentoContent || '',
                       podium: editingTournament?.config?.podium || (editingTournament?.events?.[0]?.standings?.nodes || []),
                       bannerPositionX: editingTournament?.config?.bannerPositionX || 50,
-                      bannerPositionY: editingTournament?.config?.bannerPositionY || 50
+                      bannerPositionY: editingTournament?.config?.bannerPositionY || 50,
+                      vods: editingTournament?.config?.vods || []
                     };
 
                     const currentData = {
@@ -1168,7 +1191,8 @@ export function TournamentsPage() {
                       regolamentoContent: editForm.regolamentoContent,
                       podium: editForm.podium,
                       bannerPositionX: editForm.bannerPositionX,
-                      bannerPositionY: editForm.bannerPositionY
+                      bannerPositionY: editForm.bannerPositionY,
+                      vods: editForm.vods
                     };
 
                     if (JSON.stringify(initialData) === JSON.stringify(currentData)) {
@@ -1489,6 +1513,109 @@ export function TournamentsPage() {
                     hidden={editForm.podium.length >= 12}
                   >
                     + AGGIUNGI RIGA AL PODIO
+                  </button>
+                </div>
+
+                {/* VODs Section */}
+                <div className="space-y-3 p-4 rounded-2xl bg-white/5 border border-white/10">
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="text-[11px] text-cyan-400 font-black uppercase tracking-widest ml-1">Video dei Match (VODs)</label>
+                  </div>
+                  
+                  {editForm.vods && editForm.vods.map((v, i) => (
+                    <div key={v.id || i} className="bg-black/20 p-4 rounded-xl border border-white/5 space-y-3 relative group/vodrow">
+                      <div className="flex justify-between items-center border-b border-white/5 pb-2 mb-2">
+                        <span className="text-[9px] text-gray-500 font-bold uppercase">Video #{i + 1}</span>
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            const nv = editForm.vods.filter((_, idx) => idx !== i);
+                            setEditForm({ ...editForm, vods: nv });
+                          }} 
+                          className="p-1 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded transition-all"
+                          title="Rimuovi Video"
+                        >
+                          <Trash2 size={14}/>
+                        </button>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Titolo Match / Giocatori</label>
+                          <input 
+                            type="text" 
+                            value={v.title || ''} 
+                            onChange={e => {
+                              const nv = [...editForm.vods];
+                              nv[i] = { ...v, title: e.target.value };
+                              setEditForm({ ...editForm, vods: nv });
+                            }} 
+                            placeholder="Es: Semifinale: Player A vs Player B" 
+                            className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-cyan-500 transition-colors" 
+                          />
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Link YouTube</label>
+                          <input 
+                            type="text" 
+                            value={v.url || ''} 
+                            onChange={e => {
+                              const nv = [...editForm.vods];
+                              nv[i] = { ...v, url: e.target.value };
+                              setEditForm({ ...editForm, vods: nv });
+                            }} 
+                            placeholder="https://www.youtube.com/watch?v=..." 
+                            className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-cyan-500 transition-colors" 
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                        <div className="space-y-1">
+                          <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Fase / Round (Opzionale)</label>
+                          <input 
+                            type="text" 
+                            value={v.round || ''} 
+                            onChange={e => {
+                              const nv = [...editForm.vods];
+                              nv[i] = { ...v, round: e.target.value };
+                              setEditForm({ ...editForm, vods: nv });
+                            }} 
+                            placeholder="Es: Winners Round 1, Finale" 
+                            className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-cyan-500 transition-colors" 
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Risultato (Opzionale)</label>
+                          <input 
+                            type="text" 
+                            value={v.score || ''} 
+                            onChange={e => {
+                              const nv = [...editForm.vods];
+                              nv[i] = { ...v, score: e.target.value };
+                              setEditForm({ ...editForm, vods: nv });
+                            }} 
+                            placeholder="Es: 3-1" 
+                            className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-cyan-500 transition-colors" 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      const nv = editForm.vods || [];
+                      setEditForm({
+                        ...editForm,
+                        vods: [...nv, { id: `vod-${Date.now()}`, title: '', url: '', round: '', score: '' }]
+                      });
+                    }} 
+                    className="w-full py-3 border border-dashed border-white/10 hover:border-cyan-500/50 rounded-2xl text-cyan-400 hover:text-cyan-300 text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 bg-white/[0.01] hover:bg-white/[0.03] active:scale-[0.98]"
+                  >
+                    + AGGIUNGI MATCH VIDEO (VOD)
                   </button>
                 </div>
 
