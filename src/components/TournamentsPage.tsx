@@ -808,7 +808,7 @@ export function TournamentsPage() {
                           "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center gap-2 transition-all",
                           status === 'In corso' ? "bg-green-600/60 border-green-500/50 text-slate-100" : 
                           status === 'Programmato' ? "bg-blue-600/60 border-blue-500/50 text-slate-100" :
-                          "bg-red-600/60 border-red-500/50 text-slate-100"
+                          "bg-[#FF6961]/60 border-[#FF6961]/50 text-slate-100"
                         )}
                       >
                         {status === 'In corso' && <span className="w-1.5 h-1.5 rounded-full bg-slate-100 inline-block mr-0.5 animate-pulse" />}
