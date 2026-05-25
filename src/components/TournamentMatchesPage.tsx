@@ -114,6 +114,12 @@ export function TournamentMatchesPage() {
     return matchesSearch && matchesRound;
   });
 
+  const hasIntegratedBracket = tournament && tournament.source === 'startgg' && (
+    tournament.slug?.startsWith('tournament/') || 
+    !tournament.direct_link || 
+    tournament.direct_link.includes('start.gg')
+  );
+
   return (
     <div className="flex flex-col min-h-screen bg-[#0a0a0b] text-white">
       <SEO 
@@ -146,7 +152,7 @@ export function TournamentMatchesPage() {
             
             {/* Right Side */}
             <div className="flex flex-col items-end gap-3 text-right">
-              {tournament.source === 'startgg' ? (
+              {hasIntegratedBracket ? (
                 <button 
                   onClick={() => navigate(`/tornei/${window.location.pathname.includes('/tournament/') ? `tournament/${slug}` : slug}${window.location.search}`)}
                   className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"

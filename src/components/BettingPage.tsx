@@ -436,6 +436,12 @@ export function BettingPage() {
     </div>
   );
 
+  const hasIntegratedBracket = tournament && tournament.source === 'startgg' && (
+    tournament.slug?.startsWith('tournament/') || 
+    !tournament.direct_link || 
+    tournament.direct_link.includes('start.gg')
+  );
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in duration-700">
       <div className="flex justify-between items-start mb-6 w-full gap-4 px-4 md:px-0">
@@ -451,7 +457,7 @@ export function BettingPage() {
 
         {/* Right Side */}
         <div className="flex flex-col items-end gap-3 text-right">
-          {tournament?.source === 'startgg' ? (
+          {hasIntegratedBracket ? (
             <Link 
               to={`/tornei/${window.location.pathname.includes('/tournament/') ? `tournament/${slug}` : slug}${location.search}`}
               className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
