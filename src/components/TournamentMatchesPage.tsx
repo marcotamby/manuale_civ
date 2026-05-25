@@ -137,7 +137,7 @@ export function TournamentMatchesPage() {
                 onClick={() => window.open(tournament.direct_link, '_blank')}
                 className="flex items-center gap-2 text-gray-400 hover:text-red-400 transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.3)] w-fit animate-in fade-in slide-in-from-left-4 duration-500"
               >
-                <ExternalLink size={16} className="transition-transform duration-300 ease-in-out group-hover:scale-110" />
+                <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" />
                 Vai al tabellone
               </button>
             )}

@@ -438,13 +438,12 @@ export function BettingPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in duration-700">
-      {/* Header Section */}
       <div className="flex flex-col md:flex-row items-start justify-between mb-8 gap-10 px-4 md:px-0">
         <div className="relative flex-1">
            <div className="flex flex-col gap-3 mb-6">
              <Link 
               to="/tornei"
-              className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-xs font-black uppercase tracking-widest hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
              >
               <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" /> Torna ai Tornei
              </Link>
@@ -452,7 +451,7 @@ export function BettingPage() {
               to={location.pathname.includes('/tournament/') 
                 ? `/tornei/tournament/${slug}${location.search}` 
                 : `/tornei/${slug}${location.search}`}
-              className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-xs font-black uppercase tracking-widest hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
              >
               <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" /> Vai al tabellone
              </Link>
