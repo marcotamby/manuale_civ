@@ -26,6 +26,7 @@ export function TournamentMatchesPage() {
   const [tournament, setTournament] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [hasMarkets, setHasMarkets] = useState(false);
   
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -53,6 +54,14 @@ export function TournamentMatchesPage() {
 
         if (dbTournament) {
           setTournament(dbTournament);
+          
+          // Check if there are active markets
+          const { data: markets } = await supabase
+            .from('betting_markets')
+            .select('id')
+            .or(`tournament_slug.eq.${cleanSlug},tournament_slug.eq.${cleanSlug}/,tournament_slug.ilike.%${cleanSlug}%`)
+            .limit(1);
+          setHasMarkets(!!(markets && markets.length > 0));
         } else {
           setErrorMsg("Torneo non trovato.");
         }
@@ -123,24 +132,54 @@ export function TournamentMatchesPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0b] via-[#0a0a0b]/60 to-transparent"></div>
         
         <div className="absolute bottom-0 left-0 right-0 max-w-7xl mx-auto px-4 pb-6 md:pb-10">
-          <div className="flex flex-col gap-3 mb-6">
-            <button 
-              onClick={() => navigate('/tornei')}
-              className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
-            >
-              <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" />
-              Torna ai tornei
-            </button>
-            
-            {tournament.direct_link && (
+          <div className="flex justify-between items-start mb-6 w-full gap-4">
+            {/* Left Side */}
+            <div className="flex flex-col gap-3">
               <button 
-                onClick={() => window.open(tournament.direct_link, '_blank')}
-                className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit animate-in fade-in slide-in-from-left-4 duration-500"
+                onClick={() => navigate('/tornei')}
+                className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
               >
-                <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" />
-                Vai al tabellone
+                <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" />
+                Torna ai tornei
               </button>
-            )}
+            </div>
+            
+            {/* Right Side */}
+            <div className="flex flex-col items-end gap-3 text-right">
+              {tournament.source === 'startgg' ? (
+                <button 
+                  onClick={() => navigate(window.location.pathname.includes('/tournament/') 
+                    ? `/tornei/tournament/${tournament.slug}${window.location.search}` 
+                    : `/tornei/${tournament.slug}${window.location.search}`)}
+                  className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
+                >
+                  <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" />
+                  Vai al tabellone
+                </button>
+              ) : (
+                tournament.direct_link && (
+                  <button 
+                    onClick={() => window.open(tournament.direct_link, '_blank')}
+                    className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
+                  >
+                    <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" />
+                    Vai al tabellone
+                  </button>
+                )
+              )}
+
+              {hasMarkets && (
+                <button 
+                  onClick={() => navigate(window.location.pathname.includes('/tournament/')
+                    ? `/tornei/tournament/${tournament.slug}/scommetti${window.location.search}`
+                    : `/tornei/${tournament.slug}/scommetti${window.location.search}`)}
+                  className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
+                >
+                  <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" />
+                  Vai alle scommesse
+                </button>
+              )}
+            </div>
           </div>
           
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
