@@ -6,7 +6,7 @@ import { useParams, useLocation, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { fetchTournament } from '../services/startgg';
-import { Loader2, ArrowLeft, Trophy, Users, AlertCircle, Plus, X, Zap, ChevronDown, Trash2, Edit2, Filter, Check } from 'lucide-react';
+import { Loader2, ArrowLeft, ArrowRight, Trophy, Users, AlertCircle, Plus, X, Zap, ChevronDown, Trash2, Edit2, Filter, Check } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import clsx from 'clsx';
 
@@ -453,7 +453,7 @@ export function BettingPage() {
                 : `/tornei/${slug}${location.search}`}
               className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
              >
-              <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" /> Vai al tabellone
+              <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" /> Vai al tabellone
              </Link>
            </div>
            <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-white to-slate-400 uppercase tracking-tighter mb-4 leading-tight">

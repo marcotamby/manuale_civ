@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
-import { Loader2, ArrowLeft, Trophy, Calendar, Users, Play, Search, Video, ExternalLink } from 'lucide-react';
+import { Loader2, ArrowLeft, ArrowRight, Trophy, Calendar, Users, Play, Search, Video, ExternalLink } from 'lucide-react';
 import { clsx } from 'clsx';
 import { SEO } from './SEO';
 
@@ -137,7 +137,7 @@ export function TournamentMatchesPage() {
                 onClick={() => window.open(tournament.direct_link, '_blank')}
                 className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit animate-in fade-in slide-in-from-left-4 duration-500"
               >
-                <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" />
+                <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" />
                 Vai al tabellone
               </button>
             )}
