@@ -20,22 +20,27 @@ export const SEO = memo(({
   jsonLd,
   subtitle
 }: SEOProps) => {
-  const siteTitle = title.includes('Manuale Civ') ? title : `${title} | Manuale Civ`;
+  // Ensure we have fallbacks even if parameters are explicitly passed as null/undefined
+  const safeTitle = title || 'Manuale Civ - Age of Empires 4 Guides';
+  const safeDescription = description || 'Il manuale definitivo per Age of Empires 4. Build order, civiltà, strategie e molto altro.';
+  const safeImage = image || 'https://manualeciv.it/header-bg.png';
+
+  const siteTitle = safeTitle.includes('Manuale Civ') ? safeTitle : `${safeTitle} | Manuale Civ`;
 
   // Dynamic OG image URL - Memoized for performance
   const finalImageUrl = useMemo(() => {
     try {
       const base = typeof window !== 'undefined' ? window.location.origin : 'https://manualeciv.it';
       const ogImageUrl = new URL(`${base}/api/og`);
-      ogImageUrl.searchParams.set('title', title.replace(' | Manuale Civ', ''));
-      ogImageUrl.searchParams.set('description', description.length > 100 ? description.substring(0, 97) + '...' : description);
-      ogImageUrl.searchParams.set('image', image.startsWith('http') ? image : `${base}${image}`);
+      ogImageUrl.searchParams.set('title', safeTitle.replace(' | Manuale Civ', ''));
+      ogImageUrl.searchParams.set('description', safeDescription.length > 100 ? safeDescription.substring(0, 97) + '...' : safeDescription);
+      ogImageUrl.searchParams.set('image', safeImage.startsWith('http') ? safeImage : `${base}${safeImage}`);
       if (subtitle) ogImageUrl.searchParams.set('subtitle', subtitle);
       return ogImageUrl.toString();
     } catch (e) {
-      return image.startsWith('http') ? image : `https://manualeciv.it${image}`;
+      return safeImage.startsWith('http') ? safeImage : `https://manualeciv.it${safeImage}`;
     }
-  }, [title, description, image, subtitle]);
+  }, [safeTitle, safeDescription, safeImage, subtitle]);
 
   return (
     <Helmet>

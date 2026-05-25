@@ -164,8 +164,14 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                 if (isCompareMode) {
                   e.preventDefault();
                   handleCardClick(civ.id);
-                } else {
-                  // Call onSelectCiv for any side effects (like analytics or closing menus)
+                } else if (
+                  !e.defaultPrevented &&
+                  e.button === 0 && // Left click only
+                  (!e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) // No modifier keys
+                ) {
+                  // Call onSelectCiv for programmatic navigation + side effects
+                  // and prevent default link click to avoid double navigation crash
+                  e.preventDefault();
                   onSelectCiv(civ.id, isBOMode ? 'buildorders' : undefined);
                 }
               }}
@@ -236,6 +242,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
+                    e.preventDefault(); // Prevent standard link click
                     if (!isAuthenticated) {
                       openLoginModal('Esegui l\'accesso per salvare le tue civiltà preferite e averle sempre a portata di mano!');
                       return;
@@ -251,18 +258,14 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                 </button>
               )}
 
-              {/* Desktop Hover Standard Button */}
+              {/* Desktop Hover Standard Button (Visual indicator) */}
               {!isCompareMode && !isBOMode && (
-                 <button
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     onSelectCiv(civ.id);
-                   }}
-                   className="absolute bottom-20 left-1/2 -translate-x-1/2 hidden md:flex items-center gap-2 px-4 py-2 bg-gradient-to-b from-[#e5e7eb] to-[#9ca3af] text-black opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] whitespace-nowrap shadow-[0_10px_25px_rgba(0,0,0,0.5)] border border-white/40 z-30 cursor-pointer"
+                 <div
+                   className="absolute bottom-20 left-1/2 -translate-x-1/2 hidden md:flex items-center gap-2 px-4 py-2 bg-gradient-to-b from-[#e5e7eb] to-[#9ca3af] text-black opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] whitespace-nowrap shadow-[0_10px_25px_rgba(0,0,0,0.5)] border border-white/40 z-30 pointer-events-none"
                  >
                     <Shield size={14} fill="black" />
                     Scheda civiltà
-                 </button>
+                 </div>
               )}
 
               {/* Text at bottom */}

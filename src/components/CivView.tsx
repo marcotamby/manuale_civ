@@ -298,7 +298,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       .select('*')
       .in('build_order_id', boIds);
     
-    if (error) return;
+    if (error || !data) return;
 
     const counts: Record<string, { up: number, down: number, userVote: number | null }> = {};
     data.forEach(v => {
@@ -383,7 +383,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
       const counts: Record<string, { count: number, userVoted: boolean }> = {};
       const currentUserEmail = user?.email?.toLowerCase();
-      data.forEach(v => {
+      (data || []).forEach(v => {
         if (!counts[v.item_id]) counts[v.item_id] = { count: 0, userVoted: false };
         counts[v.item_id].count++;
         if (currentUserEmail && v.user_email.toLowerCase() === currentUserEmail) {
