@@ -1021,7 +1021,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         </div>
 
         {/* Navigation Bar - Fully Transparent over the cinematic background */}
-        <div className="relative sticky top-0 z-20 border-y border-[#D4AF37]/15 w-full bg-transparent backdrop-blur-sm">
+        <div className="relative sticky top-0 z-20 border-y border-slate-500/20 w-full bg-transparent backdrop-blur-sm">
           <div
             ref={scrollContainerRef}
             onScroll={checkScroll}
@@ -1031,9 +1031,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
-                className={`flex items-center gap-2 px-5 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.id
-                  ? 'border-yellow-500 text-yellow-400'
-                  : 'border-transparent text-gray-400 hover:text-gray-200'
+                className={`flex items-center gap-2 px-5 py-4 text-sm font-semibold transition-all duration-300 whitespace-nowrap border-b-2 ${activeTab === tab.id
+                  ? 'border-cyan-400/90 text-cyan-200 bg-gradient-to-t from-blue-950/40 via-slate-800/15 to-transparent shadow-[0_4px_20px_rgba(56,189,248,0.12)]'
+                  : 'border-transparent text-gray-400 hover:text-cyan-300/90 hover:bg-blue-950/15'
                   }`}
               >
                 {tab.icon}
@@ -1044,7 +1044,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
 
           {canScrollRight && (
             <div className="md:hidden absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[var(--color-brand-dark)]/90 to-transparent pointer-events-none flex items-center justify-end pr-2">
-              <ChevronRight size={16} className="text-yellow-500/70 animate-pulse" />
+              <ChevronRight size={16} className="text-cyan-400/70 animate-pulse" />
             </div>
           )}
         </div>
