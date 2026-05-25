@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament, fetchChallongeData } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
-import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, ChevronUp, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink, MoveVertical, Play } from 'lucide-react';
+import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, ChevronUp, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink, MoveVertical, Youtube } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
@@ -986,9 +986,9 @@ export function TournamentsPage() {
                         {t.config.vods && t.config.vods.length > 0 && (
                           <Link 
                             to={`/tornei/${t.slug}/match`} 
-                            className="flex-grow h-full bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/30 rounded-2xl text-cyan-400 text-[10px] font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/vods shadow-lg active:scale-95"
+                            className="flex-grow h-full bg-red-950/30 hover:bg-red-900/50 border border-red-500/20 hover:border-red-500/50 rounded-2xl text-red-400 hover:text-red-300 text-[10px] font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/vods shadow-lg active:scale-95"
                           >
-                            VODs <Play size={14} className="group-hover/vods:scale-110 transition-transform" />
+                            VODs <Youtube size={14} className="group-hover/vods:scale-110 transition-transform text-red-500" />
                           </Link>
                         )}
                         {t.config.hasRegolamento && (
@@ -1519,7 +1519,7 @@ export function TournamentsPage() {
                 {/* VODs Section */}
                 <div className="space-y-3 p-4 rounded-2xl bg-white/5 border border-white/10">
                   <div className="flex justify-between items-center mb-1">
-                    <label className="text-[11px] text-cyan-400 font-black uppercase tracking-widest ml-1">Video dei Match (VODs)</label>
+                    <label className="text-[11px] text-red-400 font-black uppercase tracking-widest ml-1">Video dei Match (VODs)</label>
                   </div>
                   
                   {editForm.vods && editForm.vods.map((v, i) => (
@@ -1551,12 +1551,12 @@ export function TournamentsPage() {
                               setEditForm({ ...editForm, vods: nv });
                             }} 
                             placeholder="Es: Semifinale: Player A vs Player B" 
-                            className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-cyan-500 transition-colors" 
+                            className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-red-500 transition-colors" 
                           />
                         </div>
                         
                         <div className="space-y-1">
-                          <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Link YouTube</label>
+                          <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-1.5"><Youtube size={12}/> Link YouTube</label>
                           <input 
                             type="text" 
                             value={v.url || ''} 
@@ -1566,7 +1566,7 @@ export function TournamentsPage() {
                               setEditForm({ ...editForm, vods: nv });
                             }} 
                             placeholder="https://www.youtube.com/watch?v=..." 
-                            className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-cyan-500 transition-colors" 
+                            className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-red-500 transition-colors" 
                           />
                         </div>
                       </div>
@@ -1583,7 +1583,7 @@ export function TournamentsPage() {
                               setEditForm({ ...editForm, vods: nv });
                             }} 
                             placeholder="Es: Winners Round 1, Finale" 
-                            className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-cyan-500 transition-colors" 
+                            className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-red-500 transition-colors" 
                           />
                         </div>
                         <div className="space-y-1">
@@ -1597,7 +1597,7 @@ export function TournamentsPage() {
                               setEditForm({ ...editForm, vods: nv });
                             }} 
                             placeholder="Es: 3-1" 
-                            className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-cyan-500 transition-colors" 
+                            className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-red-500 transition-colors" 
                           />
                         </div>
                       </div>
@@ -1613,7 +1613,7 @@ export function TournamentsPage() {
                         vods: [...nv, { id: `vod-${Date.now()}`, title: '', url: '', round: '', score: '' }]
                       });
                     }} 
-                    className="w-full py-3 border border-dashed border-white/10 hover:border-cyan-500/50 rounded-2xl text-cyan-400 hover:text-cyan-300 text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 bg-white/[0.01] hover:bg-white/[0.03] active:scale-[0.98]"
+                    className="w-full py-3 border border-dashed border-white/10 hover:border-red-500/50 rounded-2xl text-red-400 hover:text-red-300 text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 bg-white/[0.01] hover:bg-white/[0.03] active:scale-[0.98]"
                   >
                     + AGGIUNGI MATCH VIDEO (VOD)
                   </button>

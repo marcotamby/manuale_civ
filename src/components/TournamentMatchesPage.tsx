@@ -69,7 +69,7 @@ export function TournamentMatchesPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <Loader2 className="w-12 h-12 text-cyan-400 animate-spin" />
+        <Loader2 className="w-12 h-12 text-red-500 animate-spin" />
       </div>
     );
   }
@@ -82,7 +82,7 @@ export function TournamentMatchesPage() {
           <p className="text-gray-400 mb-6 italic">{errorMsg || "Impossibile trovare i match per questo torneo."}</p>
           <button 
             onClick={() => navigate('/tornei')} 
-            className="px-6 py-2 bg-cyan-600/10 hover:bg-cyan-600/20 border border-cyan-500/30 rounded-xl text-cyan-400 font-bold uppercase text-xs tracking-widest transition-all"
+            className="px-6 py-2 bg-red-600/10 hover:bg-red-600/20 border border-red-500/30 rounded-xl text-red-400 font-bold uppercase text-xs tracking-widest transition-all"
           >
             Torna ai tornei
           </button>
@@ -126,7 +126,7 @@ export function TournamentMatchesPage() {
           <div className="flex flex-col gap-3 mb-6">
             <button 
               onClick={() => navigate('/tornei')}
-              className="flex items-center gap-2 text-gray-400 hover:text-cyan-300 transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.3)] w-fit"
+              className="flex items-center gap-2 text-gray-400 hover:text-red-400 transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.3)] w-fit"
             >
               <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" />
               Torna ai tornei
@@ -135,7 +135,7 @@ export function TournamentMatchesPage() {
           
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="flex-1">
-              <div className="flex items-center gap-3 text-cyan-400 mb-2">
+              <div className="flex items-center gap-3 text-red-500 mb-2">
                 <Trophy size={18} />
                 <span className="text-[10px] font-black uppercase tracking-[0.2em]">organizzato da {tournament.organizer || 'Admin'}</span>
               </div>
@@ -144,11 +144,11 @@ export function TournamentMatchesPage() {
               </h1>
               <div className="flex flex-wrap gap-6 text-gray-400 text-xs font-semibold uppercase tracking-wider">
                 <div className="flex items-center gap-2">
-                  <Calendar size={14} className="text-cyan-500/50" />
+                  <Calendar size={14} className="text-red-500/50" />
                   {tournament.period || 'Data da definire'}
                 </div>
                 <div className="flex items-center gap-2">
-                  <Users size={14} className="text-cyan-500/50" />
+                  <Users size={14} className="text-red-500/50" />
                   {tournament.type || '1v1'}
                 </div>
               </div>
@@ -157,7 +157,7 @@ export function TournamentMatchesPage() {
             {tournament.direct_link && (
               <button 
                 onClick={() => window.open(tournament.direct_link, '_blank')}
-                className="flex items-center gap-2.5 px-6 py-3.5 bg-white/5 hover:bg-cyan-500/10 rounded-2xl text-white hover:text-cyan-300 font-black uppercase text-[10px] tracking-[0.2em] transition-all border border-white/5 hover:border-cyan-500/30 active:scale-95 shadow-2xl group"
+                className="flex items-center gap-2.5 px-6 py-3.5 bg-white/5 hover:bg-red-500/10 rounded-2xl text-white hover:text-red-400 font-black uppercase text-[10px] tracking-[0.2em] transition-all border border-white/5 hover:border-red-500/30 active:scale-95 shadow-2xl group"
               >
                 Tabellone Ufficiale <ExternalLink size={14} />
               </button>
@@ -193,7 +193,7 @@ export function TournamentMatchesPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Cerca match o giocatore..."
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 pl-12 text-white text-sm focus:border-cyan-500/50 outline-none transition-all placeholder:text-gray-500"
+                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 pl-12 text-white text-sm focus:border-red-500/50 outline-none transition-all placeholder:text-gray-500"
                 />
               </div>
 
@@ -207,7 +207,7 @@ export function TournamentMatchesPage() {
                       className={clsx(
                         "px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all whitespace-nowrap border",
                         selectedRound === 'Tutti'
-                          ? "bg-cyan-500 text-black border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.25)]"
+                          ? "bg-red-600 text-white border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.25)]"
                           : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border-white/5"
                       )}
                     >
@@ -220,7 +220,7 @@ export function TournamentMatchesPage() {
                         className={clsx(
                           "px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all whitespace-nowrap border",
                           selectedRound === r
-                            ? "bg-cyan-500 text-black border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.25)]"
+                            ? "bg-red-600 text-white border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.25)]"
                             : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border-white/5"
                         )}
                       >
@@ -246,7 +246,7 @@ export function TournamentMatchesPage() {
                   return (
                     <div 
                       key={vod.id} 
-                      className="glass flex flex-col rounded-3xl border border-white/5 overflow-hidden transition-all duration-300 hover:border-cyan-500/30 hover:shadow-[0_10px_30px_rgba(34,211,238,0.06)] group h-full"
+                      className="glass flex flex-col rounded-3xl border border-white/5 overflow-hidden transition-all duration-300 hover:border-red-500/30 hover:shadow-[0_10px_30px_rgba(239,68,68,0.06)] group h-full"
                     >
                       {/* Video Player / Thumbnail Area */}
                       <div className="relative aspect-video w-full bg-black overflow-hidden flex items-center justify-center">
@@ -280,7 +280,7 @@ export function TournamentMatchesPage() {
                               
                               {/* Big Play Button Overlay */}
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-16 h-16 rounded-full bg-black/80 hover:bg-cyan-500 hover:scale-110 text-white hover:text-black flex items-center justify-center transition-all duration-300 border border-white/10 hover:border-cyan-400 hover:shadow-[0_0_30px_rgba(34,211,238,0.4)]">
+                                <div className="w-16 h-16 rounded-full bg-black/80 hover:bg-red-600 hover:scale-110 text-white hover:text-white flex items-center justify-center transition-all duration-300 border border-white/10 hover:border-red-500 hover:shadow-[0_0_30px_rgba(220,38,38,0.45)]">
                                   <Play size={24} className="fill-current ml-1" />
                                 </div>
                               </div>
@@ -295,7 +295,7 @@ export function TournamentMatchesPage() {
                                 href={vod.url} 
                                 target="_blank" 
                                 rel="noopener noreferrer" 
-                                className="text-[10px] text-cyan-400 hover:underline mt-1 inline-block"
+                                className="text-[10px] text-red-400 hover:underline mt-1 inline-block"
                               >
                                 Apri esternamente <ExternalLink size={8} className="inline ml-1" />
                               </a>
@@ -308,7 +308,7 @@ export function TournamentMatchesPage() {
                       <div className="p-5 flex-grow flex flex-col bg-[#0d1017]/40">
                         <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
                           {vod.round && (
-                            <span className="text-[9px] font-black uppercase text-cyan-400 bg-cyan-950/40 px-2.5 py-1 rounded-md border border-cyan-500/20 tracking-wider">
+                            <span className="text-[9px] font-black uppercase text-red-400 bg-red-950/40 px-2.5 py-1 rounded-md border border-red-500/20 tracking-wider">
                               {vod.round}
                             </span>
                           )}
@@ -319,7 +319,7 @@ export function TournamentMatchesPage() {
                           )}
                         </div>
 
-                        <h4 className="text-base font-bold text-slate-100 group-hover:text-cyan-300 transition-colors leading-snug uppercase tracking-tight line-clamp-2 select-text">
+                        <h4 className="text-base font-bold text-slate-100 group-hover:text-red-400 transition-colors leading-snug uppercase tracking-tight line-clamp-2 select-text">
                           {vod.title}
                         </h4>
                       </div>
