@@ -208,15 +208,15 @@ export function TournamentDetail() {
                 className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
               >
                 <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" />
-                Vai ai VODs del torneo
+                Vai ai VODs
               </button>
             )}
           </div>
         </div>
         
         <div className="absolute bottom-0 left-0 right-0 max-w-7xl mx-auto px-4 pb-8 md:pb-12">
-          <div className="flex items-end gap-6">
-            <div className="hidden md:block w-32 h-32 rounded-2xl glass border border-yellow-500/30 overflow-hidden shrink-0 shadow-2xl">
+          <div className="flex items-start gap-6">
+            <div className="hidden md:block w-32 h-32 rounded-2xl glass border border-yellow-500/30 overflow-hidden shrink-0 shadow-2xl mt-1.5">
               <img src={profileImage} className="w-full h-full object-cover" />
             </div>
             <div className="flex-1">
@@ -252,7 +252,7 @@ export function TournamentDetail() {
                   onClick={() => window.open(tournament.db.direct_link, '_blank')}
                   className="flex items-center gap-3 px-10 py-4 bg-white/5 hover:bg-white/10 rounded-2xl text-white font-black uppercase text-[10px] tracking-[0.2em] transition-all border border-white/5 hover:border-white/20 active:scale-95 shadow-2xl group/external"
                 >
-                  Tabellone <ArrowRight size={16} className="group-hover/external:translate-x-1 transition-transform" />
+                  {(source === 'challonge' || tournament?.db?.source === 'challonge') ? 'Tabellone' : 'Tabellone su startgg'} <ArrowRight size={16} className="group-hover/external:translate-x-1 transition-transform" />
                 </button>
               )}
             </div>
@@ -329,7 +329,7 @@ export function TournamentDetail() {
                     onClick={() => window.open(tournament.db.direct_link, '_blank')}
                     className="flex items-center justify-center gap-3 w-full py-5 bg-white/5 hover:bg-white/10 rounded-2xl text-white font-black uppercase text-xs tracking-wider transition-all border border-white/10 shadow-lg active:scale-95 group/btn"
                   >
-                    Tabellone <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
+                    {(source === 'challonge' || tournament?.db?.source === 'challonge') ? 'Tabellone' : 'Tabellone su startgg'} <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
                   </button>
                 ) : (
                   <p className="text-yellow-500/50 text-[10px] font-black uppercase tracking-widest">Tabellone non ancora disponibile</p>
