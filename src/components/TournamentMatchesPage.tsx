@@ -309,7 +309,7 @@ export function TournamentMatchesPage() {
                       <div className="p-5 flex-grow flex flex-col bg-[#0d1017]/40">
                         <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
                           {vod.round && (
-                            <span className="text-[9px] font-black uppercase text-red-400 bg-red-950/40 px-2.5 py-1 rounded-md border border-red-500/20 tracking-wider">
+                            <span className="text-[9px] font-black uppercase text-cyan-200 bg-gradient-to-r from-slate-800/60 to-cyan-950/60 px-2.5 py-1 rounded-md border border-cyan-500/20 tracking-wider shadow-[0_0_10px_rgba(6,182,212,0.15)]">
                               {vod.round}
                             </span>
                           )}
@@ -320,7 +320,7 @@ export function TournamentMatchesPage() {
                           )}
                         </div>
 
-                        <h4 className="text-base font-bold text-slate-100 group-hover:text-red-400 transition-colors leading-snug uppercase tracking-tight line-clamp-2 select-text">
+                        <h4 className="text-base font-bold text-slate-100 group-hover:text-red-400 transform transition-all duration-300 group-hover:scale-[1.02] origin-left leading-snug uppercase tracking-tight line-clamp-2 select-text">
                           {vod.title}
                         </h4>
                       </div>
