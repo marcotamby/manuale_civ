@@ -320,7 +320,7 @@ export function TournamentMatchesPage() {
                           )}
                         </div>
 
-                        <h4 className="text-base font-bold text-slate-100 group-hover:text-red-400 transform transition-all duration-300 group-hover:scale-[1.02] origin-left leading-snug uppercase tracking-tight line-clamp-2 select-text">
+                        <h4 className="text-base font-bold text-slate-100 group-hover:text-white transform transition-all duration-300 group-hover:scale-[1.02] origin-left leading-snug uppercase tracking-tight line-clamp-2 select-text">
                           {vod.title}
                         </h4>
                       </div>
