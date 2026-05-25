@@ -438,55 +438,52 @@ export function BettingPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in duration-700">
+      <div className="flex justify-between items-start mb-6 w-full gap-4 px-4 md:px-0">
+        {/* Left Side */}
+        <div className="flex flex-col gap-3">
+          <Link 
+            to="/tornei"
+            className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+          >
+            <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" /> Torna ai Tornei
+          </Link>
+        </div>
+
+        {/* Right Side */}
+        <div className="flex flex-col items-end gap-3 text-right">
+          {tournament?.source === 'startgg' ? (
+            <Link 
+              to={`/tornei/${window.location.pathname.includes('/tournament/') ? `tournament/${slug}` : slug}${location.search}`}
+              className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+            >
+              <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" /> Vai al tabellone
+            </Link>
+          ) : (
+            tournament?.direct_link && (
+              <a 
+                href={tournament.direct_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+              >
+                <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" /> Vai al tabellone
+              </a>
+            )
+          )}
+
+          {tournament?.vods && tournament.vods.length > 0 && (
+            <Link 
+              to={`/tornei/${window.location.pathname.includes('/tournament/') ? `tournament/${slug}` : slug}/match${location.search}`}
+              className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+            >
+              <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" /> Vai ai VODs
+            </Link>
+          )}
+        </div>
+      </div>
+
       <div className="flex flex-col md:flex-row items-start justify-between mb-8 gap-10 px-4 md:px-0">
         <div className="relative flex-1">
-           <div className="flex justify-between items-start mb-6 w-full gap-4">
-            {/* Left Side */}
-            <div className="flex flex-col gap-3">
-              <Link 
-                to="/tornei"
-                className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
-              >
-                <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" /> Torna ai Tornei
-              </Link>
-            </div>
-
-            {/* Right Side */}
-            <div className="flex flex-col items-end gap-3 text-right">
-              {tournament?.source === 'startgg' ? (
-                <Link 
-                  to={location.pathname.includes('/tournament/') 
-                    ? `/tornei/tournament/${slug}${location.search}` 
-                    : `/tornei/${slug}${location.search}`}
-                  className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
-                >
-                  <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" /> Vai al tabellone
-                </Link>
-              ) : (
-                tournament?.direct_link && (
-                  <a 
-                    href={tournament.direct_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
-                  >
-                    <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" /> Vai al tabellone
-                  </a>
-                )
-              )}
-
-              {tournament?.vods && tournament.vods.length > 0 && (
-                <Link 
-                  to={location.pathname.includes('/tournament/') 
-                    ? `/tornei/tournament/${slug}/match${location.search}` 
-                    : `/tornei/${slug}/match${location.search}`}
-                  className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
-                >
-                  <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" /> Vai ai VODs
-                </Link>
-              )}
-            </div>
-          </div>
            <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-white to-slate-400 uppercase tracking-tighter mb-4 leading-tight">
             Social Betting:<br/>
             {tournament?.name || (slug?.replace(/-/g, ' ')) || 'Torneo'}
@@ -593,7 +590,7 @@ export function BettingPage() {
            </div>
         </div>
 
-        <div className="flex flex-col md:flex-row items-start gap-4 self-stretch md:self-start mt-4 md:mt-10">
+        <div className="flex flex-col md:flex-row items-start gap-4 self-stretch md:self-start mt-4 md:mt-24">
             {isAuthenticated && (
               <div className="bg-[#111218]/80 backdrop-blur-md px-6 h-14 rounded-2xl border border-white/10 flex items-center gap-3 transition-all hover:bg-[#1a1c25] group flex-1">
                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest whitespace-nowrap">Il Tuo Gregge:</span>

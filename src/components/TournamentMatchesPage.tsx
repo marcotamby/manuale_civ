@@ -137,7 +137,7 @@ export function TournamentMatchesPage() {
             <div className="flex flex-col gap-3">
               <button 
                 onClick={() => navigate('/tornei')}
-                className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
+                className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
               >
                 <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" />
                 Torna ai tornei
@@ -148,10 +148,8 @@ export function TournamentMatchesPage() {
             <div className="flex flex-col items-end gap-3 text-right">
               {tournament.source === 'startgg' ? (
                 <button 
-                  onClick={() => navigate(window.location.pathname.includes('/tournament/') 
-                    ? `/tornei/tournament/${tournament.slug}${window.location.search}` 
-                    : `/tornei/${tournament.slug}${window.location.search}`)}
-                  className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
+                  onClick={() => navigate(`/tornei/${window.location.pathname.includes('/tournament/') ? `tournament/${slug}` : slug}${window.location.search}`)}
+                  className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
                 >
                   <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" />
                   Vai al tabellone
@@ -160,7 +158,7 @@ export function TournamentMatchesPage() {
                 tournament.direct_link && (
                   <button 
                     onClick={() => window.open(tournament.direct_link, '_blank')}
-                    className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
+                    className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
                   >
                     <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" />
                     Vai al tabellone
@@ -170,10 +168,8 @@ export function TournamentMatchesPage() {
 
               {hasMarkets && (
                 <button 
-                  onClick={() => navigate(window.location.pathname.includes('/tournament/')
-                    ? `/tornei/tournament/${tournament.slug}/scommetti${window.location.search}`
-                    : `/tornei/${tournament.slug}/scommetti${window.location.search}`)}
-                  className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
+                  onClick={() => navigate(`/tornei/${window.location.pathname.includes('/tournament/') ? `tournament/${slug}` : slug}/scommetti${window.location.search}`)}
+                  className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
                 >
                   <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" />
                   Vai alle scommesse

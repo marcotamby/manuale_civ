@@ -177,47 +177,44 @@ export function TournamentDetail() {
         <img src={banner} className="w-full h-full object-cover opacity-40 blur-sm scale-105" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0b] via-[#0a0a0b]/60 to-transparent"></div>
         
-        <div className="absolute bottom-0 left-0 right-0 max-w-7xl mx-auto px-4 pb-8 md:pb-12">
-          <div className="flex justify-between items-start mb-8 w-full gap-4">
-            {/* Left Side */}
-            <div className="flex flex-col gap-3">
-              <button 
-                onClick={() => navigate('/tornei')}
-                className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
-              >
-                <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" />
-                Torna ai tornei
-              </button>
-            </div>
-
-            {/* Right Side */}
-            <div className="flex flex-col items-end gap-3 text-right">
-              {hasMarkets && (
-                <button 
-                  onClick={() => navigate(window.location.pathname.includes('/tournament/') 
-                    ? `/tornei/tournament/${slug}/scommetti${window.location.search}` 
-                    : `/tornei/${slug}/scommetti${window.location.search}`)}
-                  className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
-                >
-                  <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" />
-                  Vai alle scommesse
-                </button>
-              )}
-
-              {tournament?.db?.vods && tournament.db.vods.length > 0 && (
-                <button 
-                  onClick={() => navigate(window.location.pathname.includes('/tournament/') 
-                    ? `/tornei/tournament/${slug}/match${window.location.search}` 
-                    : `/tornei/${slug}/match${window.location.search}`)}
-                  className="flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
-                >
-                  <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" />
-                  Vai ai VODs del torneo
-                </button>
-              )}
-            </div>
+        {/* Top-aligned Navigation Row spanning to the edges */}
+        <div className="absolute top-6 md:top-8 left-0 right-0 w-full pl-6 md:pl-12 pr-2 md:pr-4 flex justify-between items-start z-30">
+          {/* Left Side */}
+          <div className="flex flex-col gap-3">
+            <button 
+              onClick={() => navigate('/tornei')}
+              className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
+            >
+              <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" />
+              Torna ai tornei
+            </button>
           </div>
-          
+
+          {/* Right Side */}
+          <div className="flex flex-col items-end gap-3 text-right">
+            {hasMarkets && (
+              <button 
+                onClick={() => navigate(`/tornei/${window.location.pathname.includes('/tournament/') ? `tournament/${slug}` : slug}/scommetti${window.location.search}`)}
+                className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
+              >
+                <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" />
+                Vai alle scommesse
+              </button>
+            )}
+
+            {tournament?.db?.vods && tournament.db.vods.length > 0 && (
+              <button 
+                onClick={() => navigate(`/tornei/${window.location.pathname.includes('/tournament/') ? `tournament/${slug}` : slug}/match${window.location.search}`)}
+                className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
+              >
+                <ArrowRight size={16} className="transition-transform duration-300 ease-in-out group-hover:translate-x-[2px]" />
+                Vai ai VODs del torneo
+              </button>
+            )}
+          </div>
+        </div>
+        
+        <div className="absolute bottom-0 left-0 right-0 max-w-7xl mx-auto px-4 pb-8 md:pb-12">
           <div className="flex items-end gap-6">
             <div className="hidden md:block w-32 h-32 rounded-2xl glass border border-yellow-500/30 overflow-hidden shrink-0 shadow-2xl">
               <img src={profileImage} className="w-full h-full object-cover" />
