@@ -234,14 +234,15 @@ function BracketSet({ set, isFirstRound, isLastRound, hideConnectors }: { set: S
                 
                 <div className="relative group/player min-w-0">
                   <span className={clsx(
-                    "text-[13px] font-black truncate block transition-all duration-300 group-hover/player:text-white cursor-help uppercase tracking-wider",
-                    isWinner ? "text-yellow-400" : "text-gray-300"
+                    "text-[13px] font-black truncate block transition-all duration-300 group-hover/player:text-white uppercase tracking-wider",
+                    isWinner ? "text-yellow-400" : "text-gray-300",
+                    entrant && entrant.participants && entrant.participants.length > 1 ? "cursor-help" : "cursor-default"
                   )}>
                     {entrant?.name || 'TBD'}
                   </span>
                   
                   {/* Tooltip for Players (Teams) - Premium Design (Right Positioned, Discrete) */}
-                  {entrant && entrant.participants && entrant.participants.length > 0 && (
+                  {entrant && entrant.participants && entrant.participants.length > 1 && (
                     <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 opacity-0 group-hover/player:opacity-100 pointer-events-none transition-all duration-300 -translate-x-2 group-hover/player:translate-x-0 z-[150] w-[180px]">
                       <div className="bg-[#0a0f1a]/95 backdrop-blur-xl border border-yellow-500/30 rounded-xl p-3 shadow-[0_15px_40px_rgba(0,0,0,0.6),0_0_15px_rgba(234,179,8,0.1)] overflow-hidden">
                         {/* Background Decoration */}
