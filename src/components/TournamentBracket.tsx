@@ -7,9 +7,11 @@ import { clsx } from 'clsx';
 
 interface TournamentBracketProps {
   phase: StartGGPhase;
+  tournamentSlug?: string;
+  directLink?: string;
 }
 
-export function TournamentBracket({ phase }: TournamentBracketProps) {
+export function TournamentBracket({ phase, tournamentSlug, directLink }: TournamentBracketProps) {
   const [sets, setSets] = useState<StartGGSet[]>([]);
   const [pools, setPools] = useState<StartGGPhaseGroup[]>([]);
   const [activePoolId, setActivePoolId] = useState<string | null>(null);
@@ -81,7 +83,7 @@ export function TournamentBracket({ phase }: TournamentBracketProps) {
           I dati del torneo non sono ancora disponibili tramite connessione remota o il tabellone è in fase di generazione.
         </p>
         <a 
-          href="https://www.start.gg/tournament/torneo-1v1-2026/event/1v1/brackets" 
+          href={directLink || (tournamentSlug ? `https://www.start.gg/${tournamentSlug.includes('tournament/') ? tournamentSlug : `tournament/${tournamentSlug}`}/brackets` : "https://www.start.gg")} 
           target="_blank" 
           rel="noopener noreferrer"
           className="px-6 py-2 bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/30 rounded-xl text-yellow-500 text-[10px] font-black uppercase tracking-widest transition-all"

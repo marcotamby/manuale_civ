@@ -1003,7 +1003,7 @@ export function TournamentsPage() {
                         {(() => {
                           const hasEvents = t.events && t.events.length > 0;
                           const isChallongeWithSlug = t.config.source === 'challonge' && t.slug && !t.config.slug.startsWith('tb-');
-                          const isStartGGWithEvents = t.config.source === 'startgg' && hasEvents;
+                          const isStartGGWithEvents = t.config.source === 'startgg' && (hasEvents || (t.slug && t.slug.startsWith('tournament/')));
                           
                           const commonClasses = clsx(
                             "flex-grow h-full bg-white/5 hover:bg-white/10 rounded-2xl text-white font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/det shadow-lg active:scale-95",

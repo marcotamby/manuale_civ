@@ -93,6 +93,7 @@ const getHeaders = () => {
 };
 
 export async function fetchTournament(slug: string): Promise<StartGGTournament | null> {
+  const cleanSlug = slug.includes('/') ? slug : `tournament/${slug}`;
   const query = `
     query TournamentQuery($slug: String) {
       tournament(slug: $slug) {
@@ -148,7 +149,7 @@ export async function fetchTournament(slug: string): Promise<StartGGTournament |
       headers: getHeaders(),
       body: JSON.stringify({
         query,
-        variables: { slug },
+        variables: { slug: cleanSlug },
       }),
     });
     const result = await response.json();

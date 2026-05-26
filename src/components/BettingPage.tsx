@@ -107,7 +107,8 @@ export function BettingPage() {
 
       // Fetch participants for admin tools
       try {
-        const startggData = await fetchTournament(cleanSlug);
+        const startggSlug = tourney?.slug || (window.location.pathname.includes('/tournament/') ? `tournament/${cleanSlug}` : cleanSlug);
+        const startggData = await fetchTournament(startggSlug);
         if (startggData?.events) {
           const mapping: { [level: string]: string[] } = { 'High Elo': [], 'Low Elo': [] };
           startggData.events.forEach((e: any) => {

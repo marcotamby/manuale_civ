@@ -59,7 +59,8 @@ export function TournamentDetail() {
               setSelectedPhase(unifiedPhase);
             }
           } else {
-            const data = await fetchTournament(slug);
+            const fullSlug = dbTournament?.slug || (window.location.pathname.includes('/tournament/') ? `tournament/${slug}` : slug);
+            const data = await fetchTournament(fullSlug);
             if (data) {
               setTournament({ ...data, db: dbTournament });
               if (data.events && data.events.length > 0) {
@@ -308,7 +309,11 @@ export function TournamentDetail() {
       {/* Main Content Area */}
       <main className="flex-1 max-w-full">
         {selectedPhase ? (
-          <TournamentBracket phase={selectedPhase} />
+          <TournamentBracket 
+            phase={selectedPhase} 
+            tournamentSlug={tournament?.slug || slug} 
+            directLink={tournament?.db?.direct_link} 
+          />
         ) : (
           <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
             <div className="glass p-12 rounded-[3rem] border border-white/10 max-w-lg w-full shadow-2xl relative overflow-hidden group">
