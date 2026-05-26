@@ -1407,18 +1407,18 @@ export function TournamentsPage() {
                 </div>
 
                 <div className="space-y-4 p-4 rounded-2xl bg-white/5 border border-white/10">
-                  <div className="flex items-center justify-between">
+                  <div 
+                    className="flex items-center justify-between cursor-pointer select-none hover:bg-white/[0.02] p-2 -mx-2 rounded-xl transition-all"
+                    onClick={() => setIsPodiumExpanded(!isPodiumExpanded)}
+                    title="Clicca per espandere o comprimere il Podio"
+                  >
                     <div className="flex items-center gap-3">
                       <Trophy size={20} className="text-yellow-500/80" />
                       <p className="text-xs font-bold text-white uppercase tracking-tight">Podio del Torneo</p>
                     </div>
-                    <button 
-                      type="button"
-                      onClick={() => setIsPodiumExpanded(!isPodiumExpanded)}
-                      className="p-2 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-white"
-                    >
+                    <div className="p-2 text-slate-400">
                       <ChevronDown size={20} className={clsx("transition-transform", isPodiumExpanded && "rotate-180")} />
-                    </button>
+                    </div>
                   </div>
                   
                   {isPodiumExpanded && (
@@ -1539,18 +1539,18 @@ export function TournamentsPage() {
                 </div>
 
                 <div className="space-y-4 p-4 rounded-2xl bg-white/5 border border-white/10">
-                  <div className="flex items-center justify-between">
+                  <div 
+                    className="flex items-center justify-between cursor-pointer select-none hover:bg-white/[0.02] p-2 -mx-2 rounded-xl transition-all"
+                    onClick={() => setIsVodsExpanded(!isVodsExpanded)}
+                    title="Clicca per espandere o comprimere i VODs"
+                  >
                     <div className="flex items-center gap-3">
                       <Youtube size={20} className="text-red-400" />
                       <p className="text-xs font-bold text-white uppercase tracking-tight">Video dei Match (VODs)</p>
                     </div>
-                    <button 
-                      type="button"
-                      onClick={() => setIsVodsExpanded(!isVodsExpanded)}
-                      className="p-2 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-white"
-                    >
+                    <div className="p-2 text-slate-400">
                       <ChevronDown size={20} className={clsx("transition-transform", isVodsExpanded && "rotate-180")} />
-                    </button>
+                    </div>
                   </div>
                   
                   {isVodsExpanded && (
