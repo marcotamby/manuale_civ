@@ -6,12 +6,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // Proviamo a leggere con vari nomi possibili
-  const token = process.env.VITE_STARTGG_TOKEN || process.env.STARTGG_TOKEN;
+  const token = 
+    process.env.VITE_STARTGG_TOKEN || 
+    process.env.STARTGG_TOKEN || 
+    process.env.VITE_START_GG_TOKEN || 
+    process.env.START_GG_TOKEN;
 
   if (!token) {
     return res.status(401).json({ 
       error: 'API Token assente', 
-      details: 'Il server non trova la chiave VITE_STARTGG_TOKEN. Verifica le Environment Variables su Vercel.' 
+      details: 'Il server non trova la chiave VITE_STARTGG_TOKEN o VITE_START_GG_TOKEN. Verifica le Environment Variables su Vercel.' 
     });
   }
 
