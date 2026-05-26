@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament, fetchChallongeData } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
-import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, ChevronUp, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink, MoveVertical, Youtube } from 'lucide-react';
+import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, ChevronUp, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink, MoveVertical, Youtube, Trophy } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
@@ -66,6 +66,8 @@ export function TournamentsPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [dragState, setDragState] = useState<{ startX: number; startY: number; startPosX: number; startPosY: number } | null>(null);
   const [isRegEditorExpanded, setIsRegEditorExpanded] = useState(false);
+  const [isPodiumExpanded, setIsPodiumExpanded] = useState(false);
+  const [isVodsExpanded, setIsVodsExpanded] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'synced'>('idle');
   const [bracketErrorId, setBracketErrorId] = useState<string | null>(null);
@@ -729,6 +731,9 @@ export function TournamentsPage() {
                 vods: []
               });
               setShowEditModal(true);
+              setIsRegEditorExpanded(false);
+              setIsPodiumExpanded(false);
+              setIsVodsExpanded(false);
             }} 
             className="flex items-center gap-3 px-6 py-4 bg-gradient-to-b from-slate-100 to-gray-400 font-black text-black rounded-2xl hover:from-white hover:to-gray-300 transition-all hover:scale-[1.05] shadow-[0_0_20px_rgba(255,255,255,0.1)] uppercase text-xs tracking-widest active:scale-[0.98]"
           >
@@ -1087,6 +1092,8 @@ export function TournamentsPage() {
                               });
                               setShowEditModal(true);
                               setIsRegEditorExpanded(false);
+                              setIsPodiumExpanded(false);
+                              setIsVodsExpanded(false);
                             }} 
                             className="w-14 h-full bg-white/5 hover:bg-white/10 rounded-2xl text-blue-400 transition-all border border-white/5 hover:border-blue-500/30 active:scale-95 shadow-lg flex items-center justify-center shrink-0"
                           >
@@ -1399,225 +1406,252 @@ export function TournamentsPage() {
                   )}
                 </div>
 
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-[11px] text-yellow-500/80 font-black uppercase tracking-widest ml-1">Podio del Torneo</label>
+                <div className="space-y-4 p-4 rounded-2xl bg-white/5 border border-white/10">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Trophy size={20} className="text-yellow-500/80" />
+                      <p className="text-xs font-bold text-white uppercase tracking-tight">Podio del Torneo</p>
+                    </div>
+                    <button 
+                      type="button"
+                      onClick={() => setIsPodiumExpanded(!isPodiumExpanded)}
+                      className="p-2 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-white"
+                    >
+                      <ChevronDown size={20} className={clsx("transition-transform", isPodiumExpanded && "rotate-180")} />
+                    </button>
                   </div>
                   
-                  {editForm.podium.map((p, i) => (
-                    <div key={i} className="bg-black/20 p-5 rounded-2xl border border-white/5 space-y-4 relative group/podiumrow">
-                    <div className="flex gap-4 items-start w-full">
-                      <div className="w-40 shrink-0 space-y-2">
-                          <label className="text-[9px] text-gray-500 font-black uppercase tracking-widest ml-1 opacity-60">Posizione</label>
-                          <div className="relative">
-                            <select 
-                              value={p.placement || (i + 1)} 
-                              onChange={e => {
-                                const np = [...editForm.podium];
-                                np[i] = { ...p, placement: parseInt(e.target.value) };
-                                setEditForm({ ...editForm, podium: np });
-                              }}
-                              className="w-full bg-white/5 border border-white/10 h-12 px-4 rounded-xl text-white text-base font-bold outline-none focus:border-yellow-500 transition-all appearance-none cursor-pointer"
-                            >
-                              <option value={1} className="bg-[#121620]">🥇 1° Posto</option>
-                              <option value={2} className="bg-[#121620]">🥈 2° Posto</option>
-                              <option value={3} className="bg-[#121620]">🥉 3° Posto</option>
-                            </select>
-                            <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                  {isPodiumExpanded && (
+                    <div className="space-y-3 animate-in fade-in zoom-in-95 duration-300">
+                      {editForm.podium.map((p, i) => (
+                        <div key={i} className="bg-black/20 p-5 rounded-2xl border border-white/5 space-y-4 relative group/podiumrow">
+                        <div className="flex gap-4 items-start w-full">
+                          <div className="w-40 shrink-0 space-y-2">
+                              <label className="text-[9px] text-gray-500 font-black uppercase tracking-widest ml-1 opacity-60">Posizione</label>
+                              <div className="relative">
+                                <select 
+                                  value={p.placement || (i + 1)} 
+                                  onChange={e => {
+                                    const np = [...editForm.podium];
+                                    np[i] = { ...p, placement: parseInt(e.target.value) };
+                                    setEditForm({ ...editForm, podium: np });
+                                  }}
+                                  className="w-full bg-white/5 border border-white/10 h-12 px-4 rounded-xl text-white text-base font-bold outline-none focus:border-yellow-500 transition-all appearance-none cursor-pointer"
+                                >
+                                  <option value={1} className="bg-[#121620]">🥇 1° Posto</option>
+                                  <option value={2} className="bg-[#121620]">🥈 2° Posto</option>
+                                  <option value={3} className="bg-[#121620]">🥉 3° Posto</option>
+                                </select>
+                                <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                              </div>
+                            </div>
+                            
+                            <div className="flex-grow space-y-2 relative">
+                              <label className="text-[9px] text-gray-500 font-black uppercase tracking-widest ml-1 opacity-60">Nome Team / Giocatore</label>
+                              <div className="relative">
+                                <input 
+                                  type="text" 
+                                  value={p.entrant?.name || ''} 
+                                  onChange={e => {
+                                    const np = [...editForm.podium]; np[i] = {...p, entrant: {name: e.target.value}}; setEditForm({...editForm, podium: np});
+                                  }} 
+                                  placeholder="Inserisci nome..." 
+                                  className="w-full h-12 bg-white/5 border border-white/10 px-4 pr-14 rounded-xl text-white text-base font-bold outline-none focus:border-yellow-500 transition-colors" 
+                                />
+                                <button 
+                                  onClick={() => setEditForm({...editForm, podium: editForm.podium.filter((_, idx) => idx !== i)})} 
+                                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-red-500/30 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                                  title="Rimuovi riga"
+                                >
+                                  <Trash2 size={18}/>
+                                </button>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                        
-                        <div className="flex-grow space-y-2 relative">
-                          <label className="text-[9px] text-gray-500 font-black uppercase tracking-widest ml-1 opacity-60">Nome Team / Giocatore</label>
-                          <div className="relative">
+                          
+                          {/* Sub-players for Team Games */}
+                          {['2v2', '3v3', '4v4', 'Mod'].includes(editForm.type) && (
+                            <div className="space-y-1.5 pt-4 border-t border-white/5">
+                              <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-2">
+                                <Users size={10} /> Componenti Team (per {editForm.type})
+                              </label>
+                              <input 
+                                type="text" 
+                                value={p.players?.join(', ') || ''} 
+                                onChange={e => {
+                                  const playerList = e.target.value.split(',').map((s, idx, arr) => {
+                                    if (idx === arr.length - 1) {
+                                      return s.replace(/^\s+/, '');
+                                    }
+                                    return s.trim();
+                                  });
+                                  const np = [...editForm.podium]; 
+                                  np[i] = { ...p, players: playerList }; 
+                                  setEditForm({ ...editForm, podium: np });
+                                }} 
+                                placeholder="Esempio: Marco, Alessio, Luca (separati da virgola)" 
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white/60 text-[11px] outline-none focus:border-yellow-500/20 transition-all italic" 
+                              />
+                            </div>
+                          )}
+    
+                          {/* Division/Fascia input */}
+                          <div className="space-y-1.5 pt-3 border-t border-white/5">
+                            <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-2">
+                              🏆 Divisione / Fascia (Opzionale)
+                            </label>
                             <input 
                               type="text" 
-                              value={p.entrant?.name || ''} 
+                              value={p.division || ''} 
                               onChange={e => {
-                                const np = [...editForm.podium]; np[i] = {...p, entrant: {name: e.target.value}}; setEditForm({...editForm, podium: np});
+                                const np = [...editForm.podium]; 
+                                np[i] = { ...p, division: e.target.value }; 
+                                setEditForm({ ...editForm, podium: np });
                               }} 
-                              placeholder="Inserisci nome..." 
-                              className="w-full h-12 bg-white/5 border border-white/10 px-4 pr-14 rounded-xl text-white text-base font-bold outline-none focus:border-yellow-500 transition-colors" 
+                              placeholder="Esempio: Fascia 1 (High Elo), Fascia 2 (Low Elo)" 
+                              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white/60 text-[11px] outline-none focus:border-yellow-500/20 transition-all italic" 
                             />
-                            <button 
-                              onClick={() => setEditForm({...editForm, podium: editForm.podium.filter((_, idx) => idx !== i)})} 
-                              className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-red-500/30 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
-                              title="Rimuovi riga"
-                            >
-                              <Trash2 size={18}/>
-                            </button>
                           </div>
                         </div>
-                      </div>
-                      
-                      {/* Sub-players for Team Games */}
-                      {['2v2', '3v3', '4v4', 'Mod'].includes(editForm.type) && (
-                        <div className="space-y-1.5 pt-4 border-t border-white/5">
-                          <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-2">
-                            <Users size={10} /> Componenti Team (per {editForm.type})
-                          </label>
-                          <input 
-                            type="text" 
-                            value={p.players?.join(', ') || ''} 
-                            onChange={e => {
-                              const playerList = e.target.value.split(',').map((s, idx, arr) => {
-                                if (idx === arr.length - 1) {
-                                  return s.replace(/^\s+/, '');
-                                }
-                                return s.trim();
-                              });
-                              const np = [...editForm.podium]; 
-                              np[i] = { ...p, players: playerList }; 
-                              setEditForm({ ...editForm, podium: np });
-                            }} 
-                            placeholder="Esempio: Marco, Alessio, Luca (separati da virgola)" 
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white/60 text-[11px] outline-none focus:border-yellow-500/20 transition-all italic" 
-                          />
-                        </div>
-                      )}
-
-                      {/* Division/Fascia input */}
-                      <div className="space-y-1.5 pt-3 border-t border-white/5">
-                        <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-2">
-                          🏆 Divisione / Fascia (Opzionale)
-                        </label>
-                        <input 
-                          type="text" 
-                          value={p.division || ''} 
-                          onChange={e => {
-                            const np = [...editForm.podium]; 
-                            np[i] = { ...p, division: e.target.value }; 
-                            setEditForm({ ...editForm, podium: np });
-                          }} 
-                          placeholder="Esempio: Fascia 1 (High Elo), Fascia 2 (Low Elo)" 
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white/60 text-[11px] outline-none focus:border-yellow-500/20 transition-all italic" 
-                        />
-                      </div>
+                      ))}
+    
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          if (editForm.podium.length < 12) {
+                            const lastItem = editForm.podium[editForm.podium.length - 1];
+                            const lastDivision = lastItem ? (lastItem.division || '') : '';
+                            const divisionCount = editForm.podium.filter((p: any) => (p.division || '') === lastDivision).length;
+                            const nextPlacement = Math.min(3, divisionCount + 1);
+                            setEditForm({
+                              ...editForm,
+                              podium: [...editForm.podium, { placement: nextPlacement, entrant: { name: '' }, division: lastDivision }]
+                            });
+                          }
+                        }} 
+                        className="w-full py-4 border border-dashed border-white/10 hover:border-yellow-500/50 rounded-2xl text-yellow-500 hover:text-yellow-400 text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 bg-white/[0.01] hover:bg-white/[0.03] active:scale-[0.98]"
+                        hidden={editForm.podium.length >= 12}
+                      >
+                        + AGGIUNGI RIGA AL PODIO
+                      </button>
                     </div>
-                  ))}
-
-                  <button 
-                    type="button"
-                    onClick={() => {
-                      if (editForm.podium.length < 12) {
-                        const lastItem = editForm.podium[editForm.podium.length - 1];
-                        const lastDivision = lastItem ? (lastItem.division || '') : '';
-                        const divisionCount = editForm.podium.filter((p: any) => (p.division || '') === lastDivision).length;
-                        const nextPlacement = Math.min(3, divisionCount + 1);
-                        setEditForm({
-                          ...editForm,
-                          podium: [...editForm.podium, { placement: nextPlacement, entrant: { name: '' }, division: lastDivision }]
-                        });
-                      }
-                    }} 
-                    className="w-full py-4 border border-dashed border-white/10 hover:border-yellow-500/50 rounded-2xl text-yellow-500 hover:text-yellow-400 text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 bg-white/[0.01] hover:bg-white/[0.03] active:scale-[0.98]"
-                    hidden={editForm.podium.length >= 12}
-                  >
-                    + AGGIUNGI RIGA AL PODIO
-                  </button>
+                  )}
                 </div>
 
-                {/* VODs Section */}
-                <div className="space-y-3 p-4 rounded-2xl bg-white/5 border border-white/10">
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-[11px] text-red-400 font-black uppercase tracking-widest ml-1">Video dei Match (VODs)</label>
+                <div className="space-y-4 p-4 rounded-2xl bg-white/5 border border-white/10">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Youtube size={20} className="text-red-400" />
+                      <p className="text-xs font-bold text-white uppercase tracking-tight">Video dei Match (VODs)</p>
+                    </div>
+                    <button 
+                      type="button"
+                      onClick={() => setIsVodsExpanded(!isVodsExpanded)}
+                      className="p-2 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-white"
+                    >
+                      <ChevronDown size={20} className={clsx("transition-transform", isVodsExpanded && "rotate-180")} />
+                    </button>
                   </div>
                   
-                  {editForm.vods && editForm.vods.map((v, i) => (
-                    <div key={v.id || i} className="bg-black/20 p-4 rounded-xl border border-white/5 space-y-3 relative group/vodrow">
-                      <div className="flex justify-between items-center border-b border-white/5 pb-2 mb-2">
-                        <span className="text-[9px] text-gray-500 font-bold uppercase">Video #{i + 1}</span>
-                        <button 
-                          type="button"
-                          onClick={() => {
-                            const nv = editForm.vods.filter((_, idx) => idx !== i);
-                            setEditForm({ ...editForm, vods: nv });
-                          }} 
-                          className="p-1 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded transition-all"
-                          title="Rimuovi Video"
-                        >
-                          <Trash2 size={14}/>
-                        </button>
-                      </div>
+                  {isVodsExpanded && (
+                    <div className="space-y-3 animate-in fade-in zoom-in-95 duration-300">
+                      {editForm.vods && editForm.vods.map((v, i) => (
+                        <div key={v.id || i} className="bg-black/20 p-4 rounded-xl border border-white/5 space-y-3 relative group/vodrow">
+                          <div className="flex justify-between items-center border-b border-white/5 pb-2 mb-2">
+                            <span className="text-[9px] text-gray-500 font-bold uppercase">Video #{i + 1}</span>
+                            <button 
+                              type="button"
+                              onClick={() => {
+                                const nv = editForm.vods.filter((_, idx) => idx !== i);
+                                setEditForm({ ...editForm, vods: nv });
+                              }} 
+                              className="p-1 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded transition-all"
+                              title="Rimuovi Video"
+                            >
+                              <Trash2 size={14}/>
+                            </button>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Titolo Match / Giocatori</label>
+                              <input 
+                                type="text" 
+                                value={v.title || ''} 
+                                onChange={e => {
+                                  const nv = [...editForm.vods];
+                                  nv[i] = { ...v, title: e.target.value };
+                                  setEditForm({ ...editForm, vods: nv });
+                                }} 
+                                placeholder="Es: Semifinale: Player A vs Player B" 
+                                className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-red-500 transition-colors" 
+                              />
+                            </div>
+                            
+                            <div className="space-y-1">
+                              <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-1.5"><Youtube size={12}/> Link YouTube</label>
+                              <input 
+                                type="text" 
+                                value={v.url || ''} 
+                                onChange={e => {
+                                  const nv = [...editForm.vods];
+                                  nv[i] = { ...v, url: e.target.value };
+                                  setEditForm({ ...editForm, vods: nv });
+                                }} 
+                                placeholder="https://www.youtube.com/watch?v=..." 
+                                className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-red-500 transition-colors" 
+                              />
+                            </div>
+                          </div>
+    
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                            <div className="space-y-1">
+                              <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Fase / Round (Opzionale)</label>
+                              <input 
+                                type="text" 
+                                value={v.round || ''} 
+                                onChange={e => {
+                                  const nv = [...editForm.vods];
+                                  nv[i] = { ...v, round: e.target.value };
+                                  setEditForm({ ...editForm, vods: nv });
+                                }} 
+                                placeholder="Es: Winners Round 1, Finale" 
+                                className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-red-500 transition-colors" 
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Risultato (Opzionale)</label>
+                              <input 
+                                type="text" 
+                                value={v.score || ''} 
+                                onChange={e => {
+                                  const nv = [...editForm.vods];
+                                  nv[i] = { ...v, score: e.target.value };
+                                  setEditForm({ ...editForm, vods: nv });
+                                }} 
+                                placeholder="Es: 3-1" 
+                                className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-red-500 transition-colors" 
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div className="space-y-1">
-                          <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Titolo Match / Giocatori</label>
-                          <input 
-                            type="text" 
-                            value={v.title || ''} 
-                            onChange={e => {
-                              const nv = [...editForm.vods];
-                              nv[i] = { ...v, title: e.target.value };
-                              setEditForm({ ...editForm, vods: nv });
-                            }} 
-                            placeholder="Es: Semifinale: Player A vs Player B" 
-                            className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-red-500 transition-colors" 
-                          />
-                        </div>
-                        
-                        <div className="space-y-1">
-                          <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-1.5"><Youtube size={12}/> Link YouTube</label>
-                          <input 
-                            type="text" 
-                            value={v.url || ''} 
-                            onChange={e => {
-                              const nv = [...editForm.vods];
-                              nv[i] = { ...v, url: e.target.value };
-                              setEditForm({ ...editForm, vods: nv });
-                            }} 
-                            placeholder="https://www.youtube.com/watch?v=..." 
-                            className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-red-500 transition-colors" 
-                          />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-                        <div className="space-y-1">
-                          <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Fase / Round (Opzionale)</label>
-                          <input 
-                            type="text" 
-                            value={v.round || ''} 
-                            onChange={e => {
-                              const nv = [...editForm.vods];
-                              nv[i] = { ...v, round: e.target.value };
-                              setEditForm({ ...editForm, vods: nv });
-                            }} 
-                            placeholder="Es: Winners Round 1, Finale" 
-                            className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-red-500 transition-colors" 
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Risultato (Opzionale)</label>
-                          <input 
-                            type="text" 
-                            value={v.score || ''} 
-                            onChange={e => {
-                              const nv = [...editForm.vods];
-                              nv[i] = { ...v, score: e.target.value };
-                              setEditForm({ ...editForm, vods: nv });
-                            }} 
-                            placeholder="Es: 3-1" 
-                            className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-red-500 transition-colors" 
-                          />
-                        </div>
-                      </div>
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          const nv = editForm.vods || [];
+                          setEditForm({
+                            ...editForm,
+                            vods: [...nv, { id: `vod-${Date.now()}`, title: '', url: '', round: '', score: '' }]
+                          });
+                        }} 
+                        className="w-full py-3 border border-dashed border-white/10 hover:border-red-500/50 rounded-2xl text-red-400 hover:text-red-300 text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 bg-white/[0.01] hover:bg-white/[0.03] active:scale-[0.98]"
+                      >
+                        + AGGIUNGI MATCH VIDEO (VOD)
+                      </button>
                     </div>
-                  ))}
-                  
-                  <button 
-                    type="button"
-                    onClick={() => {
-                      const nv = editForm.vods || [];
-                      setEditForm({
-                        ...editForm,
-                        vods: [...nv, { id: `vod-${Date.now()}`, title: '', url: '', round: '', score: '' }]
-                      });
-                    }} 
-                    className="w-full py-3 border border-dashed border-white/10 hover:border-red-500/50 rounded-2xl text-red-400 hover:text-red-300 text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 bg-white/[0.01] hover:bg-white/[0.03] active:scale-[0.98]"
-                  >
-                    + AGGIUNGI MATCH VIDEO (VOD)
-                  </button>
+                  )}
                 </div>
 
                 <div className="flex gap-4 pt-6 border-t border-white/5">
