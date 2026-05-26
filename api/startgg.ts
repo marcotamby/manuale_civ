@@ -5,7 +5,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Proviamo a leggere con vari nomi possibili
+  // Proviamo a leggere con vari nomi possibili - force deploy 1
   const token = 
     process.env.VITE_STARTGG_TOKEN || 
     process.env.STARTGG_TOKEN || 
