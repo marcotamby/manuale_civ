@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draft Matching Overlay</title>
+    <!-- Outfit & Inter Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --gold: #d4af37;
+            --gold-bright: #ffed4a;
+            --blue: #0080ff;
+            --bg-dark: #05080f;
+            --card-bg: rgba(10, 15, 26, 0.85);
+            --border-glow-gold: rgba(212, 175, 55, 0.4);
+            --border-glow-blue: rgba(0, 128, 255, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            width: 1920px;
+            height: 1080px;
+            color: white;
+            overflow: hidden;
+            background: transparent url('../background/background.png') no-repeat center center/cover;
+            font-family: 'Outfit', 'Inter', sans-serif;
+        }
+
+        /* Full Screen SVG for line drawing */
+        #connections-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1920px;
+            height: 1080px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Glowing Connection Lines */
+        .connection-line {
+            fill: none;
+            stroke-linecap: round;
+        }
+
+        .glow-thick {
+            stroke: var(--gold);
+            stroke-width: 16px;
+            opacity: 0.12;
+            filter: blur(8px);
+        }
+
+        .glow-medium {
+            stroke: var(--gold);
+            stroke-width: 6px;
+            opacity: 0.35;
+            filter: blur(3px);
+        }
+
+        .core-line {
+            stroke: #ffffff;
+            stroke-width: 2px;
+            opacity: 0.95;
+            filter: drop-shadow(0 0 4px var(--gold-bright));
+        }
+
+        /* Overlay Layout Header */
+        #header-container {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 10;
+        }
+
+        #header-title {
+            font-size: 32px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            color: #ffffff;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.8), 0 0 20px rgba(255,255,255,0.1);
+        }
+
+        /* Columns Containers */
+        .side-container {
+            position: absolute;
+            top: 140px;
+            bottom: 350px;
+            width: 440px;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        #coaches-container {
+            left: 120px;
+        }
+
+        #students-container {
+            right: 120px;
+        }
+
+        .column-title {
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: 5px;
+            margin-bottom: 25px;
+            text-align: center;
+            text-transform: uppercase;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .gold-text {
+            color: var(--gold);
+            text-shadow: 0 0 12px rgba(212, 175, 55, 0.25);
+        }
+
+        .blue-text {
+            color: var(--blue);
+            text-shadow: 0 0 12px rgba(0, 128, 255, 0.25);
+        }
+
+        .names-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        /* Esports Card Styles */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 20px 28px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            height: 64px;
+        }
+
+        .coach-card {
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-left: 6px solid var(--gold);
+        }
+
+        .coach-card.paired {
+            border-color: var(--border-glow-gold);
+            box-shadow: 0 12px 32px rgba(212, 175, 55, 0.12), 0 0 15px rgba(212, 175, 55, 0.05);
+        }
+
+        .student-card {
+            border: 1px solid rgba(0, 128, 255, 0.15);
+            border-right: 6px solid var(--blue);
+            justify-content: flex-end;
+        }
+
+        .student-card.paired {
+            border-color: var(--border-glow-blue);
+            box-shadow: 0 12px 32px rgba(0, 128, 255, 0.12), 0 0 15px rgba(0, 128, 255, 0.05);
+        }
+
+        .card-name {
+            font-size: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* CASTERS AREA */
+        #casters-container {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .caster-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            visibility: hidden;
+        }
+
+        .caster-box.active {
+            opacity: 1;
+            transform: translateY(0);
+            visibility: visible;
+        }
+
+        .webcam-frame {
+            width: 440px;
+            height: 248px; /* 16:9 aspect ratio */
+            border: 2px solid var(--gold);
+            background: rgba(5, 8, 15, 0.4);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), inset 0 0 24px rgba(212, 175, 55, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Scanline scan effects */
+        .webcam-frame::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(212, 175, 55, 0.04) 50%, rgba(0, 0, 0, 0.08) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+
+        .caster-name {
+            background: linear-gradient(135deg, var(--gold), #b89326);
+            color: var(--bg-dark);
+            font-weight: 900;
+            padding: 8px 36px;
+            font-size: 18px;
+            border-radius: 30px;
+            text-transform: uppercase;
+            min-width: 250px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.35);
+            letter-spacing: 1.5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="header-container">
+        <h1 id="header-title">MATCHMAKING DRAFT</h1>
+    </div>
+
+    <!-- Connection SVG layer -->
+    <svg id="connections-svg"></svg>
+
+    <!-- Coaches Column (Left) -->
+    <div id="coaches-container" class="side-container">
+        <h2 class="column-title gold-text">COACH</h2>
+        <div id="coaches-list" class="names-list"></div>
+    </div>
+
+    <!-- Students Column (Right) -->
+    <div id="students-container" class="side-container">
+        <h2 class="column-title blue-text">ALLIEVI</h2>
+        <div id="students-list" class="names-list"></div>
+    </div>
+
+    <!-- Casters Area -->
+    <div id="casters-container">
+        <div id="cb-1" class="caster-box">
+            <div class="webcam-frame"></div>
+            <div id="c-1-name" class="caster-name"></div>
+        </div>
+        <div id="cb-2" class="caster-box">
+            <div class="webcam-frame"></div>
+            <div id="c-2-name" class="caster-name"></div>
+        </div>
+    </div>
+
+    <script>
+        const SUB_URL = "https://laliiuqjpxanhwhxajlm.supabase.co";
+        const SUB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhbGlpdXFqcHhhbmh3aHhhamxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjQ5MjEsImV4cCI6MjA4ODU0MDkyMX0.1xIE1MXy1JxgGzpP0Hitotz8o3aMwASV8NUr06bQjkA";
+        
+        const { createClient } = window.supabase;
+        const client = createClient(SUB_URL, SUB_KEY);
+        let lastState = null;
+
+        function updateConnectingLines() {
+            const svg = document.getElementById('connections-svg');
+            svg.innerHTML = '';
+            
+            if (!lastState || !lastState.pairings || lastState.pairings.length === 0) return;
+            
+            lastState.pairings.forEach(pairing => {
+                const coachEl = document.getElementById(`coach-${pairing.coachId}`);
+                const studentEl = document.getElementById(`student-${pairing.studentId}`);
+                
+                if (!coachEl || !studentEl) return;
+                
+                const coachRect = coachEl.getBoundingClientRect();
+                const studentRect = studentEl.getBoundingClientRect();
+                
+                // Get absolute coordinates
+                const x1 = coachRect.right;
+                const y1 = coachRect.top + coachRect.height / 2;
+                
+                const x2 = studentRect.left;
+                const y2 = studentRect.top + studentRect.height / 2;
+                
+                // S-curve Bezier control points
+                const controlOffset = Math.abs(x2 - x1) * 0.45;
+                const cp1x = x1 + controlOffset;
+                const cp1y = y1;
+                const cp2x = x2 - controlOffset;
+                const cp2y = y2;
+                
+                const pathData = `M ${x1} ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`;
+                
+                // Thick Glow
+                const glowThick = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                glowThick.setAttribute('d', pathData);
+                glowThick.setAttribute('class', 'connection-line glow-thick');
+                
+                // Medium Glow
+                const glowMedium = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                glowMedium.setAttribute('d', pathData);
+                glowMedium.setAttribute('class', 'connection-line glow-medium');
+                
+                // Bright Core
+                const coreLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                coreLine.setAttribute('d', pathData);
+                coreLine.setAttribute('class', 'connection-line core-line');
+                
+                svg.appendChild(glowThick);
+                svg.appendChild(glowMedium);
+                svg.appendChild(coreLine);
+            });
+        }
+
+        function render(state, backgroundUrl) {
+            // Background image handling
+            if (backgroundUrl) {
+                document.body.style.backgroundImage = `url(${backgroundUrl})`;
+            } else {
+                document.body.style.backgroundImage = "url('../background/background.png')";
+            }
+
+            if (!state) return;
+            lastState = state;
+            console.log("Rendering state:", state);
+
+            // 1. Render Coaches List
+            const coachesList = document.getElementById('coaches-list');
+            coachesList.innerHTML = (state.coaches || []).map(coach => {
+                const isPaired = (state.pairings || []).some(p => p.coachId === coach.id);
+                return `
+                    <div id="coach-${coach.id}" class="card coach-card ${isPaired ? 'paired' : ''}">
+                        <div class="card-name">${coach.name}</div>
+                    </div>
+                `;
+            }).join('');
+
+            // 2. Render Students List
+            const studentsList = document.getElementById('students-list');
+            studentsList.innerHTML = (state.students || []).map(student => {
+                const isPaired = (state.pairings || []).some(p => p.studentId === student.id);
+                return `
+                    <div id="student-${student.id}" class="card student-card ${isPaired ? 'paired' : ''}">
+                        <div class="card-name">${student.name}</div>
+                    </div>
+                `;
+            }).join('');
+
+            // 3. Render Casters
+            (state.casters || []).forEach((c, idx) => {
+                const box = document.getElementById(`cb-${idx+1}`);
+                const name = document.getElementById(`c-${idx+1}-name`);
+                if (box && name) {
+                    if (c.active && c.name) {
+                        name.innerText = c.name;
+                        box.classList.add('active');
+                    } else {
+                        box.classList.remove('active');
+                    }
+                }
+            });
+
+            // Trigger connecting line draw after DOM updates
+            setTimeout(updateConnectingLines, 50);
+        }
+
+        async function init() {
+            // Load initial state
+            const { data } = await client.from('stream_overlays').select('state, background_url').eq('id', 'draft-matching').single();
+            if (data) {
+                render(data.state, data.background_url);
+            }
+
+            // Subscribe to Postgres updates
+            client.channel('public:stream_overlays')
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stream_overlays', filter: 'id=eq.draft-matching' }, payload => {
+                    render(payload.new.state, payload.new.background_url);
+                })
+                .subscribe();
+
+            // Backup polling every 5s
+            setInterval(async () => {
+                const { data } = await client.from('stream_overlays').select('state, background_url').eq('id', 'draft-matching').single();
+                if (data) render(data.state, data.background_url);
+            }, 5000);
+
+            // Re-render lines on window resize
+            window.addEventListener('resize', updateConnectingLines);
+            // Continuous fine tuning of lines (handles element position shifts due to rendering)
+            setInterval(updateConnectingLines, 100);
+        }
+
+        init();
+    </script>
+</body>
+</html>

@@ -9,9 +9,13 @@ export interface OverlayState {
   p2?: { name: string; score: number; civId: string };
   map?: string;
   maps?: any[];
-  timer: { active: boolean; min?: number; sec?: number; timestamp?: number; startTime?: number | null };
-  casters: { active: boolean; name: string }[];
+  timer?: { active: boolean; min?: number; sec?: number; timestamp?: number; startTime?: number | null };
+  casters?: { active: boolean; name: string }[];
   bracket?: any;
+  coaches?: any[];
+  students?: any[];
+  pairings?: any[];
+  liveSync?: boolean;
 }
 
 export const overlayService = {

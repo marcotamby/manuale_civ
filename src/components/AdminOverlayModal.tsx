@@ -4,6 +4,7 @@ import { X, ExternalLink, Copy, Monitor, ShieldCheck, Info, Trophy, Settings, Ch
 import { AoE4MatchDashboard } from './AoE4MatchDashboard';
 import { TournamentOverlayDashboard } from './TournamentOverlayDashboard';
 import { TournamentOverlay2v2Dashboard } from './TournamentOverlay2v2Dashboard';
+import { DraftMatchingDashboard } from './DraftMatchingDashboard';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
 import { overlayService } from '../services/overlayService';
@@ -63,6 +64,13 @@ const OVERLAYS: OverlayItem[] = [
     description: 'Tabellone per torneo 2V2 High Elo.',
     path: '/overlays/tournament-2v2-high-bracket/index.html',
     icon: Trophy
+  },
+  {
+    id: 'draft-matching',
+    name: 'Abbinamento Coach-Allievi',
+    description: 'Schermata per abbinamento in tempo reale di Coach e Allievi con linee luminose.',
+    path: '/overlays/draft-matching/index.html',
+    icon: Users
   }
 ];
 
@@ -499,6 +507,8 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                     <div className="h-full bg-black/20 p-8">
                       {selectedOverlay.id === 'aoe4-match' ? (
                         <AoE4MatchDashboard onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} />
+                      ) : selectedOverlay.id === 'draft-matching' ? (
+                        <DraftMatchingDashboard onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} />
                       ) : selectedOverlay.id.startsWith('tournament-2v2') ? (
                         <TournamentOverlay2v2Dashboard 
                           overlayId={selectedOverlay.id} 
