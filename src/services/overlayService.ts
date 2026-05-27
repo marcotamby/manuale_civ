@@ -16,6 +16,9 @@ export interface OverlayState {
   students?: any[];
   pairings?: any[];
   liveSync?: boolean;
+  titleText?: string;
+  titleFont?: string;
+  titleFontSize?: number;
 }
 
 export const overlayService = {

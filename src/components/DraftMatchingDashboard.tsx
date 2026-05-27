@@ -32,6 +32,9 @@ interface DashboardState {
   pairings: Pairing[];
   casters: Caster[];
   liveSync: boolean;
+  titleText: string;
+  titleFont: string;
+  titleFontSize: number;
 }
 
 const DEFAULT_STATE: DashboardState = {
@@ -42,7 +45,10 @@ const DEFAULT_STATE: DashboardState = {
     { name: '', active: false },
     { name: '', active: false }
   ],
-  liveSync: true
+  liveSync: true,
+  titleText: 'MATCHMAKING DRAFT',
+  titleFont: 'Outfit',
+  titleFontSize: 32
 };
 
 const OVERLAY_ID = "draft-matching";
@@ -74,7 +80,10 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
             students: savedState.students || [],
             pairings: savedState.pairings || [],
             casters: savedState.casters || DEFAULT_STATE.casters,
-            liveSync: savedState.liveSync !== undefined ? savedState.liveSync : true
+            liveSync: savedState.liveSync !== undefined ? savedState.liveSync : true,
+            titleText: savedState.titleText !== undefined ? savedState.titleText : DEFAULT_STATE.titleText,
+            titleFont: savedState.titleFont || DEFAULT_STATE.titleFont,
+            titleFontSize: savedState.titleFontSize || DEFAULT_STATE.titleFontSize
           });
         }
       })
@@ -568,32 +577,95 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
 
         </div>
 
-        {/* Row 2: Casters Configuration */}
-        <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-6 shadow-2xl">
-          <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest mb-4 border-b border-white/5 pb-3 flex items-center gap-2">
-            <Sparkles size={16} className="text-cyan-400" /> Configurazione Caster
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {state.casters.map((c, idx) => (
-              <div key={idx} className="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-white/5 hover:border-blue-500/20 transition-all group overflow-hidden">
-                <div className="flex-1 min-w-0">
-                  <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block mb-1">Caster #{idx+1}</span>
+        {/* Row 2: Casters & Title Settings */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left Card: Caster Configuration */}
+          <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-6 shadow-2xl">
+            <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest mb-4 border-b border-white/5 pb-3 flex items-center gap-2">
+              <Sparkles size={16} className="text-cyan-400" /> Configurazione Caster
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {state.casters.map((c, idx) => (
+                <div key={idx} className="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-white/5 hover:border-blue-500/20 transition-all group overflow-hidden">
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block mb-1">Caster #{idx+1}</span>
+                    <input 
+                      type="text" 
+                      value={c.name} 
+                      onChange={(e) => handleCasterNameChange(idx, e.target.value)} 
+                      placeholder={`Nome Caster ${idx+1}`} 
+                      className="w-full bg-transparent text-xs font-black text-white outline-none placeholder:text-gray-700 uppercase tracking-wider" 
+                    />
+                  </div>
+                  <div 
+                    onClick={() => handleCasterActiveChange(idx, !c.active)}
+                    className={`w-12 h-6 rounded-full relative cursor-pointer transition-all flex-shrink-0 ${c.active ? 'bg-cyan-500 shadow-lg shadow-cyan-500/20' : 'bg-white/10'}`}
+                  >
+                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${c.active ? 'left-7' : 'left-1'}`}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Card: Title Settings */}
+          <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-6 shadow-2xl flex flex-col justify-between">
+            <div>
+              <h3 className="text-sm font-black text-purple-400 uppercase tracking-widest mb-4 border-b border-white/5 pb-3 flex items-center gap-2">
+                <Sparkles size={16} className="text-purple-400" /> Impostazioni Titolo Overlay
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Title Text Input */}
+                <div className="space-y-1">
+                  <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block">Testo Titolo</span>
                   <input 
                     type="text" 
-                    value={c.name} 
-                    onChange={(e) => handleCasterNameChange(idx, e.target.value)} 
-                    placeholder={`Nome Caster ${idx+1}`} 
-                    className="w-full bg-transparent text-xs font-black text-white outline-none placeholder:text-gray-700 uppercase tracking-wider" 
+                    value={state.titleText} 
+                    onChange={(e) => handleStateChange({ ...state, titleText: e.target.value })} 
+                    placeholder="Esempio: MATCHMAKING DRAFT" 
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:border-purple-500/50 outline-none transition-all placeholder:text-gray-700 font-bold uppercase" 
                   />
                 </div>
-                <div 
-                  onClick={() => handleCasterActiveChange(idx, !c.active)}
-                  className={`w-12 h-6 rounded-full relative cursor-pointer transition-all flex-shrink-0 ${c.active ? 'bg-cyan-500 shadow-lg shadow-cyan-500/20' : 'bg-white/10'}`}
-                >
-                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${c.active ? 'left-7' : 'left-1'}`}></div>
+
+                {/* Font Family Selector */}
+                <div className="space-y-1">
+                  <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block font-bold">Font Titolo</span>
+                  <div className="relative">
+                    <select
+                      value={state.titleFont}
+                      onChange={(e) => handleStateChange({ ...state, titleFont: e.target.value })}
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:border-purple-500/50 outline-none font-bold uppercase appearance-none cursor-pointer"
+                    >
+                      <option value="Outfit">Outfit (Moderna)</option>
+                      <option value="Inter">Inter (Pulito)</option>
+                      <option value="Montserrat">Montserrat (Corsivo/Gros)</option>
+                      <option value="Cinzel">Cinzel (Classico/Mitico)</option>
+                      <option value="Orbitron">Orbitron (Fantascienza)</option>
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500" size={12} />
+                  </div>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Font Size Slider */}
+            <div className="space-y-1 mt-4">
+              <div className="flex justify-between items-center">
+                <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Dimensione Carattere ({state.titleFontSize}px)</span>
+              </div>
+              <div className="flex items-center gap-4 bg-black/40 px-4 py-2 rounded-xl border border-white/5">
+                <input 
+                  type="range" 
+                  min="16" 
+                  max="64" 
+                  value={state.titleFontSize} 
+                  onChange={(e) => handleStateChange({ ...state, titleFontSize: parseInt(e.target.value) })}
+                  className="flex-1 accent-purple-500 h-1 bg-white/10 rounded-lg cursor-pointer"
+                />
+                <span className="text-xs font-black text-purple-400 w-8 text-right">{state.titleFontSize}px</span>
+              </div>
+            </div>
           </div>
         </div>
 

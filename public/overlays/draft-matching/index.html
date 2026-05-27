@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Draft Matching Overlay</title>
-    <!-- Outfit & Inter Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Import Dynamic Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;700&family=Montserrat:wght@400;700;900&family=Cinzel:wght@700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -17,7 +17,8 @@
             --card-bg: rgba(10, 15, 26, 0.85);
             --border-glow-gold: rgba(212, 175, 55, 0.4);
             --border-glow-blue: rgba(0, 128, 255, 0.4);
-            --silver-blue: #a3c2e0;
+            --silver-blue-bright: #d0e1f9;
+            --silver-blue-medium: #a3c2e0;
             --silver-blue-dark: #668cb3;
         }
 
@@ -104,6 +105,7 @@
             letter-spacing: 6px;
             color: #ffffff;
             text-shadow: 0 4px 12px rgba(0,0,0,0.8), 0 0 20px rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
         }
 
         /* Columns Containers - Reduced to 360px and dynamically centered vertically */
@@ -127,7 +129,7 @@
             right: 120px;
         }
 
-        /* Readable background for column titles just above columns */
+        /* Distinct and themed background for column titles just above columns */
         .column-title {
             font-size: 20px;
             font-weight: 900;
@@ -136,11 +138,21 @@
             text-align: center;
             text-transform: uppercase;
             padding: 12px 24px;
-            background: rgba(5, 8, 15, 0.85);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        #coaches-container .column-title {
+            background: rgba(212, 175, 55, 0.08);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            box-shadow: 0 8px 32px rgba(212, 175, 55, 0.1), 0 0 15px rgba(212, 175, 55, 0.05);
+        }
+
+        #students-container .column-title {
+            background: rgba(0, 128, 255, 0.08);
+            border: 1px solid rgba(0, 128, 255, 0.25);
+            box-shadow: 0 8px 32px rgba(0, 128, 255, 0.1), 0 0 15px rgba(0, 128, 255, 0.05);
         }
 
         .gold-text {
@@ -245,15 +257,17 @@
             visibility: visible;
         }
 
-        /* Webcam frame - Styled in Silver/Light Blue */
+        /* Webcam frame - Highly luminous Silver-Blue Glow */
         .webcam-frame {
             width: 420px;
-            height: 236px; /* 16:9 ratio, slightly larger than 380 */
-            border: 2px solid var(--silver-blue);
-            background: rgba(5, 8, 15, 0.5);
+            height: 236px;
+            border: 2.5px solid var(--silver-blue-bright);
+            background: rgba(10, 15, 28, 0.4);
             backdrop-filter: blur(8px);
             border-radius: 16px;
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), inset 0 0 24px rgba(163, 194, 224, 0.15);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), 
+                        0 0 25px rgba(208, 225, 249, 0.35), 
+                        inset 0 0 24px rgba(208, 225, 249, 0.2);
             position: relative;
             overflow: hidden;
         }
@@ -263,14 +277,14 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(rgba(163, 194, 224, 0.04) 50%, rgba(0, 0, 0, 0.08) 50%);
+            background: linear-gradient(rgba(208, 225, 249, 0.05) 50%, rgba(0, 0, 0, 0.08) 50%);
             background-size: 100% 4px;
             pointer-events: none;
         }
 
-        /* Caster Nameplate - Styled in Silver/Light Blue */
+        /* Caster Nameplate - Highly luminous and shiny metallic gradient */
         .caster-name {
-            background: linear-gradient(135deg, var(--silver-blue), var(--silver-blue-dark));
+            background: linear-gradient(135deg, #ffffff 0%, var(--silver-blue-bright) 50%, var(--silver-blue-medium) 100%);
             color: var(--bg-dark);
             font-weight: 900;
             padding: 8px 36px;
@@ -279,8 +293,10 @@
             text-transform: uppercase;
             min-width: 240px;
             text-align: center;
-            box-shadow: 0 8px 24px rgba(163, 194, 224, 0.35);
+            box-shadow: 0 8px 30px rgba(208, 225, 249, 0.55), 0 0 15px rgba(255, 255, 255, 0.25);
+            border: 1.5px solid #ffffff;
             letter-spacing: 1.5px;
+            text-shadow: 0 1px 0px rgba(255, 255, 255, 0.8);
         }
     </style>
 </head>
@@ -410,7 +426,22 @@
             lastState = state;
             console.log("Rendering state:", state);
 
-            // 1. Render Coaches List
+            // 1. Render Title Settings (Text, Font, Size)
+            const titleEl = document.getElementById('header-title');
+            if (titleEl) {
+                titleEl.innerText = state.titleText !== undefined ? state.titleText : "MATCHMAKING DRAFT";
+                titleEl.style.fontFamily = state.titleFont ? `'${state.titleFont}', sans-serif` : "'Outfit', sans-serif";
+                titleEl.style.fontSize = state.titleFontSize ? `${state.titleFontSize}px` : "32px";
+                
+                // Hide header title if text is completely empty
+                if (state.titleText === '') {
+                    titleEl.style.display = 'none';
+                } else {
+                    titleEl.style.display = 'block';
+                }
+            }
+
+            // 2. Render Coaches List
             const coachesList = document.getElementById('coaches-list');
             coachesList.innerHTML = (state.coaches || []).map(coach => {
                 const isPaired = (state.pairings || []).some(p => p.coachId === coach.id);
@@ -421,7 +452,7 @@
                 `;
             }).join('');
 
-            // 2. Render Students List
+            // 3. Render Students List
             const studentsList = document.getElementById('students-list');
             studentsList.innerHTML = (state.students || []).map(student => {
                 const isPaired = (state.pairings || []).some(p => p.studentId === student.id);
@@ -432,7 +463,7 @@
                 `;
             }).join('');
 
-            // 3. Render Casters - Fixed toggle and silver-blue styling
+            // 4. Render Casters - Fixed toggle and silver-blue styling
             (state.casters || []).forEach((c, idx) => {
                 const box = document.getElementById(`cb-${idx+1}`);
                 const name = document.getElementById(`c-${idx+1}-name`);
