@@ -19,6 +19,9 @@ export interface OverlayState {
   titleText?: string;
   titleFont?: string;
   titleFontSize?: number;
+  titleColor?: string;
+  titleBorderColor?: string;
+  titleBorderWidth?: number;
 }
 
 export const overlayService = {

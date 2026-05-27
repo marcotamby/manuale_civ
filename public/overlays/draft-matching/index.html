@@ -9,7 +9,7 @@
     <meta http-equiv="Expires" content="0" />
     <title>Draft Matching Overlay</title>
     <!-- Import Dynamic Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;700&family=Montserrat:wght@400;700;900&family=Cinzel:wght@700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;700&family=Montserrat:wght@400;700;900&family=Cinzel:wght@700;900&family=Orbitron:wght@700;900&family=Bebas+Neue&family=Russo+One&family=Teko:wght@700&family=Press+Start+2P&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -497,12 +497,17 @@
             lastState = state;
             console.log("Rendering state:", state);
 
-            // 1. Render Title Settings (Text, Font, Size)
+            // 1. Render Title Settings (Text, Font, Size, Colors, Border)
             const titleEl = document.getElementById('header-title');
             if (titleEl) {
                 titleEl.innerText = state.titleText !== undefined ? state.titleText : "MATCHMAKING DRAFT";
                 titleEl.style.fontFamily = state.titleFont ? `'${state.titleFont}', sans-serif` : "'Outfit', sans-serif";
                 titleEl.style.fontSize = state.titleFontSize ? `${state.titleFontSize}px` : "32px";
+                
+                // Custom colors and border styling
+                titleEl.style.color = state.titleColor || '#ffffff';
+                titleEl.style.webkitTextStrokeColor = state.titleBorderColor || '#000000';
+                titleEl.style.webkitTextStrokeWidth = state.titleBorderWidth !== undefined ? `${state.titleBorderWidth}px` : '0px';
                 
                 // Hide header title if text is completely empty
                 if (state.titleText === '') {

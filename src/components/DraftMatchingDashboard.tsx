@@ -35,6 +35,9 @@ interface DashboardState {
   titleText: string;
   titleFont: string;
   titleFontSize: number;
+  titleColor?: string;
+  titleBorderColor?: string;
+  titleBorderWidth?: number;
 }
 
 const DEFAULT_STATE: DashboardState = {
@@ -48,7 +51,10 @@ const DEFAULT_STATE: DashboardState = {
   liveSync: true,
   titleText: 'MATCHMAKING DRAFT',
   titleFont: 'Outfit',
-  titleFontSize: 32
+  titleFontSize: 32,
+  titleColor: '#ffffff',
+  titleBorderColor: '#000000',
+  titleBorderWidth: 0
 };
 
 const OVERLAY_ID = "draft-matching";
@@ -101,7 +107,10 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
             liveSync: savedState.liveSync !== undefined ? savedState.liveSync : true,
             titleText: savedState.titleText !== undefined ? savedState.titleText : DEFAULT_STATE.titleText,
             titleFont: savedState.titleFont || DEFAULT_STATE.titleFont,
-            titleFontSize: savedState.titleFontSize || DEFAULT_STATE.titleFontSize
+            titleFontSize: savedState.titleFontSize || DEFAULT_STATE.titleFontSize,
+            titleColor: savedState.titleColor || DEFAULT_STATE.titleColor,
+            titleBorderColor: savedState.titleBorderColor || DEFAULT_STATE.titleBorderColor,
+            titleBorderWidth: savedState.titleBorderWidth !== undefined ? savedState.titleBorderWidth : DEFAULT_STATE.titleBorderWidth
           });
         }
         isLoadedRef.current = true;
@@ -300,7 +309,7 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
 
   return (
     <div className="flex flex-col bg-[#05080f] font-inter text-white min-h-screen">
-      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;700&family=Montserrat:wght@400;700;900&family=Cinzel:wght@700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;700&family=Montserrat:wght@400;700;900&family=Cinzel:wght@700;900&family=Orbitron:wght@700;900&family=Bebas+Neue&family=Russo+One&family=Teko:wght@700&family=Press+Start+2P&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet" />
       {/* Top Action Bar */}
       <div className="flex items-center justify-between p-6 bg-black/40 border-b border-white/10 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-4">
@@ -704,7 +713,12 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                           { value: 'Inter', label: 'Inter', desc: 'Pulito & Leggibile' },
                           { value: 'Montserrat', label: 'Montserrat', desc: 'Bold & Geometrico' },
                           { value: 'Cinzel', label: 'Cinzel', desc: 'Classico & Mitico' },
-                          { value: 'Orbitron', label: 'Orbitron', desc: 'Fantascienza & Gaming' }
+                          { value: 'Orbitron', label: 'Orbitron', desc: 'Fantascienza & Gaming' },
+                          { value: 'Bebas Neue', label: 'Bebas Neue', desc: 'Bold & Impattante' },
+                          { value: 'Russo One', label: 'Russo One', desc: 'Gaming & Tecnologico' },
+                          { value: 'Teko', label: 'Teko', desc: 'Stretto & Moderno' },
+                          { value: 'Press Start 2P', label: 'Press Start 2P', desc: 'Pixel Retro Gaming' },
+                          { value: 'Cinzel Decorative', label: 'Cinzel Decorative', desc: 'Artistico & Elegante' }
                         ].map((item) => {
                           const isSelected = state.titleFont === item.value;
                           return (
@@ -742,21 +756,72 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
               </div>
             </div>
 
-            {/* Font Size Slider */}
-            <div className="space-y-1 mt-4">
-              <div className="flex justify-between items-center">
-                <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Dimensione Carattere ({state.titleFontSize}px)</span>
+            {/* Title Control sliders and color pickers */}
+            <div className="space-y-4 mt-4">
+              {/* Sliders Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Font Size Slider */}
+                <div className="space-y-1">
+                  <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block font-bold">Dimensione Carattere ({state.titleFontSize}px)</span>
+                  <div className="flex items-center gap-4 bg-black/40 px-4 py-2 rounded-xl border border-white/5">
+                    <input 
+                      type="range" 
+                      min="16" 
+                      max="64" 
+                      value={state.titleFontSize} 
+                      onChange={(e) => setState(prev => ({ ...prev, titleFontSize: parseInt(e.target.value) }))}
+                      className="flex-1 accent-purple-500 h-1 bg-white/10 rounded-lg cursor-pointer"
+                    />
+                    <span className="text-xs font-black text-purple-400 w-8 text-right">{state.titleFontSize}px</span>
+                  </div>
+                </div>
+
+                {/* Border Width Slider */}
+                <div className="space-y-1">
+                  <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block font-bold">Spessore Contorno ({state.titleBorderWidth || 0}px)</span>
+                  <div className="flex items-center gap-4 bg-black/40 px-4 py-2 rounded-xl border border-white/5">
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max="8" 
+                      value={state.titleBorderWidth || 0} 
+                      onChange={(e) => setState(prev => ({ ...prev, titleBorderWidth: parseInt(e.target.value) }))}
+                      className="flex-1 accent-purple-500 h-1 bg-white/10 rounded-lg cursor-pointer"
+                    />
+                    <span className="text-xs font-black text-purple-400 w-8 text-right">{state.titleBorderWidth || 0}px</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-4 bg-black/40 px-4 py-2 rounded-xl border border-white/5">
-                <input 
-                  type="range" 
-                  min="16" 
-                  max="64" 
-                  value={state.titleFontSize} 
-                  onChange={(e) => setState(prev => ({ ...prev, titleFontSize: parseInt(e.target.value) }))}
-                  className="flex-1 accent-purple-500 h-1 bg-white/10 rounded-lg cursor-pointer"
-                />
-                <span className="text-xs font-black text-purple-400 w-8 text-right">{state.titleFontSize}px</span>
+
+              {/* Colors Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Text Fill Color */}
+                <div className="space-y-1">
+                  <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block font-bold">Colore Riempimento</span>
+                  <div className="flex items-center gap-3 bg-black/40 border border-white/10 rounded-xl px-3 py-2">
+                    <input 
+                      type="color" 
+                      value={state.titleColor || '#ffffff'} 
+                      onChange={(e) => setState(prev => ({ ...prev, titleColor: e.target.value }))} 
+                      className="w-8 h-8 bg-transparent border-0 rounded cursor-pointer shrink-0" 
+                    />
+                    <span className="text-xs font-mono uppercase text-gray-300">{state.titleColor || '#ffffff'}</span>
+                  </div>
+                </div>
+
+                {/* Text Border/Outline Color */}
+                <div className="space-y-1">
+                  <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block font-bold">Colore Contorno</span>
+                  <div className="flex items-center gap-3 bg-black/40 border border-white/10 rounded-xl px-3 py-2">
+                    <input 
+                      type="color" 
+                      value={state.titleBorderColor || '#000000'} 
+                      onChange={(e) => setState(prev => ({ ...prev, titleBorderColor: e.target.value }))} 
+                      className="w-8 h-8 bg-transparent border-0 rounded cursor-pointer shrink-0" 
+                    />
+                    <span className="text-xs font-mono uppercase text-gray-300">{state.titleBorderColor || '#000000'}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
