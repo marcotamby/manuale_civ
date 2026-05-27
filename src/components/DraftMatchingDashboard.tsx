@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Save, Plus, X, ChevronDown, Loader2, RefreshCcw, Sparkles, Users, HelpCircle, Trash2, Edit2, Check } from 'lucide-react';
 import { overlayService } from '../services/overlayService';
 
@@ -67,6 +67,12 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
   const [editingStudentName, setEditingStudentName] = useState('');
 
+  // Dropdown & Sync Refs
+  const [fontMenuOpen, setFontMenuOpen] = useState(false);
+  const fontDropdownRef = useRef<HTMLDivElement>(null);
+  const isLoadedRef = useRef(false);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Fetch initial state
   useEffect(() => {
     overlayService.getOverlayState(OVERLAY_ID)
@@ -75,7 +81,6 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
           setState({
             ...DEFAULT_STATE,
             ...savedState,
-            // Ensure lists are defined
             coaches: savedState.coaches || [],
             students: savedState.students || [],
             pairings: savedState.pairings || [],
@@ -86,8 +91,20 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
             titleFontSize: savedState.titleFontSize || DEFAULT_STATE.titleFontSize
           });
         }
+        isLoadedRef.current = true;
       })
       .catch(err => onError("Errore caricamento stato: " + err.message));
+  }, []);
+
+  // Click outside custom font dropdown to close it
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (fontDropdownRef.current && !fontDropdownRef.current.contains(event.target as Node)) {
+        setFontMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Save changes
@@ -101,12 +118,26 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
     }
   };
 
-  const handleStateChange = async (newState: DashboardState) => {
-    setState(newState);
-    if (newState.liveSync) {
-      await saveState(newState);
+  // Debounced auto-sync to avoid Supabase write race conditions during quick typing
+  useEffect(() => {
+    if (!isLoadedRef.current) return;
+
+    if (state.liveSync) {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      saveTimeoutRef.current = setTimeout(() => {
+        overlayService.updateOverlayState(OVERLAY_ID, state)
+          .catch(err => onError("Errore sincronizzazione live: " + err.message));
+      }, 250);
     }
-  };
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [state]);
 
   const handleSaveManual = async () => {
     setIsSaving(true);
@@ -121,7 +152,7 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
   const handleReset = async () => {
     setState(DEFAULT_STATE);
     setShowResetConfirm(false);
-    if (DEFAULT_STATE.liveSync) {
+    if (!DEFAULT_STATE.liveSync) {
       await saveState(DEFAULT_STATE);
     }
   };
@@ -133,22 +164,19 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
       id: `c-${Date.now()}`,
       name: newCoachName.trim()
     };
-    const newState = {
-      ...state,
-      coaches: [...state.coaches, newCoach]
-    };
+    setState(prev => ({
+      ...prev,
+      coaches: [...prev.coaches, newCoach]
+    }));
     setNewCoachName('');
-    handleStateChange(newState);
   };
 
   const deleteCoach = (id: string) => {
-    const newState = {
-      ...state,
-      coaches: state.coaches.filter(c => c.id !== id),
-      // Clean up pairings
-      pairings: state.pairings.filter(p => p.coachId !== id)
-    };
-    handleStateChange(newState);
+    setState(prev => ({
+      ...prev,
+      coaches: prev.coaches.filter(c => c.id !== id),
+      pairings: prev.pairings.filter(p => p.coachId !== id)
+    }));
   };
 
   const startEditCoach = (coach: Coach) => {
@@ -158,13 +186,12 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
 
   const saveEditCoach = () => {
     if (!editingCoachName.trim() || !editingCoachId) return;
-    const newState = {
-      ...state,
-      coaches: state.coaches.map(c => c.id === editingCoachId ? { ...c, name: editingCoachName.trim() } : c)
-    };
+    setState(prev => ({
+      ...prev,
+      coaches: prev.coaches.map(c => c.id === editingCoachId ? { ...c, name: editingCoachName.trim() } : c)
+    }));
     setEditingCoachId(null);
     setEditingCoachName('');
-    handleStateChange(newState);
   };
 
   // Students Management
@@ -174,22 +201,19 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
       id: `s-${Date.now()}`,
       name: newStudentName.trim()
     };
-    const newState = {
-      ...state,
-      students: [...state.students, newStudent]
-    };
+    setState(prev => ({
+      ...prev,
+      students: [...prev.students, newStudent]
+    }));
     setNewStudentName('');
-    handleStateChange(newState);
   };
 
   const deleteStudent = (id: string) => {
-    const newState = {
-      ...state,
-      students: state.students.filter(s => s.id !== id),
-      // Clean up pairings
-      pairings: state.pairings.filter(p => p.studentId !== id)
-    };
-    handleStateChange(newState);
+    setState(prev => ({
+      ...prev,
+      students: prev.students.filter(s => s.id !== id),
+      pairings: prev.pairings.filter(p => p.studentId !== id)
+    }));
   };
 
   const startEditStudent = (student: Student) => {
@@ -199,60 +223,58 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
 
   const saveEditStudent = () => {
     if (!editingStudentName.trim() || !editingStudentId) return;
-    const newState = {
-      ...state,
-      students: state.students.map(s => s.id === editingStudentId ? { ...s, name: editingStudentName.trim() } : s)
-    };
+    setState(prev => ({
+      ...prev,
+      students: prev.students.map(s => s.id === editingStudentId ? { ...s, name: editingStudentName.trim() } : s)
+    }));
     setEditingStudentId(null);
     setEditingStudentName('');
-    handleStateChange(newState);
   };
 
   // Pairings Management
   const handlePair = (coachId: string, studentId: string) => {
-    // Remove existing pairing for this coach if any
-    const filteredPairings = state.pairings.filter(p => p.coachId !== coachId);
-    
-    const newPairings = [...filteredPairings];
-    if (studentId) {
-      newPairings.push({ coachId, studentId });
-    }
-
-    const newState = {
-      ...state,
-      pairings: newPairings
-    };
-    handleStateChange(newState);
+    setState(prev => {
+      const filteredPairings = prev.pairings.filter(p => p.coachId !== coachId);
+      const newPairings = [...filteredPairings];
+      if (studentId) {
+        newPairings.push({ coachId, studentId });
+      }
+      return {
+        ...prev,
+        pairings: newPairings
+      };
+    });
   };
 
   // Casters Management
   const handleCasterNameChange = (idx: number, name: string) => {
-    const newCasters = [...state.casters];
-    newCasters[idx] = { ...newCasters[idx], name };
-    const newState = {
-      ...state,
-      casters: newCasters
-    };
-    handleStateChange(newState);
+    setState(prev => {
+      const newCasters = [...prev.casters];
+      newCasters[idx] = { ...newCasters[idx], name };
+      return {
+        ...prev,
+        casters: newCasters
+      };
+    });
   };
 
   const handleCasterActiveChange = (idx: number, active: boolean) => {
-    const newCasters = [...state.casters];
-    newCasters[idx] = { ...newCasters[idx], active };
-    const newState = {
-      ...state,
-      casters: newCasters
-    };
-    handleStateChange(newState);
+    setState(prev => {
+      const newCasters = [...prev.casters];
+      newCasters[idx] = { ...newCasters[idx], active };
+      return {
+        ...prev,
+        casters: newCasters
+      };
+    });
   };
 
   // Toggle Live Sync
   const handleToggleLiveSync = () => {
-    const newState = {
-      ...state,
-      liveSync: !state.liveSync
-    };
-    handleStateChange(newState);
+    setState(prev => ({
+      ...prev,
+      liveSync: !prev.liveSync
+    }));
   };
 
   // Check if a student is already paired (returns coach name)
@@ -265,6 +287,7 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
 
   return (
     <div className="flex flex-col bg-[#05080f] font-inter text-white min-h-screen">
+      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;700&family=Montserrat:wght@400;700;900&family=Cinzel:wght@700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet" />
       {/* Top Action Bar */}
       <div className="flex items-center justify-between p-6 bg-black/40 border-b border-white/10 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-4">
@@ -618,33 +641,72 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Title Text Input */}
                 <div className="space-y-1">
-                  <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block">Testo Titolo</span>
+                  <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block font-bold">Testo Titolo</span>
                   <input 
                     type="text" 
                     value={state.titleText} 
-                    onChange={(e) => handleStateChange({ ...state, titleText: e.target.value })} 
+                    onChange={(e) => setState(prev => ({ ...prev, titleText: e.target.value }))} 
                     placeholder="Esempio: MATCHMAKING DRAFT" 
                     className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:border-purple-500/50 outline-none transition-all placeholder:text-gray-700 font-bold uppercase" 
                   />
                 </div>
 
                 {/* Font Family Selector */}
-                <div className="space-y-1">
+                <div className="space-y-1 relative" ref={fontDropdownRef}>
                   <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block font-bold">Font Titolo</span>
-                  <div className="relative">
-                    <select
-                      value={state.titleFont}
-                      onChange={(e) => handleStateChange({ ...state, titleFont: e.target.value })}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:border-purple-500/50 outline-none font-bold uppercase appearance-none cursor-pointer"
-                    >
-                      <option value="Outfit">Outfit (Moderna)</option>
-                      <option value="Inter">Inter (Pulito)</option>
-                      <option value="Montserrat">Montserrat (Corsivo/Gros)</option>
-                      <option value="Cinzel">Cinzel (Classico/Mitico)</option>
-                      <option value="Orbitron">Orbitron (Fantascienza)</option>
-                    </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500" size={12} />
-                  </div>
+                  <button
+                    onClick={() => setFontMenuOpen(!fontMenuOpen)}
+                    type="button"
+                    className="w-full bg-black/40 border border-white/10 hover:border-purple-500/30 rounded-xl px-4 py-2.5 text-xs text-white outline-none font-bold flex items-center justify-between transition-all cursor-pointer"
+                  >
+                    <span style={{ fontFamily: state.titleFont }} className="tracking-wide uppercase">
+                      {state.titleFont}
+                    </span>
+                    <ChevronDown size={14} className={`text-gray-500 transition-transform duration-300 ${fontMenuOpen ? 'rotate-180 text-purple-400' : ''}`} />
+                  </button>
+
+                  {fontMenuOpen && (
+                    <div className="absolute left-0 right-0 mt-2 bg-[#090d16]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="p-1.5 max-h-60 overflow-y-auto elegant-scrollbar space-y-0.5">
+                        {[
+                          { value: 'Outfit', label: 'Outfit', desc: 'Moderna & Sleek' },
+                          { value: 'Inter', label: 'Inter', desc: 'Pulito & Leggibile' },
+                          { value: 'Montserrat', label: 'Montserrat', desc: 'Bold & Geometrico' },
+                          { value: 'Cinzel', label: 'Cinzel', desc: 'Classico & Mitico' },
+                          { value: 'Orbitron', label: 'Orbitron', desc: 'Fantascienza & Gaming' }
+                        ].map((item) => {
+                          const isSelected = state.titleFont === item.value;
+                          return (
+                            <button
+                              key={item.value}
+                              type="button"
+                              onClick={() => {
+                                setState(prev => ({ ...prev, titleFont: item.value }));
+                                setFontMenuOpen(false);
+                              }}
+                              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all text-left ${
+                                isSelected 
+                                  ? 'bg-purple-600/20 border border-purple-500/30 text-white' 
+                                  : 'hover:bg-white/5 border border-transparent text-gray-300 hover:text-white'
+                              }`}
+                            >
+                              <div className="flex flex-col">
+                                <span style={{ fontFamily: item.value }} className="text-xs font-bold uppercase tracking-wider">
+                                  {item.label}
+                                </span>
+                                <span className="text-[8px] text-gray-500 font-medium">
+                                  {item.desc}
+                                </span>
+                              </div>
+                              {isSelected && (
+                                <Check size={12} className="text-purple-400" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -660,7 +722,7 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                   min="16" 
                   max="64" 
                   value={state.titleFontSize} 
-                  onChange={(e) => handleStateChange({ ...state, titleFontSize: parseInt(e.target.value) })}
+                  onChange={(e) => setState(prev => ({ ...prev, titleFontSize: parseInt(e.target.value) }))}
                   className="flex-1 accent-purple-500 h-1 bg-white/10 rounded-lg cursor-pointer"
                 />
                 <span className="text-xs font-black text-purple-400 w-8 text-right">{state.titleFontSize}px</span>
