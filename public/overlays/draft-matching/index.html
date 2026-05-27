@@ -17,6 +17,8 @@
             --card-bg: rgba(10, 15, 26, 0.85);
             --border-glow-gold: rgba(212, 175, 55, 0.4);
             --border-glow-blue: rgba(0, 128, 255, 0.4);
+            --silver-blue: #a3c2e0;
+            --silver-blue-dark: #668cb3;
         }
 
         * {
@@ -46,7 +48,7 @@
             z-index: 5;
         }
 
-        /* Glowing Connection Lines with Slow Draw Animation */
+        /* Glowing Connection Lines with Slow Draw Animation - Thicker */
         @keyframes draw-line {
             from {
                 stroke-dashoffset: 2000;
@@ -66,23 +68,23 @@
 
         .glow-thick {
             stroke: var(--gold);
-            stroke-width: 16px;
+            stroke-width: 30px;
             opacity: 0.12;
-            filter: blur(8px);
+            filter: blur(10px);
         }
 
         .glow-medium {
             stroke: var(--gold);
-            stroke-width: 6px;
+            stroke-width: 12px;
             opacity: 0.35;
-            filter: blur(3px);
+            filter: blur(4px);
         }
 
         .core-line {
             stroke: #ffffff;
-            stroke-width: 2px;
+            stroke-width: 4px;
             opacity: 0.95;
-            filter: drop-shadow(0 0 4px var(--gold-bright));
+            filter: drop-shadow(0 0 6px var(--gold-bright));
         }
 
         /* Overlay Layout Header */
@@ -104,15 +106,17 @@
             text-shadow: 0 4px 12px rgba(0,0,0,0.8), 0 0 20px rgba(255,255,255,0.1);
         }
 
-        /* Columns Containers */
+        /* Columns Containers - Reduced to 360px and dynamically centered vertically */
         .side-container {
             position: absolute;
-            top: 140px;
-            bottom: 350px;
-            width: 440px;
+            top: 45%;
+            transform: translateY(-50%);
+            width: 360px;
             display: flex;
             flex-direction: column;
             z-index: 10;
+            height: auto;
+            max-height: 600px;
         }
 
         #coaches-container {
@@ -123,15 +127,20 @@
             right: 120px;
         }
 
+        /* Readable background for column titles just above columns */
         .column-title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 900;
             letter-spacing: 5px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             text-align: center;
             text-transform: uppercase;
-            padding-bottom: 12px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+            padding: 12px 24px;
+            background: rgba(5, 8, 15, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
 
         .gold-text {
@@ -145,25 +154,24 @@
         }
 
         .names-list {
-            flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             gap: 16px;
         }
 
-        /* Esports Card Styles */
+        /* Esports Card Styles - Reduced width */
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(12px);
             border-radius: 16px;
-            padding: 20px 28px;
+            padding: 20px 24px;
             display: flex;
             align-items: center;
             position: relative;
             box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             height: 64px;
+            width: 100%;
         }
 
         .coach-card {
@@ -188,7 +196,7 @@
         }
 
         .card-name {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -199,21 +207,20 @@
             text-overflow: ellipsis;
         }
 
-        /* CASTERS AREA */
+        /* CASTERS AREA - Separated Left & Right, centered vertical axes */
         #casters-container {
             position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 40px;
-            justify-content: center;
-            align-items: center;
+            bottom: 0;
+            left: 0;
+            width: 1920px;
+            height: 340px;
             pointer-events: none;
             z-index: 10;
         }
 
         .caster-box {
+            position: absolute;
+            bottom: 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -224,45 +231,55 @@
             visibility: hidden;
         }
 
+        #cb-1 {
+            left: 90px; /* Centered along same vertical axis as Coaches column */
+        }
+
+        #cb-2 {
+            right: 90px; /* Centered along same vertical axis as Students column */
+        }
+
         .caster-box.active {
             opacity: 1;
             transform: translateY(0);
             visibility: visible;
         }
 
+        /* Webcam frame - Styled in Silver/Light Blue */
         .webcam-frame {
-            width: 440px;
-            height: 248px; /* 16:9 aspect ratio */
-            border: 2px solid var(--gold);
-            background: rgba(5, 8, 15, 0.4);
+            width: 420px;
+            height: 236px; /* 16:9 ratio, slightly larger than 380 */
+            border: 2px solid var(--silver-blue);
+            background: rgba(5, 8, 15, 0.5);
             backdrop-filter: blur(8px);
             border-radius: 16px;
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), inset 0 0 24px rgba(212, 175, 55, 0.1);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), inset 0 0 24px rgba(163, 194, 224, 0.15);
             position: relative;
             overflow: hidden;
         }
 
-        /* Scanline scan effects */
+        /* Scanline scan effects in Silver-Blue */
         .webcam-frame::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(rgba(212, 175, 55, 0.04) 50%, rgba(0, 0, 0, 0.08) 50%);
+            background: linear-gradient(rgba(163, 194, 224, 0.04) 50%, rgba(0, 0, 0, 0.08) 50%);
             background-size: 100% 4px;
             pointer-events: none;
         }
 
+        /* Caster Nameplate - Styled in Silver/Light Blue */
         .caster-name {
-            background: linear-gradient(135deg, var(--gold), #b89326);
+            background: linear-gradient(135deg, var(--silver-blue), var(--silver-blue-dark));
             color: var(--bg-dark);
             font-weight: 900;
             padding: 8px 36px;
-            font-size: 18px;
+            font-size: 17px;
             border-radius: 30px;
             text-transform: uppercase;
-            min-width: 250px;
+            min-width: 240px;
             text-align: center;
-            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.35);
+            box-shadow: 0 8px 24px rgba(163, 194, 224, 0.35);
             letter-spacing: 1.5px;
         }
     </style>
@@ -337,7 +354,6 @@
                 const dy = y2 - y1;
                 
                 // Winding "ghirigoro" path using Q and T bezier smooth chain
-                // We add smooth wave peaks & valleys to meander gracefully
                 const pathData = `M ${x1} ${y1} Q ${x1 + dx * 0.125} ${y1 - 60}, ${x1 + dx * 0.25} ${y1 + dy * 0.15 - 30} T ${x1 + dx * 0.5} ${y1 + dy * 0.5 + 45} T ${x1 + dx * 0.75} ${y1 + dy * 0.85 - 30} T ${x2} ${y2}`;
                 
                 const pairingId = `pair-${pairing.coachId}-${pairing.studentId}`;
@@ -416,15 +432,13 @@
                 `;
             }).join('');
 
-            // 3. Render Casters
+            // 3. Render Casters - Fixed toggle and silver-blue styling
             (state.casters || []).forEach((c, idx) => {
                 const box = document.getElementById(`cb-${idx+1}`);
                 const name = document.getElementById(`c-${idx+1}-name`);
                 if (box && name) {
                     if (c.active) {
-                        // Display webcam frame
                         box.classList.add('active');
-                        // Show/Hide name plate depending on whether name is set
                         if (c.name) {
                             name.innerText = c.name;
                             name.style.display = 'block';

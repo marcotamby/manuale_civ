@@ -468,7 +468,7 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                             {student.name}
                           </span>
                           {getPairedCoachName(student.id) && (
-                            <span className="text-[8px] font-bold text-amber-500/60 uppercase tracking-widest mt-0.5">
+                            <span className="text-[8px] font-bold text-cyan-400/80 uppercase tracking-widest mt-0.5">
                               Abbinato a: {getPairedCoachName(student.id)}
                             </span>
                           )}
@@ -522,7 +522,7 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                       className="bg-black/30 border border-white/5 rounded-2xl p-4 space-y-2 hover:border-amber-500/20 transition-all"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black text-amber-500 uppercase tracking-wider">
+                        <span className="text-[10px] font-black text-cyan-400 uppercase tracking-wider">
                           Coach: {coach.name}
                         </span>
                         {pairing && (
