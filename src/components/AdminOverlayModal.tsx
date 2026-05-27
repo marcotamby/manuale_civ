@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { X, ExternalLink, Copy, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft, Pencil, Check, Upload, Users } from 'lucide-react';
+import { X, ExternalLink, Copy, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft, Pencil, Check, Upload, Users, Loader2 } from 'lucide-react';
 import { AoE4MatchDashboard } from './AoE4MatchDashboard';
 import { TournamentOverlayDashboard } from './TournamentOverlayDashboard';
 import { TournamentOverlay2v2Dashboard } from './TournamentOverlay2v2Dashboard';
@@ -8,6 +8,7 @@ import { DraftMatchingDashboard } from './DraftMatchingDashboard';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
 import { overlayService } from '../services/overlayService';
+import { supabase } from '../lib/supabaseClient';
 
 interface OverlayItem {
   id: string;
@@ -99,6 +100,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
   const editDescInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bgInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingBg, setIsUploadingBg] = useState(false);
 
   const { overlayId, tab } = useParams();
   const navigate = useNavigate();
@@ -262,6 +264,20 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
     reader.readAsDataURL(file);
   };
 
+  const handleResetBackground = async () => {
+    if (!selectedOverlay) return;
+    setIsUploadingBg(true);
+    try {
+      await overlayService.updateOverlayBackground(selectedOverlay.id, '');
+      setOverlayBackgrounds(prev => ({ ...prev, [selectedOverlay.id]: '' }));
+      setToast({ isVisible: true, message: 'Sfondo resettato al predefinito! 🧹', type: 'success' });
+    } catch {
+      setToast({ isVisible: true, message: 'Errore nel reset dello sfondo.', type: 'error' });
+    } finally {
+      setIsUploadingBg(false);
+    }
+  };
+
   const handleBackgroundUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !selectedOverlay) return;
@@ -272,20 +288,34 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64 = reader.result as string;
-      try {
-        await overlayService.updateOverlayBackground(selectedOverlay.id, base64);
-        setOverlayBackgrounds(prev => ({ ...prev, [selectedOverlay.id]: base64 }));
-        setToast({ isVisible: true, message: 'Background aggiornato! 🖼️', type: 'success' });
-      } catch {
-        setToast({ isVisible: true, message: 'Errore caricamento background.', type: 'error' });
-      } finally {
-        if (bgInputRef.current) bgInputRef.current.value = '';
-      }
-    };
-    reader.readAsDataURL(file);
+    setIsUploadingBg(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${selectedOverlay.id}-bg-${Date.now()}.${fileExt}`;
+      const filePath = `overlay-backgrounds/${fileName}`;
+
+      // Upload to civilizations bucket in Supabase storage
+      const { error: uploadError } = await supabase.storage
+        .from('civilizations')
+        .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('civilizations')
+        .getPublicUrl(filePath);
+
+      await overlayService.updateOverlayBackground(selectedOverlay.id, publicUrl);
+      setOverlayBackgrounds(prev => ({ ...prev, [selectedOverlay.id]: publicUrl }));
+      setToast({ isVisible: true, message: 'Background aggiornato! 🖼️', type: 'success' });
+    } catch (err: any) {
+      console.error('Error uploading background:', err);
+      setToast({ isVisible: true, message: `Errore caricamento: ${err.message || 'connessione fallita'}`, type: 'error' });
+    } finally {
+      setIsUploadingBg(false);
+      if (bgInputRef.current) bgInputRef.current.value = '';
+    }
   };
 
   if (!isOpen) return null;
@@ -475,14 +505,39 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                           <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></div>
                           ANTEPRIMA LIVE (1920x1080)
                         </div>
+
+                        {overlayDisplayBackground && (
+                          <button 
+                            onClick={handleResetBackground}
+                            disabled={isUploadingBg}
+                            className="absolute top-6 right-[260px] z-10 px-4 py-2 bg-red-950/60 backdrop-blur-md rounded-full border border-red-500/30 text-[11px] font-black text-red-400 flex items-center gap-2 hover:bg-red-900/40 hover:text-red-300 transition-all cursor-pointer disabled:opacity-50"
+                          >
+                            <X size={14} className="text-red-400" />
+                            RESETTA SFONDO
+                          </button>
+                        )}
+
                         <button 
                           onClick={() => bgInputRef.current?.click()}
-                          className="absolute top-6 right-6 z-10 px-4 py-2 bg-black/60 backdrop-blur-md rounded-full border border-white/10 text-[11px] font-black text-gray-300 flex items-center gap-2 hover:bg-white/10 hover:text-white transition-all cursor-pointer"
+                          disabled={isUploadingBg}
+                          className="absolute top-6 right-6 z-10 px-4 py-2 bg-black/60 backdrop-blur-md rounded-full border border-white/10 text-[11px] font-black text-gray-300 flex items-center gap-2 hover:bg-white/10 hover:text-white transition-all cursor-pointer disabled:opacity-50"
                         >
-                          <Upload size={14} className="text-[#D4AF37]" />
-                          CAMBIA SFONDO (MAX 10MB)
+                          {isUploadingBg ? (
+                            <Loader2 size={14} className="animate-spin text-yellow-500" />
+                          ) : (
+                            <Upload size={14} className="text-[#D4AF37]" />
+                          )}
+                          {isUploadingBg ? 'CARICAMENTO...' : 'CAMBIA SFONDO (MAX 10MB)'}
                         </button>
                         <input type="file" ref={bgInputRef} onChange={handleBackgroundUpload} accept="image/*" className="hidden" />
+
+                        {isUploadingBg && (
+                          <div className="absolute inset-0 bg-black/75 backdrop-blur-sm flex flex-col items-center justify-center gap-4 z-20 animate-in fade-in duration-200">
+                            <Loader2 size={40} className="animate-spin text-[#D4AF37]" />
+                            <span className="text-xs font-black text-white uppercase tracking-widest">Caricamento dello sfondo in corso...</span>
+                          </div>
+                        )}
+
                         <div className="absolute inset-0 flex items-center justify-center p-6 overflow-hidden">
                           <div className="w-full h-full relative" ref={containerRef}>
                             <iframe 
