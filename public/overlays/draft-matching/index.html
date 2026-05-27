@@ -343,6 +343,19 @@
         let currentBackgroundUrl = null;
         const sessionBuster = Date.now();
 
+        const PAIRING_COLORS = [
+            '#00f0ff', // Electric Cyan
+            '#ff007b', // Hot Pink
+            '#00ff88', // Emerald Green
+            '#bd00ff', // Violet/Purple
+            '#ff7b00', // Neon Orange
+            '#ffd800', // Bright Gold
+            '#ff3c3c', // Vivid Coral/Red
+            '#0088ff', // Sky Blue
+            '#a2ff00', // Lime Green
+            '#ff00d4'  // Magenta
+        ];
+
         function updateConnectingLines() {
             const svg = document.getElementById('connections-svg');
             
@@ -353,7 +366,7 @@
 
             const activeIds = new Set();
             
-            lastState.pairings.forEach(pairing => {
+            lastState.pairings.forEach((pairing, index) => {
                 const coachEl = document.getElementById(`coach-${pairing.coachId}`);
                 const studentEl = document.getElementById(`student-${pairing.studentId}`);
                 
@@ -402,6 +415,8 @@
                 const pairingId = `pair-${pairing.coachId}-${pairing.studentId}`;
                 activeIds.add(pairingId);
 
+                const pairingColor = PAIRING_COLORS[index % PAIRING_COLORS.length];
+
                 // Find or create group element
                 let group = document.getElementById(pairingId);
                 if (!group) {
@@ -429,6 +444,15 @@
                 paths.forEach(path => {
                     path.setAttribute('d', pathData);
                 });
+
+                // Apply dynamic pairing color
+                const glowThick = group.querySelector('.glow-thick');
+                const glowMedium = group.querySelector('.glow-medium');
+                const coreLine = group.querySelector('.core-line');
+
+                if (glowThick) glowThick.style.stroke = pairingColor;
+                if (glowMedium) glowMedium.style.stroke = pairingColor;
+                if (coreLine) coreLine.style.filter = `drop-shadow(0 0 6px ${pairingColor})`;
 
                 // Measure path length and set as CSS variable to ensure instant drawing and true 5s duration
                 try {
@@ -543,9 +567,12 @@
 
             // 2. Render Coaches List
             coachesList.innerHTML = (state.coaches || []).map(coach => {
-                const isPaired = (state.pairings || []).some(p => p.coachId === coach.id);
+                const pairingIndex = (state.pairings || []).findIndex(p => p.coachId === coach.id);
+                const isPaired = pairingIndex !== -1;
+                const pairingColor = isPaired ? PAIRING_COLORS[pairingIndex % PAIRING_COLORS.length] : '';
+                const styleStr = isPaired ? `style="border-color: ${pairingColor}33; border-left-color: ${pairingColor}; box-shadow: 0 12px 32px ${pairingColor}15, 0 0 15px ${pairingColor}08;"` : '';
                 return `
-                    <div id="coach-${coach.id}" class="card coach-card ${isPaired ? 'paired' : ''}">
+                    <div id="coach-${coach.id}" class="card coach-card ${isPaired ? 'paired' : ''}" ${styleStr}>
                         <div class="card-name">${coach.name}</div>
                     </div>
                 `;
@@ -553,9 +580,12 @@
 
             // 3. Render Students List
             studentsList.innerHTML = (state.students || []).map(student => {
-                const isPaired = (state.pairings || []).some(p => p.studentId === student.id);
+                const pairingIndex = (state.pairings || []).findIndex(p => p.studentId === student.id);
+                const isPaired = pairingIndex !== -1;
+                const pairingColor = isPaired ? PAIRING_COLORS[pairingIndex % PAIRING_COLORS.length] : '';
+                const styleStr = isPaired ? `style="border-color: ${pairingColor}33; border-right-color: ${pairingColor}; box-shadow: 0 12px 32px ${pairingColor}15, 0 0 15px ${pairingColor}08;"` : '';
                 return `
-                    <div id="student-${student.id}" class="card student-card ${isPaired ? 'paired' : ''}">
+                    <div id="student-${student.id}" class="card student-card ${isPaired ? 'paired' : ''}" ${styleStr}>
                         <div class="card-name">${student.name}</div>
                     </div>
                 `;

@@ -53,6 +53,19 @@ const DEFAULT_STATE: DashboardState = {
 
 const OVERLAY_ID = "draft-matching";
 
+const PAIRING_COLORS = [
+  '#00f0ff', // Electric Cyan
+  '#ff007b', // Hot Pink
+  '#00ff88', // Emerald Green
+  '#bd00ff', // Violet/Purple
+  '#ff7b00', // Neon Orange
+  '#ffd800', // Bright Gold
+  '#ff3c3c', // Vivid Coral/Red
+  '#0088ff', // Sky Blue
+  '#a2ff00', // Lime Green
+  '#ff00d4'  // Magenta
+];
+
 export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps) {
   const [state, setState] = useState<DashboardState>(DEFAULT_STATE);
   const [isSaving, setIsSaving] = useState(false);
@@ -392,51 +405,58 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                   <HelpCircle size={24} className="opacity-35" />
                   <span className="text-[10px] font-black uppercase tracking-wider">Nessun coach inserito</span>
                 </div>
-              ) : (
-                state.coaches.map(coach => (
-                  <div 
-                    key={coach.id}
-                    className="bg-black/30 border border-white/5 hover:border-amber-500/20 rounded-xl p-3 flex items-center justify-between group transition-all"
-                  >
-                    {editingCoachId === coach.id ? (
-                      <div className="flex items-center gap-2 w-full">
-                        <input
-                          type="text"
-                          value={editingCoachName}
-                          onChange={(e) => setEditingCoachName(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && saveEditCoach()}
-                          className="flex-1 bg-black/60 border border-blue-500/50 rounded-lg px-2 py-1.5 text-xs text-white uppercase font-bold outline-none"
-                        />
-                        <button onClick={saveEditCoach} className="p-1.5 bg-green-600 text-white rounded-md hover:bg-green-500">
-                          <Check size={16} />
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        <span className="font-bold text-xs uppercase tracking-wide truncate max-w-[200px]">
-                          {coach.name}
-                        </span>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button 
-                            onClick={() => startEditCoach(coach)}
-                            className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-amber-500 transition-all"
-                            title="Modifica"
-                          >
-                            <Edit2 size={18} />
-                          </button>
-                          <button 
-                            onClick={() => deleteCoach(coach.id)}
-                            className="p-2 hover:bg-red-500/20 rounded-lg text-gray-500 hover:text-red-400 transition-all"
-                            title="Elimina"
-                          >
-                            <Trash2 size={18} />
+              ) :
+                state.coaches.map(coach => {
+                  const pairingIndex = state.pairings.findIndex(p => p.coachId === coach.id);
+                  const isPaired = pairingIndex !== -1;
+                  const pairingColor = isPaired ? PAIRING_COLORS[pairingIndex % PAIRING_COLORS.length] : null;
+
+                  return (
+                    <div 
+                      key={coach.id}
+                      style={pairingColor ? { borderColor: `${pairingColor}33`, borderLeftColor: pairingColor, borderLeftWidth: '4px', borderLeftStyle: 'solid' } : undefined}
+                      className="bg-black/30 border border-white/5 hover:border-amber-500/20 rounded-xl p-3 flex items-center justify-between group transition-all"
+                    >
+                      {editingCoachId === coach.id ? (
+                        <div className="flex items-center gap-2 w-full">
+                          <input
+                            type="text"
+                            value={editingCoachName}
+                            onChange={(e) => setEditingCoachName(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && saveEditCoach()}
+                            className="flex-1 bg-black/60 border border-blue-500/50 rounded-lg px-2 py-1.5 text-xs text-white uppercase font-bold outline-none"
+                          />
+                          <button onClick={saveEditCoach} className="p-1.5 bg-green-600 text-white rounded-md hover:bg-green-500">
+                            <Check size={16} />
                           </button>
                         </div>
-                      </>
-                    )}
-                  </div>
-                ))
-              )}
+                      ) : (
+                        <>
+                          <span className="font-bold text-xs uppercase tracking-wide truncate max-w-[200px]">
+                            {coach.name}
+                          </span>
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button 
+                              onClick={() => startEditCoach(coach)}
+                              className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-amber-500 transition-all"
+                              title="Modifica"
+                            >
+                              <Edit2 size={18} />
+                            </button>
+                            <button 
+                              onClick={() => deleteCoach(coach.id)}
+                              className="p-2 hover:bg-red-500/20 rounded-lg text-gray-500 hover:text-red-400 transition-all"
+                              title="Elimina"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })
+              }
             </div>
           </div>
 
@@ -474,12 +494,18 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                   <HelpCircle size={24} className="opacity-35" />
                   <span className="text-[10px] font-black uppercase tracking-wider">Nessun allievo inserito</span>
                 </div>
-              ) : (
-                state.students.map(student => (
-                  <div 
-                    key={student.id}
-                    className="bg-black/30 border border-white/5 hover:border-blue-500/20 rounded-xl p-3 flex items-center justify-between group transition-all"
-                  >
+              ) :
+                state.students.map(student => {
+                  const pairingIndex = state.pairings.findIndex(p => p.studentId === student.id);
+                  const isPaired = pairingIndex !== -1;
+                  const pairingColor = isPaired ? PAIRING_COLORS[pairingIndex % PAIRING_COLORS.length] : null;
+
+                  return (
+                    <div 
+                      key={student.id}
+                      style={pairingColor ? { borderColor: `${pairingColor}33`, borderRightColor: pairingColor, borderRightWidth: '4px', borderRightStyle: 'solid' } : undefined}
+                      className="bg-black/30 border border-white/5 hover:border-blue-500/20 rounded-xl p-3 flex items-center justify-between group transition-all"
+                    >
                     {editingStudentId === student.id ? (
                       <div className="flex items-center gap-2 w-full">
                         <input
@@ -524,8 +550,9 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                       </>
                     )}
                   </div>
-                ))
-              )}
+                  );
+                })
+              }
             </div>
           </div>
 
@@ -547,10 +574,14 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                 state.coaches.map(coach => {
                   const pairing = state.pairings.find(p => p.coachId === coach.id);
                   const selectedStudentId = pairing ? pairing.studentId : '';
+                  const pairingIndex = state.pairings.findIndex(p => p.coachId === coach.id);
+                  const isPaired = pairingIndex !== -1;
+                  const pairingColor = isPaired ? PAIRING_COLORS[pairingIndex % PAIRING_COLORS.length] : null;
                   
                   return (
                     <div 
                       key={coach.id}
+                      style={pairingColor ? { borderColor: `${pairingColor}33`, borderLeftColor: pairingColor, borderLeftWidth: '4px', borderLeftStyle: 'solid' } : undefined}
                       className="bg-black/30 border border-white/5 rounded-2xl p-4 space-y-2 hover:border-amber-500/20 transition-all"
                     >
                       <div className="flex items-center justify-between">
