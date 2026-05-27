@@ -195,26 +195,24 @@
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             height: var(--card-height, 64px);
             width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .coach-card {
-            border: 1px solid rgba(212, 175, 55, 0.15);
-            border-left: 6px solid var(--gold);
+            /* Neutral by default */
         }
 
         .coach-card.paired {
-            border-color: var(--border-glow-gold);
+            border-left: 6px solid var(--gold);
             box-shadow: 0 12px 32px rgba(212, 175, 55, 0.12), 0 0 15px rgba(212, 175, 55, 0.05);
         }
 
         .student-card {
-            border: 1px solid rgba(0, 240, 255, 0.15);
-            border-right: 6px solid var(--blue);
             justify-content: flex-end;
         }
 
         .student-card.paired {
-            border-color: var(--border-glow-blue);
+            border-right: 6px solid var(--blue);
             box-shadow: 0 12px 32px rgba(0, 240, 255, 0.12), 0 0 15px rgba(0, 240, 255, 0.05);
         }
 
