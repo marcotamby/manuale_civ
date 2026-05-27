@@ -46,10 +46,22 @@
             z-index: 5;
         }
 
-        /* Glowing Connection Lines */
+        /* Glowing Connection Lines with Slow Draw Animation */
+        @keyframes draw-line {
+            from {
+                stroke-dashoffset: 2000;
+            }
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
         .connection-line {
             fill: none;
             stroke-linecap: round;
+            stroke-dasharray: 2000;
+            stroke-dashoffset: 2000;
+            animation: draw-line 3.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
         }
 
         .glow-thick {
@@ -297,9 +309,13 @@
 
         function updateConnectingLines() {
             const svg = document.getElementById('connections-svg');
-            svg.innerHTML = '';
             
-            if (!lastState || !lastState.pairings || lastState.pairings.length === 0) return;
+            if (!lastState || !lastState.pairings || lastState.pairings.length === 0) {
+                svg.innerHTML = '';
+                return;
+            }
+
+            const activeIds = new Set();
             
             lastState.pairings.forEach(pairing => {
                 const coachEl = document.getElementById(`coach-${pairing.coachId}`);
@@ -317,33 +333,52 @@
                 const x2 = studentRect.left;
                 const y2 = studentRect.top + studentRect.height / 2;
                 
-                // S-curve Bezier control points
-                const controlOffset = Math.abs(x2 - x1) * 0.45;
-                const cp1x = x1 + controlOffset;
-                const cp1y = y1;
-                const cp2x = x2 - controlOffset;
-                const cp2y = y2;
+                const dx = x2 - x1;
+                const dy = y2 - y1;
                 
-                const pathData = `M ${x1} ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`;
+                // Winding "ghirigoro" path using Q and T bezier smooth chain
+                // We add smooth wave peaks & valleys to meander gracefully
+                const pathData = `M ${x1} ${y1} Q ${x1 + dx * 0.125} ${y1 - 60}, ${x1 + dx * 0.25} ${y1 + dy * 0.15 - 30} T ${x1 + dx * 0.5} ${y1 + dy * 0.5 + 45} T ${x1 + dx * 0.75} ${y1 + dy * 0.85 - 30} T ${x2} ${y2}`;
                 
-                // Thick Glow
-                const glowThick = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                glowThick.setAttribute('d', pathData);
-                glowThick.setAttribute('class', 'connection-line glow-thick');
-                
-                // Medium Glow
-                const glowMedium = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                glowMedium.setAttribute('d', pathData);
-                glowMedium.setAttribute('class', 'connection-line glow-medium');
-                
-                // Bright Core
-                const coreLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                coreLine.setAttribute('d', pathData);
-                coreLine.setAttribute('class', 'connection-line core-line');
-                
-                svg.appendChild(glowThick);
-                svg.appendChild(glowMedium);
-                svg.appendChild(coreLine);
+                const pairingId = `pair-${pairing.coachId}-${pairing.studentId}`;
+                activeIds.add(pairingId);
+
+                // Find or create group element
+                let group = document.getElementById(pairingId);
+                if (!group) {
+                    group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    group.setAttribute('id', pairingId);
+
+                    const glowThick = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    glowThick.setAttribute('class', 'connection-line glow-thick');
+
+                    const glowMedium = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    glowMedium.setAttribute('class', 'connection-line glow-medium');
+
+                    const coreLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    coreLine.setAttribute('class', 'connection-line core-line');
+
+                    group.appendChild(glowThick);
+                    group.appendChild(glowMedium);
+                    group.appendChild(coreLine);
+
+                    svg.appendChild(group);
+                }
+
+                // Update paths d attribute
+                const paths = group.querySelectorAll('path');
+                paths.forEach(path => {
+                    path.setAttribute('d', pathData);
+                });
+            });
+
+            // Remove groups that are no longer paired
+            const existingGroups = svg.querySelectorAll('g');
+            existingGroups.forEach(g => {
+                const id = g.getAttribute('id');
+                if (!activeIds.has(id)) {
+                    svg.removeChild(g);
+                }
             });
         }
 
@@ -386,9 +421,16 @@
                 const box = document.getElementById(`cb-${idx+1}`);
                 const name = document.getElementById(`c-${idx+1}-name`);
                 if (box && name) {
-                    if (c.active && c.name) {
-                        name.innerText = c.name;
+                    if (c.active) {
+                        // Display webcam frame
                         box.classList.add('active');
+                        // Show/Hide name plate depending on whether name is set
+                        if (c.name) {
+                            name.innerText = c.name;
+                            name.style.display = 'block';
+                        } else {
+                            name.style.display = 'none';
+                        }
                     } else {
                         box.classList.remove('active');
                     }

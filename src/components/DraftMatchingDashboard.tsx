@@ -35,14 +35,8 @@ interface DashboardState {
 }
 
 const DEFAULT_STATE: DashboardState = {
-  coaches: [
-    { id: 'c-1', name: 'Coach 1' },
-    { id: 'c-2', name: 'Coach 2' }
-  ],
-  students: [
-    { id: 's-1', name: 'Allievo 1' },
-    { id: 's-2', name: 'Allievo 2' }
-  ],
+  coaches: [],
+  students: [],
   pairings: [],
   casters: [
     { name: '', active: false },
@@ -327,222 +321,194 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
         </div>
       </div>
 
-      <div className="p-8 pb-32 grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="p-8 pb-32 space-y-8">
         
-        {/* Left Column: Coaches */}
-        <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-6 shadow-2xl flex flex-col h-[650px]">
-          <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-3">
-            <h3 className="text-sm font-black text-amber-500 uppercase tracking-widest flex items-center gap-2">
-              <Users size={16} /> Coach ({state.coaches.length})
-            </h3>
-            <span className="text-[10px] text-gray-500 uppercase font-medium">Sinistra Live</span>
-          </div>
+        {/* Row 1: Coaches, Students, Pairings */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Column 1: Coaches */}
+          <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-6 shadow-2xl flex flex-col h-[650px]">
+            <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-3">
+              <h3 className="text-sm font-black text-amber-500 uppercase tracking-widest flex items-center gap-2">
+                <Users size={16} /> Coach ({state.coaches.length})
+              </h3>
+              <span className="text-[10px] text-gray-500 uppercase font-medium">Sinistra Live</span>
+            </div>
 
-          {/* Add Coach Input */}
-          <div className="flex gap-2 mb-4">
-            <input
-              type="text"
-              value={newCoachName}
-              onChange={(e) => setNewCoachName(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && addCoach()}
-              placeholder="Aggiungi Coach..."
-              className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:border-amber-500/50 outline-none transition-all placeholder:text-gray-600 font-bold uppercase"
-            />
-            <button
-              onClick={addCoach}
-              className="bg-amber-500 hover:bg-amber-400 text-black p-2 rounded-xl transition-all shadow-md shadow-amber-500/10 flex items-center justify-center shrink-0 w-9 h-9"
-            >
-              <Plus size={16} />
-            </button>
-          </div>
+            {/* Add Coach Input */}
+            <div className="flex gap-2 mb-4">
+              <input
+                type="text"
+                value={newCoachName}
+                onChange={(e) => setNewCoachName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && addCoach()}
+                placeholder="Aggiungi Coach..."
+                className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:border-amber-500/50 outline-none transition-all placeholder:text-gray-600 font-bold uppercase"
+              />
+              <button
+                onClick={addCoach}
+                className="bg-amber-500 hover:bg-amber-400 text-black p-2.5 rounded-xl transition-all shadow-md shadow-amber-500/10 flex items-center justify-center shrink-0 w-10 h-10"
+              >
+                <Plus size={18} />
+              </button>
+            </div>
 
-          {/* Coach List */}
-          <div className="flex-1 overflow-y-auto elegant-scrollbar space-y-2 pr-1">
-            {state.coaches.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-gray-600 gap-2">
-                <HelpCircle size={24} className="opacity-35" />
-                <span className="text-[10px] font-black uppercase tracking-wider">Nessun coach inserito</span>
-              </div>
-            ) : (
-              state.coaches.map(coach => (
-                <div 
-                  key={coach.id}
-                  className="bg-black/30 border border-white/5 hover:border-amber-500/20 rounded-xl p-3 flex items-center justify-between group transition-all"
-                >
-                  {editingCoachId === coach.id ? (
-                    <div className="flex items-center gap-2 w-full">
-                      <input
-                        type="text"
-                        value={editingCoachName}
-                        onChange={(e) => setEditingCoachName(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && saveEditCoach()}
-                        className="flex-1 bg-black/60 border border-blue-500/50 rounded-lg px-2 py-1 text-xs text-white uppercase font-bold outline-none"
-                      />
-                      <button onClick={saveEditCoach} className="p-1 bg-green-600 text-white rounded-md hover:bg-green-500">
-                        <Check size={14} />
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <span className="font-bold text-xs uppercase tracking-wide truncate max-w-[200px]">
-                        {coach.name}
-                      </span>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button 
-                          onClick={() => startEditCoach(coach)}
-                          className="p-1.5 hover:bg-white/5 rounded-lg text-gray-400 hover:text-white transition-all"
-                          title="Modifica"
-                        >
-                          <Edit2 size={12} />
-                        </button>
-                        <button 
-                          onClick={() => deleteCoach(coach.id)}
-                          className="p-1.5 hover:bg-red-500/10 rounded-lg text-gray-500 hover:text-red-400 transition-all"
-                          title="Elimina"
-                        >
-                          <Trash2 size={12} />
-                        </button>
-                      </div>
-                    </>
-                  )}
+            {/* Coach List */}
+            <div className="flex-1 overflow-y-auto elegant-scrollbar space-y-2 pr-1">
+              {state.coaches.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-gray-600 gap-2">
+                  <HelpCircle size={24} className="opacity-35" />
+                  <span className="text-[10px] font-black uppercase tracking-wider">Nessun coach inserito</span>
                 </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Right Column: Students (Allievi) */}
-        <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-6 shadow-2xl flex flex-col h-[650px]">
-          <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-3">
-            <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest flex items-center gap-2">
-              <Users size={16} /> Allievi ({state.students.length})
-            </h3>
-            <span className="text-[10px] text-gray-500 uppercase font-medium">Destra Live</span>
-          </div>
-
-          {/* Add Student Input */}
-          <div className="flex gap-2 mb-4">
-            <input
-              type="text"
-              value={newStudentName}
-              onChange={(e) => setNewStudentName(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && addStudent()}
-              placeholder="Aggiungi Allievo..."
-              className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:border-blue-500/50 outline-none transition-all placeholder:text-gray-600 font-bold uppercase"
-            />
-            <button
-              onClick={addStudent}
-              className="bg-blue-600 hover:bg-blue-500 text-white p-2 rounded-xl transition-all shadow-md shadow-blue-600/10 flex items-center justify-center shrink-0 w-9 h-9"
-            >
-              <Plus size={16} />
-            </button>
-          </div>
-
-          {/* Student List */}
-          <div className="flex-1 overflow-y-auto elegant-scrollbar space-y-2 pr-1">
-            {state.students.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-gray-600 gap-2">
-                <HelpCircle size={24} className="opacity-35" />
-                <span className="text-[10px] font-black uppercase tracking-wider">Nessun allievo inserito</span>
-              </div>
-            ) : (
-              state.students.map(student => (
-                <div 
-                  key={student.id}
-                  className="bg-black/30 border border-white/5 hover:border-blue-500/20 rounded-xl p-3 flex items-center justify-between group transition-all"
-                >
-                  {editingStudentId === student.id ? (
-                    <div className="flex items-center gap-2 w-full">
-                      <input
-                        type="text"
-                        value={editingStudentName}
-                        onChange={(e) => setEditingStudentName(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && saveEditStudent()}
-                        className="flex-1 bg-black/60 border border-blue-500/50 rounded-lg px-2 py-1 text-xs text-white uppercase font-bold outline-none"
-                      />
-                      <button onClick={saveEditStudent} className="p-1 bg-green-600 text-white rounded-md hover:bg-green-500">
-                        <Check size={14} />
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex flex-col min-w-0">
-                        <span className="font-bold text-xs uppercase tracking-wide truncate max-w-[180px]">
-                          {student.name}
-                        </span>
-                        {getPairedCoachName(student.id) && (
-                          <span className="text-[8px] font-bold text-amber-500/60 uppercase tracking-widest mt-0.5">
-                            Abbinato a: {getPairedCoachName(student.id)}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button 
-                          onClick={() => startEditStudent(student)}
-                          className="p-1.5 hover:bg-white/5 rounded-lg text-gray-400 hover:text-white transition-all"
-                          title="Modifica"
-                        >
-                          <Edit2 size={12} />
-                        </button>
-                        <button 
-                          onClick={() => deleteStudent(student.id)}
-                          className="p-1.5 hover:bg-red-500/10 rounded-lg text-gray-500 hover:text-red-400 transition-all"
-                          title="Elimina"
-                        >
-                          <Trash2 size={12} />
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Center Column: Matchmaking & Casters */}
-        <div className="space-y-6 lg:col-span-1">
-          {/* Caster Settings */}
-          <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-6 shadow-2xl">
-            <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest mb-4 border-b border-white/5 pb-3 flex items-center gap-2">
-              <Sparkles size={16} className="text-cyan-400" /> Configurazione Caster
-            </h3>
-            <div className="space-y-4">
-              {state.casters.map((c, idx) => (
-                <div key={idx} className="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-white/5 hover:border-blue-500/20 transition-all group overflow-hidden">
-                  <div className="flex-1 min-w-0">
-                    <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block mb-1">Caster #{idx+1}</span>
-                    <input 
-                      type="text" 
-                      value={c.name} 
-                      onChange={(e) => handleCasterNameChange(idx, e.target.value)} 
-                      placeholder={`Nome Caster ${idx+1}`} 
-                      className="w-full bg-transparent text-xs font-black text-white outline-none placeholder:text-gray-700 uppercase tracking-wider" 
-                    />
-                  </div>
+              ) : (
+                state.coaches.map(coach => (
                   <div 
-                    onClick={() => handleCasterActiveChange(idx, !c.active)}
-                    className={`w-12 h-6 rounded-full relative cursor-pointer transition-all flex-shrink-0 ${c.active ? 'bg-cyan-500 shadow-lg shadow-cyan-500/20' : 'bg-white/10'}`}
+                    key={coach.id}
+                    className="bg-black/30 border border-white/5 hover:border-amber-500/20 rounded-xl p-3 flex items-center justify-between group transition-all"
                   >
-                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${c.active ? 'left-7' : 'left-1'}`}></div>
+                    {editingCoachId === coach.id ? (
+                      <div className="flex items-center gap-2 w-full">
+                        <input
+                          type="text"
+                          value={editingCoachName}
+                          onChange={(e) => setEditingCoachName(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && saveEditCoach()}
+                          className="flex-1 bg-black/60 border border-blue-500/50 rounded-lg px-2 py-1.5 text-xs text-white uppercase font-bold outline-none"
+                        />
+                        <button onClick={saveEditCoach} className="p-1.5 bg-green-600 text-white rounded-md hover:bg-green-500">
+                          <Check size={16} />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="font-bold text-xs uppercase tracking-wide truncate max-w-[200px]">
+                          {coach.name}
+                        </span>
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button 
+                            onClick={() => startEditCoach(coach)}
+                            className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-amber-500 transition-all"
+                            title="Modifica"
+                          >
+                            <Edit2 size={18} />
+                          </button>
+                          <button 
+                            onClick={() => deleteCoach(coach.id)}
+                            className="p-2 hover:bg-red-500/20 rounded-lg text-gray-500 hover:text-red-400 transition-all"
+                            title="Elimina"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
-          {/* Matching Management */}
-          <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-6 shadow-2xl flex flex-col h-[380px]">
+          {/* Column 2: Students (Allievi) */}
+          <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-6 shadow-2xl flex flex-col h-[650px]">
+            <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-3">
+              <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                <Users size={16} /> Allievi ({state.students.length})
+              </h3>
+              <span className="text-[10px] text-gray-500 uppercase font-medium">Destra Live</span>
+            </div>
+
+            {/* Add Student Input */}
+            <div className="flex gap-2 mb-4">
+              <input
+                type="text"
+                value={newStudentName}
+                onChange={(e) => setNewStudentName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && addStudent()}
+                placeholder="Aggiungi Allievo..."
+                className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:border-blue-500/50 outline-none transition-all placeholder:text-gray-600 font-bold uppercase"
+              />
+              <button
+                onClick={addStudent}
+                className="bg-blue-600 hover:bg-blue-500 text-white p-2.5 rounded-xl transition-all shadow-md shadow-blue-600/10 flex items-center justify-center shrink-0 w-10 h-10"
+              >
+                <Plus size={18} />
+              </button>
+            </div>
+
+            {/* Student List */}
+            <div className="flex-1 overflow-y-auto elegant-scrollbar space-y-2 pr-1">
+              {state.students.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-gray-600 gap-2">
+                  <HelpCircle size={24} className="opacity-35" />
+                  <span className="text-[10px] font-black uppercase tracking-wider">Nessun allievo inserito</span>
+                </div>
+              ) : (
+                state.students.map(student => (
+                  <div 
+                    key={student.id}
+                    className="bg-black/30 border border-white/5 hover:border-blue-500/20 rounded-xl p-3 flex items-center justify-between group transition-all"
+                  >
+                    {editingStudentId === student.id ? (
+                      <div className="flex items-center gap-2 w-full">
+                        <input
+                          type="text"
+                          value={editingStudentName}
+                          onChange={(e) => setEditingStudentName(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && saveEditStudent()}
+                          className="flex-1 bg-black/60 border border-blue-500/50 rounded-lg px-2 py-1.5 text-xs text-white uppercase font-bold outline-none"
+                        />
+                        <button onClick={saveEditStudent} className="p-1.5 bg-green-600 text-white rounded-md hover:bg-green-500">
+                          <Check size={16} />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex flex-col min-w-0">
+                          <span className="font-bold text-xs uppercase tracking-wide truncate max-w-[180px]">
+                            {student.name}
+                          </span>
+                          {getPairedCoachName(student.id) && (
+                            <span className="text-[8px] font-bold text-amber-500/60 uppercase tracking-widest mt-0.5">
+                              Abbinato a: {getPairedCoachName(student.id)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button 
+                            onClick={() => startEditStudent(student)}
+                            className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-blue-400 transition-all"
+                            title="Modifica"
+                          >
+                            <Edit2 size={18} />
+                          </button>
+                          <button 
+                            onClick={() => deleteStudent(student.id)}
+                            className="p-2 hover:bg-red-500/20 rounded-lg text-gray-500 hover:text-red-400 transition-all"
+                            title="Elimina"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Column 3: Pairings (Abbinamenti) */}
+          <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-6 shadow-2xl flex flex-col h-[650px]">
             <h3 className="text-sm font-black text-amber-500 uppercase tracking-widest mb-4 border-b border-white/5 pb-3 flex items-center gap-2">
-              <Sparkles size={16} /> Abbinamenti
+              <Sparkles size={16} /> Abbinamenti ({state.pairings.length})
             </h3>
             
             <div className="flex-1 overflow-y-auto elegant-scrollbar space-y-4 pr-1">
               {state.coaches.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-gray-600 gap-2">
+                <div className="h-full flex flex-col items-center justify-center text-gray-600 gap-2 text-center p-4">
                   <HelpCircle size={24} className="opacity-35" />
-                  <span className="text-[10px] font-black uppercase tracking-wider text-center px-4">
-                    Inserisci i Coach e gli Allievi nelle colonne laterali per creare gli abbinamenti
+                  <span className="text-[10px] font-black uppercase tracking-wider">
+                    Inserisci i Coach e gli Allievi nelle colonne a sinistra per creare gli abbinamenti
                   </span>
                 </div>
               ) : (
@@ -598,6 +564,36 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                 })
               )}
             </div>
+          </div>
+
+        </div>
+
+        {/* Row 2: Casters Configuration */}
+        <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-6 shadow-2xl">
+          <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest mb-4 border-b border-white/5 pb-3 flex items-center gap-2">
+            <Sparkles size={16} className="text-cyan-400" /> Configurazione Caster
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {state.casters.map((c, idx) => (
+              <div key={idx} className="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-white/5 hover:border-blue-500/20 transition-all group overflow-hidden">
+                <div className="flex-1 min-w-0">
+                  <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block mb-1">Caster #{idx+1}</span>
+                  <input 
+                    type="text" 
+                    value={c.name} 
+                    onChange={(e) => handleCasterNameChange(idx, e.target.value)} 
+                    placeholder={`Nome Caster ${idx+1}`} 
+                    className="w-full bg-transparent text-xs font-black text-white outline-none placeholder:text-gray-700 uppercase tracking-wider" 
+                  />
+                </div>
+                <div 
+                  onClick={() => handleCasterActiveChange(idx, !c.active)}
+                  className={`w-12 h-6 rounded-full relative cursor-pointer transition-all flex-shrink-0 ${c.active ? 'bg-cyan-500 shadow-lg shadow-cyan-500/20' : 'bg-white/10'}`}
+                >
+                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${c.active ? 'left-7' : 'left-1'}`}></div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
