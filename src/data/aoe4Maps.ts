@@ -1,6 +1,7 @@
 export const AOE4_MAPS = [
   "African Waters",
   "Alopecia",
+  "Altai",
   "Anatolian Hills",
   "Ancient Spires",
   "Archipelago",
