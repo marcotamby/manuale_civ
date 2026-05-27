@@ -38,7 +38,10 @@
             height: 1080px;
             color: white;
             overflow: hidden;
-            background: transparent url('../background/background.png') no-repeat center center/cover;
+            background-color: var(--bg-dark);
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
             font-family: 'Outfit', 'Inter', sans-serif;
         }
 
@@ -332,6 +335,7 @@
         const { createClient } = window.supabase;
         const client = createClient(SUB_URL, SUB_KEY);
         let lastState = null;
+        let currentBackgroundUrl = null;
 
         function updateConnectingLines() {
             const svg = document.getElementById('connections-svg');
@@ -408,11 +412,11 @@
         }
 
         function render(state, backgroundUrl) {
-            // Background image handling
-            if (backgroundUrl) {
-                document.body.style.backgroundImage = `url(${backgroundUrl})`;
-            } else {
-                document.body.style.backgroundImage = "url('../background/background.png')";
+            // Background image handling - Only update if changed to prevent flashing
+            const targetBg = backgroundUrl || "../background/background.png";
+            if (currentBackgroundUrl !== targetBg) {
+                currentBackgroundUrl = targetBg;
+                document.body.style.backgroundImage = `url(${targetBg})`;
             }
 
             if (!state) return;
