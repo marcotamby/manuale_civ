@@ -584,16 +584,16 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
             <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest mb-4 border-b border-white/5 pb-3 flex items-center gap-2">
               <Sparkles size={16} className="text-cyan-400" /> Configurazione Caster
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {state.casters.map((c, idx) => (
+            <div className="space-y-4">
+              {state.casters.slice(0, 1).map((c, idx) => (
                 <div key={idx} className="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-white/5 hover:border-blue-500/20 transition-all group overflow-hidden">
                   <div className="flex-1 min-w-0">
-                    <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block mb-1">Caster #{idx+1}</span>
+                    <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block mb-1">Nome Caster</span>
                     <input 
                       type="text" 
                       value={c.name} 
                       onChange={(e) => handleCasterNameChange(idx, e.target.value)} 
-                      placeholder={`Nome Caster ${idx+1}`} 
+                      placeholder="Nome Caster" 
                       className="w-full bg-transparent text-xs font-black text-white outline-none placeholder:text-gray-700 uppercase tracking-wider" 
                     />
                   </div>

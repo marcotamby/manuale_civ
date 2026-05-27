@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Disable Browser Caching completely for overlays -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Draft Matching Overlay</title>
     <!-- Import Dynamic Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;700&family=Montserrat:wght@400;700;900&family=Cinzel:wght@700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
@@ -219,7 +223,7 @@
             text-overflow: ellipsis;
         }
 
-        /* CASTERS AREA - Separated Left & Right, centered vertical axes */
+        /* SINGLE CASTER AREA - Positioned Centrally at the Bottom */
         #casters-container {
             position: absolute;
             bottom: 0;
@@ -233,27 +237,20 @@
         .caster-box {
             position: absolute;
             bottom: 40px;
+            left: 50%;
+            transform: translate(-50%, 20px);
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 12px;
             opacity: 0;
-            transform: translateY(20px);
             transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             visibility: hidden;
         }
 
-        #cb-1 {
-            left: 90px; /* Centered along same vertical axis as Coaches column */
-        }
-
-        #cb-2 {
-            right: 90px; /* Centered along same vertical axis as Students column */
-        }
-
         .caster-box.active {
             opacity: 1;
-            transform: translateY(0);
+            transform: translate(-50%, 0);
             visibility: visible;
         }
 
@@ -320,15 +317,11 @@
         <div id="students-list" class="names-list"></div>
     </div>
 
-    <!-- Casters Area -->
+    <!-- Casters Area (Single Caster Box) -->
     <div id="casters-container">
         <div id="cb-1" class="caster-box">
             <div class="webcam-frame"></div>
             <div id="c-1-name" class="caster-name"></div>
-        </div>
-        <div id="cb-2" class="caster-box">
-            <div class="webcam-frame"></div>
-            <div id="c-2-name" class="caster-name"></div>
         </div>
     </div>
 
@@ -463,24 +456,23 @@
                 `;
             }).join('');
 
-            // 4. Render Casters - Fixed toggle and silver-blue styling
-            (state.casters || []).forEach((c, idx) => {
-                const box = document.getElementById(`cb-${idx+1}`);
-                const name = document.getElementById(`c-${idx+1}-name`);
-                if (box && name) {
-                    if (c.active) {
-                        box.classList.add('active');
-                        if (c.name) {
-                            name.innerText = c.name;
-                            name.style.display = 'block';
-                        } else {
-                            name.style.display = 'none';
-                        }
+            // 4. Render Casters - Single Caster center-aligned logic
+            const caster = (state.casters || [])[0];
+            const box = document.getElementById('cb-1');
+            const name = document.getElementById('c-1-name');
+            if (box && name && caster) {
+                if (caster.active) {
+                    box.classList.add('active');
+                    if (caster.name) {
+                        name.innerText = caster.name;
+                        name.style.display = 'block';
                     } else {
-                        box.classList.remove('active');
+                        name.style.display = 'none';
                     }
+                } else {
+                    box.classList.remove('active');
                 }
-            });
+            }
 
             // Trigger connecting line draw after DOM updates
             setTimeout(updateConnectingLines, 50);
