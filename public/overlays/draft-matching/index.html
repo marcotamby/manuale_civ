@@ -372,8 +372,32 @@
                 const dx = x2 - x1;
                 const dy = y2 - y1;
                 
-                // Winding "ghirigoro" path using Q and T bezier smooth chain
-                const pathData = `M ${x1} ${y1} Q ${x1 + dx * 0.125} ${y1 - 60}, ${x1 + dx * 0.25} ${y1 + dy * 0.15 - 30} T ${x1 + dx * 0.5} ${y1 + dy * 0.5 + 45} T ${x1 + dx * 0.75} ${y1 + dy * 0.85 - 30} T ${x2} ${y2}`;
+                // Decoy student logic for visual suspense (heads towards wrong student first, then hooks to correct one)
+                const allStudentCards = Array.from(document.querySelectorAll('.student-card'));
+                const correctIndex = allStudentCards.findIndex(el => el.id === `student-${pairing.studentId}`);
+                
+                let decoyY = y2;
+                if (allStudentCards.length > 1 && correctIndex !== -1) {
+                    // Try to pick the adjacent student card (above or below)
+                    const decoyIndex = correctIndex === 0 ? 1 : correctIndex - 1;
+                    const decoyEl = allStudentCards[decoyIndex];
+                    if (decoyEl) {
+                        const decoyRect = decoyEl.getBoundingClientRect();
+                        decoyY = decoyRect.top + decoyRect.height / 2;
+                    }
+                }
+
+                // Winding "ghirigoro" path that sweeps towards decoyY before hooking to y2
+                const midX1 = x1 + dx * 0.3;
+                const midY1 = y1 + (decoyY - y1) * 0.2 + (decoyY > y1 ? -40 : 40);
+                const midX2 = x1 + dx * 0.65;
+                const midY2 = decoyY + (decoyY > y1 ? 30 : -30);
+                const decoyX = x1 + dx * 0.86; // 86% of the way (close to student cards)
+                
+                const pathData = `M ${x1} ${y1} ` +
+                                 `C ${x1 + dx * 0.15} ${y1 - 30}, ${midX1} ${midY1}, ${x1 + dx * 0.45} ${y1 + (decoyY - y1) * 0.5} ` +
+                                 `C ${x1 + dx * 0.6} ${midY2}, ${decoyX - 60} ${decoyY}, ${decoyX} ${decoyY} ` +
+                                 `C ${decoyX + 40} ${decoyY}, ${x1 + dx * 0.94} ${y2}, ${x2} ${y2}`;
                 
                 const pairingId = `pair-${pairing.coachId}-${pairing.studentId}`;
                 activeIds.add(pairingId);
