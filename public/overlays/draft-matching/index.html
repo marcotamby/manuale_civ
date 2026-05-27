@@ -59,7 +59,7 @@
         /* Glowing Connection Lines with Slow Draw Animation */
         @keyframes draw-line {
             from {
-                stroke-dashoffset: 2000;
+                stroke-dashoffset: var(--path-length, 1200);
             }
             to {
                 stroke-dashoffset: 0;
@@ -69,8 +69,8 @@
         .connection-line {
             fill: none;
             stroke-linecap: round;
-            stroke-dasharray: 2000;
-            stroke-dashoffset: 2000;
+            stroke-dasharray: var(--path-length, 1200);
+            stroke-dashoffset: var(--path-length, 1200);
             animation: draw-line 5s cubic-bezier(0.2, 0.6, 0.2, 1) forwards;
         }
 
@@ -405,6 +405,19 @@
                 paths.forEach(path => {
                     path.setAttribute('d', pathData);
                 });
+
+                // Measure path length and set as CSS variable to ensure instant drawing and true 5s duration
+                try {
+                    const samplePath = paths[0];
+                    if (samplePath) {
+                        const pathLength = Math.ceil(samplePath.getTotalLength() || 1200);
+                        paths.forEach(path => {
+                            path.style.setProperty('--path-length', pathLength);
+                        });
+                    }
+                } catch (e) {
+                    console.error("Error measuring path length:", e);
+                }
             });
 
             // Remove groups that are no longer paired
