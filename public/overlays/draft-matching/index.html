@@ -342,6 +342,12 @@
         let currentBackgroundUrl = null;
         const sessionBuster = Date.now();
 
+        // Tracks which pairings have had their line fully drawn (student border can show)
+        // key = "coachId-studentId", value = true
+        const arrivedPairings = new Map();
+        // Tracks pending setTimeout IDs for pairings currently animating
+        const pendingBorderTimers = new Map();
+
         const PAIRING_COLORS = [
             '#00f0ff', // Electric Cyan
             '#ff007b', // Hot Pink
@@ -571,7 +577,7 @@
                 }
             });
 
-            // 2. Render Coaches List
+            // 2. Render Coaches List (border appears immediately)
             coachesList.innerHTML = (state.coaches || []).map(coach => {
                 const pairingIndex = (state.pairings || []).findIndex(p => p.coachId === coach.id);
                 const isPaired = pairingIndex !== -1;
@@ -585,11 +591,55 @@
             }).join('');
 
             // 3. Render Students List
+            // Detect NEW pairings (not yet in arrivedPairings) -> schedule 5s delay for border
+            const currentPairings = (state.pairings || []);
+            const currentPairingKeys = new Set(currentPairings.map(p => `${p.coachId}-${p.studentId}`));
+
+            // Cancel timers for pairings that no longer exist
+            pendingBorderTimers.forEach((timerId, key) => {
+                if (!currentPairingKeys.has(key)) {
+                    clearTimeout(timerId);
+                    pendingBorderTimers.delete(key);
+                    arrivedPairings.delete(key);
+                }
+            });
+            // Also remove arrived pairings that were removed
+            arrivedPairings.forEach((_, key) => {
+                if (!currentPairingKeys.has(key)) arrivedPairings.delete(key);
+            });
+
+            // Schedule border for each pairing
+            currentPairings.forEach((pairing, index) => {
+                const key = `${pairing.coachId}-${pairing.studentId}`;
+                const isNew = !arrivedPairings.has(key) && !pendingBorderTimers.has(key);
+                if (isNew) {
+                    // New pairing: schedule border to appear after 5s (line duration)
+                    const timerId = setTimeout(() => {
+                        arrivedPairings.set(key, true);
+                        pendingBorderTimers.delete(key);
+                        // Apply border directly to the student DOM element
+                        const studentEl = document.getElementById(`student-${pairing.studentId}`);
+                        const pairingColor = PAIRING_COLORS[index % PAIRING_COLORS.length];
+                        if (studentEl) {
+                            studentEl.style.borderColor = `${pairingColor}33`;
+                            studentEl.style.borderRightColor = pairingColor;
+                            studentEl.style.borderRightWidth = '6px';
+                            studentEl.style.borderRightStyle = 'solid';
+                            studentEl.style.boxShadow = `0 12px 32px ${pairingColor}15, 0 0 15px ${pairingColor}08`;
+                        }
+                    }, 5000);
+                    pendingBorderTimers.set(key, timerId);
+                }
+            });
+
             studentsList.innerHTML = (state.students || []).map(student => {
-                const pairingIndex = (state.pairings || []).findIndex(p => p.studentId === student.id);
+                const pairingIndex = currentPairings.findIndex(p => p.studentId === student.id);
                 const isPaired = pairingIndex !== -1;
                 const pairingColor = isPaired ? PAIRING_COLORS[pairingIndex % PAIRING_COLORS.length] : '';
-                const styleStr = isPaired ? `style="border-color: ${pairingColor}33; border-right-color: ${pairingColor}; box-shadow: 0 12px 32px ${pairingColor}15, 0 0 15px ${pairingColor}08;"` : '';
+                const key = isPaired ? `${currentPairings[pairingIndex].coachId}-${student.id}` : '';
+                // Show border only if this pairing has already "arrived"
+                const hasArrived = isPaired && arrivedPairings.has(key);
+                const styleStr = hasArrived ? `style="border-color: ${pairingColor}33; border-right-color: ${pairingColor}; border-right-width: 6px; border-right-style: solid; box-shadow: 0 12px 32px ${pairingColor}15, 0 0 15px ${pairingColor}08;"` : '';
                 return `
                     <div id="student-${student.id}" class="card student-card ${isPaired ? 'paired' : ''}" ${styleStr}>
                         <div class="card-name">${student.name}</div>
