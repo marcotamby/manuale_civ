@@ -73,7 +73,6 @@ export function PrivacyPage() {
   const [saveLoading, setSaveLoading] = useState(false);
   const [isSaveSuccess, setIsSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [supabaseSession, setSupabaseSession] = useState<string>("Verifica in corso...");
 
   useEffect(() => {
     const fetchPolicy = async () => {
@@ -98,25 +97,10 @@ export function PrivacyPage() {
     fetchPolicy();
   }, []);
 
-  const checkSession = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const lastError = localStorage.getItem('supabase_auth_error');
-      if (session?.user) {
-        setSupabaseSession(`Autenticato su Supabase: ${session.user.email} (Ruolo DB: ${session.user.role})`);
-      } else {
-        setSupabaseSession(`Non autenticato su Supabase (Ruolo DB: anon). ${lastError ? `Dettaglio errore login: ${lastError}` : 'Nessun errore di login registrato.'}`);
-      }
-    } catch (err: any) {
-      setSupabaseSession(`Errore verifica sessione: ${err.message}`);
-    }
-  };
-
   const openModal = () => {
     setEditTitle(title);
     setEditContent(content);
     setIsModalOpen(false); // Reset first
-    checkSession();
     setTimeout(() => {
       setIsModalOpen(true);
       setIsSaveSuccess(false);
@@ -245,11 +229,6 @@ export function PrivacyPage() {
 
             {/* Modal Content */}
             <div className="p-6 overflow-y-auto space-y-4 flex-1 elegant-scrollbar">
-              <div className="p-2.5 bg-blue-950/25 border border-blue-500/20 text-blue-300 text-xs rounded-lg flex items-center gap-2">
-                <div className={clsx("w-2 h-2 rounded-full", supabaseSession.includes("Autenticato") ? "bg-green-400" : "bg-red-400")}></div>
-                {supabaseSession}
-              </div>
-
               {saveError && (
                 <div className="p-3 bg-red-950/50 border border-red-500/35 text-red-200 text-xs rounded-lg whitespace-pre-wrap">
                   {saveError}
