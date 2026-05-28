@@ -9,7 +9,7 @@ const getCivArticle = (name: string): string => {
     'Ayyubidi': 'gli ',
     'Bizantini': 'i ',
     'Cinesi': 'i ',
-    'Dinastia di Tughlaq': 'i ',
+    'Dinastia di Tughlaq': 'la ',
     'Eredità di Zhu Xi': "l'",
     'Francesi': 'i ',
     'Giapponesi': 'i ',
