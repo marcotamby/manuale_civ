@@ -44,7 +44,7 @@ export const mapAoe2cmCivId = (id: string): string => {
     'orderofthedragon': 'orderofthedragon',
     'houseoflancaster': 'lancaster',
     'lancaster': 'lancaster',
-    'tughlaqdynasty': 'delhi',
+    'tughlaqdynasty': 'tughlaq',
     'sengokudaimyo': 'sengoku',
     'sengoku': 'sengoku',
     'knightstemplar': 'templar',
