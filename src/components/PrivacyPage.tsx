@@ -101,10 +101,11 @@ export function PrivacyPage() {
   const checkSession = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
+      const lastError = localStorage.getItem('supabase_auth_error');
       if (session?.user) {
         setSupabaseSession(`Autenticato su Supabase: ${session.user.email} (Ruolo DB: ${session.user.role})`);
       } else {
-        setSupabaseSession("Non autenticato su Supabase (Ruolo DB: anon)");
+        setSupabaseSession(`Non autenticato su Supabase (Ruolo DB: anon). ${lastError ? `Dettaglio errore login: ${lastError}` : 'Nessun errore di login registrato.'}`);
       }
     } catch (err: any) {
       setSupabaseSession(`Errore verifica sessione: ${err.message}`);

@@ -274,17 +274,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (googleToken) {
       try {
         console.log('🔄 Logging into Supabase Auth with Google token...');
+        localStorage.removeItem('supabase_auth_error');
         const { data, error } = await supabase.auth.signInWithIdToken({
           provider: 'google',
           token: googleToken,
         });
         if (error) {
           console.error('❌ Supabase Auth error:', error.message);
+          localStorage.setItem('supabase_auth_error', error.message);
         } else {
           console.log('✅ Logged into Supabase Auth successfully:', data.user?.email);
+          localStorage.removeItem('supabase_auth_error');
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('❌ Failed to sign into Supabase Auth:', err);
+        localStorage.setItem('supabase_auth_error', err.message || JSON.stringify(err));
       }
     }
 
