@@ -32,14 +32,14 @@ export function useCivilizations() {
             : localCiv?.flag?.replace('.png', '.webp'),
           difficulty: row.difficulty,
           shortDescription: row.short_description || localCiv?.shortDescription || '',
-          passiveBonuses: (row.passive_bonuses && row.passive_bonuses.length > 0) ? row.passive_bonuses : (localCiv?.passiveBonuses || []),
-          uniqueUnits: (row.unique_units && row.unique_units.length > 0) ? row.unique_units : (localCiv?.uniqueUnits || []),
-          technologies: (row.technologies && row.technologies.length > 0) ? row.technologies : (localCiv?.technologies || []),
-          landmarks: (row.landmarks && row.landmarks.length > 0) ? row.landmarks : (localCiv?.landmarks || []),
-          videos: (row.videos && row.videos.length > 0) ? row.videos : (localCiv?.videos || []),
-          buildOrders: (row.build_orders && row.build_orders.length > 0) ? row.build_orders : (localCiv?.buildOrders || []),
-          strengths: (row.strengths && row.strengths.length > 0) ? row.strengths : (localCiv?.strengths || []),
-          weaknesses: (row.weaknesses && row.weaknesses.length > 0) ? row.weaknesses : (localCiv?.weaknesses || []),
+          passiveBonuses: row.passive_bonuses !== null && row.passive_bonuses !== undefined ? row.passive_bonuses : (localCiv?.passiveBonuses || []),
+          uniqueUnits: row.unique_units !== null && row.unique_units !== undefined ? row.unique_units : (localCiv?.uniqueUnits || []),
+          technologies: row.technologies !== null && row.technologies !== undefined ? row.technologies : (localCiv?.technologies || []),
+          landmarks: row.landmarks !== null && row.landmarks !== undefined ? row.landmarks : (localCiv?.landmarks || []),
+          videos: row.videos !== null && row.videos !== undefined ? row.videos : (localCiv?.videos || []),
+          buildOrders: row.build_orders !== null && row.build_orders !== undefined ? row.build_orders : (localCiv?.buildOrders || []),
+          strengths: row.strengths !== null && row.strengths !== undefined ? row.strengths : (localCiv?.strengths || []),
+          weaknesses: row.weaknesses !== null && row.weaknesses !== undefined ? row.weaknesses : (localCiv?.weaknesses || []),
           primaryColor: row.primary_color || localCiv?.primaryColor
         };
       });
