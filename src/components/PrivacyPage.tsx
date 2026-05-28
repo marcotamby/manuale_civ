@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { SEO } from './SEO';
@@ -134,7 +135,7 @@ export function PrivacyPage() {
       }, 2000);
     } catch (err: any) {
       console.error("Errore durante il salvataggio della privacy policy:", err);
-      setSaveError("Errore durante il salvataggio. Assicurati che la tabella esista sul database.");
+      setSaveError(`Errore durante il salvataggio: ${err.message || err.details || JSON.stringify(err)}`);
     } finally {
       setSaveLoading(false);
     }
@@ -168,7 +169,7 @@ export function PrivacyPage() {
           {isSuperAdmin && (
             <button 
               onClick={openModal}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-lg hover:bg-blue-600/30 transition-all text-xs font-bold uppercase tracking-wider"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-lg hover:bg-blue-600/30 transition-all text-xs font-bold uppercase tracking-wider animate-pulse hover:animate-none"
             >
               <Edit3 size={16} /> Modifica Privacy
             </button>
@@ -202,10 +203,16 @@ export function PrivacyPage() {
         </div>
       </div>
 
-      {/* Edit Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-[#0f0f0f] border border-blue-500/30 rounded-2xl max-w-4xl w-full max-h-[95vh] flex flex-col shadow-2xl shadow-blue-500/10 animate-in zoom-in-95 duration-200">
+      {/* Edit Modal - Rendered via React Portal */}
+      {isModalOpen && createPortal(
+        <div 
+          className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div 
+            className="bg-[#0f0f0f] border border-blue-500/30 rounded-2xl max-w-4xl w-full max-h-[95vh] flex flex-col shadow-2xl shadow-blue-500/20 animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/5">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
@@ -214,7 +221,7 @@ export function PrivacyPage() {
               </h2>
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-gray-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/5"
               >
                 <X size={20} />
               </button>
@@ -223,7 +230,7 @@ export function PrivacyPage() {
             {/* Modal Content */}
             <div className="p-6 overflow-y-auto space-y-4 flex-1 elegant-scrollbar">
               {saveError && (
-                <div className="p-3 bg-red-950/50 border border-red-500/35 text-red-200 text-xs rounded-lg">
+                <div className="p-3 bg-red-950/50 border border-red-500/35 text-red-200 text-xs rounded-lg whitespace-pre-wrap">
                   {saveError}
                 </div>
               )}
@@ -279,7 +286,8 @@ export function PrivacyPage() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
@@ -565,7 +573,7 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
           }
           handleInput();
         }}
-        className="w-full bg-black/40 border border-white/10 p-8 rounded-[2rem] text-white text-base outline-none focus:border-blue-500/40 transition-all min-h-[350px] max-h-[50vh] overflow-y-auto shadow-inner text-left elegant-scrollbar"
+        className="w-full bg-black/40 border border-white/10 p-8 rounded-[2rem] text-white text-base outline-none focus:border-blue-500/40 transition-all min-h-[300px] max-h-[40vh] overflow-y-auto shadow-inner text-left elegant-scrollbar"
         style={{ textAlign: 'left' }}
       ></div>
       <p className="text-[9px] text-gray-500 italic px-4">Modifica il testo sopra. Clicca sui tasti per applicare lo stile alla selezione.</p>
