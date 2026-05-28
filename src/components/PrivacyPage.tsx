@@ -163,7 +163,7 @@ export function PrivacyPage() {
             className="flex items-center gap-2 text-blue-400 hover:text-cyan-300 transition-all hover:translate-x-[-4px]"
           >
             <ArrowLeft size={20} />
-            <span className="font-sans font-bold uppercase text-xs tracking-widest">Torna alla Dashboard</span>
+            <span className="font-sans font-bold uppercase text-xs tracking-widest">Torna alla Home</span>
           </button>
 
           {isSuperAdmin && (
