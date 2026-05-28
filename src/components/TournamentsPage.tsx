@@ -38,6 +38,7 @@ const TOURNAMENTS: TournamentConfig[] = [];
 export function TournamentsPage() {
   const { canManageTournaments } = useAuth();
   const [tournaments, setTournaments] = useState<(StartGGTournament & { config: TournamentConfig })[]>([]);
+  const [tournamentsWithBets, setTournamentsWithBets] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -86,6 +87,19 @@ export function TournamentsPage() {
         .order('created_at', { ascending: false });
 
       if (dbError) console.error("Supabase error:", dbError);
+
+      // Fetch tournaments with betting markets
+      try {
+        const { data: marketsData } = await supabase
+          .from('betting_markets')
+          .select('tournament_slug');
+        const uniqueBettingSlugs = Array.from(
+          new Set((marketsData || []).map(m => (m.tournament_slug || '').trim().toLowerCase().replace(/\/$/, '')))
+        ).filter(Boolean);
+        setTournamentsWithBets(uniqueBettingSlugs);
+      } catch (e) {
+        console.error("Error loading betting market slugs:", e);
+      }
       
       // DEBUG CLOUD: Log raw DB data to help identify persistence issues
       console.log("DB Tournaments:", dbTournaments);
@@ -828,6 +842,15 @@ export function TournamentsPage() {
                           className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center justify-center gap-2 transition-all bg-purple-600/60 border-purple-500/50 text-slate-100 hover:bg-purple-500/80 hover:scale-105 active:scale-95 hover:border-purple-400/60"
                         >
                           Scommetti! 🐑
+                        </Link>
+                      )}
+
+                      {status === 'Concluso' && tournamentsWithBets.some(slug => slug.includes(t.slug.toLowerCase()) || t.slug.toLowerCase().includes(slug)) && (
+                        <Link
+                          to={`/tornei/${t.slug}/scommetti`}
+                          className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center justify-center gap-2 transition-all bg-blue-600/60 border-blue-500/50 text-slate-100 hover:bg-blue-500/80 hover:scale-105 active:scale-95 hover:border-blue-400/60"
+                        >
+                          Storico Scommesse 🐑
                         </Link>
                       )}
 

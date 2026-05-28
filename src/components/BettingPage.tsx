@@ -492,12 +492,12 @@ export function BettingPage() {
       <div className="flex flex-col md:flex-row items-start justify-between mb-8 gap-10 px-4 md:px-0">
         <div className="relative flex-1">
            <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-white to-slate-400 uppercase tracking-tighter mb-4 leading-tight">
-            Social Betting:<br/>
+            {tournament?.config?.status === 'Concluso' || tournament?.status === 'Concluso' ? 'Storico Betting' : 'Social Betting'}:<br/>
             {tournament?.name || (slug?.replace(/-/g, ' ')) || 'Torneo'}
            </h1>
             <div className="flex flex-col gap-4">
              <p className="text-slate-300/80 font-serif italic text-lg flex items-center gap-2">
-              Il mercato delle pecore è aperto! 🐑
+              {tournament?.config?.status === 'Concluso' || tournament?.status === 'Concluso' ? 'Il mercato delle pecore è concluso! Ecco lo storico delle scommesse 🐑' : 'Il mercato delle pecore è aperto! 🐑'}
              </p>
 
              {/* Real-time Total Recap */}
@@ -1113,8 +1113,9 @@ export function BettingPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 -ml-1">
                 {(() => {
                     const filtered = markets.filter(market => {
-                      // Hide settled markets from the main view as they are visible in profile history
-                      if (market.status === 'settled') return false;
+                      // Hide settled markets from the main view as they are visible in profile history, unless the tournament is concluded
+                      const isConcluded = tournament?.status === 'Concluso' || tournament?.config?.status === 'Concluso';
+                      if (market.status === 'settled' && !isConcluded) return false;
                       
                       if (filterCategory === 'all') return true;
                       if (filterCategory === 'open') return market.status === 'open';
@@ -1156,9 +1157,11 @@ export function BettingPage() {
                           <span className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.15em] shrink-0">{market.type}</span>
                           <div className={clsx(
                             "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase border shrink-0",
-                            market.status === 'open' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-red-500/10 border-red-500/20 text-red-400"
+                            market.status === 'open' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : 
+                            market.status === 'settled' ? "bg-blue-500/10 border-blue-500/20 text-blue-400" :
+                            "bg-red-500/10 border-red-500/20 text-red-400"
                           )}>
-                             {market.status === 'open' ? 'Bet Aperta' : 'Bet Chiusa'}
+                             {market.status === 'open' ? 'Bet Aperta' : market.status === 'settled' ? 'Liquidato' : 'Bet Chiusa'}
                           </div>
                         </div>
                         
@@ -1421,7 +1424,7 @@ export function BettingPage() {
                       </div>
                     )}
 
-                    {!isAuthenticated && (
+                    {!isAuthenticated && market.status === 'open' && (
                       <div className="mt-auto pt-6 text-center">
                         <p className="text-yellow-500/50 text-[10px] font-black uppercase tracking-[0.15em] border border-yellow-500/10 py-3 rounded-xl bg-yellow-500/5">Effettua il login per scommettere</p>
                       </div>
