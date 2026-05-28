@@ -58,6 +58,7 @@ const jinData = {
         "age": 1,
         "name": "Reindeer Trader",
         "type": "Worker",
+        "imageId": "reindeer-trader-2",
         "stats": { "armor": 0, "speed": 1.1, "attack": 0, "health": 100 },
         "strengths": ["Trading"],
         "weaknesses": ["Cavalry"],
@@ -88,6 +89,7 @@ const jinData = {
         "age": 3,
         "name": "Zhanma Swordsman",
         "type": "Infantry",
+        "imageId": "zhanma-swordsman-4",
         "stats": { "armor": 8, "speed": 1.12, "attack": 23, "health": 250 },
         "strengths": ["Cavalry"],
         "weaknesses": ["Ranged Units", "Crossbowmen"],
@@ -116,6 +118,14 @@ const jinData = {
     ],
     "technologies": [],
     "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
       {
         "id": "flower-pagoda",
         "age": 2,

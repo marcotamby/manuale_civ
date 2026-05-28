@@ -881,6 +881,7 @@ export const civilizationsData: Civilization[] = [
         "age": 1,
         "name": "Reindeer Trader",
         "type": "Worker",
+        "imageId": "reindeer-trader-2",
         "stats": {
           "armor": 0,
           "speed": 1.1,
@@ -941,6 +942,7 @@ export const civilizationsData: Civilization[] = [
         "age": 3,
         "name": "Zhanma Swordsman",
         "type": "Infantry",
+        "imageId": "zhanma-swordsman-4",
         "stats": {
           "armor": 8,
           "speed": 1.12,
@@ -1001,6 +1003,14 @@ export const civilizationsData: Civilization[] = [
     ],
     "technologies": [],
     "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
       {
         "id": "flower-pagoda",
         "age": 2,
