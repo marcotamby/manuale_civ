@@ -27,7 +27,7 @@ interface AuthContextType {
   loginModalMessage: string | null;
   openLoginModal: (message?: string) => void;
   closeLoginModal: () => void;
-  login: (userData: UserData) => void;
+  login: (userData: UserData, googleToken?: string) => void;
   logout: () => void;
   toggleFavorite: (civId: string) => void;
   updateRank: (rank: string) => void;
@@ -248,7 +248,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [isAuthenticated, !!user?.email]);
 
-  const login = async (userData: UserData) => {
+  const login = async (userData: UserData, googleToken?: string) => {
     const email = userData.email?.toLowerCase() || 'guest';
     const savedRank = localStorage.getItem(`auth_user_rank_${email}`) || localStorage.getItem('auth_user_rank') || 'Unranked';
     const savedNickname = localStorage.getItem(`auth_user_nickname_${email}`) || localStorage.getItem('auth_user_nickname') || '';
@@ -269,6 +269,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Migration: save back to per-user keys if using old global keys
     localStorage.setItem(`auth_user_rank_${email}`, savedRank);
     localStorage.setItem(`auth_user_nickname_${email}`, savedNickname);
+
+    // Log into Supabase Auth if Google token is provided
+    if (googleToken) {
+      try {
+        console.log('🔄 Logging into Supabase Auth with Google token...');
+        const { data, error } = await supabase.auth.signInWithIdToken({
+          provider: 'google',
+          token: googleToken,
+        });
+        if (error) {
+          console.error('❌ Supabase Auth error:', error.message);
+        } else {
+          console.log('✅ Logged into Supabase Auth successfully:', data.user?.email);
+        }
+      } catch (err) {
+        console.error('❌ Failed to sign into Supabase Auth:', err);
+      }
+    }
 
     // Sync favorites and profile from Supabase
     if (userData.email) {
@@ -291,7 +309,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setFavorites([]); // Clear favorites state on logout
     localStorage.removeItem('auth_user');
-    // We don't remove rank/nickname keys as they are per-user in localStorage
+    
+    // Log out of Supabase Auth
+    supabase.auth.signOut()
+      .then(() => console.log('👋 Logged out of Supabase Auth successfully.'))
+      .catch(err => console.error('❌ Error logging out of Supabase:', err));
   };
 
   const updateRank = (rank: string) => {
