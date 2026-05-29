@@ -848,7 +848,7 @@ export function TournamentsPage() {
                       {status === 'Concluso' && tournamentsWithBets.some(slug => slug.includes(t.slug.toLowerCase()) || t.slug.toLowerCase().includes(slug)) && (
                         <Link
                           to={`/tornei/${t.slug}/scommetti`}
-                          className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center justify-center gap-2 transition-all bg-blue-600/60 border-blue-500/50 text-slate-100 hover:bg-blue-500/80 hover:scale-105 active:scale-95 hover:border-blue-400/60"
+                          className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center justify-center gap-2 transition-all bg-sky-600/60 border-sky-500/50 text-slate-100 hover:bg-sky-500/80 hover:scale-105 active:scale-95 hover:border-sky-400/60"
                         >
                           Storico Scommesse 🐑
                         </Link>
