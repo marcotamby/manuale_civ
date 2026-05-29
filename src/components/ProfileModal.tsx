@@ -903,9 +903,9 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                     </p>
                                     <div className="relative group/tooltip inline-block shrink-0">
                                         <Info size={11} className="text-gray-400 hover:text-blue-400 cursor-help transition-colors" />
-                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 p-2.5 bg-[#111625] border border-blue-500/30 text-gray-300 text-[9px] rounded-lg shadow-[0_10px_30px_rgba(0,0,0,0.8)] opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-[200] pointer-events-none text-center leading-normal">
+                                        <div className="absolute bottom-full right-0 mb-2 w-56 p-2.5 bg-[#0b0f19] border border-blue-500/40 text-gray-200 text-[9px] rounded-lg shadow-[0_10px_30px_rgba(0,0,0,0.95)] opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-[200] pointer-events-none text-left leading-normal">
                                             L'ID è la serie di numeri alla fine dell'URL del tuo profilo (es: aoe4world.com/players/<span className="text-blue-400 font-black">7000836</span>).
-                                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#111625] w-0 h-0" />
+                                            <div className="absolute top-full right-1.5 border-4 border-transparent border-t-[#0b0f19] w-0 h-0" />
                                         </div>
                                     </div>
                                 </div>
