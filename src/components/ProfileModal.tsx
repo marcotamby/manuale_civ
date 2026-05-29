@@ -140,6 +140,10 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     const [pendingNickname, setPendingNickname] = useState(user?.nickname || '');
     const [pendingRank, setPendingRank] = useState(user?.rank || 'Unranked');
     const [pendingAvatar, setPendingAvatar] = useState<string | null>(user?.avatar_url || null);
+    const [pendingAoe4Id, setPendingAoe4Id] = useState(user?.aoe4_profile_id || '');
+    const [aoe4Stats, setAoe4Stats] = useState<any | null>(null);
+    const [isAoe4Loading, setIsAoe4Loading] = useState(false);
+    const [aoe4Error, setAoe4Error] = useState<string | null>(null);
     const [showSaveSuccess, setShowSaveSuccess] = useState(false);
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
@@ -150,13 +154,53 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     const [isArchiving, setIsArchiving] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const mapAoe4RankToLocal = (aoe4Rank: string): string => {
+        if (!aoe4Rank || aoe4Rank === 'unranked') return 'Unranked';
+        const parts = aoe4Rank.split('_');
+        const name = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+        const tier = parts[1];
+        let roman = '';
+        if (tier === '1') roman = 'I';
+        else if (tier === '2') roman = 'II';
+        else if (tier === '3') roman = 'III';
+        return `${name} ${roman}`.trim();
+    };
+
+    const fetchAoe4Stats = async (profileId: string) => {
+        if (!profileId) return null;
+        setIsAoe4Loading(true);
+        setAoe4Error(null);
+        try {
+            const response = await fetch(`https://aoe4world.com/api/v0/players/${profileId}`);
+            if (!response.ok) {
+                throw new Error('Profilo non trovato o errore di connessione.');
+            }
+            const data = await response.json();
+            setAoe4Stats(data);
+            return data;
+        } catch (err: any) {
+            console.error('Error fetching AoE4 World data:', err);
+            setAoe4Error(err.message || 'Errore durante il recupero dei dati.');
+            return null;
+        } finally {
+            setIsAoe4Loading(false);
+        }
+    };
+
     // Sync local state ONLY when modal opens
     useEffect(() => {
         if (isOpen) {
             setPendingNickname(user?.nickname || '');
             setPendingRank(user?.rank || 'Unranked');
             setPendingAvatar(user?.avatar_url || null);
+            setPendingAoe4Id(user?.aoe4_profile_id || '');
             setShowSaveSuccess(false);
+
+            if (user?.aoe4_profile_id) {
+                fetchAoe4Stats(user.aoe4_profile_id);
+            } else {
+                setAoe4Stats(null);
+            }
 
             // REFRESH Notification Data from localStorage whenever modal opens
             if (user?.email) {
@@ -164,17 +208,66 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                 setLastSeenData(refreshedData);
             }
         }
-    }, [isOpen, user?.email]); // Only sync on open, or if user changes while open
+    }, [isOpen, user?.email, user?.aoe4_profile_id]); // Sync on open or if user profile changes
 
     const hasChanges = pendingNickname !== (user?.nickname || '') || 
                        pendingRank !== (user?.rank || 'Unranked') || 
-                       pendingAvatar !== (user?.avatar_url || null);
+                       pendingAvatar !== (user?.avatar_url || null) ||
+                       pendingAoe4Id !== (user?.aoe4_profile_id || '');
 
     const handleSaveProfile = () => {
         updateProfile({
             nickname: pendingNickname,
             rank: pendingRank,
-            avatar_url: pendingAvatar
+            avatar_url: pendingAvatar,
+            aoe4_profile_id: pendingAoe4Id || null
+        });
+        setShowSaveSuccess(true);
+        setTimeout(() => setShowSaveSuccess(false), 1000);
+    };
+
+    const handleLinkAoe4 = async () => {
+        if (!pendingAoe4Id.trim()) return;
+        const data = await fetchAoe4Stats(pendingAoe4Id.trim());
+        if (data) {
+            let finalNickname = pendingNickname;
+            if (data.name) {
+                setPendingNickname(data.name);
+                finalNickname = data.name;
+            }
+            
+            const rmSoloRank = data.modes?.rm_solo?.rank_level;
+            const rmTeamRank = data.modes?.rm_team?.rank_level;
+            const finalRankLevel = rmSoloRank && rmSoloRank !== 'unranked' ? rmSoloRank : rmTeamRank;
+            let finalRank = pendingRank;
+            if (finalRankLevel) {
+                const mappedRank = mapAoe4RankToLocal(finalRankLevel);
+                setPendingRank(mappedRank);
+                finalRank = mappedRank;
+            }
+            
+            let finalAvatar = pendingAvatar;
+            if (data.avatars?.medium && !pendingAvatar) {
+                setPendingAvatar(data.avatars.medium);
+                finalAvatar = data.avatars.medium;
+            }
+            
+            updateProfile({
+                nickname: finalNickname,
+                rank: finalRank,
+                avatar_url: finalAvatar,
+                aoe4_profile_id: pendingAoe4Id.trim()
+            });
+            setShowSaveSuccess(true);
+            setTimeout(() => setShowSaveSuccess(false), 1000);
+        }
+    };
+
+    const handleUnlinkAoe4 = () => {
+        setPendingAoe4Id('');
+        setAoe4Stats(null);
+        updateProfile({
+            aoe4_profile_id: null
         });
         setShowSaveSuccess(true);
         setTimeout(() => setShowSaveSuccess(false), 1000);
@@ -767,9 +860,157 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                     <section>
                         <div className="flex items-center gap-2 mb-4 text-blue-400 tracking-widest uppercase text-xs font-bold">
                             <Trophy size={14} />
-                            <span>Informazioni In Gioco</span>
+                            <span>Informazioni In Gioco & Statistiche</span>
                         </div>
                         <div className="bg-white/[0.03] border border-white/8 rounded-xl p-5 space-y-5">
+                            
+                            {/* Collegamento AoE4 World */}
+                            <div className="border-b border-white/5 pb-5">
+                                <label className="block text-[10px] text-gray-400 uppercase font-black tracking-widest mb-2">
+                                    ID Profilo AoE4 World
+                                </label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Es: 4635035"
+                                        value={pendingAoe4Id}
+                                        onChange={(e) => setPendingAoe4Id(e.target.value)}
+                                        className="flex-1 bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors"
+                                    />
+                                    {user?.aoe4_profile_id ? (
+                                        <button
+                                            type="button"
+                                            onClick={handleUnlinkAoe4}
+                                            className="px-4 py-2.5 border border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-lg text-xs font-bold uppercase tracking-widest transition-all"
+                                        >
+                                            Scollega
+                                        </button>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={handleLinkAoe4}
+                                            disabled={isAoe4Loading || !pendingAoe4Id.trim()}
+                                            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:bg-white/5 disabled:text-gray-500 text-white rounded-lg text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(37,99,235,0.2)]"
+                                        >
+                                            {isAoe4Loading ? <Loader2 size={12} className="animate-spin" /> : <ExternalLink size={12} />}
+                                            Collega
+                                        </button>
+                                    )}
+                                </div>
+                                <p className="text-[9px] text-gray-500 mt-2 font-medium">
+                                    Collega il profilo per sincronizzare automaticamente avatar, nickname e rank. Trovi il tuo ID nell'URL di <a href="https://aoe4world.com" target="_blank" rel="noreferrer" className="text-blue-400 hover:underline">aoe4world.com</a>.
+                                </p>
+                                {aoe4Error && (
+                                    <p className="text-xs text-red-400 mt-2 font-bold">{aoe4Error}</p>
+                                )}
+                            </div>
+
+                            {/* Statistiche AoE4 World (Visualizzazione Premium) */}
+                            {aoe4Stats && (
+                                <div className="bg-[#121828]/60 border border-blue-500/20 rounded-xl p-4 space-y-4 animate-in fade-in duration-300 shadow-inner">
+                                    <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
+                                        <div className="flex items-center gap-2.5">
+                                            {aoe4Stats.avatars?.small ? (
+                                                <img src={aoe4Stats.avatars.small} alt="Steam Avatar" className="w-6 h-6 rounded-full border border-white/10" />
+                                            ) : (
+                                                <div className="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center text-gray-500">
+                                                    <User size={12} />
+                                                </div>
+                                            )}
+                                            <span className="text-xs font-black text-white uppercase tracking-wider">{aoe4Stats.name}</span>
+                                            {aoe4Stats.country && (
+                                                <span className="text-[9px] bg-white/5 text-gray-400 px-1.5 py-0.5 rounded uppercase font-bold tracking-tight">
+                                                    {aoe4Stats.country}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <a
+                                            href={aoe4Stats.site_url || `https://aoe4world.com/players/${pendingAoe4Id}`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="text-[9px] text-blue-400 hover:text-blue-300 font-black tracking-widest flex items-center gap-1 uppercase transition-colors"
+                                        >
+                                            Profilo AoE4 <ExternalLink size={10} />
+                                        </a>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        {/* RM 1v1 */}
+                                        {aoe4Stats.modes?.rm_solo ? (
+                                            <div className="bg-black/35 p-3 rounded-lg border border-white/5 flex flex-col justify-between hover:border-white/10 transition-colors">
+                                                <span className="text-[9px] text-gray-400 uppercase font-black tracking-widest">Ranked 1v1</span>
+                                                <div className="flex items-center gap-2.5 my-2">
+                                                    {aoe4Stats.modes.rm_solo.rank_level && RANK_ICONS[mapAoe4RankToLocal(aoe4Stats.modes.rm_solo.rank_level)] ? (
+                                                        <img
+                                                            src={RANK_ICONS[mapAoe4RankToLocal(aoe4Stats.modes.rm_solo.rank_level)]}
+                                                            alt={aoe4Stats.modes.rm_solo.rank_level}
+                                                            className="w-9 h-9 object-contain"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-9 h-9 rounded-full bg-gray-800/50 flex items-center justify-center text-gray-500">
+                                                            <Trophy size={16} />
+                                                        </div>
+                                                    )}
+                                                    <div>
+                                                        <span className="text-xs font-black text-yellow-400 block leading-tight">
+                                                            {mapAoe4RankToLocal(aoe4Stats.modes.rm_solo.rank_level)}
+                                                        </span>
+                                                        <span className="text-[10px] text-gray-400 font-bold">
+                                                            {aoe4Stats.modes.rm_solo.rating || 0} punti
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="text-[10px] text-gray-500 flex justify-between pt-1.5 border-t border-white/5">
+                                                    <span>Win Rate: <strong className="text-white">{aoe4Stats.modes.rm_solo.win_rate || 0}%</strong></span>
+                                                    <span className="font-bold">{aoe4Stats.modes.rm_solo.wins_count || 0}V - {aoe4Stats.modes.rm_solo.losses_count || 0}P</span>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-black/20 p-3 rounded-lg border border-white/5 border-dashed flex flex-col justify-center items-center text-center h-[90px]">
+                                                <span className="text-[9px] text-gray-500 uppercase font-black tracking-widest">Ranked 1v1</span>
+                                                <span className="text-[10px] text-gray-600 font-bold uppercase mt-1">Non Giocato</span>
+                                            </div>
+                                        )}
+
+                                        {/* RM Team */}
+                                        {aoe4Stats.modes?.rm_team ? (
+                                            <div className="bg-black/35 p-3 rounded-lg border border-white/5 flex flex-col justify-between hover:border-white/10 transition-colors">
+                                                <span className="text-[9px] text-gray-400 uppercase font-black tracking-widest">Ranked Team</span>
+                                                <div className="flex items-center gap-2.5 my-2">
+                                                    {aoe4Stats.modes.rm_team.rank_level && RANK_ICONS[mapAoe4RankToLocal(aoe4Stats.modes.rm_team.rank_level)] ? (
+                                                        <img
+                                                            src={RANK_ICONS[mapAoe4RankToLocal(aoe4Stats.modes.rm_team.rank_level)]}
+                                                            alt={aoe4Stats.modes.rm_team.rank_level}
+                                                            className="w-9 h-9 object-contain"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-9 h-9 rounded-full bg-gray-800/50 flex items-center justify-center text-gray-500">
+                                                            <Trophy size={16} />
+                                                        </div>
+                                                    )}
+                                                    <div>
+                                                        <span className="text-xs font-black text-yellow-400 block leading-tight">
+                                                            {mapAoe4RankToLocal(aoe4Stats.modes.rm_team.rank_level)}
+                                                        </span>
+                                                        <span className="text-[10px] text-gray-400 font-bold">
+                                                            {aoe4Stats.modes.rm_team.rating || 0} punti
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="text-[10px] text-gray-500 flex justify-between pt-1.5 border-t border-white/5">
+                                                    <span>Win Rate: <strong className="text-white">{aoe4Stats.modes.rm_team.win_rate || 0}%</strong></span>
+                                                    <span className="font-bold">{aoe4Stats.modes.rm_team.wins_count || 0}V - {aoe4Stats.modes.rm_team.losses_count || 0}P</span>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-black/20 p-3 rounded-lg border border-white/5 border-dashed flex flex-col justify-center items-center text-center h-[90px]">
+                                                <span className="text-[9px] text-gray-500 uppercase font-black tracking-widest">Ranked Team</span>
+                                                <span className="text-[10px] text-gray-600 font-bold uppercase mt-1">Non Giocato</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Nickname */}
                             <div>

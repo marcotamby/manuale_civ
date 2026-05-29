@@ -10,6 +10,7 @@ interface UserData {
   nickname?: string;
   sheep_balance?: number;
   id?: string;
+  aoe4_profile_id?: string | null;
 }
 
 interface AuthContextType {
@@ -31,7 +32,7 @@ interface AuthContextType {
   logout: () => void;
   toggleFavorite: (civId: string) => void;
   updateRank: (rank: string) => void;
-  updateProfile: (data: { rank?: string; nickname?: string; avatar_url?: string | null }) => void;
+  updateProfile: (data: { rank?: string; nickname?: string; avatar_url?: string | null; aoe4_profile_id?: string | null }) => void;
   refreshUser: () => Promise<void>;
   setUser: (user: UserData | null) => void;
 }
@@ -148,7 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('nickname, rank, avatar_url, role, is_streamer, can_manage_tournaments, can_manage_civs, can_manage_buildorders, sheep_balance')
+        .select('nickname, rank, avatar_url, role, is_streamer, can_manage_tournaments, can_manage_civs, can_manage_buildorders, sheep_balance, aoe4_profile_id')
         .ilike('email', userEmail)
         .maybeSingle();
       
@@ -156,6 +157,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const email = userEmail.toLowerCase();
         const currentRank = data.rank || 'Unranked';
         const currentNickname = data.nickname || '';
+        const currentAoe4Id = data.aoe4_profile_id || null;
         
         const storedUser = localStorage.getItem('auth_user');
         if (storedUser) {
@@ -170,7 +172,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
              can_manage_tournaments: data.can_manage_tournaments,
              can_manage_civs: data.can_manage_civs,
              can_manage_buildorders: data.can_manage_buildorders,
-             sheep_balance: data.sheep_balance ?? 100
+             sheep_balance: data.sheep_balance ?? 100,
+             aoe4_profile_id: currentAoe4Id
            };
            localStorage.setItem('auth_user', JSON.stringify(updated));
            localStorage.setItem(`auth_user_${email}`, JSON.stringify(updated));
@@ -182,6 +185,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const email = userEmail.toLowerCase();
         const rank = localStorage.getItem(`auth_user_rank_${email}`) || localStorage.getItem('auth_user_rank') || 'Unranked';
         const nickname = localStorage.getItem(`auth_user_nickname_${email}`) || localStorage.getItem('auth_user_nickname') || '';
+        const aoe4Id = localStorage.getItem(`auth_user_aoe4_id_${email}`) || null;
         
         const { data: newProfile } = await supabase
           .from('profiles')
@@ -190,7 +194,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             nickname, 
             rank,
             avatar_url: user?.avatar_url || null,
-            sheep_balance: 100
+            sheep_balance: 100,
+            aoe4_profile_id: aoe4Id
           })
           .select()
           .maybeSingle();
@@ -252,13 +257,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const email = userData.email?.toLowerCase() || 'guest';
     const savedRank = localStorage.getItem(`auth_user_rank_${email}`) || localStorage.getItem('auth_user_rank') || 'Unranked';
     const savedNickname = localStorage.getItem(`auth_user_nickname_${email}`) || localStorage.getItem('auth_user_nickname') || '';
+    const savedAoe4Id = localStorage.getItem(`auth_user_aoe4_id_${email}`) || null;
     const savedUser = localStorage.getItem(`auth_user_${email}`) || localStorage.getItem('auth_user');
     const parsedSavedUser = savedUser ? JSON.parse(savedUser) : null;
     
     // Prioritize previously saved user avatar if it exists (might be custom/DB)
     const finalAvatar = parsedSavedUser?.avatar_url || userData.avatar_url;
 
-    const enrichedUser = { ...userData, rank: savedRank, nickname: savedNickname, avatar_url: finalAvatar };
+    const enrichedUser = { 
+      ...userData, 
+      rank: savedRank, 
+      nickname: savedNickname, 
+      avatar_url: finalAvatar,
+      aoe4_profile_id: savedAoe4Id
+    };
 
     setIsAuthenticated(true);
     setUser(enrichedUser);
@@ -324,7 +336,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     updateProfile({ rank });
   };
 
-  const updateProfile = (data: { rank?: string; nickname?: string; avatar_url?: string | null }) => {
+  const updateProfile = (data: { rank?: string; nickname?: string; avatar_url?: string | null; aoe4_profile_id?: string | null }) => {
     if (user) {
       const updatedUser = { ...user, ...data };
       const email = user.email?.toLowerCase() || 'guest';
@@ -338,8 +350,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem('auth_user_rank');
       }
       if (data.nickname !== undefined) {
-        localStorage.setItem(`auth_user_nickname_${email}`, data.nickname);
+        localStorage.setItem(`auth_user_nickname_${email}`, data.nickname || '');
         localStorage.removeItem('auth_user_nickname');
+      }
+      if (data.aoe4_profile_id !== undefined) {
+        if (data.aoe4_profile_id) {
+          localStorage.setItem(`auth_user_aoe4_id_${email}`, data.aoe4_profile_id);
+        } else {
+          localStorage.removeItem(`auth_user_aoe4_id_${email}`);
+        }
       }
 
       // Sync to Supabase
@@ -351,6 +370,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             nickname: updatedUser.nickname || '', 
             rank: updatedUser.rank || 'Unranked',
             avatar_url: updatedUser.avatar_url || null,
+            aoe4_profile_id: updatedUser.aoe4_profile_id || null,
             updated_at: new Date().toISOString()
           })
           .then(({ error }) => {
