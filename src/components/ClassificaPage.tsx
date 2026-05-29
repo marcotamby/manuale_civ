@@ -683,7 +683,7 @@ export function ClassificaPage() {
       </div>
 
       {/* Content */}
-      <div className="px-6 md:px-20 py-8">
+      <div className="px-6 md:px-8 py-8">
         {loading ? (
           <div className="text-center py-12">
             <div className="inline-block">
