@@ -79,10 +79,10 @@ export function TournamentRegolamento() {
       <div className="max-w-6xl mx-auto px-4 mb-6">
         <button 
           onClick={() => navigate('/tornei')}
-          className="flex items-center gap-2 px-4 py-2 glass rounded-xl text-gray-200 hover:text-white transition-all group text-sm font-bold uppercase tracking-widest border border-white/5 hover:border-white/20 w-fit"
+          className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
         >
           <ArrowLeft size={16} className="transition-transform duration-300 ease-in-out group-hover:-translate-x-[2px]" />
-          Torna ai Tornei
+          Torna ai tornei
         </button>
       </div>
 
