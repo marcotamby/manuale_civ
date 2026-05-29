@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, User, Heart, MessageSquare, Trophy, ExternalLink, Loader2, ChevronDown, LogOut, Camera, Trash2 as TrashIcon, TrendingUp, History } from 'lucide-react';
+import { X, User, Heart, MessageSquare, Trophy, ExternalLink, Loader2, ChevronDown, LogOut, Camera, Trash2 as TrashIcon, TrendingUp, History, Info } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
 import { supabase } from '../lib/supabaseClient';
@@ -897,9 +897,18 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                         </button>
                                     )}
                                 </div>
-                                <p className="text-[9px] text-gray-500 mt-2 font-medium">
-                                    Collega il profilo per sincronizzare automaticamente avatar, nickname e rank. Trovi il tuo ID nell'URL di <a href="https://aoe4world.com" target="_blank" rel="noreferrer" className="text-blue-400 hover:underline">aoe4world.com</a>.
-                                </p>
+                                <div className="flex flex-wrap items-center gap-1 mt-2">
+                                    <p className="text-[9px] text-gray-500 font-medium">
+                                        Collega il profilo per sincronizzare automaticamente avatar, nickname e rank. Trovi il tuo ID nell'URL di <a href="https://aoe4world.com" target="_blank" rel="noreferrer" className="text-blue-400 hover:underline">aoe4world.com</a>.
+                                    </p>
+                                    <div className="relative group/tooltip inline-block shrink-0">
+                                        <Info size={11} className="text-gray-400 hover:text-blue-400 cursor-help transition-colors" />
+                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 p-2.5 bg-[#111625] border border-blue-500/30 text-gray-300 text-[9px] rounded-lg shadow-[0_10px_30px_rgba(0,0,0,0.8)] opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-[200] pointer-events-none text-center leading-normal">
+                                            L'ID è la serie di numeri alla fine dell'URL del tuo profilo (es: aoe4world.com/players/<span className="text-blue-400 font-black">7000836</span>).
+                                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#111625] w-0 h-0" />
+                                        </div>
+                                    </div>
+                                </div>
                                 {aoe4Error && (
                                     <p className="text-xs text-red-400 mt-2 font-bold">{aoe4Error}</p>
                                 )}
