@@ -4,11 +4,27 @@ import { useNavigate, Link } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament, fetchChallongeData } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
-import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, ChevronUp, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink, MoveVertical, Youtube, Trophy } from 'lucide-react';
+import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, ChevronUp, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink, MoveVertical, Youtube, Trophy, GripVertical } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
 import { toast } from 'react-hot-toast';
+import {
+  DndContext, 
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToFirstScrollableAncestor } from '@dnd-kit/modifiers';
 
 
 interface TournamentConfig {
@@ -34,6 +50,450 @@ interface TournamentConfig {
 }
 
 const TOURNAMENTS: TournamentConfig[] = [];
+
+interface SortableTournamentCardProps {
+  t: any;
+  index: number;
+  isEditingOrder: boolean;
+  canManageTournaments: boolean;
+  tournamentsWithBets: string[];
+  activeDivisions: Record<string, string>;
+  setActiveDivisions: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  bracketErrorId: string | null;
+  setBracketErrorId: React.Dispatch<React.SetStateAction<string | null>>;
+  handleMoveTournament: (index: number, direction: 'up' | 'down') => Promise<void>;
+  setEditingTournament: React.Dispatch<React.SetStateAction<any>>;
+  setEditForm: React.Dispatch<React.SetStateAction<any>>;
+  setShowEditModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsRegEditorExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsPodiumExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsVodsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+function SortableTournamentCard({
+  t,
+  index,
+  isEditingOrder,
+  canManageTournaments,
+  tournamentsWithBets,
+  activeDivisions,
+  setActiveDivisions,
+  bracketErrorId,
+  setBracketErrorId,
+  handleMoveTournament,
+  setEditingTournament,
+  setEditForm,
+  setShowEditModal,
+  setIsRegEditorExpanded,
+  setIsPodiumExpanded,
+  setIsVodsExpanded
+}: SortableTournamentCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: t.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : 'auto',
+    opacity: isDragging ? 0.6 : 1,
+  };
+
+  const banner = t.config.bannerUrl || t.images?.[0]?.url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop';
+  const status = t.config.status || 'Concluso';
+  const podium = t.config.podium || t.events?.[0]?.standings?.nodes || [];
+
+  return (
+    <div 
+      ref={setNodeRef}
+      style={style}
+      {...(isEditingOrder ? { ...attributes, ...listeners } : {})}
+      className={clsx(
+        "relative z-10 hover:z-50 group h-full flex flex-col",
+        isEditingOrder ? "cursor-grab active:cursor-grabbing select-none" : ""
+      )}
+    >
+      <div 
+        className={clsx(
+          "glass rounded-3xl border flex flex-col flex-grow h-full transition-all duration-500",
+          isEditingOrder ? "border-blue-500/40 bg-slate-950/40" : "border-white/5 hover:border-white/80 hover:shadow-[0_30px_60px_rgba(0,0,0,0.8)] hover:-translate-y-1 hover:scale-[1.05] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] [backface-visibility:hidden] [transform-style:preserve-3d]"
+        )}
+      >
+        {(() => {
+          const canRenderInternal = (t.events?.length > 0 || t.config.source === 'challonge' || t.config.source === 'startgg') && !t.config.slug.startsWith('tb-');
+          const bannerContent = (
+            <>
+              <img 
+                src={banner} 
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
+                alt={t.name} 
+                style={{ objectPosition: `${t.config?.bannerPositionX || 50}% ${t.config?.bannerPositionY || 50}%` }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0d1424] to-transparent" />
+            </>
+          );
+
+          if (isEditingOrder) {
+            return (
+              <div className="h-48 relative overflow-hidden rounded-t-3xl">
+                {bannerContent}
+              </div>
+            );
+          }
+
+          if (canRenderInternal) {
+            return (
+              <Link 
+                to={`/tornei/${t.slug}`}
+                className="h-48 relative overflow-hidden cursor-pointer block rounded-t-3xl"
+              >
+                {bannerContent}
+              </Link>
+            );
+          } else if (t.config.directLink) {
+            return (
+              <a 
+                href={t.config.directLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-48 relative overflow-hidden cursor-pointer block rounded-t-3xl"
+              >
+                {bannerContent}
+              </a>
+            );
+          } else {
+            return (
+              <div className="h-48 relative overflow-hidden rounded-t-3xl">
+                {bannerContent}
+              </div>
+            );
+          }
+        })()}
+            
+        {/* Status Badges Overlay */}
+        <div className="absolute top-4 right-4 flex flex-col items-end gap-2 z-20">
+           <div 
+            className={clsx(
+              "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center gap-2 transition-all",
+              status === 'In corso' ? "bg-green-600/60 border-green-500/50 text-slate-100" : 
+              status === 'Programmato' ? "bg-blue-600/60 border-blue-500/50 text-slate-100" :
+              "bg-[#FF6961]/60 border-[#FF6961]/50 text-slate-100"
+            )}
+          >
+            {status === 'In corso' && <span className="w-1.5 h-1.5 rounded-full bg-slate-100 inline-block mr-0.5 animate-pulse" />}
+            {status === 'Concluso' && <span className="w-1.5 h-1.5 rounded-full bg-slate-100 inline-block mr-0.5" />}
+            {status === 'Programmato' && <Calendar size={10} className="mr-0.5 text-slate-100" />}
+            {status}
+          </div>
+
+          {!isEditingOrder && status === 'In corso' && (
+            <Link
+              to={`/tornei/${t.slug}/scommetti`}
+              className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center justify-center gap-2 transition-all bg-purple-600/60 border-purple-500/50 text-slate-100 hover:bg-purple-500/80 hover:scale-105 active:scale-95 hover:border-purple-400/60"
+            >
+              Scommetti! 🐑
+            </Link>
+          )}
+
+          {!isEditingOrder && status === 'Concluso' && tournamentsWithBets.some(slug => slug.includes(t.slug.toLowerCase()) || t.slug.toLowerCase().includes(slug)) && (
+            <Link
+              to={`/tornei/${t.slug}/scommetti`}
+              className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center justify-center gap-2 transition-all bg-sky-600/60 border-sky-500/50 text-slate-100 hover:bg-sky-500/80 hover:scale-105 active:scale-95 hover:border-sky-400/60"
+            >
+              Storico Scommesse 🐑
+            </Link>
+          )}
+
+          {!isEditingOrder && t.config.vods && t.config.vods.length > 0 && (
+            <Link
+              to={`/tornei/${t.slug}/match`}
+              className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center justify-center gap-2 transition-all bg-red-600/60 border-red-500/50 text-slate-100 hover:bg-red-500/80 hover:scale-105 active:scale-95 hover:border-red-400/60 group/vods"
+            >
+              VODs <Youtube size={14} className="group-hover/vods:scale-110 transition-transform text-white" />
+            </Link>
+          )}
+        </div>
+
+        {isEditingOrder && (
+          <div className="absolute top-4 left-4 p-2 bg-slate-900/80 backdrop-blur-md rounded-xl border border-blue-500/30 text-blue-400 z-30 pointer-events-none shadow-lg flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
+            <GripVertical size={14} />
+            Trascina
+          </div>
+        )}
+
+        <div className="p-6 flex flex-col flex-grow bg-[#0a0d14] relative z-10 -mt-px rounded-b-3xl">
+          <span className="text-xs font-bold text-yellow-500/50 uppercase mb-1 tracking-widest">Organizzato da {t.config.organizer}</span>
+          <div className="relative group/title">
+            <h3 className="text-2xl font-black text-white mb-4 line-clamp-1 group-hover/title:text-yellow-400 transition-colors uppercase tracking-tight">
+              {t.config.name || t.name}
+            </h3>
+            
+            {/* Premium Title Tooltip */}
+            {!isEditingOrder && (
+              <div className="absolute bottom-full left-0 mb-4 px-4 py-3 bg-slate-900/95 backdrop-blur-xl border border-yellow-500/30 rounded-2xl opacity-0 group-hover/title:opacity-100 transition-all duration-300 pointer-events-none z-[100] shadow-2xl scale-95 group-hover/title:scale-100 origin-bottom-left min-w-[240px] max-w-[320px]">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-black text-yellow-500/60 uppercase tracking-[0.2em] mb-2 border-b border-white/5 pb-1">Dettagli Torneo</span>
+                  <span className="text-sm font-bold text-white leading-relaxed">{t.config.name || t.name}</span>
+                </div>
+                <div className="absolute top-full left-6 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900/95"></div>
+              </div>
+            )}
+          </div>
+          
+          <div className="flex flex-col gap-3 mb-6 text-gray-300 text-sm font-medium">
+            <div className="flex items-center gap-3">
+              <Calendar size={18} className="text-yellow-500/40" /> 
+              <span>{t.config.period || 'Data da definire'}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Users size={18} className="text-yellow-500/40" /> 
+              <span>Age of Empires IV - <strong className="text-yellow-500/80">{t.config.type || '1v1'}</strong></span>
+            </div>
+          </div>
+
+          <div className="mb-6 p-4 rounded-2xl bg-white/[0.03] border border-white/5 shadow-inner min-h-[145px] flex flex-col flex-grow justify-center animate-all duration-300">
+            {(() => {
+              const renderStandingRow = (entries: any[], idx: number, hasData: boolean) => (
+                <div key={idx} className="flex justify-between text-sm items-center group/standing relative z-10">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <span className={clsx("text-lg flex-shrink-0", !hasData && "opacity-20 grayscale")}>
+                      {['🥇','🥈','🥉'][idx]}
+                    </span>
+                    {hasData ? (
+                      <div className="flex items-center gap-x-1.5 flex-1 min-w-0 group/players">
+                        {entries.map((s, sIdx) => (
+                          <div key={sIdx} className="relative flex items-center min-w-0 flex-shrink-1 group/name">
+                            <div className="relative min-w-0 flex-shrink-1">
+                              <span 
+                                className={clsx(
+                                  "font-bold transition-colors truncate block",
+                                  idx === 0 ? "text-yellow-100" : "text-gray-400",
+                                  !isEditingOrder && "cursor-help",
+                                  s.players && s.players.length > 0 && "decoration-yellow-500/30 underline underline-offset-8 decoration-dotted"
+                                )}
+                              >
+                                {s.entrant?.name || '---'}
+                              </span>
+
+                              {!isEditingOrder && (
+                                <div className={clsx(
+                                  "absolute bottom-full mb-3 px-4 py-2.5 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-2xl opacity-0 group-hover/name:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/name:scale-100 z-50",
+                                  sIdx > 0 ? "right-0 origin-bottom-right" : "left-0 origin-bottom-left"
+                                )}>
+                                  <div className="flex flex-col">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 border-b border-white/5 pb-1">
+                                      {idx === 0 ? '🏆 Campione' : idx === 1 ? '🥈 Finalista' : '🥉 3° Classificato'}
+                                    </span>
+                                    <span className={clsx("text-sm font-bold text-white", s.players && s.players.length > 0 ? "mb-2" : "mb-0")}>{s.entrant?.name || '---'}</span>
+                                    
+                                    {s.players && s.players.length > 0 && (
+                                      <div className="mt-1 pt-2 border-t border-white/10">
+                                        <p className="text-[9px] font-black text-yellow-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                                          <Users size={10} /> Componenti Team
+                                        </p>
+                                        <div className="space-y-1.5">
+                                          {s.players.map((player: string, pIdx: number) => (
+                                            <div key={pIdx} className="flex items-center gap-2 text-[11px] text-white/80 font-bold uppercase tracking-tight">
+                                              <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
+                                              {player}
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className={clsx(
+                                    "absolute top-full -mt-1 border-4 border-transparent border-t-slate-800/95",
+                                    sIdx > 0 ? "right-4" : "left-4 -translate-x-1/2"
+                                  )}></div>
+                                </div>
+                              )}
+                            </div>
+                            {sIdx < entries.length - 1 && <span className="text-gray-600 font-black flex-shrink-0 mx-1">&&</span>}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-gray-600 italic text-[11px] font-medium tracking-tight">In attesa...</span>
+                    )}
+                  </div>
+                  <span className="text-white/20 font-black italic uppercase text-[9px] group-hover/standing:text-white/40 transition-colors flex-shrink-0 ml-2">
+                    {hasData ? (idx === 0 ? 'WINNER' : `${idx+1}° PLACE`) : '---'}
+                  </span>
+                </div>
+              );
+
+              const divisions = Array.from(new Set(podium.map((s: any) => s.division || '').filter(Boolean))) as string[];
+              const activeDiv = activeDivisions[t.id] || divisions[0];
+
+              return (
+                <>
+                  <div className="flex justify-between items-center mb-3 border-b border-white/5 pb-2 min-h-[28px] overflow-visible">
+                    <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Risultati Finali</p>
+                    
+                    {divisions.length > 1 && (
+                      <div className="flex gap-1 bg-white/[0.02] p-0.5 rounded-lg border border-white/5 shadow-inner">
+                        {divisions.map((divName) => {
+                          const isActive = activeDiv === divName;
+                          return (
+                            <button
+                              key={divName}
+                              type="button"
+                              onClick={() => setActiveDivisions(prev => ({ ...prev, [t.id]: divName }))}
+                              className={clsx(
+                                "py-1 px-3.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all min-w-[70px] text-center",
+                                isActive
+                                  ? "bg-gradient-to-b from-slate-100 via-slate-200 to-blue-200 text-slate-900 shadow-[0_0_10px_rgba(191,219,254,0.25)] scale-[1.02]"
+                                  : "text-slate-400 hover:text-white hover:bg-white/5"
+                              )}
+                            >
+                              {divName}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {divisions.length === 1 && (
+                      <span className="text-[9px] font-bold text-yellow-500/80 uppercase tracking-widest flex items-center gap-1">
+                        🏆 {divisions[0]}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-2 overflow-visible flex-grow flex flex-col justify-center transition-all duration-300">
+                    {[1, 2, 3].map((placement, idx) => {
+                      const entries = podium.filter((s: any) => {
+                        const matchesPlacement = s.placement === placement || s.rank === placement;
+                        const matchesDivision = divisions.length > 1 ? s.division === activeDiv : true;
+                        return matchesPlacement && matchesDivision;
+                      });
+                      const hasData = entries.length > 0;
+                      return renderStandingRow(entries, idx, hasData);
+                    })}
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+
+          {!isEditingOrder && (
+            <div className="mt-auto flex items-center gap-2 pt-4 border-t border-white/5 h-16">
+              {t.config.hasRegolamento && (
+                <Link 
+                  to={`/tornei/${t.slug}/regolamento`} 
+                  className="flex-grow h-full bg-blue-950/40 hover:bg-blue-900/60 border border-blue-500/30 rounded-2xl text-blue-400 text-[10px] font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/reg shadow-lg active:scale-95"
+                >
+                  Regolamento <BookOpen size={14} className="group-hover/reg:scale-110 transition-transform" />
+                </Link>
+              )}
+              {(() => {
+                const hasEvents = t.events && t.events.length > 0;
+                const isChallongeWithSlug = t.config.source === 'challonge' && t.slug && !t.config.slug.startsWith('tb-');
+                const isStartGGWithEvents = t.config.source === 'startgg' && (hasEvents || (t.slug && t.slug.startsWith('tournament/')));
+                
+                const commonClasses = clsx(
+                  "flex-grow h-full bg-white/5 hover:bg-white/10 rounded-2xl text-white font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/det shadow-lg active:scale-95",
+                  t.config.hasRegolamento ? "text-[10px]" : "text-xs"
+                );
+
+                if (isStartGGWithEvents || isChallongeWithSlug) {
+                  return (
+                    <Link to={`/tornei/${t.slug}`} className={commonClasses}>
+                      {bracketErrorId === t.id ? (
+                        <span className="text-red-400 font-black animate-pulse text-[10px] tracking-tight">
+                          NON DISPONIBILE
+                        </span>
+                      ) : (
+                        <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
+                      )}
+                    </Link>
+                  );
+                } else if (t.config.directLink) {
+                  return (
+                    <a href={t.config.directLink} target="_blank" rel="noopener noreferrer" className={commonClasses}>
+                      <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
+                    </a>
+                  );
+                } else {
+                  return (
+                    <button 
+                      onClick={() => {
+                        setBracketErrorId(t.id);
+                        setTimeout(() => setBracketErrorId(null), 3000);
+                      }} 
+                      className={commonClasses}
+                    >
+                      {bracketErrorId === t.id ? (
+                        <span className="text-red-400 font-black animate-pulse text-[10px] tracking-tight">
+                          NON DISPONIBILE
+                        </span>
+                      ) : (
+                        <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
+                      )}
+                    </button>
+                  );
+                }
+              })()}
+              {canManageTournaments && (
+                <div className="flex flex-col gap-1 h-full">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleMoveTournament(index, 'up'); }}
+                    className="w-8 flex-1 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all flex items-center justify-center border border-white/5"
+                  >
+                    <ChevronUp size={14} />
+                  </button>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleMoveTournament(index, 'down'); }}
+                    className="w-8 flex-1 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all flex items-center justify-center border border-white/5"
+                  >
+                    <ChevronDown size={14} />
+                  </button>
+                </div>
+              )}
+              {canManageTournaments && (
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditingTournament(t);
+                    setEditForm({
+                      organizer: t.config?.organizer || '',
+                      period: t.config?.period || '',
+                      bannerUrl: t.config?.bannerUrl || '',
+                      status: t.config?.status || 'Concluso',
+                      name: t.config?.name || t.name || '',
+                      type: t.config?.type || '1v1',
+                      podium: t.config?.podium || (t.events?.[0]?.standings?.nodes || []),
+                      hasRegolamento: t.config?.hasRegolamento || false,
+                      regolamentoContent: t.config?.regolamentoContent || '',
+                      externalUrl: t.config?.externalUrl || '',
+                      display_order: t.config?.display_order || 0,
+                      bannerPositionX: t.config?.bannerPositionX || 50,
+                      bannerPositionY: t.config?.bannerPositionY || 50,
+                      vods: t.config?.vods || []
+                    });
+                    setShowEditModal(true);
+                    setIsRegEditorExpanded(false);
+                    setIsPodiumExpanded(false);
+                    setIsVodsExpanded(false);
+                  }} 
+                  className="w-14 h-full bg-white/5 hover:bg-white/10 rounded-2xl text-blue-400 transition-all border border-white/5 hover:border-blue-500/30 active:scale-95 shadow-lg flex items-center justify-center shrink-0"
+                >
+                  <Edit2 size={20} />
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function TournamentsPage() {
   const { canManageTournaments } = useAuth();
@@ -74,6 +534,15 @@ export function TournamentsPage() {
   const [bracketErrorId, setBracketErrorId] = useState<string | null>(null);
   const [returnPath, setReturnPath] = useState<string | null>(null);
   const [activeDivisions, setActiveDivisions] = useState<Record<string, string>>({});
+  const [isEditingOrder, setIsEditingOrder] = useState(false);
+  const [isSavingOrder, setIsSavingOrder] = useState(false);
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
   const regSectionRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
@@ -284,6 +753,52 @@ export function TournamentsPage() {
       }
     }
   }, [tournaments, openEditModal]);
+
+  const handleSaveOrder = async () => {
+    setIsSavingOrder(true);
+    try {
+      const updates = tournaments.map((t, idx) => {
+        const newOrder = tournaments.length - idx;
+        const config = t.config || {};
+        return {
+          id: config.id,
+          slug: t.slug,
+          display_order: newOrder
+        };
+      });
+
+      const promises = updates.map(async (update) => {
+        const query = (update.id && update.id.length > 20)
+          ? supabase.from('tournaments').update({ display_order: update.display_order }).eq('id', update.id)
+          : supabase.from('tournaments').update({ display_order: update.display_order }).eq('slug', update.slug);
+        
+        const { error } = await query;
+        if (error) throw error;
+      });
+
+      await Promise.all(promises);
+      toast.success('Ordinamento salvato con successo!');
+      setIsEditingOrder(false);
+      loadTournaments(true);
+    } catch (err: any) {
+      console.error('Error saving tournaments order:', err);
+      toast.error(`Errore nel salvataggio dell'ordine: ${err.message || 'Errore'}`);
+    } finally {
+      setIsSavingOrder(false);
+    }
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = tournaments.findIndex(t => t.id === active.id);
+    const newIndex = tournaments.findIndex(t => t.id === over.id);
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      setTournaments(prev => arrayMove(prev, oldIndex, newIndex));
+    }
+  };
 
   const closeModal = useCallback(() => {
     setShowEditModal(false);
@@ -725,35 +1240,69 @@ export function TournamentsPage() {
         </div>
 
         {canManageTournaments && (
-          <button 
-            onClick={() => {
-              setEditingTournament(null);
-              setEditForm({
-                externalUrl: '',
-                organizer: 'Manuale Civ',
-                period: '',
-                bannerUrl: '',
-                status: 'Programmato',
-                name: '',
-                type: '1v1',
-                podium: [],
-                hasRegolamento: false,
-                regolamentoContent: '',
-                display_order: 0,
-                bannerPositionX: 50,
-                bannerPositionY: 50,
-                vods: []
-              });
-              setShowEditModal(true);
-              setIsRegEditorExpanded(false);
-              setIsPodiumExpanded(false);
-              setIsVodsExpanded(false);
-            }} 
-            className="flex items-center gap-3 px-6 py-4 bg-gradient-to-b from-slate-100 to-gray-400 font-black text-black rounded-2xl hover:from-white hover:to-gray-300 transition-all hover:scale-[1.05] shadow-[0_0_20px_rgba(255,255,255,0.1)] uppercase text-xs tracking-widest active:scale-[0.98]"
-          >
-            <Plus size={20} strokeWidth={3} />
-            Aggiungi Torneo
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3">
+            {isEditingOrder ? (
+              <>
+                <button
+                  onClick={() => {
+                    setIsEditingOrder(false);
+                    loadTournaments();
+                  }}
+                  className="flex items-center gap-3 px-6 py-4 bg-gray-800 border border-white/10 hover:bg-gray-700 font-bold text-white rounded-2xl transition-all hover:scale-[1.05] shadow-[0_0_20px_rgba(255,255,255,0.05)] uppercase text-xs tracking-widest active:scale-[0.98]"
+                >
+                  <X size={16} />
+                  Annulla
+                </button>
+                <button
+                  onClick={handleSaveOrder}
+                  disabled={isSavingOrder}
+                  className="flex items-center gap-3 px-6 py-4 bg-gradient-to-b from-blue-500 to-blue-700 font-black text-white rounded-2xl hover:brightness-110 transition-all hover:scale-[1.05] shadow-[0_0_20px_rgba(59,130,246,0.3)] uppercase text-xs tracking-widest active:scale-[0.98] disabled:opacity-50"
+                >
+                  {isSavingOrder ? <Loader2 size={16} className="animate-spin text-blue-400" /> : <Save size={16} />}
+                  Salva Ordine
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => setIsEditingOrder(true)}
+                  className="flex items-center gap-3 px-6 py-4 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-2xl hover:bg-blue-600/30 transition-all hover:scale-[1.05] shadow-[0_0_20px_rgba(59,130,246,0.1)] uppercase text-xs tracking-widest active:scale-[0.98]"
+                >
+                  <Edit2 size={16} />
+                  Modifica Ordine
+                </button>
+                <button 
+                  onClick={() => {
+                    setEditingTournament(null);
+                    setEditForm({
+                      externalUrl: '',
+                      organizer: 'Manuale Civ',
+                      period: '',
+                      bannerUrl: '',
+                      status: 'Programmato',
+                      name: '',
+                      type: '1v1',
+                      podium: [],
+                      hasRegolamento: false,
+                      regolamentoContent: '',
+                      display_order: 0,
+                      bannerPositionX: 50,
+                      bannerPositionY: 50,
+                      vods: []
+                    });
+                    setShowEditModal(true);
+                    setIsRegEditorExpanded(false);
+                    setIsPodiumExpanded(false);
+                    setIsVodsExpanded(false);
+                  }} 
+                  className="flex items-center gap-3 px-6 py-4 bg-gradient-to-b from-slate-100 to-gray-400 font-black text-black rounded-2xl hover:from-white hover:to-gray-300 transition-all hover:scale-[1.05] shadow-[0_0_20px_rgba(255,255,255,0.1)] uppercase text-xs tracking-widest active:scale-[0.98]"
+                >
+                  <Plus size={20} strokeWidth={3} />
+                  Aggiungi Torneo
+                </button>
+              </>
+            )}
+          </div>
         )}
       </div>
 
@@ -764,372 +1313,41 @@ export function TournamentsPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {tournaments.map((t, index) => {
-          const banner = t.config.bannerUrl || t.images?.[0]?.url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop';
-          const status = t.config.status || 'Concluso';
-          const podium = t.config.podium || t.events?.[0]?.standings?.nodes || [];
-
-          return (
-            <div key={t.id} className="relative z-10 hover:z-50 group h-full flex flex-col">
-              <div 
-                className="glass rounded-3xl border border-white/5 flex flex-col flex-grow h-full transition-all duration-500 hover:border-white/80 hover:shadow-[0_30px_60px_rgba(0,0,0,0.8)] hover:-translate-y-1 hover:scale-[1.05] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] [backface-visibility:hidden] [transform-style:preserve-3d]"
-              >
-                {(() => {
-                  const canRenderInternal = (t.events?.length > 0 || t.config.source === 'challonge' || t.config.source === 'startgg') && !t.config.slug.startsWith('tb-');
-                  const bannerContent = (
-                    <>
-                      <img 
-                        src={banner} 
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
-                        alt={t.name} 
-                        style={{ objectPosition: `${t.config?.bannerPositionX || 50}% ${t.config?.bannerPositionY || 50}%` }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0d1424] to-transparent" />
-                    </>
-                  );
-
-                  if (canRenderInternal) {
-                    return (
-                      <Link 
-                        to={`/tornei/${t.slug}`}
-                        className="h-48 relative overflow-hidden cursor-pointer block rounded-t-3xl"
-                      >
-                        {bannerContent}
-                      </Link>
-                    );
-                  } else if (t.config.directLink) {
-                    return (
-                      <a 
-                        href={t.config.directLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="h-48 relative overflow-hidden cursor-pointer block rounded-t-3xl"
-                      >
-                        {bannerContent}
-                      </a>
-                    );
-                  } else {
-                    return (
-                      <div className="h-48 relative overflow-hidden rounded-t-3xl">
-                        {bannerContent}
-                      </div>
-                    );
-                  }
-                })()}
-                    
-                    {/* Status Badges Overlay */}
-                    <div className="absolute top-4 right-4 flex flex-col items-end gap-2 z-20">
-
-
-                       <div 
-                        className={clsx(
-                          "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center gap-2 transition-all",
-                          status === 'In corso' ? "bg-green-600/60 border-green-500/50 text-slate-100" : 
-                          status === 'Programmato' ? "bg-blue-600/60 border-blue-500/50 text-slate-100" :
-                          "bg-[#FF6961]/60 border-[#FF6961]/50 text-slate-100"
-                        )}
-                      >
-                        {status === 'In corso' && <span className="w-1.5 h-1.5 rounded-full bg-slate-100 inline-block mr-0.5 animate-pulse" />}
-                        {status === 'Concluso' && <span className="w-1.5 h-1.5 rounded-full bg-slate-100 inline-block mr-0.5" />}
-                        {status === 'Programmato' && <Calendar size={10} className="mr-0.5 text-slate-100" />}
-                        {status}
-                      </div>
-
-                      {(status === 'In corso' || status === 'Programmato') && (
-                        <Link
-                          to={`/tornei/${t.slug}/scommetti`}
-                          className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center justify-center gap-2 transition-all bg-purple-600/60 border-purple-500/50 text-slate-100 hover:bg-purple-500/80 hover:scale-105 active:scale-95 hover:border-purple-400/60"
-                        >
-                          Scommetti! 🐑
-                        </Link>
-                      )}
-
-                      {status === 'Concluso' && tournamentsWithBets.some(slug => slug.includes(t.slug.toLowerCase()) || t.slug.toLowerCase().includes(slug)) && (
-                        <Link
-                          to={`/tornei/${t.slug}/scommetti`}
-                          className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center justify-center gap-2 transition-all bg-sky-600/60 border-sky-500/50 text-slate-100 hover:bg-sky-500/80 hover:scale-105 active:scale-95 hover:border-sky-400/60"
-                        >
-                          Storico Scommesse 🐑
-                        </Link>
-                      )}
-
-                      {t.config.vods && t.config.vods.length > 0 && (
-                        <Link
-                          to={`/tornei/${t.slug}/match`}
-                          className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center justify-center gap-2 transition-all bg-red-600/60 border-red-500/50 text-slate-100 hover:bg-red-500/80 hover:scale-105 active:scale-95 hover:border-red-400/60 group/vods"
-                        >
-                          VODs <Youtube size={14} className="group-hover/vods:scale-110 transition-transform text-white" />
-                        </Link>
-                      )}
-                    </div>
-
-                <div className="p-6 flex flex-col flex-grow bg-[#0a0d14] relative z-10 -mt-px rounded-b-3xl">
-                    <span className="text-xs font-bold text-yellow-500/50 uppercase mb-1 tracking-widest">Organizzato da {t.config.organizer}</span>
-                    <div className="relative group/title">
-                      <h3 className="text-2xl font-black text-white mb-4 line-clamp-1 group-hover/title:text-yellow-400 transition-colors uppercase tracking-tight">
-                        {t.config.name || t.name}
-                      </h3>
-                      
-                      {/* Premium Title Tooltip */}
-                      <div className="absolute bottom-full left-0 mb-4 px-4 py-3 bg-slate-900/95 backdrop-blur-xl border border-yellow-500/30 rounded-2xl opacity-0 group-hover/title:opacity-100 transition-all duration-300 pointer-events-none z-[100] shadow-2xl scale-95 group-hover/title:scale-100 origin-bottom-left min-w-[240px] max-w-[320px]">
-                        <div className="flex flex-col">
-                          <span className="text-[10px] font-black text-yellow-500/60 uppercase tracking-[0.2em] mb-2 border-b border-white/5 pb-1">Dettagli Torneo</span>
-                          <span className="text-sm font-bold text-white leading-relaxed">{t.config.name || t.name}</span>
-                        </div>
-                        {/* Tooltip Arrow */}
-                        <div className="absolute top-full left-6 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900/95"></div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-col gap-3 mb-6 text-gray-300 text-sm font-medium">
-                      <div className="flex items-center gap-3">
-                        <Calendar size={18} className="text-yellow-500/40" /> 
-                        <span>{t.config.period || 'Data da definire'}</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Users size={18} className="text-yellow-500/40" /> 
-                        <span>Age of Empires IV - <strong className="text-yellow-500/80">{t.config.type || '1v1'}</strong></span>
-                      </div>
-                    </div>
-
-                    <div className="mb-6 p-4 rounded-2xl bg-white/[0.03] border border-white/5 shadow-inner min-h-[145px] flex flex-col flex-grow justify-center animate-all duration-300">
-                      {(() => {
-                        const renderStandingRow = (entries: any[], idx: number, hasData: boolean) => (
-                          <div key={idx} className="flex justify-between text-sm items-center group/standing relative z-10">
-                            <div className="flex items-center gap-3 flex-1 min-w-0">
-                              <span className={clsx("text-lg flex-shrink-0", !hasData && "opacity-20 grayscale")}>
-                                {['🥇','🥈','🥉'][idx]}
-                              </span>
-                              {hasData ? (
-                                <div className="flex items-center gap-x-1.5 flex-1 min-w-0 group/players">
-                                  {entries.map((s, sIdx) => (
-                                    <div key={sIdx} className="relative flex items-center min-w-0 flex-shrink-1 group/name">
-                                      <div className="relative min-w-0 flex-shrink-1">
-                                        <span 
-                                          className={clsx(
-                                            "font-bold transition-colors truncate block cursor-help",
-                                            idx === 0 ? "text-yellow-100" : "text-gray-400",
-                                            s.players && s.players.length > 0 && "decoration-yellow-500/30 underline underline-offset-8 decoration-dotted"
-                                          )}
-                                        >
-                                          {s.entrant?.name || '---'}
-                                        </span>
-
-                                         {/* Premium Tooltip (Combined for Name and Players) */}
-                                        <div className={clsx(
-                                          "absolute bottom-full mb-3 px-4 py-2.5 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-2xl opacity-0 group-hover/name:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/name:scale-100 z-50",
-                                          sIdx > 0 ? "right-0 origin-bottom-right" : "left-0 origin-bottom-left"
-                                        )}>
-                                          <div className="flex flex-col">
-                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 border-b border-white/5 pb-1">
-                                              {idx === 0 ? '🏆 Campione' : idx === 1 ? '🥈 Finalista' : '🥉 3° Classificato'}
-                                            </span>
-                                            <span className={clsx("text-sm font-bold text-white", s.players && s.players.length > 0 ? "mb-2" : "mb-0")}>{s.entrant?.name || '---'}</span>
-                                            
-                                            {s.players && s.players.length > 0 && (
-                                              <div className="mt-1 pt-2 border-t border-white/10">
-                                                <p className="text-[9px] font-black text-yellow-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-                                                  <Users size={10} /> Componenti Team
-                                                </p>
-                                                <div className="space-y-1.5">
-                                                  {s.players.map((player: string, pIdx: number) => (
-                                                    <div key={pIdx} className="flex items-center gap-2 text-[11px] text-white/80 font-bold uppercase tracking-tight">
-                                                      <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
-                                                      {player}
-                                                    </div>
-                                                  ))}
-                                                </div>
-                                              </div>
-                                            )}
-                                          </div>
-                                          {/* Tooltip Arrow */}
-                                          <div className={clsx(
-                                            "absolute top-full -mt-1 border-4 border-transparent border-t-slate-800/95",
-                                            sIdx > 0 ? "right-4" : "left-4 -translate-x-1/2"
-                                          )}></div>
-                                        </div>
-                                      </div>
-                                      {sIdx < entries.length - 1 && <span className="text-gray-600 font-black flex-shrink-0 mx-1">&</span>}
-                                    </div>
-                                  ))}
-                                </div>
-                              ) : (
-                                <span className="text-gray-600 italic text-[11px] font-medium tracking-tight">In attesa...</span>
-                              )}
-                            </div>
-                            <span className="text-white/20 font-black italic uppercase text-[9px] group-hover/standing:text-white/40 transition-colors flex-shrink-0 ml-2">
-                              {hasData ? (idx === 0 ? 'WINNER' : `${idx+1}° PLACE`) : '---'}
-                            </span>
-                          </div>
-                        );
-
-                        // Extract unique divisions, ignoring empty/null values
-                        const divisions = Array.from(new Set(podium.map((s: any) => s.division || '').filter(Boolean))) as string[];
-                        const activeDiv = activeDivisions[t.id] || divisions[0];
-
-                        return (
-                          <>
-                            <div className="flex justify-between items-center mb-3 border-b border-white/5 pb-2 min-h-[28px] overflow-visible">
-                              <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Risultati Finali</p>
-                              
-                              {divisions.length > 1 && (
-                                <div className="flex gap-1 bg-white/[0.02] p-0.5 rounded-lg border border-white/5 shadow-inner">
-                                  {divisions.map((divName) => {
-                                    const isActive = activeDiv === divName;
-                                    return (
-                                      <button
-                                        key={divName}
-                                        type="button"
-                                        onClick={() => setActiveDivisions(prev => ({ ...prev, [t.id]: divName }))}
-                                        className={clsx(
-                                          "py-1 px-3.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all min-w-[70px] text-center",
-                                          isActive
-                                            ? "bg-gradient-to-b from-slate-100 via-slate-200 to-blue-200 text-slate-900 shadow-[0_0_10px_rgba(191,219,254,0.25)] scale-[1.02]"
-                                            : "text-slate-400 hover:text-white hover:bg-white/5"
-                                        )}
-                                      >
-                                        {divName}
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              )}
-
-                              {divisions.length === 1 && (
-                                <span className="text-[9px] font-bold text-yellow-500/80 uppercase tracking-widest flex items-center gap-1">
-                                  🏆 {divisions[0]}
-                                </span>
-                              )}
-                            </div>
-
-                            <div className="space-y-2 overflow-visible flex-grow flex flex-col justify-center transition-all duration-300">
-                              {[1, 2, 3].map((placement, idx) => {
-                                const entries = podium.filter((s: any) => {
-                                  const matchesPlacement = s.placement === placement || s.rank === placement;
-                                  const matchesDivision = divisions.length > 1 ? s.division === activeDiv : true;
-                                  return matchesPlacement && matchesDivision;
-                                });
-                                const hasData = entries.length > 0;
-                                return renderStandingRow(entries, idx, hasData);
-                              })}
-                            </div>
-                          </>
-                        );
-                      })()}
-                    </div>
-
-                    <div className="mt-auto flex items-center gap-2 pt-4 border-t border-white/5 h-16">
-                        {t.config.hasRegolamento && (
-                          <Link 
-                            to={`/tornei/${t.slug}/regolamento`} 
-                            className="flex-grow h-full bg-blue-950/40 hover:bg-blue-900/60 border border-blue-500/30 rounded-2xl text-blue-400 text-[10px] font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/reg shadow-lg active:scale-95"
-                          >
-                            Regolamento <BookOpen size={14} className="group-hover/reg:scale-110 transition-transform" />
-                          </Link>
-                        )}
-                        {(() => {
-                          const hasEvents = t.events && t.events.length > 0;
-                          const isChallongeWithSlug = t.config.source === 'challonge' && t.slug && !t.config.slug.startsWith('tb-');
-                          const isStartGGWithEvents = t.config.source === 'startgg' && (hasEvents || (t.slug && t.slug.startsWith('tournament/')));
-                          
-                          const commonClasses = clsx(
-                            "flex-grow h-full bg-white/5 hover:bg-white/10 rounded-2xl text-white font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/det shadow-lg active:scale-95",
-                            t.config.hasRegolamento ? "text-[10px]" : "text-xs"
-                          );
-
-                          if (isStartGGWithEvents || isChallongeWithSlug) {
-                            return (
-                              <Link to={`/tornei/${t.slug}`} className={commonClasses}>
-                                {bracketErrorId === t.id ? (
-                                  <span className="text-red-400 font-black animate-pulse text-[10px] tracking-tight">
-                                    NON DISPONIBILE
-                                  </span>
-                                ) : (
-                                  <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
-                                )}
-                              </Link>
-                            );
-                          } else if (t.config.directLink) {
-                            return (
-                              <a href={t.config.directLink} target="_blank" rel="noopener noreferrer" className={commonClasses}>
-                                <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
-                              </a>
-                            );
-                          } else {
-                            return (
-                              <button 
-                                onClick={() => {
-                                  setBracketErrorId(t.id);
-                                  setTimeout(() => setBracketErrorId(null), 3000);
-                                }} 
-                                className={commonClasses}
-                              >
-                                {bracketErrorId === t.id ? (
-                                  <span className="text-red-400 font-black animate-pulse text-[10px] tracking-tight">
-                                    NON DISPONIBILE
-                                  </span>
-                                ) : (
-                                  <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
-                                )}
-                              </button>
-                            );
-                          }
-                        })()}
-                        {canManageTournaments && (
-                          <div className="flex flex-col gap-1 h-full">
-                            <button 
-                              onClick={(e) => { e.stopPropagation(); handleMoveTournament(index, 'up'); }}
-                              className="w-8 flex-1 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all flex items-center justify-center border border-white/5"
-                            >
-                              <ChevronUp size={14} />
-                            </button>
-                            <button 
-                              onClick={(e) => { e.stopPropagation(); handleMoveTournament(index, 'down'); }}
-                              className="w-8 flex-1 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all flex items-center justify-center border border-white/5"
-                            >
-                              <ChevronDown size={14} />
-                            </button>
-                          </div>
-                        )}
-                        {canManageTournaments && (
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditingTournament(t);
-                              setEditForm({
-                                organizer: t.config?.organizer || '',
-                                period: t.config?.period || '',
-                                bannerUrl: t.config?.bannerUrl || '',
-                                status: t.config?.status || 'Concluso',
-                                name: t.config?.name || t.name || '',
-                                type: t.config?.type || '1v1',
-                                podium: t.config?.podium || (t.events?.[0]?.standings?.nodes || []),
-                                hasRegolamento: t.config?.hasRegolamento || false,
-                                regolamentoContent: t.config?.regolamentoContent || '',
-                                externalUrl: t.config?.externalUrl || '',
-                                display_order: t.config?.display_order || 0,
-                                bannerPositionX: t.config?.bannerPositionX || 50,
-                                bannerPositionY: t.config?.bannerPositionY || 50,
-                                vods: t.config?.vods || []
-                              });
-                              setShowEditModal(true);
-                              setIsRegEditorExpanded(false);
-                              setIsPodiumExpanded(false);
-                              setIsVodsExpanded(false);
-                            }} 
-                            className="w-14 h-full bg-white/5 hover:bg-white/10 rounded-2xl text-blue-400 transition-all border border-white/5 hover:border-blue-500/30 active:scale-95 shadow-lg flex items-center justify-center shrink-0"
-                          >
-                            <Edit2 size={20} />
-                          </button>
-                        )}
-                    </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+        modifiers={[restrictToFirstScrollableAncestor]}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <SortableContext
+            items={tournaments.map(t => t.id)}
+            strategy={rectSortingStrategy}
+          >
+            {tournaments.map((t, index) => (
+              <SortableTournamentCard
+                key={t.id}
+                t={t}
+                index={index}
+                isEditingOrder={isEditingOrder}
+                canManageTournaments={canManageTournaments}
+                tournamentsWithBets={tournamentsWithBets}
+                activeDivisions={activeDivisions}
+                setActiveDivisions={setActiveDivisions}
+                bracketErrorId={bracketErrorId}
+                setBracketErrorId={setBracketErrorId}
+                handleMoveTournament={handleMoveTournament}
+                setEditingTournament={setEditingTournament}
+                setEditForm={setEditForm}
+                setShowEditModal={setShowEditModal}
+                setIsRegEditorExpanded={setIsRegEditorExpanded}
+                setIsPodiumExpanded={setIsPodiumExpanded}
+                setIsVodsExpanded={setIsVodsExpanded}
+              />
+            ))}
+          </SortableContext>
+        </div>
+      </DndContext>
 
 
       {showEditModal && (
