@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament, fetchChallongeData } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
-import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, ChevronUp, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink, MoveVertical, Youtube, Trophy, GripVertical } from 'lucide-react';
+import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink, MoveVertical, Youtube, Trophy, GripVertical } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
@@ -53,7 +53,6 @@ const TOURNAMENTS: TournamentConfig[] = [];
 
 interface SortableTournamentCardProps {
   t: any;
-  index: number;
   isEditingOrder: boolean;
   canManageTournaments: boolean;
   tournamentsWithBets: string[];
@@ -61,7 +60,6 @@ interface SortableTournamentCardProps {
   setActiveDivisions: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   bracketErrorId: string | null;
   setBracketErrorId: React.Dispatch<React.SetStateAction<string | null>>;
-  handleMoveTournament: (index: number, direction: 'up' | 'down') => Promise<void>;
   setEditingTournament: React.Dispatch<React.SetStateAction<any>>;
   setEditForm: React.Dispatch<React.SetStateAction<any>>;
   setShowEditModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -72,7 +70,6 @@ interface SortableTournamentCardProps {
 
 function SortableTournamentCard({
   t,
-  index,
   isEditingOrder,
   canManageTournaments,
   tournamentsWithBets,
@@ -80,7 +77,6 @@ function SortableTournamentCard({
   setActiveDivisions,
   bracketErrorId,
   setBracketErrorId,
-  handleMoveTournament,
   setEditingTournament,
   setEditForm,
   setShowEditModal,
@@ -449,22 +445,6 @@ function SortableTournamentCard({
                   );
                 }
               })()}
-              {canManageTournaments && (
-                <div className="flex flex-col gap-1 h-full">
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); handleMoveTournament(index, 'up'); }}
-                    className="w-8 flex-1 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all flex items-center justify-center border border-white/5"
-                  >
-                    <ChevronUp size={14} />
-                  </button>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); handleMoveTournament(index, 'down'); }}
-                    className="w-8 flex-1 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all flex items-center justify-center border border-white/5"
-                  >
-                    <ChevronDown size={14} />
-                  </button>
-                </div>
-              )}
               {canManageTournaments && (
                 <button 
                   onClick={(e) => {
@@ -1105,75 +1085,6 @@ export function TournamentsPage() {
     }
   };
 
-  const handleMoveTournament = async (index: number, direction: 'up' | 'down') => {
-    const otherIndex = direction === 'up' ? index - 1 : index + 1;
-    if (otherIndex < 0 || otherIndex >= tournaments.length) return;
-
-    const current = tournaments[index];
-    const other = tournaments[otherIndex];
-
-    // Swap or adjust display_order
-    let newCurrentOrder = (other.config?.display_order || 0);
-    let newOtherOrder = (current.config?.display_order || 0);
-
-    if (newCurrentOrder === newOtherOrder) {
-      if (direction === 'up') {
-        newCurrentOrder = newOtherOrder + 1;
-      } else {
-        newOtherOrder = newCurrentOrder + 1;
-      }
-    }
-
-    try {
-      const moveUpsert = async (tournament: any, newOrder: number) => {
-        const config = tournament.config || {};
-        const data: any = {
-          slug: tournament.slug,
-          source: config.source || 'challonge',
-          name: config.name || tournament.name || tournament.slug,
-          organizer: config.organizer || 'Admin',
-          period: config.period || null,
-          banner_url: config.bannerUrl || null,
-          status: config.status || 'Concluso',
-          podium: config.podium || null,
-          type: config.type || '1v1',
-          has_regolamento: config.hasRegolamento || false,
-          regolamento_content: config.regolamentoContent || '',
-          direct_link: config.directLink || null,
-          display_order: newOrder,
-          updated_at: new Date().toISOString()
-        };
-
-        // If ID is a valid UUID, use it
-        if (config.id && config.id.length > 20) {
-          data.id = config.id;
-        }
-
-        const { error } = await supabase.from('tournaments').upsert(data, { onConflict: 'slug' });
-        if (error) {
-          if (error.message.includes('display_order')) {
-            toast.error('Errore: Devi prima attivare la colonna Ordinamento nel database');
-            return false;
-          }
-          throw error;
-        }
-        return true;
-      };
-
-      const ok1 = await moveUpsert(current, newCurrentOrder);
-      if (!ok1) return;
-
-      const ok2 = await moveUpsert(other, newOtherOrder);
-      if (!ok2) return;
-
-      loadTournaments();
-      toast.success('Ordine aggiornato');
-    } catch (err: any) {
-      toast.error('Errore durante l\'ordinamento');
-      console.error('Reorder error:', err);
-    }
-  };
-
   // Banner Drag Logic
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -1342,11 +1253,10 @@ export function TournamentsPage() {
             items={tournaments.map(t => t.id)}
             strategy={rectSortingStrategy}
           >
-            {tournaments.map((t, index) => (
+            {tournaments.map((t) => (
               <SortableTournamentCard
                 key={t.id}
                 t={t}
-                index={index}
                 isEditingOrder={isEditingOrder}
                 canManageTournaments={canManageTournaments}
                 tournamentsWithBets={tournamentsWithBets}
@@ -1354,7 +1264,6 @@ export function TournamentsPage() {
                 setActiveDivisions={setActiveDivisions}
                 bracketErrorId={bracketErrorId}
                 setBracketErrorId={setBracketErrorId}
-                handleMoveTournament={handleMoveTournament}
                 setEditingTournament={setEditingTournament}
                 setEditForm={setEditForm}
                 setShowEditModal={setShowEditModal}
