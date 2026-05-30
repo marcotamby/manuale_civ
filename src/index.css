@@ -64,7 +64,7 @@ body {
 /* Apply scrollbar globally */
 html, body, .elegant-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(212, 175, 55, 0.3) rgba(18, 18, 18, 0.1);
+  scrollbar-color: rgba(96, 165, 250, 0.3) rgba(18, 18, 18, 0.1);
 }
 
 *::-webkit-scrollbar {
@@ -76,12 +76,12 @@ html, body, .elegant-scrollbar {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.2));
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(96, 165, 250, 0.2));
   border-radius: 10px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: rgba(212, 175, 55, 0.5);
+  background: rgba(96, 165, 250, 0.5);
 }
 
 @utility glass {
