@@ -535,7 +535,7 @@ export function TournamentsPage() {
   const [returnPath, setReturnPath] = useState<string | null>(null);
   const [activeDivisions, setActiveDivisions] = useState<Record<string, string>>({});
   const [isEditingOrder, setIsEditingOrder] = useState(false);
-  const [isSavingOrder, setIsSavingOrder] = useState(false);
+  const [saveOrderStatus, setSaveOrderStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -755,7 +755,7 @@ export function TournamentsPage() {
   }, [tournaments, openEditModal]);
 
   const handleSaveOrder = async () => {
-    setIsSavingOrder(true);
+    setSaveOrderStatus('saving');
     try {
       const updates = tournaments.map((t, idx) => {
         const newOrder = tournaments.length - idx;
@@ -777,14 +777,16 @@ export function TournamentsPage() {
       });
 
       await Promise.all(promises);
-      toast.success('Ordinamento salvato con successo!');
-      setIsEditingOrder(false);
+      setSaveOrderStatus('saved');
       loadTournaments(true);
+      setTimeout(() => {
+        setSaveOrderStatus('idle');
+        setIsEditingOrder(false);
+      }, 1500);
     } catch (err: any) {
       console.error('Error saving tournaments order:', err);
       toast.error(`Errore nel salvataggio dell'ordine: ${err.message || 'Errore'}`);
-    } finally {
-      setIsSavingOrder(false);
+      setSaveOrderStatus('idle');
     }
   };
 
@@ -1253,13 +1255,20 @@ export function TournamentsPage() {
                   <X size={16} />
                   Annulla
                 </button>
-                <button
+                 <button
                   onClick={handleSaveOrder}
-                  disabled={isSavingOrder}
-                  className="flex items-center gap-3 px-6 py-4 bg-gradient-to-b from-blue-500 to-blue-700 font-black text-white rounded-2xl hover:brightness-110 transition-all hover:scale-[1.05] shadow-[0_0_20px_rgba(59,130,246,0.3)] uppercase text-xs tracking-widest active:scale-[0.98] disabled:opacity-50"
+                  disabled={saveOrderStatus !== 'idle'}
+                  className={clsx(
+                    "flex items-center gap-3 px-6 py-4 font-black rounded-2xl transition-all hover:scale-[1.05] uppercase text-xs tracking-widest active:scale-[0.98] disabled:opacity-50",
+                    saveOrderStatus === 'saved'
+                      ? "bg-green-600 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]"
+                      : "bg-gradient-to-b from-blue-500 to-blue-700 text-white shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:brightness-110"
+                  )}
                 >
-                  {isSavingOrder ? <Loader2 size={16} className="animate-spin text-blue-400" /> : <Save size={16} />}
-                  Salva Ordine
+                  {saveOrderStatus === 'saving' && <Loader2 size={16} className="animate-spin text-blue-400" />}
+                  {saveOrderStatus === 'saved' && <CheckCircle2 size={16} />}
+                  {saveOrderStatus === 'idle' && <Save size={16} />}
+                  {saveOrderStatus === 'saving' ? 'Salvataggio...' : saveOrderStatus === 'saved' ? 'Salvato!' : 'Salva Ordine'}
                 </button>
               </>
             ) : (
