@@ -1893,6 +1893,7 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
     alignLeft: false, alignCenter: false, alignRight: false, alignJustify: false,
     font: 'Inter',
     h2: false,
+    h3: false,
     link: false
   });
 
@@ -1907,14 +1908,17 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
     const block = document.queryCommandValue('formatBlock');
     
     let isH2 = block === 'h2' || block === 'H2';
-    if (!isH2) {
+    let isH3 = block === 'h3' || block === 'H3';
+    if (!isH2 || !isH3) {
       const selection = window.getSelection();
       if (selection && selection.rangeCount > 0) {
         let node: Node | null = selection.anchorNode;
         while (node && node !== editorRef.current) {
           if (node.nodeName === 'H2') {
             isH2 = true;
-            break;
+          }
+          if (node.nodeName === 'H3') {
+            isH3 = true;
           }
           node = node.parentNode;
         }
@@ -1922,7 +1926,7 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
     }
 
     setActiveStyles({
-      bold: document.queryCommandState('bold') && !isH2,
+      bold: document.queryCommandState('bold') && !isH2 && !isH3,
       italic: document.queryCommandState('italic'),
       underline: document.queryCommandState('underline'),
       alignLeft: document.queryCommandState('justifyLeft'),
@@ -1931,6 +1935,7 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
       alignJustify: document.queryCommandState('justifyFull'),
       font: (document.queryCommandValue('fontName') || 'Inter').replace(/['"]/g, ''),
       h2: isH2,
+      h3: isH3,
       link: document.queryCommandState('createLink')
     });
   };
@@ -2075,6 +2080,25 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
           >
             TITOLO H2
           </button>
+          <button 
+            type="button"
+            onMouseDown={(e) => { 
+              e.preventDefault(); 
+              const isH3 = activeStyles.h3;
+              document.execCommand('formatBlock', false, isH3 ? 'p' : 'h3');
+              setTimeout(() => {
+                checkActiveStyles();
+                handleInput();
+              }, 10);
+            }} 
+            className={clsx(
+              "p-2 rounded-lg font-black text-[10px] px-4 transition-all uppercase tracking-tighter",
+              activeStyles.h3 ? "bg-blue-500 text-white shadow-lg scale-110" : "hover:bg-white/10 text-white"
+            )} 
+            title="Titolo Medio"
+          >
+            TITOLO H3
+          </button>
         </div>
 
         <div className="relative">
@@ -2135,6 +2159,7 @@ function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onCha
               const innerHTML = Array.from(el.childNodes).map(sanitize).join('');
               
               if (tag === 'h2') return `<h2>${innerHTML}</h2>`;
+              if (tag === 'h3') return `<h3>${innerHTML}</h3>`;
               if (tag === 'p') return `<p>${innerHTML}</p>`;
               if (tag === 'ul') return `<ul>${innerHTML}</ul>`;
               if (tag === 'ol') return `<ol>${innerHTML}</ol>`;

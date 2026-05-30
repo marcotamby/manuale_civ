@@ -141,6 +141,20 @@ html, body, .elegant-scrollbar {
   padding-bottom: 0.5rem;
 }
 
+.regulation-editor-content h3,
+.regulation-content h3 {
+  display: block;
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: #e2e8f0 !important;
+  margin-top: 1.25rem !important;
+  margin-bottom: 0.5rem !important;
+  font-family: 'Outfit', sans-serif !important;
+  line-height: 1.2 !important;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+  padding-bottom: 0.25rem;
+}
+
 .regulation-editor-content p,
 .regulation-content p {
   margin-top: 0.75rem !important;
