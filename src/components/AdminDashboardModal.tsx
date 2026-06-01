@@ -358,8 +358,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
       setIsSendingEmail(true);
       setToast({ isVisible: false, message: '', type: 'success' });
 
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token || import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+      const token = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
       const { error: invokeError } = await supabase.functions.invoke('batch-send-notifications', {
         headers: {
