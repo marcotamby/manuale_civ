@@ -56,7 +56,8 @@ export function DesktopFooter() {
       </div>
 
       <div className="flex items-center gap-2 lg:gap-4 xl:gap-6 text-[9px] xl:text-[12px] font-bold text-white/30 uppercase tracking-widest whitespace-nowrap shrink-0">
-        <span>Age of Empires IV © Microsoft</span>
+        <span className="hidden xl:inline">Age of Empires IV © Microsoft</span>
+        <span className="inline xl:hidden">AoE IV © Microsoft</span>
         <div className="w-1 h-1 rounded-full bg-white/20 shrink-0" />
         <a href="/privacy" className="hover:text-white transition-colors flex items-center gap-1">
           Privacy <ExternalLink size={14} />
