@@ -4,7 +4,7 @@ import { useCivData } from './CivContext';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Link, useLocation } from 'react-router-dom';
-import { Coffee, Radio as _Radio, HelpCircle, LogOut, Trophy, Monitor, Award } from 'lucide-react';
+import { Coffee, Radio as _Radio, HelpCircle, LogOut, Trophy, Monitor, Award, Swords } from 'lucide-react';
 import { usePresence } from './PresenceContext';
 
 export type FilterType = 'Tutte' | 'Fanteria' | 'Cavalleria' | 'Arcieri' | 'Assedio';
@@ -264,6 +264,15 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
             <Link to="/classifica" className="flex items-center gap-2 text-pink-300 hover:text-pink-200 transition-colors text-[13px] font-bold uppercase tracking-wider">
               <Award size={14} /> Classifica
             </Link>
+            <div className="w-px h-3 bg-white/10"></div>
+            <a 
+              href="https://aoefightsimulator.onrender.com/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors text-[13px] font-bold uppercase tracking-wider"
+            >
+              <Swords size={14} /> Fight simulator
+            </a>
          </div>
 
          {/* Right Side: Auth & Presence */}
