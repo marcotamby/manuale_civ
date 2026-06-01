@@ -63,6 +63,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   const [inlineToast, setInlineToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
+  const [sendNotifSuccess, setSendNotifSuccess] = useState(false);
   const [allProfiles, setAllProfiles] = useState<any[]>([]);
   const [isRefilling, setIsRefilling] = useState<string | null>(null);
   const [perUserRefillAmounts, setPerUserRefillAmounts] = useState<Record<string, number>>({});
@@ -380,12 +381,11 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
         throw new Error(msg || 'Errore durante l\'invio delle notifiche');
       }
 
-      setToast({
-        isVisible: true,
-        message: 'Notifiche inviate con successo! 🎉',
-        type: 'success'
-      });
+      setSendNotifSuccess(true);
       setPendingNotifCount(0);
+      setTimeout(() => {
+        setSendNotifSuccess(false);
+      }, 3000);
     } catch (err: any) {
       console.error('Notification error:', err);
 
@@ -1382,21 +1382,29 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
         )}
 
         {/* Fixed Footer with Send Notifications Button */}
-        {pendingNotifCount > 0 && (
+        {(pendingNotifCount > 0 || sendNotifSuccess) && (
           <div className="p-6 border-t border-[#D4AF37]/20 bg-gradient-to-r from-[#0d1424] to-[#1a1c32] flex justify-center sticky bottom-0 rounded-b-2xl z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
             <button
               onClick={handleSendNotifications}
-              disabled={isSendingEmail}
-              className="flex items-center gap-4 px-12 py-4 bg-yellow-600 hover:bg-yellow-500 text-white rounded-xl transition-all font-bold shadow-xl shadow-yellow-600/30 group animate-in slide-in-from-bottom duration-500 hover:scale-105 active:scale-95"
+              disabled={isSendingEmail || sendNotifSuccess}
+              className={`flex items-center gap-4 px-12 py-4 rounded-xl transition-all font-bold shadow-xl group animate-in slide-in-from-bottom duration-500 hover:scale-105 active:scale-95 ${
+                sendNotifSuccess
+                  ? 'bg-green-600 shadow-green-600/30 text-white'
+                  : 'bg-yellow-600 hover:bg-yellow-500 text-white shadow-yellow-600/30'
+              }`}
             >
               {isSendingEmail ? (
                 <Loader2 size={24} className="animate-spin" />
               ) : (
-                <CheckCircle size={24} className="group-hover:scale-110 transition-transform" />
+                <CheckCircle size={24} className={sendNotifSuccess ? '' : 'group-hover:scale-110 transition-transform'} />
               )}
               <div className="text-left">
-                <div className="text-lg leading-tight">Invia {pendingNotifCount} Notifiche Ora</div>
-                <div className="text-[11px] opacity-70 font-normal uppercase tracking-widest">Invia il riepilogo email agli utenti</div>
+                <div className="text-lg leading-tight">
+                  {sendNotifSuccess ? 'Notifiche inviate con successo! 🎉' : `Invia ${pendingNotifCount} Notifiche Ora`}
+                </div>
+                <div className="text-[11px] opacity-70 font-normal uppercase tracking-widest">
+                  {sendNotifSuccess ? 'Riepilogo email spedito agli utenti' : 'Invia il riepilogo email agli utenti'}
+                </div>
               </div>
             </button>
           </div>
