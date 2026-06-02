@@ -37,9 +37,9 @@ export function DesktopFooter() {
           >
             <Youtube size={15} className="group-hover:scale-110 transition-transform" />
             <span>
-              <span className="hidden lg:inline">YouTube</span>
-              <span className="inline lg:hidden">YT</span>
-              <span className="hidden xl:inline text-white/20 font-medium"> Aoeitalia</span>
+              <span className="hidden xl:inline">YouTube</span>
+              <span className="inline xl:hidden">YT</span>
+              <span className="text-white/20 font-medium"> Aoeitalia</span>
             </span>
           </a>
 
@@ -51,9 +51,9 @@ export function DesktopFooter() {
           >
             <Youtube size={15} className="group-hover:scale-110 transition-transform" />
             <span>
-              <span className="hidden lg:inline">YouTube</span>
-              <span className="inline lg:hidden">YT</span>
-              <span className="hidden xl:inline text-white/20 font-medium"> marcotamby</span>
+              <span className="hidden xl:inline">YouTube</span>
+              <span className="inline xl:hidden">YT</span>
+              <span className="text-white/20 font-medium"> marcotamby</span>
             </span>
           </a>
 
