@@ -369,7 +369,10 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
               <h2 className="text-2xl font-black text-white tracking-tight uppercase">
                 {boIndex !== null ? 'Modifica Build Order' : 'Nuovo Build Order'}
               </h2>
-              <p className="text-xs text-cyan-400/60 font-bold uppercase tracking-widest">{civ.name}</p>
+              <p className="text-xs text-cyan-400/60 font-bold uppercase tracking-widest flex items-center gap-1.5 mt-0.5">
+                {civ.flag && <img src={civ.flag} alt="" className="w-4 h-4 object-contain rounded-sm" />}
+                <span>{civ.name}</span>
+              </p>
             </div>
           </div>
           <button onClick={handleClose} className="p-2.5 bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 rounded-2xl transition-all border border-white/5 hover:border-red-500/30">

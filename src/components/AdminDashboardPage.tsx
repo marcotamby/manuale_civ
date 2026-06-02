@@ -4,7 +4,7 @@ import {
   MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, 
   AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, 
   Trophy, BookOpen, Zap, Edit2, Check, Trash2, Plus, Minus, ArrowLeft, LayoutDashboard,
-  Save, Sparkles
+  Save, Sparkles, ChevronDown, Users, Youtube
 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
@@ -97,8 +97,11 @@ export default function AdminDashboardPage() {
     display_order: 0,
     banner_position_x: 50,
     banner_position_y: 50,
-    vods: []
+    vods: [],
+    podium: []
   });
+  const [isPodiumExpanded, setIsPodiumExpanded] = useState(false);
+  const [isVodsExpanded, setIsVodsExpanded] = useState(false);
 
   // Betting markets states
   const [markets, setMarkets] = useState<any[]>([]);
@@ -123,7 +126,8 @@ export default function AdminDashboardPage() {
     short_description: '',
     passive_bonuses: [],
     strengths: [],
-    weaknesses: []
+    weaknesses: [],
+    flag: ''
   });
   
   const [selectedBOIndex, setSelectedBOIndex] = useState<number | null>(null); // -1 for new, number for edit index, null for none
@@ -169,12 +173,19 @@ export default function AdminDashboardPage() {
       setTournamentsLoading(true);
       const { data, error } = await supabase
         .from('tournaments')
-        .select('*')
-        .order('created_at', { ascending: true });
+        .select('*');
       if (error) throw error;
-      setTournaments(data || []);
-      if (data && data.length > 0 && !selectedTournament) {
-        setSelectedTournament(data[0]);
+      const sorted = (data || []).sort((a: any, b: any) => {
+        if ((b.display_order || 0) !== (a.display_order || 0)) {
+          return (b.display_order || 0) - (a.display_order || 0);
+        }
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return dateB - dateA;
+      });
+      setTournaments(sorted);
+      if (sorted && sorted.length > 0 && !selectedTournament) {
+        setSelectedTournament(sorted[0]);
       }
     } catch (err: any) {
       console.error('Error fetching tournaments:', err);
@@ -218,11 +229,14 @@ export default function AdminDashboardPage() {
         display_order: selectedTournament.display_order || 0,
         banner_position_x: selectedTournament.banner_position_x || 50,
         banner_position_y: selectedTournament.banner_position_y || 50,
-        vods: selectedTournament.vods || []
+        vods: selectedTournament.vods || [],
+        podium: selectedTournament.podium || []
       });
       setIsEditingTournament(false);
       setIsCreatingTournament(false);
       setIsCreatingMarket(false);
+      setIsPodiumExpanded(false);
+      setIsVodsExpanded(false);
     }
   }, [selectedTournament]);
 
@@ -249,7 +263,17 @@ export default function AdminDashboardPage() {
       display_order: Number(tournamentForm.display_order || 0),
       banner_position_x: Number(tournamentForm.banner_position_x || 50),
       banner_position_y: Number(tournamentForm.banner_position_y || 50),
-      vods: tournamentForm.vods,
+      vods: (tournamentForm.vods || []).map((v: any) => ({
+        id: v.id || `vod-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        title: (v.title || '').trim(),
+        url: (v.url || '').trim(),
+        round: (v.round || '').trim(),
+        score: (v.score || '').trim()
+      })),
+      podium: (tournamentForm.podium || []).map((p: any) => ({
+        ...p,
+        players: p.players ? p.players.map((name: string) => name.trim()).filter((name: string) => name !== '') : []
+      })),
       updated_at: new Date().toISOString()
     };
 
@@ -390,7 +414,8 @@ export default function AdminDashboardPage() {
         short_description: selectedCiv.short_description || '',
         passive_bonuses: selectedCiv.passive_bonuses || [],
         strengths: selectedCiv.strengths || [],
-        weaknesses: selectedCiv.weaknesses || []
+        weaknesses: selectedCiv.weaknesses || [],
+        flag: selectedCiv.flag || ''
       });
       setSelectedBOIndex(null);
     }
@@ -410,7 +435,8 @@ export default function AdminDashboardPage() {
           short_description: civForm.short_description,
           passive_bonuses: civForm.passive_bonuses?.filter((b: string) => b.trim() !== '') || [],
           strengths: civForm.strengths?.filter((s: string) => s.trim() !== '') || [],
-          weaknesses: civForm.weaknesses?.filter((w: string) => w.trim() !== '') || []
+          weaknesses: civForm.weaknesses?.filter((w: string) => w.trim() !== '') || [],
+          flag: civForm.flag
         })
         .eq('id', selectedCiv.id);
       if (error) throw error;
@@ -423,7 +449,8 @@ export default function AdminDashboardPage() {
         short_description: civForm.short_description,
         passive_bonuses: civForm.passive_bonuses,
         strengths: civForm.strengths,
-        weaknesses: civForm.weaknesses
+        weaknesses: civForm.weaknesses,
+        flag: civForm.flag
       } : c));
       
       setSelectedCiv((prev: any) => ({
@@ -433,7 +460,8 @@ export default function AdminDashboardPage() {
         short_description: civForm.short_description,
         passive_bonuses: civForm.passive_bonuses,
         strengths: civForm.strengths,
-        weaknesses: civForm.weaknesses
+        weaknesses: civForm.weaknesses,
+        flag: civForm.flag
       }));
 
       refreshCivs();
@@ -1932,7 +1960,8 @@ export default function AdminDashboardPage() {
                           display_order: 0,
                           banner_position_x: 50,
                           banner_position_y: 50,
-                          vods: []
+                          vods: [],
+                          podium: []
                         });
                       }}
                       className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-black transition-all hover:-translate-y-0.5 shadow-lg active:scale-95 uppercase tracking-widest flex items-center gap-1.5"
@@ -2116,6 +2145,252 @@ export default function AdminDashboardPage() {
                                   className="w-full bg-white/[0.01] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl p-4 text-xs text-white focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none font-sans"
                                   placeholder="Inserisci qui le regole del torneo..."
                                 />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* PODIO DEL TORNEO */}
+                          <div className="border-2 border-white/5 bg-black/20 p-6 rounded-3xl space-y-4">
+                            <div 
+                              className="flex items-center justify-between cursor-pointer select-none"
+                              onClick={() => setIsPodiumExpanded(!isPodiumExpanded)}
+                            >
+                              <div className="flex items-center gap-3">
+                                <Trophy size={18} className="text-yellow-500 animate-pulse" />
+                                <label className="text-xs font-black uppercase tracking-wider text-white select-none cursor-pointer">Podio del Torneo</label>
+                              </div>
+                              <ChevronDown size={20} className={`transition-transform duration-300 ${isPodiumExpanded ? 'rotate-180 text-yellow-500' : 'text-gray-400'}`} />
+                            </div>
+
+                            {isPodiumExpanded && (
+                              <div className="space-y-4 pt-4 border-t border-white/5 animate-in fade-in slide-in-from-top-2 duration-300">
+                                {(tournamentForm.podium || []).map((p: any, i: number) => (
+                                  <div key={i} className="bg-black/40 p-5 rounded-2xl border border-white/5 space-y-4 relative group">
+                                    <div className="flex flex-col sm:flex-row gap-4 items-start w-full">
+                                      <div className="w-full sm:w-40 shrink-0 space-y-2">
+                                        <label className="text-[9px] text-gray-500 font-black uppercase tracking-widest ml-1 opacity-60">Posizione</label>
+                                        <div className="relative">
+                                          <select 
+                                            value={p.placement || (i + 1)} 
+                                            onChange={e => {
+                                              const np = [...tournamentForm.podium];
+                                              np[i] = { ...p, placement: parseInt(e.target.value) };
+                                              setTournamentForm({ ...tournamentForm, podium: np });
+                                            }}
+                                            className="w-full bg-[#111218] border border-white/10 h-10 px-4 rounded-xl text-white text-xs font-bold outline-none focus:border-yellow-500 transition-all cursor-pointer appearance-none [&>option]:bg-[#111218]"
+                                          >
+                                            <option value={1}>🥇 1° Posto</option>
+                                            <option value={2}>🥈 2° Posto</option>
+                                            <option value={3}>🥉 3° Posto</option>
+                                          </select>
+                                          <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="flex-grow w-full space-y-2 relative">
+                                        <label className="text-[9px] text-gray-500 font-black uppercase tracking-widest ml-1 opacity-60">Giocatore / Team</label>
+                                        <div className="relative flex gap-2">
+                                          <input 
+                                            type="text" 
+                                            value={p.entrant?.name || ''} 
+                                            onChange={e => {
+                                              const np = [...tournamentForm.podium]; 
+                                              np[i] = {...p, entrant: {name: e.target.value}}; 
+                                              setTournamentForm({...tournamentForm, podium: np});
+                                            }} 
+                                            placeholder="Inserisci nome..." 
+                                            className="w-full h-10 bg-white/5 border border-white/10 px-4 rounded-xl text-white text-xs font-bold outline-none focus:border-yellow-500 transition-colors" 
+                                          />
+                                          <button 
+                                            onClick={() => setTournamentForm({...tournamentForm, podium: tournamentForm.podium.filter((_: any, idx: number) => idx !== i)})} 
+                                            className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl transition-all h-10 w-10 flex items-center justify-center shrink-0 border border-red-500/20"
+                                            title="Rimuovi riga"
+                                          >
+                                            <Trash2 size={16} />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* Sub-players for Team Games */}
+                                    {['2v2', '3v3', '4v4', 'Mod', 'Team'].some(t => (tournamentForm.type || '').toLowerCase().includes(t.toLowerCase())) && (
+                                      <div className="space-y-1.5 pt-3 border-t border-white/5">
+                                        <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-2">
+                                          <Users size={10} /> Componenti Team (per {tournamentForm.type})
+                                        </label>
+                                        <input 
+                                          type="text" 
+                                          value={p.players?.join(', ') || ''} 
+                                          onChange={e => {
+                                            const playerList = e.target.value.split(',').map((s, idx, arr) => {
+                                              if (idx === arr.length - 1) {
+                                                return s.replace(/^\s+/, '');
+                                              }
+                                              return s.trim();
+                                            });
+                                            const np = [...tournamentForm.podium]; 
+                                            np[i] = { ...p, players: playerList }; 
+                                            setTournamentForm({ ...tournamentForm, podium: np });
+                                          }} 
+                                          placeholder="Esempio: Marco, Alessio, Luca (separati da virgola)" 
+                                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white/60 text-[10px] outline-none focus:border-yellow-500/20 transition-all italic" 
+                                        />
+                                      </div>
+                                    )}
+
+                                    {/* Division/Fascia input */}
+                                    <div className="space-y-1.5 pt-3 border-t border-white/5">
+                                      <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-2">
+                                        🏆 Divisione / Fascia (Opzionale)
+                                      </label>
+                                      <input 
+                                        type="text" 
+                                        value={p.division || ''} 
+                                        onChange={e => {
+                                          const np = [...tournamentForm.podium]; 
+                                          np[i] = { ...p, division: e.target.value }; 
+                                          setTournamentForm({ ...tournamentForm, podium: np });
+                                        }} 
+                                        placeholder="Esempio: Fascia 1 (High Elo), Fascia 2 (Low Elo)" 
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white/60 text-[10px] outline-none focus:border-yellow-500/20 transition-all italic" 
+                                      />
+                                    </div>
+                                  </div>
+                                ))}
+
+                                <button 
+                                  type="button"
+                                  onClick={() => {
+                                    const podiumList = tournamentForm.podium || [];
+                                    if (podiumList.length < 12) {
+                                      const lastItem = podiumList[podiumList.length - 1];
+                                      const lastDivision = lastItem ? (lastItem.division || '') : '';
+                                      const divisionCount = podiumList.filter((p: any) => (p.division || '') === lastDivision).length;
+                                      const nextPlacement = Math.min(3, divisionCount + 1);
+                                      setTournamentForm({
+                                        ...tournamentForm,
+                                        podium: [...podiumList, { placement: nextPlacement, entrant: { name: '' }, division: lastDivision }]
+                                      });
+                                    }
+                                  }} 
+                                  className="w-full py-3 border border-dashed border-white/10 hover:border-yellow-500/50 rounded-2xl text-yellow-500 hover:text-yellow-400 text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 bg-white/[0.01] hover:bg-white/[0.03] active:scale-[0.98]"
+                                >
+                                  + AGGIUNGI RIGA AL PODIO
+                                </button>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* VIDEO DEI MATCH (VODs) */}
+                          <div className="border-2 border-white/5 bg-black/20 p-6 rounded-3xl space-y-4">
+                            <div 
+                              className="flex items-center justify-between cursor-pointer select-none"
+                              onClick={() => setIsVodsExpanded(!isVodsExpanded)}
+                            >
+                              <div className="flex items-center gap-3">
+                                <Youtube size={18} className="text-red-500" />
+                                <label className="text-xs font-black uppercase tracking-wider text-white select-none cursor-pointer">Video dei Match (VODs)</label>
+                              </div>
+                              <ChevronDown size={20} className={`transition-transform duration-300 ${isVodsExpanded ? 'rotate-180 text-red-500' : 'text-gray-400'}`} />
+                            </div>
+
+                            {isVodsExpanded && (
+                              <div className="space-y-4 pt-4 border-t border-white/5 animate-in fade-in slide-in-from-top-2 duration-300">
+                                {(tournamentForm.vods || []).map((v: any, i: number) => (
+                                  <div key={v.id || i} className="bg-black/40 p-4 rounded-2xl border border-white/5 space-y-3 relative group">
+                                    <div className="flex justify-between items-center border-b border-white/5 pb-2 mb-2">
+                                      <span className="text-[9px] text-gray-500 font-bold uppercase">Video #{i + 1}</span>
+                                      <button 
+                                        type="button"
+                                        onClick={() => {
+                                          const nv = tournamentForm.vods.filter((_: any, idx: number) => idx !== i);
+                                          setTournamentForm({ ...tournamentForm, vods: nv });
+                                        }} 
+                                        className="p-1 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded transition-all"
+                                        title="Rimuovi Video"
+                                      >
+                                        <Trash2 size={14} />
+                                      </button>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                      <div className="space-y-1">
+                                        <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Titolo Match / Giocatori</label>
+                                        <input 
+                                          type="text" 
+                                          value={v.title || ''} 
+                                          onChange={e => {
+                                            const nv = [...tournamentForm.vods];
+                                            nv[i] = { ...v, title: e.target.value };
+                                            setTournamentForm({ ...tournamentForm, vods: nv });
+                                          }} 
+                                          placeholder="Es: Semifinale: Player A vs Player B" 
+                                          className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-red-500 transition-colors" 
+                                        />
+                                      </div>
+                                      
+                                      <div className="space-y-1">
+                                        <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-1.5"><Youtube size={12}/> Link YouTube</label>
+                                        <input 
+                                          type="text" 
+                                          value={v.url || ''} 
+                                          onChange={e => {
+                                            const nv = [...tournamentForm.vods];
+                                            nv[i] = { ...v, url: e.target.value };
+                                            setTournamentForm({ ...tournamentForm, vods: nv });
+                                          }} 
+                                          placeholder="https://www.youtube.com/watch?v=..." 
+                                          className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-red-500 transition-colors" 
+                                        />
+                                      </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                                      <div className="space-y-1">
+                                        <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Fase / Round (Opzionale)</label>
+                                        <input 
+                                          type="text" 
+                                          value={v.round || ''} 
+                                          onChange={e => {
+                                            const nv = [...tournamentForm.vods];
+                                            nv[i] = { ...v, round: e.target.value };
+                                            setTournamentForm({ ...tournamentForm, vods: nv });
+                                          }} 
+                                          placeholder="Es: Winners Round 1, Finale" 
+                                          className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-red-500 transition-colors" 
+                                        />
+                                      </div>
+                                      <div className="space-y-1">
+                                        <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Risultato (Opzionale)</label>
+                                        <input 
+                                          type="text" 
+                                          value={v.score || ''} 
+                                          onChange={e => {
+                                            const nv = [...tournamentForm.vods];
+                                            nv[i] = { ...v, score: e.target.value };
+                                            setTournamentForm({ ...tournamentForm, vods: nv });
+                                          }} 
+                                          placeholder="Es: 3-1" 
+                                          className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white text-xs outline-none focus:border-red-500 transition-colors" 
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                                
+                                <button 
+                                  type="button"
+                                  onClick={() => {
+                                    const nv = tournamentForm.vods || [];
+                                    setTournamentForm({
+                                      ...tournamentForm,
+                                      vods: [...nv, { id: `vod-${Date.now()}`, title: '', url: '', round: '', score: '' }]
+                                    });
+                                  }} 
+                                  className="w-full py-3 border border-dashed border-white/10 hover:border-red-500/50 rounded-2xl text-red-400 hover:text-red-300 text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 bg-white/[0.01] hover:bg-white/[0.03] active:scale-[0.98]"
+                                >
+                                  + AGGIUNGI MATCH VIDEO (VOD)
+                                </button>
                               </div>
                             )}
                           </div>
@@ -2398,9 +2673,12 @@ export default function AdminDashboardPage() {
                             setSelectedCiv(c);
                             setSelectedBOIndex(null);
                           }}
-                          className={`w-full text-left px-4 py-3 rounded-xl border text-sm font-bold transition-all hover:scale-[1.02] ${selectedCiv?.id === c.id ? 'bg-gradient-to-r from-blue-950/40 to-indigo-950/40 border-blue-500/80 text-white shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'bg-black/30 border-white/5 text-gray-400 hover:text-white hover:bg-white/5 hover:border-white/10'}`}
+                          className={`w-full text-left px-4 py-3 rounded-xl border text-sm font-bold transition-all hover:scale-[1.02] flex items-center gap-3 ${selectedCiv?.id === c.id ? 'bg-gradient-to-r from-blue-950/40 to-indigo-950/40 border-blue-500/80 text-white shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'bg-black/30 border-white/5 text-gray-400 hover:text-white hover:bg-white/5 hover:border-white/10'}`}
                         >
-                          {c.name}
+                          {c.flag && (
+                            <img src={c.flag} alt={c.name} className="w-6 h-6 object-contain rounded-md" />
+                          )}
+                          <span>{c.name}</span>
                         </button>
                       ))}
                     </div>
@@ -2435,6 +2713,26 @@ export default function AdminDashboardPage() {
                         <div className="bg-[#0a0e1c]/60 border border-[#D4AF37]/15 rounded-3xl p-8 space-y-8 shadow-2xl backdrop-blur-md relative overflow-hidden">
                           <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/35 to-transparent"></div>
                           
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                            <div className="md:col-span-10">
+                              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Flag Image URL / Percorso Bandiera</label>
+                              <input
+                                type="text"
+                                value={civForm.flag}
+                                onChange={(e) => setCivForm({ ...civForm, flag: e.target.value })}
+                                className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none font-mono"
+                                placeholder="es: /civs/English.webp"
+                              />
+                            </div>
+                            <div className="md:col-span-2 flex flex-col items-center justify-center pt-5">
+                              {civForm.flag ? (
+                                <img src={civForm.flag} alt="Preview Bandiera" className="w-16 h-16 object-contain rounded-xl border border-white/10 bg-black/40 p-2 shadow-inner" />
+                              ) : (
+                                <div className="w-16 h-16 rounded-xl border-2 border-dashed border-white/10 flex items-center justify-center text-[10px] text-gray-500 font-bold uppercase tracking-tighter">No Flag</div>
+                              )}
+                            </div>
+                          </div>
+
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                               <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Nome Civiltà</label>
@@ -2769,7 +3067,10 @@ export default function AdminDashboardPage() {
                             <div className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-8 space-y-6 shadow-2xl relative overflow-hidden">
                               <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
                               <div className="flex justify-between items-center">
-                                <h4 className="text-xs font-black text-white uppercase tracking-[0.25em]">Build Orders di {selectedCiv.name}</h4>
+                                <h4 className="text-xs font-black text-white uppercase tracking-[0.25em] flex items-center gap-2">
+                                  {selectedCiv.flag && <img src={selectedCiv.flag} alt="" className="w-5 h-5 object-contain" />}
+                                  Build Orders di {selectedCiv.name}
+                                </h4>
                                 <button
                                   onClick={() => handleEditBO(-1)}
                                   className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl text-xs font-black transition-all hover:-translate-y-0.5 shadow-lg active:scale-95 uppercase tracking-widest flex items-center gap-1.5"

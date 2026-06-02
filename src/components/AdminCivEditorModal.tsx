@@ -353,10 +353,13 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
 
         <div className="p-6 border-b border-purple-500/20 flex justify-between items-center bg-purple-500/5">
           <div>
-            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-              <span className="text-yellow-500">
-                {initialSection ? `Modifica ${initialSection === 'global' ? 'Unità' : initialSection.charAt(0).toUpperCase() + initialSection.slice(1)}:` : 'Admin Editor:'}
-              </span> {civ.name}
+            <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+              {civ.flag && <img src={civ.flag} alt="" className="w-8 h-8 object-contain rounded-md" />}
+              <div>
+                <span className="text-yellow-500">
+                  {initialSection ? `Modifica ${initialSection === 'global' ? 'Unità' : initialSection.charAt(0).toUpperCase() + initialSection.slice(1)}:` : 'Admin Editor:'}
+                </span> {civ.name}
+              </div>
             </h2>
             <p className="text-xs text-gray-400 mt-1">Le modifiche apportate qui verranno salvate istantaneamente nel database (live per tutti).</p>
           </div>
