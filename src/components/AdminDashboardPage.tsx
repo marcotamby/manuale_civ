@@ -170,7 +170,7 @@ export default function AdminDashboardPage() {
       const { data, error } = await supabase
         .from('tournaments')
         .select('*')
-        .order('display_order', { ascending: true });
+        .order('created_at', { ascending: true });
       if (error) throw error;
       setTournaments(data || []);
       if (data && data.length > 0 && !selectedTournament) {
@@ -1891,13 +1891,17 @@ export default function AdminDashboardPage() {
 
           {/* TAB TORNEI */}
           {activeTab === 'tornei' && (isSuperAdmin || canManageTournaments) && (
-            <div className="space-y-6 animate-in fade-in duration-300">
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
                 {/* Sidebar Tornei */}
-                <div className="lg:col-span-4 bg-[#0a0e1c]/40 border border-white/5 rounded-2xl p-4 space-y-4">
+                <div className="lg:col-span-4 bg-[#0a0e1c]/60 border border-[#D4AF37]/15 rounded-3xl p-6 space-y-6 shadow-2xl backdrop-blur-md relative overflow-hidden group">
+                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37]/35 to-transparent"></div>
+                  
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-wider">Lista Tornei</h3>
+                    <h3 className="text-xs font-black text-cyan-400 uppercase tracking-[0.25em] flex items-center gap-2">
+                      <Trophy size={14} className="text-yellow-500 animate-pulse" /> Tornei Attivi
+                    </h3>
                     <button
                       onClick={() => {
                         setIsCreatingTournament(true);
@@ -1919,18 +1923,19 @@ export default function AdminDashboardPage() {
                           vods: []
                         });
                       }}
-                      className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition-all uppercase tracking-wider flex items-center gap-1"
+                      className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-black transition-all hover:-translate-y-0.5 shadow-lg active:scale-95 uppercase tracking-widest flex items-center gap-1.5"
                     >
-                      <Plus size={14} /> Nuovo
+                      <Plus size={14} strokeWidth={3} /> Nuovo
                     </button>
                   </div>
 
                   {tournamentsLoading ? (
-                    <div className="flex justify-center py-10">
-                      <Loader2 className="animate-spin text-blue-400" />
+                    <div className="flex flex-col items-center justify-center py-20">
+                      <Loader2 className="animate-spin text-cyan-400 mb-2" size={32} />
+                      <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Sincronizzazione...</span>
                     </div>
                   ) : (
-                    <div className="space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar">
+                    <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                       {tournaments.map((t) => (
                         <button
                           key={t.id}
@@ -1939,13 +1944,13 @@ export default function AdminDashboardPage() {
                             setIsCreatingTournament(false);
                             setIsEditingTournament(false);
                           }}
-                          className={`w-full flex items-center justify-between p-3 rounded-xl border text-left transition-all ${selectedTournament?.id === t.id && !isCreatingTournament ? 'bg-blue-600/10 border-blue-500 text-white' : 'bg-black/20 border-white/5 text-gray-400 hover:text-white hover:bg-white/5'}`}
+                          className={`w-full flex items-center justify-between p-4 rounded-2xl border text-left transition-all hover:scale-[1.02] ${selectedTournament?.id === t.id && !isCreatingTournament ? 'bg-gradient-to-r from-blue-950/40 to-indigo-950/40 border-blue-500/80 text-white shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'bg-black/30 border-white/5 text-gray-400 hover:text-white hover:bg-white/5 hover:border-white/10'}`}
                         >
                           <div>
-                            <span className="font-bold text-sm block">{t.name}</span>
-                            <span className="text-[10px] uppercase font-bold text-gray-500">{t.status} • {t.type}</span>
+                            <span className="font-bold text-sm block leading-tight">{t.name}</span>
+                            <span className={`text-[9px] uppercase font-black tracking-widest block mt-1 ${t.status === 'In Corso' ? 'text-green-400' : t.status === 'Concluso' ? 'text-gray-500' : 'text-yellow-500'}`}>{t.status} • {t.type}</span>
                           </div>
-                          <span className="text-xs font-mono text-gray-500">#{t.display_order}</span>
+                          <span className="text-xs font-black text-gray-600 bg-white/5 px-2 py-0.5 rounded-lg border border-white/5">#{t.display_order}</span>
                         </button>
                       ))}
                     </div>
@@ -1955,29 +1960,31 @@ export default function AdminDashboardPage() {
                 {/* Dettagli / Gestione Scommesse */}
                 <div className="lg:col-span-8 space-y-6">
                   {(selectedTournament || isCreatingTournament) ? (
-                    <div className="bg-[#0a0e1c]/40 border border-white/5 rounded-2xl p-6 space-y-6">
+                    <div className="bg-[#0a0e1c]/60 border border-[#D4AF37]/15 rounded-3xl p-8 space-y-8 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/35 to-transparent"></div>
                       
                       {/* Titolo Sezione */}
-                      <div className="flex justify-between items-center border-b border-white/5 pb-4">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-white/5 pb-6 gap-4">
                         <div>
-                          <h3 className="text-lg font-bold text-white">
+                          <h3 className="text-2xl font-black text-white tracking-tight uppercase leading-none">
                             {isCreatingTournament ? 'Nuovo Torneo' : selectedTournament?.name}
                           </h3>
-                          <p className="text-xs text-gray-400">
-                            {isCreatingTournament ? 'Configura le informazioni iniziali del torneo.' : 'Gestisci metadata e mercati scommesse.'}
+                          <p className="text-xs text-cyan-400/60 font-bold uppercase tracking-widest mt-2">
+                            {isCreatingTournament ? 'Configura le informazioni iniziali del torneo' : 'Gestisci metadati e mercati scommesse'}
                           </p>
                         </div>
                         {!isCreatingTournament && (
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 shrink-0">
                             <button
                               onClick={() => setIsEditingTournament(!isEditingTournament)}
-                              className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-lg text-xs font-bold transition-all uppercase"
+                              className="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-white border-2 border-white/10 hover:border-white/20 rounded-xl text-xs font-black transition-all hover:-translate-y-0.5 active:scale-95 uppercase tracking-wider"
                             >
                               {isEditingTournament ? 'Visualizza Scommesse' : 'Modifica Torneo'}
                             </button>
                             <button
                               onClick={() => handleDeleteTournament(selectedTournament.id)}
-                              className="p-1.5 bg-red-600/15 hover:bg-red-600/25 border border-red-500/20 text-red-400 rounded-lg transition-all"
+                              className="p-2.5 bg-red-500/10 hover:bg-red-500/20 border-2 border-red-500/20 text-red-400 rounded-xl transition-all hover:-translate-y-0.5 active:scale-95"
+                              title="Elimina Torneo"
                             >
                               <Trash2 size={16} />
                             </button>
@@ -1987,35 +1994,35 @@ export default function AdminDashboardPage() {
 
                       {/* Configurazione Form o Scommesse */}
                       {isEditingTournament || isCreatingTournament ? (
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Nome Torneo</label>
+                              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Nome Torneo</label>
                               <input
                                 type="text"
                                 value={tournamentForm.name}
                                 onChange={(e) => setTournamentForm({ ...tournamentForm, name: e.target.value })}
-                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                                className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl px-4 py-3 text-sm text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none font-bold"
                               />
                             </div>
                             <div>
-                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Organizzatore</label>
+                              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Organizzatore</label>
                               <input
                                 type="text"
                                 value={tournamentForm.organizer}
                                 onChange={(e) => setTournamentForm({ ...tournamentForm, organizer: e.target.value })}
-                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                                className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl px-4 py-3 text-sm text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none"
                               />
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
-                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Stato</label>
+                              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Stato</label>
                               <select
                                 value={tournamentForm.status}
                                 onChange={(e) => setTournamentForm({ ...tournamentForm, status: e.target.value })}
-                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none [&>option]:bg-[#1a1c23]"
+                                className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl px-4 py-3 text-sm text-white focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none font-bold [&>option]:bg-[#111218]"
                               >
                                 <option value="Programmato">Programmato</option>
                                 <option value="In Corso">In Corso</option>
@@ -2023,150 +2030,150 @@ export default function AdminDashboardPage() {
                               </select>
                             </div>
                             <div>
-                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Tipo</label>
+                              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Tipo</label>
                               <input
                                 type="text"
                                 value={tournamentForm.type}
                                 onChange={(e) => setTournamentForm({ ...tournamentForm, type: e.target.value })}
-                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                                className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl px-4 py-3 text-sm text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none"
                                 placeholder="es: 1v1, 2v2, 3v3"
                               />
                             </div>
                             <div>
-                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Ordine Visualizzazione</label>
+                              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Ordine Visualizzazione</label>
                               <input
                                 type="number"
                                 value={tournamentForm.display_order}
                                 onChange={(e) => setTournamentForm({ ...tournamentForm, display_order: e.target.value })}
-                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                                className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl px-4 py-3 text-sm text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none text-center font-bold"
                               />
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Periodo / Date</label>
+                              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Periodo / Date</label>
                               <input
                                 type="text"
                                 value={tournamentForm.period}
                                 onChange={(e) => setTournamentForm({ ...tournamentForm, period: e.target.value })}
-                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                                className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl px-4 py-3 text-sm text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none"
                                 placeholder="es: 12 - 15 Giugno 2026"
                               />
                             </div>
                             <div>
-                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Banner Image URL</label>
+                              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Banner Image URL</label>
                               <input
                                 type="text"
                                 value={tournamentForm.banner_url}
                                 onChange={(e) => setTournamentForm({ ...tournamentForm, banner_url: e.target.value })}
-                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                                className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl px-4 py-3 text-sm text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none text-xs text-blue-300 font-mono"
                               />
                             </div>
                           </div>
 
                           <div>
-                            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Link Diretto Challonge/Startgg</label>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Link Diretto Challonge/Startgg</label>
                             <input
                               type="text"
                               value={tournamentForm.direct_link}
                               onChange={(e) => setTournamentForm({ ...tournamentForm, direct_link: e.target.value })}
-                              className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                              className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl px-4 py-3 text-sm text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none"
                               placeholder="https://challonge.com/..."
                             />
                           </div>
 
-                          <div className="border border-white/5 p-4 rounded-xl space-y-3">
-                            <div className="flex items-center gap-2">
+                          <div className="border-2 border-white/5 bg-black/20 p-6 rounded-3xl space-y-4">
+                            <div className="flex items-center gap-3">
                               <input
                                 type="checkbox"
                                 id="has_regolamento"
                                 checked={tournamentForm.has_regolamento}
                                 onChange={(e) => setTournamentForm({ ...tournamentForm, has_regolamento: e.target.checked })}
-                                className="rounded bg-black/40 border-gray-600 text-blue-500 focus:ring-0"
+                                className="w-5 h-5 rounded-lg bg-black/40 border-2 border-white/20 text-blue-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
                               />
-                              <label htmlFor="has_regolamento" className="text-xs font-bold text-white select-none">Abilita Regolamento Dedicato</label>
+                              <label htmlFor="has_regolamento" className="text-xs font-black uppercase tracking-wider text-white select-none cursor-pointer">Abilita Regolamento Dedicato</label>
                             </div>
                             {tournamentForm.has_regolamento && (
-                              <div>
-                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Contenuto Regolamento (Markdown supportato)</label>
+                              <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Contenuto Regolamento (Markdown supportato)</label>
                                 <textarea
                                   value={tournamentForm.regolamento_content}
                                   onChange={(e) => setTournamentForm({ ...tournamentForm, regolamento_content: e.target.value })}
-                                  rows={5}
-                                  className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-blue-500 outline-none font-sans"
+                                  rows={6}
+                                  className="w-full bg-white/[0.01] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl p-4 text-xs text-white focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none font-sans"
                                   placeholder="Inserisci qui le regole del torneo..."
                                 />
                               </div>
                             )}
                           </div>
 
-                          <div className="flex justify-end gap-3 pt-4">
+                          <div className="flex justify-end gap-3 pt-6 border-t border-white/5">
                             <button
                               onClick={() => {
                                 setIsEditingTournament(false);
                                 setIsCreatingTournament(false);
                               }}
-                              className="px-4 py-2 border border-gray-600 text-gray-400 rounded-lg hover:bg-white/5 transition-colors font-medium text-xs uppercase"
+                              className="px-5 py-3 border-2 border-white/10 text-gray-400 hover:text-white hover:border-white/20 rounded-xl transition-all font-black text-xs uppercase tracking-widest active:scale-95"
                             >
                               Annulla
                             </button>
                             <button
                               onClick={handleSaveTournament}
-                              className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-2"
+                              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all flex items-center gap-2"
                             >
-                              <Save size={14} /> Salva Torneo
+                              <Save size={14} strokeWidth={3} /> Salva Torneo
                             </button>
                           </div>
                         </div>
                       ) : (
-                        <div className="space-y-6">
+                        <div className="space-y-6 animate-in fade-in duration-300">
                           
                           {/* Scommesse Tab Content */}
                           <div className="flex justify-between items-center">
-                            <h4 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                            <h4 className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
                               <Radio size={16} className="text-red-500 animate-pulse" /> Mercati Scommesse
                             </h4>
                             <button
                               onClick={() => setIsCreatingMarket(true)}
-                              className="px-3 py-1.5 bg-yellow-500 text-black hover:bg-yellow-400 rounded-lg text-xs font-bold transition-all uppercase tracking-wider flex items-center gap-1"
+                              className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-black rounded-xl text-xs font-black transition-all hover:-translate-y-0.5 shadow-lg active:scale-95 uppercase tracking-widest flex items-center gap-1.5"
                             >
-                              <Plus size={14} /> Nuova Scommessa
+                              <Plus size={14} strokeWidth={3} /> Nuova Scommessa
                             </button>
                           </div>
 
                           {isCreatingMarket && (
-                            <div className="bg-black/30 border border-yellow-500/20 p-4 rounded-xl space-y-4">
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-black/30 border-2 border-yellow-500/20 p-6 rounded-3xl space-y-6 animate-in zoom-in-95 duration-300">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Titolo Scommessa</label>
+                                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Titolo Scommessa</label>
                                   <input
                                     type="text"
                                     value={marketForm.title}
                                     onChange={(e) => setMarketForm({ ...marketForm, title: e.target.value })}
-                                    className="w-full bg-[#1a1c23] border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-yellow-500 outline-none"
+                                    className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-yellow-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:shadow-[0_0_15px_rgba(234,179,8,0.1)] transition-all outline-none font-bold"
                                     placeholder="es: VortiX vs LucifroN"
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Descrizione</label>
+                                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Descrizione</label>
                                   <input
                                     type="text"
                                     value={marketForm.description}
                                     onChange={(e) => setMarketForm({ ...marketForm, description: e.target.value })}
-                                    className="w-full bg-[#1a1c23] border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-yellow-500 outline-none"
+                                    className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-yellow-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:shadow-[0_0_15px_rgba(234,179,8,0.1)] transition-all outline-none"
                                     placeholder="es: Match Winner semifinale"
                                   />
                                 </div>
                               </div>
 
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Tipo Mercato</label>
+                                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Tipo Mercato</label>
                                   <select
                                     value={marketForm.type}
                                     onChange={(e) => setMarketForm({ ...marketForm, type: e.target.value })}
-                                    className="w-full bg-[#1a1c23] border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-yellow-500 outline-none [&>option]:bg-[#1a1c23]"
+                                    className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-yellow-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:shadow-[0_0_15px_rgba(234,179,8,0.1)] transition-all outline-none font-bold [&>option]:bg-[#111218]"
                                   >
                                     <option value="Match Winner">Match Winner</option>
                                     <option value="Tournament Winner">Tournament Winner</option>
@@ -2174,11 +2181,11 @@ export default function AdminDashboardPage() {
                                   </select>
                                 </div>
                                 <div>
-                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Fascia Elo</label>
+                                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Fascia Elo</label>
                                   <select
                                     value={marketForm.event_level}
                                     onChange={(e) => setMarketForm({ ...marketForm, event_level: e.target.value })}
-                                    className="w-full bg-[#1a1c23] border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-yellow-500 outline-none [&>option]:bg-[#1a1c23]"
+                                    className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-yellow-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:shadow-[0_0_15px_rgba(234,179,8,0.1)] transition-all outline-none font-bold [&>option]:bg-[#111218]"
                                   >
                                     <option value="High Elo">High Elo</option>
                                     <option value="Low Elo">Low Elo</option>
@@ -2186,46 +2193,48 @@ export default function AdminDashboardPage() {
                                 </div>
                               </div>
 
-                              <div className="space-y-2">
-                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Opzioni & Pesi Iniziali</label>
-                                {marketForm.options.map((opt: any, idx: number) => (
-                                  <div key={idx} className="flex gap-2 items-center">
-                                    <input
-                                      type="text"
-                                      value={opt.label}
-                                      onChange={(e) => {
-                                        const newOpts = [...marketForm.options];
-                                        newOpts[idx].label = e.target.value;
-                                        setMarketForm({ ...marketForm, options: newOpts });
-                                      }}
-                                      className="flex-1 bg-[#1a1c23] border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-yellow-500 outline-none"
-                                      placeholder={`Opzione ${idx + 1}`}
-                                    />
-                                    <input
-                                      type="number"
-                                      value={opt.weight}
-                                      onChange={(e) => {
-                                        const newOpts = [...marketForm.options];
-                                        newOpts[idx].weight = e.target.value;
-                                        setMarketForm({ ...marketForm, options: newOpts });
-                                      }}
-                                      className="w-20 bg-[#1a1c23] border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-yellow-500 outline-none text-center"
-                                      placeholder="Peso"
-                                      title="Peso probabilistico iniziale"
-                                    />
-                                    {marketForm.options.length > 2 && (
-                                      <button
-                                        onClick={() => {
-                                          const newOpts = marketForm.options.filter((_: any, i: number) => i !== idx);
+                              <div className="space-y-3">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block">Opzioni & Pesi Iniziali</label>
+                                <div className="space-y-2">
+                                  {marketForm.options.map((opt: any, idx: number) => (
+                                    <div key={idx} className="flex gap-3 items-center">
+                                      <input
+                                        type="text"
+                                        value={opt.label}
+                                        onChange={(e) => {
+                                          const newOpts = [...marketForm.options];
+                                          newOpts[idx].label = e.target.value;
                                           setMarketForm({ ...marketForm, options: newOpts });
                                         }}
-                                        className="p-2 bg-red-500/10 hover:bg-red-500/25 border border-red-500/20 text-red-400 rounded-lg text-xs"
-                                      >
-                                        <X size={12} />
-                                      </button>
-                                    )}
-                                  </div>
-                                ))}
+                                        className="flex-1 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-yellow-500/50 rounded-xl px-4 py-2 text-xs text-white focus:shadow-[0_0_15px_rgba(234,179,8,0.1)] transition-all outline-none font-bold"
+                                        placeholder={`Opzione ${idx + 1}`}
+                                      />
+                                      <input
+                                        type="number"
+                                        value={opt.weight}
+                                        onChange={(e) => {
+                                          const newOpts = [...marketForm.options];
+                                          newOpts[idx].weight = e.target.value;
+                                          setMarketForm({ ...marketForm, options: newOpts });
+                                        }}
+                                        className="w-24 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-yellow-500/50 rounded-xl px-4 py-2 text-xs text-white focus:shadow-[0_0_15px_rgba(234,179,8,0.1)] transition-all outline-none text-center font-bold"
+                                        placeholder="Peso"
+                                        title="Peso probabilistico iniziale"
+                                      />
+                                      {marketForm.options.length > 2 && (
+                                        <button
+                                          onClick={() => {
+                                            const newOpts = marketForm.options.filter((_: any, i: number) => i !== idx);
+                                            setMarketForm({ ...marketForm, options: newOpts });
+                                          }}
+                                          className="p-2 bg-red-500/10 hover:bg-red-500/25 border-2 border-red-500/20 text-red-400 rounded-xl text-xs transition-colors"
+                                        >
+                                          <X size={14} />
+                                        </button>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
                                 <button
                                   onClick={() => setMarketForm({ ...marketForm, options: [...marketForm.options, { label: '', weight: 100 }] })}
                                   className="text-xs text-yellow-500 font-bold hover:underline"
@@ -2234,16 +2243,16 @@ export default function AdminDashboardPage() {
                                 </button>
                               </div>
 
-                              <div className="flex justify-end gap-2 pt-2">
+                              <div className="flex justify-end gap-2 pt-4 border-t border-white/5">
                                 <button
                                   onClick={() => setIsCreatingMarket(false)}
-                                  className="px-3 py-1.5 border border-gray-600 text-gray-400 rounded-lg hover:bg-white/5 transition-colors text-xs font-bold uppercase"
+                                  className="px-4 py-2 border-2 border-white/10 text-gray-400 hover:text-white rounded-xl transition-all text-xs font-bold uppercase tracking-wider"
                                 >
                                   Annulla
                                 </button>
                                 <button
                                   onClick={handleSaveMarket}
-                                  className="px-4 py-1.5 bg-yellow-500 text-black font-bold rounded-lg hover:bg-yellow-400 transition-all text-xs uppercase"
+                                  className="px-6 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-black font-black rounded-xl hover:-translate-y-0.5 active:scale-95 shadow-lg transition-all text-xs uppercase tracking-widest"
                                 >
                                   Crea Scommessa
                                 </button>
@@ -2252,50 +2261,53 @@ export default function AdminDashboardPage() {
                           )}
 
                           {marketsLoading ? (
-                            <div className="flex justify-center py-6">
-                              <Loader2 className="animate-spin text-yellow-500" />
+                            <div className="flex flex-col items-center justify-center py-20">
+                              <Loader2 className="animate-spin text-yellow-500 mb-2" size={32} />
+                              <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Caricamento mercati...</span>
                             </div>
                           ) : markets.length === 0 ? (
-                            <div className="text-center py-10 bg-white/[0.01] border border-dashed border-white/5 rounded-xl text-gray-500">
-                              Nessuna scommessa per questo torneo.
+                            <div className="text-center py-20 bg-white/[0.01] border-2 border-dashed border-white/5 rounded-2xl text-gray-500">
+                              Nessuna scommessa registrata per questo torneo.
                             </div>
                           ) : (
-                            <div className="space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar">
+                            <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                               {markets.map((market) => (
-                                <div key={market.id} className="bg-black/30 border border-white/5 rounded-xl p-4 space-y-3">
+                                <div key={market.id} className="bg-black/30 border border-white/5 rounded-2xl p-5 space-y-4 shadow-xl">
                                   <div className="flex items-center justify-between">
                                     <div>
-                                      <span className="font-bold text-sm text-white block">{market.title}</span>
-                                      <span className="text-[10px] text-gray-500">{market.description || market.type}</span>
+                                      <span className="font-black text-sm text-white block">{market.title}</span>
+                                      <span className="text-[10px] text-cyan-400/60 font-bold uppercase tracking-wider">{market.description || market.type}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${market.status === 'open' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
+                                      <span className={`px-2.5 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider border ${market.status === 'open' ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
                                         {market.status === 'open' ? 'Aperto' : 'Chiuso'}
                                       </span>
                                       <button
                                         onClick={() => handleToggleMarketStatus(market.id, market.status)}
-                                        className="px-2 py-1 bg-white/5 hover:bg-white/10 text-white rounded text-[10px] border border-white/10 font-bold transition-all uppercase"
+                                        className="px-3 py-1 bg-white/5 hover:bg-white/10 text-white rounded-lg text-[9px] border-2 border-white/10 font-black transition-all uppercase tracking-wider"
                                       >
                                         {market.status === 'open' ? 'Chiudi scommesse' : 'Riapri'}
                                       </button>
                                     </div>
                                   </div>
 
-                                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-black/40 p-2.5 rounded-lg">
+                                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-black/40 p-4 rounded-xl border border-white/5">
                                     {market.options?.map((opt: any) => {
                                       const isWinner = market.winner_option_id === opt.id;
                                       return (
-                                        <div key={opt.id} className={`p-2 rounded border text-center relative ${isWinner ? 'bg-green-500/20 border-green-500/50 text-green-300' : 'bg-white/5 border-transparent text-gray-400'}`}>
-                                          <span className="text-xs font-bold block truncate" title={opt.label}>{opt.label}</span>
-                                          <span className="text-[10px] text-gray-500">Puntate: {opt.total_bet || 0} 🐑</span>
+                                        <div key={opt.id} className={`p-3 rounded-xl border text-center relative flex flex-col justify-between ${isWinner ? 'bg-green-500/10 border-green-500/50 text-green-300' : 'bg-white/[0.01] border-white/5 text-gray-400'}`}>
+                                          <div>
+                                            <span className="text-xs font-black block truncate" title={opt.label}>{opt.label}</span>
+                                            <span className="text-[10px] text-gray-500 block mt-1">Puntate: <b className="text-gray-300">{opt.total_bet || 0} 🐑</b></span>
+                                          </div>
                                           
                                           {/* Settle option selector if market is closed and not settled */}
                                           {market.status === 'closed' && market.winner_option_id === null && (
                                             <button
                                               onClick={() => setSettleConfirmOption({ marketId: market.id, optionId: opt.id })}
-                                              className="w-full mt-1.5 py-1 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 text-[9px] font-black rounded border border-yellow-500/20 transition-all uppercase"
+                                              className="w-full mt-3 py-1.5 bg-yellow-500 text-black hover:bg-yellow-400 text-[9px] font-black rounded-lg transition-all uppercase tracking-wider"
                                             >
-                                              Liquida Vincente
+                                              Decreta Vincitore
                                             </button>
                                           )}
                                         </div>
@@ -2310,9 +2322,10 @@ export default function AdminDashboardPage() {
                       )}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center py-20 text-center bg-white/[0.01] border border-dashed border-white/5 rounded-2xl text-gray-500">
-                      <Trophy size={48} className="opacity-20 mb-3" />
-                      <p>Seleziona un torneo a sinistra per gestirlo oppure creane uno nuovo.</p>
+                    <div className="flex flex-col items-center justify-center py-32 text-center bg-white/[0.01] border-2 border-dashed border-white/5 rounded-3xl text-gray-500 shadow-inner">
+                      <Trophy size={64} className="opacity-20 mb-4 animate-bounce" style={{ animationDuration: '4s' }} />
+                      <h4 className="text-sm font-bold uppercase tracking-wider text-gray-400">Nessun torneo selezionato</h4>
+                      <p className="text-xs text-gray-600 mt-2 max-w-sm">Seleziona un torneo a sinistra per gestirlo oppure creane uno nuovo.</p>
                     </div>
                   )}
                 </div>
@@ -2321,26 +2334,27 @@ export default function AdminDashboardPage() {
               {/* Modale Conferma Liquidazione Scommessa */}
               {settleConfirmOption && (
                 <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
-                  <div className="bg-[#0a0e1c] border border-yellow-500/30 p-8 rounded-3xl max-w-sm w-full shadow-2xl text-center">
+                  <div className="bg-[#0a0e1c] border border-yellow-500/30 p-8 rounded-3xl max-w-sm w-full shadow-2xl text-center relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent"></div>
                     <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-yellow-500/20">
                       <AlertTriangle className="text-yellow-500" size={32} />
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">Conferma Liquidazione</h3>
-                    <p className="text-sm text-gray-400 mb-6">
-                      Sei sicuro di voler decretare questa opzione come vincente? L'operazione assegnerà automaticamente i premi in pecore a tutti i vincitori e non può essere annullata.
+                    <h3 className="text-xl font-black text-white uppercase mb-2">Sei sicuro?</h3>
+                    <p className="text-xs text-gray-400 mb-6">
+                      Questa azione assegnerà automaticamente i premi in pecore a tutti i vincitori e non può essere annullata.
                     </p>
                     <div className="flex gap-3">
                       <button
                         onClick={() => setSettleConfirmOption(null)}
-                        className="flex-1 px-4 py-2 bg-white/5 border border-white/10 text-gray-400 hover:text-white rounded-xl transition-all text-xs font-bold uppercase"
+                        className="flex-1 py-3 border-2 border-white/10 text-gray-400 hover:text-white rounded-xl transition-all text-xs font-black uppercase tracking-wider active:scale-95"
                       >
                         Annulla
                       </button>
                       <button
                         onClick={() => handleSettleMarketDashboard(settleConfirmOption.marketId, settleConfirmOption.optionId)}
-                        className="flex-1 px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black rounded-xl transition-all text-xs font-black uppercase"
+                        className="flex-1 py-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-xl transition-all text-xs font-black uppercase tracking-wider active:scale-95 shadow-lg"
                       >
-                        Conferma Liquida
+                        Conferma
                       </button>
                     </div>
                   </div>
@@ -2351,18 +2365,20 @@ export default function AdminDashboardPage() {
 
           {/* TAB CIVILTA */}
           {activeTab === 'civilta' && (isSuperAdmin || canManageCivs || canManageBuildorders) && (
-            <div className="space-y-6 animate-in fade-in duration-300">
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
                 {/* Sidebar Civiltà */}
-                <div className="lg:col-span-3 bg-[#0a0e1c]/40 border border-white/5 rounded-2xl p-4 space-y-4">
-                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-wider border-b border-white/5 pb-2">Civiltà</h3>
+                <div className="lg:col-span-3 bg-[#0a0e1c]/60 border border-[#D4AF37]/15 rounded-3xl p-6 space-y-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37]/35 to-transparent"></div>
+                  <h3 className="text-xs font-black text-cyan-400 uppercase tracking-[0.25em] border-b border-white/5 pb-3">Lista Civiltà</h3>
                   {civsLoading ? (
-                    <div className="flex justify-center py-10">
-                      <Loader2 className="animate-spin text-blue-400" />
+                    <div className="flex flex-col items-center justify-center py-20">
+                      <Loader2 className="animate-spin text-cyan-400 mb-2" size={32} />
+                      <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Caricamento...</span>
                     </div>
                   ) : (
-                    <div className="space-y-1.5 max-h-[550px] overflow-y-auto custom-scrollbar">
+                    <div className="space-y-2 max-h-[550px] overflow-y-auto pr-2 custom-scrollbar">
                       {civList.map((c) => (
                         <button
                           key={c.id}
@@ -2370,7 +2386,7 @@ export default function AdminDashboardPage() {
                             setSelectedCiv(c);
                             setSelectedBOIndex(null);
                           }}
-                          className={`w-full text-left px-3 py-2 rounded-xl border text-sm font-bold transition-all ${selectedCiv?.id === c.id ? 'bg-blue-600/10 border-blue-500 text-white' : 'bg-black/20 border-white/5 text-gray-400 hover:text-white hover:bg-white/5'}`}
+                          className={`w-full text-left px-4 py-3 rounded-xl border text-sm font-bold transition-all hover:scale-[1.02] ${selectedCiv?.id === c.id ? 'bg-gradient-to-r from-blue-950/40 to-indigo-950/40 border-blue-500/80 text-white shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'bg-black/30 border-white/5 text-gray-400 hover:text-white hover:bg-white/5 hover:border-white/10'}`}
                         >
                           {c.name}
                         </button>
@@ -2382,45 +2398,47 @@ export default function AdminDashboardPage() {
                 {/* Corpo Editor Civiltà & BO */}
                 <div className="lg:col-span-9 space-y-6">
                   {selectedCiv ? (
-                    <div className="space-y-6">
+                    <div className="space-y-6 animate-in fade-in duration-300">
                       
                       {/* Nav Tab interna all'Editor Civ */}
                       <div className="flex items-center gap-6 border-b border-white/5 pb-1">
                         <button
                           onClick={() => setSelectedBOIndex(null)}
-                          className={`pb-3 text-sm font-bold uppercase tracking-wider relative transition-colors ${selectedBOIndex === null ? 'text-blue-400 font-black' : 'text-gray-400 hover:text-white'}`}
+                          className={`pb-3 text-sm font-black uppercase tracking-wider relative transition-colors ${selectedBOIndex === null ? 'text-blue-400 font-black' : 'text-gray-400 hover:text-white'}`}
                         >
                           Dettagli Civiltà
-                          {selectedBOIndex === null && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 rounded-full"></span>}
+                          {selectedBOIndex === null && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"></span>}
                         </button>
                         <button
                           onClick={() => handleEditBO(-1)}
-                          className={`pb-3 text-sm font-bold uppercase tracking-wider relative transition-colors ${selectedBOIndex !== null ? 'text-blue-400 font-black' : 'text-gray-400 hover:text-white'}`}
+                          className={`pb-3 text-sm font-black uppercase tracking-wider relative transition-colors ${selectedBOIndex !== null ? 'text-blue-400 font-black' : 'text-gray-400 hover:text-white'}`}
                         >
                           Build Orders ({selectedCiv.build_orders?.length || 0})
-                          {selectedBOIndex !== null && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 rounded-full"></span>}
+                          {selectedBOIndex !== null && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"></span>}
                         </button>
                       </div>
 
                       {/* PANEL 1: Dettagli Civiltà */}
                       {selectedBOIndex === null ? (
-                        <div className="bg-[#0a0e1c]/40 border border-white/5 rounded-2xl p-6 space-y-6">
+                        <div className="bg-[#0a0e1c]/60 border border-[#D4AF37]/15 rounded-3xl p-8 space-y-8 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                          <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/35 to-transparent"></div>
+                          
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Nome Civiltà</label>
+                              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Nome Civiltà</label>
                               <input
                                 type="text"
                                 value={civForm.name}
                                 onChange={(e) => setCivForm({ ...civForm, name: e.target.value })}
-                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                                className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl px-4 py-3 text-sm text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none font-bold"
                               />
                             </div>
                             <div>
-                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Difficoltà</label>
+                              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Difficoltà</label>
                               <select
                                 value={civForm.difficulty}
                                 onChange={(e) => setCivForm({ ...civForm, difficulty: e.target.value })}
-                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none [&>option]:bg-[#1a1c23]"
+                                className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl px-4 py-3 text-sm text-white focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none font-bold [&>option]:bg-[#111218]"
                               >
                                 <option value="Facile">Facile</option>
                                 <option value="Medio">Medio</option>
@@ -2430,21 +2448,21 @@ export default function AdminDashboardPage() {
                           </div>
 
                           <div>
-                            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Descrizione Breve</label>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Descrizione Breve</label>
                             <textarea
                               value={civForm.short_description}
                               onChange={(e) => setCivForm({ ...civForm, short_description: e.target.value })}
-                              rows={4}
-                              className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                              rows={5}
+                              className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl p-4 text-sm text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none"
                             />
                           </div>
 
                           {/* Passive bonuses list */}
-                          <div className="bg-black/20 border border-white/5 p-4 rounded-xl space-y-4">
-                            <label className="text-[10px] font-bold text-yellow-500 uppercase tracking-wider block">Bonus Passivi</label>
-                            <div className="space-y-2">
+                          <div className="bg-black/20 border-2 border-white/5 p-6 rounded-3xl space-y-4">
+                            <label className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.2em] block">Bonus Passivi</label>
+                            <div className="space-y-3">
                               {civForm.passive_bonuses?.map((bonus: string, idx: number) => (
-                                <div key={idx} className="flex gap-2">
+                                <div key={idx} className="flex gap-3 items-start animate-in fade-in duration-300">
                                   <textarea
                                     value={bonus}
                                     onChange={(e) => {
@@ -2453,58 +2471,58 @@ export default function AdminDashboardPage() {
                                       setCivForm({ ...civForm, passive_bonuses: newB });
                                     }}
                                     rows={2}
-                                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-1.5 text-xs text-white focus:border-yellow-500 outline-none"
+                                    className="w-full bg-white/[0.01] border-2 border-white/10 hover:border-white/20 focus:border-yellow-500/50 rounded-2xl p-3 text-xs text-white focus:shadow-[0_0_15px_rgba(234,179,8,0.1)] transition-all outline-none"
                                   />
                                   <button
                                     onClick={() => {
                                       const newB = civForm.passive_bonuses.filter((_: any, i: number) => i !== idx);
                                       setCivForm({ ...civForm, passive_bonuses: newB });
                                     }}
-                                    className="p-2 bg-red-500/10 hover:bg-red-500/25 border border-red-500/20 text-red-400 rounded-lg text-xs"
+                                    className="p-3 bg-red-500/10 hover:bg-red-500/25 border-2 border-red-500/20 text-red-400 rounded-xl transition-all"
                                   >
-                                    <Trash2 size={14} />
+                                    <Trash2 size={16} />
                                   </button>
                                 </div>
                               ))}
                               <button
                                 onClick={() => setCivForm({ ...civForm, passive_bonuses: [...(civForm.passive_bonuses || []), ''] })}
-                                className="text-xs text-yellow-500 font-bold hover:underline"
+                                className="text-xs text-yellow-500 font-black uppercase tracking-wider hover:underline flex items-center gap-1.5 pt-2"
                               >
-                                + Aggiungi Nuovo Bonus
+                                <Plus size={14} strokeWidth={3} /> Aggiungi Nuovo Bonus
                               </button>
                             </div>
                           </div>
 
-                          {/* Strengths & Weaknesses (Row lines textareas) */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="bg-black/20 border border-white/5 p-4 rounded-xl space-y-2">
-                              <label className="text-[10px] font-bold text-green-500 uppercase tracking-wider block">Punti di Forza (Uno per riga)</label>
+                          {/* strengths & weaknesses */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="bg-black/20 border-2 border-white/5 p-6 rounded-3xl space-y-3">
+                              <label className="text-[10px] font-black text-green-500 uppercase tracking-[0.2em] block">Punti di Forza (Uno per riga)</label>
                               <textarea
                                 value={civForm.strengths?.join('\n') || ''}
                                 onChange={(e) => setCivForm({ ...civForm, strengths: e.target.value.split('\n') })}
-                                rows={4}
-                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-green-500 outline-none"
+                                rows={5}
+                                className="w-full bg-white/[0.01] border-2 border-white/10 hover:border-white/20 focus:border-green-500/50 rounded-2xl p-4 text-xs text-white focus:shadow-[0_0_15px_rgba(34,197,94,0.1)] transition-all outline-none"
                                 placeholder="Inserisci un punto di forza per riga..."
                               />
                             </div>
-                            <div className="bg-black/20 border border-white/5 p-4 rounded-xl space-y-2">
-                              <label className="text-[10px] font-bold text-red-500 uppercase tracking-wider block">Punti di Debolezza (Uno per riga)</label>
+                            <div className="bg-black/20 border-2 border-white/5 p-6 rounded-3xl space-y-3">
+                              <label className="text-[10px] font-black text-red-500 uppercase tracking-[0.2em] block">Punti di Debolezza (Uno per riga)</label>
                               <textarea
                                 value={civForm.weaknesses?.join('\n') || ''}
                                 onChange={(e) => setCivForm({ ...civForm, weaknesses: e.target.value.split('\n') })}
-                                rows={4}
-                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-red-500 outline-none"
+                                rows={5}
+                                className="w-full bg-white/[0.01] border-2 border-white/10 hover:border-white/20 focus:border-red-500/50 rounded-2xl p-4 text-xs text-white focus:shadow-[0_0_15px_rgba(239,68,68,0.1)] transition-all outline-none"
                                 placeholder="Inserisci un punto debole per riga..."
                               />
                             </div>
                           </div>
 
-                          <div className="flex justify-end pt-2">
+                          <div className="flex justify-end pt-4 border-t border-white/5">
                             <button
                               onClick={handleSaveCivDetails}
-                              className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-2"
+                              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all flex items-center gap-2"
                             >
-                              <Save size={14} /> Salva Dettagli Civiltà
+                              <Save size={14} strokeWidth={3} /> Salva Dettagli Civiltà
                             </button>
                           </div>
                         </div>
@@ -2515,39 +2533,43 @@ export default function AdminDashboardPage() {
                           {selectedBOIndex === -1 || selectedBOIndex > -1 ? (
                             
                             /* INLINE BO EDITOR FORM */
-                            <div className="bg-[#0a0e1c]/40 border border-cyan-500/20 rounded-2xl p-6 space-y-6">
+                            <div className="bg-[#0a0e1c]/60 border border-[#D4AF37]/15 rounded-3xl p-8 space-y-8 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                              <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
+                              
                               <div className="flex items-center justify-between border-b border-white/5 pb-4">
                                 <div>
-                                  <h4 className="text-sm font-bold text-white uppercase tracking-wider">
+                                  <h4 className="text-lg font-black text-white uppercase tracking-tight">
                                     {selectedBOIndex === -1 ? 'Nuovo Build Order' : 'Modifica Build Order'}
                                   </h4>
-                                  <p className="text-[10px] text-gray-400">Associa passaggi temporizzati ed IA ad una strategia.</p>
+                                  <p className="text-xs text-cyan-400/60 font-bold uppercase tracking-widest mt-1">
+                                    Associa passaggi temporizzati ed IA ad una strategia
+                                  </p>
                                 </div>
                                 <button
                                   onClick={() => setSelectedBOIndex(null)}
-                                  className="text-xs text-gray-500 hover:text-white uppercase tracking-wider font-bold"
+                                  className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border-2 border-white/10 hover:border-white/20 rounded-xl text-xs font-black uppercase tracking-wider text-gray-400 hover:text-white transition-all"
                                 >
                                   Chiudi Editor
                                 </button>
                               </div>
 
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="md:col-span-2">
-                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Titolo BO</label>
+                                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Titolo BO</label>
                                   <input
                                     type="text"
                                     value={boForm.title}
                                     onChange={(e) => setBoForm({ ...boForm, title: e.target.value })}
-                                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none"
+                                    className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none font-bold"
                                     placeholder="es: Fast Castle 2-TC..."
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Difficoltà</label>
+                                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Difficoltà</label>
                                   <select
                                     value={boForm.difficulty}
                                     onChange={(e) => setBoForm({ ...boForm, difficulty: Number(e.target.value) })}
-                                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none [&>option]:bg-[#1a1c23]"
+                                    className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none font-bold [&>option]:bg-[#111218]"
                                   >
                                     <option value={1}>Facile</option>
                                     <option value={2}>Medio</option>
@@ -2556,96 +2578,96 @@ export default function AdminDashboardPage() {
                                 </div>
                               </div>
 
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
-                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Mappa Consigliata</label>
+                                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Mappa Consigliata</label>
                                   <input
                                     type="text"
                                     value={boForm.map}
                                     onChange={(e) => setBoForm({ ...boForm, map: e.target.value })}
-                                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none"
+                                    className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none"
                                     placeholder="Qualsiasi, Land, ecc."
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Autore Nickname</label>
+                                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Autore Nickname</label>
                                   <input
                                     type="text"
                                     value={boForm.author_nickname}
                                     onChange={(e) => setBoForm({ ...boForm, author_nickname: e.target.value })}
-                                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none"
+                                    className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none font-bold"
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Autore Rank</label>
+                                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Autore Rank</label>
                                   <input
                                     type="text"
                                     value={boForm.author_rank}
                                     onChange={(e) => setBoForm({ ...boForm, author_rank: e.target.value })}
-                                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none"
+                                    className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none"
                                     placeholder="Conqueror, Diamond, etc."
                                   />
                                 </div>
                               </div>
 
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Banner Image URL</label>
+                                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Banner Image URL</label>
                                   <input
                                     type="text"
                                     value={boForm.banner_url}
                                     onChange={(e) => setBoForm({ ...boForm, banner_url: e.target.value })}
-                                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none"
+                                    className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none"
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Link YouTube Video Guida</label>
+                                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Link YouTube Video Guida</label>
                                   <input
                                     type="text"
                                     value={boForm.source}
                                     onChange={(e) => setBoForm({ ...boForm, source: e.target.value })}
-                                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none"
+                                    className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none"
                                     placeholder="https://youtube.com/watch?v=..."
                                   />
                                 </div>
                               </div>
 
                               <div>
-                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Descrizione Strategia</label>
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Descrizione Strategia</label>
                                 <textarea
                                   value={boForm.description}
                                   onChange={(e) => setBoForm({ ...boForm, description: e.target.value })}
-                                  rows={2}
-                                  className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none"
+                                  rows={3}
+                                  className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl p-4 text-xs text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none"
                                   placeholder="Spiega l'obiettivo o il tempismo di questa build..."
                                 />
                               </div>
 
                               {/* AI Transcription Extraction Box */}
-                              <div className="bg-cyan-950/20 border border-cyan-500/20 p-4 rounded-xl space-y-4">
-                                <label className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block flex items-center gap-1">
-                                  <Sparkles size={12} /> Gemini AI Trascrizione (Analisi Automatica Passaggi)
+                              <div className="bg-[#0c192c]/50 border-2 border-cyan-500/20 p-6 rounded-3xl space-y-4">
+                                <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] block flex items-center gap-1.5">
+                                  <Sparkles size={14} className="animate-bounce" /> Gemini AI Trascrizione (Analisi Automatica Passaggi)
                                 </label>
                                 <textarea
                                   value={boManualText}
                                   onChange={(e) => setBoManualText(e.target.value)}
-                                  rows={4}
-                                  className="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 text-xs text-cyan-100 placeholder:text-cyan-500/20 focus:border-cyan-500 outline-none font-sans"
+                                  rows={5}
+                                  className="w-full bg-black/60 border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl p-4 text-xs text-cyan-100 placeholder:text-cyan-500/20 focus:shadow-[0_0_20px_rgba(6,182,212,0.1)] transition-all outline-none font-sans"
                                   placeholder="Incolla qui la trascrizione del video youtube per estrarre passaggi e tempi in automatico..."
                                 />
                                 {isAnalyzingBO && (
-                                  <div className="space-y-1">
-                                    <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                                      <div className="h-full bg-cyan-400 transition-all duration-300" style={{ width: `${boAnalysisProgress}%` }}></div>
+                                  <div className="space-y-2 animate-in fade-in duration-300">
+                                    <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                      <div className="h-full bg-cyan-400 transition-all duration-300 shadow-[0_0_10px_rgba(6,182,212,0.5)]" style={{ width: `${boAnalysisProgress}%` }}></div>
                                     </div>
-                                    <span className="text-[9px] text-cyan-500 font-bold block">Analisi in corso con Gemini...</span>
+                                    <span className="text-[9px] text-cyan-500 font-black block uppercase tracking-widest">Analisi in corso con Gemini...</span>
                                   </div>
                                 )}
                                 <div className="flex justify-end">
                                   <button
                                     onClick={handleAIBOAnalysis}
                                     disabled={isAnalyzingBO || !boManualText.trim()}
-                                    className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-1.5 disabled:opacity-30 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                                    className="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all hover:-translate-y-0.5 active:scale-95 disabled:opacity-30 flex items-center gap-1.5 shadow-[0_0_20px_rgba(6,182,212,0.2)]"
                                   >
                                     <Sparkles size={14} /> Analizza Trascrizione
                                   </button>
@@ -2653,28 +2675,28 @@ export default function AdminDashboardPage() {
                               </div>
 
                               {/* Passaggi steps management */}
-                              <div className="space-y-3">
-                                <div className="flex justify-between items-center border-t border-white/5 pt-4">
-                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Passaggi Temporizzati</label>
+                              <div className="space-y-4">
+                                <div className="flex justify-between items-center border-t border-white/5 pt-6">
+                                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block">Passaggi Temporizzati</label>
                                   <button
                                     onClick={() => setBoForm({ ...boForm, steps: [...(boForm.steps || []), { time: '00:00', action: '', note: '' }] })}
-                                    className="text-xs text-cyan-400 font-bold hover:underline"
+                                    className="text-xs text-cyan-400 font-black uppercase tracking-wider hover:underline flex items-center gap-1"
                                   >
-                                    + Aggiungi Passo
+                                    <Plus size={12} strokeWidth={3} /> Aggiungi Passo
                                   </button>
                                 </div>
 
-                                <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+                                <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                                   {(boForm.steps || []).map((step: any, idx: number) => (
-                                    <div key={idx} className="bg-black/30 border border-white/5 p-3 rounded-lg flex flex-col md:flex-row gap-2 relative">
+                                    <div key={idx} className="bg-black/30 border-2 border-white/5 p-4 rounded-2xl flex flex-col md:flex-row gap-3 relative animate-in fade-in duration-300">
                                       <button
                                         onClick={() => {
                                           const newSteps = boForm.steps.filter((_: any, i: number) => i !== idx);
                                           setBoForm({ ...boForm, steps: newSteps });
                                         }}
-                                        className="absolute -top-1.5 -right-1.5 p-1 bg-red-600 hover:bg-red-500 text-white rounded-full text-xs shadow-lg"
+                                        className="absolute -top-2 -right-2 p-1.5 bg-red-600 hover:bg-red-500 text-white rounded-full text-xs shadow-lg transition-transform hover:scale-110"
                                       >
-                                        <X size={10} />
+                                        <X size={12} />
                                       </button>
                                       <input
                                         type="text"
@@ -2684,7 +2706,7 @@ export default function AdminDashboardPage() {
                                           newSteps[idx].time = e.target.value;
                                           setBoForm({ ...boForm, steps: newSteps });
                                         }}
-                                        className="w-full md:w-20 bg-[#1a1c23] border border-gray-600 rounded px-2 py-1 text-xs text-yellow-500 font-bold text-center outline-none"
+                                        className="w-full md:w-24 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-xl px-3 py-2 text-xs text-yellow-500 font-black text-center outline-none"
                                         placeholder="00:00"
                                       />
                                       <input
@@ -2695,7 +2717,7 @@ export default function AdminDashboardPage() {
                                           newSteps[idx].action = e.target.value;
                                           setBoForm({ ...boForm, steps: newSteps });
                                         }}
-                                        className="flex-1 bg-[#1a1c23] border border-gray-600 rounded px-2 py-1 text-xs text-white font-bold outline-none"
+                                        className="flex-1 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-xl px-4 py-2 text-xs text-white font-bold outline-none"
                                         placeholder="Azione..."
                                       />
                                       <input
@@ -2706,7 +2728,7 @@ export default function AdminDashboardPage() {
                                           newSteps[idx].note = e.target.value;
                                           setBoForm({ ...boForm, steps: newSteps });
                                         }}
-                                        className="flex-1 bg-[#1a1c23] border border-gray-600 rounded px-2 py-1 text-xs text-gray-400 italic outline-none"
+                                        className="flex-1 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-xl px-4 py-2 text-xs text-gray-400 italic outline-none"
                                         placeholder="Nota/Dettaglio..."
                                       />
                                     </div>
@@ -2714,55 +2736,56 @@ export default function AdminDashboardPage() {
                                 </div>
                               </div>
 
-                              <div className="flex justify-end gap-2 pt-2 border-t border-white/5">
+                              <div className="flex justify-end gap-3 pt-6 border-t border-white/5">
                                 <button
                                   onClick={() => setSelectedBOIndex(null)}
-                                  className="px-4 py-2 border border-gray-600 text-gray-400 rounded-lg hover:bg-white/5 transition-colors text-xs font-bold uppercase"
+                                  className="px-5 py-3 border-2 border-white/10 text-gray-400 hover:text-white rounded-xl transition-all text-xs font-black uppercase tracking-wider active:scale-95"
                                 >
                                   Annulla
                                 </button>
                                 <button
                                   onClick={handleSaveBO}
-                                  className="px-6 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-1.5"
+                                  className="px-8 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all flex items-center gap-2"
                                 >
-                                  <Save size={14} /> Salva Build Order
+                                  <Save size={14} strokeWidth={3} /> Salva Build Order
                                 </button>
                               </div>
                             </div>
                           ) : (
                             
                             /* BO LISTING VIEW */
-                            <div className="bg-[#0a0e1c]/40 border border-white/5 rounded-2xl p-6 space-y-6">
+                            <div className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-8 space-y-6 shadow-2xl relative overflow-hidden">
+                              <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
                               <div className="flex justify-between items-center">
-                                <h4 className="text-sm font-bold text-white uppercase tracking-wider">Build Orders di {selectedCiv.name}</h4>
+                                <h4 className="text-xs font-black text-white uppercase tracking-[0.25em]">Build Orders di {selectedCiv.name}</h4>
                                 <button
                                   onClick={() => handleEditBO(-1)}
-                                  className="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-bold transition-all uppercase tracking-wider flex items-center gap-1"
+                                  className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl text-xs font-black transition-all hover:-translate-y-0.5 shadow-lg active:scale-95 uppercase tracking-widest flex items-center gap-1.5"
                                 >
-                                  <Plus size={14} /> Nuovo BO
+                                  <Plus size={14} strokeWidth={3} /> Nuovo BO
                                 </button>
                               </div>
 
-                              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1 custom-scrollbar">
+                              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                                 {(selectedCiv.build_orders || []).map((bo: any, idx: number) => (
-                                  <div key={bo.id || idx} className="bg-black/35 border border-white/5 rounded-xl p-4 flex items-center justify-between hover:border-cyan-500/30 transition-all">
+                                  <div key={bo.id || idx} className="bg-black/30 border border-white/5 rounded-2xl p-5 flex items-center justify-between hover:border-cyan-500/30 transition-all hover:scale-[1.01] duration-300">
                                     <div>
-                                      <span className="font-bold text-sm text-white block">{bo.title}</span>
-                                      <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                                      <span className="font-black text-sm text-white block">{bo.title}</span>
+                                      <span className="text-[10px] text-cyan-400/60 font-black uppercase tracking-wider block mt-1">
                                         Difficoltà: {bo.difficulty === 1 ? 'Facile' : bo.difficulty === 3 ? 'Difficile' : 'Medio'} • Passaggi: {bo.steps?.length || 0}
                                       </span>
                                     </div>
                                     <div className="flex gap-2">
                                       <button
                                         onClick={() => handleEditBO(idx)}
-                                        className="p-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg transition-all"
+                                        className="p-2 bg-white/5 hover:bg-white/10 border-2 border-white/10 text-white rounded-xl transition-all"
                                         title="Modifica"
                                       >
                                         <Edit2 size={14} />
                                       </button>
                                       <button
                                         onClick={() => handleDeleteBO(idx)}
-                                        className="p-1.5 bg-red-600/15 hover:bg-red-600/25 border border-red-500/20 text-red-400 rounded-lg transition-all"
+                                        className="p-2 bg-red-500/10 hover:bg-red-500/25 border-2 border-red-500/20 text-red-400 rounded-xl transition-all"
                                         title="Elimina"
                                       >
                                         <Trash2 size={14} />
@@ -2772,7 +2795,7 @@ export default function AdminDashboardPage() {
                                 ))}
 
                                 {(!selectedCiv.build_orders || selectedCiv.build_orders.length === 0) && (
-                                  <div className="text-center py-10 bg-white/[0.01] border border-dashed border-white/5 rounded-xl text-gray-500">
+                                  <div className="text-center py-20 bg-white/[0.01] border-2 border-dashed border-white/5 rounded-3xl text-gray-500">
                                     Nessun build order presente per questa civiltà.
                                   </div>
                                 )}
@@ -2783,16 +2806,16 @@ export default function AdminDashboardPage() {
                       )}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center py-20 text-center bg-white/[0.01] border border-dashed border-white/5 rounded-2xl text-gray-500">
-                      <BookOpen size={48} className="opacity-20 mb-3" />
-                      <p>Seleziona una civiltà a sinistra per gestirne i dettagli ed i build orders.</p>
+                    <div className="flex flex-col items-center justify-center py-32 text-center bg-white/[0.01] border-2 border-dashed border-white/5 rounded-3xl text-gray-500 shadow-inner">
+                      <BookOpen size={64} className="opacity-20 mb-4 animate-bounce" style={{ animationDuration: '4s' }} />
+                      <h4 className="text-sm font-bold uppercase tracking-wider text-gray-400">Nessuna civiltà selezionata</h4>
+                      <p className="text-xs text-gray-600 mt-2 max-w-sm">Seleziona una civiltà a sinistra per gestirne i dettagli ed i build orders.</p>
                     </div>
                   )}
                 </div>
               </div>
             </div>
           )}
-
         </div>
 
         {/* Footer Fisso per Invio Mail */}
