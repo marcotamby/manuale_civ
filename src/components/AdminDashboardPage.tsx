@@ -1435,12 +1435,15 @@ export default function AdminDashboardPage() {
   // Analytics Functions (Tab 4)
   const getTrendData = (items: any[]) => {
     const now = new Date();
+    const months = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
     const weeks = Array.from({ length: 6 }).map((_, idx) => {
       const d = new Date();
       d.setDate(now.getDate() - idx * 7);
+      const start = new Date(d.setDate(d.getDate() - d.getDay()));
+      const label = `${start.getDate()} ${months[start.getMonth()]}`;
       return {
-        start: new Date(d.setDate(d.getDate() - d.getDay())),
-        label: `Sett. -${idx}`,
+        start,
+        label,
         count: 0
       };
     }).reverse();
@@ -1460,7 +1463,7 @@ export default function AdminDashboardPage() {
     });
 
     return weeks.map(w => ({ 
-      label: w.label === 'Sett. -0' ? 'Corrente' : w.label, 
+      label: w.label, 
       value: w.count 
     }));
   };
@@ -1477,16 +1480,7 @@ export default function AdminDashboardPage() {
       .slice(0, 5);
   };
 
-  const getHourlyHeatmap = (items: any[]) => {
-    const hours = Array.from({ length: 24 }).map((_, h) => ({ label: `${h}:00`, value: 0 }));
-    items.forEach(item => {
-      if (!item.created_at) return;
-      const date = new Date(item.created_at);
-      const hour = date.getHours();
-      hours[hour].value++;
-    });
-    return hours;
-  };
+
 
   // ========== FAQ Functions ==========
   const fetchFAQData = async () => {
@@ -1670,7 +1664,6 @@ export default function AdminDashboardPage() {
         suggestionsTrend: getTrendData(suggestions),
         betsTrend: getTrendData(bets),
         civPopularity: getCivPopularity(suggestions),
-        hourlyHeatmap: getHourlyHeatmap([...profiles, ...suggestions, ...bets]),
         newUsersThisWeek,
         newUsersToday,
         newSuggestionsThisWeek,
@@ -5825,30 +5818,7 @@ export default function AdminDashboardPage() {
                     </div>
                   </div>
 
-                  {/* Heatmap Oraria */}
-                  <div className="bg-[#0a0e1c]/60 p-6 rounded-3xl border border-cyan-500/15 backdrop-blur-md relative overflow-hidden flex flex-col shadow-2xl">
-                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
-                    <h3 className="text-xs font-black uppercase tracking-wider text-gray-400 mb-6">🕒 Heatmap Oraria Contributi & Attività (24 Ore)</h3>
-                    
-                    <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-12 gap-3">
-                      {(() => {
-                        const maxHourValue = Math.max(...analyticsData.hourlyHeatmap.map((h: any) => h.value), 1);
-                        return analyticsData.hourlyHeatmap.map((h: any, i: number) => {
-                          const intensity = h.value / maxHourValue;
-                          return (
-                            <div key={i} className="flex flex-col items-center justify-center p-3.5 bg-black/20 border border-white/5 rounded-2xl relative group hover:border-cyan-500/30 transition-all duration-300">
-                              <div 
-                                style={{ opacity: intensity * 0.4 + (h.value > 0 ? 0.05 : 0) }}
-                                className="absolute inset-0 bg-cyan-500 rounded-2xl transition-all duration-300"
-                              ></div>
-                              <span className="relative text-[9px] text-gray-500 group-hover:text-gray-300 font-black uppercase tracking-wider transition-colors">{h.label}</span>
-                              <span className="relative text-base font-black text-white group-hover:scale-110 group-hover:text-cyan-400 transition-all mt-1">{h.value}</span>
-                            </div>
-                          );
-                        });
-                      })()}
-                    </div>
-                  </div>
+
 
                 </div>
               ) : (
