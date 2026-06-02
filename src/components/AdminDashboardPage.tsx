@@ -5022,7 +5022,8 @@ export default function AdminDashboardPage() {
                             {[
                               { field: 'can_manage_tournaments', label: 'Gestione Tornei 🏆' },
                               { field: 'can_manage_civs', label: 'Gestione Civiltà 🏛️' },
-                              { field: 'can_manage_buildorders', label: 'Gestione Build Orders ⚡' }
+                              { field: 'can_manage_buildorders', label: 'Gestione Build Orders ⚡' },
+                              { field: 'can_view_admin', label: 'Accesso Pannello Admin 🔑' }
                             ].map((perm) => (
                               <div key={perm.field} className="flex items-center justify-between p-2 bg-[#111218] border border-white/5 rounded-xl">
                                 <span className="text-[10px] font-bold text-gray-300">{perm.label}</span>

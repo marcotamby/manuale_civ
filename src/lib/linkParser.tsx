@@ -16,7 +16,7 @@ export function renderTextWithLinks(text: string): React.ReactNode {
 
   while ((match = regex.exec(text)) !== null) {
     const matchIndex = match.index;
-    const [fullMatch, markdownLabel, markdownUrl, plainUrl] = match;
+    const [, markdownLabel, markdownUrl, plainUrl] = match;
 
     // Push text before the match
     if (matchIndex > lastIndex) {

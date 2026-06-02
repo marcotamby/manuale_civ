@@ -22,6 +22,7 @@ interface AuthContextType {
   canManageTournaments: boolean;
   canManageCivs: boolean;
   canManageBuildorders: boolean;
+  canViewAdmin: boolean;
   user: UserData | null;
   favorites: string[];
   isLoginModalOpen: boolean;
@@ -48,6 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [canManageTournaments, setCanManageTournaments] = useState(false);
   const [canManageCivs, setCanManageCivs] = useState(false);
   const [canManageBuildorders, setCanManageBuildorders] = useState(false);
+  const [canViewAdmin, setCanViewAdmin] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -70,14 +72,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const canT = isSA || !!userData.can_manage_tournaments;
     const canC = isSA || !!userData.can_manage_civs;
     const canB = isSA || !!userData.can_manage_buildorders;
+    const canViewA = isSA || !!userData.can_view_admin;
 
     setIsSuperAdmin(!!isSA);
     setIsEditor(!!isEd);
     setIsStreamer(!!isStr);
-    setIsAdmin(!!isSA || !!isEd);
+    setIsAdmin(!!isSA || !!isEd || !!canViewA);
     setCanManageTournaments(canT);
     setCanManageCivs(canC);
     setCanManageBuildorders(canB);
+    setCanViewAdmin(canViewA);
     
     console.log('🔐 Auth roles checked:', { 
       email, 
@@ -149,7 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('nickname, rank, avatar_url, role, is_streamer, can_manage_tournaments, can_manage_civs, can_manage_buildorders, sheep_balance, aoe4_profile_id')
+        .select('nickname, rank, avatar_url, role, is_streamer, can_manage_tournaments, can_manage_civs, can_manage_buildorders, can_view_admin, sheep_balance, aoe4_profile_id')
         .ilike('email', userEmail)
         .maybeSingle();
       
@@ -172,6 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
              can_manage_tournaments: data.can_manage_tournaments,
              can_manage_civs: data.can_manage_civs,
              can_manage_buildorders: data.can_manage_buildorders,
+             can_view_admin: data.can_view_admin,
              sheep_balance: data.sheep_balance ?? 100,
              aoe4_profile_id: currentAoe4Id
            };
@@ -322,6 +327,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCanManageTournaments(false);
     setCanManageCivs(false);
     setCanManageBuildorders(false);
+    setCanViewAdmin(false);
     setUser(null);
     setFavorites([]); // Clear favorites state on logout
     localStorage.removeItem('auth_user');
@@ -428,6 +434,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       canManageTournaments,
       canManageCivs,
       canManageBuildorders,
+      canViewAdmin,
       user,
       favorites,
       isLoginModalOpen,
