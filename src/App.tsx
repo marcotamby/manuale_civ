@@ -32,6 +32,7 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { usePresence } from './components/PresenceContext';
 import { ClassificaPage } from './components/ClassificaPage';
+import { renderTextWithLinks } from './lib/linkParser';
 
 function App() {
   const navigate = useNavigate();
@@ -278,7 +279,7 @@ function App() {
             </span>
             <span className="text-cyan-400 uppercase tracking-widest text-[9px] font-black border border-cyan-400/30 px-1.5 py-0.5 rounded shrink-0">Annuncio</span>
             <span className="font-semibold text-gray-200">{activeBanner.title}:</span>
-            <span className="text-gray-300 font-normal">{activeBanner.body}</span>
+            <span className="text-gray-300 font-normal">{renderTextWithLinks(activeBanner.body)}</span>
           </div>
           <button 
             onClick={handleDismissBanner}

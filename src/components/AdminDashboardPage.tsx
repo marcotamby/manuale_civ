@@ -15,6 +15,7 @@ import type { ToastType } from './Toast';
 import { CustomSelect } from './CustomSelect';
 import { sendNewBuildOrderWebhook } from '../utils/discordWebhook';
 import { WYSIWYGEditor } from './TournamentsPage';
+import { renderTextWithLinks } from '../lib/linkParser';
 
 export interface Suggestion {
   id: string;
@@ -74,6 +75,7 @@ export default function AdminDashboardPage() {
     is_active: true
   });
   const [annError, setAnnError] = useState<string | null>(null);
+  const [editingAnnId, setEditingAnnId] = useState<string | null>(null);
 
   // Analytics States (Tab 4)
   const [analyticsData, setAnalyticsData] = useState<any>(null);
@@ -1207,28 +1209,58 @@ export default function AdminDashboardPage() {
     
     try {
       const userEmail = user?.email || 'admin@localhost';
-      const { error } = await supabase
-        .from('announcements')
-        .insert({
-          title: annForm.title.trim(),
-          body: annForm.body.trim(),
-          type: annForm.type,
-          target: annForm.target,
-          is_active: annForm.is_active,
-          created_by: userEmail
-        });
-        
-      if (error) throw error;
       
-      await logAdminAction(
-        'CREATE_ANNOUNCEMENT',
-        'announcements',
-        null,
-        `Creato annuncio "${annForm.title}"`,
-        { form: annForm }
-      );
+      if (editingAnnId) {
+        // Mode: Edit
+        const { error } = await supabase
+          .from('announcements')
+          .update({
+            title: annForm.title.trim(),
+            body: annForm.body.trim(),
+            type: annForm.type,
+            target: annForm.target,
+            is_active: annForm.is_active
+          })
+          .eq('id', editingAnnId);
+          
+        if (error) throw error;
+        
+        await logAdminAction(
+          'UPDATE_ANNOUNCEMENT',
+          'announcements',
+          editingAnnId,
+          `Aggiornato annuncio ID ${editingAnnId} ("${annForm.title}")`,
+          { form: annForm }
+        );
+        
+        setToast({ isVisible: true, message: 'Annuncio aggiornato con successo', type: 'success' });
+        setEditingAnnId(null);
+      } else {
+        // Mode: Create
+        const { error } = await supabase
+          .from('announcements')
+          .insert({
+            title: annForm.title.trim(),
+            body: annForm.body.trim(),
+            type: annForm.type,
+            target: annForm.target,
+            is_active: annForm.is_active,
+            created_by: userEmail
+          });
+          
+        if (error) throw error;
+        
+        await logAdminAction(
+          'CREATE_ANNOUNCEMENT',
+          'announcements',
+          null,
+          `Creato annuncio "${annForm.title}"`,
+          { form: annForm }
+        );
 
-      setToast({ isVisible: true, message: 'Annuncio creato con successo', type: 'success' });
+        setToast({ isVisible: true, message: 'Annuncio creato con successo', type: 'success' });
+      }
+      
       setAnnForm({
         title: '',
         body: '',
@@ -1238,9 +1270,31 @@ export default function AdminDashboardPage() {
       });
       fetchAnnouncements();
     } catch (err) {
-      console.error('Error creating announcement:', err);
-      setToast({ isVisible: true, message: 'Errore nella creazione dell\'annuncio', type: 'error' });
+      console.error('Error saving announcement:', err);
+      setToast({ isVisible: true, message: editingAnnId ? 'Errore nell\'aggiornamento dell\'annuncio' : 'Errore nella creazione dell\'annuncio', type: 'error' });
     }
+  };
+
+  const handleStartEditAnnouncement = (ann: any) => {
+    setEditingAnnId(ann.id);
+    setAnnForm({
+      title: ann.title,
+      body: ann.body,
+      type: ann.type,
+      target: ann.target,
+      is_active: ann.is_active
+    });
+  };
+
+  const handleCancelEditAnnouncement = () => {
+    setEditingAnnId(null);
+    setAnnForm({
+      title: '',
+      body: '',
+      type: 'banner',
+      target: 'all',
+      is_active: true
+    });
   };
 
   const handleToggleAnnouncementActive = async (id: string, currentActive: boolean) => {
@@ -5073,7 +5127,9 @@ export default function AdminDashboardPage() {
                   <div className="xl:col-span-5 bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-6 shadow-2xl backdrop-blur-md relative overflow-hidden h-fit">
                     <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
                     
-                    <h3 className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-6">📢 Crea Nuova Comunicazione</h3>
+                    <h3 className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-6">
+                      📢 {editingAnnId ? 'Modifica Comunicazione' : 'Crea Nuova Comunicazione'}
+                    </h3>
                     
                     <form onSubmit={handleCreateAnnouncement} className="space-y-4">
                       <div className="space-y-2">
@@ -5145,12 +5201,23 @@ export default function AdminDashboardPage() {
                         </span>
                       </div>
 
-                      <button
-                        type="submit"
-                        className="w-full py-3.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-black uppercase tracking-wider rounded-2xl transition-all active:scale-95 shadow-lg shadow-cyan-600/10"
-                      >
-                        Invia Comunicazione
-                      </button>
+                      <div className="flex gap-3">
+                        {editingAnnId && (
+                          <button
+                            type="button"
+                            onClick={handleCancelEditAnnouncement}
+                            className="flex-1 py-3.5 bg-white/5 border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white text-xs font-black uppercase tracking-wider rounded-2xl transition-all"
+                          >
+                            Annulla
+                          </button>
+                        )}
+                        <button
+                          type="submit"
+                          className={`py-3.5 text-white text-xs font-black uppercase tracking-wider rounded-2xl transition-all active:scale-95 shadow-lg ${editingAnnId ? 'flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 shadow-green-600/10' : 'w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-cyan-600/10'}`}
+                        >
+                          {editingAnnId ? 'Salva Modifiche' : 'Invia Comunicazione'}
+                        </button>
+                      </div>
                     </form>
                   </div>
 
@@ -5195,6 +5262,13 @@ export default function AdminDashboardPage() {
                                   {ann.is_active ? 'Attivo' : 'Spento'}
                                 </button>
                                 <button
+                                  onClick={() => handleStartEditAnnouncement(ann)}
+                                  className={`p-1 hover:bg-cyan-500/10 hover:text-cyan-400 rounded transition-colors ${editingAnnId === ann.id ? 'text-cyan-400 bg-cyan-500/10' : 'text-gray-500'}`}
+                                  title="Modifica annuncio"
+                                >
+                                  <Edit2 size={14} />
+                                </button>
+                                <button
                                   onClick={() => {
                                     if (confirm('Sei sicuro di voler eliminare questo annuncio?')) {
                                       handleDeleteAnnouncement(ann.id);
@@ -5208,7 +5282,7 @@ export default function AdminDashboardPage() {
                             </div>
                             
                             <p className="text-[11px] text-gray-300 leading-relaxed font-medium bg-black/30 p-3 rounded-xl border border-white/5">
-                              {ann.body}
+                              {renderTextWithLinks(ann.body)}
                             </p>
                             
                             <div className="text-[9px] text-gray-500 text-right">
