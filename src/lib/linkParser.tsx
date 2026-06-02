@@ -7,7 +7,7 @@ export function renderTextWithLinks(text: string): React.ReactNode {
   if (!text) return null;
 
   // Match either [markdown label](url) OR a plain HTTP/S URL
-  const regex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s<>]+)/g;
+  const regex = /\[([^\]]+)\]\(([^\s)]+)\)|(https?:\/\/[^\s<>]+)/g;
 
   const parts: React.ReactNode[] = [];
   let lastIndex = 0;
@@ -36,12 +36,17 @@ export function renderTextWithLinks(text: string): React.ReactNode {
         </a>
       );
     } else if (markdownLabel && markdownUrl) {
+      const isInternal = markdownUrl.startsWith('/');
+      let href = markdownUrl;
+      if (!isInternal && !/^https?:\/\//i.test(markdownUrl)) {
+        href = `https://${markdownUrl}`;
+      }
       parts.push(
         <a
           key={key++}
-          href={markdownUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+          href={href}
+          target={isInternal ? undefined : "_blank"}
+          rel={isInternal ? undefined : "noopener noreferrer"}
           className="underline text-cyan-400 hover:text-cyan-300 transition-colors font-bold"
         >
           {markdownLabel}

@@ -996,8 +996,8 @@ export default function AdminDashboardPage() {
   };
 
   const handleCrmToggleBan = async (userEmail: string, currentRole: string) => {
-    if (!isSuperAdmin) {
-      setToast({ isVisible: true, message: 'Solo i Super Admin possono bannare utenti', type: 'error' });
+    if (!isAdmin) {
+      setToast({ isVisible: true, message: 'Solo gli amministratori possono bannare utenti', type: 'error' });
       return;
     }
     const isBanned = currentRole === 'banned';
@@ -1061,8 +1061,8 @@ export default function AdminDashboardPage() {
   };
 
   const handleCrmAdjustSheep = async (userEmail: string, amount: number, isSet = false) => {
-    if (!isSuperAdmin) {
-      setToast({ isVisible: true, message: 'Solo i Super Admin possono modificare il bilancio', type: 'error' });
+    if (!isAdmin) {
+      setToast({ isVisible: true, message: 'Solo gli amministratori possono modificare il bilancio', type: 'error' });
       return;
     }
     try {
@@ -1099,8 +1099,8 @@ export default function AdminDashboardPage() {
   };
 
   const handleCrmChangeRole = async (userEmail: string, role: string) => {
-    if (!isSuperAdmin) {
-      setToast({ isVisible: true, message: 'Solo i Super Admin possono promuovere utenti', type: 'error' });
+    if (!isAdmin) {
+      setToast({ isVisible: true, message: 'Solo gli amministratori possono modificare i ruoli', type: 'error' });
       return;
     }
     try {
@@ -1143,8 +1143,8 @@ export default function AdminDashboardPage() {
   };
 
   const handleCrmTogglePermission = async (userEmail: string, field: string, value: boolean) => {
-    if (!isSuperAdmin) {
-      setToast({ isVisible: true, message: 'Solo i Super Admin possono modificare i permessi', type: 'error' });
+    if (!isAdmin) {
+      setToast({ isVisible: true, message: 'Solo gli amministratori possono modificare i permessi', type: 'error' });
       return;
     }
     try {
@@ -1815,7 +1815,7 @@ export default function AdminDashboardPage() {
   };
 
   const handleSendNotifications = async () => {
-    if (pendingNotifCount === 0 || !isSuperAdmin) return;
+    if (pendingNotifCount === 0 || !isAdmin) return;
 
     try {
       setIsSendingEmail(true);
@@ -1862,7 +1862,7 @@ export default function AdminDashboardPage() {
 
   const handleUpdateStatus = async (sugg: Suggestion, newStatus: 'implemented' | 'rejected', reason?: string) => {
     const canManage = (sugg.section === 'build_order' && canManageBuildorders) || (sugg.section !== 'build_order' && canManageCivs);
-    if (!isSuperAdmin && !canManage) return;
+    if (!isAdmin && !canManage) return;
     try {
       let justApprovedBO: any = null;
       let targetCiv: any = null;
@@ -2156,7 +2156,7 @@ export default function AdminDashboardPage() {
             )}
           </button>
 
-          {(isSuperAdmin || canManageTournaments) && (
+          {(isAdmin || canManageTournaments) && (
             <button
               onClick={() => selectTab('tornei')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'tornei' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
@@ -2166,7 +2166,7 @@ export default function AdminDashboardPage() {
             </button>
           )}
 
-          {(isSuperAdmin || canManageCivs || canManageBuildorders) && (
+          {(isAdmin || canManageCivs || canManageBuildorders) && (
             <button
               onClick={() => selectTab('civilta')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'civilta' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
@@ -2177,40 +2177,38 @@ export default function AdminDashboardPage() {
           )}
 
           {isSuperAdmin && (
-            <>
-              <button
-                onClick={() => selectTab('users')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'users' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-              >
-                <ShieldCheck size={18} />
-                <span>Permessi Staff</span>
-              </button>
-
-              <button
-                onClick={() => selectTab('pecore')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'pecore' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-              >
-                <span className="text-base">🐑</span>
-                <span>Bilancio Pecore</span>
-              </button>
-
-              <button
-                onClick={() => selectTab('audit')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'audit' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-              >
-                <History size={18} />
-                <span>Registro Attività</span>
-              </button>
-
-              <button
-                onClick={() => selectTab('diagnostics')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'diagnostics' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-              >
-                <Database size={18} />
-                <span>Backup & Diagnostica</span>
-              </button>
-            </>
+            <button
+              onClick={() => selectTab('users')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'users' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            >
+              <ShieldCheck size={18} />
+              <span>Permessi Staff</span>
+            </button>
           )}
+
+          <button
+            onClick={() => selectTab('pecore')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'pecore' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+          >
+            <span className="text-base">🐑</span>
+            <span>Bilancio Pecore</span>
+          </button>
+
+          <button
+            onClick={() => selectTab('audit')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'audit' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+          >
+            <History size={18} />
+            <span>Registro Attività</span>
+          </button>
+
+          <button
+            onClick={() => selectTab('diagnostics')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'diagnostics' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+          >
+            <Database size={18} />
+            <span>Backup & Diagnostica</span>
+          </button>
         </nav>
 
         <div className="p-4 border-t border-white/5">
@@ -2291,7 +2289,7 @@ export default function AdminDashboardPage() {
               <div className="space-y-4">
                 <h4 className="text-[11px] font-black uppercase text-gray-500 tracking-[0.2em]">⚠️ Cose che richiedono la tua attenzione</h4>
                 
-                {suggestions.length === 0 && questions.length === 0 && answers.length === 0 && (!isSuperAdmin || pendingNotifCount === 0) ? (
+                {suggestions.length === 0 && questions.length === 0 && answers.length === 0 && (!isAdmin || pendingNotifCount === 0) ? (
                   <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-3xl p-8 flex flex-col items-center text-center shadow-lg backdrop-blur-md">
                     <CheckCircle className="text-emerald-400 mb-3 animate-pulse" size={36} />
                     <h5 className="text-sm font-black text-white uppercase tracking-wider">Tutto sotto controllo!</h5>
@@ -2357,7 +2355,7 @@ export default function AdminDashboardPage() {
                       </div>
                     )}
 
-                    {isSuperAdmin && pendingNotifCount > 0 && (
+                    {isAdmin && pendingNotifCount > 0 && (
                       <div className="bg-[#0a0e1c]/60 border border-purple-500/20 rounded-3xl p-5 flex flex-col justify-between shadow-xl relative overflow-hidden group hover:border-purple-500/50 transition-all duration-300">
                         <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-purple-500/30 to-transparent"></div>
                         <div className="space-y-3">
@@ -2999,6 +2997,14 @@ export default function AdminDashboardPage() {
                             <Zap size={14} />
                           </button>
 
+                          <button
+                            onClick={() => handleToggleUserRole(u.email, 'can_view_admin', !u.can_view_admin)}
+                            className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all ${u.can_view_admin ? 'bg-purple-600 text-white font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
+                            title="Accesso Pannello Admin"
+                          >
+                            <LayoutDashboard size={14} />
+                          </button>
+
                           <div className="w-px h-5 bg-white/10 mx-0.5" />
 
                           <button
@@ -3030,7 +3036,7 @@ export default function AdminDashboardPage() {
             </div>
           )}
 
-          {activeTab === 'pecore' && isSuperAdmin && (
+          {activeTab === 'pecore' && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500">
               <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-[#0a0e1c]/60 p-6 rounded-3xl border border-cyan-500/15 shadow-2xl backdrop-blur-md relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
@@ -3137,7 +3143,7 @@ export default function AdminDashboardPage() {
           )}
 
           {/* TAB TORNEI */}
-          {activeTab === 'tornei' && (isSuperAdmin || canManageTournaments) && (
+          {activeTab === 'tornei' && (isAdmin || canManageTournaments) && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
@@ -3864,7 +3870,7 @@ export default function AdminDashboardPage() {
           )}
 
           {/* TAB CIVILTA */}
-          {activeTab === 'civilta' && (isSuperAdmin || canManageCivs || canManageBuildorders) && (
+          {activeTab === 'civilta' && (isAdmin || canManageCivs || canManageBuildorders) && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
@@ -4379,7 +4385,7 @@ export default function AdminDashboardPage() {
           )}
 
           {/* TAB AUDIT LOG */}
-          {activeTab === 'audit' && isSuperAdmin && (
+          {activeTab === 'audit' && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
               <div className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-8 shadow-2xl backdrop-blur-md relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
@@ -4534,7 +4540,7 @@ export default function AdminDashboardPage() {
           )}
 
           {/* TAB DIAGNOSTICS & BACKUPS */}
-          {activeTab === 'diagnostics' && isSuperAdmin && (
+          {activeTab === 'diagnostics' && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
               
               {/* Metrics Grid */}
@@ -5006,7 +5012,7 @@ export default function AdminDashboardPage() {
                             {['user', 'staff', 'editor', 'admin'].map((role) => (
                               <button
                                 key={role}
-                                disabled={!isSuperAdmin}
+                                disabled={!isAdmin}
                                 onClick={() => handleCrmChangeRole(selectedCrmUser.email, role)}
                                 className={`py-2 rounded-xl text-[10px] font-black uppercase border transition-all ${selectedCrmUser.role === role ? 'bg-cyan-600/20 border-cyan-500/50 text-cyan-400 font-bold' : 'bg-black/10 border-white/5 text-gray-400 hover:bg-white/5'}`}
                               >
@@ -5029,9 +5035,9 @@ export default function AdminDashboardPage() {
                                 <span className="text-[10px] font-bold text-gray-300">{perm.label}</span>
                                 <button
                                   type="button"
-                                  disabled={!isSuperAdmin}
+                                  disabled={!isAdmin}
                                   onClick={() => handleCrmTogglePermission(selectedCrmUser.email, perm.field, !selectedCrmUser[perm.field])}
-                                  className={`w-9 h-5 rounded-full relative transition-all flex-shrink-0 outline-none ${!isSuperAdmin ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${selectedCrmUser[perm.field] ? 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)]' : 'bg-white/10'}`}
+                                  className={`w-9 h-5 rounded-full relative transition-all flex-shrink-0 outline-none ${!isAdmin ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${selectedCrmUser[perm.field] ? 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)]' : 'bg-white/10'}`}
                                 >
                                   <div className={`absolute top-[2px] w-4 h-4 bg-white rounded-full transition-all ${selectedCrmUser[perm.field] ? 'left-[18px]' : 'left-[2px]'}`} />
                                 </button>
@@ -5043,7 +5049,7 @@ export default function AdminDashboardPage() {
                         <div className="pt-2">
                           {selectedCrmUser.role === 'banned' ? (
                             <button
-                              disabled={!isSuperAdmin}
+                              disabled={!isAdmin}
                               onClick={() => handleCrmToggleBan(selectedCrmUser.email, 'banned')}
                               className="w-full flex items-center justify-center gap-2 py-3 bg-green-500/10 hover:bg-green-600 border border-green-500/20 hover:border-green-500 text-green-400 hover:text-white rounded-2xl transition-all font-black text-xs uppercase tracking-wider"
                             >
@@ -5051,7 +5057,7 @@ export default function AdminDashboardPage() {
                             </button>
                           ) : (
                             <button
-                              disabled={!isSuperAdmin}
+                              disabled={!isAdmin}
                               onClick={() => handleCrmToggleBan(selectedCrmUser.email, selectedCrmUser.role || 'user')}
                               className="w-full flex items-center justify-center gap-2 py-3 bg-red-500/10 hover:bg-red-600 border border-red-500/20 hover:border-red-500 text-red-400 hover:text-white rounded-2xl transition-all font-black text-xs uppercase tracking-wider shadow-lg shadow-red-950/20"
                             >
@@ -5447,7 +5453,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Footer Fisso per Invio Mail */}
-        {isSuperAdmin && (pendingNotifCount > 0 || sendNotifSuccess) && (
+        {isAdmin && (pendingNotifCount > 0 || sendNotifSuccess) && (
           <div className="p-6 border-t border-cyan-500/15 bg-gradient-to-r from-[#0d1424] to-[#1a1c32] flex justify-center sticky bottom-0 z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
             <button
               onClick={handleSendNotifications}
