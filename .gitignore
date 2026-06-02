@@ -28,6 +28,9 @@ scripts/*.json
 backups/*_backup_*.json
 !backups/*_latest.json
 
+# Debug / scratch scripts (never commit)
+scratch/
+
 .vercel
 .env
 .env.local
