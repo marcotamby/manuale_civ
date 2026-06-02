@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, 
   AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, 
@@ -41,7 +41,8 @@ export default function AdminDashboardPage() {
     }
   }, [isAuthenticated, isAdmin, navigate]);
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'proposte' | 'qa' | 'users' | 'pecore' | 'tornei' | 'civilta' | 'audit' | 'diagnostics'>('overview');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = (searchParams.get('tab') as 'overview' | 'proposte' | 'qa' | 'users' | 'pecore' | 'tornei' | 'civilta' | 'audit' | 'diagnostics') || 'overview';
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Audit Log states
@@ -59,7 +60,7 @@ export default function AdminDashboardPage() {
   const [webhookTesting, setWebhookTesting] = useState(false);
   
   const selectTab = (tab: typeof activeTab) => {
-    setActiveTab(tab);
+    setSearchParams({ tab });
     setIsMobileMenuOpen(false);
   };
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
