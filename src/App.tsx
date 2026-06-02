@@ -105,7 +105,7 @@ function App() {
   // Active banner announcement states
   const [activeBanner, setActiveBanner] = useState<{ id: string; title: string; body: string } | null>(null);
   const [isBannerDismissed, setIsBannerDismissed] = useState(false);
-  const [activeNotification, setActiveNotification] = useState<{ id: string; title: string; body: string } | null>(null);
+  const [activeNotification, setActiveNotification] = useState<{ id: string; title: string; body: string; btn_label?: string | null; btn_url?: string | null } | null>(null);
 
   useEffect(() => {
     async function fetchAnnouncements() {
@@ -113,7 +113,7 @@ function App() {
         // 1. Fetch active banner
         const { data: bannerData, error: bannerError } = await supabase
           .from('announcements')
-          .select('id, title, body, is_active, type')
+          .select('id, title, body, is_active, type, btn_label, btn_url')
           .eq('is_active', true)
           .or('type.eq.banner,type.eq.both')
           .order('created_at', { ascending: false })
@@ -130,7 +130,7 @@ function App() {
         // 2. Fetch active popup notification
         const { data: notifData, error: notifError } = await supabase
           .from('announcements')
-          .select('id, title, body, is_active, type')
+          .select('id, title, body, is_active, type, btn_label, btn_url')
           .eq('is_active', true)
           .or('type.eq.notification,type.eq.both')
           .order('created_at', { ascending: false })
@@ -290,7 +290,7 @@ function App() {
       onTouchEnd={handleTouchEnd}
     >
       {activeNotification && (
-        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-black/75 backdrop-blur-xl animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-black/65 backdrop-blur-md animate-in fade-in duration-300">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.08),transparent_70%)] pointer-events-none"></div>
 
           <div className="bg-gradient-to-b from-[#0a0e1c] to-[#04060f] border border-cyan-500/30 p-8 rounded-3xl max-w-lg w-full shadow-[0_0_50px_rgba(6,182,212,0.15)] animate-in zoom-in-95 duration-300 relative overflow-hidden flex flex-col items-center text-center">
@@ -312,15 +312,49 @@ function App() {
               {renderTextWithLinks(activeNotification.body)}
             </div>
 
-            <button
-              onClick={() => {
-                localStorage.setItem(`dismissed_notif_popup_${activeNotification.id}`, 'true');
-                setActiveNotification(null);
-              }}
-              className="w-full py-3.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-cyan-600/15 active:scale-[0.98] transition-all cursor-pointer shrink-0"
-            >
-              Ho Capito
-            </button>
+            {activeNotification.btn_label && activeNotification.btn_url ? (() => {
+              const url = activeNotification.btn_url;
+              const label = activeNotification.btn_label;
+              return (
+                <div className="flex flex-col sm:flex-row gap-3 w-full shrink-0">
+                  <button
+                    onClick={() => {
+                      localStorage.setItem(`dismissed_notif_popup_${activeNotification.id}`, 'true');
+                      setActiveNotification(null);
+                    }}
+                    className="flex-1 order-2 sm:order-1 py-3 bg-white/5 border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white text-xs font-black uppercase tracking-wider rounded-2xl transition-all"
+                  >
+                    Chiudi
+                  </button>
+                  <a
+                    href={url.startsWith('/') ? undefined : url}
+                    onClick={(e) => {
+                      localStorage.setItem(`dismissed_notif_popup_${activeNotification.id}`, 'true');
+                      setActiveNotification(null);
+                      if (url.startsWith('/')) {
+                        e.preventDefault();
+                        navigate(url);
+                      }
+                    }}
+                    target={url.startsWith('/') ? undefined : "_blank"}
+                    rel={url.startsWith('/') ? undefined : "noopener noreferrer"}
+                    className="flex-1 order-1 sm:order-2 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-cyan-600/15 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center"
+                  >
+                    {label}
+                  </a>
+                </div>
+              );
+            })() : (
+              <button
+                onClick={() => {
+                  localStorage.setItem(`dismissed_notif_popup_${activeNotification.id}`, 'true');
+                  setActiveNotification(null);
+                }}
+                className="w-full py-3.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-cyan-600/15 active:scale-[0.98] transition-all cursor-pointer shrink-0"
+              >
+                Chiudi
+              </button>
+            )}
           </div>
         </div>
       )}

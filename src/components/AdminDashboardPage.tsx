@@ -77,7 +77,9 @@ export default function AdminDashboardPage() {
     body: '',
     type: 'banner',
     target: 'all',
-    is_active: true
+    is_active: true,
+    btn_label: '',
+    btn_url: ''
   });
   const [annError, setAnnError] = useState<string | null>(null);
   const [editingAnnId, setEditingAnnId] = useState<string | null>(null);
@@ -1270,7 +1272,9 @@ export default function AdminDashboardPage() {
             body: annForm.body.trim(),
             type: annForm.type,
             target: annForm.target,
-            is_active: annForm.is_active
+            is_active: annForm.is_active,
+            btn_label: annForm.btn_label.trim() || null,
+            btn_url: annForm.btn_url.trim() || null
           })
           .eq('id', editingAnnId);
           
@@ -1296,7 +1300,9 @@ export default function AdminDashboardPage() {
             type: annForm.type,
             target: annForm.target,
             is_active: annForm.is_active,
-            created_by: userEmail
+            created_by: userEmail,
+            btn_label: annForm.btn_label.trim() || null,
+            btn_url: annForm.btn_url.trim() || null
           });
           
         if (error) throw error;
@@ -1317,7 +1323,9 @@ export default function AdminDashboardPage() {
         body: '',
         type: 'banner',
         target: 'all',
-        is_active: true
+        is_active: true,
+        btn_label: '',
+        btn_url: ''
       });
       fetchAnnouncements();
     } catch (err) {
@@ -1333,7 +1341,9 @@ export default function AdminDashboardPage() {
       body: ann.body,
       type: ann.type,
       target: ann.target,
-      is_active: ann.is_active
+      is_active: ann.is_active,
+      btn_label: ann.btn_label || '',
+      btn_url: ann.btn_url || ''
     });
   };
 
@@ -1344,7 +1354,9 @@ export default function AdminDashboardPage() {
       body: '',
       type: 'banner',
       target: 'all',
-      is_active: true
+      is_active: true,
+      btn_label: '',
+      btn_url: ''
     });
   };
 
@@ -5253,6 +5265,32 @@ export default function AdminDashboardPage() {
                           buttonClassName="h-10 border-white/10 hover:border-cyan-500/50 rounded-xl text-xs py-2 bg-[#111218] font-bold"
                         />
                       </div>
+
+                      {(annForm.type === 'notification' || annForm.type === 'both') && (
+                        <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Testo Bottone Azione (Opzionale)</label>
+                            <input
+                              type="text"
+                              placeholder="es. Iscriviti"
+                              value={annForm.btn_label}
+                              onChange={(e) => setAnnForm({ ...annForm, btn_label: e.target.value })}
+                              className="w-full bg-[#111218] border border-white/10 focus:border-cyan-500/50 rounded-xl px-4 py-2.5 text-xs text-white font-bold outline-none"
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Link Bottone Azione (Opzionale)</label>
+                            <input
+                              type="text"
+                              placeholder="es. /tornei o https://..."
+                              value={annForm.btn_url}
+                              onChange={(e) => setAnnForm({ ...annForm, btn_url: e.target.value })}
+                              className="w-full bg-[#111218] border border-white/10 focus:border-cyan-500/50 rounded-xl px-4 py-2.5 text-xs text-white font-bold outline-none"
+                            />
+                          </div>
+                        </div>
+                      )}
 
                       <div className="flex items-center gap-3 py-2">
                         <button
