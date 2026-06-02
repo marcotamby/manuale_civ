@@ -32,7 +32,7 @@ export interface Suggestion {
 
 export default function AdminDashboardPage() {
   const navigate = useNavigate();
-  const { isAuthenticated, isAdmin, isSuperAdmin, canManageCivs, canManageBuildorders, canManageTournaments } = useAuth();
+  const { isAuthenticated, isAdmin, isSuperAdmin, canManageCivs, canManageBuildorders, canManageTournaments, user } = useAuth();
   const { refreshCivs } = useCivData();
 
   // Redirect if not admin
@@ -610,8 +610,8 @@ export default function AdminDashboardPage() {
         difficulty: 2,
         description: '',
         map: '',
-        author_nickname: useAuth().user?.nickname || '',
-        author_rank: useAuth().user?.rank || '',
+        author_nickname: user?.nickname || '',
+        author_rank: user?.rank || '',
         banner_url: '',
         banner_position: 50,
         source: '',
@@ -1206,7 +1206,7 @@ export default function AdminDashboardPage() {
     if (!annForm.title.trim() || !annForm.body.trim()) return;
     
     try {
-      const userEmail = useAuth().user?.email || 'admin@localhost';
+      const userEmail = user?.email || 'admin@localhost';
       const { error } = await supabase
         .from('announcements')
         .insert({
@@ -1428,8 +1428,8 @@ export default function AdminDashboardPage() {
     details: Record<string, any> = {}
   ) => {
     try {
-      const userEmail = useAuth().user?.email || 'admin@localhost';
-      const userNickname = useAuth().user?.nickname || 'Admin';
+      const userEmail = user?.email || 'admin@localhost';
+      const userNickname = user?.nickname || 'Admin';
       await supabase.from('audit_log').insert({
         user_email: userEmail,
         user_nickname: userNickname,
@@ -2226,7 +2226,7 @@ export default function AdminDashboardPage() {
                 <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
                 <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border-2 border-cyan-500/20 flex items-center justify-center text-cyan-400 text-2xl shadow-lg shrink-0">🔑</div>
                 <div>
-                  <h3 className="text-lg font-black text-white uppercase tracking-tight">Benvenuto nel Pannello Admin, {useAuth().user?.nickname || 'Admin'}</h3>
+                  <h3 className="text-lg font-black text-white uppercase tracking-tight">Benvenuto nel Pannello Admin, {user?.nickname || 'Admin'}</h3>
                   <p className="text-xs text-gray-400 mt-1">
                     Ecco una panoramica dello stato attuale del sito e delle attività che richiedono il tuo intervento.
                   </p>

@@ -102,9 +102,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    // Development bypass: if running on localhost, always enable admin features
+    // Development bypass: if running on localhost and not logged in, always enable admin features
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    if (isLocalhost) {
+    if (isLocalhost && !storedUser) {
       console.log('🛡️ Local development detected: Admin bypass active.');
       setIsAdmin(true);
       setIsAuthenticated(true);
