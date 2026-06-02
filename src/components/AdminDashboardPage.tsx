@@ -2337,7 +2337,7 @@ export default function AdminDashboardPage() {
 
               {/* Sezione Punti Salienti (Highlights) */}
               <div className="space-y-4">
-                <h4 className="text-[11px] font-black uppercase text-gray-500 tracking-[0.2em]">📈 Highlights dell'Attività (Questa Settimana)</h4>
+                <h4 className="text-[11px] font-black uppercase text-gray-500 tracking-[0.2em]">📈 Highlights dell'Attività</h4>
                 
                 {analyticsLoading ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -2353,33 +2353,35 @@ export default function AdminDashboardPage() {
                     <div className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-md shadow-2xl">
                       <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
                       <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Nuovi Iscritti</span>
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Utenti Registrati</span>
                         <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
                           <Users size={16} />
                         </div>
                       </div>
                       <p className="text-3xl font-black mt-4 text-white tracking-tight">
-                        {analyticsData.newUsersThisWeek}
+                        {analyticsData.totalUsers}
                       </p>
-                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">
-                        +{analyticsData.newUsersToday} nelle ultime 24 ore
-                      </p>
+                      <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-2 flex flex-col gap-0.5">
+                        <span className="text-cyan-400">+{analyticsData.newUsersThisWeek} questa settimana</span>
+                        <span>+{analyticsData.newUsersToday} oggi</span>
+                      </div>
                     </div>
 
                     <div className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-md shadow-2xl">
                       <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/25 to-transparent"></div>
                       <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Nuove Proposte</span>
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Proposte Totali</span>
                         <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
                           <Inbox size={16} />
                         </div>
                       </div>
                       <p className="text-3xl font-black mt-4 text-white tracking-tight">
-                        {analyticsData.newSuggestionsThisWeek}
+                        {analyticsData.totalSuggestions}
                       </p>
-                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">
-                        +{analyticsData.newSuggestionsToday} nelle ultime 24 ore
-                      </p>
+                      <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-2 flex flex-col gap-0.5">
+                        <span className="text-blue-400">+{analyticsData.newSuggestionsThisWeek} questa settimana</span>
+                        <span>+{analyticsData.newSuggestionsToday} oggi</span>
+                      </div>
                     </div>
 
                     <div className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-md shadow-2xl">
@@ -2391,11 +2393,12 @@ export default function AdminDashboardPage() {
                         </div>
                       </div>
                       <p className="text-3xl font-black mt-4 text-white tracking-tight">
-                        {analyticsData.betsThisWeek}
+                        {analyticsData.totalBets}
                       </p>
-                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">
-                        +{analyticsData.betsToday} nelle ultime 24 ore
-                      </p>
+                      <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-2 flex flex-col gap-0.5">
+                        <span className="text-indigo-400">+{analyticsData.betsThisWeek} questa settimana</span>
+                        <span>+{analyticsData.betsToday} oggi</span>
+                      </div>
                     </div>
 
                     <div className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-md shadow-2xl">
@@ -2407,11 +2410,12 @@ export default function AdminDashboardPage() {
                         </div>
                       </div>
                       <p className="text-3xl font-black mt-4 text-cyan-400 tracking-tight">
-                        🐑 {analyticsData.sheepWageredThisWeek}
+                        🐑 {analyticsData.totalSheep}
                       </p>
-                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">
-                        +🐑 {analyticsData.sheepWageredToday} nelle ultime 24 ore
-                      </p>
+                      <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-2 flex flex-col gap-0.5">
+                        <span className="text-cyan-400">+🐑 {analyticsData.sheepWageredThisWeek} questa settimana</span>
+                        <span>+🐑 {analyticsData.sheepWageredToday} oggi</span>
+                      </div>
                     </div>
                   </div>
                 ) : (
