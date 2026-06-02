@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { X, ExternalLink, Copy, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft, Pencil, Check, Upload, Users, Loader2 } from 'lucide-react';
 import { AoE4MatchDashboard } from './AoE4MatchDashboard';
 import { TournamentOverlayDashboard } from './TournamentOverlayDashboard';
@@ -104,6 +104,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
 
   const { overlayId, tab } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (isOpen) {
@@ -134,7 +135,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
       } else if (OVERLAYS.length > 0) {
         setSelectedOverlay(OVERLAYS[0]);
         // Se non c'è overlayId nell'URL, lo aggiungiamo per coerenza
-        navigate(`/admin/overlays/${OVERLAYS[0].id}/${tab === 'config' ? 'config' : 'preview'}`, { replace: true });
+        navigate(`/admin/overlays/${OVERLAYS[0].id}/${tab === 'config' ? 'config' : 'preview'}`, { replace: true, state: location.state });
       }
       
       if (tab === 'config') {
@@ -147,14 +148,14 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
 
   const handleSelectOverlay = (ov: OverlayItem) => {
     setSelectedOverlay(ov);
-    navigate(`/admin/overlays/${ov.id}/${activeTab === 'dashboard' ? 'config' : 'preview'}`);
+    navigate(`/admin/overlays/${ov.id}/${activeTab === 'dashboard' ? 'config' : 'preview'}`, { state: location.state });
   };
 
   const handleToggleTab = () => {
     const nextTab = activeTab === 'preview' ? 'dashboard' : 'preview';
     setActiveTab(nextTab);
     const targetOverlayId = selectedOverlay?.id || overlayId || OVERLAYS[0].id;
-    navigate(`/admin/overlays/${targetOverlayId}/${nextTab === 'dashboard' ? 'config' : 'preview'}`);
+    navigate(`/admin/overlays/${targetOverlayId}/${nextTab === 'dashboard' ? 'config' : 'preview'}`, { state: location.state });
   };
 
   const overlayDisplayName = (selectedOverlay && overlayNames[selectedOverlay.id]) ?? selectedOverlay?.name ?? '';

@@ -2443,7 +2443,7 @@ export default function AdminDashboardPage() {
 
           <button
             onClick={() => {
-              navigate('/admin/overlays');
+              navigate('/admin/overlays', { state: { fromAdmin: true } });
               setIsMobileMenuOpen(false);
             }}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-gray-400 hover:text-white hover:bg-white/5"

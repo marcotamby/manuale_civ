@@ -85,7 +85,13 @@ function App() {
       setCivEditorConfig({});
       setIsBOEditorOpen(false);
       setIsSidebarOpen(false);
-      if (location.pathname.startsWith('/admin/overlays')) navigate('/');
+      if (location.pathname.startsWith('/admin/overlays')) {
+        if (location.state?.fromAdmin) {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
+      }
     };
   }, []); // State setters are stable, so empty dep array is fine
 
@@ -561,7 +567,13 @@ function App() {
           isOpen={isAdminOverlayOpen}
           onClose={() => {
             setIsAdminOverlayOpen(false);
-            if (location.pathname.startsWith('/admin/overlays')) navigate('/');
+            if (location.pathname.startsWith('/admin/overlays')) {
+              if (location.state?.fromAdmin) {
+                navigate('/admin');
+              } else {
+                navigate('/');
+              }
+            }
           }}
         />
       )}
