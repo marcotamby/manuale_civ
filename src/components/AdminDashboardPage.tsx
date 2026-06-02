@@ -1387,7 +1387,7 @@ export default function AdminDashboardPage() {
                                       <div className="space-y-2 mt-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                                         {currentEdits.steps.map((s: any, i: number) => (
                                           <p key={i} className="text-xs text-gray-200 flex items-start">
-                                            <span className="text-yellow-500 font-mono mr-4 text-xs font-black shrink-0">{s.time}</span>
+                                            <span className="text-cyan-400 font-mono mr-4 text-xs font-black shrink-0">{s.time}</span>
                                             <span className="flex-1 font-medium">{s.action}</span>
                                           </p>
                                         ))}
@@ -1418,7 +1418,7 @@ export default function AdminDashboardPage() {
                                         {currentEdits.steps.map((s: any, i: number) => (
                                           <div key={i} className="grid grid-cols-12 gap-3 p-4 bg-black/35 rounded-2xl border border-white/5 relative">
                                             <input
-                                              className="col-span-3 md:col-span-2 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-xl px-2 py-2 text-xs text-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.1)] outline-none text-center font-bold"
+                                              className="col-span-3 md:col-span-2 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-xl px-2 py-2 text-xs text-cyan-400 focus:shadow-[0_0_15px_rgba(6,182,212,0.15)] outline-none text-center font-bold"
                                               value={s.time}
                                               onChange={(e) => updateBOStep(i, 'time', e.target.value)}
                                             />
@@ -1713,7 +1713,7 @@ export default function AdminDashboardPage() {
                   <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Caricamento staff...</span>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex flex-col gap-3">
                   {users
                   .filter(u => {
                     const email = u.email?.toLowerCase();
@@ -1741,9 +1741,10 @@ export default function AdminDashboardPage() {
                     return matchSearch;
                   })
                   .map(u => (
-                    <div key={u.id} className={`bg-[#0a0e1c]/60 border rounded-3xl p-6 flex flex-col gap-5 group hover:bg-[#0a0e1c]/80 hover:border-blue-500/40 hover:-translate-y-0.5 shadow-2xl transition-all duration-300 ${u.role === 'admin' ? 'border-yellow-500/20' : 'border-white/5'}`}>
-                      <div className="flex items-center gap-4">
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border-2 text-xl font-bold shrink-0 overflow-hidden shadow-lg ${u.role === 'admin' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
+                    <div key={u.id} className={`bg-[#0a0e1c]/60 border rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 group hover:bg-[#0a0e1c]/80 hover:border-cyan-500/40 shadow-xl transition-all duration-300 ${u.role === 'admin' ? 'border-cyan-500/20' : 'border-white/5'}`}>
+                      {/* Left: Avatar & Info */}
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border text-sm font-bold shrink-0 overflow-hidden shadow-md ${u.role === 'admin' ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
                           {u.avatar_url ? (
                             <img 
                               src={u.avatar_url} 
@@ -1758,13 +1759,14 @@ export default function AdminDashboardPage() {
                             <span>{u.nickname?.[0]?.toUpperCase() || u.email?.[0]?.toUpperCase() || 'U'}</span>
                           )}
                         </div>
-                        <div className="flex flex-col min-w-0 flex-1">
+                        
+                        <div className="flex flex-col min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             {editingNickname === u.email ? (
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1">
                                 <input
                                   autoFocus
-                                  className="bg-black/60 border border-blue-500/50 rounded-xl px-2 py-1 text-xs text-white focus:outline-none"
+                                  className="bg-black/60 border border-cyan-500/50 rounded-lg px-2 py-0.5 text-xs text-white focus:outline-none"
                                   value={tempNickname}
                                   disabled={isSavingNickname === u.email}
                                   onChange={(e) => setTempNickname(e.target.value)}
@@ -1779,79 +1781,78 @@ export default function AdminDashboardPage() {
                                   disabled={isSavingNickname === u.email}
                                   className="text-green-500 hover:text-green-400"
                                 >
-                                  {isSavingNickname === u.email ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
+                                  {isSavingNickname === u.email ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle size={12} />}
                                 </button>
                               </div>
                             ) : (
-                              <div className="flex items-center gap-2 group/nick relative">
-                                <span className={`text-base font-black text-white truncate leading-tight transition-colors ${savedSuccess === u.email ? 'text-green-400' : ''}`}>
+                              <div className="flex items-center gap-1.5 group/nick relative">
+                                <span className={`text-sm font-bold text-white truncate transition-colors ${savedSuccess === u.email ? 'text-green-400' : ''}`}>
                                   {u.nickname || 'Senza Nickname'}
                                 </span>
-                                {savedSuccess === u.email && <CheckCircle size={12} className="text-green-400 animate-in" />}
+                                {savedSuccess === u.email && <CheckCircle size={10} className="text-green-400 animate-in" />}
                                 <button
                                   onClick={() => { setEditingNickname(u.email); setTempNickname(u.nickname || ''); }}
-                                  className="opacity-0 group-hover/nick:opacity-100 p-1 text-gray-500 hover:text-blue-400 transition-all"
+                                  className="opacity-0 group-hover/nick:opacity-100 p-0.5 text-gray-500 hover:text-cyan-400 transition-all"
                                 >
-                                  <Edit2 size={12} />
+                                  <Edit2 size={10} />
                                 </button>
                               </div>
                             )}
-                            {u.role === 'admin' && <span className="text-[8px] px-2 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded-lg font-black uppercase tracking-wider">Owner</span>}
-                            {u.role === 'editor' && <span className="text-[8px] px-2 py-0.5 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded-lg font-black uppercase tracking-wider">Editor</span>}
+                            {u.role === 'admin' && <span className="text-[7px] px-1.5 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded font-black uppercase tracking-wider">Owner</span>}
+                            {u.role === 'editor' && <span className="text-[7px] px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black uppercase tracking-wider">Editor</span>}
+                            <span className="text-[8px] font-black text-cyan-400/80 border border-cyan-500/20 px-1.5 py-0.5 rounded bg-cyan-500/5 uppercase tracking-wider">{u.rank || 'Unranked'}</span>
                           </div>
-                          <span className="text-xs text-gray-500 truncate block mt-1">{u.email}</span>
-                          <div className="flex items-center gap-2 mt-2">
-                            <span className="text-[9px] font-black text-blue-400/80 border border-blue-500/20 px-2 py-0.5 rounded-lg bg-blue-500/5 uppercase tracking-wider">{u.rank || 'Unranked'}</span>
-                          </div>
+                          <span className="text-[10px] text-gray-500 truncate mt-0.5">{u.email}</span>
                         </div>
                       </div>
 
-                      <div className="pt-4 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <span className="text-[9px] font-black text-gray-500 uppercase tracking-[0.25em] select-none">Gestione Permessi</span>
-                        <div className="flex items-center gap-1.5 bg-black/40 p-1.5 rounded-2xl border border-white/5 w-fit">
+                      {/* Right: Controls */}
+                      <div className="flex items-center gap-3 shrink-0 self-end md:self-center">
+                        <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest hidden sm:inline select-none">Permessi</span>
+                        <div className="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/5">
                           <button
                             onClick={() => handleToggleUserRole(u.email, 'can_manage_tournaments', !u.can_manage_tournaments)}
-                            className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all shadow-md ${u.can_manage_tournaments ? 'bg-yellow-500 text-black font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
+                            className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${u.can_manage_tournaments ? 'bg-cyan-500 text-black font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
                             title="Gestione Tornei"
                           >
-                            <Trophy size={15} />
+                            <Trophy size={12} />
                           </button>
 
                           <button
                             onClick={() => handleToggleUserRole(u.email, 'can_manage_civs', !u.can_manage_civs)}
-                            className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all shadow-md ${u.can_manage_civs ? 'bg-blue-600 text-white font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
+                            className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${u.can_manage_civs ? 'bg-blue-600 text-white font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
                             title="Gestione Civiltà"
                           >
-                            <BookOpen size={15} />
+                            <BookOpen size={12} />
                           </button>
 
                           <button
                             onClick={() => handleToggleUserRole(u.email, 'can_manage_buildorders', !u.can_manage_buildorders)}
-                            className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all shadow-md ${u.can_manage_buildorders ? 'bg-orange-500 text-white font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
+                            className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${u.can_manage_buildorders ? 'bg-orange-500 text-white font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
                             title="Gestione Build Orders"
                           >
-                            <Zap size={15} />
+                            <Zap size={12} />
                           </button>
 
-                          <div className="w-px h-5 bg-white/10 mx-1" />
+                          <div className="w-px h-4 bg-white/10 mx-0.5" />
 
                           <button
                             onClick={() => handleToggleUserRole(u.email, 'is_streamer', !u.is_streamer)}
-                            className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all shadow-md ${u.is_streamer ? 'bg-pink-600 text-white font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
+                            className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${u.is_streamer ? 'bg-pink-600 text-white font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
                             title="Streamer"
                           >
-                            <Radio size={15} />
+                            <Radio size={12} />
                           </button>
                           
                           {isSuperAdmin && (
                             <>
-                              <div className="w-px h-5 bg-white/10 mx-1" />
+                              <div className="w-px h-4 bg-white/10 mx-0.5" />
                               <button
                                 onClick={() => handleDeleteUser(u.email)}
-                                className="w-9 h-9 flex items-center justify-center rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/25 border-2 border-red-500/20 transition-all shadow-md"
+                                className="w-7 h-7 flex items-center justify-center rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/25 border border-red-500/20 transition-all"
                                 title="Elimina Utente"
                               >
-                                <Trash2 size={15} />
+                                <Trash2 size={12} />
                               </button>
                             </>
                           )}
@@ -1884,13 +1885,14 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="flex flex-col gap-3">
                 {allProfiles
                   .filter(p => !userSearch || p.email?.toLowerCase().includes(userSearch.toLowerCase()) || p.nickname?.toLowerCase().includes(userSearch.toLowerCase()))
                   .map(p => (
-                    <div key={p.email} className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 flex flex-col gap-5 hover:border-cyan-500/40 hover:-translate-y-0.5 shadow-2xl transition-all duration-300 group">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold border-2 border-cyan-500/20 overflow-hidden shadow-lg shrink-0">
+                    <div key={p.email} className="bg-[#0a0e1c]/60 border border-white/5 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-cyan-500/40 shadow-xl transition-all duration-300 group">
+                      {/* Left: Avatar & Info */}
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold border border-cyan-500/20 overflow-hidden shadow-md shrink-0">
                           {p.avatar_url ? (
                             <img 
                               src={p.avatar_url} 
@@ -1905,57 +1907,60 @@ export default function AdminDashboardPage() {
                             <span>{p.nickname?.[0] || p.email?.[0]}</span>
                           )}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-white font-black text-base truncate">{p.nickname || 'Anonimo'}</p>
+                        <div className="min-w-0">
+                          <p className="text-white font-bold text-sm truncate">{p.nickname || 'Anonimo'}</p>
                           <p className="text-[10px] text-gray-500 truncate block mt-0.5">{p.email}</p>
                         </div>
                       </div>
                       
-                      <div className="bg-black/40 p-4 rounded-2xl border border-white/5 flex flex-col items-stretch gap-4 w-full shadow-inner">
-                        <div className="flex items-center justify-between gap-2 w-full">
-                          <div className="flex items-center gap-2 shrink-0 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
-                            <span className="text-xl">🐑</span>
-                            <span className="text-base font-black text-white tracking-tight">{p.sheep_balance || 0}</span>
-                          </div>
-                          <div className="flex items-center gap-1 bg-[#111218] p-1 rounded-2xl border border-white/10 shrink-0 ml-auto shadow-md">
-                            <button
-                              onClick={() => {
-                                const current = perUserRefillAmounts[p.email] ?? 100;
-                                setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: Math.max(0, current - 10) });
-                              }}
-                              className="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-xl text-cyan-400 transition-colors"
-                            >
-                              <Minus size={12} />
-                            </button>
-                            <input
-                              type="number"
-                              value={perUserRefillAmounts[p.email] ?? 100}
-                              onChange={(e) => setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: Number(e.target.value) })}
-                              className="w-12 bg-transparent text-xs text-white font-black text-center outline-none"
-                            />
-                            <button
-                              onClick={() => {
-                                const current = perUserRefillAmounts[p.email] ?? 100;
-                                setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: current + 10 });
-                              }}
-                              className="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-xl text-cyan-400 transition-colors"
-                            >
-                              <Plus size={12} />
-                            </button>
-                          </div>
+                      {/* Middle: Sheep Balance */}
+                      <div className="flex items-center gap-2 shrink-0 md:justify-center">
+                        <div className="flex items-center gap-1.5 bg-white/5 px-3 py-1 rounded-xl border border-white/10">
+                          <span className="text-sm">🐑</span>
+                          <span className="text-sm font-black text-white tracking-tight">{p.sheep_balance || 0}</span>
+                        </div>
+                      </div>
+
+                      {/* Right: Controls & Actions */}
+                      <div className="flex items-center justify-between md:justify-end gap-3 shrink-0 self-stretch md:self-auto">
+                        <div className="flex items-center gap-1 bg-[#111218] p-1 rounded-xl border border-white/10 shadow-md">
+                          <button
+                            onClick={() => {
+                              const current = perUserRefillAmounts[p.email] ?? 100;
+                              setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: Math.max(0, current - 10) });
+                            }}
+                            className="w-7 h-7 flex items-center justify-center hover:bg-white/5 rounded-lg text-cyan-400 transition-colors"
+                          >
+                            <Minus size={10} />
+                          </button>
+                          <input
+                            type="number"
+                            value={perUserRefillAmounts[p.email] ?? 100}
+                            onChange={(e) => setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: Number(e.target.value) })}
+                            className="w-10 bg-transparent text-xs text-white font-bold text-center outline-none"
+                          />
+                          <button
+                            onClick={() => {
+                              const current = perUserRefillAmounts[p.email] ?? 100;
+                              setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: current + 10 });
+                            }}
+                            className="w-7 h-7 flex items-center justify-center hover:bg-white/5 rounded-lg text-cyan-400 transition-colors"
+                          >
+                            <Plus size={10} />
+                          </button>
                         </div>
                         
                         <button
                           onClick={() => handleSheepRefill(p.email, perUserRefillAmounts[p.email] ?? 100)}
                           disabled={isRefilling === p.email}
-                          className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white rounded-xl text-xs font-black border-0 shadow-lg transition-all uppercase tracking-widest active:scale-95 disabled:opacity-40 group/btn"
+                          className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white rounded-xl text-[10px] font-black border-0 shadow-md transition-all uppercase tracking-widest active:scale-95 disabled:opacity-40 flex items-center gap-1 group/btn min-w-[110px] justify-center"
                         >
                           {isRefilling === p.email ? (
-                            <Loader2 size={16} className="animate-spin" />
+                            <Loader2 size={12} className="animate-spin" />
                           ) : (
                             <>
-                              <Zap size={14} className="group-hover/btn:fill-cyan-400 transition-all" />
-                              <span>Ricarica +{perUserRefillAmounts[p.email] ?? 100}</span>
+                              <Zap size={10} className="group-hover/btn:fill-cyan-400 transition-all animate-pulse" />
+                              <span>Ricarica</span>
                             </>
                           )}
                         </button>
@@ -2237,7 +2242,7 @@ export default function AdminDashboardPage() {
                                               setTournamentForm({...tournamentForm, podium: np});
                                             }} 
                                             placeholder="Inserisci nome..." 
-                                            className="w-full h-10 bg-white/5 border border-white/10 px-4 rounded-xl text-white text-xs font-bold outline-none focus:border-yellow-500 transition-colors" 
+                                            className="w-full h-10 bg-white/5 border border-white/10 px-4 rounded-xl text-white text-xs font-bold outline-none focus:border-cyan-500 transition-colors" 
                                           />
                                           <button 
                                             onClick={() => setTournamentForm({...tournamentForm, podium: tournamentForm.podium.filter((_: any, idx: number) => idx !== i)})} 
@@ -2271,7 +2276,7 @@ export default function AdminDashboardPage() {
                                             setTournamentForm({ ...tournamentForm, podium: np });
                                           }} 
                                           placeholder="Esempio: Marco, Alessio, Luca (separati da virgola)" 
-                                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white/60 text-[10px] outline-none focus:border-yellow-500/20 transition-all italic" 
+                                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white/60 text-[10px] outline-none focus:border-cyan-500/20 transition-all italic" 
                                         />
                                       </div>
                                     )}
@@ -2290,7 +2295,7 @@ export default function AdminDashboardPage() {
                                           setTournamentForm({ ...tournamentForm, podium: np });
                                         }} 
                                         placeholder="Esempio: Fascia 1 (High Elo), Fascia 2 (Low Elo)" 
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white/60 text-[10px] outline-none focus:border-yellow-500/20 transition-all italic" 
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white/60 text-[10px] outline-none focus:border-cyan-500/20 transition-all italic" 
                                       />
                                     </div>
                                   </div>
@@ -2311,7 +2316,7 @@ export default function AdminDashboardPage() {
                                       });
                                     }
                                   }} 
-                                  className="w-full py-3 border border-dashed border-white/10 hover:border-yellow-500/50 rounded-2xl text-yellow-500 hover:text-yellow-400 text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 bg-white/[0.01] hover:bg-white/[0.03] active:scale-[0.98]"
+                                  className="w-full py-3 border border-dashed border-white/10 hover:border-cyan-500/50 rounded-2xl text-cyan-400 hover:text-cyan-300 text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 bg-white/[0.01] hover:bg-white/[0.03] active:scale-[0.98]"
                                 >
                                   + AGGIUNGI RIGA AL PODIO
                                 </button>
@@ -2461,14 +2466,14 @@ export default function AdminDashboardPage() {
                             </h4>
                             <button
                               onClick={() => setIsCreatingMarket(true)}
-                              className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-black rounded-xl text-xs font-black transition-all hover:-translate-y-0.5 shadow-lg active:scale-95 uppercase tracking-widest flex items-center gap-1.5"
+                              className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black rounded-xl text-xs font-black transition-all hover:-translate-y-0.5 shadow-lg active:scale-95 uppercase tracking-widest flex items-center gap-1.5 shadow-cyan-500/10"
                             >
                               <Plus size={14} strokeWidth={3} /> Nuova Scommessa
                             </button>
                           </div>
 
                           {isCreatingMarket && (
-                            <div className="bg-black/30 border-2 border-yellow-500/20 p-6 rounded-3xl space-y-6 animate-in zoom-in-95 duration-300">
+                            <div className="bg-black/30 border-2 border-cyan-500/20 p-6 rounded-3xl space-y-6 animate-in zoom-in-95 duration-300">
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Titolo Scommessa</label>
@@ -2476,7 +2481,7 @@ export default function AdminDashboardPage() {
                                     type="text"
                                     value={marketForm.title}
                                     onChange={(e) => setMarketForm({ ...marketForm, title: e.target.value })}
-                                    className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-yellow-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:shadow-[0_0_15px_rgba(234,179,8,0.1)] transition-all outline-none font-bold"
+                                    className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none font-bold"
                                     placeholder="es: VortiX vs LucifroN"
                                   />
                                 </div>
@@ -2533,7 +2538,7 @@ export default function AdminDashboardPage() {
                                           newOpts[idx].label = e.target.value;
                                           setMarketForm({ ...marketForm, options: newOpts });
                                         }}
-                                        className="flex-1 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-yellow-500/50 rounded-xl px-4 py-2 text-xs text-white focus:shadow-[0_0_15px_rgba(234,179,8,0.1)] transition-all outline-none font-bold"
+                                        className="flex-1 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-xl px-4 py-2 text-xs text-white focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none font-bold"
                                         placeholder={`Opzione ${idx + 1}`}
                                       />
                                       <input
@@ -2544,7 +2549,7 @@ export default function AdminDashboardPage() {
                                           newOpts[idx].weight = e.target.value;
                                           setMarketForm({ ...marketForm, options: newOpts });
                                         }}
-                                        className="w-24 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-yellow-500/50 rounded-xl px-4 py-2 text-xs text-white focus:shadow-[0_0_15px_rgba(234,179,8,0.1)] transition-all outline-none text-center font-bold"
+                                        className="w-24 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-xl px-4 py-2 text-xs text-white focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none text-center font-bold"
                                         placeholder="Peso"
                                         title="Peso probabilistico iniziale"
                                       />
@@ -2564,7 +2569,7 @@ export default function AdminDashboardPage() {
                                 </div>
                                 <button
                                   onClick={() => setMarketForm({ ...marketForm, options: [...marketForm.options, { label: '', weight: 100 }] })}
-                                  className="text-xs text-yellow-500 font-bold hover:underline"
+                                  className="text-xs text-cyan-400 font-bold hover:underline"
                                 >
                                   + Aggiungi Opzione
                                 </button>
@@ -2579,7 +2584,7 @@ export default function AdminDashboardPage() {
                                 </button>
                                 <button
                                   onClick={handleSaveMarket}
-                                  className="px-6 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-black font-black rounded-xl hover:-translate-y-0.5 active:scale-95 shadow-lg transition-all text-xs uppercase tracking-widest"
+                                  className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-bold rounded-xl hover:-translate-y-0.5 active:scale-95 shadow-lg shadow-cyan-500/10 transition-all text-xs uppercase tracking-widest"
                                 >
                                   Crea Scommessa
                                 </button>
@@ -2589,7 +2594,7 @@ export default function AdminDashboardPage() {
 
                           {marketsLoading ? (
                             <div className="flex flex-col items-center justify-center py-20">
-                              <Loader2 className="animate-spin text-yellow-500 mb-2" size={32} />
+                              <Loader2 className="animate-spin text-cyan-400 mb-2" size={32} />
                               <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Caricamento mercati...</span>
                             </div>
                           ) : markets.length === 0 ? (
@@ -2632,7 +2637,7 @@ export default function AdminDashboardPage() {
                                           {market.status === 'closed' && market.winner_option_id === null && (
                                             <button
                                               onClick={() => setSettleConfirmOption({ marketId: market.id, optionId: opt.id })}
-                                              className="w-full mt-3 py-1.5 bg-yellow-500 text-black hover:bg-yellow-400 text-[9px] font-black rounded-lg transition-all uppercase tracking-wider"
+                                              className="w-full mt-3 py-1.5 bg-cyan-500 text-black hover:bg-cyan-400 text-[9px] font-bold rounded-lg transition-all uppercase tracking-wider shadow-md shadow-cyan-500/15"
                                             >
                                               Decreta Vincitore
                                             </button>
@@ -2727,15 +2732,15 @@ export default function AdminDashboardPage() {
                                 src={c.flag} 
                                 alt={c.name} 
                                 className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
-                                  isSelected ? 'opacity-25 scale-105' : 'opacity-15 group-hover:opacity-25'
+                                  isSelected ? 'opacity-95 scale-105' : 'opacity-70 group-hover:opacity-95'
                                 }`} 
                               />
                             ) : (
                               <div className="absolute inset-0 bg-slate-900 opacity-20"></div>
                             )}
                             
-                            {/* Vignette Overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#0d1222] via-[#0d1222]/85 to-[#0d1222]/20 pointer-events-none"></div>
+                            {/* Vignette Overlay (dark left, clear right) */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-[#0a0e1c]/95 via-[#0a0e1c]/40 to-transparent pointer-events-none"></div>
                             
                             {/* Active glow indicator on the left */}
                             {isSelected && (
@@ -3091,7 +3096,7 @@ export default function AdminDashboardPage() {
                                           newSteps[idx].time = e.target.value;
                                           setBoForm({ ...boForm, steps: newSteps });
                                         }}
-                                        className="w-full md:w-24 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-xl px-3 py-2 text-xs text-yellow-500 font-black text-center outline-none"
+                                        className="w-full md:w-24 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-xl px-3 py-2 text-xs text-cyan-400 font-black text-center outline-none"
                                         placeholder="00:00"
                                       />
                                       <input
@@ -3215,7 +3220,7 @@ export default function AdminDashboardPage() {
               className={`flex items-center gap-4 px-12 py-4 rounded-xl transition-all font-bold shadow-xl group hover:scale-105 active:scale-95 ${
                 sendNotifSuccess
                   ? 'bg-green-600 shadow-green-600/30 text-white'
-                  : 'bg-yellow-600 hover:bg-yellow-500 text-white shadow-yellow-600/30'
+                  : 'bg-cyan-600 hover:bg-cyan-500 text-white shadow-cyan-600/30'
               }`}
             >
               {isSendingEmail ? (

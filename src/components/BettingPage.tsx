@@ -508,7 +508,7 @@ export function BettingPage() {
                </div>
                <div className="w-px h-8 bg-white/10" />
                <div className="flex flex-col">
-                 <span className="text-[10px] font-black text-amber-400/60 uppercase tracking-[0.2em]">Pastori</span>
+                 <span className="text-[10px] font-black text-blue-400/60 uppercase tracking-[0.2em]">Pastori</span>
                  <span className="text-xl font-black text-white tabular-nums">{totalStats.pastori}</span>
                </div>
                <div className="w-px h-8 bg-white/10" />
@@ -1426,7 +1426,7 @@ export function BettingPage() {
 
                     {!isAuthenticated && market.status === 'open' && (
                       <div className="mt-auto pt-6 text-center">
-                        <p className="text-yellow-500/50 text-[10px] font-black uppercase tracking-[0.15em] border border-yellow-500/10 py-3 rounded-xl bg-yellow-500/5">Effettua il login per scommettere</p>
+                        <p className="text-cyan-400/50 text-[10px] font-black uppercase tracking-[0.15em] border border-cyan-500/10 py-3 rounded-xl bg-cyan-500/5">Effettua il login per scommettere</p>
                       </div>
                     )}
                   </div>
@@ -1475,14 +1475,14 @@ export function BettingPage() {
           <div className="absolute inset-0 bg-black/90 backdrop-blur-xl" onClick={() => setSettleConfirm(null)} />
           <div className="relative bg-[#111218] border border-white/10 rounded-[2.5rem] p-8 md:p-12 max-w-lg w-full shadow-2xl animate-in zoom-in-95 duration-300">
             <div className="flex flex-col items-center text-center space-y-6">
-              <div className="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center border border-yellow-500/20 shadow-[0_0_40px_rgba(234,179,8,0.1)]">
-                <Trophy size={40} className="text-yellow-500" />
+              <div className="w-20 h-20 bg-cyan-500/10 rounded-full flex items-center justify-center border border-cyan-500/20 shadow-[0_0_40px_rgba(6,182,212,0.1)]">
+                <Trophy size={40} className="text-cyan-400" />
               </div>
               
               <div className="space-y-2">
                 <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Conferma Vincitore</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Stai per dichiarare <span className="text-yellow-500 font-bold">"{settleConfirm.optionLabel}"</span> come vincitore. 
+                  Stai per dichiarare <span className="text-cyan-400 font-bold">"{settleConfirm.optionLabel}"</span> come vincitore. 
                   Tutte le scommesse su questa opzione verranno liquidate. L'azione è irreversibile.
                 </p>
               </div>
@@ -1490,7 +1490,7 @@ export function BettingPage() {
               <div className="flex flex-col w-full gap-3 pt-4">
                 <button
                   onClick={() => handleSettleMarket(settleConfirm.marketId, settleConfirm.optionId)}
-                  className="w-full py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-black font-black uppercase tracking-widest rounded-2xl transition-all shadow-lg active:scale-95"
+                  className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-black uppercase tracking-widest rounded-2xl transition-all shadow-lg active:scale-95"
                 >
                   Conferma Vittoria
                 </button>
