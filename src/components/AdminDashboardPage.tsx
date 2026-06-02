@@ -4,7 +4,7 @@ import {
   MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, 
   AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, 
   Trophy, BookOpen, Zap, Edit2, Check, Trash2, Plus, Minus, ArrowLeft, LayoutDashboard,
-  Save, Sparkles, ChevronDown, Users, Youtube, Menu
+  Save, Sparkles, ChevronDown, Users, Youtube, Menu, History, Database, Activity, Download
 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
@@ -41,8 +41,22 @@ export default function AdminDashboardPage() {
     }
   }, [isAuthenticated, isAdmin, navigate]);
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'proposte' | 'qa' | 'users' | 'pecore' | 'tornei' | 'civilta'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'proposte' | 'qa' | 'users' | 'pecore' | 'tornei' | 'civilta' | 'audit' | 'diagnostics'>('overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Audit Log states
+  const [auditLogs, setAuditLogs] = useState<any[]>([]);
+  const [auditLoading, setAuditLoading] = useState(false);
+  const [auditSearch, setAuditSearch] = useState('');
+  const [auditActionFilter, setAuditActionFilter] = useState('all');
+  const [expandedAuditLog, setExpandedAuditLog] = useState<string | null>(null);
+
+  // Diagnostics states
+  const [dbMetrics, setDbMetrics] = useState<Record<string, number>>({});
+  const [metricsLoading, setMetricsLoading] = useState(false);
+  const [pingStatus, setPingStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  const [isGeneratingBackup, setIsGeneratingBackup] = useState(false);
+  const [webhookTesting, setWebhookTesting] = useState(false);
   
   const selectTab = (tab: typeof activeTab) => {
     setActiveTab(tab);
@@ -173,6 +187,10 @@ export default function AdminDashboardPage() {
       fetchTournaments();
     } else if (activeTab === 'civilta') {
       fetchCivilizations();
+    } else if (activeTab === 'audit') {
+      fetchAuditLogs();
+    } else if (activeTab === 'diagnostics') {
+      fetchDiagnostics();
     }
   }, [activeTab]);
 
@@ -295,6 +313,17 @@ export default function AdminDashboardPage() {
         error = updError;
       }
       if (error) throw error;
+
+      await logAdminAction(
+        isCreatingTournament ? 'CREATE_TOURNAMENT' : 'UPDATE_TOURNAMENT',
+        'tournaments',
+        slug,
+        isCreatingTournament 
+          ? `Creato nuovo torneo: "${payload.name}" (${payload.type})`
+          : `Aggiornato torneo: "${payload.name}"`,
+        { tournament_name: payload.name, tournament_slug: slug, form_payload: payload }
+      );
+
       setToast({ isVisible: true, message: isCreatingTournament ? 'Torneo creato!' : 'Torneo salvato!', type: 'success' });
       setIsCreatingTournament(false);
       setIsEditingTournament(false);
@@ -310,6 +339,15 @@ export default function AdminDashboardPage() {
     try {
       const { error } = await supabase.from('tournaments').delete().eq('id', tId);
       if (error) throw error;
+
+      await logAdminAction(
+        'DELETE_TOURNAMENT',
+        'tournaments',
+        tId,
+        `Eliminato torneo "${selectedTournament?.name || tId}"`,
+        { id: tId, name: selectedTournament?.name, slug: selectedTournament?.slug }
+      );
+
       setToast({ isVisible: true, message: 'Torneo eliminato', type: 'success' });
       setSelectedTournament(null);
       await fetchTournaments();
@@ -349,6 +387,15 @@ export default function AdminDashboardPage() {
     try {
       const { error } = await supabase.from('betting_markets').insert(payload);
       if (error) throw error;
+
+      await logAdminAction(
+        'CREATE_MARKET',
+        'betting_markets',
+        payload.title,
+        `Creato mercato scommesse: "${payload.title}" per il torneo "${selectedTournament.name}"`,
+        { market_payload: payload, tournament_name: selectedTournament.name }
+      );
+
       setToast({ isVisible: true, message: 'Scommessa pubblicata!', type: 'success' });
       setIsCreatingMarket(false);
       setMarketForm({
@@ -372,6 +419,16 @@ export default function AdminDashboardPage() {
         .update({ status: newStatus })
         .eq('id', marketId);
       if (error) throw error;
+
+      const market = markets.find(m => m.id === marketId);
+      await logAdminAction(
+        'TOGGLE_MARKET_STATUS',
+        'betting_markets',
+        marketId,
+        `Modificato stato scommessa "${market?.title || marketId}" a "${newStatus}"`,
+        { id: marketId, title: market?.title, new_status: newStatus, previous_status: currentStatus }
+      );
+
       setToast({ isVisible: true, message: `Stato mercato aggiornato a ${newStatus}`, type: 'success' });
       await fetchMarkets(selectedTournament.slug);
     } catch (err: any) {
@@ -386,6 +443,17 @@ export default function AdminDashboardPage() {
         p_winner_option_id: optionId
       });
       if (error) throw error;
+
+      const market = markets.find(m => m.id === marketId);
+      const winnerOpt = market?.options?.find((o: any) => o.id === optionId);
+      await logAdminAction(
+        'SETTLE_MARKET',
+        'betting_markets',
+        marketId,
+        `Liquidata scommessa "${market?.title || marketId}" (Vincitore: "${winnerOpt?.label || optionId}")`,
+        { id: marketId, title: market?.title, winner_option_id: optionId, winner_label: winnerOpt?.label }
+      );
+
       setToast({ isVisible: true, message: 'Scommessa liquidata con successo!', type: 'success' });
       setSettleConfirmOption(null);
       await fetchMarkets(selectedTournament.slug);
@@ -448,6 +516,15 @@ export default function AdminDashboardPage() {
         })
         .eq('id', selectedCiv.id);
       if (error) throw error;
+
+      await logAdminAction(
+        'SAVE_CIV_DETAILS',
+        'civilizations',
+        selectedCiv.id,
+        `Aggiornati dettagli della civiltà "${civForm.name}"`,
+        { civ_id: selectedCiv.id, updated_fields: civForm }
+      );
+
       setToast({ isVisible: true, message: 'Dettagli civiltà salvati!', type: 'success' });
       
       setCivList(prev => prev.map(c => c.id === selectedCiv.id ? {
@@ -533,6 +610,17 @@ export default function AdminDashboardPage() {
         .eq('id', selectedCiv.id);
 
       if (error) throw error;
+
+      await logAdminAction(
+        selectedBOIndex === -1 ? 'CREATE_BUILD_ORDER' : 'UPDATE_BUILD_ORDER',
+        'civilizations',
+        selectedCiv.id,
+        selectedBOIndex === -1 
+          ? `Creato build order "${boForm.title}" per "${selectedCiv.name}"`
+          : `Aggiornato build order "${boForm.title}" per "${selectedCiv.name}"`,
+        { civ_id: selectedCiv.id, bo_id: boForm.id, bo_title: boForm.title, is_new: selectedBOIndex === -1, details: boForm }
+      );
+
       setToast({ isVisible: true, message: 'Build order salvato!', type: 'success' });
       
       const updatedCiv = { ...selectedCiv, build_orders: currentBOs };
@@ -574,6 +662,16 @@ export default function AdminDashboardPage() {
         .eq('id', selectedCiv.id);
 
       if (error) throw error;
+
+      const deletedBO = selectedCiv.build_orders?.[index];
+      await logAdminAction(
+        'DELETE_BUILD_ORDER',
+        'civilizations',
+        selectedCiv.id,
+        `Eliminato build order "${deletedBO?.title || index}" per "${selectedCiv.name}"`,
+        { civ_id: selectedCiv.id, bo_index: index, bo_title: deletedBO?.title }
+      );
+
       setToast({ isVisible: true, message: 'Build order eliminato', type: 'success' });
       const updatedCiv = { ...selectedCiv, build_orders: currentBOs };
       setSelectedCiv(updatedCiv);
@@ -690,6 +788,14 @@ export default function AdminDashboardPage() {
 
       if (error) throw error;
       
+      await logAdminAction(
+        'SHEEP_REFILL',
+        'profiles',
+        profile.id || email,
+        `Modificato saldo pecore per ${profile.nickname || email} a ${newBalance} 🐑 (variazione: ${isSet ? 'impostato a' : (amount >= 0 ? '+' : '') + amount})`,
+        { target_email: email, previous_balance: profile.sheep_balance, new_balance: newBalance, amount, is_set: isSet }
+      );
+      
       setAllProfiles(allProfiles.map(p => 
         p.email === email ? { ...p, sheep_balance: newBalance } : p
       ));
@@ -762,6 +868,240 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Helper utility to write audit logs
+  const logAdminAction = async (
+    action: string,
+    targetType: string | null,
+    targetId: string | null,
+    description: string,
+    details: Record<string, any> = {}
+  ) => {
+    try {
+      const userEmail = useAuth().user?.email || 'admin@localhost';
+      const userNickname = useAuth().user?.nickname || 'Admin';
+      await supabase.from('audit_log').insert({
+        user_email: userEmail,
+        user_nickname: userNickname,
+        action,
+        target_type: targetType,
+        target_id: targetId,
+        description,
+        details
+      });
+    } catch (err) {
+      console.error('Error writing audit log:', err);
+    }
+  };
+
+  // Fetch all audit logs
+  const fetchAuditLogs = async () => {
+    try {
+      setAuditLoading(true);
+      const { data, error } = await supabase
+        .from('audit_log')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setAuditLogs(data || []);
+    } catch (err: any) {
+      console.error('Error fetching audit logs:', err);
+      setToast({ isVisible: true, message: 'Errore nel caricamento del registro attività', type: 'error' });
+    } finally {
+      setAuditLoading(false);
+    }
+  };
+
+  // Fetch metrics & row counts for Diagnostics
+  const fetchDiagnostics = async () => {
+    try {
+      setMetricsLoading(true);
+      setPingStatus('checking');
+
+      // Test Supabase connection
+      const { error: pingError } = await supabase.from('civilizations').select('id').limit(1);
+      if (pingError) {
+        setPingStatus('offline');
+      } else {
+        setPingStatus('online');
+      }
+
+      // Fetch row counts for all tables (run in parallel)
+      const tables = [
+        'profiles', 'suggestions', 'questions', 'answers', 
+        'tournaments', 'betting_markets', 'user_bets', 
+        'civilizations', 'audit_log', 'stream_overlays', 'faq_sections', 'faq_items'
+      ];
+
+      const counts: Record<string, number> = {};
+      await Promise.all(
+        tables.map(async (table) => {
+          try {
+            const { count, error } = await supabase
+              .from(table)
+              .select('*', { count: 'exact', head: true });
+            if (!error) {
+              counts[table] = count || 0;
+            } else {
+              counts[table] = 0;
+            }
+          } catch (e) {
+            counts[table] = 0;
+          }
+        })
+      );
+
+      // Total Sheep in circulation
+      const { data: sheepData, error: sheepErr } = await supabase.from('profiles').select('sheep_balance');
+      let totalSheep = 0;
+      if (!sheepErr && sheepData) {
+        totalSheep = sheepData.reduce((acc, curr) => acc + (curr.sheep_balance || 0), 0);
+      }
+
+      setDbMetrics({
+        ...counts,
+        total_sheep: totalSheep
+      });
+    } catch (err: any) {
+      console.error('Error fetching diagnostics:', err);
+    } finally {
+      setMetricsLoading(false);
+    }
+  };
+
+  // Perform full database backup download client-side
+  const handleDownloadBackup = async () => {
+    try {
+      setIsGeneratingBackup(true);
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      
+      const tables = [
+        'civilizations',
+        'suggestions',
+        'faq_settings',
+        'faq_sections',
+        'faq_items',
+        'profiles',
+        'build_order_votes',
+        'betting_markets',
+        'user_bets',
+        'betting_notifications',
+        'tournaments',
+        'stream_overlays',
+        'qa_votes',
+        'audit_log'
+      ];
+
+      const backupData: Record<string, any[]> = {};
+
+      // Load all data
+      await Promise.all(
+        tables.map(async (table) => {
+          let allData: any[] = [];
+          let from = 0;
+          const step = 1000;
+          let hasMore = true;
+
+          while (hasMore) {
+            const { data, error } = await supabase
+              .from(table)
+              .select('*')
+              .range(from, from + step - 1);
+
+            if (error) {
+              console.error(`Error backing up table ${table}:`, error.message);
+              hasMore = false;
+              continue;
+            }
+
+            if (data && data.length > 0) {
+              allData = [...allData, ...data];
+              if (data.length < step) {
+                hasMore = false;
+              } else {
+                from += step;
+              }
+            } else {
+              hasMore = false;
+            }
+          }
+          backupData[table] = allData;
+        })
+      );
+
+      // Create browser download
+      const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
+        JSON.stringify(backupData, null, 2)
+      )}`;
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute('href', jsonString);
+      downloadAnchor.setAttribute('download', `manualeciv_backup_${timestamp}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      setToast({ isVisible: true, message: 'Backup database scaricato con successo!', type: 'success' });
+      
+      // Log the backup action!
+      await logAdminAction(
+        'BACKUP_DATABASE',
+        'system',
+        null,
+        'Eseguito backup manuale e scaricato il dump JSON completo del database.'
+      );
+    } catch (err: any) {
+      console.error('Error creating backup:', err);
+      setToast({ isVisible: true, message: `Errore backup: ${err.message}`, type: 'error' });
+    } finally {
+      setIsGeneratingBackup(false);
+    }
+  };
+
+  // Test Discord Webhook connection
+  const handleTestWebhook = async () => {
+    try {
+      setWebhookTesting(true);
+      const webhookUrl = (import.meta.env.VITE_DISCORD_WEBHOOK_URL as string) || 'https://discord.com/api/webhooks/1507674866646646824/TRa7Xby4IN0VJix9Jzuh1I1-x6kTqYapYwBptLzEI7essf7A2EwJJzogey1MrfH5GOyB';
+      
+      const payload = {
+        content: `🔧 **Test Diagnostica Manuale Civ**`,
+        embeds: [{
+          title: `Diagnostica Connessione Integrata`,
+          description: `Questo messaggio è stato generato dall'Admin Dashboard per verificare che i Webhook di Discord siano operativi.\n\n*Eseguito da: ${useAuth().user?.nickname || useAuth().user?.email || 'Admin'}*`,
+          color: 13915904, // Yellow Gold hex #D4AF30 in decimal
+          footer: {
+            text: 'Diagnostica Manuale Civ',
+            icon_url: 'https://aoe4guide.it/favicon.ico'
+          },
+          timestamp: new Date().toISOString()
+        }]
+      };
+
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) throw new Error(`Discord API Status ${response.status}`);
+      
+      setToast({ isVisible: true, message: 'Webhook test inviato con successo a Discord!', type: 'success' });
+      await logAdminAction(
+        'TEST_DISCORD_WEBHOOK',
+        'system',
+        null,
+        'Inviato un messaggio di test per diagnosticare il funzionamento del webhook Discord.'
+      );
+    } catch (err: any) {
+      console.error(err);
+      setToast({ isVisible: true, message: `Errore Webhook: ${err.message}`, type: 'error' });
+    } finally {
+      setWebhookTesting(false);
+    }
+  };
+
   const handleAddUser = async () => {
     if (!newUemail.trim() || !isSuperAdmin) return;
     try {
@@ -771,6 +1111,14 @@ export default function AdminDashboardPage() {
         .upsert({ email, role: 'staff' }, { onConflict: 'email' });
 
       if (error) throw error;
+
+      await logAdminAction(
+        'ADD_STAFF_USER',
+        'profiles',
+        email,
+        `Aggiunto utente "${email}" allo staff`,
+        { target_email: email }
+      );
 
       setAddSuccess(true);
       setInlineToast({ message: 'Utente aggiunto allo staff', type: 'success' });
@@ -798,6 +1146,14 @@ export default function AdminDashboardPage() {
         .eq('email', email);
 
       if (error) throw error;
+
+      await logAdminAction(
+        'UPDATE_NICKNAME',
+        'profiles',
+        email,
+        `Modificato nickname di "${email}" in "${nickname}"`,
+        { target_email: email, new_nickname: nickname }
+      );
 
       setUsers(prev => prev.map(u => u.email === email ? { ...u, nickname } : u));
       setEditingNickname(null);
@@ -827,6 +1183,14 @@ export default function AdminDashboardPage() {
 
       if (error) throw error;
 
+      await logAdminAction(
+        'TOGGLE_USER_PERMISSION',
+        'profiles',
+        userEmail,
+        `Modificato permesso "${field}" per "${userEmail}" a "${value}"`,
+        { target_email: userEmail, field, value, updates }
+      );
+
       setUsers(prev => prev.map(u => u.email === userEmail ? { ...u, ...updates } : u));
       setToast({ isVisible: true, message: 'Permessi aggiornati', type: 'success' });
     } catch (err: any) {
@@ -855,6 +1219,14 @@ export default function AdminDashboardPage() {
         .eq('email', email);
 
       if (error) throw error;
+
+      await logAdminAction(
+        'REMOVE_STAFF_USER',
+        'profiles',
+        email,
+        `Rimosso "${email}" dallo staff (revocati tutti i ruoli e permessi)`,
+        { target_email: email }
+      );
 
       setDeleteSuccess(true);
       setUsers(prev => prev.filter(u => u.email !== email));
@@ -1028,6 +1400,16 @@ export default function AdminDashboardPage() {
 
       if (error) throw error;
 
+      await logAdminAction(
+        newStatus === 'implemented' ? 'RESOLVE_SUGGESTION' : 'REJECT_SUGGESTION',
+        'suggestions',
+        sugg.id,
+        newStatus === 'implemented' 
+          ? `Approvata proposta di modifica da parte di "${sugg.user_name || sugg.user_email || 'Anonimo'}" per "${sugg.civ_name}" (${sugg.section})`
+          : `Scartata proposta di modifica da parte di "${sugg.user_name || sugg.user_email || 'Anonimo'}" per "${sugg.civ_name}" (${sugg.section})${reason ? `: "${reason}"` : ''}`,
+        { suggestion: sugg, status: newStatus, reason }
+      );
+
       setToast({
         isVisible: true,
         message: newStatus === 'implemented' ? 'Proposta segnata come risolta!' : 'Proposta rifiutata',
@@ -1074,6 +1456,14 @@ export default function AdminDashboardPage() {
       }
 
       if (error) throw error;
+
+      await logAdminAction(
+        `QA_${newStatus.toUpperCase()}_${type.toUpperCase()}`,
+        table,
+        item.id,
+        `${newStatus === 'approved' ? 'Approvata' : newStatus === 'deleted' ? 'Eliminata' : 'Rifiutata'} ${type === 'question' ? 'domanda' : 'risposta'} (ID: ${item.id}) da parte di "${item.user_nickname || item.user_name || 'Anonimo'}"`,
+        { qa_item: item, type, new_status: newStatus }
+      );
 
       setToast({
         isVisible: true,
@@ -1209,6 +1599,22 @@ export default function AdminDashboardPage() {
                 <span className="text-base">🐑</span>
                 <span>Bilancio Pecore</span>
               </button>
+
+              <button
+                onClick={() => selectTab('audit')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'audit' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+              >
+                <History size={18} />
+                <span>Registro Attività</span>
+              </button>
+
+              <button
+                onClick={() => selectTab('diagnostics')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'diagnostics' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+              >
+                <Database size={18} />
+                <span>Backup & Diagnostica</span>
+              </button>
             </>
           )}
         </nav>
@@ -1245,6 +1651,8 @@ export default function AdminDashboardPage() {
                 {activeTab === 'pecore' && 'Bilancio Pecore'}
                 {activeTab === 'tornei' && 'Gestione Tornei'}
                 {activeTab === 'civilta' && 'Gestione Civiltà & BO'}
+                {activeTab === 'audit' && 'Registro Attività (Audit)'}
+                {activeTab === 'diagnostics' && 'Backup & Diagnostica'}
               </h2>
               <p className="text-[10px] md:text-xs text-gray-400 truncate">
                 {activeTab === 'overview' && 'Panoramica e statistiche globali del manuale.'}
@@ -1254,6 +1662,8 @@ export default function AdminDashboardPage() {
                 {activeTab === 'pecore' && 'Gestisci e ricarica i saldi di pecore dei pastori.'}
                 {activeTab === 'tornei' && 'Pianifica tornei, gestisci podi e video dei match.'}
                 {activeTab === 'civilta' && 'Modifica dettagli civiltà e crea/edita i build orders.'}
+                {activeTab === 'audit' && 'Registro di controllo e sicurezza di tutte le azioni dello staff.'}
+                {activeTab === 'diagnostics' && 'Monitoraggio del database, test di integrazione ed esportazione backup.'}
               </p>
             </div>
           </div>
@@ -3204,6 +3614,338 @@ export default function AdminDashboardPage() {
                   )}
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* TAB AUDIT LOG */}
+          {activeTab === 'audit' && isSuperAdmin && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+              <div className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-8 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
+                
+                {/* Search & Filters */}
+                <div className="flex flex-col sm:flex-row gap-4 items-center justify-between border-b border-white/5 pb-6 mb-6">
+                  <div className="relative w-full sm:max-w-md">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                    <input
+                      type="text"
+                      placeholder="Cerca per moderatore, azione o descrizione..."
+                      value={auditSearch}
+                      onChange={(e) => setAuditSearch(e.target.value)}
+                      className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl pl-12 pr-4 py-3 text-sm text-white transition-all outline-none font-bold"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
+                    <span className="text-[10px] font-black text-gray-500 uppercase tracking-wider">Azione:</span>
+                    <CustomSelect
+                      value={auditActionFilter}
+                      onChange={(val) => setAuditActionFilter(val)}
+                      options={[
+                        { value: 'all', label: 'Tutte le azioni' },
+                        { value: 'SHEEP_REFILL', label: 'Ricarica Pecore 🐑' },
+                        { value: 'CREATE_TOURNAMENT', label: 'Creazione Tornei 🏆' },
+                        { value: 'UPDATE_TOURNAMENT', label: 'Aggiornamento Tornei 🏆' },
+                        { value: 'DELETE_TOURNAMENT', label: 'Cancellazione Tornei 🏆' },
+                        { value: 'CREATE_MARKET', label: 'Creazione Scommesse 🎲' },
+                        { value: 'TOGGLE_MARKET_STATUS', label: 'Apertura/Chiusura Scommesse 🎲' },
+                        { value: 'SETTLE_MARKET', label: 'Liquidazione Scommesse 💸' },
+                        { value: 'SAVE_CIV_DETAILS', label: 'Modifica Civiltà 🏛️' },
+                        { value: 'CREATE_BUILD_ORDER', label: 'Nuovo Build Order 📖' },
+                        { value: 'UPDATE_BUILD_ORDER', label: 'Aggiorna Build Order 📖' },
+                        { value: 'DELETE_BUILD_ORDER', label: 'Elimina Build Order 📖' },
+                        { value: 'RESOLVE_SUGGESTION', label: 'Approvazione Suggerimento 💡' },
+                        { value: 'REJECT_SUGGESTION', label: 'Rifiuto Suggerimento 💡' },
+                        { value: 'QA_ACTION', label: 'Moderazione Q&A 💬' },
+                        { value: 'ADD_STAFF_USER', label: 'Aggiunta Staff 👑' },
+                        { value: 'REMOVE_STAFF_USER', label: 'Rimozione Staff 👑' },
+                        { value: 'UPDATE_NICKNAME', label: 'Cambio Nickname ✏️' },
+                        { value: 'BACKUP_DATABASE', label: 'Backup Generato 💾' }
+                      ]}
+                      buttonClassName="bg-[#111218] border-2 border-white/10 hover:border-cyan-500/40 rounded-2xl px-4 py-3 h-12 text-sm text-white transition-all outline-none font-bold"
+                    />
+                  </div>
+                </div>
+
+                {/* Audit Logs Content */}
+                {auditLoading ? (
+                  <div className="flex flex-col items-center justify-center py-32">
+                    <Loader2 className="animate-spin text-cyan-400 mb-4" size={48} />
+                    <span className="text-xs text-gray-500 uppercase tracking-widest font-black">Caricamento registro...</span>
+                  </div>
+                ) : auditLogs.length === 0 ? (
+                  <div className="text-center py-20 bg-black/20 rounded-2xl border border-white/5">
+                    <History size={48} className="text-gray-600 mx-auto mb-4 opacity-30" />
+                    <h4 className="text-sm font-bold uppercase tracking-wider text-gray-400">Nessun log trovato</h4>
+                    <p className="text-xs text-gray-600 mt-2">Le azioni degli amministratori appariranno in questo registro una volta registrate.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto rounded-2xl border border-white/5 bg-black/20">
+                      <table className="w-full text-left border-collapse text-xs md:text-sm">
+                        <thead>
+                          <tr className="border-b border-white/5 bg-white/[0.02] text-gray-400 uppercase tracking-wider text-[10px] font-black">
+                            <th className="p-4 w-[160px]">Data & Ora</th>
+                            <th className="p-4 w-[180px]">Moderatore</th>
+                            <th className="p-4 w-[200px]">Azione</th>
+                            <th className="p-4">Descrizione</th>
+                            <th className="p-4 w-[80px] text-center">Dettagli</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5 font-medium">
+                          {auditLogs
+                            .filter(log => {
+                              const matchesSearch = 
+                                (log.user_email || '').toLowerCase().includes(auditSearch.toLowerCase()) ||
+                                (log.user_nickname || '').toLowerCase().includes(auditSearch.toLowerCase()) ||
+                                (log.action || '').toLowerCase().includes(auditSearch.toLowerCase()) ||
+                                (log.description || '').toLowerCase().includes(auditSearch.toLowerCase());
+                              
+                              if (auditActionFilter === 'all') return matchesSearch;
+                              if (auditActionFilter === 'QA_ACTION') return matchesSearch && log.action.startsWith('QA_');
+                              return matchesSearch && log.action === auditActionFilter;
+                            })
+                            .map((log) => {
+                              const isExpanded = expandedAuditLog === log.id;
+                              
+                              // Pill colors mapping
+                              let badgeColor = 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20';
+                              if (log.action.includes('REFILL')) badgeColor = 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
+                              else if (log.action.includes('CREATE')) badgeColor = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+                              else if (log.action.includes('DELETE') || log.action.includes('REMOVE') || log.action.includes('REJECT')) badgeColor = 'bg-red-500/10 text-red-400 border-red-500/20';
+                              else if (log.action.includes('SETTLE')) badgeColor = 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20';
+                              else if (log.action.includes('BACKUP')) badgeColor = 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+
+                              return (
+                                <tr key={log.id} className="hover:bg-white/[0.01] transition-colors group">
+                                  <td className="p-4 text-gray-400 whitespace-nowrap">
+                                    {new Date(log.created_at).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'medium' })}
+                                  </td>
+                                  <td className="p-4">
+                                    <div className="font-bold text-white leading-tight">{log.user_nickname || 'Admin'}</div>
+                                    <div className="text-[10px] text-gray-500 font-mono">{log.user_email}</div>
+                                  </td>
+                                  <td className="p-4 whitespace-nowrap">
+                                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${badgeColor}`}>
+                                      {log.action.replace(/_/g, ' ')}
+                                    </span>
+                                  </td>
+                                  <td className="p-4 text-gray-300">
+                                    {log.description}
+                                  </td>
+                                  <td className="p-4 text-center">
+                                    <button
+                                      onClick={() => setExpandedAuditLog(isExpanded ? null : log.id)}
+                                      className={`px-3 py-1.5 rounded-lg border text-[10px] uppercase font-black transition-all ${isExpanded ? 'bg-cyan-600 border-cyan-500 text-white shadow-lg shadow-cyan-600/20' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10'}`}
+                                    >
+                                      {isExpanded ? 'Chiudi' : 'Payload'}
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Expanded Payload Viewer */}
+                    {expandedAuditLog && (() => {
+                      const log = auditLogs.find(l => l.id === expandedAuditLog);
+                      if (!log) return null;
+                      return (
+                        <div className="bg-[#0e1227] border border-cyan-500/15 p-6 rounded-2xl animate-in slide-in-from-top-4 duration-300 space-y-4">
+                          <div className="flex justify-between items-center border-b border-white/5 pb-3">
+                            <h4 className="text-xs font-black uppercase text-cyan-400 tracking-widest flex items-center gap-2">
+                              📌 Dettagli Tecnici (Payload JSON)
+                            </h4>
+                            <span className="text-[10px] font-mono text-gray-500">Log ID: {log.id}</span>
+                          </div>
+                          <pre className="text-xs font-mono text-cyan-300 bg-black/45 p-5 rounded-xl border border-white/5 overflow-x-auto max-h-[350px] custom-scrollbar leading-relaxed">
+                            {JSON.stringify(log.details || {}, null, 2)}
+                          </pre>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* TAB DIAGNOSTICS & BACKUPS */}
+          {activeTab === 'diagnostics' && isSuperAdmin && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+              
+              {/* Metrics Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                
+                {/* Supabase Connection State */}
+                <div className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-6 shadow-2xl backdrop-blur-md relative overflow-hidden flex items-center gap-5">
+                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
+                  <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center shadow-lg ${pingStatus === 'online' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : pingStatus === 'offline' ? 'bg-red-500/10 border-red-500/30 text-red-400' : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400 animate-pulse'}`}>
+                    <Activity size={24} />
+                  </div>
+                  <div>
+                    <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block">Supabase Client</span>
+                    <span className="text-base font-black text-white uppercase tracking-wider block mt-0.5">
+                      {pingStatus === 'online' ? 'ONLINE' : pingStatus === 'offline' ? 'OFFLINE' : 'VERIFICA...'}
+                    </span>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <div className={`w-2 h-2 rounded-full ${pingStatus === 'online' ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : pingStatus === 'offline' ? 'bg-red-500' : 'bg-yellow-500 animate-ping'}`}></div>
+                      <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">
+                        {pingStatus === 'online' ? 'Connesso' : pingStatus === 'offline' ? 'Disconnesso' : 'In attesa'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Total Registered Users */}
+                <div className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-6 shadow-2xl backdrop-blur-md relative overflow-hidden flex items-center gap-5">
+                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/35 to-transparent"></div>
+                  <div className="w-12 h-12 bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded-2xl flex items-center justify-center shadow-lg">
+                    <Users size={24} />
+                  </div>
+                  <div>
+                    <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block">Profili Utenti</span>
+                    <span className="text-xl font-black text-white block mt-0.5">
+                      {metricsLoading ? '...' : dbMetrics.profiles || 0}
+                    </span>
+                    <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider block mt-1">Registrati sul database</span>
+                  </div>
+                </div>
+
+                {/* Total Sheep in Circulation */}
+                <div className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-6 shadow-2xl backdrop-blur-md relative overflow-hidden flex items-center gap-5">
+                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-yellow-500/35 to-transparent"></div>
+                  <div className="w-12 h-12 bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 rounded-2xl flex items-center justify-center text-xl shadow-lg">
+                    🐑
+                  </div>
+                  <div>
+                    <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block">Massa Pecore Totale</span>
+                    <span className="text-xl font-black text-yellow-500 block mt-0.5">
+                      {metricsLoading ? '...' : (dbMetrics.total_sheep || 0).toLocaleString('it-IT')} 🐑
+                    </span>
+                    <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider block mt-1">Nelle tasche dei pastori</span>
+                  </div>
+                </div>
+
+                {/* Pending Actions */}
+                <div className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-6 shadow-2xl backdrop-blur-md relative overflow-hidden flex items-center gap-5">
+                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-red-500/35 to-transparent"></div>
+                  <div className="w-12 h-12 bg-red-500/10 border border-red-500/30 text-red-400 rounded-2xl flex items-center justify-center shadow-lg">
+                    <Inbox size={24} />
+                  </div>
+                  <div>
+                    <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block">Proposte / Q&A In Coda</span>
+                    <span className="text-xl font-black text-white block mt-0.5">
+                      {metricsLoading ? '...' : (dbMetrics.suggestions || 0) + (dbMetrics.questions || 0) + (dbMetrics.answers || 0)}
+                    </span>
+                    <span className="text-[9px] text-red-400 font-black uppercase tracking-wider block mt-1 animate-pulse">Da revisionare</span>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Database & Integrations Control */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                {/* Backup actions */}
+                <div className="lg:col-span-5 bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-8 space-y-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
+                  
+                  <div>
+                    <h3 className="text-xs font-black text-cyan-400 uppercase tracking-[0.25em] flex items-center gap-2 mb-2">
+                      <Database size={14} className="text-cyan-400" /> Utility Database
+                    </h3>
+                    <p className="text-xs text-gray-400 leading-relaxed font-medium">
+                      Esegui backup di sicurezza della struttura e del contenuto del manuale. Il backup viene assemblato ed esportato in formato JSON leggibile.
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <button
+                      onClick={handleDownloadBackup}
+                      disabled={isGeneratingBackup}
+                      className="w-full px-6 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white border border-cyan-400/20 rounded-2xl text-xs font-black tracking-widest uppercase transition-all hover:-translate-y-0.5 shadow-lg active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isGeneratingBackup ? (
+                        <Loader2 size={16} className="animate-spin text-white" />
+                      ) : (
+                        <Download size={16} />
+                      )}
+                      {isGeneratingBackup ? 'Generazione Backup...' : 'Scarica Backup JSON Completo'}
+                    </button>
+
+                    <button
+                      onClick={handleTestWebhook}
+                      disabled={webhookTesting}
+                      className="w-full px-6 py-4 bg-white/5 border border-white/10 hover:bg-white/10 text-gray-300 rounded-2xl text-xs font-black tracking-widest uppercase transition-all hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50"
+                    >
+                      {webhookTesting ? (
+                        <Loader2 size={16} className="animate-spin text-[#D4AF37]" />
+                      ) : (
+                        <span>🔧</span>
+                      )}
+                      Testa Webhook Discord Staff
+                    </button>
+                  </div>
+
+                  <div className="bg-black/30 p-4 border border-white/5 rounded-2xl space-y-2">
+                    <div className="flex items-center gap-2 text-[10px] font-black uppercase text-gray-500 tracking-wider">
+                      <span>💡 Informazioni di Sicurezza</span>
+                    </div>
+                    <p className="text-[10px] text-gray-500 leading-relaxed font-medium">
+                      Il file scaricato conterrà tutte le tabelle essenziali (profilo utenti, civiltà, tornei, scommesse). Può essere usato per ripristinare il database in caso di corruzione dei dati.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Table row count diagnostics */}
+                <div className="lg:col-span-7 bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-8 space-y-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
+                  
+                  <div>
+                    <h3 className="text-xs font-black text-cyan-400 uppercase tracking-[0.25em] flex items-center gap-2 mb-2">
+                      📊 Diagnostica Tabelle Supabase
+                    </h3>
+                    <p className="text-xs text-gray-400 leading-relaxed font-medium">
+                      Dimensione delle singole entità presenti nel database di produzione. Ciascun conteggio corrisponde al numero totale di righe memorizzate.
+                    </p>
+                  </div>
+
+                  {metricsLoading ? (
+                    <div className="flex flex-col items-center justify-center py-20">
+                      <Loader2 className="animate-spin text-cyan-400 mb-2" size={32} />
+                      <span className="text-[10px] text-gray-500 uppercase tracking-widest font-black">Interrogazione Tabelle...</span>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {[
+                        { name: 'civilizations', label: 'Civiltà Registrate 🏛️' },
+                        { name: 'suggestions', label: 'Suggerimenti Pendenti 💡' },
+                        { name: 'tournaments', label: 'Tornei Totali 🏆' },
+                        { name: 'betting_markets', label: 'Mercati Scommesse 🎲' },
+                        { name: 'user_bets', label: 'Scommesse Totali 💸' },
+                        { name: 'profiles', label: 'Utenti / Profili 👤' },
+                        { name: 'audit_log', label: 'Voci Registro Attività 📝' },
+                        { name: 'stream_overlays', label: 'Overlay Stream Configurati 🖥️' },
+                        { name: 'faq_sections', label: 'Sezioni delle FAQ 📖' },
+                        { name: 'faq_items', label: 'Domande FAQ Totali 📖' }
+                      ].map((t) => (
+                        <div key={t.name} className="flex justify-between items-center p-3.5 bg-black/20 border border-white/5 rounded-2xl group hover:border-cyan-500/30 transition-colors">
+                          <span className="text-xs font-black text-gray-400 group-hover:text-white transition-colors">{t.label}</span>
+                          <span className="text-xs font-bold text-cyan-400 bg-cyan-950/40 border border-cyan-800/30 px-3 py-1 rounded-xl">
+                            {dbMetrics[t.name] || 0}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                </div>
+
+              </div>
+
             </div>
           )}
         </div>
