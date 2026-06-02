@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Home as HomeIcon } from 'lucide-react';
+import { Home as HomeIcon, X } from 'lucide-react';
+import { supabase } from './lib/supabaseClient';
 import { Sidebar } from './components/Sidebar';
 import { Topbar } from './components/Topbar';
 import { UnitDetailModal } from './components/UnitDetailModal';
@@ -99,6 +100,42 @@ function App() {
   const { updateActivity } = usePresence();
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
+
+  // Active banner announcement states
+  const [activeBanner, setActiveBanner] = useState<{ id: string; title: string; body: string } | null>(null);
+  const [isBannerDismissed, setIsBannerDismissed] = useState(false);
+
+  useEffect(() => {
+    async function fetchActiveBanner() {
+      try {
+        const { data, error } = await supabase
+          .from('announcements')
+          .select('id, title, body, is_active, type')
+          .eq('is_active', true)
+          .or('type.eq.banner,type.eq.both')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (!error && data) {
+          const dismissed = localStorage.getItem(`dismissed_announcement_${data.id}`);
+          if (!dismissed) {
+            setActiveBanner(data);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching active banner:', err);
+      }
+    }
+    fetchActiveBanner();
+  }, []);
+
+  const handleDismissBanner = () => {
+    if (activeBanner) {
+      localStorage.setItem(`dismissed_announcement_${activeBanner.id}`, 'true');
+      setIsBannerDismissed(true);
+    }
+  };
 
   // Track activity globally
   useEffect(() => {
@@ -232,6 +269,26 @@ function App() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
+      {activeBanner && !isBannerDismissed && (
+        <div className="bg-gradient-to-r from-cyan-950/90 to-blue-950/90 border-b border-cyan-500/30 text-white px-4 py-2.5 flex items-center justify-between relative z-50 text-xs md:text-sm font-bold shadow-lg shadow-cyan-950/40 backdrop-blur-md shrink-0">
+          <div className="flex items-center gap-2 mx-auto">
+            <span className="flex h-2 w-2 relative shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+            </span>
+            <span className="text-cyan-400 uppercase tracking-widest text-[9px] font-black border border-cyan-400/30 px-1.5 py-0.5 rounded shrink-0">Annuncio</span>
+            <span className="font-semibold text-gray-200">{activeBanner.title}:</span>
+            <span className="text-gray-300 font-normal">{activeBanner.body}</span>
+          </div>
+          <button 
+            onClick={handleDismissBanner}
+            className="p-1 hover:bg-white/10 text-gray-400 hover:text-white rounded-lg transition-colors absolute right-4"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       <Topbar
         isHome={isHome}
         searchQuery=""

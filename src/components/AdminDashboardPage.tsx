@@ -4,7 +4,8 @@ import {
   MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, 
   AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, 
   Trophy, BookOpen, Zap, Edit2, Check, Trash2, Plus, Minus, ArrowLeft, LayoutDashboard,
-  Save, Sparkles, ChevronDown, Users, Youtube, Menu, History, Database, Activity, Download
+  Save, Sparkles, ChevronDown, Users, Youtube, Menu, History, Database, Activity, Download,
+  Megaphone, TrendingUp, Coins, Lock, Unlock, ChevronRight
 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
@@ -42,8 +43,41 @@ export default function AdminDashboardPage() {
   }, [isAuthenticated, isAdmin, navigate]);
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeTab = (searchParams.get('tab') as 'overview' | 'proposte' | 'qa' | 'users' | 'pecore' | 'tornei' | 'civilta' | 'audit' | 'diagnostics') || 'overview';
+  const activeTab = (searchParams.get('tab') as 'overview' | 'proposte' | 'qa' | 'users' | 'pecore' | 'tornei' | 'civilta' | 'audit' | 'diagnostics' | 'utenti' | 'comunicazioni' | 'analytics') || 'overview';
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // CRM States (Tab 2)
+  const [crmUsers, setCrmUsers] = useState<any[]>([]);
+  const [crmLoading, setCrmLoading] = useState(false);
+  const [crmSearch, setCrmSearch] = useState('');
+  const [crmRoleFilter, setCrmRoleFilter] = useState('all');
+  const [crmSortField, setCrmSortField] = useState('created_at');
+  const [crmSortOrder, setCrmSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [crmPage, setCrmPage] = useState(1);
+  const [crmTotalCount, setCrmTotalCount] = useState(0);
+  const [selectedCrmUser, setSelectedCrmUser] = useState<any | null>(null);
+  const [selectedUserStats, setSelectedUserStats] = useState<{ suggestions: number; bets: number; qa: number } | null>(null);
+  const [selectedUserLogs, setSelectedUserLogs] = useState<any[]>([]);
+  const [statsLoading, setStatsLoading] = useState(false);
+  const [crmTempNickname, setCrmTempNickname] = useState('');
+  const [crmEditingNickname, setCrmEditingNickname] = useState(false);
+  const [crmSheepAmount, setCrmSheepAmount] = useState<number | ''>('');
+
+  // Announcements States (Tab 3)
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [announcementsLoading, setAnnouncementsLoading] = useState(false);
+  const [annForm, setAnnForm] = useState({
+    title: '',
+    body: '',
+    type: 'banner',
+    target: 'all',
+    is_active: true
+  });
+  const [annError, setAnnError] = useState<string | null>(null);
+
+  // Analytics States (Tab 4)
+  const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   // Audit Log states
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
@@ -192,8 +226,19 @@ export default function AdminDashboardPage() {
       fetchAuditLogs();
     } else if (activeTab === 'diagnostics') {
       fetchDiagnostics();
+    } else if (activeTab === 'comunicazioni') {
+      fetchAnnouncements();
+    } else if (activeTab === 'analytics') {
+      fetchAnalyticsData();
     }
   }, [activeTab]);
+
+  // CRM dynamic filters effect
+  useEffect(() => {
+    if (activeTab === 'utenti') {
+      fetchCrmUsers();
+    }
+  }, [crmSearch, crmRoleFilter, crmSortField, crmSortOrder, crmPage, activeTab]);
 
   const fetchTournaments = async () => {
     try {
@@ -869,6 +914,482 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // CRM Functions (Tab 2)
+  const handleCrmSearchChange = (value: string) => {
+    setCrmSearch(value);
+    setCrmPage(1);
+  };
+
+  const handleCrmRoleFilterChange = (value: string) => {
+    setCrmRoleFilter(value);
+    setCrmPage(1);
+  };
+
+  const fetchCrmUsers = async () => {
+    setCrmLoading(true);
+    try {
+      let query = supabase.from('profiles').select('*', { count: 'exact' });
+      
+      if (crmSearch.trim()) {
+        query = query.or(`email.ilike.%${crmSearch.trim()}%,nickname.ilike.%${crmSearch.trim()}%`);
+      }
+      
+      if (crmRoleFilter !== 'all') {
+        if (crmRoleFilter === 'user') {
+          query = query.or('role.is.null,role.eq.user');
+        } else {
+          query = query.eq('role', crmRoleFilter);
+        }
+      }
+      
+      query = query.order(crmSortField, { ascending: crmSortOrder === 'asc' });
+      
+      const pageSize = 12;
+      const fromRange = (crmPage - 1) * pageSize;
+      const toRange = fromRange + pageSize - 1;
+      query = query.range(fromRange, toRange);
+      
+      const { data, error, count } = await query;
+      if (error) throw error;
+      
+      setCrmUsers(data || []);
+      setCrmTotalCount(count || 0);
+    } catch (err) {
+      console.error('Error fetching CRM users:', err);
+      setToast({ isVisible: true, message: 'Errore nel caricamento degli utenti CRM', type: 'error' });
+    } finally {
+      setCrmLoading(false);
+    }
+  };
+
+  const handleSelectCrmUser = async (userProfile: any) => {
+    setSelectedCrmUser(userProfile);
+    setCrmTempNickname(userProfile.nickname || '');
+    setCrmEditingNickname(false);
+    setCrmSheepAmount('');
+    setStatsLoading(true);
+    try {
+      const email = userProfile.email;
+      if (!email) return;
+
+      const [suggRes, betsRes, qRes, aRes, logsRes] = await Promise.all([
+        supabase.from('suggestions').select('id', { count: 'exact', head: true }).ilike('user_email', email),
+        supabase.from('user_bets').select('id', { count: 'exact', head: true }).ilike('user_email', email),
+        supabase.from('questions').select('id', { count: 'exact', head: true }).ilike('user_email', email),
+        supabase.from('answers').select('id', { count: 'exact', head: true }).ilike('user_email', email),
+        supabase.from('audit_log').select('*').ilike('user_email', email).order('created_at', { ascending: false }).limit(10)
+      ]);
+
+      setSelectedUserStats({
+        suggestions: suggRes.count || 0,
+        bets: betsRes.count || 0,
+        qa: (qRes.count || 0) + (aRes.count || 0)
+      });
+      setSelectedUserLogs(logsRes.data || []);
+    } catch (err) {
+      console.error('Error fetching user stats:', err);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  const handleCrmToggleBan = async (userEmail: string, currentRole: string) => {
+    if (!isSuperAdmin) {
+      setToast({ isVisible: true, message: 'Solo i Super Admin possono bannare utenti', type: 'error' });
+      return;
+    }
+    const isBanned = currentRole === 'banned';
+    const newRole = isBanned ? 'user' : 'banned';
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ role: newRole })
+        .eq('email', userEmail);
+      
+      if (error) throw error;
+      
+      await logAdminAction(
+        isBanned ? 'UNBAN_USER' : 'BAN_USER',
+        'profiles',
+        userEmail,
+        isBanned ? `Sbloccato utente "${userEmail}"` : `Bannato utente "${userEmail}"`,
+        { target_email: userEmail }
+      );
+
+      setToast({ isVisible: true, message: isBanned ? 'Utente sbloccato' : 'Utente bannato', type: 'success' });
+      
+      setCrmUsers((prev: any[]) => prev.map(u => u.email === userEmail ? { ...u, role: newRole } : u));
+      if (selectedCrmUser && selectedCrmUser.email === userEmail) {
+        setSelectedCrmUser((prev: any) => prev ? { ...prev, role: newRole } : null);
+      }
+    } catch (err) {
+      console.error('Error toggling ban:', err);
+      setToast({ isVisible: true, message: 'Errore durante l\'azione', type: 'error' });
+    }
+  };
+
+  const handleCrmUpdateNickname = async (userEmail: string, newNickname: string) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ nickname: newNickname })
+        .eq('email', userEmail);
+      
+      if (error) throw error;
+      
+      await logAdminAction(
+        'UPDATE_NICKNAME',
+        'profiles',
+        userEmail,
+        `Modificato nickname di "${userEmail}" in "${newNickname}"`,
+        { target_email: userEmail, nickname: newNickname }
+      );
+
+      setToast({ isVisible: true, message: 'Nickname aggiornato', type: 'success' });
+      setCrmEditingNickname(false);
+      
+      setCrmUsers((prev: any[]) => prev.map(u => u.email === userEmail ? { ...u, nickname: newNickname } : u));
+      if (selectedCrmUser && selectedCrmUser.email === userEmail) {
+        setSelectedCrmUser((prev: any) => prev ? { ...prev, nickname: newNickname } : null);
+      }
+    } catch (err) {
+      console.error('Error updating nickname:', err);
+      setToast({ isVisible: true, message: 'Errore durante l\'aggiornamento', type: 'error' });
+    }
+  };
+
+  const handleCrmAdjustSheep = async (userEmail: string, amount: number, isSet = false) => {
+    if (!isSuperAdmin) {
+      setToast({ isVisible: true, message: 'Solo i Super Admin possono modificare il bilancio', type: 'error' });
+      return;
+    }
+    try {
+      const profile = crmUsers.find(u => u.email === userEmail) || selectedCrmUser;
+      if (!profile) return;
+      const newBalance = isSet ? amount : (profile.sheep_balance || 0) + amount;
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ sheep_balance: newBalance })
+        .eq('email', userEmail);
+      
+      if (error) throw error;
+      
+      await logAdminAction(
+        'ADJUST_SHEEP_BALANCE',
+        'profiles',
+        userEmail,
+        `Modificato bilancio pecore di "${userEmail}" a ${newBalance}`,
+        { target_email: userEmail, amount: newBalance }
+      );
+
+      setToast({ isVisible: true, message: 'Bilancio pecore aggiornato', type: 'success' });
+      setCrmSheepAmount('');
+      
+      setCrmUsers((prev: any[]) => prev.map(u => u.email === userEmail ? { ...u, sheep_balance: newBalance } : u));
+      if (selectedCrmUser && selectedCrmUser.email === userEmail) {
+        setSelectedCrmUser((prev: any) => prev ? { ...prev, sheep_balance: newBalance } : null);
+      }
+    } catch (err) {
+      console.error('Error adjusting sheep:', err);
+      setToast({ isVisible: true, message: 'Errore durante l\'aggiornamento', type: 'error' });
+    }
+  };
+
+  const handleCrmChangeRole = async (userEmail: string, role: string) => {
+    if (!isSuperAdmin) {
+      setToast({ isVisible: true, message: 'Solo i Super Admin possono promuovere utenti', type: 'error' });
+      return;
+    }
+    try {
+      const updates: any = { role };
+      if (role === 'admin' || role === 'editor' || role === 'staff') {
+        updates.can_manage_tournaments = true;
+        updates.can_manage_civs = true;
+        updates.can_manage_buildorders = true;
+      } else if (role === 'user') {
+        updates.can_manage_tournaments = false;
+        updates.can_manage_civs = false;
+        updates.can_manage_buildorders = false;
+      }
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('email', userEmail);
+      
+      if (error) throw error;
+      
+      await logAdminAction(
+        'PROMOTE_USER_ROLE',
+        'profiles',
+        userEmail,
+        `Modificato ruolo di "${userEmail}" in "${role}"`,
+        { target_email: userEmail, role, updates }
+      );
+
+      setToast({ isVisible: true, message: 'Ruolo aggiornato', type: 'success' });
+      
+      setCrmUsers((prev: any[]) => prev.map(u => u.email === userEmail ? { ...u, ...updates } : u));
+      if (selectedCrmUser && selectedCrmUser.email === userEmail) {
+        setSelectedCrmUser((prev: any) => prev ? { ...prev, ...updates } : null);
+      }
+    } catch (err) {
+      console.error('Error updating role:', err);
+      setToast({ isVisible: true, message: 'Errore durante l\'aggiornamento', type: 'error' });
+    }
+  };
+
+  const handleCrmTogglePermission = async (userEmail: string, field: string, value: boolean) => {
+    if (!isSuperAdmin) {
+      setToast({ isVisible: true, message: 'Solo i Super Admin possono modificare i permessi', type: 'error' });
+      return;
+    }
+    try {
+      const updates = { [field]: value };
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('email', userEmail);
+      
+      if (error) throw error;
+      
+      await logAdminAction(
+        'TOGGLE_USER_PERMISSION',
+        'profiles',
+        userEmail,
+        `Modificato permesso "${field}" per "${userEmail}" a "${value}"`,
+        { target_email: userEmail, field, value }
+      );
+
+      setToast({ isVisible: true, message: 'Permessi aggiornati', type: 'success' });
+      
+      setCrmUsers((prev: any[]) => prev.map(u => u.email === userEmail ? { ...u, ...updates } : u));
+      if (selectedCrmUser && selectedCrmUser.email === userEmail) {
+        setSelectedCrmUser((prev: any) => prev ? { ...prev, ...updates } : null);
+      }
+    } catch (err) {
+      console.error('Error toggling permission:', err);
+      setToast({ isVisible: true, message: 'Errore durante l\'aggiornamento', type: 'error' });
+    }
+  };
+
+  // Announcements Functions (Tab 3)
+  const fetchAnnouncements = async () => {
+    setAnnouncementsLoading(true);
+    setAnnError(null);
+    try {
+      const { data, error } = await supabase
+        .from('announcements')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        if (error.code === 'PGRST116' || error.message.includes('does not exist') || error.message.includes('announcements')) {
+          setAnnError('table_missing');
+        } else {
+          throw error;
+        }
+      } else {
+        setAnnouncements(data || []);
+      }
+    } catch (err: any) {
+      console.error('Error fetching announcements:', err);
+      setToast({ isVisible: true, message: 'Errore nel caricamento degli annunci', type: 'error' });
+    } finally {
+      setAnnouncementsLoading(false);
+    }
+  };
+
+  const handleCreateAnnouncement = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!annForm.title.trim() || !annForm.body.trim()) return;
+    
+    try {
+      const userEmail = useAuth().user?.email || 'admin@localhost';
+      const { error } = await supabase
+        .from('announcements')
+        .insert({
+          title: annForm.title.trim(),
+          body: annForm.body.trim(),
+          type: annForm.type,
+          target: annForm.target,
+          is_active: annForm.is_active,
+          created_by: userEmail
+        });
+        
+      if (error) throw error;
+      
+      await logAdminAction(
+        'CREATE_ANNOUNCEMENT',
+        'announcements',
+        null,
+        `Creato annuncio "${annForm.title}"`,
+        { form: annForm }
+      );
+
+      setToast({ isVisible: true, message: 'Annuncio creato con successo', type: 'success' });
+      setAnnForm({
+        title: '',
+        body: '',
+        type: 'banner',
+        target: 'all',
+        is_active: true
+      });
+      fetchAnnouncements();
+    } catch (err) {
+      console.error('Error creating announcement:', err);
+      setToast({ isVisible: true, message: 'Errore nella creazione dell\'annuncio', type: 'error' });
+    }
+  };
+
+  const handleToggleAnnouncementActive = async (id: string, currentActive: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('announcements')
+        .update({ is_active: !currentActive })
+        .eq('id', id);
+        
+      if (error) throw error;
+      
+      await logAdminAction(
+        'TOGGLE_ANNOUNCEMENT_ACTIVE',
+        'announcements',
+        id,
+        `Modificato stato attivo annuncio in ${!currentActive}`,
+        { announcement_id: id, is_active: !currentActive }
+      );
+
+      setToast({ isVisible: true, message: 'Stato annuncio aggiornato', type: 'success' });
+      fetchAnnouncements();
+    } catch (err) {
+      console.error('Error toggling active state:', err);
+      setToast({ isVisible: true, message: 'Errore nell\'aggiornamento', type: 'error' });
+    }
+  };
+
+  const handleDeleteAnnouncement = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('announcements')
+        .delete()
+        .eq('id', id);
+        
+      if (error) throw error;
+      
+      await logAdminAction(
+        'DELETE_ANNOUNCEMENT',
+        'announcements',
+        id,
+        `Eliminato annuncio ID ${id}`,
+        { announcement_id: id }
+      );
+
+      setToast({ isVisible: true, message: 'Annuncio eliminato', type: 'success' });
+      fetchAnnouncements();
+    } catch (err) {
+      console.error('Error deleting announcement:', err);
+      setToast({ isVisible: true, message: 'Errore nell\'eliminazione', type: 'error' });
+    }
+  };
+
+  // Analytics Functions (Tab 4)
+  const getTrendData = (items: any[]) => {
+    const now = new Date();
+    const weeks = Array.from({ length: 6 }).map((_, idx) => {
+      const d = new Date();
+      d.setDate(now.getDate() - idx * 7);
+      return {
+        start: new Date(d.setDate(d.getDate() - d.getDay())),
+        label: `Sett. -${idx}`,
+        count: 0
+      };
+    }).reverse();
+
+    items.forEach(item => {
+      if (!item.created_at) return;
+      const date = new Date(item.created_at);
+      for (let i = 0; i < weeks.length; i++) {
+        const w = weeks[i].start;
+        const nextW = new Date(w);
+        nextW.setDate(nextW.getDate() + 7);
+        if (date >= w && date < nextW) {
+          weeks[i].count++;
+          break;
+        }
+      }
+    });
+
+    return weeks.map(w => ({ 
+      label: w.label === 'Sett. -0' ? 'Corrente' : w.label, 
+      value: w.count 
+    }));
+  };
+
+  const getCivPopularity = (suggestions: any[]) => {
+    const counts: Record<string, number> = {};
+    suggestions.forEach(s => {
+      const name = s.civ_name || 'Generico';
+      counts[name] = (counts[name] || 0) + 1;
+    });
+    return Object.entries(counts)
+      .map(([label, value]) => ({ label, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
+  };
+
+  const getHourlyHeatmap = (items: any[]) => {
+    const hours = Array.from({ length: 24 }).map((_, h) => ({ label: `${h}:00`, value: 0 }));
+    items.forEach(item => {
+      if (!item.created_at) return;
+      const date = new Date(item.created_at);
+      const hour = date.getHours();
+      hours[hour].value++;
+    });
+    return hours;
+  };
+
+  const fetchAnalyticsData = async () => {
+    setAnalyticsLoading(true);
+    try {
+      const [profilesRes, suggestionsRes, betsRes] = await Promise.all([
+        supabase.from('profiles').select('created_at'),
+        supabase.from('suggestions').select('created_at, status, civ_name'),
+        supabase.from('user_bets').select('created_at, amount')
+      ]);
+
+      if (profilesRes.error) throw profilesRes.error;
+      if (suggestionsRes.error) throw suggestionsRes.error;
+      if (betsRes.error) throw betsRes.error;
+
+      const profiles = profilesRes.data || [];
+      const suggestions = suggestionsRes.data || [];
+      const bets = betsRes.data || [];
+
+      const totalUsers = profiles.length;
+      const totalSuggestions = suggestions.length;
+      const totalBets = bets.length;
+      const totalSheep = bets.reduce((sum, b) => sum + (b.amount || 0), 0);
+
+      setAnalyticsData({
+        totalUsers,
+        totalSuggestions,
+        totalBets,
+        totalSheep,
+        registrationsTrend: getTrendData(profiles),
+        suggestionsTrend: getTrendData(suggestions),
+        betsTrend: getTrendData(bets),
+        civPopularity: getCivPopularity(suggestions),
+        hourlyHeatmap: getHourlyHeatmap([...profiles, ...suggestions, ...bets])
+      });
+    } catch (err) {
+      console.error('Error fetching analytics data:', err);
+      setToast({ isVisible: true, message: 'Errore nel caricamento delle metriche', type: 'error' });
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
+
   // Helper utility to write audit logs
   const logAdminAction = async (
     action: string,
@@ -1499,6 +2020,30 @@ export default function AdminDashboardPage() {
           </button>
           
           <button
+            onClick={() => selectTab('utenti')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'utenti' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+          >
+            <Users size={18} />
+            <span>Utenti (CRM)</span>
+          </button>
+
+          <button
+            onClick={() => selectTab('comunicazioni')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'comunicazioni' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+          >
+            <Megaphone size={18} />
+            <span>Comunicazioni</span>
+          </button>
+
+          <button
+            onClick={() => selectTab('analytics')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'analytics' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+          >
+            <TrendingUp size={18} />
+            <span>Analytics</span>
+          </button>
+          
+          <button
             onClick={() => selectTab('proposte')}
             className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'proposte' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
           >
@@ -1619,6 +2164,9 @@ export default function AdminDashboardPage() {
                 {activeTab === 'civilta' && 'Gestione Civiltà & BO'}
                 {activeTab === 'audit' && 'Registro Attività (Audit)'}
                 {activeTab === 'diagnostics' && 'Backup & Diagnostica'}
+                {activeTab === 'utenti' && 'Anagrafica Utenti (CRM)'}
+                {activeTab === 'comunicazioni' && 'Centro Comunicazioni'}
+                {activeTab === 'analytics' && 'Metriche & Analytics'}
               </h2>
               <p className="text-[10px] md:text-xs text-gray-400 truncate">
                 {activeTab === 'overview' && 'Panoramica e statistiche globali del manuale.'}
@@ -1630,6 +2178,9 @@ export default function AdminDashboardPage() {
                 {activeTab === 'civilta' && 'Modifica dettagli civiltà e crea/edita i build orders.'}
                 {activeTab === 'audit' && 'Registro di controllo e sicurezza di tutte le azioni dello staff.'}
                 {activeTab === 'diagnostics' && 'Monitoraggio del database, test di integrazione ed esportazione backup.'}
+                {activeTab === 'utenti' && 'CRM per la gestione di tutti gli utenti registrati sul portale.'}
+                {activeTab === 'comunicazioni' && 'Crea e pubblica annunci, banner in-app e notifiche per la community.'}
+                {activeTab === 'analytics' && 'Visualizza trend di crescita, scommesse, contributi e fasce orarie.'}
               </p>
             </div>
           </div>
@@ -3903,6 +4454,696 @@ export default function AdminDashboardPage() {
 
             </div>
           )}
+
+          {/* TAB 2: CRM Utenti */}
+          {activeTab === 'utenti' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500">
+              <div className="flex flex-col xl:flex-row gap-6">
+                
+                {/* Lista Utenti */}
+                <div className="flex-1 bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-6 shadow-2xl backdrop-blur-md relative overflow-hidden flex flex-col min-w-0">
+                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
+                  
+                  {/* Filtri */}
+                  <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-6">
+                    <div className="relative w-full md:w-80">
+                      <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                      <input
+                        type="text"
+                        placeholder="Cerca per email o nickname..."
+                        value={crmSearch}
+                        onChange={(e) => handleCrmSearchChange(e.target.value)}
+                        className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl py-3 pl-11 pr-4 text-xs text-white focus:shadow-[0_0_15px_rgba(34,211,238,0.15)] transition-all outline-none font-bold"
+                      />
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+                      <select
+                        value={crmRoleFilter}
+                        onChange={(e) => handleCrmRoleFilterChange(e.target.value)}
+                        className="bg-[#111218] border-2 border-white/10 rounded-2xl px-4 py-2.5 text-xs text-white outline-none focus:border-cyan-500/50 font-bold"
+                      >
+                        <option value="all">Tutti i Ruoli</option>
+                        <option value="admin">Admin</option>
+                        <option value="editor">Editor</option>
+                        <option value="staff">Staff</option>
+                        <option value="user">Utenti standard</option>
+                        <option value="banned">Bloccati 🚫</option>
+                      </select>
+
+                      <select
+                        value={crmSortField}
+                        onChange={(e) => { setCrmSortField(e.target.value); setCrmPage(1); }}
+                        className="bg-[#111218] border-2 border-white/10 rounded-2xl px-4 py-2.5 text-xs text-white outline-none focus:border-cyan-500/50 font-bold"
+                      >
+                        <option value="created_at">Data Registrazione</option>
+                        <option value="sheep_balance">Saldo Pecore</option>
+                        <option value="nickname">Nickname</option>
+                        <option value="email">Email</option>
+                      </select>
+
+                      <button
+                        onClick={() => setCrmSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+                        className="p-2.5 bg-[#111218] border-2 border-white/10 hover:border-cyan-500/30 rounded-2xl text-cyan-400 font-bold transition-all text-xs active:scale-95"
+                      >
+                        {crmSortOrder === 'asc' ? '↑ ASC' : '↓ DESC'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Tabella Utenti */}
+                  {crmLoading ? (
+                    <div className="flex flex-col items-center justify-center py-24">
+                      <Loader2 className="animate-spin text-cyan-400 mb-2" size={36} />
+                      <span className="text-[10px] text-gray-500 uppercase tracking-widest font-black">Interrogazione registro utenti...</span>
+                    </div>
+                  ) : crmUsers.length === 0 ? (
+                    <div className="text-center py-20 bg-black/20 border border-white/5 rounded-2xl">
+                      <p className="text-sm text-gray-400 font-medium">Nessun utente trovato con questi criteri di ricerca.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="overflow-x-auto elegant-scrollbar">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="border-b border-white/5 text-[10px] font-black uppercase text-gray-500 tracking-wider">
+                              <th className="py-3 px-4">Utente</th>
+                              <th className="py-3 px-4">Ruolo</th>
+                              <th className="py-3 px-4 text-center">🐑 Pecore</th>
+                              <th className="py-3 px-4">Creato il</th>
+                              <th className="py-3 px-4 text-right">Azioni</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-white/5">
+                            {crmUsers.map((u) => {
+                              const isSelected = selectedCrmUser?.email === u.email;
+                              return (
+                                <tr 
+                                  key={u.id}
+                                  onClick={() => handleSelectCrmUser(u)}
+                                  className={`group cursor-pointer transition-colors ${isSelected ? 'bg-cyan-500/5' : 'hover:bg-white/[0.02]'}`}
+                                >
+                                  <td className="py-3 px-4">
+                                    <div className="flex items-center gap-3">
+                                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center border text-xs font-bold shrink-0 overflow-hidden shadow ${u.role === 'admin' ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : u.role === 'banned' ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
+                                        {u.avatar_url ? (
+                                          <img src={u.avatar_url} alt="" className="w-full h-full object-cover" />
+                                        ) : (
+                                          <span>{u.nickname?.[0]?.toUpperCase() || u.email?.[0]?.toUpperCase() || 'U'}</span>
+                                        )}
+                                      </div>
+                                      <div className="flex flex-col min-w-0">
+                                        <span className="text-xs font-bold text-white truncate max-w-[150px]">{u.nickname || 'Nessun nickname'}</span>
+                                        <span className="text-[10px] text-gray-500 truncate max-w-[150px]">{u.email}</span>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="py-3 px-4">
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                      {u.role === 'admin' && <span className="text-[8px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-md font-black uppercase tracking-wider">Owner</span>}
+                                      {u.role === 'editor' && <span className="text-[8px] px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-md font-black uppercase tracking-wider">Editor</span>}
+                                      {u.role === 'staff' && <span className="text-[8px] px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-md font-black uppercase tracking-wider">Staff</span>}
+                                      {u.role === 'banned' && <span className="text-[8px] px-2 py-0.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded-md font-black uppercase tracking-wider">Bannato</span>}
+                                      {(!u.role || u.role === 'user') && <span className="text-[8px] px-2 py-0.5 bg-white/5 text-gray-400 border border-white/10 rounded-md font-black uppercase tracking-wider">User</span>}
+                                    </div>
+                                  </td>
+                                  <td className="py-3 px-4 text-center">
+                                    <span className="text-xs font-bold text-cyan-400 bg-cyan-950/40 border border-cyan-900/40 px-2.5 py-0.5 rounded-full">{u.sheep_balance ?? 100}</span>
+                                  </td>
+                                  <td className="py-3 px-4 text-xs text-gray-400 font-medium">
+                                    {new Date(u.created_at).toLocaleDateString('it-IT')}
+                                  </td>
+                                  <td className="py-3 px-4 text-right">
+                                    <button 
+                                      className="p-1.5 bg-white/5 hover:bg-cyan-500/10 text-gray-400 hover:text-cyan-400 border border-white/5 hover:border-cyan-500/20 rounded-xl transition-all"
+                                      onClick={(e) => { e.stopPropagation(); handleSelectCrmUser(u); }}
+                                    >
+                                      <ChevronRight size={14} />
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Paginazione */}
+                      {crmTotalCount > 12 && (
+                        <div className="flex justify-between items-center pt-4 border-t border-white/5">
+                          <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+                            Mostrando {crmUsers.length} di {crmTotalCount} utenti
+                          </span>
+                          <div className="flex gap-2">
+                            <button
+                              disabled={crmPage === 1}
+                              onClick={() => setCrmPage(prev => Math.max(prev - 1, 1))}
+                              className="px-4 py-2 bg-[#111218] border-2 border-white/10 hover:border-cyan-500/30 text-xs font-bold text-white rounded-xl disabled:opacity-30 disabled:pointer-events-none transition-all active:scale-95"
+                            >
+                              Precedente
+                            </button>
+                            <span className="px-4 py-2 bg-white/5 border border-white/5 rounded-xl text-xs font-bold text-cyan-400 flex items-center">
+                              Pagina {crmPage}
+                            </span>
+                            <button
+                              disabled={crmPage * 12 >= crmTotalCount}
+                              onClick={() => setCrmPage(prev => prev + 1)}
+                              className="px-4 py-2 bg-[#111218] border-2 border-white/10 hover:border-cyan-500/30 text-xs font-bold text-white rounded-xl disabled:opacity-30 disabled:pointer-events-none transition-all active:scale-95"
+                            >
+                              Successiva
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Scheda Dettagli Laterale */}
+                <div className="w-full xl:w-96 space-y-6">
+                  {selectedCrmUser ? (
+                    <div className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-6 shadow-2xl backdrop-blur-md relative overflow-hidden space-y-6">
+                      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
+                      
+                      <div className="flex flex-col items-center text-center pb-6 border-b border-white/5">
+                        <div className={`w-20 h-20 rounded-3xl flex items-center justify-center border-2 text-2xl font-bold overflow-hidden shadow-lg mb-4 ${selectedCrmUser.role === 'admin' ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400' : selectedCrmUser.role === 'banned' ? 'bg-red-500/10 border-red-500/30 text-red-500' : 'bg-blue-600/10 border-blue-500/30 text-blue-400'}`}>
+                          {selectedCrmUser.avatar_url ? (
+                            <img src={selectedCrmUser.avatar_url} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <span>{selectedCrmUser.nickname?.[0]?.toUpperCase() || selectedCrmUser.email?.[0]?.toUpperCase() || 'U'}</span>
+                          )}
+                        </div>
+                        
+                        <div className="w-full">
+                          {crmEditingNickname ? (
+                            <div className="flex items-center justify-center gap-1.5 w-full">
+                              <input
+                                autoFocus
+                                className="bg-black/60 border-2 border-cyan-500/30 rounded-xl px-3 py-1.5 text-xs text-white text-center focus:outline-none max-w-[180px] font-bold"
+                                value={crmTempNickname}
+                                onChange={(e) => setCrmTempNickname(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleCrmUpdateNickname(selectedCrmUser.email, crmTempNickname);
+                                  if (e.key === 'Escape') setCrmEditingNickname(false);
+                                }}
+                              />
+                              <button 
+                                onClick={() => handleCrmUpdateNickname(selectedCrmUser.email, crmTempNickname)}
+                                className="p-1.5 bg-green-500/10 border border-green-500/20 text-green-400 rounded-lg hover:bg-green-500/20"
+                              >
+                                <Check size={14} />
+                              </button>
+                            </div>
+                          ) : (
+                            <h3 className="text-base font-black text-white flex items-center justify-center gap-2">
+                              {selectedCrmUser.nickname || 'Nessun Nickname'}
+                              <button 
+                                onClick={() => setCrmEditingNickname(true)} 
+                                className="p-1 text-gray-400 hover:text-white transition-colors"
+                              >
+                                <Edit2 size={12} />
+                              </button>
+                            </h3>
+                          )}
+                          <p className="text-xs text-gray-400 mt-1 truncate select-all">{selectedCrmUser.email}</p>
+                          <p className="text-[9px] text-gray-500 uppercase tracking-widest font-black mt-2">
+                            ID AoE4: {selectedCrmUser.aoe4_profile_id || 'Non Collegato'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Contributi */}
+                      <div className="space-y-3">
+                        <h4 className="text-[10px] font-black uppercase text-gray-500 tracking-wider">Contributi Portale</h4>
+                        {statsLoading ? (
+                          <div className="flex justify-center py-4">
+                            <Loader2 className="animate-spin text-cyan-400" size={18} />
+                          </div>
+                        ) : selectedUserStats ? (
+                          <div className="grid grid-cols-3 gap-2">
+                            <div className="bg-black/20 border border-white/5 rounded-2xl p-3 text-center">
+                              <span className="text-[9px] font-black text-gray-500 uppercase block tracking-wider">Proposte</span>
+                              <span className="text-base font-black text-white">{selectedUserStats.suggestions}</span>
+                            </div>
+                            <div className="bg-black/20 border border-white/5 rounded-2xl p-3 text-center">
+                              <span className="text-[9px] font-black text-gray-500 uppercase block tracking-wider">Scommesse</span>
+                              <span className="text-base font-black text-cyan-400">{selectedUserStats.bets}</span>
+                            </div>
+                            <div className="bg-black/20 border border-white/5 rounded-2xl p-3 text-center">
+                              <span className="text-[9px] font-black text-gray-500 uppercase block tracking-wider">Q&A</span>
+                              <span className="text-base font-black text-white">{selectedUserStats.qa}</span>
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
+
+                      {/* Azioni Gestionali */}
+                      <div className="space-y-4 pt-4 border-t border-white/5">
+                        <h4 className="text-[10px] font-black uppercase text-gray-500 tracking-wider">Azioni Gestionali CRM</h4>
+                        
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 block uppercase tracking-wider">Bilancio Pecore ({selectedCrmUser.sheep_balance ?? 100})</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="number"
+                              placeholder="Quantità..."
+                              value={crmSheepAmount}
+                              onChange={(e) => setCrmSheepAmount(e.target.value === '' ? '' : Number(e.target.value))}
+                              className="flex-1 bg-[#111218] border border-white/10 focus:border-cyan-500/50 rounded-xl px-3 py-2 text-xs text-white font-bold outline-none"
+                            />
+                            <button
+                              disabled={crmSheepAmount === ''}
+                              onClick={() => handleCrmAdjustSheep(selectedCrmUser.email, Number(crmSheepAmount))}
+                              className="px-3 py-2 bg-cyan-600/20 hover:bg-cyan-600 border border-cyan-500/30 text-cyan-400 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider disabled:opacity-30 disabled:pointer-events-none transition-all"
+                            >
+                              Invia
+                            </button>
+                            <button
+                              disabled={crmSheepAmount === ''}
+                              onClick={() => handleCrmAdjustSheep(selectedCrmUser.email, Number(crmSheepAmount), true)}
+                              className="px-3 py-2 bg-cyan-600/10 hover:bg-cyan-600 border border-cyan-500/15 text-cyan-400 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider disabled:opacity-30 disabled:pointer-events-none transition-all"
+                            >
+                              Imposta
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 block uppercase tracking-wider">Modifica Ruolo Operativo</label>
+                          <div className="grid grid-cols-2 gap-2">
+                            {['user', 'staff', 'editor', 'admin'].map((role) => (
+                              <button
+                                key={role}
+                                disabled={!isSuperAdmin}
+                                onClick={() => handleCrmChangeRole(selectedCrmUser.email, role)}
+                                className={`py-2 rounded-xl text-[10px] font-black uppercase border transition-all ${selectedCrmUser.role === role ? 'bg-cyan-600/20 border-cyan-500/50 text-cyan-400 font-bold' : 'bg-black/10 border-white/5 text-gray-400 hover:bg-white/5'}`}
+                              >
+                                {role}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="space-y-2 pt-2">
+                          <label className="text-[10px] font-black text-gray-400 block uppercase tracking-wider text-left">Permessi Granulari</label>
+                          <div className="space-y-2">
+                            {[
+                              { field: 'can_manage_tournaments', label: 'Gestione Tornei 🏆' },
+                              { field: 'can_manage_civs', label: 'Gestione Civiltà 🏛️' },
+                              { field: 'can_manage_buildorders', label: 'Gestione Build Orders ⚡' }
+                            ].map((perm) => (
+                              <div key={perm.field} className="flex items-center justify-between p-2 bg-[#111218] border border-white/5 rounded-xl">
+                                <span className="text-[10px] font-bold text-gray-300">{perm.label}</span>
+                                <input
+                                  type="checkbox"
+                                  disabled={!isSuperAdmin}
+                                  checked={!!selectedCrmUser[perm.field]}
+                                  onChange={(e) => handleCrmTogglePermission(selectedCrmUser.email, perm.field, e.target.checked)}
+                                  className="w-4 h-4 rounded border-white/10 text-cyan-600 focus:ring-cyan-500 bg-[#111218]"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="pt-2">
+                          {selectedCrmUser.role === 'banned' ? (
+                            <button
+                              disabled={!isSuperAdmin}
+                              onClick={() => handleCrmToggleBan(selectedCrmUser.email, 'banned')}
+                              className="w-full flex items-center justify-center gap-2 py-3 bg-green-500/10 hover:bg-green-600 border border-green-500/20 hover:border-green-500 text-green-400 hover:text-white rounded-2xl transition-all font-black text-xs uppercase tracking-wider"
+                            >
+                              <Unlock size={14} /> Sblocca Account
+                            </button>
+                          ) : (
+                            <button
+                              disabled={!isSuperAdmin}
+                              onClick={() => handleCrmToggleBan(selectedCrmUser.email, selectedCrmUser.role || 'user')}
+                              className="w-full flex items-center justify-center gap-2 py-3 bg-red-500/10 hover:bg-red-600 border border-red-500/20 hover:border-red-500 text-red-400 hover:text-white rounded-2xl transition-all font-black text-xs uppercase tracking-wider shadow-lg shadow-red-950/20"
+                            >
+                              <Lock size={14} /> Blocca / Banna Utente
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Log Attività Utente */}
+                      <div className="space-y-3 pt-4 border-t border-white/5">
+                        <h4 className="text-[10px] font-black uppercase text-gray-500 tracking-wider">Ultime Azioni Log</h4>
+                        {statsLoading ? (
+                          <div className="flex justify-center py-4">
+                            <Loader2 className="animate-spin text-cyan-400" size={14} />
+                          </div>
+                        ) : selectedUserLogs.length === 0 ? (
+                          <p className="text-[10px] text-gray-500 italic">Nessuna azione registrata nell'audit log.</p>
+                        ) : (
+                          <div className="space-y-2 max-h-48 overflow-y-auto elegant-scrollbar pr-1">
+                            {selectedUserLogs.map((log) => (
+                              <div key={log.id} className="bg-black/20 border border-white/5 rounded-xl p-2.5 text-[10px] space-y-1">
+                                <div className="flex justify-between font-black text-gray-400">
+                                  <span className="text-cyan-400 uppercase tracking-wider">{log.action}</span>
+                                  <span>{new Date(log.created_at).toLocaleDateString('it-IT')}</span>
+                                </div>
+                                <p className="text-gray-300 font-medium">{log.description}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                    </div>
+                  ) : (
+                    <div className="bg-[#0a0e1c]/40 border border-white/5 rounded-3xl p-8 text-center h-full flex flex-col items-center justify-center py-24">
+                      <Users size={32} className="text-gray-600 mb-2" />
+                      <h3 className="text-sm font-bold text-gray-400">Nessun utente selezionato</h3>
+                      <p className="text-[11px] text-gray-500 mt-1 max-w-[200px] mx-auto">Clicca sulla riga di un utente per visualizzare dettagli, storico contributi e controlli CRM.</p>
+                    </div>
+                  )}
+                </div>
+
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: Comunicazioni */}
+          {activeTab === 'comunicazioni' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500">
+              {annError === 'table_missing' ? (
+                <div className="bg-red-500/10 border-2 border-red-500/20 rounded-3xl p-8 text-center max-w-2xl mx-auto space-y-4">
+                  <AlertTriangle className="text-red-500 mx-auto" size={48} />
+                  <h3 className="text-lg font-black text-white uppercase tracking-wider">Tabella DB "announcements" non trovata</h3>
+                  <p className="text-xs text-gray-300 leading-relaxed font-medium">
+                    Per poter utilizzare il modulo Comunicazioni, è necessario creare la tabella <code>announcements</code> all'interno del database Supabase.
+                  </p>
+                  <p className="text-xs text-gray-400 leading-relaxed font-semibold">
+                    Abbiamo già generato il file SQL per te. Copia il contenuto del file <code>supabase_announcements_migration.sql</code> presente nella cartella principale del progetto ed eseguilo nel terminale SQL Editor del tuo pannello Supabase.
+                  </p>
+                  <div className="pt-2">
+                    <button
+                      onClick={fetchAnnouncements}
+                      className="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-black uppercase rounded-2xl transition-all shadow-lg shadow-cyan-600/15 animate-pulse"
+                    >
+                      Aggiorna Verifica Database
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                  
+                  {/* Creazione Annuncio */}
+                  <div className="xl:col-span-5 bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-6 shadow-2xl backdrop-blur-md relative overflow-hidden h-fit">
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
+                    
+                    <h3 className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-6">📢 Crea Nuova Comunicazione</h3>
+                    
+                    <form onSubmit={handleCreateAnnouncement} className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Titolo Annuncio</label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="es. Torneo Aperto a Tutti!"
+                          value={annForm.title}
+                          onChange={(e) => setAnnForm({ ...annForm, title: e.target.value })}
+                          className="w-full bg-[#111218] border border-white/10 focus:border-cyan-500/50 rounded-xl px-4 py-3 text-xs text-white font-bold outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Corpo / Messaggio</label>
+                        <textarea
+                          required
+                          rows={4}
+                          placeholder="Inserisci il testo dettagliato dell'annuncio o del banner..."
+                          value={annForm.body}
+                          onChange={(e) => setAnnForm({ ...annForm, body: e.target.value })}
+                          className="w-full bg-[#111218] border border-white/10 focus:border-cyan-500/50 rounded-xl px-4 py-3 text-xs text-white font-medium outline-none resize-none"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Tipo Pubblicazione</label>
+                          <select
+                            value={annForm.type}
+                            onChange={(e) => setAnnForm({ ...annForm, type: e.target.value })}
+                            className="w-full bg-[#111218] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-cyan-500/50 font-bold"
+                          >
+                            <option value="banner">Banner Superiore</option>
+                            <option value="notification">Notifica In-App</option>
+                            <option value="both">Entrambi</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Target Destinatari</label>
+                          <select
+                            value={annForm.target}
+                            onChange={(e) => setAnnForm({ ...annForm, target: e.target.value })}
+                            className="w-full bg-[#111218] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-cyan-500/50 font-bold"
+                          >
+                            <option value="all">Tutti gli Utenti</option>
+                            <option value="staff">Solo Staff</option>
+                            <option value="pastori">Solo Chi Ha Scommesso</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 py-2">
+                        <input
+                          type="checkbox"
+                          id="ann_is_active"
+                          checked={annForm.is_active}
+                          onChange={(e) => setAnnForm({ ...annForm, is_active: e.target.checked })}
+                          className="w-4 h-4 rounded border-white/10 text-cyan-600 focus:ring-cyan-500 bg-[#111218]"
+                        />
+                        <label htmlFor="ann_is_active" className="text-xs font-bold text-gray-300 cursor-pointer">Attiva e mostra subito</label>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="w-full py-3.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-black uppercase tracking-wider rounded-2xl transition-all active:scale-95 shadow-lg shadow-cyan-600/10"
+                      >
+                        Invia Comunicazione
+                      </button>
+                    </form>
+                  </div>
+
+                  {/* Storico Annunci */}
+                  <div className="xl:col-span-7 bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-6 shadow-2xl backdrop-blur-md relative overflow-hidden flex flex-col h-fit">
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
+                    
+                    <h3 className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-6">📣 Storico Annunci & Pubblicazioni</h3>
+                    
+                    {announcementsLoading ? (
+                      <div className="flex flex-col items-center justify-center py-20">
+                        <Loader2 className="animate-spin text-cyan-400" size={32} />
+                        <span className="text-[10px] text-gray-500 uppercase tracking-widest font-black">Interrogazione annunci...</span>
+                      </div>
+                    ) : announcements.length === 0 ? (
+                      <div className="text-center py-16 bg-black/20 border border-white/5 rounded-2xl">
+                        <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">Nessuna comunicazione registrata</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4 max-h-[500px] overflow-y-auto elegant-scrollbar pr-2">
+                        {announcements.map((ann) => (
+                          <div 
+                            key={ann.id} 
+                            className={`bg-black/20 border rounded-2xl p-4.5 space-y-3 relative group transition-colors ${ann.is_active ? 'border-cyan-500/20' : 'border-white/5'}`}
+                          >
+                            <div className="flex justify-between items-start gap-4">
+                              <div className="space-y-1">
+                                <h4 className="text-xs font-black text-white">{ann.title}</h4>
+                                <div className="flex items-center gap-2 text-[8px] font-black uppercase text-gray-500">
+                                  <span className="text-cyan-400">{ann.type}</span>
+                                  <span>•</span>
+                                  <span>Destinatari: {ann.target}</span>
+                                  <span>•</span>
+                                  <span>Creato da: {ann.created_by}</span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <button
+                                  onClick={() => handleToggleAnnouncementActive(ann.id, ann.is_active)}
+                                  className={`px-2.5 py-1 text-[8px] font-black uppercase tracking-wider rounded border transition-all ${ann.is_active ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : 'bg-white/5 border-white/10 text-gray-400'}`}
+                                >
+                                  {ann.is_active ? 'Attivo' : 'Spento'}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    if (confirm('Sei sicuro di voler eliminare questo annuncio?')) {
+                                      handleDeleteAnnouncement(ann.id);
+                                    }
+                                  }}
+                                  className="p-1 hover:bg-red-500/10 hover:text-red-500 text-gray-500 rounded transition-colors"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            </div>
+                            
+                            <p className="text-[11px] text-gray-300 leading-relaxed font-medium bg-black/30 p-3 rounded-xl border border-white/5">
+                              {ann.body}
+                            </p>
+                            
+                            <div className="text-[9px] text-gray-500 text-right">
+                              Data invio: {new Date(ann.created_at).toLocaleString('it-IT')}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 4: Analytics */}
+          {activeTab === 'analytics' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500">
+              
+              {analyticsLoading ? (
+                <div className="flex flex-col items-center justify-center py-40">
+                  <Loader2 className="animate-spin text-cyan-400 mb-2" size={40} />
+                  <span className="text-[10px] text-gray-500 uppercase tracking-widest font-black">Analisi dati in corso...</span>
+                </div>
+              ) : analyticsData ? (
+                <div className="space-y-6">
+                  {/* Riepiloghi Metriche */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-md shadow-2xl">
+                      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Registrati Totali</span>
+                        <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                          <Users size={16} />
+                        </div>
+                      </div>
+                      <p className="text-3xl font-black mt-4 text-white tracking-tight">{analyticsData.totalUsers}</p>
+                    </div>
+
+                    <div className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-md shadow-2xl">
+                      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/25 to-transparent"></div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Suggerimenti Inviati</span>
+                        <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                          <Inbox size={16} />
+                        </div>
+                      </div>
+                      <p className="text-3xl font-black mt-4 text-white tracking-tight">{analyticsData.totalSuggestions}</p>
+                    </div>
+
+                    <div className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-md shadow-2xl">
+                      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-indigo-500/25 to-transparent"></div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Scommesse Totali</span>
+                        <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                          <TrendingUp size={16} />
+                        </div>
+                      </div>
+                      <p className="text-3xl font-black mt-4 text-white tracking-tight">{analyticsData.totalBets}</p>
+                    </div>
+
+                    <div className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-md shadow-2xl">
+                      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Pecore Wagered</span>
+                        <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                          <Coins size={16} />
+                        </div>
+                      </div>
+                      <p className="text-3xl font-black mt-4 text-cyan-400 tracking-tight">🐑 {analyticsData.totalSheep}</p>
+                    </div>
+                  </div>
+
+                  {/* Grafici SVG */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <GlassyLineChart 
+                      data={analyticsData.registrationsTrend} 
+                      title="👥 Andamento Iscrizioni (Ultime 6 Settimane)" 
+                      color="#22d3ee" 
+                    />
+                    <GlassyLineChart 
+                      data={analyticsData.suggestionsTrend} 
+                      title="💡 Andamento Proposte Ricevute (Ultime 6 Settimane)" 
+                      color="#3b82f6" 
+                    />
+                    <GlassyLineChart 
+                      data={analyticsData.betsTrend} 
+                      title="💸 Andamento Scommesse Piazzate (Ultime 6 Settimane)" 
+                      color="#6366f1" 
+                    />
+
+                    {/* Civiltà Più Modificate */}
+                    <div className="bg-[#0a0e1c]/60 p-6 rounded-3xl border border-cyan-500/15 backdrop-blur-md relative overflow-hidden flex flex-col h-80 shadow-2xl">
+                      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
+                      <h3 className="text-xs font-black uppercase tracking-wider text-gray-400 mb-6">🏛️ Civiltà Più Votate (Suggerimenti)</h3>
+                      
+                      {analyticsData.civPopularity.length === 0 ? (
+                        <div className="flex-1 flex items-center justify-center">
+                          <p className="text-xs text-gray-500 font-black uppercase">Nessuna proposta registrata</p>
+                        </div>
+                      ) : (
+                        <div className="flex-1 flex flex-col justify-center gap-4">
+                          {analyticsData.civPopularity.map((c: any, i: number) => {
+                            const maxVal = Math.max(...analyticsData.civPopularity.map((x: any) => x.value), 1);
+                            const percent = (c.value / maxVal) * 100;
+                            return (
+                              <div key={i} className="space-y-1">
+                                <div className="flex justify-between items-center text-xs font-bold">
+                                  <span className="text-white">{c.label}</span>
+                                  <span className="text-cyan-400 font-black">{c.value} proposte</span>
+                                </div>
+                                <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden border border-white/5">
+                                  <div 
+                                    style={{ width: `${percent}%` }}
+                                    className="bg-cyan-500 h-full rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(34,211,238,0.3)]"
+                                  ></div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Heatmap Oraria */}
+                  <div className="bg-[#0a0e1c]/60 p-6 rounded-3xl border border-cyan-500/15 backdrop-blur-md relative overflow-hidden flex flex-col shadow-2xl">
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
+                    <h3 className="text-xs font-black uppercase tracking-wider text-gray-400 mb-6">🕒 Heatmap Oraria Contributi & Attività (24 Ore)</h3>
+                    
+                    <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-12 gap-3">
+                      {(() => {
+                        const maxHourValue = Math.max(...analyticsData.hourlyHeatmap.map((h: any) => h.value), 1);
+                        return analyticsData.hourlyHeatmap.map((h: any, i: number) => {
+                          const intensity = h.value / maxHourValue;
+                          return (
+                            <div key={i} className="flex flex-col items-center justify-center p-3.5 bg-black/20 border border-white/5 rounded-2xl relative group hover:border-cyan-500/30 transition-all duration-300">
+                              <div 
+                                style={{ opacity: intensity * 0.4 + (h.value > 0 ? 0.05 : 0) }}
+                                className="absolute inset-0 bg-cyan-500 rounded-2xl transition-all duration-300"
+                              ></div>
+                              <span className="relative text-[9px] text-gray-500 group-hover:text-gray-300 font-black uppercase tracking-wider transition-colors">{h.label}</span>
+                              <span className="relative text-base font-black text-white group-hover:scale-110 group-hover:text-cyan-400 transition-all mt-1">{h.value}</span>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </div>
+                  </div>
+
+                </div>
+              ) : (
+                <div className="text-center py-20">
+                  <p className="text-sm text-gray-400 font-medium">Impossibile generare le metriche.</p>
+                </div>
+              )}
+
+            </div>
+          )}
         </div>
 
         {/* Footer Fisso per Invio Mail */}
@@ -4029,6 +5270,104 @@ export default function AdminDashboardPage() {
         type={toast.type}
         onClose={() => setToast({ ...toast, isVisible: false })}
       />
+    </div>
+  );
+}
+
+interface ChartDataPoint {
+  label: string;
+  value: number;
+}
+
+function GlassyLineChart({ data, title, color = '#22d3ee' }: { data: ChartDataPoint[]; title: string; color?: string }) {
+  const maxValue = Math.max(...data.map(d => d.value), 1);
+  const width = 500;
+  const height = 180;
+  const padding = 20;
+  
+  const points = data.map((d, i) => {
+    const x = padding + (i / (data.length - 1 || 1)) * (width - padding * 2);
+    const y = height - padding - (d.value / maxValue) * (height - padding * 2);
+    return { x, y, value: d.value, label: d.label };
+  });
+  
+  const linePath = points.length > 0 
+    ? `M ${points[0].x} ${points[0].y} ` + points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ')
+    : '';
+    
+  const areaPath = points.length > 0
+    ? `${linePath} L ${points[points.length-1].x} ${height - padding} L ${points[0].x} ${height - padding} Z`
+    : '';
+
+  return (
+    <div className="bg-[#0a0e1c]/60 p-6 rounded-3xl border border-cyan-500/15 backdrop-blur-md relative overflow-hidden flex flex-col shadow-2xl">
+      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
+      <h3 className="text-xs font-black uppercase tracking-wider text-gray-400 mb-6">{title}</h3>
+      <div className="relative w-full h-40">
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full overflow-visible">
+          <defs>
+            <linearGradient id={`areaGrad-${title.replace(/[^a-zA-Z0-9]/g, '')}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={color} stopOpacity="0.2" />
+              <stop offset="100%" stopColor={color} stopOpacity="0.0" />
+            </linearGradient>
+          </defs>
+          
+          {[0, 0.25, 0.5, 0.75, 1].map((r, i) => {
+            const y = padding + r * (height - padding * 2);
+            return (
+              <line 
+                key={i} 
+                x1={padding} 
+                y1={y} 
+                x2={width - padding} 
+                y2={y} 
+                stroke="rgba(255,255,255,0.05)" 
+                strokeWidth="1" 
+              />
+            );
+          })}
+          
+          {areaPath && <path d={areaPath} fill={`url(#areaGrad-${title.replace(/[^a-zA-Z0-9]/g, '')})`} />}
+          
+          {linePath && (
+            <path 
+              d={linePath} 
+              fill="none" 
+              stroke={color} 
+              strokeWidth="2.5" 
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          )}
+          
+          {points.map((p, i) => (
+            <g key={i} className="group cursor-pointer">
+              <circle 
+                cx={p.x} 
+                cy={p.y} 
+                r="4" 
+                fill="#070a13" 
+                stroke={color} 
+                strokeWidth="2" 
+              />
+              <circle 
+                cx={p.x} 
+                cy={p.y} 
+                r="12" 
+                fill={color} 
+                fillOpacity="0"
+                className="hover:fill-opacity-10 transition-all"
+              />
+              <title>{`${p.label}: ${p.value}`}</title>
+            </g>
+          ))}
+        </svg>
+      </div>
+      <div className="flex justify-between mt-2 text-[9px] font-black text-gray-500 uppercase tracking-wider px-2">
+        {data.map((item, idx) => (
+          <span key={idx} className="truncate">{item.label}</span>
+        ))}
+      </div>
     </div>
   );
 }
