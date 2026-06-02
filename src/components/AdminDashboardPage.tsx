@@ -5,7 +5,7 @@ import {
   AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, 
   Trophy, BookOpen, Zap, Edit2, Check, Trash2, Plus, Minus, ArrowLeft, LayoutDashboard,
   Save, Sparkles, ChevronDown, ChevronUp, Users, Youtube, Menu, History, Database, Activity, Download,
-  Megaphone, TrendingUp, Coins, Lock, Unlock, ChevronRight, Link2, HelpCircle, Shield
+  Megaphone, TrendingUp, Coins, Lock, Unlock, ChevronRight, Link2, HelpCircle, Shield, Monitor
 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
@@ -2278,7 +2278,7 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="h-screen w-screen flex bg-[#070a13] text-white overflow-hidden font-sans relative">
+    <div className="h-screen w-screen flex bg-[#04060b] text-white overflow-hidden font-sans relative">
       
       {/* Backdrop per mobile drawer */}
       {isMobileMenuOpen && (
@@ -2289,7 +2289,7 @@ export default function AdminDashboardPage() {
       )}
 
       {/* Sidebar di Navigazione Dashboard */}
-      <aside className={`fixed inset-y-0 left-0 w-64 bg-[#0a0e1c] border-r border-cyan-500/15 flex flex-col shrink-0 z-50 transform md:translate-x-0 md:static md:flex transition-transform duration-300 ease-in-out ${
+      <aside className={`fixed inset-y-0 left-0 w-64 bg-[#080b16] border-r border-cyan-500/15 flex flex-col shrink-0 z-50 transform md:translate-x-0 md:static md:flex transition-transform duration-300 ease-in-out ${
         isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="p-6 border-b border-white/5 flex items-center justify-between gap-3">
@@ -2440,6 +2440,17 @@ export default function AdminDashboardPage() {
             <Database size={18} />
             <span>Backup & Diagnostica</span>
           </button>
+
+          <button
+            onClick={() => {
+              navigate('/admin/overlays');
+              setIsMobileMenuOpen(false);
+            }}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-gray-400 hover:text-white hover:bg-white/5"
+          >
+            <Monitor size={18} />
+            <span>Stream Overlays</span>
+          </button>
         </nav>
 
         <div className="p-4 border-t border-white/5">
@@ -2525,12 +2536,14 @@ export default function AdminDashboardPage() {
                 <h4 className="text-[11px] font-black uppercase text-gray-500 tracking-[0.2em]">⚠️ Cose che richiedono la tua attenzione</h4>
                 
                 {suggestions.length === 0 && questions.length === 0 && answers.length === 0 && (!isAdmin || pendingNotifCount === 0) ? (
-                  <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-3xl p-8 flex flex-col items-center text-center shadow-lg backdrop-blur-md">
-                    <CheckCircle className="text-emerald-400 mb-3 animate-pulse" size={36} />
-                    <h5 className="text-sm font-black text-white uppercase tracking-wider">Tutto sotto controllo!</h5>
-                    <p className="text-xs text-gray-400 mt-1 max-w-md">
-                      Non ci sono proposte pendenti, contributi Q&A da moderare o notifiche in attesa di invio. Ottimo lavoro!
-                    </p>
+                  <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl py-4 px-6 flex items-center justify-center gap-4 shadow-sm backdrop-blur-sm transition-all hover:bg-emerald-500/10">
+                    <CheckCircle className="text-emerald-400 animate-pulse shrink-0" size={24} />
+                    <div className="text-left">
+                      <h5 className="text-xs font-black text-white uppercase tracking-wider">Tutto sotto controllo!</h5>
+                      <p className="text-[10px] text-gray-400 mt-0.5 max-w-md">
+                        Non ci sono proposte pendenti, contributi Q&A da moderare o notifiche in attesa di invio.
+                      </p>
+                    </div>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -2722,10 +2735,12 @@ export default function AdminDashboardPage() {
                   <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Caricamento proposte...</span>
                 </div>
               ) : suggestions.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-center bg-[#0a0e1c]/40 border-2 border-dashed border-white/5 rounded-3xl text-gray-500 shadow-inner">
-                  <Inbox size={48} className="text-gray-600 mb-4 opacity-40 animate-pulse" />
-                  <h3 className="text-sm font-black text-white uppercase tracking-wider">Tutto gestito!</h3>
-                  <p className="text-xs text-gray-500 mt-2">Non ci sono proposte in sospeso da approvare.</p>
+                <div className="flex items-center justify-center py-6 px-6 bg-white/[0.02] border border-white/5 rounded-2xl text-gray-500 shadow-sm gap-4 hover:bg-white/[0.03] transition-colors">
+                  <Inbox size={24} className="text-gray-500 opacity-60 animate-pulse shrink-0" />
+                  <div className="text-left">
+                    <h3 className="text-xs font-black text-white uppercase tracking-wider">Tutto gestito!</h3>
+                    <p className="text-[10px] text-gray-500 mt-0.5">Non ci sono proposte in sospeso da approvare.</p>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -2929,7 +2944,10 @@ export default function AdminDashboardPage() {
                       <MessageSquare size={16} className="text-yellow-500 shrink-0" /> Domande da Approvare ({questions.length})
                     </h3>
                     {questions.length === 0 ? (
-                      <p className="text-gray-500 text-xs italic py-4 bg-white/[0.01] border-2 border-dashed border-white/5 rounded-2xl text-center">Nessuna domanda in sospeso.</p>
+                      <div className="flex items-center gap-3 py-3 px-5 bg-white/[0.02] border border-white/5 rounded-xl text-gray-500">
+                        <MessageSquare size={16} className="text-gray-500 opacity-50 shrink-0" />
+                        <span className="text-[11px] font-medium">Nessuna domanda in sospeso.</span>
+                      </div>
                     ) : (
                       <div className="grid gap-4">
                         {questions.map(q => (
@@ -2984,7 +3002,10 @@ export default function AdminDashboardPage() {
                       <Send size={16} className="text-blue-400 shrink-0" /> Risposte da Approvare ({answers.length})
                     </h3>
                     {answers.length === 0 ? (
-                      <p className="text-gray-500 text-xs italic py-4 bg-white/[0.01] border-2 border-dashed border-white/5 rounded-2xl text-center">Nessuna risposta in sospeso.</p>
+                      <div className="flex items-center gap-3 py-3 px-5 bg-white/[0.02] border border-white/5 rounded-xl text-gray-500">
+                        <Send size={16} className="text-gray-500 opacity-50 shrink-0" />
+                        <span className="text-[11px] font-medium">Nessuna risposta in sospeso.</span>
+                      </div>
                     ) : (
                       <div className="grid gap-4">
                         {answers.map(a => (
@@ -3950,18 +3971,33 @@ export default function AdminDashboardPage() {
                                         className="flex-1 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-xl px-4 py-2 text-xs text-white focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none font-bold"
                                         placeholder={`Opzione ${idx + 1}`}
                                       />
-                                      <input
-                                        type="number"
-                                        value={opt.weight}
-                                        onChange={(e) => {
-                                          const newOpts = [...marketForm.options];
-                                          newOpts[idx].weight = e.target.value;
-                                          setMarketForm({ ...marketForm, options: newOpts });
-                                        }}
-                                        className="w-24 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-xl px-4 py-2 text-xs text-white focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none text-center font-bold"
-                                        placeholder="Peso"
-                                        title="Peso probabilistico iniziale"
-                                      />
+                                      <div className="flex gap-1 ml-2">
+                                        {[
+                                          { l: 'U', v: 500, t: 'Under' },
+                                          { l: 'S', v: 1000, t: 'Sfav.' },
+                                          { l: 'E', v: 2000, t: 'Eq.' },
+                                          { l: 'F', v: 5000, t: 'Fav.' },
+                                          { l: 'T', v: 15000, t: 'Top' }
+                                        ].map(w => (
+                                          <button
+                                            key={w.v}
+                                            type="button"
+                                            title={w.t}
+                                            onClick={() => {
+                                              const newOpts = [...marketForm.options];
+                                              newOpts[idx].weight = w.v;
+                                              setMarketForm({ ...marketForm, options: newOpts });
+                                            }}
+                                            className={`w-8 h-8 rounded-lg text-[10px] font-black uppercase transition-all flex items-center justify-center ${
+                                              Number(opt.weight) === w.v
+                                                ? "bg-cyan-500 text-black shadow-lg shadow-cyan-500/20"
+                                                : "bg-[#111218] border-2 border-white/10 text-gray-400 hover:border-white/30 hover:text-white"
+                                            }`}
+                                          >
+                                            {w.l}
+                                          </button>
+                                        ))}
+                                      </div>
                                       {marketForm.options.length > 2 && (
                                         <button
                                           onClick={() => {
