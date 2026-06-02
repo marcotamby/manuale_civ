@@ -57,7 +57,6 @@ export default function AdminDashboardPage() {
   const [metricsLoading, setMetricsLoading] = useState(false);
   const [pingStatus, setPingStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [isGeneratingBackup, setIsGeneratingBackup] = useState(false);
-  const [webhookTesting, setWebhookTesting] = useState(false);
   const [pendingQueueCount, setPendingQueueCount] = useState<number | null>(null);
   
   const selectTab = (tab: typeof activeTab) => {
@@ -1067,50 +1066,7 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // Test Discord Webhook connection
-  const handleTestWebhook = async () => {
-    try {
-      setWebhookTesting(true);
-      const webhookUrl = (import.meta.env.VITE_DISCORD_WEBHOOK_URL as string) || 'https://discord.com/api/webhooks/1507674866646646824/TRa7Xby4IN0VJix9Jzuh1I1-x6kTqYapYwBptLzEI7essf7A2EwJJzogey1MrfH5GOyB';
-      
-      const payload = {
-        content: `🔧 **Test Diagnostica Manuale Civ**`,
-        embeds: [{
-          title: `Diagnostica Connessione Integrata`,
-          description: `Questo messaggio è stato generato dall'Admin Dashboard per verificare che i Webhook di Discord siano operativi.\n\n*Eseguito da: ${useAuth().user?.nickname || useAuth().user?.email || 'Admin'}*`,
-          color: 13915904, // Yellow Gold hex #D4AF30 in decimal
-          footer: {
-            text: 'Diagnostica Manuale Civ',
-            icon_url: 'https://aoe4guide.it/favicon.ico'
-          },
-          timestamp: new Date().toISOString()
-        }]
-      };
 
-      const response = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) throw new Error(`Discord API Status ${response.status}`);
-      
-      setToast({ isVisible: true, message: 'Webhook test inviato con successo a Discord!', type: 'success' });
-      await logAdminAction(
-        'TEST_DISCORD_WEBHOOK',
-        'system',
-        null,
-        'Inviato un messaggio di test per diagnosticare il funzionamento del webhook Discord.'
-      );
-    } catch (err: any) {
-      console.error(err);
-      setToast({ isVisible: true, message: `Errore Webhook: ${err.message}`, type: 'error' });
-    } finally {
-      setWebhookTesting(false);
-    }
-  };
 
   const handleAddUser = async () => {
     if (!newUemail.trim() || !isSuperAdmin) return;
@@ -3886,18 +3842,7 @@ export default function AdminDashboardPage() {
                       {isGeneratingBackup ? 'Generazione Backup...' : 'Scarica Backup JSON Completo'}
                     </button>
 
-                    <button
-                      onClick={handleTestWebhook}
-                      disabled={webhookTesting}
-                      className="w-full px-6 py-4 bg-white/5 border border-white/10 hover:bg-white/10 text-gray-300 rounded-2xl text-xs font-black tracking-widest uppercase transition-all hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50"
-                    >
-                      {webhookTesting ? (
-                        <Loader2 size={16} className="animate-spin text-[#D4AF37]" />
-                      ) : (
-                        <span>🔧</span>
-                      )}
-                      Testa Webhook Discord Staff
-                    </button>
+
                   </div>
 
                   <div className="bg-black/30 p-4 border border-white/5 rounded-2xl space-y-2">
