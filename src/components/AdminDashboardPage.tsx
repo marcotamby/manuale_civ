@@ -1198,47 +1198,51 @@ export default function AdminDashboardPage() {
           
           {/* TAB PANELS */}
           {activeTab === 'overview' && (
-            <div className="space-y-6">
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div 
                   onClick={() => setActiveTab('proposte')}
-                  className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 hover:border-blue-500/30 transition-all cursor-pointer group"
+                  className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 hover:border-blue-500/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:scale-[1.02] transition-all cursor-pointer group relative overflow-hidden backdrop-blur-md"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-4 group-hover:scale-110 transition-transform">
+                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent"></div>
+                  <div className="w-12 h-12 rounded-2xl bg-blue-600/10 border-2 border-blue-500/20 flex items-center justify-center text-blue-400 mb-4 group-hover:scale-110 transition-transform">
                     <Inbox size={24} />
                   </div>
-                  <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Proposte Pendenti</h3>
-                  <p className="text-3xl font-black mt-2 text-white">{suggestions.length}</p>
+                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Proposte Pendenti</h3>
+                  <p className="text-3xl font-black mt-2 text-white tracking-tight">{suggestions.length}</p>
                 </div>
                 
                 <div 
                   onClick={() => setActiveTab('qa')}
-                  className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 hover:border-blue-500/30 transition-all cursor-pointer group"
+                  className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 hover:border-yellow-500/50 hover:shadow-[0_0_20px_rgba(234,179,8,0.15)] hover:scale-[1.02] transition-all cursor-pointer group relative overflow-hidden backdrop-blur-md"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-500 mb-4 group-hover:scale-110 transition-transform">
+                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-yellow-500/30 to-transparent"></div>
+                  <div className="w-12 h-12 rounded-2xl bg-yellow-500/10 border-2 border-yellow-500/20 flex items-center justify-center text-yellow-500 mb-4 group-hover:scale-110 transition-transform">
                     <MessageSquare size={24} />
                   </div>
-                  <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Contributi Q&A Pendenti</h3>
-                  <p className="text-3xl font-black mt-2 text-white">{questions.length + answers.length}</p>
+                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Contributi Q&A Pendenti</h3>
+                  <p className="text-3xl font-black mt-2 text-white tracking-tight">{questions.length + answers.length}</p>
                 </div>
 
                 <div 
                   onClick={() => setActiveTab('pecore')}
-                  className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 hover:border-blue-500/30 transition-all cursor-pointer group"
+                  className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] hover:scale-[1.02] transition-all cursor-pointer group relative overflow-hidden backdrop-blur-md"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-cyan-600/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-4 group-hover:scale-110 transition-transform">
+                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
+                  <div className="w-12 h-12 rounded-2xl bg-cyan-600/10 border-2 border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-4 group-hover:scale-110 transition-transform">
                     <span className="text-2xl">🐑</span>
                   </div>
-                  <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Utenti Registrati</h3>
-                  <p className="text-3xl font-black mt-2 text-white">{allProfiles.length}</p>
+                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Utenti Registrati</h3>
+                  <p className="text-3xl font-black mt-2 text-white tracking-tight">{allProfiles.length}</p>
                 </div>
               </div>
 
-              <div className="bg-[#0a0e1c]/60 border border-white/5 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-6">
-                <div className="w-16 h-16 rounded-full bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-500 text-3xl">🔑</div>
+              <div className="bg-[#0a0e1c]/60 border border-[#D4AF37]/15 rounded-3xl p-8 flex flex-col md:flex-row items-center gap-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37]/35 to-transparent"></div>
+                <div className="w-16 h-16 rounded-2xl bg-yellow-500/10 border-2 border-yellow-500/20 flex items-center justify-center text-yellow-500 text-3xl shadow-lg shrink-0">🔑</div>
                 <div>
-                  <h3 className="text-lg font-bold">Benvenuto nel Pannello Admin, {useAuth().user?.nickname || 'Admin'}</h3>
-                  <p className="text-sm text-gray-400 mt-1 max-w-xl">
+                  <h3 className="text-lg font-black text-white uppercase tracking-tight">Benvenuto nel Pannello Admin, {useAuth().user?.nickname || 'Admin'}</h3>
+                  <p className="text-xs text-gray-400 mt-2 max-w-xl leading-relaxed">
                     Da qui puoi moderare il sito con un solo clic. Tutte le modifiche fatte alle proposte o al Q&A saranno sincronizzate immediatamente in tempo reale sul database.
                   </p>
                 </div>
@@ -1247,46 +1251,46 @@ export default function AdminDashboardPage() {
           )}
 
           {activeTab === 'proposte' && (
-            <div className="space-y-4">
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500">
               {isLoading ? (
-                <div className="flex flex-col items-center justify-center py-20 text-center bg-white/[0.02] border border-white/5 rounded-2xl">
+                <div className="flex flex-col items-center justify-center py-20 text-center bg-[#0a0e1c]/40 border border-white/5 rounded-3xl shadow-inner">
                   <Loader2 className="animate-spin text-blue-400 mb-2" size={32} />
-                  <p className="text-gray-400 text-sm">Caricamento proposte...</p>
+                  <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Caricamento proposte...</span>
                 </div>
               ) : suggestions.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-center bg-white/[0.02] border border-white/5 rounded-2xl">
-                  <Inbox size={48} className="text-gray-600 mb-4" />
-                  <h3 className="text-lg font-bold text-white">Tutto gestito!</h3>
-                  <p className="text-gray-400 text-sm mt-1">Non ci sono proposte in sospeso da approvare.</p>
+                <div className="flex flex-col items-center justify-center py-20 text-center bg-[#0a0e1c]/40 border-2 border-dashed border-white/5 rounded-3xl text-gray-500 shadow-inner">
+                  <Inbox size={48} className="text-gray-600 mb-4 opacity-40 animate-pulse" />
+                  <h3 className="text-sm font-black text-white uppercase tracking-wider">Tutto gestito!</h3>
+                  <p className="text-xs text-gray-500 mt-2">Non ci sono proposte in sospeso da approvare.</p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {suggestions.map((sugg) => (
-                    <div key={sugg.id} className="bg-[#0a0e1c]/40 border border-[#D4AF37]/20 rounded-xl p-5 hover:border-blue-500/50 transition-colors relative overflow-hidden group">
-                      <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/50 hidden group-hover:block blur-sm"></div>
+                    <div key={sugg.id} className="bg-[#0a0e1c]/60 border border-[#D4AF37]/15 rounded-3xl p-6 hover:border-blue-500/50 shadow-2xl relative overflow-hidden backdrop-blur-md transition-all duration-300">
+                      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/35 to-transparent"></div>
 
-                      <div className="flex flex-col md:flex-row justify-between gap-6 relative z-10">
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-3">
+                      <div className="flex flex-col lg:flex-row justify-between gap-6 relative z-10">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                             <div className="flex items-center gap-3">
-                              <span className="px-3 py-1 bg-blue-600/20 text-blue-400 text-xs font-bold rounded-lg border border-blue-500/30 uppercase tracking-wider">
+                              <span className="px-2.5 py-0.5 bg-blue-600/20 text-blue-400 text-[10px] font-black rounded-lg border border-blue-500/20 uppercase tracking-wider">
                                 {sugg.civ_name}
                               </span>
-                              <span className="text-sm text-gray-400 flex items-center gap-2">
-                                Sezione: <span className="text-white font-medium">{sugg.section}</span>
+                              <span className="text-xs text-gray-400 flex items-center gap-1.5 font-bold uppercase tracking-wider">
+                                Sezione: <span className="text-white">{sugg.section}</span>
                               </span>
                             </div>
                             {sugg.section === 'build_order' && (
                               <button
                                 onClick={() => setExpandedSugg(expandedSugg === sugg.id ? null : sugg.id)}
-                                className="text-xs text-blue-400 hover:underline font-bold"
+                                className="text-xs text-blue-400 hover:text-blue-300 hover:underline font-black uppercase tracking-wider"
                               >
                                 {expandedSugg === sugg.id ? 'Chiudi Editor' : 'Edita Passaggi'}
                               </button>
                             )}
                           </div>
 
-                          <div className="bg-black/50 p-4 rounded-lg border border-gray-700/50 mb-4">
+                          <div className="bg-black/40 p-5 rounded-2xl border border-white/5 mb-4 shadow-inner">
                             {sugg.section === 'build_order' ? (
                               (() => {
                                 let boData: any;
@@ -1313,12 +1317,13 @@ export default function AdminDashboardPage() {
 
                                 if (expandedSugg !== sugg.id) {
                                   return (
-                                    <div className="space-y-3">
-                                      <p className="text-blue-400 font-bold text-xl">{currentEdits.title}</p>
-                                      <div className="space-y-3 mt-3">
+                                    <div className="space-y-4">
+                                      <p className="text-blue-400 font-black text-lg tracking-tight">{currentEdits.title}</p>
+                                      <div className="space-y-2 mt-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                                         {currentEdits.steps.map((s: any, i: number) => (
-                                          <p key={i} className="text-base text-gray-100">
-                                            <span className="text-yellow-500 font-mono mr-4 text-sm font-bold">{s.time}</span> {s.action}
+                                          <p key={i} className="text-xs text-gray-200 flex items-start">
+                                            <span className="text-yellow-500 font-mono mr-4 text-xs font-black shrink-0">{s.time}</span>
+                                            <span className="flex-1 font-medium">{s.action}</span>
                                           </p>
                                         ))}
                                       </div>
@@ -1332,48 +1337,50 @@ export default function AdminDashboardPage() {
                                 }
 
                                 return (
-                                  <div className="space-y-5 animate-in fade-in duration-300">
+                                  <div className="space-y-6 animate-in fade-in duration-300">
                                     <div>
-                                      <label className="text-xs text-gray-500 uppercase font-bold mb-1.5 block">Titolo</label>
+                                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Titolo Proposto</label>
                                       <input
-                                        className="w-full bg-black/40 border border-gray-700 rounded-lg px-4 py-3 text-lg text-white focus:border-blue-500 outline-none"
+                                        className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:shadow-[0_0_15px_rgba(59,130,246,0.15)] transition-all outline-none font-bold"
                                         value={currentEdits.title === 'Nuovo Build Order' ? '' : currentEdits.title}
                                         onChange={(e) => updateBOField('title', e.target.value)}
                                         placeholder="Titolo"
                                       />
                                     </div>
                                     <div className="space-y-4">
-                                      <label className="text-xs text-gray-500 uppercase font-bold mb-1.5 block">Passaggi</label>
-                                      {currentEdits.steps.map((s: any, i: number) => (
-                                        <div key={i} className="grid grid-cols-12 gap-3 p-4 bg-white/5 rounded border border-white/5">
-                                          <input
-                                            className="col-span-2 bg-black/40 border border-transparent rounded px-2 py-2 text-base text-yellow-500 focus:border-blue-500 outline-none font-mono"
-                                            value={s.time}
-                                            onChange={(e) => updateBOStep(i, 'time', e.target.value)}
-                                          />
-                                          <input
-                                            className="col-span-10 bg-black/40 border border-transparent rounded px-2 py-2 text-lg text-white focus:border-blue-500 outline-none font-bold"
-                                            value={s.action}
-                                            onChange={(e) => updateBOStep(i, 'action', e.target.value)}
-                                          />
-                                          <textarea
-                                            className="col-span-12 bg-black/40 border border-transparent rounded px-2 py-2 text-base text-gray-300 focus:border-blue-500 outline-none resize-none h-20 italic"
-                                            value={s.note}
-                                            placeholder="Nota..."
-                                            onChange={(e) => updateBOStep(i, 'note', e.target.value)}
-                                          />
-                                        </div>
-                                      ))}
+                                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block">Passaggi Temporizzati</label>
+                                      <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                                        {currentEdits.steps.map((s: any, i: number) => (
+                                          <div key={i} className="grid grid-cols-12 gap-3 p-4 bg-black/35 rounded-2xl border border-white/5 relative">
+                                            <input
+                                              className="col-span-3 md:col-span-2 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-xl px-2 py-2 text-xs text-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.1)] outline-none text-center font-bold"
+                                              value={s.time}
+                                              onChange={(e) => updateBOStep(i, 'time', e.target.value)}
+                                            />
+                                            <input
+                                              className="col-span-9 md:col-span-10 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-xl px-4 py-2 text-xs text-white focus:shadow-[0_0_15px_rgba(59,130,246,0.15)] outline-none font-bold"
+                                              value={s.action}
+                                              onChange={(e) => updateBOStep(i, 'action', e.target.value)}
+                                            />
+                                            <textarea
+                                              className="col-span-12 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-xl px-4 py-2 text-xs text-gray-300 focus:shadow-[0_0_15px_rgba(59,130,246,0.15)] outline-none resize-none h-16 italic"
+                                              value={s.note}
+                                              placeholder="Nota di dettaglio..."
+                                              onChange={(e) => updateBOStep(i, 'note', e.target.value)}
+                                            />
+                                          </div>
+                                        ))}
+                                      </div>
                                     </div>
                                     <div>
-                                      <label className="text-[10px] text-gray-500 uppercase font-bold mb-1.5 block">Fonte / Link YouTube</label>
+                                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Fonte / Link YouTube Video</label>
                                       <input
-                                        className="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-yellow-400/80 focus:border-blue-500 outline-none"
+                                        className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl px-4 py-2 text-xs text-cyan-400/80 focus:shadow-[0_0_15px_rgba(59,130,246,0.15)] outline-none"
                                         value={currentEdits.source}
                                         onChange={(e) => updateBOField('source', e.target.value)}
                                       />
                                       {currentEdits.source && getYoutubeId(currentEdits.source) && (
-                                        <div className="mt-3 relative aspect-video w-full max-w-[240px] rounded-lg overflow-hidden border border-white/10 group">
+                                        <div className="mt-4 relative aspect-video w-full max-w-[240px] rounded-2xl overflow-hidden border border-white/10 shadow-lg">
                                           <img
                                             src={`https://img.youtube.com/vi/${getYoutubeId(currentEdits.source)}/mqdefault.jpg`}
                                             alt="Preview"
@@ -1391,47 +1398,47 @@ export default function AdminDashboardPage() {
                                 );
                               })()
                             ) : (
-                              <p className="text-gray-200 text-sm whitespace-pre-wrap leading-relaxed">{sugg.suggestion_text}</p>
+                              <p className="text-gray-200 text-xs whitespace-pre-wrap leading-relaxed">{sugg.suggestion_text}</p>
                             )}
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-4 text-xs">
-                            <div className="flex items-center gap-2 text-gray-400 bg-white/5 px-2 py-1 rounded border border-white/5">
-                              <span className="font-bold text-[10px] uppercase text-gray-500">Autore:</span>
-                              <span className="text-blue-400">{sugg.user_nickname || sugg.user_name || 'Anonimo'}</span>
+                          <div className="flex flex-wrap items-center gap-4 text-[10px] text-gray-500">
+                            <div className="flex items-center gap-2 bg-white/5 px-2.5 py-1 rounded-xl border border-white/5">
+                              <span className="font-black uppercase text-gray-500">Autore:</span>
+                              <span className="text-blue-400 font-bold">{sugg.user_nickname || sugg.user_name || 'Anonimo'}</span>
                               {sugg.user_rank && sugg.user_rank !== 'Unranked' && (
-                                <span className="bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded-md text-[10px] border border-blue-500/30">
+                                <span className="bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded-lg text-[9px] border border-blue-500/30">
                                   {sugg.user_rank}
                                 </span>
                               )}
                             </div>
-                            <div className="text-gray-500">
-                              <strong>Email:</strong> {sugg.user_email || 'Non fornita'}
+                            <div>
+                              <strong className="uppercase font-black text-gray-600">Email:</strong> <span className="text-gray-400">{sugg.user_email || 'Non fornita'}</span>
                             </div>
-                            <div className="text-gray-500">
-                              <strong>Data:</strong> {new Date(sugg.created_at).toLocaleString('it-IT')}
+                            <div>
+                              <strong className="uppercase font-black text-gray-600">Data:</strong> <span className="text-gray-400">{new Date(sugg.created_at).toLocaleString('it-IT')}</span>
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex md:flex-col gap-3 shrink-0 items-center md:items-end justify-center">
+                        <div className="flex lg:flex-col gap-3 shrink-0 items-center lg:items-end justify-center">
                           {((sugg.section === 'build_order' && canManageBuildorders) || (sugg.section !== 'build_order' && canManageCivs)) && (
                             <button
                               onClick={() => handleUpdateStatus(sugg, 'implemented')}
-                              className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-green-600/20 hover:bg-green-600/40 text-green-400 rounded-lg border border-green-500/30 transition-colors font-medium text-sm"
+                              className="w-full lg:w-auto flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white rounded-xl shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all text-xs font-black uppercase tracking-widest border-0"
                               title="Segna come completata"
                             >
-                              <CheckCircle size={18} /> Approva
+                              <CheckCircle size={14} strokeWidth={3} /> Approva
                             </button>
                           )}
 
                           {((sugg.section === 'build_order' && canManageBuildorders) || (sugg.section !== 'build_order' && canManageCivs)) && (
                             <button
                               onClick={() => setRejectionModalSugg(sugg)}
-                              className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/40 text-red-400 rounded-lg border border-red-500/30 transition-colors font-medium text-sm"
+                              className="w-full lg:w-auto flex items-center justify-center gap-2 px-5 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl hover:-translate-y-0.5 active:scale-95 transition-all text-xs font-black uppercase tracking-widest border border-red-500/20"
                               title="Rifiuta proposta"
                             >
-                              <XCircle size={18} /> Scarta
+                              <XCircle size={14} strokeWidth={3} /> Scarta
                             </button>
                           )}
                         </div>
@@ -1444,141 +1451,145 @@ export default function AdminDashboardPage() {
           )}
 
           {activeTab === 'qa' && (
-            <div className="space-y-8">
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
               {qaLoading ? (
-                <div className="flex flex-col items-center justify-center py-20 text-center bg-white/[0.02] border border-white/5 rounded-2xl">
+                <div className="flex flex-col items-center justify-center py-20 text-center bg-[#0a0e1c]/40 border border-white/5 rounded-3xl">
                   <Loader2 className="animate-spin text-blue-400 mb-2" size={32} />
-                  <p className="text-gray-400 text-sm">Caricamento domande e risposte...</p>
+                  <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Caricamento domande e risposte...</span>
                 </div>
               ) : (
                 <>
                   {/* Domande Pendenti */}
                   <div className="space-y-4">
-                    <h3 className="text-sm font-black text-yellow-500 uppercase tracking-widest flex items-center gap-3">
+                    <h3 className="text-xs font-black text-yellow-500 uppercase tracking-[0.25em] flex items-center gap-3">
                       <MessageSquare size={16} className="text-yellow-500 shrink-0" /> Domande da Approvare ({questions.length})
                     </h3>
                     {questions.length === 0 ? (
-                      <p className="text-gray-500 text-sm italic py-4">Nessuna domanda in sospeso.</p>
+                      <p className="text-gray-500 text-xs italic py-4 bg-white/[0.01] border-2 border-dashed border-white/5 rounded-2xl text-center">Nessuna domanda in sospeso.</p>
                     ) : (
-                  <div className="grid gap-4">
-                    {questions.map(q => (
-                      <div key={q.id} className="bg-[#0a0e1c]/40 border border-white/5 p-5 rounded-xl space-y-4">
-                        <div className="flex justify-between items-start gap-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="px-2 py-0.5 bg-yellow-500/10 text-yellow-500 text-[10px] font-black rounded border border-yellow-500/20 uppercase">{q.civ_id}</span>
-                              <span className="text-xs font-bold text-white">{q.user_nickname}</span>
-                              <span className="text-[10px] text-gray-500">({q.user_rank})</span>
-                            </div>
-                            <p className="text-gray-200 text-sm">{q.question_text}</p>
-                            <div className="flex flex-wrap gap-3 mt-6 pt-5 border-t border-white/5">
-                              {canManageCivs && (
-                                <>
-                                  <button 
-                                    onClick={() => handleUpdateQAStatus(q, 'question', 'approved')} 
-                                    className="flex items-center gap-2 px-5 py-2.5 bg-green-500/10 text-green-500 rounded-xl border border-green-500/20 hover:bg-green-500/20 hover:scale-105 transition-all text-xs font-black uppercase tracking-wider" 
-                                  >
-                                    <CheckCircle size={18} />
-                                    <span>Approva</span>
-                                  </button>
-                                  <button 
-                                    onClick={() => handleUpdateQAStatus(q, 'question', 'rejected')} 
-                                    className="flex items-center gap-2 px-5 py-2.5 bg-red-500/10 text-red-500 rounded-xl border border-red-500/20 hover:bg-red-500/20 hover:scale-105 transition-all text-xs font-black uppercase tracking-wider" 
-                                  >
-                                    <XCircle size={18} />
-                                    <span>Rifiuta</span>
-                                  </button>
-                                  <button 
-                                    onClick={() => setDeleteConfirm({ id: q.id, type: 'question', item: q })} 
-                                    className="flex items-center gap-2 px-4 py-2.5 bg-white/5 text-gray-400 rounded-xl border border-white/5 hover:bg-red-500/20 hover:text-red-500 hover:border-red-500/30 transition-all text-xs font-bold uppercase ml-auto" 
-                                  >
-                                    <Trash2 size={18} />
-                                  </button>
-                                </>
-                              )}
+                      <div className="grid gap-4">
+                        {questions.map(q => (
+                          <div key={q.id} className="bg-[#0a0e1c]/60 border border-white/5 p-6 rounded-3xl space-y-4 hover:border-yellow-500/30 transition-colors shadow-2xl relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-yellow-500/25 to-transparent"></div>
+                            <div className="flex justify-between items-start gap-4">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-3 flex-wrap">
+                                  <span className="px-2 py-0.5 bg-yellow-500/10 text-yellow-500 text-[9px] font-black rounded-lg border border-yellow-500/20 uppercase tracking-wider">{q.civ_id}</span>
+                                  <span className="text-xs font-black text-white">{q.user_nickname}</span>
+                                  <span className="text-[9px] font-black text-gray-500">({q.user_rank})</span>
+                                </div>
+                                <p className="text-gray-200 text-xs font-medium leading-relaxed">{q.question_text}</p>
+                                
+                                <div className="flex flex-wrap gap-3 mt-6 pt-5 border-t border-white/5">
+                                  {canManageCivs && (
+                                    <>
+                                      <button 
+                                        onClick={() => handleUpdateQAStatus(q, 'question', 'approved')} 
+                                        className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white rounded-xl shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all text-[10px] font-black uppercase tracking-widest" 
+                                      >
+                                        <CheckCircle size={14} strokeWidth={3} />
+                                        <span>Approva</span>
+                                      </button>
+                                      <button 
+                                        onClick={() => handleUpdateQAStatus(q, 'question', 'rejected')} 
+                                        className="flex items-center gap-2 px-5 py-2.5 bg-[#111218] border-2 border-white/10 hover:border-white/20 text-gray-400 hover:text-white rounded-xl hover:-translate-y-0.5 active:scale-95 transition-all text-[10px] font-black uppercase tracking-widest" 
+                                      >
+                                        <XCircle size={14} strokeWidth={3} />
+                                        <span>Rifiuta</span>
+                                      </button>
+                                      <button 
+                                        onClick={() => setDeleteConfirm({ id: q.id, type: 'question', item: q })} 
+                                        className="flex items-center gap-2 px-3 py-2 bg-red-500/10 text-red-400 rounded-xl border border-red-500/20 hover:bg-red-500/25 transition-all text-[10px] font-bold uppercase ml-auto" 
+                                      >
+                                        <Trash2 size={14} />
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
-                )}
-              </div>
 
-              {/* Risposte Pendenti */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest flex items-center gap-3">
-                  <Send size={16} className="text-blue-400 shrink-0" /> Risposte da Approvare ({answers.length})
-                </h3>
-                {answers.length === 0 ? (
-                  <p className="text-gray-500 text-sm italic py-4">Nessuna risposta in sospeso.</p>
-                ) : (
-                  <div className="grid gap-4">
-                    {answers.map(a => (
-                      <div key={a.id} className="bg-[#0a0e1c]/40 border border-white/5 p-5 rounded-xl space-y-4">
-                        <div className="flex justify-between items-start gap-4">
-                          <div className="flex-1">
-                            <div className="bg-white/5 p-3 rounded-lg border border-white/5 mb-3">
-                              <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">In risposta a:</p>
-                              <p className="text-xs text-gray-400 italic line-clamp-1">"{a.questions?.question_text}"</p>
-                            </div>
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-[10px] font-black rounded border border-blue-500/20 uppercase">{a.questions?.civ_id}</span>
-                              <span className="text-xs font-bold text-white">{a.user_nickname}</span>
-                              <span className="text-[10px] text-gray-500">({a.user_rank})</span>
-                            </div>
-                            <p className="text-gray-200 text-sm">{a.answer_text}</p>
-                            
-                            <div className="flex flex-wrap gap-3 mt-6 pt-5 border-t border-white/5">
-                              {canManageCivs && (
-                                <>
-                                  <button 
-                                    onClick={() => handleUpdateQAStatus(a, 'answer', 'approved')} 
-                                    className="flex items-center gap-2 px-5 py-2.5 bg-green-500/10 text-green-500 rounded-xl border border-green-500/20 hover:bg-green-500/20 hover:scale-105 transition-all text-xs font-black uppercase tracking-wider" 
-                                  >
-                                    <CheckCircle size={18} />
-                                    <span>Approva</span>
-                                  </button>
-                                  <button 
-                                    onClick={() => handleUpdateQAStatus(a, 'answer', 'rejected')} 
-                                    className="flex items-center gap-2 px-5 py-2.5 bg-red-500/10 text-red-500 rounded-xl border border-red-500/20 hover:bg-red-500/20 hover:scale-105 transition-all text-xs font-black uppercase tracking-wider" 
-                                  >
-                                    <XCircle size={18} />
-                                    <span>Rifiuta</span>
-                                  </button>
-                                  <button 
-                                    onClick={() => setDeleteConfirm({ id: a.id, type: 'answer', item: a })} 
-                                    className="flex items-center gap-2 px-4 py-2.5 bg-white/5 text-gray-400 rounded-xl border border-white/5 hover:bg-red-500/20 hover:text-red-500 hover:border-red-500/30 transition-all text-xs font-bold uppercase ml-auto" 
-                                  >
-                                    <Trash2 size={18} />
-                                  </button>
-                                </>
-                              )}
+                  {/* Risposte Pendenti */}
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black text-blue-400 uppercase tracking-[0.25em] flex items-center gap-3">
+                      <Send size={16} className="text-blue-400 shrink-0" /> Risposte da Approvare ({answers.length})
+                    </h3>
+                    {answers.length === 0 ? (
+                      <p className="text-gray-500 text-xs italic py-4 bg-white/[0.01] border-2 border-dashed border-white/5 rounded-2xl text-center">Nessuna risposta in sospeso.</p>
+                    ) : (
+                      <div className="grid gap-4">
+                        {answers.map(a => (
+                          <div key={a.id} className="bg-[#0a0e1c]/60 border border-white/5 p-6 rounded-3xl space-y-4 hover:border-blue-500/30 transition-colors shadow-2xl relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/25 to-transparent"></div>
+                            <div className="flex justify-between items-start gap-4">
+                              <div className="flex-1">
+                                <div className="bg-black/40 p-4 rounded-2xl border border-white/5 mb-4 shadow-inner">
+                                  <span className="text-[9px] text-gray-500 uppercase font-black tracking-wider block mb-1">In risposta a:</span>
+                                  <p className="text-xs text-gray-400 italic line-clamp-2">"{a.questions?.question_text}"</p>
+                                </div>
+                                <div className="flex items-center gap-2 mb-3 flex-wrap">
+                                  <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-[9px] font-black rounded-lg border border-blue-500/20 uppercase tracking-wider">{a.questions?.civ_id}</span>
+                                  <span className="text-xs font-black text-white">{a.user_nickname}</span>
+                                  <span className="text-[9px] font-black text-gray-500">({a.user_rank})</span>
+                                </div>
+                                <p className="text-gray-200 text-xs font-medium leading-relaxed">{a.answer_text}</p>
+                                
+                                <div className="flex flex-wrap gap-3 mt-6 pt-5 border-t border-white/5">
+                                  {canManageCivs && (
+                                    <>
+                                      <button 
+                                        onClick={() => handleUpdateQAStatus(a, 'answer', 'approved')} 
+                                        className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white rounded-xl shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all text-[10px] font-black uppercase tracking-widest" 
+                                      >
+                                        <CheckCircle size={14} strokeWidth={3} />
+                                        <span>Approva</span>
+                                      </button>
+                                      <button 
+                                        onClick={() => handleUpdateQAStatus(a, 'answer', 'rejected')} 
+                                        className="flex items-center gap-2 px-5 py-2.5 bg-[#111218] border-2 border-white/10 hover:border-white/20 text-gray-400 hover:text-white rounded-xl hover:-translate-y-0.5 active:scale-95 transition-all text-[10px] font-black uppercase tracking-widest" 
+                                      >
+                                        <XCircle size={14} strokeWidth={3} />
+                                        <span>Rifiuta</span>
+                                      </button>
+                                      <button 
+                                        onClick={() => setDeleteConfirm({ id: a.id, type: 'answer', item: a })} 
+                                        className="flex items-center gap-2 px-3 py-2 bg-red-500/10 text-red-400 rounded-xl border border-red-500/20 hover:bg-red-500/25 transition-all text-[10px] font-bold uppercase ml-auto" 
+                                      >
+                                        <Trash2 size={14} />
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
-                )}
-              </div>
-            </>
+                </>
+              )}
+            </div>
           )}
-        </div>
-      )}
 
           {activeTab === 'users' && isSuperAdmin && (
-            <div className="space-y-6">
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500">
               {/* Toolbar */}
-              <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-[#0a0e1c]/30 p-6 rounded-2xl border border-white/5">
+              <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-[#0a0e1c]/60 p-6 rounded-3xl border border-[#D4AF37]/15 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37]/35 to-transparent"></div>
                 <div className="relative w-full md:w-96">
-                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
                   <input
                     type="text"
                     placeholder="Cerca per email o nickname..."
                     value={userSearch}
                     onChange={(e) => setUserSearch(e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:border-blue-500 outline-none transition-all"
+                    className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl py-3 pl-11 pr-4 text-xs text-white focus:shadow-[0_0_15px_rgba(59,130,246,0.15)] transition-all outline-none font-bold"
                   />
                 </div>
 
@@ -1592,14 +1603,14 @@ export default function AdminDashboardPage() {
                         value={newUemail}
                         onChange={(e) => setNewUemail(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleAddUser()}
-                        className="flex-1 bg-blue-500/10 border border-blue-500/30 rounded-xl px-4 py-2 text-sm text-white outline-none focus:border-blue-400"
+                        className="flex-1 bg-[#111218] border-2 border-blue-500/30 rounded-2xl px-4 py-2.5 text-xs text-white outline-none focus:border-blue-400 focus:shadow-[0_0_15px_rgba(59,130,246,0.15)] font-bold"
                       />
                       <button
                         onClick={handleAddUser}
                         disabled={!newUemail.trim() || addSuccess}
-                        className={`px-4 py-2 ${addSuccess ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-500'} text-white rounded-xl font-bold text-xs uppercase disabled:opacity-50 transition-all flex items-center gap-2`}
+                        className={`px-5 py-2.5 ${addSuccess ? 'bg-green-600' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500'} text-white rounded-2xl font-black text-xs uppercase disabled:opacity-50 transition-all flex items-center gap-2 active:scale-95 shadow-md`}
                       >
-                        {addSuccess ? <Check size={14} /> : null}
+                        {addSuccess ? <Check size={14} strokeWidth={3} /> : null}
                         {addSuccess ? 'Aggiunto' : 'Aggiungi'}
                       </button>
                       <button
@@ -1612,7 +1623,7 @@ export default function AdminDashboardPage() {
                   ) : (
                     <button
                       onClick={() => setIsAddingUser(true)}
-                      className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-xl border border-blue-500/30 transition-all font-bold text-xs uppercase"
+                      className="w-full md:w-auto flex items-center justify-center gap-2 px-5 py-3 bg-blue-600/10 hover:bg-blue-600/25 border-2 border-blue-500/20 text-blue-400 hover:text-white rounded-2xl transition-all font-black text-xs uppercase tracking-widest active:scale-95 shadow-lg"
                     >
                       <UserPlus size={16} /> Aggiungi Utente
                     </button>
@@ -1621,20 +1632,20 @@ export default function AdminDashboardPage() {
               </div>
 
               {inlineToast && (
-                <div className={`p-3 rounded-xl border flex items-center gap-2 ${
+                <div className={`p-4 rounded-2xl border-2 flex items-center gap-2 animate-in fade-in duration-300 ${
                   inlineToast.type === 'success' 
                     ? 'bg-green-500/10 border-green-500/20 text-green-400' 
                     : 'bg-red-500/10 border-red-500/20 text-red-400'
                 }`}>
                   {inlineToast.type === 'success' ? <CheckCircle size={16} /> : <AlertTriangle size={16} />}
-                  <span className="text-xs font-bold uppercase">{inlineToast.message}</span>
+                  <span className="text-xs font-black uppercase tracking-wider">{inlineToast.message}</span>
                 </div>
               )}
 
               {userLoading ? (
-                <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="flex flex-col items-center justify-center py-20 text-center bg-[#0a0e1c]/40 border border-white/5 rounded-3xl">
                   <Loader2 className="animate-spin text-blue-400 mb-2" size={32} />
-                  <p className="text-gray-400 text-sm">Caricamento staff...</p>
+                  <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Caricamento staff...</span>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1665,9 +1676,9 @@ export default function AdminDashboardPage() {
                     return matchSearch;
                   })
                   .map(u => (
-                    <div key={u.id} className={`bg-[#0a0e1c]/40 border rounded-2xl p-5 flex flex-col gap-4 group hover:bg-white/[0.02] transition-all ${u.role === 'admin' ? 'border-yellow-500/20' : 'border-white/5'}`}>
+                    <div key={u.id} className={`bg-[#0a0e1c]/60 border rounded-3xl p-6 flex flex-col gap-5 group hover:bg-[#0a0e1c]/80 hover:border-blue-500/40 hover:-translate-y-0.5 shadow-2xl transition-all duration-300 ${u.role === 'admin' ? 'border-yellow-500/20' : 'border-white/5'}`}>
                       <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center border text-xl font-bold shrink-0 overflow-hidden ${u.role === 'admin' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
+                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border-2 text-xl font-bold shrink-0 overflow-hidden shadow-lg ${u.role === 'admin' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
                           {u.avatar_url ? (
                             <img 
                               src={u.avatar_url} 
@@ -1683,12 +1694,12 @@ export default function AdminDashboardPage() {
                           )}
                         </div>
                         <div className="flex flex-col min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             {editingNickname === u.email ? (
                               <div className="flex items-center gap-2">
                                 <input
                                   autoFocus
-                                  className="bg-black/60 border border-blue-500/50 rounded px-2 py-1 text-sm text-white focus:outline-none"
+                                  className="bg-black/60 border border-blue-500/50 rounded-xl px-2 py-1 text-xs text-white focus:outline-none"
                                   value={tempNickname}
                                   disabled={isSavingNickname === u.email}
                                   onChange={(e) => setTempNickname(e.target.value)}
@@ -1708,7 +1719,7 @@ export default function AdminDashboardPage() {
                               </div>
                             ) : (
                               <div className="flex items-center gap-2 group/nick relative">
-                                <span className={`text-base md:text-lg font-bold text-white truncate leading-tight transition-colors ${savedSuccess === u.email ? 'text-green-400' : ''}`}>
+                                <span className={`text-base font-black text-white truncate leading-tight transition-colors ${savedSuccess === u.email ? 'text-green-400' : ''}`}>
                                   {u.nickname || 'Senza Nickname'}
                                 </span>
                                 {savedSuccess === u.email && <CheckCircle size={12} className="text-green-400 animate-in" />}
@@ -1720,62 +1731,62 @@ export default function AdminDashboardPage() {
                                 </button>
                               </div>
                             )}
-                            {u.role === 'admin' && <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded font-black uppercase">Owner</span>}
-                            {u.role === 'editor' && <span className="text-[9px] px-1.5 py-0.5 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded font-black uppercase">Editor</span>}
+                            {u.role === 'admin' && <span className="text-[8px] px-2 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded-lg font-black uppercase tracking-wider">Owner</span>}
+                            {u.role === 'editor' && <span className="text-[8px] px-2 py-0.5 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded-lg font-black uppercase tracking-wider">Editor</span>}
                           </div>
-                          <span className="text-xs md:text-sm text-gray-500 truncate block">{u.email}</span>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] font-bold text-blue-400/70 border border-blue-500/20 px-1.5 py-0.5 rounded bg-blue-500/5">{u.rank || 'Unranked'}</span>
+                          <span className="text-xs text-gray-500 truncate block mt-1">{u.email}</span>
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="text-[9px] font-black text-blue-400/80 border border-blue-500/20 px-2 py-0.5 rounded-lg bg-blue-500/5 uppercase tracking-wider">{u.rank || 'Unranked'}</span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="pt-3 border-t border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-3">
-                        <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] select-none">Permessi</span>
-                        <div className="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/5">
+                      <div className="pt-4 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <span className="text-[9px] font-black text-gray-500 uppercase tracking-[0.25em] select-none">Gestione Permessi</span>
+                        <div className="flex items-center gap-1.5 bg-black/40 p-1.5 rounded-2xl border border-white/5 w-fit">
                           <button
                             onClick={() => handleToggleUserRole(u.email, 'can_manage_tournaments', !u.can_manage_tournaments)}
-                            className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_tournaments ? 'bg-yellow-500 text-black' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                            className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all shadow-md ${u.can_manage_tournaments ? 'bg-yellow-500 text-black font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
                             title="Gestione Tornei"
                           >
-                            <Trophy size={16} />
+                            <Trophy size={15} />
                           </button>
 
                           <button
                             onClick={() => handleToggleUserRole(u.email, 'can_manage_civs', !u.can_manage_civs)}
-                            className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_civs ? 'bg-blue-600 text-white' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                            className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all shadow-md ${u.can_manage_civs ? 'bg-blue-600 text-white font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
                             title="Gestione Civiltà"
                           >
-                            <BookOpen size={16} />
+                            <BookOpen size={15} />
                           </button>
 
                           <button
                             onClick={() => handleToggleUserRole(u.email, 'can_manage_buildorders', !u.can_manage_buildorders)}
-                            className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_buildorders ? 'bg-orange-500 text-white' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                            className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all shadow-md ${u.can_manage_buildorders ? 'bg-orange-500 text-white font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
                             title="Gestione Build Orders"
                           >
-                            <Zap size={16} />
+                            <Zap size={15} />
                           </button>
 
-                          <div className="w-px h-4 bg-white/10 mx-1" />
+                          <div className="w-px h-5 bg-white/10 mx-1" />
 
                           <button
                             onClick={() => handleToggleUserRole(u.email, 'is_streamer', !u.is_streamer)}
-                            className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.is_streamer ? 'bg-pink-600 text-white' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                            className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all shadow-md ${u.is_streamer ? 'bg-pink-600 text-white font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
                             title="Streamer"
                           >
-                            <Radio size={16} />
+                            <Radio size={15} />
                           </button>
                           
                           {isSuperAdmin && (
                             <>
-                              <div className="w-px h-4 bg-white/10 mx-1" />
+                              <div className="w-px h-5 bg-white/10 mx-1" />
                               <button
                                 onClick={() => handleDeleteUser(u.email)}
-                                className="w-9 h-9 flex items-center justify-center rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-all"
+                                className="w-9 h-9 flex items-center justify-center rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/25 border-2 border-red-500/20 transition-all shadow-md"
                                 title="Elimina Utente"
                               >
-                                <Trash2 size={16} />
+                                <Trash2 size={15} />
                               </button>
                             </>
                           )}
@@ -1783,27 +1794,28 @@ export default function AdminDashboardPage() {
                       </div>
                     </div>
                   ))}
-              </div>
+                </div>
               )}
             </div>
           )}
 
           {activeTab === 'pecore' && isSuperAdmin && (
-            <div className="space-y-6">
-              <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-[#0a0e1c]/30 p-6 rounded-2xl border border-white/5">
-                <div className="relative w-80">
-                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500">
+              <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-[#0a0e1c]/60 p-6 rounded-3xl border border-[#D4AF37]/15 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37]/35 to-transparent"></div>
+                <div className="relative w-full md:w-80">
+                  <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400" />
                   <input
                     type="text"
                     placeholder="Cerca utente per email..."
                     value={userSearch}
                     onChange={(e) => setUserSearch(e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs text-white focus:border-cyan-500 outline-none transition-all placeholder:text-gray-600"
+                    className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl py-3 pl-11 pr-4 text-xs text-white focus:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all outline-none font-bold placeholder:text-gray-600"
                   />
                 </div>
-                <div className="flex items-center gap-3 bg-cyan-500/5 px-4 py-2.5 rounded-xl border border-cyan-500/10 shrink-0">
-                  <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">Totale Pastori:</span>
-                  <span className="text-sm font-black text-white">{allProfiles.length}</span>
+                <div className="flex items-center gap-3 bg-cyan-500/5 px-4 py-2.5 rounded-2xl border border-cyan-500/15 shrink-0">
+                  <span className="text-[9px] font-black text-cyan-400 uppercase tracking-widest">Totale Pastori:</span>
+                  <span className="text-xs font-black text-white">{allProfiles.length}</span>
                 </div>
               </div>
 
@@ -1811,9 +1823,9 @@ export default function AdminDashboardPage() {
                 {allProfiles
                   .filter(p => !userSearch || p.email?.toLowerCase().includes(userSearch.toLowerCase()) || p.nickname?.toLowerCase().includes(userSearch.toLowerCase()))
                   .map(p => (
-                    <div key={p.email} className="bg-[#0a0e1c]/40 border border-white/5 rounded-2xl p-5 flex flex-col gap-4 hover:border-cyan-500/30 transition-all group">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold border border-cyan-500/20 overflow-hidden">
+                    <div key={p.email} className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 flex flex-col gap-5 hover:border-cyan-500/40 hover:-translate-y-0.5 shadow-2xl transition-all duration-300 group">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold border-2 border-cyan-500/20 overflow-hidden shadow-lg shrink-0">
                           {p.avatar_url ? (
                             <img 
                               src={p.avatar_url} 
@@ -1829,24 +1841,24 @@ export default function AdminDashboardPage() {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-white font-bold truncate">{p.nickname || 'Anonimo'}</p>
-                          <p className="text-[10px] text-gray-500 truncate">{p.email}</p>
+                          <p className="text-white font-black text-base truncate">{p.nickname || 'Anonimo'}</p>
+                          <p className="text-[10px] text-gray-500 truncate block mt-0.5">{p.email}</p>
                         </div>
                       </div>
                       
-                      <div className="bg-black/40 p-4 rounded-xl border border-white/5 flex flex-col items-stretch gap-4 w-full">
+                      <div className="bg-black/40 p-4 rounded-2xl border border-white/5 flex flex-col items-stretch gap-4 w-full shadow-inner">
                         <div className="flex items-center justify-between gap-2 w-full">
-                          <div className="flex items-center gap-2 shrink-0">
+                          <div className="flex items-center gap-2 shrink-0 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
                             <span className="text-xl">🐑</span>
-                            <span className="text-xl font-black text-white">{p.sheep_balance || 0}</span>
+                            <span className="text-base font-black text-white tracking-tight">{p.sheep_balance || 0}</span>
                           </div>
-                          <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10 shrink-0 ml-auto">
+                          <div className="flex items-center gap-1 bg-[#111218] p-1 rounded-2xl border border-white/10 shrink-0 ml-auto shadow-md">
                             <button
                               onClick={() => {
                                 const current = perUserRefillAmounts[p.email] ?? 100;
                                 setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: Math.max(0, current - 10) });
                               }}
-                              className="p-1.5 hover:bg-white/10 rounded-lg text-cyan-400 transition-colors"
+                              className="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-xl text-cyan-400 transition-colors"
                             >
                               <Minus size={12} />
                             </button>
@@ -1854,14 +1866,14 @@ export default function AdminDashboardPage() {
                               type="number"
                               value={perUserRefillAmounts[p.email] ?? 100}
                               onChange={(e) => setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: Number(e.target.value) })}
-                              className="w-12 bg-transparent text-xs text-white font-bold text-center outline-none"
+                              className="w-12 bg-transparent text-xs text-white font-black text-center outline-none"
                             />
                             <button
                               onClick={() => {
                                 const current = perUserRefillAmounts[p.email] ?? 100;
                                 setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: current + 10 });
                               }}
-                              className="p-1.5 hover:bg-white/10 rounded-lg text-cyan-400 transition-colors"
+                              className="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-xl text-cyan-400 transition-colors"
                             >
                               <Plus size={12} />
                             </button>
@@ -1871,7 +1883,7 @@ export default function AdminDashboardPage() {
                         <button
                           onClick={() => handleSheepRefill(p.email, perUserRefillAmounts[p.email] ?? 100)}
                           disabled={isRefilling === p.email}
-                          className="w-full flex items-center justify-center gap-2 py-3 bg-cyan-500/10 text-cyan-400 rounded-xl text-xs font-black border border-cyan-500/20 hover:bg-cyan-500/20 transition-all uppercase tracking-widest active:scale-95 group/btn"
+                          className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white rounded-xl text-xs font-black border-0 shadow-lg transition-all uppercase tracking-widest active:scale-95 disabled:opacity-40 group/btn"
                         >
                           {isRefilling === p.email ? (
                             <Loader2 size={16} className="animate-spin" />
