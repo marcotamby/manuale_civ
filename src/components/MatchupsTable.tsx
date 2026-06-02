@@ -161,23 +161,23 @@ export function MatchupsTable({ selectedCiv }: { selectedCiv: string }) {
       <div className="flex gap-4 mb-6 border-b border-white/5">
         <button
           onClick={() => setActiveSubTab('civ')}
-          className={`pb-3 text-sm font-bold transition-all relative ${activeSubTab === 'civ' ? 'text-yellow-400' : 'text-gray-500 hover:text-gray-300'}`}
+          className={`pb-3 text-sm font-bold transition-all relative ${activeSubTab === 'civ' ? 'text-cyan-400' : 'text-gray-500 hover:text-gray-300'}`}
         >
           <div className="flex items-center gap-2">
             <Users size={16} />
             Civiltà
           </div>
-          {activeSubTab === 'civ' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-500" />}
+          {activeSubTab === 'civ' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" />}
         </button>
         <button
           onClick={() => setActiveSubTab('maps')}
-          className={`pb-3 text-sm font-bold transition-all relative ${activeSubTab === 'maps' ? 'text-yellow-400' : 'text-gray-500 hover:text-gray-300'}`}
+          className={`pb-3 text-sm font-bold transition-all relative ${activeSubTab === 'maps' ? 'text-cyan-400' : 'text-gray-500 hover:text-gray-300'}`}
         >
           <div className="flex items-center gap-2">
             <Trophy size={16} />
             Mappe
           </div>
-          {activeSubTab === 'maps' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-500" />}
+          {activeSubTab === 'maps' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" />}
         </button>
       </div>
 
@@ -206,22 +206,22 @@ export function MatchupsTable({ selectedCiv }: { selectedCiv: string }) {
       )}
 
       {!error && (
-        <div className="bg-[#0a0c12]/90 backdrop-blur-xl rounded-2xl overflow-hidden border border-[#D4AF37]/20 shadow-2xl relative min-h-[400px]">
+        <div className="bg-[#0a0c12]/90 backdrop-blur-xl rounded-2xl overflow-hidden border border-cyan-500/20 shadow-2xl relative min-h-[400px]">
           {loading && (
             <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center z-20 animate-in fade-in duration-200">
-              <Loader2 className="w-10 h-10 text-yellow-500 animate-spin mb-3" />
+              <Loader2 className="w-10 h-10 text-cyan-400 animate-spin mb-3" />
               <span className="text-gray-400 text-xs font-black uppercase tracking-[0.2em] animate-pulse">Sincronizzazione dati live...</span>
             </div>
           )}
           <div className="overflow-x-auto no-scrollbar">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-white/5 border-b border-[#D4AF37]/20">
-                  <th className="py-4 px-6 text-xs font-bold text-yellow-500/70 uppercase tracking-widest">
+                <tr className="bg-white/5 border-b border-cyan-500/20">
+                  <th className="py-4 px-6 text-xs font-bold text-cyan-400/80 uppercase tracking-widest">
                     {activeSubTab === 'civ' ? 'Avversario' : 'Mappa'}
                   </th>
-                  <th className="py-4 px-6 text-xs font-bold text-yellow-500/70 uppercase tracking-widest text-right">Win Rate</th>
-                  <th className="py-4 px-6 text-xs font-bold text-yellow-100/70 uppercase tracking-widest text-right">Partite</th>
+                  <th className="py-4 px-6 text-xs font-bold text-cyan-400/80 uppercase tracking-widest text-right">Win Rate</th>
+                  <th className="py-4 px-6 text-xs font-bold text-slate-300/80 uppercase tracking-widest text-right">Partite</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">

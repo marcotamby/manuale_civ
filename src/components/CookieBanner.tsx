@@ -23,9 +23,9 @@ export function CookieBanner() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 shrink-0 bg-gray-900 border-t border-[#D4AF37]/30 shadow-[0_-5px_20px_rgba(0,0,0,0.5)] flex flex-col sm:flex-row items-center justify-between gap-4 glass">
+    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 shrink-0 bg-gray-900 border-t border-cyan-500/20 shadow-[0_-5px_20px_rgba(0,0,0,0.5)] flex flex-col sm:flex-row items-center justify-between gap-4 glass">
       <div className="text-sm text-gray-300 flex-1">
-        <p><strong>Informativa sui Cookie:</strong> Utilizziamo cookie tecnici per migliorare la tua esperienza di navigazione. Continuando a utilizzare il sito accetti i termini allineati alla normativa UE e GDPR. <a href="/privacy" className="text-yellow-500 hover:underline ml-1">Leggi la Privacy Policy</a></p>
+        <p><strong>Informativa sui Cookie:</strong> Utilizziamo cookie tecnici per migliorare la tua esperienza di navigazione. Continuando a utilizzare il sito accetti i termini allineati alla normativa UE e GDPR. <a href="/privacy" className="text-cyan-400 hover:underline ml-1">Leggi la Privacy Policy</a></p>
       </div>
       <div className="flex shrink-0 gap-3">
         <button 

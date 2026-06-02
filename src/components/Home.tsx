@@ -179,7 +179,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
                 ? 'border-blue-400 shadow-[0_0_40px_rgba(59,130,246,0.4)] scale-[1.02] z-20 brightness-110'
                 : isUnselectable
                   ? 'border-white/5 opacity-40 cursor-not-allowed pointer-events-none'
-                  : 'border-[#D4AF37]/30 hover:border-white/80 hover:shadow-[0_50px_100px_rgba(0,0,0,1)] hover:-translate-y-1 hover:scale-110 2xl:hover:scale-[1.25] hover:z-50'
+                  : 'border-cyan-500/20 hover:border-white/80 hover:shadow-[0_50px_100px_rgba(0,0,0,1)] hover:-translate-y-1 hover:scale-110 2xl:hover:scale-[1.25] hover:z-50'
                 }`}
             >
               {/* Full Cover Flag Background */}

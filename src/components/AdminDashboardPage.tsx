@@ -4,13 +4,14 @@ import {
   MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, 
   AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, 
   Trophy, BookOpen, Zap, Edit2, Check, Trash2, Plus, Minus, ArrowLeft, LayoutDashboard,
-  Save, Sparkles, ChevronDown, Users, Youtube
+  Save, Sparkles, ChevronDown, Users, Youtube, Menu
 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
+import { CustomSelect } from './CustomSelect';
 import { sendNewBuildOrderWebhook } from '../utils/discordWebhook';
 
 export interface Suggestion {
@@ -40,6 +41,12 @@ export default function AdminDashboardPage() {
   }, [isAuthenticated, isAdmin, navigate]);
 
   const [activeTab, setActiveTab] = useState<'overview' | 'proposte' | 'qa' | 'users' | 'pecore' | 'tornei' | 'civilta'>('overview');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  const selectTab = (tab: typeof activeTab) => {
+    setActiveTab(tab);
+    setIsMobileMenuOpen(false);
+  };
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; type: 'question' | 'answer' | 'user'; item: any } | null>(null);
@@ -1095,30 +1102,48 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="h-screen w-screen flex bg-[#070a13] text-white overflow-hidden font-sans">
+    <div className="h-screen w-screen flex bg-[#070a13] text-white overflow-hidden font-sans relative">
       
+      {/* Backdrop per mobile drawer */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden transition-all duration-300 animate-in fade-in"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar di Navigazione Dashboard */}
-      <aside className="w-64 bg-[#0a0e1c] border-r border-[#D4AF37]/15 flex flex-col shrink-0">
-        <div className="p-6 border-b border-white/5 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-600/10 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold">M</div>
-          <div>
-            <h1 className="text-sm font-black uppercase tracking-wider text-white">Manuale Civ</h1>
-            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Admin Control</p>
+      <aside className={`fixed inset-y-0 left-0 w-64 bg-[#0a0e1c] border-r border-cyan-500/15 flex flex-col shrink-0 z-50 transform md:translate-x-0 md:static md:flex transition-transform duration-300 ease-in-out ${
+        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        <div className="p-6 border-b border-white/5 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-blue-600/10 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold">M</div>
+            <div>
+              <h1 className="text-sm font-black uppercase tracking-wider text-white">Manuale Civ</h1>
+              <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Admin Control</p>
+            </div>
           </div>
+          <button 
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="p-1.5 text-gray-400 hover:text-white md:hidden hover:bg-white/5 rounded-lg transition-colors"
+          >
+            <X size={18} />
+          </button>
         </div>
 
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
           <button
-            onClick={() => setActiveTab('overview')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'overview' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            onClick={() => selectTab('overview')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'overview' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
           >
             <LayoutDashboard size={18} />
             <span>Panoramica</span>
           </button>
           
           <button
-            onClick={() => setActiveTab('proposte')}
-            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'proposte' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            onClick={() => selectTab('proposte')}
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'proposte' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
           >
             <div className="flex items-center gap-3">
               <Inbox size={18} />
@@ -1132,15 +1157,15 @@ export default function AdminDashboardPage() {
           </button>
 
           <button
-            onClick={() => setActiveTab('qa')}
-            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'qa' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            onClick={() => selectTab('qa')}
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'qa' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
           >
             <div className="flex items-center gap-3">
               <MessageSquare size={18} />
               <span>Q&A Mod</span>
             </div>
             {(questions.length + answers.length) > 0 && (
-              <span className="px-2 py-0.5 bg-yellow-500 text-black text-[10px] rounded-full font-black">
+              <span className="px-2 py-0.5 bg-cyan-400 text-black text-[10px] rounded-full font-black shadow-[0_0_8px_rgba(34,211,238,0.4)]">
                 {questions.length + answers.length}
               </span>
             )}
@@ -1148,8 +1173,8 @@ export default function AdminDashboardPage() {
 
           {(isSuperAdmin || canManageTournaments) && (
             <button
-              onClick={() => setActiveTab('tornei')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'tornei' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+              onClick={() => selectTab('tornei')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'tornei' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
             >
               <Trophy size={18} />
               <span>Gestione Tornei</span>
@@ -1158,8 +1183,8 @@ export default function AdminDashboardPage() {
 
           {(isSuperAdmin || canManageCivs || canManageBuildorders) && (
             <button
-              onClick={() => setActiveTab('civilta')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'civilta' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+              onClick={() => selectTab('civilta')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'civilta' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
             >
               <BookOpen size={18} />
               <span>Civiltà & BO</span>
@@ -1169,16 +1194,16 @@ export default function AdminDashboardPage() {
           {isSuperAdmin && (
             <>
               <button
-                onClick={() => setActiveTab('users')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'users' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                onClick={() => selectTab('users')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'users' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
               >
                 <ShieldCheck size={18} />
                 <span>Permessi Staff</span>
               </button>
 
               <button
-                onClick={() => setActiveTab('pecore')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'pecore' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                onClick={() => selectTab('pecore')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'pecore' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
               >
                 <span className="text-base">🐑</span>
                 <span>Bilancio Pecore</span>
@@ -1202,34 +1227,46 @@ export default function AdminDashboardPage() {
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         
         {/* Header superiore */}
-        <header className="h-20 border-b border-white/5 flex items-center justify-between px-8 bg-[#0a0e1c]/40 backdrop-blur-sm shrink-0">
-          <div>
-            <h2 className="text-xl font-bold uppercase tracking-wider">
-              {activeTab === 'overview' && 'Pannello di Controllo'}
-              {activeTab === 'proposte' && 'Gestione Suggerimenti'}
-              {activeTab === 'qa' && 'Moderazione Domande & Risposte'}
-              {activeTab === 'users' && 'Staff & Permessi'}
-              {activeTab === 'pecore' && 'Bilancio Pecore'}
-            </h2>
-            <p className="text-xs text-gray-400">
-              {activeTab === 'overview' && 'Panoramica e statistiche globali del manuale.'}
-              {activeTab === 'proposte' && 'Revisiona e approva i suggerimenti inviati dalla community.'}
-              {activeTab === 'qa' && 'Approva, rifiuta o elimina i contributi Q&A degli utenti.'}
-              {activeTab === 'users' && 'Gestisci i permessi operativi ed i ruoli dello staff.'}
-              {activeTab === 'pecore' && 'Gestisci e ricarica i saldi di pecore dei pastori.'}
-            </p>
+        <header className="h-20 border-b border-white/5 flex items-center justify-between px-4 md:px-8 bg-[#0a0e1c]/40 backdrop-blur-sm shrink-0 gap-4">
+          <div className="flex items-center gap-3 overflow-hidden">
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="p-2.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-xl md:hidden shrink-0 transition-colors"
+            >
+              <Menu size={20} className="text-cyan-400" />
+            </button>
+            <div className="overflow-hidden">
+              <h2 className="text-sm md:text-xl font-bold uppercase tracking-wider truncate">
+                {activeTab === 'overview' && 'Pannello di Controllo'}
+                {activeTab === 'proposte' && 'Gestione Suggerimenti'}
+                {activeTab === 'qa' && 'Moderazione Domande & Risposte'}
+                {activeTab === 'users' && 'Staff & Permessi'}
+                {activeTab === 'pecore' && 'Bilancio Pecore'}
+                {activeTab === 'tornei' && 'Gestione Tornei'}
+                {activeTab === 'civilta' && 'Gestione Civiltà & BO'}
+              </h2>
+              <p className="text-[10px] md:text-xs text-gray-400 truncate">
+                {activeTab === 'overview' && 'Panoramica e statistiche globali del manuale.'}
+                {activeTab === 'proposte' && 'Revisiona e approva i suggerimenti inviati dalla community.'}
+                {activeTab === 'qa' && 'Approva, rifiuta o elimina i contributi Q&A degli utenti.'}
+                {activeTab === 'users' && 'Gestisci i permessi operativi ed i ruoli dello staff.'}
+                {activeTab === 'pecore' && 'Gestisci e ricarica i saldi di pecore dei pastori.'}
+                {activeTab === 'tornei' && 'Pianifica tornei, gestisci podi e video dei match.'}
+                {activeTab === 'civilta' && 'Modifica dettagli civiltà e crea/edita i build orders.'}
+              </p>
+            </div>
           </div>
         </header>
 
         {/* Corpo scrollabile */}
-        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
           
           {/* TAB PANELS */}
           {activeTab === 'overview' && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div 
-                  onClick={() => setActiveTab('proposte')}
+                  onClick={() => selectTab('proposte')}
                   className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 hover:border-blue-500/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:scale-[1.02] transition-all cursor-pointer group relative overflow-hidden backdrop-blur-md"
                 >
                   <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent"></div>
@@ -1241,19 +1278,19 @@ export default function AdminDashboardPage() {
                 </div>
                 
                 <div 
-                  onClick={() => setActiveTab('qa')}
-                  className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 hover:border-yellow-500/50 hover:shadow-[0_0_20px_rgba(234,179,8,0.15)] hover:scale-[1.02] transition-all cursor-pointer group relative overflow-hidden backdrop-blur-md"
+                  onClick={() => selectTab('qa')}
+                  className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] hover:scale-[1.02] transition-all cursor-pointer group relative overflow-hidden backdrop-blur-md"
                 >
-                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-yellow-500/30 to-transparent"></div>
-                  <div className="w-12 h-12 rounded-2xl bg-yellow-500/10 border-2 border-yellow-500/20 flex items-center justify-center text-yellow-500 mb-4 group-hover:scale-110 transition-transform">
+                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
+                  <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border-2 border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-4 group-hover:scale-110 transition-transform">
                     <MessageSquare size={24} />
                   </div>
                   <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Contributi Q&A Pendenti</h3>
                   <p className="text-3xl font-black mt-2 text-white tracking-tight">{questions.length + answers.length}</p>
                 </div>
-
+                
                 <div 
-                  onClick={() => setActiveTab('pecore')}
+                  onClick={() => selectTab('pecore')}
                   className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] hover:scale-[1.02] transition-all cursor-pointer group relative overflow-hidden backdrop-blur-md"
                 >
                   <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
@@ -1264,10 +1301,10 @@ export default function AdminDashboardPage() {
                   <p className="text-3xl font-black mt-2 text-white tracking-tight">{allProfiles.length}</p>
                 </div>
               </div>
-
-              <div className="bg-[#0a0e1c]/60 border border-[#D4AF37]/15 rounded-3xl p-8 flex flex-col md:flex-row items-center gap-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37]/35 to-transparent"></div>
-                <div className="w-16 h-16 rounded-2xl bg-yellow-500/10 border-2 border-yellow-500/20 flex items-center justify-center text-yellow-500 text-3xl shadow-lg shrink-0">🔑</div>
+ 
+              <div className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-8 flex flex-col md:flex-row items-center gap-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
+                <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border-2 border-cyan-500/20 flex items-center justify-center text-cyan-400 text-3xl shadow-lg shrink-0">🔑</div>
                 <div>
                   <h3 className="text-lg font-black text-white uppercase tracking-tight">Benvenuto nel Pannello Admin, {useAuth().user?.nickname || 'Admin'}</h3>
                   <p className="text-xs text-gray-400 mt-2 max-w-xl leading-relaxed">
@@ -1294,7 +1331,7 @@ export default function AdminDashboardPage() {
               ) : (
                 <div className="space-y-6">
                   {suggestions.map((sugg) => (
-                    <div key={sugg.id} className="bg-[#0a0e1c]/60 border border-[#D4AF37]/15 rounded-3xl p-6 hover:border-blue-500/50 shadow-2xl relative overflow-hidden backdrop-blur-md transition-all duration-300">
+                    <div key={sugg.id} className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-6 hover:border-blue-500/50 shadow-2xl relative overflow-hidden backdrop-blur-md transition-all duration-300">
                       <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/35 to-transparent"></div>
 
                       <div className="flex flex-col lg:flex-row justify-between gap-6 relative z-10">
@@ -1608,8 +1645,8 @@ export default function AdminDashboardPage() {
           {activeTab === 'users' && isSuperAdmin && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500">
               {/* Toolbar */}
-              <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-[#0a0e1c]/60 p-6 rounded-3xl border border-[#D4AF37]/15 shadow-2xl backdrop-blur-md relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37]/35 to-transparent"></div>
+              <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-[#0a0e1c]/60 p-6 rounded-3xl border border-cyan-500/15 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
                 <div className="relative w-full md:w-96">
                   <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
                   <input
@@ -1829,8 +1866,8 @@ export default function AdminDashboardPage() {
 
           {activeTab === 'pecore' && isSuperAdmin && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500">
-              <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-[#0a0e1c]/60 p-6 rounded-3xl border border-[#D4AF37]/15 shadow-2xl backdrop-blur-md relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37]/35 to-transparent"></div>
+              <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-[#0a0e1c]/60 p-6 rounded-3xl border border-cyan-500/15 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
                 <div className="relative w-full md:w-80">
                   <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400" />
                   <input
@@ -1935,8 +1972,8 @@ export default function AdminDashboardPage() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
                 {/* Sidebar Tornei */}
-                <div className="lg:col-span-4 bg-[#0a0e1c]/60 border border-[#D4AF37]/15 rounded-3xl p-6 space-y-6 shadow-2xl backdrop-blur-md relative overflow-hidden group">
-                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37]/35 to-transparent"></div>
+                <div className="lg:col-span-4 bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-6 space-y-6 shadow-2xl backdrop-blur-md relative overflow-hidden group">
+                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
                   
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-black text-cyan-400 uppercase tracking-[0.25em] flex items-center gap-2">
@@ -2001,7 +2038,7 @@ export default function AdminDashboardPage() {
                 {/* Dettagli / Gestione Scommesse */}
                 <div className="lg:col-span-8 space-y-6">
                   {(selectedTournament || isCreatingTournament) ? (
-                    <div className="bg-[#0a0e1c]/60 border border-[#D4AF37]/15 rounded-3xl p-8 space-y-8 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                    <div className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-8 space-y-8 shadow-2xl backdrop-blur-md relative overflow-hidden">
                       <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/35 to-transparent"></div>
                       
                       {/* Titolo Sezione */}
@@ -2060,15 +2097,16 @@ export default function AdminDashboardPage() {
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
                               <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Stato</label>
-                              <select
+                              <CustomSelect
                                 value={tournamentForm.status}
-                                onChange={(e) => setTournamentForm({ ...tournamentForm, status: e.target.value })}
-                                className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl px-4 py-3 text-sm text-white focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none font-bold [&>option]:bg-[#111218]"
-                              >
-                                <option value="Programmato">Programmato</option>
-                                <option value="In Corso">In Corso</option>
-                                <option value="Concluso">Concluso</option>
-                              </select>
+                                onChange={(val) => setTournamentForm({ ...tournamentForm, status: val })}
+                                options={[
+                                  { value: 'Programmato', label: 'Programmato' },
+                                  { value: 'In Corso', label: 'In Corso' },
+                                  { value: 'Concluso', label: 'Concluso' }
+                                ]}
+                                buttonClassName="bg-[#111218] border-2 border-white/10 hover:border-cyan-500/40 rounded-2xl px-4 py-3 h-12 text-sm text-white transition-all outline-none font-bold"
+                              />
                             </div>
                             <div>
                               <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Tipo</label>
@@ -2156,10 +2194,10 @@ export default function AdminDashboardPage() {
                               onClick={() => setIsPodiumExpanded(!isPodiumExpanded)}
                             >
                               <div className="flex items-center gap-3">
-                                <Trophy size={18} className="text-yellow-500 animate-pulse" />
+                                <Trophy size={18} className="text-cyan-400 animate-pulse" />
                                 <label className="text-xs font-black uppercase tracking-wider text-white select-none cursor-pointer">Podio del Torneo</label>
                               </div>
-                              <ChevronDown size={20} className={`transition-transform duration-300 ${isPodiumExpanded ? 'rotate-180 text-yellow-500' : 'text-gray-400'}`} />
+                              <ChevronDown size={20} className={`transition-transform duration-300 ${isPodiumExpanded ? 'rotate-180 text-cyan-400' : 'text-gray-400'}`} />
                             </div>
 
                             {isPodiumExpanded && (
@@ -2169,21 +2207,21 @@ export default function AdminDashboardPage() {
                                     <div className="flex flex-col sm:flex-row gap-4 items-start w-full">
                                       <div className="w-full sm:w-40 shrink-0 space-y-2">
                                         <label className="text-[9px] text-gray-500 font-black uppercase tracking-widest ml-1 opacity-60">Posizione</label>
-                                        <div className="relative">
-                                          <select 
+                                        <div className="relative w-full">
+                                          <CustomSelect 
                                             value={p.placement || (i + 1)} 
-                                            onChange={e => {
+                                            onChange={val => {
                                               const np = [...tournamentForm.podium];
-                                              np[i] = { ...p, placement: parseInt(e.target.value) };
+                                              np[i] = { ...p, placement: parseInt(val) };
                                               setTournamentForm({ ...tournamentForm, podium: np });
                                             }}
-                                            className="w-full bg-[#111218] border border-white/10 h-10 px-4 rounded-xl text-white text-xs font-bold outline-none focus:border-yellow-500 transition-all cursor-pointer appearance-none [&>option]:bg-[#111218]"
-                                          >
-                                            <option value={1}>🥇 1° Posto</option>
-                                            <option value={2}>🥈 2° Posto</option>
-                                            <option value={3}>🥉 3° Posto</option>
-                                          </select>
-                                          <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                                            options={[
+                                              { value: 1, label: '🥇 1° Posto' },
+                                              { value: 2, label: '🥈 2° Posto' },
+                                              { value: 3, label: '🥉 3° Posto' }
+                                            ]}
+                                            buttonClassName="bg-[#111218] border border-white/10 h-10 px-4 rounded-xl text-white text-xs font-bold transition-all outline-none"
+                                          />
                                         </div>
                                       </div>
                                       
@@ -2448,7 +2486,7 @@ export default function AdminDashboardPage() {
                                     type="text"
                                     value={marketForm.description}
                                     onChange={(e) => setMarketForm({ ...marketForm, description: e.target.value })}
-                                    className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-yellow-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:shadow-[0_0_15px_rgba(234,179,8,0.1)] transition-all outline-none"
+                                    className="w-full bg-[#111218] border-2 border-white/10 hover:border-cyan-500/30 focus:border-cyan-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none"
                                     placeholder="es: Match Winner semifinale"
                                   />
                                 </div>
@@ -2457,26 +2495,28 @@ export default function AdminDashboardPage() {
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Tipo Mercato</label>
-                                  <select
+                                  <CustomSelect
                                     value={marketForm.type}
-                                    onChange={(e) => setMarketForm({ ...marketForm, type: e.target.value })}
-                                    className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-yellow-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:shadow-[0_0_15px_rgba(234,179,8,0.1)] transition-all outline-none font-bold [&>option]:bg-[#111218]"
-                                  >
-                                    <option value="Match Winner">Match Winner</option>
-                                    <option value="Tournament Winner">Tournament Winner</option>
-                                    <option value="Final Score">Final Score</option>
-                                  </select>
+                                    onChange={(val) => setMarketForm({ ...marketForm, type: val })}
+                                    options={[
+                                      { value: 'Match Winner', label: 'Match Winner' },
+                                      { value: 'Tournament Winner', label: 'Tournament Winner' },
+                                      { value: 'Final Score', label: 'Final Score' }
+                                    ]}
+                                    buttonClassName="bg-[#111218] border-2 border-white/10 hover:border-cyan-500/40 rounded-2xl px-4 py-3 h-12 text-xs text-white transition-all outline-none font-bold"
+                                  />
                                 </div>
                                 <div>
                                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Fascia Elo</label>
-                                  <select
+                                  <CustomSelect
                                     value={marketForm.event_level}
-                                    onChange={(e) => setMarketForm({ ...marketForm, event_level: e.target.value })}
-                                    className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-yellow-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:shadow-[0_0_15px_rgba(234,179,8,0.1)] transition-all outline-none font-bold [&>option]:bg-[#111218]"
-                                  >
-                                    <option value="High Elo">High Elo</option>
-                                    <option value="Low Elo">Low Elo</option>
-                                  </select>
+                                    onChange={(val) => setMarketForm({ ...marketForm, event_level: val })}
+                                    options={[
+                                      { value: 'High Elo', label: 'High Elo' },
+                                      { value: 'Low Elo', label: 'Low Elo' }
+                                    ]}
+                                    buttonClassName="bg-[#111218] border-2 border-white/10 hover:border-cyan-500/40 rounded-2xl px-4 py-3 h-12 text-xs text-white transition-all outline-none font-bold"
+                                  />
                                 </div>
                               </div>
 
@@ -2621,10 +2661,10 @@ export default function AdminDashboardPage() {
               {/* Modale Conferma Liquidazione Scommessa */}
               {settleConfirmOption && (
                 <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
-                  <div className="bg-[#0a0e1c] border border-yellow-500/30 p-8 rounded-3xl max-w-sm w-full shadow-2xl text-center relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent"></div>
-                    <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-yellow-500/20">
-                      <AlertTriangle className="text-yellow-500" size={32} />
+                  <div className="bg-[#0a0e1c] border border-cyan-500/30 p-8 rounded-3xl max-w-sm w-full shadow-2xl text-center relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+                    <div className="w-16 h-16 bg-cyan-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-cyan-500/20">
+                      <AlertTriangle className="text-cyan-400" size={32} />
                     </div>
                     <h3 className="text-xl font-black text-white uppercase mb-2">Sei sicuro?</h3>
                     <p className="text-xs text-gray-400 mb-6">
@@ -2639,7 +2679,7 @@ export default function AdminDashboardPage() {
                       </button>
                       <button
                         onClick={() => handleSettleMarketDashboard(settleConfirmOption.marketId, settleConfirmOption.optionId)}
-                        className="flex-1 py-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-xl transition-all text-xs font-black uppercase tracking-wider active:scale-95 shadow-lg"
+                        className="flex-1 py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded-xl transition-all text-xs font-black uppercase tracking-wider active:scale-95 shadow-lg shadow-cyan-500/20"
                       >
                         Conferma
                       </button>
@@ -2656,8 +2696,8 @@ export default function AdminDashboardPage() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
                 {/* Sidebar Civiltà */}
-                <div className="lg:col-span-3 bg-[#0a0e1c]/60 border border-[#D4AF37]/15 rounded-3xl p-6 space-y-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37]/35 to-transparent"></div>
+                <div className="lg:col-span-3 bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-6 space-y-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
                   <h3 className="text-xs font-black text-cyan-400 uppercase tracking-[0.25em] border-b border-white/5 pb-3">Lista Civiltà</h3>
                   {civsLoading ? (
                     <div className="flex flex-col items-center justify-center py-20">
@@ -2666,25 +2706,58 @@ export default function AdminDashboardPage() {
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-[550px] overflow-y-auto pr-2 custom-scrollbar">
-                      {civList.map((c) => (
-                        <button
-                          key={c.id}
-                          onClick={() => {
-                            setSelectedCiv(c);
-                            setSelectedBOIndex(null);
-                          }}
-                          className={`w-full text-left px-4 py-3 rounded-xl border text-sm font-bold transition-all hover:scale-[1.02] flex items-center gap-3 ${selectedCiv?.id === c.id ? 'bg-gradient-to-r from-blue-950/40 to-indigo-950/40 border-blue-500/80 text-white shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'bg-black/30 border-white/5 text-gray-400 hover:text-white hover:bg-white/5 hover:border-white/10'}`}
-                        >
-                          {c.flag && (
-                            <img src={c.flag} alt={c.name} className="w-6 h-6 object-contain rounded-md" />
-                          )}
-                          <span>{c.name}</span>
-                        </button>
-                      ))}
+                      {civList.map((c) => {
+                        const isSelected = selectedCiv?.id === c.id;
+                        return (
+                          <button
+                            key={c.id}
+                            onClick={() => {
+                              setSelectedCiv(c);
+                              setSelectedBOIndex(null);
+                            }}
+                            className={`w-full text-left h-16 rounded-xl border transition-all hover:scale-[1.02] relative overflow-hidden flex items-center px-4 group ${
+                              isSelected 
+                                ? 'border-cyan-500/80 shadow-[0_0_20px_rgba(6,182,212,0.2)]' 
+                                : 'border-white/5 hover:border-white/20'
+                            }`}
+                          >
+                            {/* Flag background */}
+                            {c.flag ? (
+                              <img 
+                                src={c.flag} 
+                                alt={c.name} 
+                                className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
+                                  isSelected ? 'opacity-25 scale-105' : 'opacity-15 group-hover:opacity-25'
+                                }`} 
+                              />
+                            ) : (
+                              <div className="absolute inset-0 bg-slate-900 opacity-20"></div>
+                            )}
+                            
+                            {/* Vignette Overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-[#0d1222] via-[#0d1222]/85 to-[#0d1222]/20 pointer-events-none"></div>
+                            
+                            {/* Active glow indicator on the left */}
+                            {isSelected && (
+                              <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)] z-10" />
+                            )}
+                            
+                            {/* Content */}
+                            <div className="relative z-10 flex flex-col justify-center">
+                              <span className="font-extrabold uppercase tracking-widest text-xs text-white/95 group-hover:text-cyan-300 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                                {c.name}
+                              </span>
+                              <span className="text-[8px] text-gray-400 font-bold uppercase tracking-wider mt-0.5 opacity-60">
+                                {c.build_orders?.length || 0} Build Orders
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
-
+ 
                 {/* Corpo Editor Civiltà & BO */}
                 <div className="lg:col-span-9 space-y-6">
                   {selectedCiv ? (
@@ -2707,10 +2780,10 @@ export default function AdminDashboardPage() {
                           {selectedBOIndex !== null && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"></span>}
                         </button>
                       </div>
-
+ 
                       {/* PANEL 1: Dettagli Civiltà */}
                       {selectedBOIndex === null ? (
-                        <div className="bg-[#0a0e1c]/60 border border-[#D4AF37]/15 rounded-3xl p-8 space-y-8 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                        <div className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-8 space-y-8 shadow-2xl backdrop-blur-md relative overflow-hidden">
                           <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/35 to-transparent"></div>
                           
                           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
@@ -2732,7 +2805,7 @@ export default function AdminDashboardPage() {
                               )}
                             </div>
                           </div>
-
+ 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                               <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Nome Civiltà</label>
@@ -2745,15 +2818,16 @@ export default function AdminDashboardPage() {
                             </div>
                             <div>
                               <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Difficoltà</label>
-                              <select
+                              <CustomSelect
                                 value={civForm.difficulty}
-                                onChange={(e) => setCivForm({ ...civForm, difficulty: e.target.value })}
-                                className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl px-4 py-3 text-sm text-white focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none font-bold [&>option]:bg-[#111218]"
-                              >
-                                <option value="Facile">Facile</option>
-                                <option value="Medio">Medio</option>
-                                <option value="Difficile">Difficile</option>
-                              </select>
+                                onChange={(val) => setCivForm({ ...civForm, difficulty: val })}
+                                options={[
+                                  { value: 'Facile', label: 'Facile' },
+                                  { value: 'Medio', label: 'Medio' },
+                                  { value: 'Difficile', label: 'Difficile' }
+                                ]}
+                                buttonClassName="bg-[#111218] border-2 border-white/10 hover:border-cyan-500/40 rounded-2xl px-4 py-3 h-12 text-sm text-white transition-all outline-none font-bold"
+                              />
                             </div>
                           </div>
 
@@ -2843,7 +2917,7 @@ export default function AdminDashboardPage() {
                           {selectedBOIndex === -1 || selectedBOIndex > -1 ? (
                             
                             /* INLINE BO EDITOR FORM */
-                            <div className="bg-[#0a0e1c]/60 border border-[#D4AF37]/15 rounded-3xl p-8 space-y-8 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                            <div className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-8 space-y-8 shadow-2xl backdrop-blur-md relative overflow-hidden">
                               <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
                               
                               <div className="flex items-center justify-between border-b border-white/5 pb-4">
@@ -2876,15 +2950,16 @@ export default function AdminDashboardPage() {
                                 </div>
                                 <div>
                                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Difficoltà</label>
-                                  <select
+                                  <CustomSelect
                                     value={boForm.difficulty}
-                                    onChange={(e) => setBoForm({ ...boForm, difficulty: Number(e.target.value) })}
-                                    className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none font-bold [&>option]:bg-[#111218]"
-                                  >
-                                    <option value={1}>Facile</option>
-                                    <option value={2}>Medio</option>
-                                    <option value={3}>Difficile</option>
-                                  </select>
+                                    onChange={(val) => setBoForm({ ...boForm, difficulty: Number(val) })}
+                                    options={[
+                                      { value: 1, label: 'Facile' },
+                                      { value: 2, label: 'Medio' },
+                                      { value: 3, label: 'Difficile' }
+                                    ]}
+                                    buttonClassName="bg-[#111218] border-2 border-white/10 hover:border-cyan-500/40 rounded-2xl px-4 py-3 h-12 text-xs text-white transition-all outline-none font-bold"
+                                  />
                                 </div>
                               </div>
 
@@ -3133,7 +3208,7 @@ export default function AdminDashboardPage() {
 
         {/* Footer Fisso per Invio Mail */}
         {isSuperAdmin && (pendingNotifCount > 0 || sendNotifSuccess) && (
-          <div className="p-6 border-t border-[#D4AF37]/20 bg-gradient-to-r from-[#0d1424] to-[#1a1c32] flex justify-center sticky bottom-0 z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+          <div className="p-6 border-t border-cyan-500/15 bg-gradient-to-r from-[#0d1424] to-[#1a1c32] flex justify-center sticky bottom-0 z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
             <button
               onClick={handleSendNotifications}
               disabled={isSendingEmail || sendNotifSuccess}
