@@ -703,7 +703,7 @@ export default function AdminDashboardPage() {
       const updatedCiv = { ...selectedCiv, build_orders: currentBOs };
       setSelectedCiv(updatedCiv);
       setCivList(prev => prev.map(c => c.id === selectedCiv.id ? updatedCiv : c));
-      setSelectedBOIndex(null);
+      setSelectedBOIndex(-2);
       refreshCivs();
 
       if (selectedBOIndex === -1) {
@@ -4216,7 +4216,7 @@ export default function AdminDashboardPage() {
                           {selectedBOIndex === null && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"></span>}
                         </button>
                         <button
-                          onClick={() => handleEditBO(-1)}
+                          onClick={() => setSelectedBOIndex(-2)}
                           className={`pb-3 text-sm font-black uppercase tracking-wider relative transition-colors ${selectedBOIndex !== null ? 'text-blue-400 font-black' : 'text-gray-400 hover:text-white'}`}
                         >
                           Build Orders ({selectedCiv.build_orders?.length || 0})
@@ -4473,7 +4473,7 @@ export default function AdminDashboardPage() {
                                   </p>
                                 </div>
                                 <button
-                                  onClick={() => setSelectedBOIndex(null)}
+                                  onClick={() => setSelectedBOIndex(-2)}
                                   className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border-2 border-white/10 hover:border-white/20 rounded-xl text-xs font-black uppercase tracking-wider text-gray-400 hover:text-white transition-all"
                                 >
                                   Chiudi Editor
@@ -4617,15 +4617,6 @@ export default function AdminDashboardPage() {
                                 <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                                   {(boForm.steps || []).map((step: any, idx: number) => (
                                     <div key={idx} className="bg-black/30 border-2 border-white/5 p-4 rounded-2xl flex flex-col md:flex-row gap-3 relative animate-in fade-in duration-300">
-                                      <button
-                                        onClick={() => {
-                                          const newSteps = boForm.steps.filter((_: any, i: number) => i !== idx);
-                                          setBoForm({ ...boForm, steps: newSteps });
-                                        }}
-                                        className="absolute -top-2 -right-2 p-1.5 bg-red-600 hover:bg-red-500 text-white rounded-full text-xs shadow-lg transition-transform hover:scale-110"
-                                      >
-                                        <X size={12} />
-                                      </button>
                                       <input
                                         type="text"
                                         value={step.time}
@@ -4659,6 +4650,16 @@ export default function AdminDashboardPage() {
                                         className="flex-1 bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-xl px-4 py-2 text-xs text-gray-400 italic outline-none"
                                         placeholder="Nota/Dettaglio..."
                                       />
+                                      <button
+                                        onClick={() => {
+                                          const newSteps = boForm.steps.filter((_: any, i: number) => i !== idx);
+                                          setBoForm({ ...boForm, steps: newSteps });
+                                        }}
+                                        className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-full transition-all shrink-0 md:self-center self-end"
+                                        title="Elimina passo"
+                                      >
+                                        <X size={14} />
+                                      </button>
                                     </div>
                                   ))}
                                 </div>
@@ -4666,7 +4667,7 @@ export default function AdminDashboardPage() {
 
                               <div className="flex justify-end gap-3 pt-6 border-t border-white/5">
                                 <button
-                                  onClick={() => setSelectedBOIndex(null)}
+                                  onClick={() => setSelectedBOIndex(-2)}
                                   className="px-5 py-3 border-2 border-white/10 text-gray-400 hover:text-white rounded-xl transition-all text-xs font-black uppercase tracking-wider active:scale-95"
                                 >
                                   Annulla
