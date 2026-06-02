@@ -290,12 +290,23 @@ function App() {
       onTouchEnd={handleTouchEnd}
     >
       {activeNotification && (
-        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-black/65 backdrop-blur-md animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-black/45 backdrop-blur-[2px] animate-in fade-in duration-300">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.08),transparent_70%)] pointer-events-none"></div>
 
           <div className="bg-gradient-to-b from-[#0a0e1c] to-[#04060f] border border-cyan-500/30 p-8 rounded-3xl max-w-lg w-full shadow-[0_0_50px_rgba(6,182,212,0.15)] animate-in zoom-in-95 duration-300 relative overflow-hidden flex flex-col items-center text-center">
             <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
             
+            <button 
+              onClick={() => {
+                localStorage.setItem(`dismissed_notif_popup_${activeNotification.id}`, 'true');
+                setActiveNotification(null);
+              }}
+              className="absolute top-4 right-4 p-1 hover:bg-white/10 text-gray-400 hover:text-white rounded-lg transition-colors cursor-pointer z-10"
+              title="Chiudi"
+            >
+              <X size={16} />
+            </button>
+
             <div className="w-16 h-16 bg-cyan-500/10 border border-cyan-500/25 rounded-2xl flex items-center justify-center text-cyan-400 mb-5 shadow-[0_0_20px_rgba(6,182,212,0.1)] shrink-0">
               <Megaphone size={28} className="animate-pulse" />
             </div>
@@ -308,7 +319,7 @@ function App() {
               {activeNotification.title}
             </h3>
 
-            <div className="w-full text-sm text-gray-300 leading-relaxed font-medium bg-black/40 border border-white/5 p-5 rounded-2xl mb-6 text-left max-h-60 overflow-y-auto elegant-scrollbar">
+            <div className="w-full text-sm text-gray-300 leading-relaxed font-medium bg-black/40 border border-white/5 p-5 rounded-2xl mb-6 text-center max-h-60 overflow-y-auto elegant-scrollbar">
               {renderTextWithLinks(activeNotification.body)}
             </div>
 
