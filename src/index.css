@@ -43,6 +43,11 @@ input, textarea, [contenteditable="true"], .select-text {
   cursor: text !important;
 }
 
+/* Force form controls and buttons to inherit the global font family */
+input, textarea, select, button {
+  font-family: inherit;
+}
+
 /* Ensure headings/paragraphs inside buttons or interactive elements keep the pointer cursor */
 button *, a *, [role="button"] *, .cursor-pointer * {
   cursor: inherit;
