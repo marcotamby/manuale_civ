@@ -15,6 +15,7 @@ import { useAuth } from './components/AuthContext';
 import { LoginModal } from './components/LoginModal';
 import { ProfileModal } from './components/ProfileModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
+import AdminDashboardPage from './components/AdminDashboardPage';
 import { AdminCivEditorModal } from './components/AdminCivEditorModal';
 import { AdminOverlayModal } from './components/AdminOverlayModal';
 import { PrivacyPage } from './components/PrivacyPage';
@@ -49,6 +50,7 @@ function App() {
   const isClassifica = location.pathname === '/classifica';
 
   const currentPage = isHome ? 'home' : isCompare ? 'compare' : isCiv ? 'civ' : isFaq ? 'faq' : isPrivacy ? 'privacy' : isTournamentsSection ? 'tornei' : isClassifica ? 'classifica' : 'home';
+  const isAdminDashboard = location.pathname.startsWith('/admin') && !location.pathname.startsWith('/admin/overlays');
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false);
@@ -205,6 +207,24 @@ function App() {
   }
 
   const currentTab = location.pathname.startsWith('/civ/') ? location.pathname.split('/')[3] : undefined;
+
+  if (isAdminDashboard) {
+    return (
+      <div className="h-screen w-screen bg-[#070a13] text-white overflow-hidden selection:bg-yellow-500/30">
+        <Routes>
+          <Route path="/admin" element={<AdminDashboardPage />} />
+        </Routes>
+        <Toaster position="bottom-right" toastOptions={{
+          style: {
+            background: '#1a1c23',
+            color: '#fff',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '16px',
+          },
+        }} />
+      </div>
+    );
+  }
 
   return (
     <div
