@@ -54,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loginModalMessage, setLoginModalMessage] = useState<string | null>(null);
 
   const SUPER_ADMIN_EMAILS = ['marco.tamborrino.94@gmail.com'];
-  const EDITOR_EMAILS = ['alessio.bella97@gmail.com', 'contattodisparta@gmail.com'];
+  const EDITOR_EMAILS = ['contattodisparta@gmail.com'];
   const STREAMER_EMAILS = ['cani.vincenzo@gmail.com', 'dadduedo@gmail.com', 'djalfredoneservice@gmail.com', 'contattodisparta@gmail.com'];
 
   const checkRoles = (userData: any) => {
