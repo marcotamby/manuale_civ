@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Home as HomeIcon, X } from 'lucide-react';
+import { Home as HomeIcon, X, Megaphone } from 'lucide-react';
 import { supabase } from './lib/supabaseClient';
 import { Sidebar } from './components/Sidebar';
 import { Topbar } from './components/Topbar';
@@ -105,11 +105,13 @@ function App() {
   // Active banner announcement states
   const [activeBanner, setActiveBanner] = useState<{ id: string; title: string; body: string } | null>(null);
   const [isBannerDismissed, setIsBannerDismissed] = useState(false);
+  const [activeNotification, setActiveNotification] = useState<{ id: string; title: string; body: string } | null>(null);
 
   useEffect(() => {
-    async function fetchActiveBanner() {
+    async function fetchAnnouncements() {
       try {
-        const { data, error } = await supabase
+        // 1. Fetch active banner
+        const { data: bannerData, error: bannerError } = await supabase
           .from('announcements')
           .select('id, title, body, is_active, type')
           .eq('is_active', true)
@@ -118,17 +120,34 @@ function App() {
           .limit(1)
           .maybeSingle();
 
-        if (!error && data) {
-          const dismissed = localStorage.getItem(`dismissed_announcement_${data.id}`);
+        if (!bannerError && bannerData) {
+          const dismissed = localStorage.getItem(`dismissed_announcement_${bannerData.id}`);
           if (!dismissed) {
-            setActiveBanner(data);
+            setActiveBanner(bannerData);
+          }
+        }
+
+        // 2. Fetch active popup notification
+        const { data: notifData, error: notifError } = await supabase
+          .from('announcements')
+          .select('id, title, body, is_active, type')
+          .eq('is_active', true)
+          .or('type.eq.notification,type.eq.both')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (!notifError && notifData) {
+          const dismissed = localStorage.getItem(`dismissed_notif_popup_${notifData.id}`);
+          if (!dismissed) {
+            setActiveNotification(notifData);
           }
         }
       } catch (err) {
-        console.error('Error fetching active banner:', err);
+        console.error('Error fetching active announcements:', err);
       }
     }
-    fetchActiveBanner();
+    fetchAnnouncements();
   }, []);
 
   const handleDismissBanner = () => {
@@ -270,6 +289,42 @@ function App() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
+      {activeNotification && (
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-black/75 backdrop-blur-xl animate-in fade-in duration-300">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.08),transparent_70%)] pointer-events-none"></div>
+
+          <div className="bg-gradient-to-b from-[#0a0e1c] to-[#04060f] border border-cyan-500/30 p-8 rounded-3xl max-w-lg w-full shadow-[0_0_50px_rgba(6,182,212,0.15)] animate-in zoom-in-95 duration-300 relative overflow-hidden flex flex-col items-center text-center">
+            <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
+            
+            <div className="w-16 h-16 bg-cyan-500/10 border border-cyan-500/25 rounded-2xl flex items-center justify-center text-cyan-400 mb-5 shadow-[0_0_20px_rgba(6,182,212,0.1)] shrink-0">
+              <Megaphone size={28} className="animate-pulse" />
+            </div>
+
+            <span className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.25em] mb-2 bg-cyan-500/5 px-3 py-1 rounded-full border border-cyan-500/15 shrink-0">
+              Comunicazione Ufficiale
+            </span>
+
+            <h3 className="text-xl md:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-300 mb-4 tracking-wide leading-tight shrink-0 uppercase">
+              {activeNotification.title}
+            </h3>
+
+            <div className="w-full text-sm text-gray-300 leading-relaxed font-medium bg-black/40 border border-white/5 p-5 rounded-2xl mb-6 text-left max-h-60 overflow-y-auto elegant-scrollbar">
+              {renderTextWithLinks(activeNotification.body)}
+            </div>
+
+            <button
+              onClick={() => {
+                localStorage.setItem(`dismissed_notif_popup_${activeNotification.id}`, 'true');
+                setActiveNotification(null);
+              }}
+              className="w-full py-3.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-cyan-600/15 active:scale-[0.98] transition-all cursor-pointer shrink-0"
+            >
+              Ho Capito
+            </button>
+          </div>
+        </div>
+      )}
+
       {activeBanner && !isBannerDismissed && (
         <div className="bg-gradient-to-r from-cyan-950/90 to-blue-950/90 border-b border-cyan-500/30 text-white px-4 py-2.5 flex items-center justify-between relative z-50 text-xs md:text-sm font-bold shadow-lg shadow-cyan-950/40 backdrop-blur-md shrink-0">
           <div className="flex items-center gap-2 mx-auto">
