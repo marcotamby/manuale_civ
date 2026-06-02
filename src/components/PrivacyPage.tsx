@@ -192,10 +192,16 @@ export function PrivacyPage() {
             dangerouslySetInnerHTML={{ __html: content }} 
           />
 
-          <section className="pt-8 border-t border-blue-500/20 mt-8">
-            <p className="text-xs text-gray-500 italic">
+          <section className="pt-8 border-t border-blue-500/20 mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <p className="text-xs text-gray-500 italic flex-1">
               Ultimo aggiornamento effettuato. ManualeCiv è un progetto amatoriale dedicato alla community di Age of Empires IV.
             </p>
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('open-cookie-settings'))}
+              className="text-xs font-bold uppercase tracking-wider text-blue-400 hover:text-cyan-300 transition-colors bg-blue-500/5 hover:bg-blue-500/10 px-4 py-2 rounded-lg border border-blue-500/20 shrink-0 cursor-pointer self-start sm:self-auto"
+            >
+              Gestisci Cookie
+            </button>
           </section>
         </div>
       </div>

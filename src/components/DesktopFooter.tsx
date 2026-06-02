@@ -62,6 +62,13 @@ export function DesktopFooter() {
         <a href="/privacy" className="hover:text-white transition-colors flex items-center gap-1">
           Privacy <ExternalLink size={14} />
         </a>
+        <div className="w-1 h-1 rounded-full bg-white/20 shrink-0" />
+        <button 
+          onClick={() => window.dispatchEvent(new CustomEvent('open-cookie-settings'))}
+          className="hover:text-white transition-colors cursor-pointer bg-transparent border-none p-0 outline-none"
+        >
+          Gestisci Cookie
+        </button>
       </div>
     </footer>
   );

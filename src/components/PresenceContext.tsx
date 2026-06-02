@@ -37,6 +37,19 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
   const [onlineUserCount, setOnlineUserCount] = useState(0);
   const [usersByPage, setUsersByPage] = useState<Record<string, number>>({});
   const [activity, setActivity] = useState<any>({ type: 'idle' });
+  const [consentStatus, setConsentStatus] = useState<string | null>(
+    () => localStorage.getItem('cookieConsent')
+  );
+
+  useEffect(() => {
+    const handleConsentChange = () => {
+      setConsentStatus(localStorage.getItem('cookieConsent'));
+    };
+    window.addEventListener('cookie-consent-changed', handleConsentChange);
+    return () => {
+      window.removeEventListener('cookie-consent-changed', handleConsentChange);
+    };
+  }, []);
 
   const staffChannelRef = useRef<any>(null);
   const globalChannelRef = useRef<any>(null);
@@ -99,8 +112,7 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let timeoutId: any;
 
-    const consent = localStorage.getItem('cookieConsent');
-    if (consent === 'declined') {
+    if (consentStatus === 'declined') {
       if (globalChannelRef.current) {
         globalChannelRef.current.unsubscribe();
         globalChannelRef.current = null;
@@ -177,7 +189,7 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
       clearTimeout(timeoutId);
       // We don't unsubscribe on activity change anymore
     };
-  }, [user?.email]);
+  }, [user?.email, consentStatus]);
 
   // 3. Cleanup everything on unmount
   useEffect(() => {
