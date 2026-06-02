@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, 
   AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, 
   Trophy, BookOpen, Zap, Edit2, Check, Trash2, Plus, Minus, ArrowLeft, LayoutDashboard,
   Save, Sparkles, ChevronDown, Users, Youtube, Menu, History, Database, Activity, Download,
-  Megaphone, TrendingUp, Coins, Lock, Unlock, ChevronRight
+  Megaphone, TrendingUp, Coins, Lock, Unlock, ChevronRight, Link2
 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
@@ -35,6 +35,11 @@ export default function AdminDashboardPage() {
   const navigate = useNavigate();
   const { isAuthenticated, isAdmin, isSuperAdmin, canManageCivs, canManageBuildorders, canManageTournaments, user } = useAuth();
   const { refreshCivs } = useCivData();
+
+  const bodyTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+  const [linkModalText, setLinkModalText] = useState('');
+  const [linkModalUrl, setLinkModalUrl] = useState('');
 
   // Redirect if not admin
   useEffect(() => {
@@ -1201,6 +1206,52 @@ export default function AdminDashboardPage() {
     } finally {
       setAnnouncementsLoading(false);
     }
+  };
+
+  const handleOpenLinkModal = () => {
+    if (bodyTextareaRef.current) {
+      const start = bodyTextareaRef.current.selectionStart;
+      const end = bodyTextareaRef.current.selectionEnd;
+      const selected = annForm.body.substring(start, end);
+      setLinkModalText(selected);
+    } else {
+      setLinkModalText('');
+    }
+    setLinkModalUrl('');
+    setIsLinkModalOpen(true);
+  };
+
+  const handleInsertLink = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!linkModalUrl.trim()) return;
+
+    const textToInsert = linkModalText.trim() || linkModalUrl.trim();
+    const formattedLink = `[${textToInsert}](${linkModalUrl.trim()})`;
+
+    let newBody = annForm.body;
+    let newCursorPos = annForm.body.length;
+
+    if (bodyTextareaRef.current) {
+      const start = bodyTextareaRef.current.selectionStart;
+      const end = bodyTextareaRef.current.selectionEnd;
+      const before = annForm.body.substring(0, start);
+      const after = annForm.body.substring(end);
+      newBody = before + formattedLink + after;
+      newCursorPos = start + formattedLink.length;
+    } else {
+      newBody = annForm.body + (annForm.body ? ' ' : '') + formattedLink;
+    }
+
+    setAnnForm({ ...annForm, body: newBody });
+    setIsLinkModalOpen(false);
+
+    // Refocus the textarea and position the cursor after the inserted link
+    setTimeout(() => {
+      if (bodyTextareaRef.current) {
+        bodyTextareaRef.current.focus();
+        bodyTextareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
+      }
+    }, 50);
   };
 
   const handleCreateAnnouncement = async (e: React.FormEvent) => {
@@ -5152,8 +5203,20 @@ export default function AdminDashboardPage() {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Corpo / Messaggio</label>
+                        <div className="flex justify-between items-center">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Corpo / Messaggio</label>
+                          <button
+                            type="button"
+                            onClick={handleOpenLinkModal}
+                            className="flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 hover:border-cyan-500/50 hover:bg-cyan-500/10 text-[10px] font-black uppercase tracking-wider text-cyan-400 rounded-lg transition-all active:scale-95 cursor-pointer shadow-lg shadow-cyan-950/20"
+                            title="Inserisci un link testuale nel messaggio"
+                          >
+                            <Link2 size={12} />
+                            <span>Aggiungi Link</span>
+                          </button>
+                        </div>
                         <textarea
+                          ref={bodyTextareaRef}
                           required
                           rows={4}
                           placeholder="Inserisci il testo dettagliato dell'annuncio o del banner..."
@@ -5565,6 +5628,66 @@ export default function AdminDashboardPage() {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Modale Assistente Link Annuncio */}
+      {isLinkModalOpen && (
+        <div className="fixed inset-0 z-[2000] bg-black/80 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-200">
+          <div className="bg-[#0a0e1c] border border-cyan-500/30 p-6 rounded-2xl max-w-md w-full shadow-2xl animate-in zoom-in duration-300 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
+            
+            <h3 className="text-sm font-black text-cyan-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+              <Link2 size={16} /> Assistente Inserimento Link
+            </h3>
+            
+            <form onSubmit={handleInsertLink} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Testo da mostrare</label>
+                <input
+                  type="text"
+                  placeholder="Es. Clicca qui, Regolamento..."
+                  value={linkModalText}
+                  onChange={(e) => setLinkModalText(e.target.value)}
+                  className="w-full bg-[#111218] border border-white/10 focus:border-cyan-500/50 rounded-xl px-4 py-2.5 text-xs text-white font-bold outline-none"
+                  autoFocus
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">URL / Destinazione</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Es. /tornei (interno) o google.com (esterno)"
+                  value={linkModalUrl}
+                  onChange={(e) => setLinkModalUrl(e.target.value)}
+                  className="w-full bg-[#111218] border border-white/10 focus:border-cyan-500/50 rounded-xl px-4 py-2.5 text-xs text-white font-medium outline-none"
+                />
+              </div>
+
+              <div className="p-3 bg-cyan-950/20 border border-cyan-500/10 rounded-xl text-[10px] text-gray-400 leading-relaxed font-semibold">
+                💡 <span className="text-cyan-400">Suggerimento:</span> Se inserisci un link interno (es. <code className="text-white">/tornei</code> o <code className="text-white">/classifica</code>), la navigazione avverrà nella stessa scheda del browser. Altrimenti aprirà una nuova scheda.
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsLinkModalOpen(false)}
+                  className="flex-1 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white rounded-xl transition-all text-xs font-bold uppercase"
+                >
+                  Annulla
+                </button>
+                <button
+                  type="submit"
+                  disabled={!linkModalUrl.trim()}
+                  className="flex-1 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl transition-all text-xs font-black uppercase shadow-lg shadow-cyan-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Inserisci Link
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
