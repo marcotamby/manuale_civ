@@ -5757,7 +5757,7 @@ export default function AdminDashboardPage() {
                     <div className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-md shadow-2xl">
                       <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
                       <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Pecore Wagered</span>
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Pecore Puntate</span>
                         <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
                           <Coins size={16} />
                         </div>
