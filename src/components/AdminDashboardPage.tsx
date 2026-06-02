@@ -58,6 +58,7 @@ export default function AdminDashboardPage() {
   const [pingStatus, setPingStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [isGeneratingBackup, setIsGeneratingBackup] = useState(false);
   const [webhookTesting, setWebhookTesting] = useState(false);
+  const [pendingQueueCount, setPendingQueueCount] = useState<number | null>(null);
   
   const selectTab = (tab: typeof activeTab) => {
     setSearchParams({ tab });
@@ -963,6 +964,14 @@ export default function AdminDashboardPage() {
         ...counts,
         total_sheep: totalSheep
       });
+
+      // Count pending items directly for the "In Coda" box (independent of local state)
+      const [{ count: pendingSugg }, { count: pendingQ }, { count: pendingA }] = await Promise.all([
+        supabase.from('suggestions').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+        supabase.from('questions').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+        supabase.from('answers').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+      ]);
+      setPendingQueueCount((pendingSugg || 0) + (pendingQ || 0) + (pendingA || 0));
     } catch (err: any) {
       console.error('Error fetching diagnostics:', err);
     } finally {
@@ -3839,7 +3848,7 @@ export default function AdminDashboardPage() {
                   <div>
                     <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block">Proposte / Q&A In Coda</span>
                     <span className="text-xl font-black text-white block mt-0.5">
-                      {metricsLoading ? '...' : (dbMetrics.suggestions || 0) + (dbMetrics.questions || 0) + (dbMetrics.answers || 0)}
+                      {metricsLoading || pendingQueueCount === null ? '...' : pendingQueueCount}
                     </span>
                     <span className="text-[9px] text-red-400 font-black uppercase tracking-wider block mt-1 animate-pulse">Da revisionare</span>
                   </div>
@@ -3923,7 +3932,7 @@ export default function AdminDashboardPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {[
                         { name: 'civilizations', label: 'Civiltà Registrate 🏛️' },
-                        { name: 'suggestions', label: 'Suggerimenti Pendenti 💡' },
+                        { name: 'suggestions', label: 'Suggerimenti Totali 💡' },
                         { name: 'tournaments', label: 'Tornei Totali 🏆' },
                         { name: 'betting_markets', label: 'Mercati Scommesse 🎲' },
                         { name: 'user_bets', label: 'Scommesse Totali 💸' },
