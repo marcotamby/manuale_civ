@@ -2192,52 +2192,11 @@ export default function AdminDashboardPage() {
           {/* TAB PANELS */}
           {activeTab === 'overview' && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div 
-                  onClick={() => selectTab('proposte')}
-                  className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 hover:border-blue-500/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:scale-[1.02] transition-all cursor-pointer group relative overflow-hidden backdrop-blur-md"
-                >
-                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent"></div>
-                  <div className="w-12 h-12 rounded-2xl bg-blue-600/10 border-2 border-blue-500/20 flex items-center justify-center text-blue-400 mb-4 group-hover:scale-110 transition-transform">
-                    <Inbox size={24} />
-                  </div>
-                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Proposte Pendenti</h3>
-                  <p className="text-3xl font-black mt-2 text-white tracking-tight">{suggestions.length}</p>
-                </div>
-                
-                <div 
-                  onClick={() => selectTab('qa')}
-                  className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] hover:scale-[1.02] transition-all cursor-pointer group relative overflow-hidden backdrop-blur-md"
-                >
-                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
-                  <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border-2 border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-4 group-hover:scale-110 transition-transform">
-                    <MessageSquare size={24} />
-                  </div>
-                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Contributi Q&A Pendenti</h3>
-                  <p className="text-3xl font-black mt-2 text-white tracking-tight">{questions.length + answers.length}</p>
-                </div>
-                
-                <div 
-                  onClick={() => selectTab('pecore')}
-                  className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] hover:scale-[1.02] transition-all cursor-pointer group relative overflow-hidden backdrop-blur-md"
-                >
-                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
-                  <div className="w-12 h-12 rounded-2xl bg-cyan-600/10 border-2 border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-4 group-hover:scale-110 transition-transform">
-                    <span className="text-2xl">🐑</span>
-                  </div>
-                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Utenti Registrati</h3>
-                  <p className="text-3xl font-black mt-2 text-white tracking-tight">{allProfiles.length}</p>
-                </div>
-              </div>
- 
               <div className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-8 flex flex-col md:flex-row items-center gap-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
                 <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border-2 border-cyan-500/20 flex items-center justify-center text-cyan-400 text-3xl shadow-lg shrink-0">🔑</div>
                 <div>
                   <h3 className="text-lg font-black text-white uppercase tracking-tight">Benvenuto nel Pannello Admin, {useAuth().user?.nickname || 'Admin'}</h3>
-                  <p className="text-xs text-gray-400 mt-2 max-w-xl leading-relaxed">
-                    Da qui puoi moderare il sito con un solo clic. Tutte le modifiche fatte alle proposte o al Q&A saranno sincronizzate immediatamente in tempo reale sul database.
-                  </p>
                 </div>
               </div>
             </div>
@@ -3096,14 +3055,20 @@ export default function AdminDashboardPage() {
 
                           <div className="border-2 border-white/5 bg-black/20 p-6 rounded-3xl space-y-4">
                             <div className="flex items-center gap-3">
-                              <input
-                                type="checkbox"
+                              <button
+                                type="button"
                                 id="has_regolamento"
-                                checked={tournamentForm.has_regolamento}
-                                onChange={(e) => setTournamentForm({ ...tournamentForm, has_regolamento: e.target.checked })}
-                                className="w-5 h-5 rounded-lg bg-black/40 border-2 border-white/20 text-blue-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
-                              />
-                              <label htmlFor="has_regolamento" className="text-xs font-black uppercase tracking-wider text-white select-none cursor-pointer">Abilita Regolamento Dedicato</label>
+                                onClick={() => setTournamentForm({ ...tournamentForm, has_regolamento: !tournamentForm.has_regolamento })}
+                                className={`w-9 h-5 rounded-full relative transition-all flex-shrink-0 outline-none cursor-pointer ${tournamentForm.has_regolamento ? 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)]' : 'bg-white/10'}`}
+                              >
+                                <div className={`absolute top-[2px] w-4 h-4 bg-white rounded-full transition-all ${tournamentForm.has_regolamento ? 'left-[18px]' : 'left-[2px]'}`} />
+                              </button>
+                              <span 
+                                onClick={() => setTournamentForm({ ...tournamentForm, has_regolamento: !tournamentForm.has_regolamento })} 
+                                className="text-xs font-black uppercase tracking-wider text-white select-none cursor-pointer"
+                              >
+                                Abilita Regolamento Dedicato
+                              </span>
                             </div>
                             {tournamentForm.has_regolamento && (
                               <div className="animate-in fade-in slide-in-from-top-2 duration-300">
@@ -4478,33 +4443,37 @@ export default function AdminDashboardPage() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
-                      <select
+                      <CustomSelect
                         value={crmRoleFilter}
-                        onChange={(e) => handleCrmRoleFilterChange(e.target.value)}
-                        className="bg-[#111218] border-2 border-white/10 rounded-2xl px-4 py-2.5 text-xs text-white outline-none focus:border-cyan-500/50 font-bold"
-                      >
-                        <option value="all">Tutti i Ruoli</option>
-                        <option value="admin">Admin</option>
-                        <option value="editor">Editor</option>
-                        <option value="staff">Staff</option>
-                        <option value="user">Utenti standard</option>
-                        <option value="banned">Bloccati 🚫</option>
-                      </select>
+                        onChange={handleCrmRoleFilterChange}
+                        options={[
+                          { value: 'all', label: 'Tutti i Ruoli' },
+                          { value: 'admin', label: 'Admin' },
+                          { value: 'editor', label: 'Editor' },
+                          { value: 'staff', label: 'Staff' },
+                          { value: 'user', label: 'Utenti standard' },
+                          { value: 'banned', label: 'Bloccati 🚫' },
+                        ]}
+                        className="min-w-[130px] flex-initial"
+                        buttonClassName="h-10 border-white/10 hover:border-cyan-500/50 rounded-2xl text-xs py-2 bg-[#111218] font-bold"
+                      />
 
-                      <select
+                      <CustomSelect
                         value={crmSortField}
-                        onChange={(e) => { setCrmSortField(e.target.value); setCrmPage(1); }}
-                        className="bg-[#111218] border-2 border-white/10 rounded-2xl px-4 py-2.5 text-xs text-white outline-none focus:border-cyan-500/50 font-bold"
-                      >
-                        <option value="created_at">Data Registrazione</option>
-                        <option value="sheep_balance">Saldo Pecore</option>
-                        <option value="nickname">Nickname</option>
-                        <option value="email">Email</option>
-                      </select>
+                        onChange={(val) => { setCrmSortField(val); setCrmPage(1); }}
+                        options={[
+                          { value: 'created_at', label: 'Data Registrazione' },
+                          { value: 'sheep_balance', label: 'Saldo Pecore' },
+                          { value: 'nickname', label: 'Nickname' },
+                          { value: 'email', label: 'Email' },
+                        ]}
+                        className="min-w-[160px] flex-initial"
+                        buttonClassName="h-10 border-white/10 hover:border-cyan-500/50 rounded-2xl text-xs py-2 bg-[#111218] font-bold"
+                      />
 
                       <button
                         onClick={() => setCrmSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
-                        className="p-2.5 bg-[#111218] border-2 border-white/10 hover:border-cyan-500/30 rounded-2xl text-cyan-400 font-bold transition-all text-xs active:scale-95"
+                        className="p-2.5 bg-[#111218] border border-white/10 hover:border-cyan-500/30 rounded-2xl text-cyan-400 font-bold transition-all text-xs active:scale-95 h-10 flex items-center justify-center"
                       >
                         {crmSortOrder === 'asc' ? '↑ ASC' : '↓ DESC'}
                       </button>
@@ -4526,12 +4495,12 @@ export default function AdminDashboardPage() {
                       <div className="overflow-x-auto elegant-scrollbar">
                         <table className="w-full text-left border-collapse">
                           <thead>
-                            <tr className="border-b border-white/5 text-[10px] font-black uppercase text-gray-500 tracking-wider">
-                              <th className="py-3 px-4">Utente</th>
-                              <th className="py-3 px-4">Ruolo</th>
-                              <th className="py-3 px-4 text-center">🐑 Pecore</th>
-                              <th className="py-3 px-4">Creato il</th>
-                              <th className="py-3 px-4 text-right">Azioni</th>
+                            <tr className="border-b border-white/5 text-[11px] font-black uppercase text-gray-500 tracking-wider">
+                              <th className="py-3.5 px-4">Utente</th>
+                              <th className="py-3.5 px-4">Ruolo</th>
+                              <th className="py-3.5 px-4 text-center">🐑 Pecore</th>
+                              <th className="py-3.5 px-4">Creato il</th>
+                              <th className="py-3.5 px-4 text-right">Azioni</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-white/5">
@@ -4543,9 +4512,9 @@ export default function AdminDashboardPage() {
                                   onClick={() => handleSelectCrmUser(u)}
                                   className={`group cursor-pointer transition-colors ${isSelected ? 'bg-cyan-500/5' : 'hover:bg-white/[0.02]'}`}
                                 >
-                                  <td className="py-3 px-4">
+                                  <td className="py-3.5 px-4">
                                     <div className="flex items-center gap-3">
-                                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center border text-xs font-bold shrink-0 overflow-hidden shadow ${u.role === 'admin' ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : u.role === 'banned' ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
+                                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center border text-sm font-bold shrink-0 overflow-hidden shadow ${u.role === 'admin' ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : u.role === 'banned' ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
                                         {u.avatar_url ? (
                                           <img src={u.avatar_url} alt="" className="w-full h-full object-cover" />
                                         ) : (
@@ -4553,27 +4522,27 @@ export default function AdminDashboardPage() {
                                         )}
                                       </div>
                                       <div className="flex flex-col min-w-0">
-                                        <span className="text-xs font-bold text-white truncate max-w-[150px]">{u.nickname || 'Nessun nickname'}</span>
-                                        <span className="text-[10px] text-gray-500 truncate max-w-[150px]">{u.email}</span>
+                                        <span className="text-sm font-bold text-white truncate max-w-[150px]">{u.nickname || 'Nessun nickname'}</span>
+                                        <span className="text-xs text-gray-400 truncate max-w-[150px]">{u.email}</span>
                                       </div>
                                     </div>
                                   </td>
-                                  <td className="py-3 px-4">
+                                  <td className="py-3.5 px-4">
                                     <div className="flex items-center gap-1.5 flex-wrap">
-                                      {u.role === 'admin' && <span className="text-[8px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-md font-black uppercase tracking-wider">Owner</span>}
-                                      {u.role === 'editor' && <span className="text-[8px] px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-md font-black uppercase tracking-wider">Editor</span>}
-                                      {u.role === 'staff' && <span className="text-[8px] px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-md font-black uppercase tracking-wider">Staff</span>}
-                                      {u.role === 'banned' && <span className="text-[8px] px-2 py-0.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded-md font-black uppercase tracking-wider">Bannato</span>}
-                                      {(!u.role || u.role === 'user') && <span className="text-[8px] px-2 py-0.5 bg-white/5 text-gray-400 border border-white/10 rounded-md font-black uppercase tracking-wider">User</span>}
+                                      {u.role === 'admin' && <span className="text-[9px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-md font-black uppercase tracking-wider">Owner</span>}
+                                      {u.role === 'editor' && <span className="text-[9px] px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-md font-black uppercase tracking-wider">Editor</span>}
+                                      {u.role === 'staff' && <span className="text-[9px] px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-md font-black uppercase tracking-wider">Staff</span>}
+                                      {u.role === 'banned' && <span className="text-[9px] px-2 py-0.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded-md font-black uppercase tracking-wider">Bannato</span>}
+                                      {(!u.role || u.role === 'user') && <span className="text-[9px] px-2 py-0.5 bg-white/5 text-gray-400 border border-white/10 rounded-md font-black uppercase tracking-wider">User</span>}
                                     </div>
                                   </td>
-                                  <td className="py-3 px-4 text-center">
-                                    <span className="text-xs font-bold text-cyan-400 bg-cyan-950/40 border border-cyan-900/40 px-2.5 py-0.5 rounded-full">{u.sheep_balance ?? 100}</span>
+                                  <td className="py-3.5 px-4 text-center">
+                                    <span className="text-sm font-bold text-cyan-400 bg-cyan-950/40 border border-cyan-900/40 px-2.5 py-0.5 rounded-full">{u.sheep_balance ?? 100}</span>
                                   </td>
-                                  <td className="py-3 px-4 text-xs text-gray-400 font-medium">
+                                  <td className="py-3.5 px-4 text-sm text-gray-400 font-medium">
                                     {new Date(u.created_at).toLocaleDateString('it-IT')}
                                   </td>
-                                  <td className="py-3 px-4 text-right">
+                                  <td className="py-3.5 px-4 text-right">
                                     <button 
                                       className="p-1.5 bg-white/5 hover:bg-cyan-500/10 text-gray-400 hover:text-cyan-400 border border-white/5 hover:border-cyan-500/20 rounded-xl transition-all"
                                       onClick={(e) => { e.stopPropagation(); handleSelectCrmUser(u); }}
@@ -4703,28 +4672,52 @@ export default function AdminDashboardPage() {
                         
                         <div className="space-y-2">
                           <label className="text-[10px] font-black text-gray-400 block uppercase tracking-wider">Bilancio Pecore ({selectedCrmUser.sheep_balance ?? 100})</label>
-                          <div className="flex gap-2">
-                            <input
-                              type="number"
-                              placeholder="Quantità..."
-                              value={crmSheepAmount}
-                              onChange={(e) => setCrmSheepAmount(e.target.value === '' ? '' : Number(e.target.value))}
-                              className="flex-1 bg-[#111218] border border-white/10 focus:border-cyan-500/50 rounded-xl px-3 py-2 text-xs text-white font-bold outline-none"
-                            />
-                            <button
-                              disabled={crmSheepAmount === ''}
-                              onClick={() => handleCrmAdjustSheep(selectedCrmUser.email, Number(crmSheepAmount))}
-                              className="px-3 py-2 bg-cyan-600/20 hover:bg-cyan-600 border border-cyan-500/30 text-cyan-400 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider disabled:opacity-30 disabled:pointer-events-none transition-all"
-                            >
-                              Invia
-                            </button>
-                            <button
-                              disabled={crmSheepAmount === ''}
-                              onClick={() => handleCrmAdjustSheep(selectedCrmUser.email, Number(crmSheepAmount), true)}
-                              className="px-3 py-2 bg-cyan-600/10 hover:bg-cyan-600 border border-cyan-500/15 text-cyan-400 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider disabled:opacity-30 disabled:pointer-events-none transition-all"
-                            >
-                              Imposta
-                            </button>
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            <div className="flex items-center bg-[#111218] border border-white/10 rounded-xl px-2 py-1 justify-between max-w-[140px] w-full">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const current = crmSheepAmount === '' ? 0 : Number(crmSheepAmount);
+                                  setCrmSheepAmount(current - 10);
+                                }}
+                                className="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-xl text-cyan-400 transition-colors active:scale-95"
+                              >
+                                <Minus size={12} />
+                              </button>
+                              <input
+                                type="number"
+                                placeholder="0"
+                                value={crmSheepAmount}
+                                onChange={(e) => setCrmSheepAmount(e.target.value === '' ? '' : Number(e.target.value))}
+                                className="w-12 bg-transparent text-xs text-white font-black text-center outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const current = crmSheepAmount === '' ? 0 : Number(crmSheepAmount);
+                                  setCrmSheepAmount(current + 10);
+                                }}
+                                className="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-xl text-cyan-400 transition-colors active:scale-95"
+                              >
+                                <Plus size={12} />
+                              </button>
+                            </div>
+                            <div className="flex gap-2 flex-1">
+                              <button
+                                disabled={crmSheepAmount === ''}
+                                onClick={() => handleCrmAdjustSheep(selectedCrmUser.email, Number(crmSheepAmount))}
+                                className="flex-1 py-2 px-3 bg-cyan-600/20 hover:bg-cyan-600 border border-cyan-500/30 text-cyan-400 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider disabled:opacity-30 disabled:pointer-events-none transition-all text-center"
+                              >
+                                Aggiungi
+                              </button>
+                              <button
+                                disabled={crmSheepAmount === ''}
+                                onClick={() => handleCrmAdjustSheep(selectedCrmUser.email, Number(crmSheepAmount), true)}
+                                className="flex-1 py-2 px-3 bg-cyan-600/10 hover:bg-cyan-600 border border-cyan-500/15 text-cyan-400 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider disabled:opacity-30 disabled:pointer-events-none transition-all text-center"
+                              >
+                                Imposta
+                              </button>
+                            </div>
                           </div>
                         </div>
 
@@ -4754,13 +4747,14 @@ export default function AdminDashboardPage() {
                             ].map((perm) => (
                               <div key={perm.field} className="flex items-center justify-between p-2 bg-[#111218] border border-white/5 rounded-xl">
                                 <span className="text-[10px] font-bold text-gray-300">{perm.label}</span>
-                                <input
-                                  type="checkbox"
+                                <button
+                                  type="button"
                                   disabled={!isSuperAdmin}
-                                  checked={!!selectedCrmUser[perm.field]}
-                                  onChange={(e) => handleCrmTogglePermission(selectedCrmUser.email, perm.field, e.target.checked)}
-                                  className="w-4 h-4 rounded border-white/10 text-cyan-600 focus:ring-cyan-500 bg-[#111218]"
-                                />
+                                  onClick={() => handleCrmTogglePermission(selectedCrmUser.email, perm.field, !selectedCrmUser[perm.field])}
+                                  className={`w-9 h-5 rounded-full relative transition-all flex-shrink-0 outline-none ${!isSuperAdmin ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${selectedCrmUser[perm.field] ? 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)]' : 'bg-white/10'}`}
+                                >
+                                  <div className={`absolute top-[2px] w-4 h-4 bg-white rounded-full transition-all ${selectedCrmUser[perm.field] ? 'left-[18px]' : 'left-[2px]'}`} />
+                                </button>
                               </div>
                             ))}
                           </div>
@@ -4882,42 +4876,48 @@ export default function AdminDashboardPage() {
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Tipo Pubblicazione</label>
-                          <select
-                            value={annForm.type}
-                            onChange={(e) => setAnnForm({ ...annForm, type: e.target.value })}
-                            className="w-full bg-[#111218] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-cyan-500/50 font-bold"
-                          >
-                            <option value="banner">Banner Superiore</option>
-                            <option value="notification">Notifica In-App</option>
-                            <option value="both">Entrambi</option>
-                          </select>
-                        </div>
+                        <CustomSelect
+                          label="Tipo Pubblicazione"
+                          value={annForm.type}
+                          onChange={(val) => setAnnForm({ ...annForm, type: val })}
+                          options={[
+                            { value: 'banner', label: 'Banner Superiore' },
+                            { value: 'notification', label: 'Notifica In-App' },
+                            { value: 'both', label: 'Entrambi' }
+                          ]}
+                          className="w-full"
+                          buttonClassName="h-10 border-white/10 hover:border-cyan-500/50 rounded-xl text-xs py-2 bg-[#111218] font-bold"
+                        />
 
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Target Destinatari</label>
-                          <select
-                            value={annForm.target}
-                            onChange={(e) => setAnnForm({ ...annForm, target: e.target.value })}
-                            className="w-full bg-[#111218] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-cyan-500/50 font-bold"
-                          >
-                            <option value="all">Tutti gli Utenti</option>
-                            <option value="staff">Solo Staff</option>
-                            <option value="pastori">Solo Chi Ha Scommesso</option>
-                          </select>
-                        </div>
+                        <CustomSelect
+                          label="Target Destinatari"
+                          value={annForm.target}
+                          onChange={(val) => setAnnForm({ ...annForm, target: val })}
+                          options={[
+                            { value: 'all', label: 'Tutti gli Utenti' },
+                            { value: 'staff', label: 'Solo Staff' },
+                            { value: 'pastori', label: 'Solo Chi Ha Scommesso' }
+                          ]}
+                          className="w-full"
+                          buttonClassName="h-10 border-white/10 hover:border-cyan-500/50 rounded-xl text-xs py-2 bg-[#111218] font-bold"
+                        />
                       </div>
 
-                      <div className="flex items-center gap-2 py-2">
-                        <input
-                          type="checkbox"
+                      <div className="flex items-center gap-3 py-2">
+                        <button
+                          type="button"
                           id="ann_is_active"
-                          checked={annForm.is_active}
-                          onChange={(e) => setAnnForm({ ...annForm, is_active: e.target.checked })}
-                          className="w-4 h-4 rounded border-white/10 text-cyan-600 focus:ring-cyan-500 bg-[#111218]"
-                        />
-                        <label htmlFor="ann_is_active" className="text-xs font-bold text-gray-300 cursor-pointer">Attiva e mostra subito</label>
+                          onClick={() => setAnnForm({ ...annForm, is_active: !annForm.is_active })}
+                          className={`w-9 h-5 rounded-full relative transition-all flex-shrink-0 outline-none cursor-pointer ${annForm.is_active ? 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)]' : 'bg-white/10'}`}
+                        >
+                          <div className={`absolute top-[2px] w-4 h-4 bg-white rounded-full transition-all ${annForm.is_active ? 'left-[18px]' : 'left-[2px]'}`} />
+                        </button>
+                        <span 
+                          onClick={() => setAnnForm({ ...annForm, is_active: !annForm.is_active })} 
+                          className="text-xs font-bold text-gray-300 cursor-pointer select-none"
+                        >
+                          Attiva e mostra subito
+                        </span>
                       </div>
 
                       <button
