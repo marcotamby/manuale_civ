@@ -228,7 +228,7 @@ export default function AdminDashboardPage() {
       fetchDiagnostics();
     } else if (activeTab === 'comunicazioni') {
       fetchAnnouncements();
-    } else if (activeTab === 'analytics') {
+    } else if (activeTab === 'analytics' || activeTab === 'overview') {
       fetchAnalyticsData();
     }
   }, [activeTab]);
@@ -1369,7 +1369,28 @@ export default function AdminDashboardPage() {
       const totalUsers = profiles.length;
       const totalSuggestions = suggestions.length;
       const totalBets = bets.length;
-      const totalSheep = bets.reduce((sum, b) => sum + (b.amount || 0), 0);
+      const totalSheep = bets.reduce((sum: number, b: any) => sum + (b.amount || 0), 0);
+
+      // Highlights calculation
+      const now = new Date();
+      const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+      const newUsersThisWeek = profiles.filter((p: any) => p.created_at && new Date(p.created_at) >= oneWeekAgo).length;
+      const newUsersToday = profiles.filter((p: any) => p.created_at && new Date(p.created_at) >= oneDayAgo).length;
+
+      const newSuggestionsThisWeek = suggestions.filter((s: any) => s.created_at && new Date(s.created_at) >= oneWeekAgo).length;
+      const newSuggestionsToday = suggestions.filter((s: any) => s.created_at && new Date(s.created_at) >= oneDayAgo).length;
+
+      const betsThisWeek = bets.filter((b: any) => b.created_at && new Date(b.created_at) >= oneWeekAgo).length;
+      const betsToday = bets.filter((b: any) => b.created_at && new Date(b.created_at) >= oneDayAgo).length;
+
+      const sheepWageredThisWeek = bets
+        .filter((b: any) => b.created_at && new Date(b.created_at) >= oneWeekAgo)
+        .reduce((sum: number, b: any) => sum + (b.amount || 0), 0);
+      const sheepWageredToday = bets
+        .filter((b: any) => b.created_at && new Date(b.created_at) >= oneDayAgo)
+        .reduce((sum: number, b: any) => sum + (b.amount || 0), 0);
 
       setAnalyticsData({
         totalUsers,
@@ -1380,7 +1401,15 @@ export default function AdminDashboardPage() {
         suggestionsTrend: getTrendData(suggestions),
         betsTrend: getTrendData(bets),
         civPopularity: getCivPopularity(suggestions),
-        hourlyHeatmap: getHourlyHeatmap([...profiles, ...suggestions, ...bets])
+        hourlyHeatmap: getHourlyHeatmap([...profiles, ...suggestions, ...bets]),
+        newUsersThisWeek,
+        newUsersToday,
+        newSuggestionsThisWeek,
+        newSuggestionsToday,
+        betsThisWeek,
+        betsToday,
+        sheepWageredThisWeek,
+        sheepWageredToday
       });
     } catch (err) {
       console.error('Error fetching analytics data:', err);
@@ -2192,12 +2221,204 @@ export default function AdminDashboardPage() {
           {/* TAB PANELS */}
           {activeTab === 'overview' && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
-              <div className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-8 flex flex-col md:flex-row items-center gap-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
+              {/* Welcome Banner */}
+              <div className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-6 flex flex-col md:flex-row items-center gap-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
-                <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border-2 border-cyan-500/20 flex items-center justify-center text-cyan-400 text-3xl shadow-lg shrink-0">🔑</div>
+                <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border-2 border-cyan-500/20 flex items-center justify-center text-cyan-400 text-2xl shadow-lg shrink-0">🔑</div>
                 <div>
                   <h3 className="text-lg font-black text-white uppercase tracking-tight">Benvenuto nel Pannello Admin, {useAuth().user?.nickname || 'Admin'}</h3>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Ecco una panoramica dello stato attuale del sito e delle attività che richiedono il tuo intervento.
+                  </p>
                 </div>
+              </div>
+
+              {/* Sezione Attenzione Richiesta */}
+              <div className="space-y-4">
+                <h4 className="text-[11px] font-black uppercase text-gray-500 tracking-[0.2em]">⚠️ Cose che richiedono la tua attenzione</h4>
+                
+                {suggestions.length === 0 && questions.length === 0 && answers.length === 0 && (!isSuperAdmin || pendingNotifCount === 0) ? (
+                  <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-3xl p-8 flex flex-col items-center text-center shadow-lg backdrop-blur-md">
+                    <CheckCircle className="text-emerald-400 mb-3 animate-pulse" size={36} />
+                    <h5 className="text-sm font-black text-white uppercase tracking-wider">Tutto sotto controllo!</h5>
+                    <p className="text-xs text-gray-400 mt-1 max-w-md">
+                      Non ci sono proposte pendenti, contributi Q&A da moderare o notifiche in attesa di invio. Ottimo lavoro!
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {suggestions.length > 0 && (
+                      <div className="bg-[#0a0e1c]/60 border border-blue-500/20 rounded-3xl p-5 flex flex-col justify-between shadow-xl relative overflow-hidden group hover:border-blue-500/50 transition-all duration-300">
+                        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent"></div>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-start">
+                            <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-center text-blue-400">
+                              <Inbox size={20} />
+                            </div>
+                            <span className="px-2.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full text-[10px] font-black uppercase">
+                              {suggestions.length} Pendenti
+                            </span>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-black text-white uppercase tracking-wider">Suggerimenti in attesa</h5>
+                            <p className="text-[11px] text-gray-400 mt-1">
+                              Ci sono proposte inviate dagli utenti per le civiltà o build orders che aspettano la tua approvazione.
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => selectTab('proposte')}
+                          className="mt-4 w-full py-2 bg-blue-600/20 hover:bg-blue-600 border border-blue-500/30 text-blue-400 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all"
+                        >
+                          Risolvi Proposte
+                        </button>
+                      </div>
+                    )}
+
+                    {(questions.length > 0 || answers.length > 0) && (
+                      <div className="bg-[#0a0e1c]/60 border border-cyan-500/20 rounded-3xl p-5 flex flex-col justify-between shadow-xl relative overflow-hidden group hover:border-cyan-500/50 transition-all duration-300">
+                        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-start">
+                            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/25 flex items-center justify-center text-cyan-400">
+                              <MessageSquare size={20} />
+                            </div>
+                            <span className="px-2.5 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-full text-[10px] font-black uppercase">
+                              {questions.length + answers.length} Da moderare
+                            </span>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-black text-white uppercase tracking-wider">Moderazione Q&A</h5>
+                            <p className="text-[11px] text-gray-400 mt-1">
+                              Nuove domande o risposte della community in attesa di verifica per garantire la qualità del portale.
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => selectTab('qa')}
+                          className="mt-4 w-full py-2 bg-cyan-600/20 hover:bg-cyan-600 border border-cyan-500/30 text-cyan-400 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all"
+                        >
+                          Modera Contributi
+                        </button>
+                      </div>
+                    )}
+
+                    {isSuperAdmin && pendingNotifCount > 0 && (
+                      <div className="bg-[#0a0e1c]/60 border border-purple-500/20 rounded-3xl p-5 flex flex-col justify-between shadow-xl relative overflow-hidden group hover:border-purple-500/50 transition-all duration-300">
+                        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-purple-500/30 to-transparent"></div>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-start">
+                            <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/25 flex items-center justify-center text-purple-400">
+                              <Send size={20} />
+                            </div>
+                            <span className="px-2.5 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-full text-[10px] font-black uppercase">
+                              {pendingNotifCount} Notifiche
+                            </span>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-black text-white uppercase tracking-wider">Email da spedire</h5>
+                            <p className="text-[11px] text-gray-400 mt-1">
+                              Gli utenti attendono l'invio del resoconto delle loro proposte approvate o rifiutate.
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={handleSendNotifications}
+                          disabled={isSendingEmail}
+                          className="mt-4 w-full py-2 bg-purple-600/20 hover:bg-purple-600 border border-purple-500/30 text-purple-400 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all disabled:opacity-50"
+                        >
+                          {isSendingEmail ? 'Spedizione...' : 'Invia Email Ora'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Sezione Punti Salienti (Highlights) */}
+              <div className="space-y-4">
+                <h4 className="text-[11px] font-black uppercase text-gray-500 tracking-[0.2em]">📈 Highlights dell'Attività (Questa Settimana)</h4>
+                
+                {analyticsLoading ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {[1, 2, 3, 4].map(idx => (
+                      <div key={idx} className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 animate-pulse h-28 flex flex-col justify-center gap-2">
+                        <div className="h-2.5 bg-white/10 rounded w-1/2"></div>
+                        <div className="h-6 bg-white/15 rounded w-1/3 mt-2"></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : analyticsData ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-md shadow-2xl">
+                      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Nuovi Iscritti</span>
+                        <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                          <Users size={16} />
+                        </div>
+                      </div>
+                      <p className="text-3xl font-black mt-4 text-white tracking-tight">
+                        {analyticsData.newUsersThisWeek}
+                      </p>
+                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">
+                        +{analyticsData.newUsersToday} nelle ultime 24 ore
+                      </p>
+                    </div>
+
+                    <div className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-md shadow-2xl">
+                      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/25 to-transparent"></div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Nuove Proposte</span>
+                        <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                          <Inbox size={16} />
+                        </div>
+                      </div>
+                      <p className="text-3xl font-black mt-4 text-white tracking-tight">
+                        {analyticsData.newSuggestionsThisWeek}
+                      </p>
+                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">
+                        +{analyticsData.newSuggestionsToday} nelle ultime 24 ore
+                      </p>
+                    </div>
+
+                    <div className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-md shadow-2xl">
+                      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-indigo-500/25 to-transparent"></div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Scommesse Piazzate</span>
+                        <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                          <TrendingUp size={16} />
+                        </div>
+                      </div>
+                      <p className="text-3xl font-black mt-4 text-white tracking-tight">
+                        {analyticsData.betsThisWeek}
+                      </p>
+                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">
+                        +{analyticsData.betsToday} nelle ultime 24 ore
+                      </p>
+                    </div>
+
+                    <div className="bg-[#0a0e1c]/60 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-md shadow-2xl">
+                      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Pecore Scommesse</span>
+                        <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                          <Coins size={16} />
+                        </div>
+                      </div>
+                      <p className="text-3xl font-black mt-4 text-cyan-400 tracking-tight">
+                        🐑 {analyticsData.sheepWageredThisWeek}
+                      </p>
+                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">
+                        +🐑 {analyticsData.sheepWageredToday} nelle ultime 24 ore
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-black/20 border border-white/5 rounded-3xl p-6 text-center">
+                    <p className="text-xs text-gray-400 font-medium">Impossibile caricare gli highlights dell'attività.</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
