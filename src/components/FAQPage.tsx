@@ -216,9 +216,10 @@ function SortableFAQItem({ item, sIdx, iIdx, isEditing, isExpanded, onToggle, on
             </div>
           </div>
           <div className={`overflow-hidden transition-all duration-300 md:block ${isExpanded ? 'max-h-96 opacity-100 mt-3' : 'max-h-0 opacity-0 md:max-h-96 md:opacity-100'}`}>
-            <p className="text-sm text-gray-400 leading-relaxed border-t border-white/5 pt-3 md:border-0 md:pt-0">
-              {item.description}
-            </p>
+            <div 
+              className="text-sm text-gray-400 leading-relaxed border-t border-white/5 pt-3 md:border-0 md:pt-0 prose prose-invert max-w-none [&_a]:text-blue-400 [&_a]:hover:underline [&_a]:transition-colors [&_strong]:text-white [&_b]:text-white"
+              dangerouslySetInnerHTML={{ __html: item.description }}
+            />
           </div>
         </>
       )}
@@ -534,9 +535,10 @@ export function FAQPage() {
                 <Info className="text-blue-400" />
                 {intro.title}
               </h2>
-              <p className="text-lg leading-relaxed text-gray-300">
-                {intro.content}
-              </p>
+              <div 
+                className="text-lg leading-relaxed text-gray-300 prose prose-invert max-w-none [&_a]:text-blue-400 [&_a]:hover:underline [&_a]:transition-colors [&_strong]:text-white [&_b]:text-white"
+                dangerouslySetInnerHTML={{ __html: intro.content }}
+              />
             </>
           )}
         </div>

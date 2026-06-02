@@ -4,8 +4,8 @@ import {
   MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, 
   AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, 
   Trophy, BookOpen, Zap, Edit2, Check, Trash2, Plus, Minus, ArrowLeft, LayoutDashboard,
-  Save, Sparkles, ChevronDown, Users, Youtube, Menu, History, Database, Activity, Download,
-  Megaphone, TrendingUp, Coins, Lock, Unlock, ChevronRight, Link2
+  Save, Sparkles, ChevronDown, ChevronUp, Users, Youtube, Menu, History, Database, Activity, Download,
+  Megaphone, TrendingUp, Coins, Lock, Unlock, ChevronRight, Link2, HelpCircle, Shield
 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
@@ -15,6 +15,7 @@ import type { ToastType } from './Toast';
 import { CustomSelect } from './CustomSelect';
 import { sendNewBuildOrderWebhook } from '../utils/discordWebhook';
 import { WYSIWYGEditor } from './TournamentsPage';
+import { WYSIWYGEditor as SharedWYSIWYGEditor } from './WYSIWYGEditor';
 import { renderTextWithLinks } from '../lib/linkParser';
 
 export interface Suggestion {
@@ -49,7 +50,7 @@ export default function AdminDashboardPage() {
   }, [isAuthenticated, isAdmin, navigate]);
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeTab = (searchParams.get('tab') as 'overview' | 'proposte' | 'qa' | 'users' | 'pecore' | 'tornei' | 'civilta' | 'audit' | 'diagnostics' | 'utenti' | 'comunicazioni' | 'analytics') || 'overview';
+  const activeTab = (searchParams.get('tab') as 'overview' | 'proposte' | 'qa' | 'users' | 'pecore' | 'tornei' | 'civilta' | 'audit' | 'diagnostics' | 'utenti' | 'comunicazioni' | 'analytics' | 'faq' | 'privacy') || 'overview';
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // CRM States (Tab 2)
@@ -193,7 +194,8 @@ export default function AdminDashboardPage() {
     passive_bonuses: [],
     strengths: [],
     weaknesses: [],
-    flag: ''
+    flag: '',
+    videos: []
   });
   
   const [selectedBOIndex, setSelectedBOIndex] = useState<number | null>(null); // -1 for new, number for edit index, null for none
@@ -213,6 +215,18 @@ export default function AdminDashboardPage() {
   const [boManualText, setBoManualText] = useState('');
   const [isAnalyzingBO, setIsAnalyzingBO] = useState(false);
   const [boAnalysisProgress, setBoAnalysisProgress] = useState(0);
+
+  // FAQ States
+  const [faqIntro, setFaqIntro] = useState({ title: "Cos'è il Manuale delle Civiltà?", content: '' });
+  const [faqSections, setFaqSections] = useState<any[]>([]);
+  const [faqLoading, setFaqLoading] = useState(false);
+  const [faqSaveLoading, setFaqSaveLoading] = useState(false);
+
+  // Privacy States
+  const [privacyTitle, setPrivacyTitle] = useState('Privacy & Cookie Policy');
+  const [privacyContent, setPrivacyContent] = useState('');
+  const [privacyLoading, setPrivacyLoading] = useState(false);
+  const [privacySaveLoading, setPrivacySaveLoading] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && isAdmin) {
@@ -239,6 +253,10 @@ export default function AdminDashboardPage() {
       fetchAnnouncements();
     } else if (activeTab === 'analytics' || activeTab === 'overview') {
       fetchAnalyticsData();
+    } else if (activeTab === 'faq') {
+      fetchFAQData();
+    } else if (activeTab === 'privacy') {
+      fetchPrivacyData();
     }
   }, [activeTab]);
 
@@ -546,7 +564,8 @@ export default function AdminDashboardPage() {
         passive_bonuses: selectedCiv.passive_bonuses || [],
         strengths: selectedCiv.strengths || [],
         weaknesses: selectedCiv.weaknesses || [],
-        flag: selectedCiv.flag || ''
+        flag: selectedCiv.flag || '',
+        videos: selectedCiv.videos || []
       });
       setSelectedBOIndex(null);
     }
@@ -567,7 +586,8 @@ export default function AdminDashboardPage() {
           passive_bonuses: civForm.passive_bonuses?.filter((b: string) => b.trim() !== '') || [],
           strengths: civForm.strengths?.filter((s: string) => s.trim() !== '') || [],
           weaknesses: civForm.weaknesses?.filter((w: string) => w.trim() !== '') || [],
-          flag: civForm.flag
+          flag: civForm.flag,
+          videos: civForm.videos || []
         })
         .eq('id', selectedCiv.id);
       if (error) throw error;
@@ -590,7 +610,8 @@ export default function AdminDashboardPage() {
         passive_bonuses: civForm.passive_bonuses,
         strengths: civForm.strengths,
         weaknesses: civForm.weaknesses,
-        flag: civForm.flag
+        flag: civForm.flag,
+        videos: civForm.videos
       } : c));
       
       setSelectedCiv((prev: any) => ({
@@ -601,7 +622,8 @@ export default function AdminDashboardPage() {
         passive_bonuses: civForm.passive_bonuses,
         strengths: civForm.strengths,
         weaknesses: civForm.weaknesses,
-        flag: civForm.flag
+        flag: civForm.flag,
+        videos: civForm.videos
       }));
 
       refreshCivs();
@@ -1466,6 +1488,136 @@ export default function AdminDashboardPage() {
     return hours;
   };
 
+  // ========== FAQ Functions ==========
+  const fetchFAQData = async () => {
+    setFaqLoading(true);
+    try {
+      // Fetch intro
+      const { data: introData } = await supabase
+        .from('faq_settings')
+        .select('title, content')
+        .eq('id', 'intro')
+        .maybeSingle();
+      
+      if (introData) {
+        setFaqIntro({ title: introData.title || faqIntro.title, content: introData.content || '' });
+      }
+
+      // Fetch sections with items
+      const { data: sectionsData } = await supabase
+        .from('faq_sections')
+        .select('*')
+        .order('display_order', { ascending: true });
+
+      const { data: itemsData } = await supabase
+        .from('faq_items')
+        .select('*')
+        .order('display_order', { ascending: true });
+
+      if (sectionsData) {
+        const combined = sectionsData.map((s: any) => ({
+          ...s,
+          items: (itemsData || []).filter((it: any) => it.section_id === s.id)
+        }));
+        setFaqSections(combined);
+      }
+    } catch (err) {
+      console.error('Error fetching FAQ:', err);
+    } finally {
+      setFaqLoading(false);
+    }
+  };
+
+  const saveFAQData = async () => {
+    setFaqSaveLoading(true);
+    try {
+      // Save Intro
+      await supabase.from('faq_settings').upsert({
+        id: 'intro',
+        title: faqIntro.title,
+        content: faqIntro.content
+      });
+
+      // Clear existing sections/items to simplify sync
+      await supabase.from('faq_items').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      await supabase.from('faq_sections').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+
+      for (let i = 0; i < faqSections.length; i++) {
+        const s = faqSections[i];
+        const { data: newS, error: sErr } = await supabase.from('faq_sections').insert({
+          title: s.title,
+          icon_name: s.icon_name || 'Layers',
+          display_order: i
+        }).select().single();
+
+        if (sErr) throw sErr;
+
+        if (s.items && s.items.length > 0) {
+          const itemsToInsert = s.items.map((item: any, idx: number) => ({
+            section_id: newS.id,
+            label: item.label,
+            description: item.description,
+            icon_name: item.icon_name || 'Info',
+            display_order: idx
+          }));
+          const { error: iErr } = await supabase.from('faq_items').insert(itemsToInsert);
+          if (iErr) throw iErr;
+        }
+      }
+
+      setToast({ isVisible: true, message: 'FAQ salvate con successo!', type: 'success' });
+      fetchFAQData();
+    } catch (err) {
+      console.error('Error saving FAQ:', err);
+      setToast({ isVisible: true, message: 'Errore nel salvataggio delle FAQ', type: 'error' });
+    } finally {
+      setFaqSaveLoading(false);
+    }
+  };
+
+  // ========== Privacy Functions ==========
+  const fetchPrivacyData = async () => {
+    setPrivacyLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('privacy_policy')
+        .select('title, content')
+        .eq('id', 'policy')
+        .maybeSingle();
+
+      if (data && !error) {
+        setPrivacyTitle(data.title || 'Privacy & Cookie Policy');
+        setPrivacyContent(data.content || '');
+      }
+    } catch (err) {
+      console.error('Error fetching privacy:', err);
+    } finally {
+      setPrivacyLoading(false);
+    }
+  };
+
+  const savePrivacyData = async () => {
+    setPrivacySaveLoading(true);
+    try {
+      const { error } = await supabase
+        .from('privacy_policy')
+        .upsert({
+          id: 'policy',
+          title: privacyTitle,
+          content: privacyContent,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+      setToast({ isVisible: true, message: 'Privacy Policy salvata con successo!', type: 'success' });
+    } catch (err: any) {
+      console.error('Error saving privacy:', err);
+      setToast({ isVisible: true, message: `Errore nel salvataggio: ${err.message}`, type: 'error' });
+    } finally {
+      setPrivacySaveLoading(false);
+    }
+  };
+
   const fetchAnalyticsData = async () => {
     setAnalyticsLoading(true);
     try {
@@ -2258,6 +2410,22 @@ export default function AdminDashboardPage() {
           </button>
 
           <button
+            onClick={() => selectTab('faq')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'faq' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+          >
+            <HelpCircle size={18} />
+            <span>Gestione FAQ</span>
+          </button>
+
+          <button
+            onClick={() => selectTab('privacy')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'privacy' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+          >
+            <Shield size={18} />
+            <span>Privacy Policy</span>
+          </button>
+
+          <button
             onClick={() => selectTab('audit')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'audit' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
           >
@@ -2311,6 +2479,8 @@ export default function AdminDashboardPage() {
                 {activeTab === 'utenti' && 'Anagrafica Utenti (CRM)'}
                 {activeTab === 'comunicazioni' && 'Centro Comunicazioni'}
                 {activeTab === 'analytics' && 'Metriche & Analytics'}
+                {activeTab === 'faq' && 'Gestione FAQ'}
+                {activeTab === 'privacy' && 'Privacy Policy'}
               </h2>
               <p className="text-[10px] md:text-xs text-gray-400 truncate">
                 {activeTab === 'overview' && 'Panoramica e statistiche globali del manuale.'}
@@ -2325,6 +2495,8 @@ export default function AdminDashboardPage() {
                 {activeTab === 'utenti' && 'CRM per la gestione di tutti gli utenti registrati sul portale.'}
                 {activeTab === 'comunicazioni' && 'Crea e pubblica annunci, banner in-app e notifiche per la community.'}
                 {activeTab === 'analytics' && 'Visualizza trend di crescita, scommesse, contributi e fasce orarie.'}
+                {activeTab === 'faq' && 'Gestisci le domande frequenti, le sezioni e i contenuti della pagina FAQ.'}
+                {activeTab === 'privacy' && 'Modifica il titolo e il contenuto della Privacy & Cookie Policy.'}
               </p>
             </div>
           </div>
@@ -4143,6 +4315,106 @@ export default function AdminDashboardPage() {
                             </div>
                           </div>
 
+                          {/* Video Guide Section */}
+                          <div className="bg-black/20 border-2 border-white/5 p-6 rounded-3xl space-y-4">
+                            <div className="flex items-center gap-3">
+                              <Youtube size={18} className="text-red-500" />
+                              <label className="text-[10px] font-black text-red-500 uppercase tracking-[0.2em]">Video Guide (YouTube)</label>
+                            </div>
+                            
+                            {(civForm.videos || []).map((video: any, idx: number) => {
+                              const videoId = typeof video === 'string' 
+                                ? (video.match(/(?:youtu\.be\/|v=)([^&\s]+)/)?.[1] || '')
+                                : (video.url?.match(/(?:youtu\.be\/|v=)([^&\s]+)/)?.[1] || '');
+                              const videoUrl = typeof video === 'string' ? video : video.url;
+                              const videoTitle = typeof video === 'string' ? '' : (video.title || '');
+                              
+                              return (
+                                <div key={idx} className="flex items-start gap-3 bg-black/30 rounded-2xl p-3 border border-white/5">
+                                  {videoId && (
+                                    <img 
+                                      src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} 
+                                      alt="Thumbnail" 
+                                      className="w-28 h-16 rounded-lg object-cover border border-white/10 shrink-0"
+                                    />
+                                  )}
+                                  <div className="flex-1 space-y-2 min-w-0">
+                                    <input
+                                      type="text"
+                                      placeholder="Titolo video (opzionale)"
+                                      value={videoTitle}
+                                      onChange={(e) => {
+                                        const newVideos = [...(civForm.videos || [])];
+                                        const v = typeof newVideos[idx] === 'string' ? { url: newVideos[idx], title: '' } : { ...newVideos[idx] };
+                                        v.title = e.target.value;
+                                        newVideos[idx] = v;
+                                        setCivForm({ ...civForm, videos: newVideos });
+                                      }}
+                                      className="w-full bg-white/[0.01] border border-white/10 rounded-xl px-3 py-1.5 text-[11px] text-white outline-none focus:border-red-500/50 transition-all"
+                                    />
+                                    <input
+                                      type="text"
+                                      placeholder="https://www.youtube.com/watch?v=..."
+                                      value={videoUrl}
+                                      onChange={(e) => {
+                                        const newVideos = [...(civForm.videos || [])];
+                                        const v = typeof newVideos[idx] === 'string' ? { url: '', title: '' } : { ...newVideos[idx] };
+                                        v.url = e.target.value;
+                                        newVideos[idx] = v;
+                                        setCivForm({ ...civForm, videos: newVideos });
+                                      }}
+                                      className="w-full bg-white/[0.01] border border-white/10 rounded-xl px-3 py-1.5 text-[11px] text-gray-400 outline-none focus:border-red-500/50 transition-all"
+                                    />
+                                  </div>
+                                  <div className="flex flex-col gap-1 shrink-0">
+                                    <button
+                                      onClick={() => {
+                                        if (idx > 0) {
+                                          const newVideos = [...(civForm.videos || [])];
+                                          [newVideos[idx - 1], newVideos[idx]] = [newVideos[idx], newVideos[idx - 1]];
+                                          setCivForm({ ...civForm, videos: newVideos });
+                                        }
+                                      }}
+                                      disabled={idx === 0}
+                                      className="p-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                                    >
+                                      <ChevronUp size={14} />
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        if (idx < (civForm.videos || []).length - 1) {
+                                          const newVideos = [...(civForm.videos || [])];
+                                          [newVideos[idx], newVideos[idx + 1]] = [newVideos[idx + 1], newVideos[idx]];
+                                          setCivForm({ ...civForm, videos: newVideos });
+                                        }
+                                      }}
+                                      disabled={idx === (civForm.videos || []).length - 1}
+                                      className="p-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                                    >
+                                      <ChevronDown size={14} />
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        const newVideos = (civForm.videos || []).filter((_: any, i: number) => i !== idx);
+                                        setCivForm({ ...civForm, videos: newVideos });
+                                      }}
+                                      className="p-1.5 bg-red-500/10 hover:bg-red-500/25 rounded-lg text-red-400 transition-all"
+                                    >
+                                      <Trash2 size={14} />
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                            
+                            <button
+                              onClick={() => setCivForm({ ...civForm, videos: [...(civForm.videos || []), { url: '', title: '' }] })}
+                              className="text-xs text-red-500 font-black uppercase tracking-wider hover:underline flex items-center gap-1.5 pt-2"
+                            >
+                              <Plus size={14} strokeWidth={3} /> Aggiungi Video Guida
+                            </button>
+                          </div>
+
                           <div className="flex justify-end pt-4 border-t border-white/5">
                             <button
                               onClick={handleSaveCivDetails}
@@ -5549,6 +5821,264 @@ export default function AdminDashboardPage() {
                 </div>
               )}
 
+            </div>
+          )}
+
+          {/* TAB 5: FAQ */}
+          {activeTab === 'faq' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500">
+              {faqLoading ? (
+                <div className="flex flex-col items-center justify-center py-40">
+                  <Loader2 className="animate-spin text-cyan-400 mb-2" size={40} />
+                  <span className="text-[10px] text-gray-500 uppercase tracking-widest font-black">Caricamento FAQ...</span>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Intro Section */}
+                  <div className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-8 space-y-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
+                    <div className="flex items-center gap-3 border-b border-white/5 pb-4">
+                      <HelpCircle size={20} className="text-cyan-400" />
+                      <h3 className="text-sm font-black uppercase tracking-[0.15em] text-white">Introduzione FAQ</h3>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block">Titolo Introduzione</label>
+                        <input
+                          type="text"
+                          value={faqIntro.title}
+                          onChange={(e) => setFaqIntro({ ...faqIntro, title: e.target.value })}
+                          className="w-full bg-white/[0.01] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl p-4 text-sm text-white focus:shadow-[0_0_15px_rgba(34,211,238,0.1)] transition-all outline-none"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block">Contenuto Introduzione</label>
+                        <SharedWYSIWYGEditor
+                          initialValue={faqIntro.content}
+                          onChange={(html) => setFaqIntro({ ...faqIntro, content: html })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sections */}
+                  {faqSections.map((section: any, sIdx: number) => (
+                    <div key={section.id || sIdx} className="bg-[#0a0e1c]/60 border border-white/10 rounded-3xl p-6 space-y-5 shadow-xl backdrop-blur-md relative overflow-hidden">
+                      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/25 to-transparent"></div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <BookOpen size={18} className="text-blue-400 shrink-0" />
+                          <input
+                            type="text"
+                            value={section.title}
+                            onChange={(e) => {
+                              const newSections = [...faqSections];
+                              newSections[sIdx] = { ...newSections[sIdx], title: e.target.value };
+                              setFaqSections(newSections);
+                            }}
+                            className="bg-transparent border-b-2 border-white/10 focus:border-blue-500/50 text-sm font-bold text-white outline-none flex-1 py-1 transition-all"
+                            placeholder="Titolo sezione..."
+                          />
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0 ml-3">
+                          <select
+                            value={section.icon_name || 'Layers'}
+                            onChange={(e) => {
+                              const newSections = [...faqSections];
+                              newSections[sIdx] = { ...newSections[sIdx], icon_name: e.target.value };
+                              setFaqSections(newSections);
+                            }}
+                            className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[10px] text-white outline-none focus:border-blue-500/50 appearance-none cursor-pointer font-bold uppercase tracking-wider"
+                          >
+                            {['Layers', 'Zap', 'Heart', 'Shield', 'Sword', 'BookOpen', 'PlayCircle', 'Users', 'HelpCircle', 'Info', 'Trophy', 'GitPullRequest'].map(icon => (
+                              <option key={icon} value={icon} className="bg-[#121620]">{icon}</option>
+                            ))}
+                          </select>
+                          <button
+                            onClick={() => {
+                              if (sIdx > 0) {
+                                const ns = [...faqSections];
+                                [ns[sIdx - 1], ns[sIdx]] = [ns[sIdx], ns[sIdx - 1]];
+                                setFaqSections(ns);
+                              }
+                            }}
+                            disabled={sIdx === 0}
+                            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-gray-400 hover:text-white transition-all disabled:opacity-30"
+                          >
+                            <ChevronUp size={16} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (sIdx < faqSections.length - 1) {
+                                const ns = [...faqSections];
+                                [ns[sIdx], ns[sIdx + 1]] = [ns[sIdx + 1], ns[sIdx]];
+                                setFaqSections(ns);
+                              }
+                            }}
+                            disabled={sIdx === faqSections.length - 1}
+                            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-gray-400 hover:text-white transition-all disabled:opacity-30"
+                          >
+                            <ChevronDown size={16} />
+                          </button>
+                          <button
+                            onClick={() => setFaqSections(faqSections.filter((_: any, i: number) => i !== sIdx))}
+                            className="p-2 bg-red-500/10 hover:bg-red-500/25 rounded-xl text-red-400 transition-all"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Items inside section */}
+                      <div className="space-y-3 pl-2 border-l-2 border-white/5 ml-2">
+                        {(section.items || []).map((item: any, iIdx: number) => (
+                          <div key={item.id || iIdx} className="bg-black/30 rounded-2xl p-4 space-y-3 border border-white/5">
+                            <div className="flex items-center gap-3">
+                              <select
+                                value={item.icon_name || 'Info'}
+                                onChange={(e) => {
+                                  const ns = [...faqSections];
+                                  const newItems = [...ns[sIdx].items];
+                                  newItems[iIdx] = { ...newItems[iIdx], icon_name: e.target.value };
+                                  ns[sIdx] = { ...ns[sIdx], items: newItems };
+                                  setFaqSections(ns);
+                                }}
+                                className="bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-[10px] text-white outline-none cursor-pointer font-bold uppercase shrink-0"
+                              >
+                                {['Info', 'Shield', 'Sword', 'BookOpen', 'PlayCircle', 'Users', 'HelpCircle', 'Heart', 'Trophy', 'Layers', 'Zap', 'GitPullRequest'].map(icon => (
+                                  <option key={icon} value={icon} className="bg-[#121620]">{icon}</option>
+                                ))}
+                              </select>
+                              <input
+                                type="text"
+                                value={item.label}
+                                onChange={(e) => {
+                                  const ns = [...faqSections];
+                                  const newItems = [...ns[sIdx].items];
+                                  newItems[iIdx] = { ...newItems[iIdx], label: e.target.value };
+                                  ns[sIdx] = { ...ns[sIdx], items: newItems };
+                                  setFaqSections(ns);
+                                }}
+                                className="flex-1 bg-transparent border-b border-white/10 focus:border-cyan-500/50 text-xs font-bold text-white outline-none py-1 transition-all"
+                                placeholder="Etichetta elemento..."
+                              />
+                              <button
+                                onClick={() => {
+                                  const ns = [...faqSections];
+                                  ns[sIdx] = { ...ns[sIdx], items: ns[sIdx].items.filter((_: any, i: number) => i !== iIdx) };
+                                  setFaqSections(ns);
+                                }}
+                                className="p-1.5 bg-red-500/10 hover:bg-red-500/25 rounded-lg text-red-400 transition-all shrink-0"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                            <div>
+                              <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest block mb-2">Descrizione</label>
+                              <SharedWYSIWYGEditor
+                                initialValue={item.description}
+                                onChange={(html) => {
+                                  const ns = [...faqSections];
+                                  const newItems = [...ns[sIdx].items];
+                                  newItems[iIdx] = { ...newItems[iIdx], description: html };
+                                  ns[sIdx] = { ...ns[sIdx], items: newItems };
+                                  setFaqSections(ns);
+                                }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                        <button
+                          onClick={() => {
+                            const ns = [...faqSections];
+                            ns[sIdx] = {
+                              ...ns[sIdx],
+                              items: [...(ns[sIdx].items || []), { id: crypto.randomUUID(), label: 'Nuovo Elemento', description: 'Descrizione...', icon_name: 'Info', display_order: (ns[sIdx].items || []).length }]
+                            };
+                            setFaqSections(ns);
+                          }}
+                          className="text-[10px] text-cyan-400 font-black uppercase tracking-wider hover:underline flex items-center gap-1.5"
+                        >
+                          <Plus size={12} strokeWidth={3} /> Aggiungi Elemento
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Add Section Button */}
+                  <button
+                    onClick={() => setFaqSections([...faqSections, { title: 'Nuova Sezione', icon_name: 'Layers', display_order: faqSections.length, items: [] }])}
+                    className="w-full py-4 border-2 border-dashed border-white/10 hover:border-cyan-500/50 rounded-3xl text-cyan-400 hover:text-cyan-300 text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 bg-white/[0.01] hover:bg-white/[0.03] active:scale-[0.98]"
+                  >
+                    <Plus size={16} strokeWidth={3} /> Aggiungi Sezione FAQ
+                  </button>
+
+                  {/* Save Button */}
+                  <div className="flex justify-end pt-4 border-t border-white/5">
+                    <button
+                      onClick={saveFAQData}
+                      disabled={faqSaveLoading}
+                      className="px-8 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-50"
+                    >
+                      {faqSaveLoading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} strokeWidth={3} />}
+                      {faqSaveLoading ? 'Salvataggio...' : 'Salva FAQ'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 6: Privacy */}
+          {activeTab === 'privacy' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500">
+              {privacyLoading ? (
+                <div className="flex flex-col items-center justify-center py-40">
+                  <Loader2 className="animate-spin text-cyan-400 mb-2" size={40} />
+                  <span className="text-[10px] text-gray-500 uppercase tracking-widest font-black">Caricamento Privacy Policy...</span>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-8 space-y-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
+                    <div className="flex items-center gap-3 border-b border-white/5 pb-4">
+                      <Shield size={20} className="text-cyan-400" />
+                      <h3 className="text-sm font-black uppercase tracking-[0.15em] text-white">Privacy & Cookie Policy</h3>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block">Titolo Pagina</label>
+                        <input
+                          type="text"
+                          value={privacyTitle}
+                          onChange={(e) => setPrivacyTitle(e.target.value)}
+                          className="w-full bg-white/[0.01] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl p-4 text-sm text-white focus:shadow-[0_0_15px_rgba(34,211,238,0.1)] transition-all outline-none"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block">Contenuto Privacy Policy</label>
+                        <SharedWYSIWYGEditor
+                          initialValue={privacyContent}
+                          onChange={(html) => setPrivacyContent(html)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Save Button */}
+                  <div className="flex justify-end pt-4 border-t border-white/5">
+                    <button
+                      onClick={savePrivacyData}
+                      disabled={privacySaveLoading}
+                      className="px-8 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-50"
+                    >
+                      {privacySaveLoading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} strokeWidth={3} />}
+                      {privacySaveLoading ? 'Salvataggio...' : 'Salva Privacy Policy'}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
