@@ -13,6 +13,7 @@ import { Toast } from './Toast';
 import type { ToastType } from './Toast';
 import { CustomSelect } from './CustomSelect';
 import { sendNewBuildOrderWebhook } from '../utils/discordWebhook';
+import { WYSIWYGEditor } from './TournamentsPage';
 
 export interface Suggestion {
   id: string;
@@ -1713,7 +1714,7 @@ export default function AdminDashboardPage() {
                   <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Caricamento staff...</span>
                 </div>
               ) : (
-                <div className="flex flex-col gap-3">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {users
                   .filter(u => {
                     const email = u.email?.toLowerCase();
@@ -1741,10 +1742,10 @@ export default function AdminDashboardPage() {
                     return matchSearch;
                   })
                   .map(u => (
-                    <div key={u.id} className={`bg-[#0a0e1c]/60 border rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 group hover:bg-[#0a0e1c]/80 hover:border-cyan-500/40 shadow-xl transition-all duration-300 ${u.role === 'admin' ? 'border-cyan-500/20' : 'border-white/5'}`}>
+                    <div key={u.id} className={`bg-[#0a0e1c]/60 border rounded-2xl p-4 flex flex-row items-center justify-between gap-4 group hover:bg-[#0a0e1c]/80 hover:border-cyan-500/40 shadow-xl transition-all duration-300 ${u.role === 'admin' ? 'border-cyan-500/20' : 'border-white/5'}`}>
                       {/* Left: Avatar & Info */}
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border text-sm font-bold shrink-0 overflow-hidden shadow-md ${u.role === 'admin' ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
+                      <div className="flex items-center gap-4 min-w-0 flex-1">
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border text-base font-bold shrink-0 overflow-hidden shadow-md ${u.role === 'admin' ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
                           {u.avatar_url ? (
                             <img 
                               src={u.avatar_url} 
@@ -1786,7 +1787,7 @@ export default function AdminDashboardPage() {
                               </div>
                             ) : (
                               <div className="flex items-center gap-1.5 group/nick relative">
-                                <span className={`text-sm font-bold text-white truncate transition-colors ${savedSuccess === u.email ? 'text-green-400' : ''}`}>
+                                <span className={`text-base font-black text-white truncate transition-colors ${savedSuccess === u.email ? 'text-green-400' : ''}`}>
                                   {u.nickname || 'Senza Nickname'}
                                 </span>
                                 {savedSuccess === u.email && <CheckCircle size={10} className="text-green-400 animate-in" />}
@@ -1798,61 +1799,60 @@ export default function AdminDashboardPage() {
                                 </button>
                               </div>
                             )}
-                            {u.role === 'admin' && <span className="text-[7px] px-1.5 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded font-black uppercase tracking-wider">Owner</span>}
-                            {u.role === 'editor' && <span className="text-[7px] px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black uppercase tracking-wider">Editor</span>}
-                            <span className="text-[8px] font-black text-cyan-400/80 border border-cyan-500/20 px-1.5 py-0.5 rounded bg-cyan-500/5 uppercase tracking-wider">{u.rank || 'Unranked'}</span>
+                            {u.role === 'admin' && <span className="text-[8px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded font-black uppercase tracking-wider">Owner</span>}
+                            {u.role === 'editor' && <span className="text-[8px] px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black uppercase tracking-wider">Editor</span>}
+                            <span className="text-[9px] font-black text-cyan-400/80 border border-cyan-500/20 px-2 py-0.5 rounded bg-cyan-500/5 uppercase tracking-wider">{u.rank || 'Unranked'}</span>
                           </div>
-                          <span className="text-[10px] text-gray-500 truncate mt-0.5">{u.email}</span>
+                          <span className="text-xs text-gray-400 truncate mt-0.5">{u.email}</span>
                         </div>
                       </div>
 
                       {/* Right: Controls */}
-                      <div className="flex items-center gap-3 shrink-0 self-end md:self-center">
-                        <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest hidden sm:inline select-none">Permessi</span>
-                        <div className="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/5">
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center gap-1 bg-black/40 p-1.5 rounded-2xl border border-white/5">
                           <button
                             onClick={() => handleToggleUserRole(u.email, 'can_manage_tournaments', !u.can_manage_tournaments)}
-                            className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${u.can_manage_tournaments ? 'bg-cyan-500 text-black font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
+                            className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all ${u.can_manage_tournaments ? 'bg-cyan-500 text-black font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
                             title="Gestione Tornei"
                           >
-                            <Trophy size={12} />
+                            <Trophy size={14} />
                           </button>
 
                           <button
                             onClick={() => handleToggleUserRole(u.email, 'can_manage_civs', !u.can_manage_civs)}
-                            className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${u.can_manage_civs ? 'bg-blue-600 text-white font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
+                            className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all ${u.can_manage_civs ? 'bg-blue-600 text-white font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
                             title="Gestione Civiltà"
                           >
-                            <BookOpen size={12} />
+                            <BookOpen size={14} />
                           </button>
 
                           <button
                             onClick={() => handleToggleUserRole(u.email, 'can_manage_buildorders', !u.can_manage_buildorders)}
-                            className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${u.can_manage_buildorders ? 'bg-orange-500 text-white font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
+                            className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all ${u.can_manage_buildorders ? 'bg-orange-500 text-white font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
                             title="Gestione Build Orders"
                           >
-                            <Zap size={12} />
+                            <Zap size={14} />
                           </button>
 
-                          <div className="w-px h-4 bg-white/10 mx-0.5" />
+                          <div className="w-px h-5 bg-white/10 mx-0.5" />
 
                           <button
                             onClick={() => handleToggleUserRole(u.email, 'is_streamer', !u.is_streamer)}
-                            className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${u.is_streamer ? 'bg-pink-600 text-white font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
+                            className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all ${u.is_streamer ? 'bg-pink-600 text-white font-black' : 'bg-gray-800/40 text-gray-500 hover:text-white'}`}
                             title="Streamer"
                           >
-                            <Radio size={12} />
+                            <Radio size={14} />
                           </button>
                           
                           {isSuperAdmin && (
                             <>
-                              <div className="w-px h-4 bg-white/10 mx-0.5" />
+                              <div className="w-px h-5 bg-white/10 mx-0.5" />
                               <button
                                 onClick={() => handleDeleteUser(u.email)}
-                                className="w-7 h-7 flex items-center justify-center rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/25 border border-red-500/20 transition-all"
+                                className="w-8 h-8 flex items-center justify-center rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/25 border border-red-500/20 transition-all"
                                 title="Elimina Utente"
                               >
-                                <Trash2 size={12} />
+                                <Trash2 size={14} />
                               </button>
                             </>
                           )}
@@ -1885,14 +1885,14 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-3">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {allProfiles
                   .filter(p => !userSearch || p.email?.toLowerCase().includes(userSearch.toLowerCase()) || p.nickname?.toLowerCase().includes(userSearch.toLowerCase()))
                   .map(p => (
-                    <div key={p.email} className="bg-[#0a0e1c]/60 border border-white/5 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-cyan-500/40 shadow-xl transition-all duration-300 group">
+                    <div key={p.email} className="bg-[#0a0e1c]/60 border border-white/5 rounded-2xl p-4 flex flex-row items-center justify-between gap-4 hover:border-cyan-500/40 shadow-xl transition-all duration-300 group">
                       {/* Left: Avatar & Info */}
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold border border-cyan-500/20 overflow-hidden shadow-md shrink-0">
+                      <div className="flex items-center gap-4 min-w-0 flex-1">
+                        <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold border border-cyan-500/20 overflow-hidden shadow-md shrink-0">
                           {p.avatar_url ? (
                             <img 
                               src={p.avatar_url} 
@@ -1908,58 +1908,58 @@ export default function AdminDashboardPage() {
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-white font-bold text-sm truncate">{p.nickname || 'Anonimo'}</p>
-                          <p className="text-[10px] text-gray-500 truncate block mt-0.5">{p.email}</p>
+                          <p className="text-white font-black text-base truncate">{p.nickname || 'Anonimo'}</p>
+                          <p className="text-xs text-gray-400 truncate block mt-0.5">{p.email}</p>
                         </div>
                       </div>
                       
                       {/* Middle: Sheep Balance */}
-                      <div className="flex items-center gap-2 shrink-0 md:justify-center">
-                        <div className="flex items-center gap-1.5 bg-white/5 px-3 py-1 rounded-xl border border-white/10">
-                          <span className="text-sm">🐑</span>
-                          <span className="text-sm font-black text-white tracking-tight">{p.sheep_balance || 0}</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center gap-1.5 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
+                          <span className="text-lg">🐑</span>
+                          <span className="text-base font-black text-white tracking-tight">{p.sheep_balance || 0}</span>
                         </div>
                       </div>
 
                       {/* Right: Controls & Actions */}
-                      <div className="flex items-center justify-between md:justify-end gap-3 shrink-0 self-stretch md:self-auto">
-                        <div className="flex items-center gap-1 bg-[#111218] p-1 rounded-xl border border-white/10 shadow-md">
+                      <div className="flex items-center gap-3 shrink-0">
+                        <div className="flex items-center gap-1 bg-[#111218] p-1 rounded-2xl border border-white/10 shadow-md">
                           <button
                             onClick={() => {
                               const current = perUserRefillAmounts[p.email] ?? 100;
                               setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: Math.max(0, current - 10) });
                             }}
-                            className="w-7 h-7 flex items-center justify-center hover:bg-white/5 rounded-lg text-cyan-400 transition-colors"
+                            className="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-xl text-cyan-400 transition-colors"
                           >
-                            <Minus size={10} />
+                            <Minus size={12} />
                           </button>
                           <input
                             type="number"
                             value={perUserRefillAmounts[p.email] ?? 100}
                             onChange={(e) => setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: Number(e.target.value) })}
-                            className="w-10 bg-transparent text-xs text-white font-bold text-center outline-none"
+                            className="w-12 bg-transparent text-xs text-white font-black text-center outline-none"
                           />
                           <button
                             onClick={() => {
                               const current = perUserRefillAmounts[p.email] ?? 100;
                               setPerUserRefillAmounts({ ...perUserRefillAmounts, [p.email]: current + 10 });
                             }}
-                            className="w-7 h-7 flex items-center justify-center hover:bg-white/5 rounded-lg text-cyan-400 transition-colors"
+                            className="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-xl text-cyan-400 transition-colors"
                           >
-                            <Plus size={10} />
+                            <Plus size={12} />
                           </button>
                         </div>
                         
                         <button
                           onClick={() => handleSheepRefill(p.email, perUserRefillAmounts[p.email] ?? 100)}
                           disabled={isRefilling === p.email}
-                          className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white rounded-xl text-[10px] font-black border-0 shadow-md transition-all uppercase tracking-widest active:scale-95 disabled:opacity-40 flex items-center gap-1 group/btn min-w-[110px] justify-center"
+                          className="px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white rounded-xl text-xs font-black border-0 shadow-md transition-all uppercase tracking-widest active:scale-95 disabled:opacity-40 flex items-center gap-1 group/btn min-w-[125px] justify-center"
                         >
                           {isRefilling === p.email ? (
-                            <Loader2 size={12} className="animate-spin" />
+                            <Loader2 size={14} className="animate-spin" />
                           ) : (
                             <>
-                              <Zap size={10} className="group-hover/btn:fill-cyan-400 transition-all animate-pulse" />
+                              <Zap size={12} className="group-hover/btn:fill-cyan-400 transition-all animate-pulse" />
                               <span>Ricarica</span>
                             </>
                           )}
@@ -2180,13 +2180,10 @@ export default function AdminDashboardPage() {
                             </div>
                             {tournamentForm.has_regolamento && (
                               <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Contenuto Regolamento (Markdown supportato)</label>
-                                <textarea
-                                  value={tournamentForm.regolamento_content}
-                                  onChange={(e) => setTournamentForm({ ...tournamentForm, regolamento_content: e.target.value })}
-                                  rows={6}
-                                  className="w-full bg-white/[0.01] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl p-4 text-xs text-white focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none font-sans"
-                                  placeholder="Inserisci qui le regole del torneo..."
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Contenuto Regolamento</label>
+                                <WYSIWYGEditor
+                                  initialValue={tournamentForm.regolamento_content}
+                                  onChange={(html) => setTournamentForm({ ...tournamentForm, regolamento_content: html })}
                                 />
                               </div>
                             )}
@@ -2732,7 +2729,7 @@ export default function AdminDashboardPage() {
                                 src={c.flag} 
                                 alt={c.name} 
                                 className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
-                                  isSelected ? 'opacity-95 scale-105' : 'opacity-70 group-hover:opacity-95'
+                                  isSelected ? 'opacity-100 scale-105' : 'opacity-90 group-hover:opacity-100'
                                 }`} 
                               />
                             ) : (
@@ -2740,7 +2737,7 @@ export default function AdminDashboardPage() {
                             )}
                             
                             {/* Vignette Overlay (dark left, clear right) */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#0a0e1c]/95 via-[#0a0e1c]/40 to-transparent pointer-events-none"></div>
+                            <div className="absolute inset-0 bg-gradient-to-r from-[#0a0e1c] via-[#0a0e1c]/35 to-transparent pointer-events-none"></div>
                             
                             {/* Active glow indicator on the left */}
                             {isSelected && (

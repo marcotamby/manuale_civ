@@ -1885,7 +1885,7 @@ export function TournamentsPage() {
   );
 }
 
-function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onChange: (html: string) => void }) {
+export function WYSIWYGEditor({ initialValue, onChange }: { initialValue: string, onChange: (html: string) => void }) {
   const editorRef = useRef<HTMLDivElement>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [activeStyles, setActiveStyles] = useState({ 
