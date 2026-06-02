@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { 
   MessageSquare, CheckCircle, XCircle, Loader2, Send, Inbox, 
   AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, 
-  Trophy, BookOpen, Zap, Edit2, Check, Trash2, Plus, Minus, ArrowLeft, LayoutDashboard
+  Trophy, BookOpen, Zap, Edit2, Check, Trash2, Plus, Minus, ArrowLeft, LayoutDashboard,
+  Save, Sparkles
 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
@@ -28,7 +29,7 @@ export interface Suggestion {
 
 export default function AdminDashboardPage() {
   const navigate = useNavigate();
-  const { isAuthenticated, isAdmin, isSuperAdmin, canManageCivs, canManageBuildorders } = useAuth();
+  const { isAuthenticated, isAdmin, isSuperAdmin, canManageCivs, canManageBuildorders, canManageTournaments } = useAuth();
   const { refreshCivs } = useCivData();
 
   // Redirect if not admin
@@ -38,7 +39,7 @@ export default function AdminDashboardPage() {
     }
   }, [isAuthenticated, isAdmin, navigate]);
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'proposte' | 'qa' | 'users' | 'pecore'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'proposte' | 'qa' | 'users' | 'pecore' | 'tornei' | 'civilta'>('overview');
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; type: 'question' | 'answer' | 'user'; item: any } | null>(null);
@@ -77,6 +78,72 @@ export default function AdminDashboardPage() {
   const [isRefilling, setIsRefilling] = useState<string | null>(null);
   const [perUserRefillAmounts, setPerUserRefillAmounts] = useState<Record<string, number>>({});
 
+  // Tournaments states
+  const [tournaments, setTournaments] = useState<any[]>([]);
+  const [tournamentsLoading, setTournamentsLoading] = useState(false);
+  const [selectedTournament, setSelectedTournament] = useState<any | null>(null);
+  const [isEditingTournament, setIsEditingTournament] = useState(false);
+  const [isCreatingTournament, setIsCreatingTournament] = useState(false);
+  const [tournamentForm, setTournamentForm] = useState<any>({
+    name: '',
+    organizer: '',
+    period: '',
+    banner_url: '',
+    status: 'Programmato',
+    type: '1v1',
+    has_regolamento: false,
+    regolamento_content: '',
+    direct_link: '',
+    display_order: 0,
+    banner_position_x: 50,
+    banner_position_y: 50,
+    vods: []
+  });
+
+  // Betting markets states
+  const [markets, setMarkets] = useState<any[]>([]);
+  const [marketsLoading, setMarketsLoading] = useState(false);
+  const [isCreatingMarket, setIsCreatingMarket] = useState(false);
+  const [settleConfirmOption, setSettleConfirmOption] = useState<{ marketId: string; optionId: string } | null>(null);
+  const [marketForm, setMarketForm] = useState<any>({
+    title: '',
+    description: '',
+    type: 'Match Winner',
+    event_level: 'High Elo',
+    options: [{ label: '', weight: 100 }, { label: '', weight: 100 }]
+  });
+
+  // Civilizations and Build Orders states
+  const [civList, setCivList] = useState<any[]>([]);
+  const [civsLoading, setCivsLoading] = useState(false);
+  const [selectedCiv, setSelectedCiv] = useState<any | null>(null);
+  const [civForm, setCivForm] = useState<any>({
+    name: '',
+    difficulty: 'Medio',
+    short_description: '',
+    passive_bonuses: [],
+    strengths: [],
+    weaknesses: []
+  });
+  
+  const [selectedBOIndex, setSelectedBOIndex] = useState<number | null>(null); // -1 for new, number for edit index, null for none
+  const [boForm, setBoForm] = useState<any>({
+    id: '',
+    title: '',
+    difficulty: 2,
+    description: '',
+    map: '',
+    author_nickname: '',
+    author_rank: '',
+    banner_url: '',
+    banner_position: 50,
+    source: '',
+    steps: []
+  });
+  const [boManualText, setBoManualText] = useState('');
+  const [isAnalyzingBO, setIsAnalyzingBO] = useState(false);
+  const [boAnalysisProgress, setBoAnalysisProgress] = useState(0);
+
   useEffect(() => {
     if (isAuthenticated && isAdmin) {
       fetchSuggestions();
@@ -87,6 +154,447 @@ export default function AdminDashboardPage() {
       }
     }
   }, [isAuthenticated, isAdmin, isSuperAdmin]);
+
+  // Tab switcher effect to load data
+  useEffect(() => {
+    if (activeTab === 'tornei') {
+      fetchTournaments();
+    } else if (activeTab === 'civilta') {
+      fetchCivilizations();
+    }
+  }, [activeTab]);
+
+  const fetchTournaments = async () => {
+    try {
+      setTournamentsLoading(true);
+      const { data, error } = await supabase
+        .from('tournaments')
+        .select('*')
+        .order('display_order', { ascending: true });
+      if (error) throw error;
+      setTournaments(data || []);
+      if (data && data.length > 0 && !selectedTournament) {
+        setSelectedTournament(data[0]);
+      }
+    } catch (err: any) {
+      console.error('Error fetching tournaments:', err);
+      setToast({ isVisible: true, message: 'Errore nel caricamento dei tornei', type: 'error' });
+    } finally {
+      setTournamentsLoading(false);
+    }
+  };
+
+  const fetchMarkets = async (tourneySlug: string) => {
+    if (!tourneySlug) return;
+    try {
+      setMarketsLoading(true);
+      const { data, error } = await supabase
+        .from('betting_markets')
+        .select('*')
+        .eq('tournament_slug', tourneySlug)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setMarkets(data || []);
+    } catch (err: any) {
+      console.error('Error fetching markets:', err);
+    } finally {
+      setMarketsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedTournament) {
+      fetchMarkets(selectedTournament.slug);
+      setTournamentForm({
+        name: selectedTournament.name || '',
+        organizer: selectedTournament.organizer || '',
+        period: selectedTournament.period || '',
+        banner_url: selectedTournament.banner_url || '',
+        status: selectedTournament.status || 'Programmato',
+        type: selectedTournament.type || '1v1',
+        has_regolamento: selectedTournament.has_regolamento || false,
+        regolamento_content: selectedTournament.regolamento_content || '',
+        direct_link: selectedTournament.direct_link || '',
+        display_order: selectedTournament.display_order || 0,
+        banner_position_x: selectedTournament.banner_position_x || 50,
+        banner_position_y: selectedTournament.banner_position_y || 50,
+        vods: selectedTournament.vods || []
+      });
+      setIsEditingTournament(false);
+      setIsCreatingTournament(false);
+      setIsCreatingMarket(false);
+    }
+  }, [selectedTournament]);
+
+  const handleSaveTournament = async () => {
+    if (!tournamentForm.name) {
+      setToast({ isVisible: true, message: 'Nome torneo obbligatorio', type: 'error' });
+      return;
+    }
+    const slug = isCreatingTournament 
+      ? tournamentForm.name.toLowerCase().trim().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-')
+      : selectedTournament.slug;
+
+    const payload = {
+      slug,
+      name: tournamentForm.name,
+      organizer: tournamentForm.organizer,
+      period: tournamentForm.period,
+      banner_url: tournamentForm.banner_url,
+      status: tournamentForm.status,
+      type: tournamentForm.type,
+      has_regolamento: tournamentForm.has_regolamento,
+      regolamento_content: tournamentForm.regolamento_content,
+      direct_link: tournamentForm.direct_link || null,
+      display_order: Number(tournamentForm.display_order || 0),
+      banner_position_x: Number(tournamentForm.banner_position_x || 50),
+      banner_position_y: Number(tournamentForm.banner_position_y || 50),
+      vods: tournamentForm.vods,
+      updated_at: new Date().toISOString()
+    };
+
+    try {
+      let error;
+      if (isCreatingTournament) {
+        const { error: insError } = await supabase.from('tournaments').insert(payload);
+        error = insError;
+      } else {
+        const { error: updError } = await supabase.from('tournaments').update(payload).eq('id', selectedTournament.id);
+        error = updError;
+      }
+      if (error) throw error;
+      setToast({ isVisible: true, message: isCreatingTournament ? 'Torneo creato!' : 'Torneo salvato!', type: 'success' });
+      setIsCreatingTournament(false);
+      setIsEditingTournament(false);
+      await fetchTournaments();
+    } catch (err: any) {
+      console.error(err);
+      setToast({ isVisible: true, message: `Errore: ${err.message}`, type: 'error' });
+    }
+  };
+
+  const handleDeleteTournament = async (tId: string) => {
+    if (!window.confirm('Sei sicuro di voler eliminare questo torneo? Tutti i dati e scommesse collegati potrebbero andare persi.')) return;
+    try {
+      const { error } = await supabase.from('tournaments').delete().eq('id', tId);
+      if (error) throw error;
+      setToast({ isVisible: true, message: 'Torneo eliminato', type: 'success' });
+      setSelectedTournament(null);
+      await fetchTournaments();
+    } catch (err: any) {
+      setToast({ isVisible: true, message: err.message, type: 'error' });
+    }
+  };
+
+  const handleSaveMarket = async () => {
+    if (!marketForm.title) {
+      setToast({ isVisible: true, message: 'Titolo scommessa obbligatorio', type: 'error' });
+      return;
+    }
+    const finalOptions = marketForm.options.map((opt: any) => ({
+      id: Math.random().toString(36).substring(2, 11),
+      label: opt.label,
+      initial_weight: Number(opt.weight || 100),
+      is_disabled: false,
+      total_bet: 0
+    }));
+
+    if (finalOptions.some((o: any) => !o.label)) {
+      setToast({ isVisible: true, message: 'Compila tutte le opzioni', type: 'error' });
+      return;
+    }
+
+    const payload = {
+      tournament_slug: selectedTournament.slug,
+      title: marketForm.title,
+      description: marketForm.description,
+      type: marketForm.type,
+      event_level: marketForm.event_level,
+      options: finalOptions,
+      status: 'open'
+    };
+
+    try {
+      const { error } = await supabase.from('betting_markets').insert(payload);
+      if (error) throw error;
+      setToast({ isVisible: true, message: 'Scommessa pubblicata!', type: 'success' });
+      setIsCreatingMarket(false);
+      setMarketForm({
+        title: '',
+        description: '',
+        type: 'Match Winner',
+        event_level: 'High Elo',
+        options: [{ label: '', weight: 100 }, { label: '', weight: 100 }]
+      });
+      await fetchMarkets(selectedTournament.slug);
+    } catch (err: any) {
+      setToast({ isVisible: true, message: err.message, type: 'error' });
+    }
+  };
+
+  const handleToggleMarketStatus = async (marketId: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'open' ? 'closed' : 'open';
+    try {
+      const { error } = await supabase
+        .from('betting_markets')
+        .update({ status: newStatus })
+        .eq('id', marketId);
+      if (error) throw error;
+      setToast({ isVisible: true, message: `Stato mercato aggiornato a ${newStatus}`, type: 'success' });
+      await fetchMarkets(selectedTournament.slug);
+    } catch (err: any) {
+      setToast({ isVisible: true, message: err.message, type: 'error' });
+    }
+  };
+
+  const handleSettleMarketDashboard = async (marketId: string, optionId: string) => {
+    try {
+      const { error } = await supabase.rpc('settle_betting_market', {
+        p_market_id: marketId,
+        p_winner_option_id: optionId
+      });
+      if (error) throw error;
+      setToast({ isVisible: true, message: 'Scommessa liquidata con successo!', type: 'success' });
+      setSettleConfirmOption(null);
+      await fetchMarkets(selectedTournament.slug);
+    } catch (err: any) {
+      setToast({ isVisible: true, message: `Errore liquidazione: ${err.message}`, type: 'error' });
+    }
+  };
+
+  const fetchCivilizations = async () => {
+    try {
+      setCivsLoading(true);
+      const { data, error } = await supabase
+        .from('civilizations')
+        .select('*')
+        .order('name', { ascending: true });
+      if (error) throw error;
+      setCivList(data || []);
+      if (data && data.length > 0 && !selectedCiv) {
+        setSelectedCiv(data[0]);
+      }
+    } catch (err: any) {
+      console.error('Error fetching civilizations:', err);
+      setToast({ isVisible: true, message: 'Errore nel caricamento delle civiltà', type: 'error' });
+    } finally {
+      setCivsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedCiv) {
+      setCivForm({
+        name: selectedCiv.name || '',
+        difficulty: selectedCiv.difficulty || 'Medio',
+        short_description: selectedCiv.short_description || '',
+        passive_bonuses: selectedCiv.passive_bonuses || [],
+        strengths: selectedCiv.strengths || [],
+        weaknesses: selectedCiv.weaknesses || []
+      });
+      setSelectedBOIndex(null);
+    }
+  }, [selectedCiv]);
+
+  const handleSaveCivDetails = async () => {
+    if (!civForm.name) {
+      setToast({ isVisible: true, message: 'Nome civiltà obbligatorio', type: 'error' });
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from('civilizations')
+        .update({
+          name: civForm.name,
+          difficulty: civForm.difficulty,
+          short_description: civForm.short_description,
+          passive_bonuses: civForm.passive_bonuses?.filter((b: string) => b.trim() !== '') || [],
+          strengths: civForm.strengths?.filter((s: string) => s.trim() !== '') || [],
+          weaknesses: civForm.weaknesses?.filter((w: string) => w.trim() !== '') || []
+        })
+        .eq('id', selectedCiv.id);
+      if (error) throw error;
+      setToast({ isVisible: true, message: 'Dettagli civiltà salvati!', type: 'success' });
+      
+      setCivList(prev => prev.map(c => c.id === selectedCiv.id ? {
+        ...c,
+        name: civForm.name,
+        difficulty: civForm.difficulty,
+        short_description: civForm.short_description,
+        passive_bonuses: civForm.passive_bonuses,
+        strengths: civForm.strengths,
+        weaknesses: civForm.weaknesses
+      } : c));
+      
+      setSelectedCiv((prev: any) => ({
+        ...prev,
+        name: civForm.name,
+        difficulty: civForm.difficulty,
+        short_description: civForm.short_description,
+        passive_bonuses: civForm.passive_bonuses,
+        strengths: civForm.strengths,
+        weaknesses: civForm.weaknesses
+      }));
+
+      refreshCivs();
+    } catch (err: any) {
+      setToast({ isVisible: true, message: err.message, type: 'error' });
+    }
+  };
+
+  const handleEditBO = (index: number) => {
+    setSelectedBOIndex(index);
+    if (index === -1) {
+      setBoForm({
+        id: `bo-${Date.now()}`,
+        title: '',
+        difficulty: 2,
+        description: '',
+        map: '',
+        author_nickname: useAuth().user?.nickname || '',
+        author_rank: useAuth().user?.rank || '',
+        banner_url: '',
+        banner_position: 50,
+        source: '',
+        steps: []
+      });
+      setBoManualText('');
+    } else {
+      const bo = selectedCiv.build_orders[index];
+      setBoForm({
+        id: bo.id || `bo-${Date.now()}`,
+        title: bo.title || '',
+        difficulty: bo.difficulty || 2,
+        description: bo.description || '',
+        map: bo.map || '',
+        author_nickname: bo.author_nickname || '',
+        author_rank: bo.author_rank || '',
+        banner_url: bo.banner_url || '',
+        banner_position: bo.banner_position || 50,
+        source: bo.source || '',
+        steps: bo.steps || []
+      });
+      setBoManualText('');
+    }
+  };
+
+  const handleSaveBO = async () => {
+    if (!boForm.title) {
+      setToast({ isVisible: true, message: 'Titolo build order obbligatorio', type: 'error' });
+      return;
+    }
+    try {
+      const currentBOs = [...(selectedCiv.build_orders || [])];
+      if (selectedBOIndex === -1) {
+        currentBOs.push(boForm);
+      } else if (selectedBOIndex !== null) {
+        currentBOs[selectedBOIndex] = boForm;
+      }
+
+      const { error } = await supabase
+        .from('civilizations')
+        .update({ build_orders: currentBOs })
+        .eq('id', selectedCiv.id);
+
+      if (error) throw error;
+      setToast({ isVisible: true, message: 'Build order salvato!', type: 'success' });
+      
+      const updatedCiv = { ...selectedCiv, build_orders: currentBOs };
+      setSelectedCiv(updatedCiv);
+      setCivList(prev => prev.map(c => c.id === selectedCiv.id ? updatedCiv : c));
+      setSelectedBOIndex(null);
+      refreshCivs();
+
+      if (selectedBOIndex === -1) {
+        try {
+          await sendNewBuildOrderWebhook({
+            civId: selectedCiv.id,
+            civName: selectedCiv.name,
+            boId: boForm.id,
+            boTitle: boForm.title,
+            difficulty: boForm.difficulty,
+            description: boForm.description,
+            map: boForm.map,
+            bannerUrl: boForm.banner_url
+          });
+        } catch (webErr) {
+          console.error(webErr);
+        }
+      }
+    } catch (err: any) {
+      setToast({ isVisible: true, message: err.message, type: 'error' });
+    }
+  };
+
+  const handleDeleteBO = async (index: number) => {
+    if (!window.confirm('Sei sicuro di voler eliminare questo build order?')) return;
+    try {
+      const currentBOs = [...(selectedCiv.build_orders || [])];
+      currentBOs.splice(index, 1);
+
+      const { error } = await supabase
+        .from('civilizations')
+        .update({ build_orders: currentBOs })
+        .eq('id', selectedCiv.id);
+
+      if (error) throw error;
+      setToast({ isVisible: true, message: 'Build order eliminato', type: 'success' });
+      const updatedCiv = { ...selectedCiv, build_orders: currentBOs };
+      setSelectedCiv(updatedCiv);
+      setCivList(prev => prev.map(c => c.id === selectedCiv.id ? updatedCiv : c));
+      refreshCivs();
+    } catch (err: any) {
+      setToast({ isVisible: true, message: err.message, type: 'error' });
+    }
+  };
+
+  const handleAIBOAnalysis = async () => {
+    if (!boManualText.trim()) {
+      setToast({ isVisible: true, message: 'Incolla il testo per l\'analisi', type: 'error' });
+      return;
+    }
+    try {
+      setIsAnalyzingBO(true);
+      setBoAnalysisProgress(10);
+      const timer = setInterval(() => {
+        setBoAnalysisProgress(p => p < 90 ? p + Math.random() * 8 : p);
+      }, 500);
+
+      const response = await fetch('/api/analyze-bo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          youtubeUrl: null,
+          rawText: boManualText,
+          civName: selectedCiv.name
+        }),
+      });
+
+      clearInterval(timer);
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.details || error.error || 'Errore durante l\'analisi');
+      }
+
+      const data = await response.json();
+      setBoForm((prev: any) => ({
+        ...prev,
+        description: data.description || prev.description,
+        steps: data.steps && data.steps.length > 0 ? data.steps : prev.steps
+      }));
+      setBoAnalysisProgress(100);
+      setToast({ isVisible: true, message: 'Analisi completata con successo!', type: 'success' });
+    } catch (err: any) {
+      console.error(err);
+      setToast({ isVisible: true, message: `Errore IA: ${err.message}`, type: 'error' });
+    } finally {
+      setIsAnalyzingBO(false);
+      setBoAnalysisProgress(0);
+    }
+  };
 
   const getYoutubeId = (url: string) => {
     if (!url) return null;
@@ -609,6 +1117,26 @@ export default function AdminDashboardPage() {
               </span>
             )}
           </button>
+
+          {(isSuperAdmin || canManageTournaments) && (
+            <button
+              onClick={() => setActiveTab('tornei')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'tornei' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            >
+              <Trophy size={18} />
+              <span>Gestione Tornei</span>
+            </button>
+          )}
+
+          {(isSuperAdmin || canManageCivs || canManageBuildorders) && (
+            <button
+              onClick={() => setActiveTab('civilta')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'civilta' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            >
+              <BookOpen size={18} />
+              <span>Civiltà & BO</span>
+            </button>
+          )}
 
           {isSuperAdmin && (
             <>
@@ -1357,6 +1885,910 @@ export default function AdminDashboardPage() {
                       </div>
                     </div>
                   ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB TORNEI */}
+          {activeTab === 'tornei' && (isSuperAdmin || canManageTournaments) && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                {/* Sidebar Tornei */}
+                <div className="lg:col-span-4 bg-[#0a0e1c]/40 border border-white/5 rounded-2xl p-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-wider">Lista Tornei</h3>
+                    <button
+                      onClick={() => {
+                        setIsCreatingTournament(true);
+                        setIsEditingTournament(true);
+                        setSelectedTournament(null);
+                        setTournamentForm({
+                          name: '',
+                          organizer: '',
+                          period: '',
+                          banner_url: '',
+                          status: 'Programmato',
+                          type: '1v1',
+                          has_regolamento: false,
+                          regolamento_content: '',
+                          direct_link: '',
+                          display_order: 0,
+                          banner_position_x: 50,
+                          banner_position_y: 50,
+                          vods: []
+                        });
+                      }}
+                      className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition-all uppercase tracking-wider flex items-center gap-1"
+                    >
+                      <Plus size={14} /> Nuovo
+                    </button>
+                  </div>
+
+                  {tournamentsLoading ? (
+                    <div className="flex justify-center py-10">
+                      <Loader2 className="animate-spin text-blue-400" />
+                    </div>
+                  ) : (
+                    <div className="space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar">
+                      {tournaments.map((t) => (
+                        <button
+                          key={t.id}
+                          onClick={() => {
+                            setSelectedTournament(t);
+                            setIsCreatingTournament(false);
+                            setIsEditingTournament(false);
+                          }}
+                          className={`w-full flex items-center justify-between p-3 rounded-xl border text-left transition-all ${selectedTournament?.id === t.id && !isCreatingTournament ? 'bg-blue-600/10 border-blue-500 text-white' : 'bg-black/20 border-white/5 text-gray-400 hover:text-white hover:bg-white/5'}`}
+                        >
+                          <div>
+                            <span className="font-bold text-sm block">{t.name}</span>
+                            <span className="text-[10px] uppercase font-bold text-gray-500">{t.status} • {t.type}</span>
+                          </div>
+                          <span className="text-xs font-mono text-gray-500">#{t.display_order}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Dettagli / Gestione Scommesse */}
+                <div className="lg:col-span-8 space-y-6">
+                  {(selectedTournament || isCreatingTournament) ? (
+                    <div className="bg-[#0a0e1c]/40 border border-white/5 rounded-2xl p-6 space-y-6">
+                      
+                      {/* Titolo Sezione */}
+                      <div className="flex justify-between items-center border-b border-white/5 pb-4">
+                        <div>
+                          <h3 className="text-lg font-bold text-white">
+                            {isCreatingTournament ? 'Nuovo Torneo' : selectedTournament?.name}
+                          </h3>
+                          <p className="text-xs text-gray-400">
+                            {isCreatingTournament ? 'Configura le informazioni iniziali del torneo.' : 'Gestisci metadata e mercati scommesse.'}
+                          </p>
+                        </div>
+                        {!isCreatingTournament && (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => setIsEditingTournament(!isEditingTournament)}
+                              className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-lg text-xs font-bold transition-all uppercase"
+                            >
+                              {isEditingTournament ? 'Visualizza Scommesse' : 'Modifica Torneo'}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteTournament(selectedTournament.id)}
+                              className="p-1.5 bg-red-600/15 hover:bg-red-600/25 border border-red-500/20 text-red-400 rounded-lg transition-all"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Configurazione Form o Scommesse */}
+                      {isEditingTournament || isCreatingTournament ? (
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Nome Torneo</label>
+                              <input
+                                type="text"
+                                value={tournamentForm.name}
+                                onChange={(e) => setTournamentForm({ ...tournamentForm, name: e.target.value })}
+                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Organizzatore</label>
+                              <input
+                                type="text"
+                                value={tournamentForm.organizer}
+                                onChange={(e) => setTournamentForm({ ...tournamentForm, organizer: e.target.value })}
+                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Stato</label>
+                              <select
+                                value={tournamentForm.status}
+                                onChange={(e) => setTournamentForm({ ...tournamentForm, status: e.target.value })}
+                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none [&>option]:bg-[#1a1c23]"
+                              >
+                                <option value="Programmato">Programmato</option>
+                                <option value="In Corso">In Corso</option>
+                                <option value="Concluso">Concluso</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Tipo</label>
+                              <input
+                                type="text"
+                                value={tournamentForm.type}
+                                onChange={(e) => setTournamentForm({ ...tournamentForm, type: e.target.value })}
+                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                                placeholder="es: 1v1, 2v2, 3v3"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Ordine Visualizzazione</label>
+                              <input
+                                type="number"
+                                value={tournamentForm.display_order}
+                                onChange={(e) => setTournamentForm({ ...tournamentForm, display_order: e.target.value })}
+                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Periodo / Date</label>
+                              <input
+                                type="text"
+                                value={tournamentForm.period}
+                                onChange={(e) => setTournamentForm({ ...tournamentForm, period: e.target.value })}
+                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                                placeholder="es: 12 - 15 Giugno 2026"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Banner Image URL</label>
+                              <input
+                                type="text"
+                                value={tournamentForm.banner_url}
+                                onChange={(e) => setTournamentForm({ ...tournamentForm, banner_url: e.target.value })}
+                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Link Diretto Challonge/Startgg</label>
+                            <input
+                              type="text"
+                              value={tournamentForm.direct_link}
+                              onChange={(e) => setTournamentForm({ ...tournamentForm, direct_link: e.target.value })}
+                              className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                              placeholder="https://challonge.com/..."
+                            />
+                          </div>
+
+                          <div className="border border-white/5 p-4 rounded-xl space-y-3">
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                id="has_regolamento"
+                                checked={tournamentForm.has_regolamento}
+                                onChange={(e) => setTournamentForm({ ...tournamentForm, has_regolamento: e.target.checked })}
+                                className="rounded bg-black/40 border-gray-600 text-blue-500 focus:ring-0"
+                              />
+                              <label htmlFor="has_regolamento" className="text-xs font-bold text-white select-none">Abilita Regolamento Dedicato</label>
+                            </div>
+                            {tournamentForm.has_regolamento && (
+                              <div>
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Contenuto Regolamento (Markdown supportato)</label>
+                                <textarea
+                                  value={tournamentForm.regolamento_content}
+                                  onChange={(e) => setTournamentForm({ ...tournamentForm, regolamento_content: e.target.value })}
+                                  rows={5}
+                                  className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-blue-500 outline-none font-sans"
+                                  placeholder="Inserisci qui le regole del torneo..."
+                                />
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex justify-end gap-3 pt-4">
+                            <button
+                              onClick={() => {
+                                setIsEditingTournament(false);
+                                setIsCreatingTournament(false);
+                              }}
+                              className="px-4 py-2 border border-gray-600 text-gray-400 rounded-lg hover:bg-white/5 transition-colors font-medium text-xs uppercase"
+                            >
+                              Annulla
+                            </button>
+                            <button
+                              onClick={handleSaveTournament}
+                              className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-2"
+                            >
+                              <Save size={14} /> Salva Torneo
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-6">
+                          
+                          {/* Scommesse Tab Content */}
+                          <div className="flex justify-between items-center">
+                            <h4 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                              <Radio size={16} className="text-red-500 animate-pulse" /> Mercati Scommesse
+                            </h4>
+                            <button
+                              onClick={() => setIsCreatingMarket(true)}
+                              className="px-3 py-1.5 bg-yellow-500 text-black hover:bg-yellow-400 rounded-lg text-xs font-bold transition-all uppercase tracking-wider flex items-center gap-1"
+                            >
+                              <Plus size={14} /> Nuova Scommessa
+                            </button>
+                          </div>
+
+                          {isCreatingMarket && (
+                            <div className="bg-black/30 border border-yellow-500/20 p-4 rounded-xl space-y-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Titolo Scommessa</label>
+                                  <input
+                                    type="text"
+                                    value={marketForm.title}
+                                    onChange={(e) => setMarketForm({ ...marketForm, title: e.target.value })}
+                                    className="w-full bg-[#1a1c23] border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-yellow-500 outline-none"
+                                    placeholder="es: VortiX vs LucifroN"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Descrizione</label>
+                                  <input
+                                    type="text"
+                                    value={marketForm.description}
+                                    onChange={(e) => setMarketForm({ ...marketForm, description: e.target.value })}
+                                    className="w-full bg-[#1a1c23] border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-yellow-500 outline-none"
+                                    placeholder="es: Match Winner semifinale"
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Tipo Mercato</label>
+                                  <select
+                                    value={marketForm.type}
+                                    onChange={(e) => setMarketForm({ ...marketForm, type: e.target.value })}
+                                    className="w-full bg-[#1a1c23] border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-yellow-500 outline-none [&>option]:bg-[#1a1c23]"
+                                  >
+                                    <option value="Match Winner">Match Winner</option>
+                                    <option value="Tournament Winner">Tournament Winner</option>
+                                    <option value="Final Score">Final Score</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Fascia Elo</label>
+                                  <select
+                                    value={marketForm.event_level}
+                                    onChange={(e) => setMarketForm({ ...marketForm, event_level: e.target.value })}
+                                    className="w-full bg-[#1a1c23] border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-yellow-500 outline-none [&>option]:bg-[#1a1c23]"
+                                  >
+                                    <option value="High Elo">High Elo</option>
+                                    <option value="Low Elo">Low Elo</option>
+                                  </select>
+                                </div>
+                              </div>
+
+                              <div className="space-y-2">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Opzioni & Pesi Iniziali</label>
+                                {marketForm.options.map((opt: any, idx: number) => (
+                                  <div key={idx} className="flex gap-2 items-center">
+                                    <input
+                                      type="text"
+                                      value={opt.label}
+                                      onChange={(e) => {
+                                        const newOpts = [...marketForm.options];
+                                        newOpts[idx].label = e.target.value;
+                                        setMarketForm({ ...marketForm, options: newOpts });
+                                      }}
+                                      className="flex-1 bg-[#1a1c23] border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-yellow-500 outline-none"
+                                      placeholder={`Opzione ${idx + 1}`}
+                                    />
+                                    <input
+                                      type="number"
+                                      value={opt.weight}
+                                      onChange={(e) => {
+                                        const newOpts = [...marketForm.options];
+                                        newOpts[idx].weight = e.target.value;
+                                        setMarketForm({ ...marketForm, options: newOpts });
+                                      }}
+                                      className="w-20 bg-[#1a1c23] border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-yellow-500 outline-none text-center"
+                                      placeholder="Peso"
+                                      title="Peso probabilistico iniziale"
+                                    />
+                                    {marketForm.options.length > 2 && (
+                                      <button
+                                        onClick={() => {
+                                          const newOpts = marketForm.options.filter((_: any, i: number) => i !== idx);
+                                          setMarketForm({ ...marketForm, options: newOpts });
+                                        }}
+                                        className="p-2 bg-red-500/10 hover:bg-red-500/25 border border-red-500/20 text-red-400 rounded-lg text-xs"
+                                      >
+                                        <X size={12} />
+                                      </button>
+                                    )}
+                                  </div>
+                                ))}
+                                <button
+                                  onClick={() => setMarketForm({ ...marketForm, options: [...marketForm.options, { label: '', weight: 100 }] })}
+                                  className="text-xs text-yellow-500 font-bold hover:underline"
+                                >
+                                  + Aggiungi Opzione
+                                </button>
+                              </div>
+
+                              <div className="flex justify-end gap-2 pt-2">
+                                <button
+                                  onClick={() => setIsCreatingMarket(false)}
+                                  className="px-3 py-1.5 border border-gray-600 text-gray-400 rounded-lg hover:bg-white/5 transition-colors text-xs font-bold uppercase"
+                                >
+                                  Annulla
+                                </button>
+                                <button
+                                  onClick={handleSaveMarket}
+                                  className="px-4 py-1.5 bg-yellow-500 text-black font-bold rounded-lg hover:bg-yellow-400 transition-all text-xs uppercase"
+                                >
+                                  Crea Scommessa
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {marketsLoading ? (
+                            <div className="flex justify-center py-6">
+                              <Loader2 className="animate-spin text-yellow-500" />
+                            </div>
+                          ) : markets.length === 0 ? (
+                            <div className="text-center py-10 bg-white/[0.01] border border-dashed border-white/5 rounded-xl text-gray-500">
+                              Nessuna scommessa per questo torneo.
+                            </div>
+                          ) : (
+                            <div className="space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar">
+                              {markets.map((market) => (
+                                <div key={market.id} className="bg-black/30 border border-white/5 rounded-xl p-4 space-y-3">
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <span className="font-bold text-sm text-white block">{market.title}</span>
+                                      <span className="text-[10px] text-gray-500">{market.description || market.type}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${market.status === 'open' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
+                                        {market.status === 'open' ? 'Aperto' : 'Chiuso'}
+                                      </span>
+                                      <button
+                                        onClick={() => handleToggleMarketStatus(market.id, market.status)}
+                                        className="px-2 py-1 bg-white/5 hover:bg-white/10 text-white rounded text-[10px] border border-white/10 font-bold transition-all uppercase"
+                                      >
+                                        {market.status === 'open' ? 'Chiudi scommesse' : 'Riapri'}
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-black/40 p-2.5 rounded-lg">
+                                    {market.options?.map((opt: any) => {
+                                      const isWinner = market.winner_option_id === opt.id;
+                                      return (
+                                        <div key={opt.id} className={`p-2 rounded border text-center relative ${isWinner ? 'bg-green-500/20 border-green-500/50 text-green-300' : 'bg-white/5 border-transparent text-gray-400'}`}>
+                                          <span className="text-xs font-bold block truncate" title={opt.label}>{opt.label}</span>
+                                          <span className="text-[10px] text-gray-500">Puntate: {opt.total_bet || 0} 🐑</span>
+                                          
+                                          {/* Settle option selector if market is closed and not settled */}
+                                          {market.status === 'closed' && market.winner_option_id === null && (
+                                            <button
+                                              onClick={() => setSettleConfirmOption({ marketId: market.id, optionId: opt.id })}
+                                              className="w-full mt-1.5 py-1 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 text-[9px] font-black rounded border border-yellow-500/20 transition-all uppercase"
+                                            >
+                                              Liquida Vincente
+                                            </button>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-20 text-center bg-white/[0.01] border border-dashed border-white/5 rounded-2xl text-gray-500">
+                      <Trophy size={48} className="opacity-20 mb-3" />
+                      <p>Seleziona un torneo a sinistra per gestirlo oppure creane uno nuovo.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Modale Conferma Liquidazione Scommessa */}
+              {settleConfirmOption && (
+                <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
+                  <div className="bg-[#0a0e1c] border border-yellow-500/30 p-8 rounded-3xl max-w-sm w-full shadow-2xl text-center">
+                    <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-yellow-500/20">
+                      <AlertTriangle className="text-yellow-500" size={32} />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Conferma Liquidazione</h3>
+                    <p className="text-sm text-gray-400 mb-6">
+                      Sei sicuro di voler decretare questa opzione come vincente? L'operazione assegnerà automaticamente i premi in pecore a tutti i vincitori e non può essere annullata.
+                    </p>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setSettleConfirmOption(null)}
+                        className="flex-1 px-4 py-2 bg-white/5 border border-white/10 text-gray-400 hover:text-white rounded-xl transition-all text-xs font-bold uppercase"
+                      >
+                        Annulla
+                      </button>
+                      <button
+                        onClick={() => handleSettleMarketDashboard(settleConfirmOption.marketId, settleConfirmOption.optionId)}
+                        className="flex-1 px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black rounded-xl transition-all text-xs font-black uppercase"
+                      >
+                        Conferma Liquida
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB CIVILTA */}
+          {activeTab === 'civilta' && (isSuperAdmin || canManageCivs || canManageBuildorders) && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                {/* Sidebar Civiltà */}
+                <div className="lg:col-span-3 bg-[#0a0e1c]/40 border border-white/5 rounded-2xl p-4 space-y-4">
+                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-wider border-b border-white/5 pb-2">Civiltà</h3>
+                  {civsLoading ? (
+                    <div className="flex justify-center py-10">
+                      <Loader2 className="animate-spin text-blue-400" />
+                    </div>
+                  ) : (
+                    <div className="space-y-1.5 max-h-[550px] overflow-y-auto custom-scrollbar">
+                      {civList.map((c) => (
+                        <button
+                          key={c.id}
+                          onClick={() => {
+                            setSelectedCiv(c);
+                            setSelectedBOIndex(null);
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-xl border text-sm font-bold transition-all ${selectedCiv?.id === c.id ? 'bg-blue-600/10 border-blue-500 text-white' : 'bg-black/20 border-white/5 text-gray-400 hover:text-white hover:bg-white/5'}`}
+                        >
+                          {c.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Corpo Editor Civiltà & BO */}
+                <div className="lg:col-span-9 space-y-6">
+                  {selectedCiv ? (
+                    <div className="space-y-6">
+                      
+                      {/* Nav Tab interna all'Editor Civ */}
+                      <div className="flex items-center gap-6 border-b border-white/5 pb-1">
+                        <button
+                          onClick={() => setSelectedBOIndex(null)}
+                          className={`pb-3 text-sm font-bold uppercase tracking-wider relative transition-colors ${selectedBOIndex === null ? 'text-blue-400 font-black' : 'text-gray-400 hover:text-white'}`}
+                        >
+                          Dettagli Civiltà
+                          {selectedBOIndex === null && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 rounded-full"></span>}
+                        </button>
+                        <button
+                          onClick={() => handleEditBO(-1)}
+                          className={`pb-3 text-sm font-bold uppercase tracking-wider relative transition-colors ${selectedBOIndex !== null ? 'text-blue-400 font-black' : 'text-gray-400 hover:text-white'}`}
+                        >
+                          Build Orders ({selectedCiv.build_orders?.length || 0})
+                          {selectedBOIndex !== null && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 rounded-full"></span>}
+                        </button>
+                      </div>
+
+                      {/* PANEL 1: Dettagli Civiltà */}
+                      {selectedBOIndex === null ? (
+                        <div className="bg-[#0a0e1c]/40 border border-white/5 rounded-2xl p-6 space-y-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Nome Civiltà</label>
+                              <input
+                                type="text"
+                                value={civForm.name}
+                                onChange={(e) => setCivForm({ ...civForm, name: e.target.value })}
+                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Difficoltà</label>
+                              <select
+                                value={civForm.difficulty}
+                                onChange={(e) => setCivForm({ ...civForm, difficulty: e.target.value })}
+                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none [&>option]:bg-[#1a1c23]"
+                              >
+                                <option value="Facile">Facile</option>
+                                <option value="Medio">Medio</option>
+                                <option value="Difficile">Difficile</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Descrizione Breve</label>
+                            <textarea
+                              value={civForm.short_description}
+                              onChange={(e) => setCivForm({ ...civForm, short_description: e.target.value })}
+                              rows={4}
+                              className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none"
+                            />
+                          </div>
+
+                          {/* Passive bonuses list */}
+                          <div className="bg-black/20 border border-white/5 p-4 rounded-xl space-y-4">
+                            <label className="text-[10px] font-bold text-yellow-500 uppercase tracking-wider block">Bonus Passivi</label>
+                            <div className="space-y-2">
+                              {civForm.passive_bonuses?.map((bonus: string, idx: number) => (
+                                <div key={idx} className="flex gap-2">
+                                  <textarea
+                                    value={bonus}
+                                    onChange={(e) => {
+                                      const newB = [...civForm.passive_bonuses];
+                                      newB[idx] = e.target.value;
+                                      setCivForm({ ...civForm, passive_bonuses: newB });
+                                    }}
+                                    rows={2}
+                                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-1.5 text-xs text-white focus:border-yellow-500 outline-none"
+                                  />
+                                  <button
+                                    onClick={() => {
+                                      const newB = civForm.passive_bonuses.filter((_: any, i: number) => i !== idx);
+                                      setCivForm({ ...civForm, passive_bonuses: newB });
+                                    }}
+                                    className="p-2 bg-red-500/10 hover:bg-red-500/25 border border-red-500/20 text-red-400 rounded-lg text-xs"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                </div>
+                              ))}
+                              <button
+                                onClick={() => setCivForm({ ...civForm, passive_bonuses: [...(civForm.passive_bonuses || []), ''] })}
+                                className="text-xs text-yellow-500 font-bold hover:underline"
+                              >
+                                + Aggiungi Nuovo Bonus
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Strengths & Weaknesses (Row lines textareas) */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-black/20 border border-white/5 p-4 rounded-xl space-y-2">
+                              <label className="text-[10px] font-bold text-green-500 uppercase tracking-wider block">Punti di Forza (Uno per riga)</label>
+                              <textarea
+                                value={civForm.strengths?.join('\n') || ''}
+                                onChange={(e) => setCivForm({ ...civForm, strengths: e.target.value.split('\n') })}
+                                rows={4}
+                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-green-500 outline-none"
+                                placeholder="Inserisci un punto di forza per riga..."
+                              />
+                            </div>
+                            <div className="bg-black/20 border border-white/5 p-4 rounded-xl space-y-2">
+                              <label className="text-[10px] font-bold text-red-500 uppercase tracking-wider block">Punti di Debolezza (Uno per riga)</label>
+                              <textarea
+                                value={civForm.weaknesses?.join('\n') || ''}
+                                onChange={(e) => setCivForm({ ...civForm, weaknesses: e.target.value.split('\n') })}
+                                rows={4}
+                                className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-red-500 outline-none"
+                                placeholder="Inserisci un punto debole per riga..."
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex justify-end pt-2">
+                            <button
+                              onClick={handleSaveCivDetails}
+                              className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-2"
+                            >
+                              <Save size={14} /> Salva Dettagli Civiltà
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        
+                        /* PANEL 2: Build Orders List & Editor */
+                        <div className="space-y-6">
+                          {selectedBOIndex === -1 || selectedBOIndex > -1 ? (
+                            
+                            /* INLINE BO EDITOR FORM */
+                            <div className="bg-[#0a0e1c]/40 border border-cyan-500/20 rounded-2xl p-6 space-y-6">
+                              <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                                <div>
+                                  <h4 className="text-sm font-bold text-white uppercase tracking-wider">
+                                    {selectedBOIndex === -1 ? 'Nuovo Build Order' : 'Modifica Build Order'}
+                                  </h4>
+                                  <p className="text-[10px] text-gray-400">Associa passaggi temporizzati ed IA ad una strategia.</p>
+                                </div>
+                                <button
+                                  onClick={() => setSelectedBOIndex(null)}
+                                  className="text-xs text-gray-500 hover:text-white uppercase tracking-wider font-bold"
+                                >
+                                  Chiudi Editor
+                                </button>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="md:col-span-2">
+                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Titolo BO</label>
+                                  <input
+                                    type="text"
+                                    value={boForm.title}
+                                    onChange={(e) => setBoForm({ ...boForm, title: e.target.value })}
+                                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none"
+                                    placeholder="es: Fast Castle 2-TC..."
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Difficoltà</label>
+                                  <select
+                                    value={boForm.difficulty}
+                                    onChange={(e) => setBoForm({ ...boForm, difficulty: Number(e.target.value) })}
+                                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none [&>option]:bg-[#1a1c23]"
+                                  >
+                                    <option value={1}>Facile</option>
+                                    <option value={2}>Medio</option>
+                                    <option value={3}>Difficile</option>
+                                  </select>
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Mappa Consigliata</label>
+                                  <input
+                                    type="text"
+                                    value={boForm.map}
+                                    onChange={(e) => setBoForm({ ...boForm, map: e.target.value })}
+                                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none"
+                                    placeholder="Qualsiasi, Land, ecc."
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Autore Nickname</label>
+                                  <input
+                                    type="text"
+                                    value={boForm.author_nickname}
+                                    onChange={(e) => setBoForm({ ...boForm, author_nickname: e.target.value })}
+                                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Autore Rank</label>
+                                  <input
+                                    type="text"
+                                    value={boForm.author_rank}
+                                    onChange={(e) => setBoForm({ ...boForm, author_rank: e.target.value })}
+                                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none"
+                                    placeholder="Conqueror, Diamond, etc."
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Banner Image URL</label>
+                                  <input
+                                    type="text"
+                                    value={boForm.banner_url}
+                                    onChange={(e) => setBoForm({ ...boForm, banner_url: e.target.value })}
+                                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Link YouTube Video Guida</label>
+                                  <input
+                                    type="text"
+                                    value={boForm.source}
+                                    onChange={(e) => setBoForm({ ...boForm, source: e.target.value })}
+                                    className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none"
+                                    placeholder="https://youtube.com/watch?v=..."
+                                  />
+                                </div>
+                              </div>
+
+                              <div>
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Descrizione Strategia</label>
+                                <textarea
+                                  value={boForm.description}
+                                  onChange={(e) => setBoForm({ ...boForm, description: e.target.value })}
+                                  rows={2}
+                                  className="w-full bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-500 outline-none"
+                                  placeholder="Spiega l'obiettivo o il tempismo di questa build..."
+                                />
+                              </div>
+
+                              {/* AI Transcription Extraction Box */}
+                              <div className="bg-cyan-950/20 border border-cyan-500/20 p-4 rounded-xl space-y-4">
+                                <label className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block flex items-center gap-1">
+                                  <Sparkles size={12} /> Gemini AI Trascrizione (Analisi Automatica Passaggi)
+                                </label>
+                                <textarea
+                                  value={boManualText}
+                                  onChange={(e) => setBoManualText(e.target.value)}
+                                  rows={4}
+                                  className="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 text-xs text-cyan-100 placeholder:text-cyan-500/20 focus:border-cyan-500 outline-none font-sans"
+                                  placeholder="Incolla qui la trascrizione del video youtube per estrarre passaggi e tempi in automatico..."
+                                />
+                                {isAnalyzingBO && (
+                                  <div className="space-y-1">
+                                    <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                                      <div className="h-full bg-cyan-400 transition-all duration-300" style={{ width: `${boAnalysisProgress}%` }}></div>
+                                    </div>
+                                    <span className="text-[9px] text-cyan-500 font-bold block">Analisi in corso con Gemini...</span>
+                                  </div>
+                                )}
+                                <div className="flex justify-end">
+                                  <button
+                                    onClick={handleAIBOAnalysis}
+                                    disabled={isAnalyzingBO || !boManualText.trim()}
+                                    className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-1.5 disabled:opacity-30 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                                  >
+                                    <Sparkles size={14} /> Analizza Trascrizione
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Passaggi steps management */}
+                              <div className="space-y-3">
+                                <div className="flex justify-between items-center border-t border-white/5 pt-4">
+                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Passaggi Temporizzati</label>
+                                  <button
+                                    onClick={() => setBoForm({ ...boForm, steps: [...(boForm.steps || []), { time: '00:00', action: '', note: '' }] })}
+                                    className="text-xs text-cyan-400 font-bold hover:underline"
+                                  >
+                                    + Aggiungi Passo
+                                  </button>
+                                </div>
+
+                                <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+                                  {(boForm.steps || []).map((step: any, idx: number) => (
+                                    <div key={idx} className="bg-black/30 border border-white/5 p-3 rounded-lg flex flex-col md:flex-row gap-2 relative">
+                                      <button
+                                        onClick={() => {
+                                          const newSteps = boForm.steps.filter((_: any, i: number) => i !== idx);
+                                          setBoForm({ ...boForm, steps: newSteps });
+                                        }}
+                                        className="absolute -top-1.5 -right-1.5 p-1 bg-red-600 hover:bg-red-500 text-white rounded-full text-xs shadow-lg"
+                                      >
+                                        <X size={10} />
+                                      </button>
+                                      <input
+                                        type="text"
+                                        value={step.time}
+                                        onChange={(e) => {
+                                          const newSteps = [...boForm.steps];
+                                          newSteps[idx].time = e.target.value;
+                                          setBoForm({ ...boForm, steps: newSteps });
+                                        }}
+                                        className="w-full md:w-20 bg-[#1a1c23] border border-gray-600 rounded px-2 py-1 text-xs text-yellow-500 font-bold text-center outline-none"
+                                        placeholder="00:00"
+                                      />
+                                      <input
+                                        type="text"
+                                        value={step.action}
+                                        onChange={(e) => {
+                                          const newSteps = [...boForm.steps];
+                                          newSteps[idx].action = e.target.value;
+                                          setBoForm({ ...boForm, steps: newSteps });
+                                        }}
+                                        className="flex-1 bg-[#1a1c23] border border-gray-600 rounded px-2 py-1 text-xs text-white font-bold outline-none"
+                                        placeholder="Azione..."
+                                      />
+                                      <input
+                                        type="text"
+                                        value={step.note || ''}
+                                        onChange={(e) => {
+                                          const newSteps = [...boForm.steps];
+                                          newSteps[idx].note = e.target.value;
+                                          setBoForm({ ...boForm, steps: newSteps });
+                                        }}
+                                        className="flex-1 bg-[#1a1c23] border border-gray-600 rounded px-2 py-1 text-xs text-gray-400 italic outline-none"
+                                        placeholder="Nota/Dettaglio..."
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <div className="flex justify-end gap-2 pt-2 border-t border-white/5">
+                                <button
+                                  onClick={() => setSelectedBOIndex(null)}
+                                  className="px-4 py-2 border border-gray-600 text-gray-400 rounded-lg hover:bg-white/5 transition-colors text-xs font-bold uppercase"
+                                >
+                                  Annulla
+                                </button>
+                                <button
+                                  onClick={handleSaveBO}
+                                  className="px-6 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-1.5"
+                                >
+                                  <Save size={14} /> Salva Build Order
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            
+                            /* BO LISTING VIEW */
+                            <div className="bg-[#0a0e1c]/40 border border-white/5 rounded-2xl p-6 space-y-6">
+                              <div className="flex justify-between items-center">
+                                <h4 className="text-sm font-bold text-white uppercase tracking-wider">Build Orders di {selectedCiv.name}</h4>
+                                <button
+                                  onClick={() => handleEditBO(-1)}
+                                  className="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-bold transition-all uppercase tracking-wider flex items-center gap-1"
+                                >
+                                  <Plus size={14} /> Nuovo BO
+                                </button>
+                              </div>
+
+                              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1 custom-scrollbar">
+                                {(selectedCiv.build_orders || []).map((bo: any, idx: number) => (
+                                  <div key={bo.id || idx} className="bg-black/35 border border-white/5 rounded-xl p-4 flex items-center justify-between hover:border-cyan-500/30 transition-all">
+                                    <div>
+                                      <span className="font-bold text-sm text-white block">{bo.title}</span>
+                                      <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                                        Difficoltà: {bo.difficulty === 1 ? 'Facile' : bo.difficulty === 3 ? 'Difficile' : 'Medio'} • Passaggi: {bo.steps?.length || 0}
+                                      </span>
+                                    </div>
+                                    <div className="flex gap-2">
+                                      <button
+                                        onClick={() => handleEditBO(idx)}
+                                        className="p-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg transition-all"
+                                        title="Modifica"
+                                      >
+                                        <Edit2 size={14} />
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteBO(idx)}
+                                        className="p-1.5 bg-red-600/15 hover:bg-red-600/25 border border-red-500/20 text-red-400 rounded-lg transition-all"
+                                        title="Elimina"
+                                      >
+                                        <Trash2 size={14} />
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
+
+                                {(!selectedCiv.build_orders || selectedCiv.build_orders.length === 0) && (
+                                  <div className="text-center py-10 bg-white/[0.01] border border-dashed border-white/5 rounded-xl text-gray-500">
+                                    Nessun build order presente per questa civiltà.
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-20 text-center bg-white/[0.01] border border-dashed border-white/5 rounded-2xl text-gray-500">
+                      <BookOpen size={48} className="opacity-20 mb-3" />
+                      <p>Seleziona una civiltà a sinistra per gestirne i dettagli ed i build orders.</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
