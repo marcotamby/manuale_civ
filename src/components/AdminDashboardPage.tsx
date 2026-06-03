@@ -2562,10 +2562,10 @@ export default function AdminDashboardPage() {
 
           <button
             onClick={() => selectTab('diagnostics')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'diagnostics' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            className={`w-full flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'diagnostics' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
           >
-            <Database size={18} />
-            <span>Backup & Diagnostica</span>
+            <Database size={18} className="shrink-0" />
+            <span className="text-left leading-snug whitespace-nowrap">Backup & Diagnostica</span>
           </button>
 
           <button
@@ -4276,19 +4276,19 @@ export default function AdminDashboardPage() {
                 <div className="lg:col-span-3 bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-6 space-y-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
                   <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                    <h3 className="text-xs font-black text-cyan-400 uppercase tracking-[0.25em]">Lista Civiltà</h3>
+                    <h3 className="text-xs font-black text-cyan-400 uppercase tracking-wider">Lista Civiltà</h3>
                     <button
                       onClick={() => {
                         setIsAddingCiv(true);
                         setSelectedCiv(null);
                       }}
-                      className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all flex items-center gap-1 active:scale-95 border ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1 active:scale-95 border ${
                         isAddingCiv
                           ? 'bg-cyan-600 text-white border-cyan-500/50 shadow-lg shadow-cyan-600/15'
                           : 'bg-[#111218] hover:bg-white/5 text-cyan-400 hover:text-cyan-300 border-cyan-500/20'
                       }`}
                     >
-                      <Plus size={10} strokeWidth={3} /> Nuova Civ
+                      <Plus size={12} strokeWidth={3} /> Nuova Civiltà
                     </button>
                   </div>
                   {civsLoading ? (
