@@ -4,6 +4,10 @@ import { CustomSelect } from './CustomSelect';
 import { Users, Trophy, Loader2 } from 'lucide-react';
 
 // Maps app civ IDs to the exact IDs used by the AoE4World API
+// NOTE FOR NEW CIVILIZATIONS: If a new civilization is added in the database, 
+// its ID/Slug should match the AoE4World API slug. If it is not listed here, 
+// the queries automatically fall back to using the civilization's ID directly, 
+// making the stats loading future-proof without requiring code updates.
 const CIV_ID_TO_API_KEY: Record<string, string> = {
   abbasid: 'abbasid_dynasty',
   ayyubids: 'ayyubids',

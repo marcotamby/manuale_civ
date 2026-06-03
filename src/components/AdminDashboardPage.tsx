@@ -198,6 +198,50 @@ export default function AdminDashboardPage() {
     videos: []
   });
   
+  const [isAddingCiv, setIsAddingCiv] = useState(false);
+  const [newCivForm, setNewCivForm] = useState<any>({
+    aoe4worldUrl: '',
+    id: '',
+    name: '',
+    flag: '',
+    difficulty: 'Medio',
+    short_description: ''
+  });
+
+  const handleAoe4WorldUrlChange = (url: string) => {
+    setNewCivForm((prev: any) => {
+      const updated = { ...prev, aoe4worldUrl: url };
+      const cleanUrl = url.trim().toLowerCase();
+      let slug = '';
+      
+      if (cleanUrl) {
+        if (cleanUrl.includes('aoe4world.com')) {
+          const match = cleanUrl.match(/\/explorer\/civilizations\/([a-z0-9-_]+)/);
+          if (match) {
+            slug = match[1];
+          } else {
+            const segments = cleanUrl.split('/');
+            slug = segments[segments.length - 1] || segments[segments.length - 2] || '';
+          }
+        } else {
+          slug = cleanUrl.replace(/[^a-z0-9-_]+/g, '');
+        }
+      }
+      
+      if (slug) {
+        updated.id = slug;
+        const nameParts = slug.split(/[-_]+/);
+        const formattedName = nameParts
+          .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(' ');
+        updated.name = formattedName;
+        updated.flag = `/flags/${slug}.png`;
+      }
+      
+      return updated;
+    });
+  };
+  
   const [selectedBOIndex, setSelectedBOIndex] = useState<number | null>(null); // -1 for new, number for edit index, null for none
   const [boForm, setBoForm] = useState<any>({
     id: '',
@@ -535,7 +579,7 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const fetchCivilizations = async () => {
+  const fetchCivilizations = async (selectId?: string) => {
     try {
       setCivsLoading(true);
       const { data, error } = await supabase
@@ -544,12 +588,102 @@ export default function AdminDashboardPage() {
         .order('name', { ascending: true });
       if (error) throw error;
       setCivList(data || []);
-      if (data && data.length > 0 && !selectedCiv) {
-        setSelectedCiv(data[0]);
+      if (data && data.length > 0) {
+        if (selectId) {
+          const newSelected = data.find(c => c.id === selectId);
+          if (newSelected) setSelectedCiv(newSelected);
+        } else if (!selectedCiv) {
+          setSelectedCiv(data[0]);
+        }
       }
     } catch (err: any) {
       console.error('Error fetching civilizations:', err);
       setToast({ isVisible: true, message: 'Errore nel caricamento delle civiltà', type: 'error' });
+    } finally {
+      setCivsLoading(false);
+    }
+  };
+
+  const handleCreateCiv = async () => {
+    if (!newCivForm.id) {
+      setToast({ isVisible: true, message: 'ID/Slug civiltà obbligatorio', type: 'error' });
+      return;
+    }
+    if (!newCivForm.name) {
+      setToast({ isVisible: true, message: 'Nome civiltà obbligatorio', type: 'error' });
+      return;
+    }
+
+    try {
+      setCivsLoading(true);
+      
+      // Check if civilization with this ID already exists
+      const { data: existing, error: checkError } = await supabase
+        .from('civilizations')
+        .select('id')
+        .eq('id', newCivForm.id.trim())
+        .maybeSingle();
+
+      if (checkError) throw checkError;
+      if (existing) {
+        throw new Error(`Una civiltà con ID "${newCivForm.id}" esiste già.`);
+      }
+
+      const newCivData = {
+        id: newCivForm.id.trim().toLowerCase(),
+        name: newCivForm.name.trim(),
+        flag: newCivForm.flag.trim(),
+        difficulty: newCivForm.difficulty,
+        short_description: newCivForm.short_description.trim(),
+        passive_bonuses: [],
+        unique_units: [],
+        technologies: [],
+        landmarks: [],
+        videos: [],
+        build_orders: [],
+        strengths: [],
+        weaknesses: []
+      };
+
+      const { error: insertError } = await supabase
+        .from('civilizations')
+        .insert(newCivData);
+
+      if (insertError) throw insertError;
+
+      // Log admin action
+      await logAdminAction(
+        'CREATE_CIVILIZATION',
+        'civilizations',
+        newCivForm.id.trim().toLowerCase(),
+        `Creata nuova civiltà "${newCivForm.name}"`,
+        { civ_id: newCivForm.id.trim().toLowerCase(), details: newCivForm }
+      );
+
+      setToast({ isVisible: true, message: 'Nuova civiltà creata con successo!', type: 'success' });
+      
+      const createdId = newCivForm.id.trim().toLowerCase();
+
+      // Reset form
+      setNewCivForm({
+        aoe4worldUrl: '',
+        id: '',
+        name: '',
+        flag: '',
+        difficulty: 'Medio',
+        short_description: ''
+      });
+      setIsAddingCiv(false);
+
+      // Reload civilizations and select the new one
+      await fetchCivilizations(createdId);
+      
+      // Trigger CivContext refresh to sync with frontend
+      refreshCivs();
+
+    } catch (err: any) {
+      console.error('Error creating civilization:', err);
+      setToast({ isVisible: true, message: err.message || 'Errore durante la creazione della civiltà', type: 'error' });
     } finally {
       setCivsLoading(false);
     }
@@ -4150,13 +4284,14 @@ export default function AdminDashboardPage() {
                   ) : (
                     <div className="space-y-2 max-h-[550px] overflow-y-auto pr-2 custom-scrollbar">
                       {civList.map((c) => {
-                        const isSelected = selectedCiv?.id === c.id;
+                        const isSelected = selectedCiv?.id === c.id && !isAddingCiv;
                         return (
                           <button
                             key={c.id}
                             onClick={() => {
                               setSelectedCiv(c);
                               setSelectedBOIndex(null);
+                              setIsAddingCiv(false);
                             }}
                             className={`w-full text-left h-16 rounded-xl border transition-all hover:scale-[1.02] relative overflow-hidden flex items-center px-4 group ${
                               isSelected 
@@ -4197,13 +4332,148 @@ export default function AdminDashboardPage() {
                           </button>
                         );
                       })}
+                      
+                      <div className="pt-4 border-t border-white/5">
+                        <button
+                          onClick={() => {
+                            setIsAddingCiv(true);
+                            setSelectedCiv(null);
+                          }}
+                          className={`w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95 ${
+                            isAddingCiv
+                              ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15 border border-cyan-500/50'
+                              : 'bg-white/5 hover:bg-white/10 text-cyan-400 hover:text-cyan-300 border border-cyan-500/20'
+                          }`}
+                        >
+                          <Plus size={14} strokeWidth={3} /> Nuova Civiltà
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
  
                 {/* Corpo Editor Civiltà & BO */}
                 <div className="lg:col-span-9 space-y-6">
-                  {selectedCiv ? (
+                  {isAddingCiv ? (
+                    <div className="bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-8 space-y-8 shadow-2xl backdrop-blur-md relative overflow-hidden animate-in fade-in duration-300">
+                      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
+                      
+                      <div className="flex justify-between items-center border-b border-white/5 pb-4">
+                        <div>
+                          <h3 className="text-lg font-black text-white uppercase tracking-tight">Crea Nuova Civiltà</h3>
+                          <p className="text-xs text-gray-400 mt-1">Inserisci un link di AoE4World per compilare automaticamente i campi principali.</p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setIsAddingCiv(false);
+                            if (civList.length > 0) setSelectedCiv(civList[0]);
+                          }}
+                          className="px-4 py-2 border-2 border-white/10 hover:border-white/20 text-gray-400 hover:text-white rounded-xl transition-all text-xs font-black uppercase tracking-wider"
+                        >
+                          Annulla
+                        </button>
+                      </div>
+
+                      <div className="space-y-6">
+                        {/* Link AoE4World */}
+                        <div>
+                          <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] block mb-2">Link AoE4World Explorer (Opzionale)</label>
+                          <input
+                            type="text"
+                            value={newCivForm.aoe4worldUrl}
+                            onChange={(e) => handleAoe4WorldUrlChange(e.target.value)}
+                            className="w-full bg-[#111218] border-2 border-white/10 hover:border-cyan-500/30 focus:border-cyan-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none"
+                            placeholder="es: https://aoe4world.com/explorer/civilizations/byzantines"
+                          />
+                        </div>
+
+                        {/* ID & Nome */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">ID / Slug Civiltà (Minuscolo, senza spazi)</label>
+                            <input
+                              type="text"
+                              value={newCivForm.id}
+                              onChange={(e) => setNewCivForm({ ...newCivForm, id: e.target.value.toLowerCase().replace(/[^a-z0-9-_]+/g, '') })}
+                              className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none font-mono"
+                              placeholder="es: byzantines"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Nome Civiltà</label>
+                            <input
+                              type="text"
+                              value={newCivForm.name}
+                              onChange={(e) => setNewCivForm({ ...newCivForm, name: e.target.value })}
+                              className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none font-bold"
+                              placeholder="es: Bizantini"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        {/* Flag & Difficoltà */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Flag URL / Percorso Bandiera</label>
+                            <input
+                              type="text"
+                              value={newCivForm.flag}
+                              onChange={(e) => setNewCivForm({ ...newCivForm, flag: e.target.value })}
+                              className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none font-mono"
+                              placeholder="es: /flags/byzantines.png"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Difficoltà</label>
+                            <CustomSelect
+                              value={newCivForm.difficulty}
+                              onChange={(val) => setNewCivForm({ ...newCivForm, difficulty: val })}
+                              options={[
+                                { value: 'Facile', label: 'Facile' },
+                                { value: 'Medio', label: 'Medio' },
+                                { value: 'Difficile', label: 'Difficile' }
+                              ]}
+                              buttonClassName="bg-[#111218] border-2 border-white/10 hover:border-cyan-500/40 rounded-2xl px-4 py-3 h-12 text-xs text-white transition-all outline-none font-bold"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Descrizione Breve */}
+                        <div>
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Descrizione Breve</label>
+                          <textarea
+                            value={newCivForm.short_description}
+                            onChange={(e) => setNewCivForm({ ...newCivForm, short_description: e.target.value })}
+                            rows={4}
+                            className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl p-4 text-xs text-white focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none"
+                            placeholder="Scrivi una breve descrizione..."
+                          />
+                        </div>
+
+                        {/* Bottoni Salva / Cancella */}
+                        <div className="flex justify-end gap-3 pt-6 border-t border-white/5">
+                          <button
+                            onClick={() => {
+                              setIsAddingCiv(false);
+                              if (civList.length > 0) setSelectedCiv(civList[0]);
+                            }}
+                            className="px-5 py-3 border-2 border-white/10 text-gray-400 hover:text-white hover:border-white/20 rounded-xl transition-all font-black text-xs uppercase tracking-widest active:scale-95"
+                          >
+                            Annulla
+                          </button>
+                          <button
+                            onClick={handleCreateCiv}
+                            disabled={civsLoading}
+                            className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black rounded-xl text-xs font-black uppercase tracking-widest shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all flex items-center gap-2"
+                          >
+                            {civsLoading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} strokeWidth={3} />} Crea Civiltà
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : selectedCiv ? (
                     <div className="space-y-6 animate-in fade-in duration-300">
                       
                       {/* Nav Tab interna all'Editor Civ */}
