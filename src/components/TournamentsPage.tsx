@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament, fetchChallongeData } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
-import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink, MoveVertical, Youtube, Trophy, GripVertical } from 'lucide-react';
+import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink, MoveVertical, Youtube, Trophy, GripVertical, Archive } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
@@ -47,6 +47,7 @@ interface TournamentConfig {
   created_at?: string;
   id?: string;
   vods?: any[];
+  isArchived?: boolean;
 }
 
 const TOURNAMENTS: TournamentConfig[] = [];
@@ -97,7 +98,7 @@ function SortableTournamentCard({
     transform: CSS.Transform.toString(transform),
     transition,
     zIndex: isDragging ? 50 : 'auto',
-    opacity: isDragging ? 0.6 : 1,
+    opacity: isDragging ? 0.6 : (t.config.isArchived ? 0.6 : 1),
   };
 
   const banner = t.config.bannerUrl || t.images?.[0]?.url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop';
@@ -179,7 +180,13 @@ function SortableTournamentCard({
             
         {/* Status Badges Overlay */}
         <div className="absolute top-4 right-4 flex flex-col items-end gap-2 z-20">
-           <div 
+          {t.config.isArchived && (
+            <div className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center gap-1.5 bg-amber-600/70 border-amber-500/50 text-slate-100">
+              <Archive size={10} />
+              Nascosto
+            </div>
+          )}
+          <div 
             className={clsx(
               "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg flex items-center gap-2 transition-all",
               status === 'In corso' ? "bg-green-600/60 border-green-500/50 text-slate-100" : 
@@ -464,7 +471,8 @@ function SortableTournamentCard({
                       display_order: t.config?.display_order || 0,
                       bannerPositionX: t.config?.bannerPositionX || 50,
                       bannerPositionY: t.config?.bannerPositionY || 50,
-                      vods: t.config?.vods || []
+                      vods: t.config?.vods || [],
+                      isArchived: t.config?.isArchived || false
                     });
                     setShowEditModal(true);
                     setIsRegEditorExpanded(false);
@@ -511,7 +519,8 @@ export function TournamentsPage() {
     display_order: 0,
     bannerPositionX: 50,
     bannerPositionY: 50,
-    vods: [] as any[]
+    vods: [] as any[],
+    isArchived: false
   });
   const [isUploading, setIsUploading] = useState(false);
   const [dragState, setDragState] = useState<{ startX: number; startY: number; startPosX: number; startPosY: number } | null>(null);
@@ -586,6 +595,7 @@ export function TournamentsPage() {
             bannerPositionY: db.banner_position_y || 50,
             created_at: db.created_at,
             id: db.id,
+            isArchived: db.is_archived || false,
             vods: db.vods || []
           };
           dbConfigs.push(configObj);
@@ -714,7 +724,8 @@ export function TournamentsPage() {
       display_order: t.config?.display_order || 0,
       bannerPositionX: t.config?.bannerPositionX || 50,
       bannerPositionY: t.config?.bannerPositionY || 50,
-      vods: t.config?.vods || []
+      vods: t.config?.vods || [],
+      isArchived: t.config?.isArchived || false
     });
     setShowEditModal(true);
     const params = new URLSearchParams(window.location.search);
@@ -967,6 +978,7 @@ export function TournamentsPage() {
         banner_position_x: editForm.bannerPositionX,
         banner_position_y: editForm.bannerPositionY,
         updated_at: new Date().toISOString(),
+        is_archived: editForm.isArchived,
         vods: editForm.vods.map(v => ({
           id: v.id || `vod-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           title: (v.title || '').trim(),
@@ -1005,19 +1017,20 @@ export function TournamentsPage() {
         if (result.error) {
           const errorMsg = result.error.message;
           // If columns are missing, retry without them and warn the user
-          if (errorMsg.includes('display_order') || errorMsg.includes('banner_position_x') || errorMsg.includes('banner_position_y')) {
+          if (errorMsg.includes('display_order') || errorMsg.includes('banner_position_x') || errorMsg.includes('banner_position_y') || errorMsg.includes('is_archived')) {
             console.warn("Missing database columns, retrying safe update:", errorMsg);
             
             const safeData = { ...data };
             delete (safeData as any).display_order;
             delete (safeData as any).banner_position_x;
             delete (safeData as any).banner_position_y;
+            delete (safeData as any).is_archived;
             
             result = await execute(safeData);
             
             if (!result.error) {
               toast.error(
-                "Attenzione: Database non aggiornato! La posizione dell'immagine e l'ordine non verranno salvati. Contatta l'amministratore per eseguire lo script SQL.",
+                "Attenzione: Database non aggiornato! Le impostazioni aggiuntive (posizione banner, ordine, archiviato) non verranno salvate. Contatta l'amministratore per eseguire lo script SQL.",
                 { duration: 6000 }
               );
             }
@@ -1049,7 +1062,8 @@ export function TournamentsPage() {
           regolamentoContent: editForm.regolamentoContent,
           bannerPositionX: editForm.bannerPositionX,
           bannerPositionY: editForm.bannerPositionY,
-          vods: editForm.vods
+          vods: editForm.vods,
+          isArchived: editForm.isArchived
         }
       }) : null);
 
@@ -1217,7 +1231,8 @@ export function TournamentsPage() {
                       display_order: 0,
                       bannerPositionX: 50,
                       bannerPositionY: 50,
-                      vods: []
+                      vods: [],
+                      isArchived: false
                     });
                     setShowEditModal(true);
                     setIsRegEditorExpanded(false);
@@ -1250,10 +1265,10 @@ export function TournamentsPage() {
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <SortableContext
-            items={tournaments.map(t => t.id)}
+            items={tournaments.filter(t => !t.config?.isArchived || canManageTournaments).map(t => t.id)}
             strategy={rectSortingStrategy}
           >
-            {tournaments.map((t) => (
+            {tournaments.filter(t => !t.config?.isArchived || canManageTournaments).map((t) => (
               <SortableTournamentCard
                 key={t.id}
                 t={t}
@@ -1353,7 +1368,8 @@ export function TournamentsPage() {
                       podium: editingTournament?.config?.podium || (editingTournament?.events?.[0]?.standings?.nodes || []),
                       bannerPositionX: editingTournament?.config?.bannerPositionX || 50,
                       bannerPositionY: editingTournament?.config?.bannerPositionY || 50,
-                      vods: editingTournament?.config?.vods || []
+                      vods: editingTournament?.config?.vods || [],
+                      isArchived: editingTournament?.config?.isArchived || false
                     };
 
                     const currentData = {
@@ -1368,7 +1384,8 @@ export function TournamentsPage() {
                       podium: editForm.podium,
                       bannerPositionX: editForm.bannerPositionX,
                       bannerPositionY: editForm.bannerPositionY,
-                      vods: editForm.vods
+                      vods: editForm.vods,
+                      isArchived: editForm.isArchived
                     };
 
                     if (JSON.stringify(initialData) === JSON.stringify(currentData)) {
@@ -1529,6 +1546,27 @@ export function TournamentsPage() {
                         {s}
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                <div className="space-y-4 p-4 rounded-2xl bg-white/5 border border-white/10">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Archive size={20} className="text-slate-400" />
+                      <div>
+                        <p className="text-xs font-bold text-white uppercase tracking-tight">Archivia / Nascondi Torneo</p>
+                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-tight mt-1">Non comparirà nella pagina pubblica per gli utenti</p>
+                      </div>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer" 
+                        checked={editForm.isArchived} 
+                        onChange={e => setEditForm({...editForm, isArchived: e.target.checked})} 
+                      />
+                      <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-gray-400 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600/70 peer-checked:after:bg-white animate-all"></div>
+                    </label>
                   </div>
                 </div>
 

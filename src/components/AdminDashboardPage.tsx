@@ -5,7 +5,7 @@ import {
   AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, 
   Trophy, BookOpen, Zap, Edit2, Check, Trash2, Plus, Minus, ArrowLeft, LayoutDashboard,
   Save, Sparkles, ChevronDown, ChevronUp, Users, Youtube, Menu, History, Database, Activity, Download,
-  Megaphone, TrendingUp, Coins, Lock, Unlock, ChevronRight, Link2, HelpCircle, Shield, Monitor
+  Megaphone, TrendingUp, Coins, Lock, Unlock, ChevronRight, Link2, HelpCircle, Shield, Monitor, Archive
 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
@@ -177,7 +177,8 @@ export default function AdminDashboardPage() {
     banner_position_x: 50,
     banner_position_y: 50,
     vods: [],
-    podium: []
+    podium: [],
+    is_archived: false
   });
   const [isPodiumExpanded, setIsPodiumExpanded] = useState(false);
   const [isVodsExpanded, setIsVodsExpanded] = useState(false);
@@ -386,7 +387,8 @@ export default function AdminDashboardPage() {
         banner_position_x: selectedTournament.banner_position_x || 50,
         banner_position_y: selectedTournament.banner_position_y || 50,
         vods: selectedTournament.vods || [],
-        podium: selectedTournament.podium || []
+        podium: selectedTournament.podium || [],
+        is_archived: selectedTournament.is_archived || false
       });
       setIsEditingTournament(false);
       setIsCreatingTournament(false);
@@ -430,18 +432,38 @@ export default function AdminDashboardPage() {
         ...p,
         players: p.players ? p.players.map((name: string) => name.trim()).filter((name: string) => name !== '') : []
       })),
+      is_archived: tournamentForm.is_archived,
       updated_at: new Date().toISOString()
     };
 
     try {
       let error;
-      if (isCreatingTournament) {
-        const { error: insError } = await supabase.from('tournaments').insert(payload);
-        error = insError;
-      } else {
-        const { error: updError } = await supabase.from('tournaments').update(payload).eq('id', selectedTournament.id);
-        error = updError;
+      const executeSave = async (data: any) => {
+        if (isCreatingTournament) {
+          return await supabase.from('tournaments').insert(data);
+        } else {
+          return await supabase.from('tournaments').update(data).eq('id', selectedTournament.id);
+        }
+      };
+
+      let result = await executeSave(payload);
+      error = result.error;
+
+      if (error && error.message.includes('is_archived')) {
+        console.warn("Missing is_archived column, retrying safe save without it:", error.message);
+        const safePayload = { ...payload };
+        delete (safePayload as any).is_archived;
+        result = await executeSave(safePayload);
+        error = result.error;
+        if (!error) {
+          setToast({ 
+            isVisible: true, 
+            message: "Salvato! Attenzione: la colonna 'is_archived' manca nel DB. Esegui lo script SQL.", 
+            type: 'error' 
+          });
+        }
       }
+
       if (error) throw error;
 
       await logAdminAction(
@@ -454,7 +476,9 @@ export default function AdminDashboardPage() {
         { tournament_name: payload.name, tournament_slug: slug, form_payload: payload }
       );
 
-      setToast({ isVisible: true, message: isCreatingTournament ? 'Torneo creato!' : 'Torneo salvato!', type: 'success' });
+      if (!toast.isVisible || toast.type !== 'error') {
+        setToast({ isVisible: true, message: isCreatingTournament ? 'Torneo creato!' : 'Torneo salvato!', type: 'success' });
+      }
       setIsCreatingTournament(false);
       setIsEditingTournament(false);
       await fetchTournaments();
@@ -3823,11 +3847,13 @@ export default function AdminDashboardPage() {
                             setIsCreatingTournament(false);
                             setIsEditingTournament(false);
                           }}
-                          className={`w-full flex items-center justify-between p-4 rounded-2xl border text-left transition-all hover:scale-[1.02] ${selectedTournament?.id === t.id && !isCreatingTournament ? 'bg-gradient-to-r from-blue-950/40 to-indigo-950/40 border-blue-500/80 text-white shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'bg-black/30 border-white/5 text-gray-400 hover:text-white hover:bg-white/5 hover:border-white/10'}`}
+                          className={`w-full flex items-center justify-between p-4 rounded-2xl border text-left transition-all hover:scale-[1.02] ${selectedTournament?.id === t.id && !isCreatingTournament ? 'bg-gradient-to-r from-blue-950/40 to-indigo-950/40 border-blue-500/80 text-white shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'bg-black/30 border-white/5 text-gray-400 hover:text-white hover:bg-white/5 hover:border-white/10'} ${t.is_archived ? 'opacity-60' : ''}`}
                         >
                           <div>
                             <span className="font-bold text-sm block leading-tight">{t.name}</span>
-                            <span className={`text-[9px] uppercase font-black tracking-widest block mt-1 ${t.status === 'In Corso' ? 'text-green-400' : t.status === 'Concluso' ? 'text-gray-500' : 'text-yellow-500'}`}>{t.status} • {t.type}</span>
+                            <span className={`text-[9px] uppercase font-black tracking-widest block mt-1 ${t.is_archived ? 'text-amber-500 font-black' : t.status === 'In Corso' ? 'text-green-400' : t.status === 'Concluso' ? 'text-gray-500' : 'text-yellow-500'}`}>
+                              {t.is_archived ? 'ARCHIVIATO • ' : ''}{t.status} • {t.type}
+                            </span>
                           </div>
                           <span className="text-xs font-black text-gray-600 bg-white/5 px-2 py-0.5 rounded-lg border border-white/5">#{t.display_order}</span>
                         </button>
@@ -3854,6 +3880,49 @@ export default function AdminDashboardPage() {
                         </div>
                         {!isCreatingTournament && (
                           <div className="flex gap-2 shrink-0">
+                            <button
+                              onClick={async () => {
+                                const newArchived = !selectedTournament.is_archived;
+                                try {
+                                  const { error } = await supabase
+                                    .from('tournaments')
+                                    .update({ is_archived: newArchived })
+                                    .eq('id', selectedTournament.id);
+                                  if (error) throw error;
+                                  
+                                  await logAdminAction(
+                                    newArchived ? 'ARCHIVE_TOURNAMENT' : 'UNARCHIVE_TOURNAMENT',
+                                    'tournaments',
+                                    selectedTournament.slug,
+                                    `${newArchived ? 'Archiviato' : 'Ripristinato'} torneo "${selectedTournament.name}"`,
+                                    { id: selectedTournament.id, name: selectedTournament.name, slug: selectedTournament.slug }
+                                  );
+
+                                  setToast({ 
+                                    isVisible: true, 
+                                    message: newArchived ? 'Torneo archiviato!' : 'Torneo ripristinato!', 
+                                    type: 'success' 
+                                  });
+                                  
+                                  await fetchTournaments();
+                                  setSelectedTournament((prev: any) => prev ? ({ ...prev, is_archived: newArchived }) : null);
+                                } catch (err: any) {
+                                  if (err.message?.includes('is_archived')) {
+                                    setToast({ 
+                                      isVisible: true, 
+                                      message: "Errore: colonna 'is_archived' non presente nel database. Esegui prima lo script SQL!", 
+                                      type: 'error' 
+                                    });
+                                  } else {
+                                    setToast({ isVisible: true, message: err.message, type: 'error' });
+                                  }
+                                }
+                              }}
+                              className={`p-2.5 border-2 rounded-xl transition-all hover:-translate-y-0.5 active:scale-95 flex items-center justify-center ${selectedTournament.is_archived ? 'bg-green-500/10 hover:bg-green-500/20 border-green-500/20 text-green-400' : 'bg-yellow-500/10 hover:bg-yellow-500/20 border-yellow-500/20 text-yellow-400'}`}
+                              title={selectedTournament.is_archived ? "Ripristina Torneo" : "Archivia Torneo"}
+                            >
+                              <Archive size={16} />
+                            </button>
                             <button
                               onClick={() => setIsEditingTournament(!isEditingTournament)}
                               className="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-white border-2 border-white/10 hover:border-white/20 rounded-xl text-xs font-black transition-all hover:-translate-y-0.5 active:scale-95 uppercase tracking-wider"
@@ -3961,6 +4030,25 @@ export default function AdminDashboardPage() {
                               className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl px-4 py-3 text-sm text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none"
                               placeholder="https://challonge.com/..."
                             />
+                          </div>
+
+                          <div className="border-2 border-white/5 bg-black/20 p-6 rounded-3xl space-y-4">
+                            <div className="flex items-center gap-3">
+                              <button
+                                type="button"
+                                id="is_archived"
+                                onClick={() => setTournamentForm({ ...tournamentForm, is_archived: !tournamentForm.is_archived })}
+                                className={`w-9 h-5 rounded-full relative transition-all flex-shrink-0 outline-none cursor-pointer ${tournamentForm.is_archived ? 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)]' : 'bg-white/10'}`}
+                              >
+                                <div className={`absolute top-[2px] w-4 h-4 bg-white rounded-full transition-all ${tournamentForm.is_archived ? 'left-[18px]' : 'left-[2px]'}`} />
+                              </button>
+                              <span 
+                                onClick={() => setTournamentForm({ ...tournamentForm, is_archived: !tournamentForm.is_archived })} 
+                                className="text-xs font-black uppercase tracking-wider text-white select-none cursor-pointer"
+                              >
+                                Archivia / Nascondi Torneo (Nasconde dalla pagina pubblica)
+                              </span>
+                            </div>
                           </div>
 
                           <div className="border-2 border-white/5 bg-black/20 p-6 rounded-3xl space-y-4">
