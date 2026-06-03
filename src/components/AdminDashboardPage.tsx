@@ -75,6 +75,9 @@ export default function AdminDashboardPage() {
   const [crmTempNickname, setCrmTempNickname] = useState('');
   const [crmEditingNickname, setCrmEditingNickname] = useState(false);
   const [crmSheepAmount, setCrmSheepAmount] = useState<number | ''>('');
+  const [pendingRedemptionsCount, setPendingRedemptionsCount] = useState(0);
+  const [selectedUserRedemptions, setSelectedUserRedemptions] = useState<any[]>([]);
+  const [redemptionsLoading, setRedemptionsLoading] = useState(false);
 
   // Announcements States (Tab 3)
   const [announcements, setAnnouncements] = useState<any[]>([]);
@@ -285,6 +288,7 @@ export default function AdminDashboardPage() {
       fetchSuggestions();
       fetchQA();
       fetchProfiles();
+      fetchPendingRedemptionsCount();
       if (isSuperAdmin) {
         fetchUsers();
       }
@@ -976,6 +980,39 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const fetchPendingRedemptionsCount = async () => {
+    try {
+      const { count, error } = await supabase
+        .from('service_redemptions')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+      if (!error && count !== null) {
+        setPendingRedemptionsCount(count);
+      }
+    } catch (err) {
+      console.error('Error fetching pending redemptions count:', err);
+    }
+  };
+
+  const fetchUserRedemptions = async (email: string) => {
+    if (!email) return;
+    setRedemptionsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('service_redemptions')
+        .select('*')
+        .eq('user_email', email.toLowerCase())
+        .order('created_at', { ascending: false });
+      if (!error && data) {
+        setSelectedUserRedemptions(data);
+      }
+    } catch (err) {
+      console.error('Error fetching user redemptions:', err);
+    } finally {
+      setRedemptionsLoading(false);
+    }
+  };
+
   const fetchProfiles = async () => {
     try {
       const [profilesRes, betsRes] = await Promise.all([
@@ -1209,6 +1246,9 @@ export default function AdminDashboardPage() {
         qa: (qRes.count || 0) + (aRes.count || 0)
       });
       setSelectedUserLogs(logsRes.data || []);
+      
+      // Fetch redemptions for this user
+      fetchUserRedemptions(email);
     } catch (err) {
       console.error('Error fetching user stats:', err);
     } finally {
@@ -1331,23 +1371,16 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleCrmDeliverService = async (userEmail: string, serviceId: string, indexToRemove: number) => {
+  const handleCrmDeliverService = async (redemptionId: string, userEmail: string, serviceId: string) => {
     if (!isAdmin) {
       setToast({ isVisible: true, message: 'Solo gli amministratori o lo staff possono erogare servizi', type: 'error' });
       return;
     }
     try {
-      const userProfile = crmUsers.find(u => u.email === userEmail) || selectedCrmUser;
-      if (!userProfile) return;
-
-      const services = [...(userProfile.unlocked_services || [])];
-      if (indexToRemove < 0 || indexToRemove >= services.length) return;
-      services.splice(indexToRemove, 1);
-
       const { error } = await supabase
-        .from('profiles')
-        .update({ unlocked_services: services })
-        .eq('email', userEmail.toLowerCase());
+        .from('service_redemptions')
+        .update({ status: 'delivered', updated_at: new Date().toISOString() })
+        .eq('id', redemptionId);
 
       if (error) throw error;
 
@@ -1356,15 +1389,12 @@ export default function AdminDashboardPage() {
         'profiles',
         userEmail,
         `Erogato servizio "${serviceId === 'replay_review' ? 'Analisi Replay' : serviceId === 'coaching_1h' ? '1h Coaching' : serviceId}" per utente "${userEmail}"`,
-        { target_email: userEmail, service_id: serviceId }
+        { target_email: userEmail, redemption_id: redemptionId, service_id: serviceId }
       );
 
       setToast({ isVisible: true, message: 'Servizio segnato come erogato! 🎉', type: 'success' });
-
-      setCrmUsers((prev: any[]) => prev.map(u => u.email === userEmail ? { ...u, unlocked_services: services } : u));
-      if (selectedCrmUser && selectedCrmUser.email === userEmail) {
-        setSelectedCrmUser((prev: any) => prev ? { ...prev, unlocked_services: services } : null);
-      }
+      fetchPendingRedemptionsCount();
+      fetchUserRedemptions(userEmail);
     } catch (err) {
       console.error('Error delivering service:', err);
       setToast({ isVisible: true, message: 'Errore nell\'erogazione del servizio', type: 'error' });
@@ -2561,10 +2591,17 @@ export default function AdminDashboardPage() {
           
           <button
             onClick={() => selectTab('utenti')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'utenti' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'utenti' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
           >
-            <Users size={18} />
-            <span>Utenti (CRM)</span>
+            <div className="flex items-center gap-3">
+              <Users size={18} />
+              <span>Utenti (CRM)</span>
+            </div>
+            {pendingRedemptionsCount > 0 && (
+              <span className="px-2 py-0.5 bg-yellow-500 text-black text-[10px] rounded-full font-black animate-pulse shadow-[0_0_8px_rgba(234,179,8,0.4)]">
+                {pendingRedemptionsCount}
+              </span>
+            )}
           </button>
 
           <button
@@ -5784,28 +5821,58 @@ export default function AdminDashboardPage() {
                       </div>
 
                       {/* Servizi Riscattati */}
-                      <div className="space-y-3 pt-4 border-t border-white/5">
-                        <h4 className="text-[10px] font-black uppercase text-gray-500 tracking-wider text-left">Servizi Da Erogare</h4>
-                        {selectedCrmUser.unlocked_services && selectedCrmUser.unlocked_services.length > 0 ? (
-                          <div className="space-y-2">
-                            {selectedCrmUser.unlocked_services.map((serviceId: string, idx: number) => {
-                              const label = serviceId === 'replay_review' ? '🎥 Replay con Staff' : serviceId === 'coaching_1h' ? '👨‍🏫 1h Coaching' : serviceId;
-                              return (
-                                <div key={idx} className="flex items-center justify-between p-2.5 bg-[#111218] border border-white/5 rounded-xl gap-2">
-                                  <span className="text-[10px] font-bold text-gray-300 truncate">{label}</span>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleCrmDeliverService(selectedCrmUser.email, serviceId, idx)}
-                                    className="px-2 py-1 bg-green-500/10 hover:bg-green-500 text-green-400 hover:text-white border border-green-500/20 rounded-lg text-[8px] font-black uppercase tracking-wider transition-all"
-                                  >
-                                    Eroga
-                                  </button>
+                      <div className="space-y-4 pt-4 border-t border-white/5">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-[10px] font-black uppercase text-gray-500 tracking-wider text-left">Servizi Riscattati</h4>
+                          {redemptionsLoading && <Loader2 className="animate-spin text-cyan-400" size={10} />}
+                        </div>
+                        
+                        {selectedUserRedemptions && selectedUserRedemptions.length > 0 ? (
+                          <div className="space-y-3">
+                            {/* Pending Services */}
+                            {selectedUserRedemptions.filter(r => r.status === 'pending').length > 0 && (
+                              <div className="space-y-2">
+                                <span className="text-[8px] font-black text-yellow-500 uppercase tracking-widest block text-left">Da Erogare (Pending)</span>
+                                {selectedUserRedemptions.filter(r => r.status === 'pending').map((redemption: any) => {
+                                  const label = redemption.service_id === 'replay_review' ? '🎥 Replay con Staff' : redemption.service_id === 'coaching_1h' ? '👨‍🏫 1h Coaching' : redemption.service_id;
+                                  return (
+                                    <div key={redemption.id} className="flex items-center justify-between p-2.5 bg-yellow-500/5 border border-yellow-500/20 rounded-xl gap-2">
+                                      <span className="text-[10px] font-bold text-yellow-400 truncate">{label}</span>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleCrmDeliverService(redemption.id, selectedCrmUser.email, redemption.service_id)}
+                                        className="px-2.5 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-[8px] font-black uppercase tracking-wider transition-all cursor-pointer shadow-md shadow-green-950/20"
+                                      >
+                                        Eroga
+                                      </button>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+
+                            {/* Completed Services */}
+                            {selectedUserRedemptions.filter(r => r.status === 'delivered').length > 0 && (
+                              <div className="space-y-2">
+                                <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest block text-left">Erogati (Delivered)</span>
+                                <div className="max-h-24 overflow-y-auto elegant-scrollbar space-y-1.5 pr-1">
+                                  {selectedUserRedemptions.filter(r => r.status === 'delivered').map((redemption: any) => {
+                                    const label = redemption.service_id === 'replay_review' ? '🎥 Replay con Staff' : redemption.service_id === 'coaching_1h' ? '👨‍🏫 1h Coaching' : redemption.service_id;
+                                    return (
+                                      <div key={redemption.id} className="flex items-center justify-between p-2 bg-black/20 border border-white/5 rounded-xl gap-2 opacity-60">
+                                        <span className="text-[9px] font-bold text-gray-400 truncate">{label}</span>
+                                        <span className="text-[7px] text-gray-500 font-bold uppercase tracking-wider">
+                                          {new Date(redemption.updated_at || redemption.created_at).toLocaleDateString('it-IT')}
+                                        </span>
+                                      </div>
+                                    );
+                                  })}
                                 </div>
-                              );
-                            })}
+                              </div>
+                            )}
                           </div>
                         ) : (
-                          <p className="text-[10px] text-gray-500 italic text-left">Nessun servizio in sospeso.</p>
+                          <p className="text-[10px] text-gray-500 italic text-left">Nessun servizio riscattato.</p>
                         )}
                       </div>
 

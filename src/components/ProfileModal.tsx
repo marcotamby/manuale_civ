@@ -167,6 +167,26 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     const [activeSubTab, setActiveSubTab] = useState<'profile' | 'shop'>('profile');
     const [shopToast, setShopToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const [showInstructionsModal, setShowInstructionsModal] = useState(false);
+    const [redemptions, setRedemptions] = useState<any[]>([]);
+    const [redemptionsLoading, setRedemptionsLoading] = useState(false);
+
+    const fetchMyRedemptions = async () => {
+        if (!user?.email) return;
+        setRedemptionsLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('service_redemptions')
+                .select('*')
+                .eq('user_email', user.email.toLowerCase());
+            if (!error && data) {
+                setRedemptions(data);
+            }
+        } catch (err) {
+            console.error("Error fetching redemptions:", err);
+        } finally {
+            setRedemptionsLoading(false);
+        }
+    };
 
     const showToast = (message: string, type: 'success' | 'error') => {
         setShopToast({ message, type });
@@ -221,21 +241,40 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
         showToast(effectId && effectId !== 'none' ? "Effetto avatar equipaggiato! ✨" : "Effetto rimosso!", "success");
     };
 
-    const handleBuyService = (serviceId: string, cost: number) => {
-        if (!user) return;
+    const handleBuyService = async (serviceId: string, cost: number) => {
+        if (!user || !user.email) return;
         const currentBalance = user.sheep_balance ?? 100;
         if (currentBalance < cost) {
             showToast("Non hai abbastanza pecore! 🐑", "error");
             return;
         }
-        const updatedUnlocked = [...(user.unlocked_services || []), serviceId];
-        const updatedBalance = currentBalance - cost;
-        updateProfile({
-            sheep_balance: updatedBalance,
-            unlocked_services: updatedUnlocked
-        });
-        showToast("Servizio acquistato con successo! 🐑", "success");
-        setShowInstructionsModal(true);
+        
+        try {
+            // Deduct sheep from profile
+            const updatedBalance = currentBalance - cost;
+            updateProfile({
+                sheep_balance: updatedBalance
+            });
+            
+            // Insert redemption transaction
+            const { error: insertError } = await supabase
+                .from('service_redemptions')
+                .insert({
+                    user_email: user.email.toLowerCase(),
+                    service_id: serviceId,
+                    cost: cost,
+                    status: 'pending'
+                });
+                
+            if (insertError) throw insertError;
+            
+            showToast("Servizio acquistato con successo! 🐑", "success");
+            setShowInstructionsModal(true);
+            fetchMyRedemptions();
+        } catch (err) {
+            console.error("Error purchasing service:", err);
+            showToast("Errore durante l'acquisto. Riprova.", "error");
+        }
     };
 
     // Local state for pending changes
@@ -297,6 +336,10 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
             setPendingAvatar(user?.avatar_url || null);
             setPendingAoe4Id(user?.aoe4_profile_id || '');
             setShowSaveSuccess(false);
+            
+            if (activeSubTab === 'shop') {
+                fetchMyRedemptions();
+            }
 
             if (user?.aoe4_profile_id) {
                 fetchAoe4Stats(user.aoe4_profile_id).then(data => {
@@ -483,6 +526,12 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
             fetchUnreadBetCount();
         }
     }, [isOpen, user?.email, user?.id]);
+
+    useEffect(() => {
+        if (isOpen && activeSubTab === 'shop' && user?.email) {
+            fetchMyRedemptions();
+        }
+    }, [isOpen, activeSubTab, user?.email]);
 
     const fetchUnreadBetCount = async () => {
         if (!user?.email) return;
@@ -1553,10 +1602,11 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                             <section className="space-y-4">
                                 <h3 className="text-xs font-black text-blue-400 tracking-widest uppercase flex items-center gap-2">
                                     🤝 Servizi & Coaching
+                                    {redemptionsLoading && <Loader2 className="animate-spin text-cyan-400" size={10} />}
                                 </h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     {SHOP_SERVICES.map(service => {
-                                        const count = (user?.unlocked_services || []).filter(s => s === service.id).length;
+                                        const count = redemptions.filter(r => r.service_id === service.id).length;
                                         const canAfford = (user?.sheep_balance ?? 100) >= service.cost;
 
                                         return (
@@ -1599,12 +1649,12 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                             </section>
 
                             {/* Active Services Instructions Banner */}
-                            {user?.unlocked_services && user.unlocked_services.length > 0 && (
+                            {redemptions.length > 0 && (
                                 <div className="p-4 rounded-xl border border-blue-500/20 bg-blue-600/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-left">
                                     <div className="space-y-0.5">
                                         <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest block">Servizi Riscattati</span>
                                         <p className="text-xs text-gray-300 font-bold">
-                                            Hai {user.unlocked_services.length} {user.unlocked_services.length === 1 ? 'servizio attivo' : 'servizi attivi'} da prenotare.
+                                            Hai {redemptions.length} {redemptions.length === 1 ? 'servizio attivo' : 'servizi attivi'} da prenotare.
                                         </p>
                                     </div>
                                     <button
