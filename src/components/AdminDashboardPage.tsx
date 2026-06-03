@@ -76,6 +76,7 @@ export default function AdminDashboardPage() {
   const [crmEditingNickname, setCrmEditingNickname] = useState(false);
   const [crmSheepAmount, setCrmSheepAmount] = useState<number | ''>('');
   const [pendingRedemptionsCount, setPendingRedemptionsCount] = useState(0);
+  const [emailsWithPendingRedemptions, setEmailsWithPendingRedemptions] = useState<string[]>([]);
   const [selectedUserRedemptions, setSelectedUserRedemptions] = useState<any[]>([]);
   const [redemptionsLoading, setRedemptionsLoading] = useState(false);
 
@@ -321,7 +322,7 @@ export default function AdminDashboardPage() {
     if (activeTab === 'utenti') {
       fetchCrmUsers();
     }
-  }, [crmSearch, crmRoleFilter, crmSortField, crmSortOrder, crmPage, activeTab]);
+  }, [crmSearch, crmRoleFilter, crmSortField, crmSortOrder, crmPage, activeTab, emailsWithPendingRedemptions.join(',')]);
 
   const fetchTournaments = async () => {
     try {
@@ -982,12 +983,14 @@ export default function AdminDashboardPage() {
 
   const fetchPendingRedemptionsCount = async () => {
     try {
-      const { count, error } = await supabase
+      const { data, error } = await supabase
         .from('service_redemptions')
-        .select('*', { count: 'exact', head: true })
+        .select('user_email')
         .eq('status', 'pending');
-      if (!error && count !== null) {
-        setPendingRedemptionsCount(count);
+      if (!error && data) {
+        setPendingRedemptionsCount(data.length);
+        const emails = Array.from(new Set(data.map((r: any) => r.user_email.toLowerCase())));
+        setEmailsWithPendingRedemptions(emails);
       }
     } catch (err) {
       console.error('Error fetching pending redemptions count:', err);
@@ -1195,7 +1198,13 @@ export default function AdminDashboardPage() {
       }
       
       if (crmRoleFilter !== 'all') {
-        if (crmRoleFilter === 'user') {
+        if (crmRoleFilter === 'pending_service') {
+          if (emailsWithPendingRedemptions.length > 0) {
+            query = query.in('email', emailsWithPendingRedemptions);
+          } else {
+            query = query.eq('email', 'non-existent-email-placeholder');
+          }
+        } else if (crmRoleFilter === 'user') {
           query = query.or('role.is.null,role.eq.user');
         } else {
           query = query.eq('role', crmRoleFilter);
@@ -2598,7 +2607,7 @@ export default function AdminDashboardPage() {
               <span>Utenti (CRM)</span>
             </div>
             {pendingRedemptionsCount > 0 && (
-              <span className="px-2 py-0.5 bg-yellow-500 text-black text-[10px] rounded-full font-black animate-pulse shadow-[0_0_8px_rgba(234,179,8,0.4)]">
+              <span className="px-2 py-0.5 bg-fuchsia-600 text-white text-[10px] rounded-full font-black animate-pulse shadow-[0_0_8px_rgba(217,70,239,0.4)]">
                 {pendingRedemptionsCount}
               </span>
             )}
@@ -5590,6 +5599,7 @@ export default function AdminDashboardPage() {
                         onChange={handleCrmRoleFilterChange}
                         options={[
                           { value: 'all', label: 'Tutti i Ruoli' },
+                          { value: 'pending_service', label: 'Servizi Pendenti 📢' },
                           { value: 'admin', label: 'Admin' },
                           { value: 'editor', label: 'Editor' },
                           { value: 'staff', label: 'Staff' },
@@ -5648,11 +5658,12 @@ export default function AdminDashboardPage() {
                           <tbody className="divide-y divide-white/5">
                             {crmUsers.map((u) => {
                               const isSelected = selectedCrmUser?.email === u.email;
+                              const hasPending = emailsWithPendingRedemptions.includes(u.email?.toLowerCase());
                               return (
                                 <tr 
                                   key={u.id}
                                   onClick={() => handleSelectCrmUser(u)}
-                                  className={`group cursor-pointer transition-colors ${isSelected ? 'bg-cyan-500/5' : 'hover:bg-white/[0.02]'}`}
+                                  className={`group cursor-pointer transition-colors ${isSelected ? 'bg-cyan-500/5' : 'hover:bg-white/[0.02]'} ${hasPending ? 'border-l-2 border-l-fuchsia-500' : ''}`}
                                 >
                                   <td className="py-3.5 px-4">
                                     <div className="flex items-center gap-3">
@@ -5664,10 +5675,15 @@ export default function AdminDashboardPage() {
                                         )}
                                       </div>
                                       <div className="flex flex-col min-w-0">
-                                        <div className="flex items-center gap-1.5 min-w-0">
+                                        <div className="flex flex-wrap items-center gap-1.5 min-w-0">
                                           <span className="text-sm font-bold text-white truncate max-w-[150px]">{u.nickname || 'Nessun nickname'}</span>
                                           {u.selected_title && (
                                             <TitleEmblemTooltip titleId={u.selected_title} label={SHOP_TITLES.find(t => t.id === u.selected_title)?.label || u.selected_title} placement="top" />
+                                          )}
+                                          {hasPending && (
+                                            <span className="text-[9px] px-1.5 py-0.5 bg-fuchsia-600/20 text-fuchsia-400 border border-fuchsia-500/30 rounded font-black uppercase tracking-tight animate-pulse shrink-0">
+                                              Servizio Pendente
+                                            </span>
                                           )}
                                         </div>
                                         <span className="text-xs text-gray-400 truncate max-w-[150px]">{u.email}</span>
@@ -5832,12 +5848,12 @@ export default function AdminDashboardPage() {
                             {/* Pending Services */}
                             {selectedUserRedemptions.filter(r => r.status === 'pending').length > 0 && (
                               <div className="space-y-2">
-                                <span className="text-[8px] font-black text-yellow-500 uppercase tracking-widest block text-left">Da Erogare (Pending)</span>
+                                <span className="text-[8px] font-black text-fuchsia-500 uppercase tracking-widest block text-left">Da Erogare (Pending)</span>
                                 {selectedUserRedemptions.filter(r => r.status === 'pending').map((redemption: any) => {
                                   const label = redemption.service_id === 'replay_review' ? '🎥 Replay con Staff' : redemption.service_id === 'coaching_1h' ? '👨‍🏫 1h Coaching' : redemption.service_id;
                                   return (
-                                    <div key={redemption.id} className="flex items-center justify-between p-2.5 bg-yellow-500/5 border border-yellow-500/20 rounded-xl gap-2">
-                                      <span className="text-[10px] font-bold text-yellow-400 truncate">{label}</span>
+                                    <div key={redemption.id} className="flex items-center justify-between p-2.5 bg-fuchsia-500/5 border border-fuchsia-500/20 rounded-xl gap-2">
+                                      <span className="text-[10px] font-bold text-fuchsia-400 truncate">{label}</span>
                                       <button
                                         type="button"
                                         onClick={() => handleCrmDeliverService(redemption.id, selectedCrmUser.email, redemption.service_id)}
