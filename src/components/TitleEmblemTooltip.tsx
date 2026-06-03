@@ -36,7 +36,7 @@ export function TitleEmblemTooltip({ titleId, label, placement = 'top' }: TitleE
     }
 
     return (
-        <div ref={containerRef} className="relative inline-block select-none z-40">
+        <div ref={containerRef} className={clsx("relative inline-block select-none", isOpen ? "z-50" : "z-40")}>
             {/* Clickable Badge */}
             <button
                 type="button"

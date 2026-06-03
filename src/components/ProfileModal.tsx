@@ -66,6 +66,11 @@ export const SHOP_EFFECTS = [
     { id: 'rainbow-rgb', label: 'Arcobaleno RGB', cost: 3000, className: 'avatar-effect-rainbow-rgb' },
 ];
 
+export const SHOP_SERVICES = [
+    { id: 'replay_review', label: 'Analisi Replay con lo Staff', cost: 500, desc: 'Pianifica una sessione con uno staffer per analizzare una tua partita registrata.' },
+    { id: 'coaching_1h', label: '1h di Coaching', cost: 1000, desc: 'Un\'ora intera di allenamento personalizzato e consigli strategici con un esperto.' },
+];
+
 const RANK_GROUPS = [
     { label: 'Bronze', ranks: ['Bronze I', 'Bronze II', 'Bronze III'] },
     { label: 'Silver', ranks: ['Silver I', 'Silver II', 'Silver III'] },
@@ -213,6 +218,22 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
             selected_avatar_effect: effectId
         });
         showToast(effectId && effectId !== 'none' ? "Effetto avatar equipaggiato! ✨" : "Effetto rimosso!", "success");
+    };
+
+    const handleBuyService = (serviceId: string, cost: number) => {
+        if (!user) return;
+        const currentBalance = user.sheep_balance ?? 100;
+        if (currentBalance < cost) {
+            showToast("Non hai abbastanza pecore! 🐑", "error");
+            return;
+        }
+        const updatedUnlocked = [...(user.unlocked_services || []), serviceId];
+        const updatedBalance = currentBalance - cost;
+        updateProfile({
+            sheep_balance: updatedBalance,
+            unlocked_services: updatedUnlocked
+        });
+        showToast("Servizio acquistato con successo! 🐑", "success");
     };
 
     // Local state for pending changes
@@ -1511,6 +1532,67 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                     })}
                                 </div>
                             </section>
+
+                            {/* Services Section */}
+                            <section className="space-y-4">
+                                <h3 className="text-xs font-black text-blue-400 tracking-widest uppercase flex items-center gap-2">
+                                    🤝 Servizi & Coaching
+                                </h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {SHOP_SERVICES.map(service => {
+                                        const count = (user?.unlocked_services || []).filter(s => s === service.id).length;
+                                        const canAfford = (user?.sheep_balance ?? 100) >= service.cost;
+
+                                        return (
+                                            <div key={service.id} className="bg-white/[0.03] border border-white/5 rounded-xl p-4 flex flex-col justify-between hover:border-white/10 transition-all">
+                                                <div className="flex gap-3 mb-4">
+                                                    <div className="w-12 h-12 bg-blue-500/10 flex items-center justify-center rounded-xl border border-blue-500/20 shrink-0 text-xl flex-shrink-0">
+                                                        {service.id === 'replay_review' ? '🎥' : '👨‍🏫'}
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-sm font-black text-white uppercase tracking-wider">{service.label}</h4>
+                                                        <p className="text-[10px] text-gray-400 font-medium leading-normal mt-1">{service.desc}</p>
+                                                        <div className="mt-2 flex items-center gap-2">
+                                                            <span className="text-xs font-bold text-blue-400">{service.cost} 🐑</span>
+                                                            {count > 0 && (
+                                                                <span className="text-[9px] bg-green-500/10 text-green-400 border border-green-500/20 px-1.5 py-0.5 rounded font-bold uppercase tracking-tight">
+                                                                    Riscattato {count}x
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="pt-2 border-t border-white/5 flex flex-col gap-2">
+                                                    <button
+                                                        onClick={() => handleBuyService(service.id, service.cost)}
+                                                        disabled={!canAfford}
+                                                        className={clsx(
+                                                            "w-full py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                                            canAfford 
+                                                                ? "bg-yellow-500 text-black hover:bg-yellow-400" 
+                                                                : "bg-white/5 text-gray-600 cursor-not-allowed"
+                                                        )}
+                                                    >
+                                                        Riscatta a {service.cost} 🐑
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </section>
+
+                            {/* Active Services Instructions */}
+                            {user?.unlocked_services && user.unlocked_services.length > 0 && (
+                                <div className="p-4 rounded-xl border border-blue-500/20 bg-blue-600/5 space-y-2">
+                                    <h4 className="text-[11px] font-black text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                                        📢 Come utilizzare i tuoi servizi riscattati
+                                    </h4>
+                                    <p className="text-[10px] text-gray-300 leading-normal font-medium">
+                                        Hai riscattato con successo dei servizi! Per prenotare l'analisi del replay o l'ora di coaching, per favore <strong>unisciti al nostro server Discord</strong> e contatta un membro dello staff fornendo il tuo nickname (<strong>{user.nickname || 'Nessun nickname impostato'}</strong>). Lo staff concorderà data e ora direttamente con te.
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

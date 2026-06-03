@@ -1331,6 +1331,46 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleCrmDeliverService = async (userEmail: string, serviceId: string, indexToRemove: number) => {
+    if (!isAdmin) {
+      setToast({ isVisible: true, message: 'Solo gli amministratori o lo staff possono erogare servizi', type: 'error' });
+      return;
+    }
+    try {
+      const userProfile = crmUsers.find(u => u.email === userEmail) || selectedCrmUser;
+      if (!userProfile) return;
+
+      const services = [...(userProfile.unlocked_services || [])];
+      if (indexToRemove < 0 || indexToRemove >= services.length) return;
+      services.splice(indexToRemove, 1);
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ unlocked_services: services })
+        .eq('email', userEmail.toLowerCase());
+
+      if (error) throw error;
+
+      await logAdminAction(
+        'DELIVER_SERVICE',
+        'profiles',
+        userEmail,
+        `Erogato servizio "${serviceId === 'replay_review' ? 'Analisi Replay' : serviceId === 'coaching_1h' ? '1h Coaching' : serviceId}" per utente "${userEmail}"`,
+        { target_email: userEmail, service_id: serviceId }
+      );
+
+      setToast({ isVisible: true, message: 'Servizio segnato come erogato! 🎉', type: 'success' });
+
+      setCrmUsers((prev: any[]) => prev.map(u => u.email === userEmail ? { ...u, unlocked_services: services } : u));
+      if (selectedCrmUser && selectedCrmUser.email === userEmail) {
+        setSelectedCrmUser((prev: any) => prev ? { ...prev, unlocked_services: services } : null);
+      }
+    } catch (err) {
+      console.error('Error delivering service:', err);
+      setToast({ isVisible: true, message: 'Errore nell\'erogazione del servizio', type: 'error' });
+    }
+  };
+
   const handleCrmChangeRole = async (userEmail: string, role: string) => {
     if (!isSuperAdmin) {
       setToast({ isVisible: true, message: 'Solo il super amministratore può modificare i ruoli', type: 'error' });
@@ -5741,6 +5781,32 @@ export default function AdminDashboardPage() {
                             </div>
                           </div>
                         ) : null}
+                      </div>
+
+                      {/* Servizi Riscattati */}
+                      <div className="space-y-3 pt-4 border-t border-white/5">
+                        <h4 className="text-[10px] font-black uppercase text-gray-500 tracking-wider text-left">Servizi Da Erogare</h4>
+                        {selectedCrmUser.unlocked_services && selectedCrmUser.unlocked_services.length > 0 ? (
+                          <div className="space-y-2">
+                            {selectedCrmUser.unlocked_services.map((serviceId: string, idx: number) => {
+                              const label = serviceId === 'replay_review' ? '🎥 Replay con Staff' : serviceId === 'coaching_1h' ? '👨‍🏫 1h Coaching' : serviceId;
+                              return (
+                                <div key={idx} className="flex items-center justify-between p-2.5 bg-[#111218] border border-white/5 rounded-xl gap-2">
+                                  <span className="text-[10px] font-bold text-gray-300 truncate">{label}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCrmDeliverService(selectedCrmUser.email, serviceId, idx)}
+                                    className="px-2 py-1 bg-green-500/10 hover:bg-green-500 text-green-400 hover:text-white border border-green-500/20 rounded-lg text-[8px] font-black uppercase tracking-wider transition-all"
+                                  >
+                                    Eroga
+                                  </button>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <p className="text-[10px] text-gray-500 italic text-left">Nessun servizio in sospeso.</p>
+                        )}
                       </div>
 
                       {/* Azioni Gestionali */}

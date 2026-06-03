@@ -1909,9 +1909,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                     </div>
                   ) : questions.length > 0 ? (
                     questions.map((q) => (
-                      <div key={q.id} className="bg-gradient-to-r from-white/[0.03] to-white/[0.01] p-4 md:p-5 rounded-3xl border border-white/10 relative overflow-hidden group/q shadow-xl backdrop-blur-sm space-y-4">
+                      <div key={q.id} className="bg-gradient-to-r from-white/[0.03] to-white/[0.01] p-4 md:p-5 rounded-3xl border border-white/10 relative group/q shadow-xl backdrop-blur-sm space-y-4">
 
-                             <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-600 to-cyan-500 opacity-30" />
+                             <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-600 to-cyan-500 opacity-30 rounded-l-3xl" />
                              
                              <div className="flex items-start gap-3 md:gap-5 mb-3">
                                <div className="shrink-0">

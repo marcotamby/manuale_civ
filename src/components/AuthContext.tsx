@@ -15,6 +15,7 @@ interface UserData {
   unlocked_titles?: string[];
   selected_avatar_effect?: string | null;
   unlocked_avatar_effects?: string[];
+  unlocked_services?: string[];
 }
 
 interface AuthContextType {
@@ -47,6 +48,7 @@ interface AuthContextType {
     unlocked_titles?: string[];
     selected_avatar_effect?: string | null;
     unlocked_avatar_effects?: string[];
+    unlocked_services?: string[];
   }) => void;
   refreshUser: () => Promise<void>;
   setUser: (user: UserData | null) => void;
@@ -167,7 +169,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('nickname, rank, avatar_url, role, is_streamer, can_manage_tournaments, can_manage_civs, can_manage_buildorders, can_view_admin, sheep_balance, aoe4_profile_id, selected_title, unlocked_titles, selected_avatar_effect, unlocked_avatar_effects')
+        .select('nickname, rank, avatar_url, role, is_streamer, can_manage_tournaments, can_manage_civs, can_manage_buildorders, can_view_admin, sheep_balance, aoe4_profile_id, selected_title, unlocked_titles, selected_avatar_effect, unlocked_avatar_effects, unlocked_services')
         .ilike('email', userEmail)
         .maybeSingle();
       
@@ -196,7 +198,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
              selected_title: data.selected_title || null,
              unlocked_titles: data.unlocked_titles || [],
              selected_avatar_effect: data.selected_avatar_effect || null,
-             unlocked_avatar_effects: data.unlocked_avatar_effects || []
+             unlocked_avatar_effects: data.unlocked_avatar_effects || [],
+             unlocked_services: data.unlocked_services || []
            };
            localStorage.setItem('auth_user', JSON.stringify(updated));
            localStorage.setItem(`auth_user_${email}`, JSON.stringify(updated));
@@ -370,6 +373,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     unlocked_titles?: string[];
     selected_avatar_effect?: string | null;
     unlocked_avatar_effects?: string[];
+    unlocked_services?: string[];
   }) => {
     if (user) {
       const updatedUser = { ...user, ...data };
@@ -411,6 +415,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (data.unlocked_titles !== undefined) payload.unlocked_titles = data.unlocked_titles;
         if (data.selected_avatar_effect !== undefined) payload.selected_avatar_effect = data.selected_avatar_effect;
         if (data.unlocked_avatar_effects !== undefined) payload.unlocked_avatar_effects = data.unlocked_avatar_effects;
+        if (data.unlocked_services !== undefined) payload.unlocked_services = data.unlocked_services;
 
         supabase
           .from('profiles')
