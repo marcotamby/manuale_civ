@@ -55,12 +55,12 @@ export function getAvatarEffectClass(effect: string | null | undefined): string 
 }
 
 export const SHOP_TITLES = [
-    { id: 'novice', label: 'Novizio del Gregge', cost: 0 },
-    { id: 'shearer', label: 'Tosatore di Professione', cost: 150 },
-    { id: 'shepherd', label: 'Guardiano dei Pascoli', cost: 300 },
-    { id: 'wool_magnate', label: 'Magnate della Lana', cost: 600 },
-    { id: 'shepherd_king', label: 'Re dei Pastori', cost: 1200 },
-    { id: 'wolf_legend', label: 'Leggenda dei Lupi', cost: 2500 },
+    { id: 'novice', label: 'Novizio del Gregge', cost: 0, badge: '/badges/novice.png' },
+    { id: 'shearer', label: 'Tosatore di Professione', cost: 150, badge: '/badges/shearer.png' },
+    { id: 'shepherd', label: 'Guardiano dei Pascoli', cost: 300, badge: '/badges/shepherd.png' },
+    { id: 'wool_magnate', label: 'Magnate della Lana', cost: 600, badge: '/badges/wool_magnate.png' },
+    { id: 'shepherd_king', label: 'Re dei Pastori', cost: 1200, badge: '/badges/shepherd_king.png' },
+    { id: 'wolf_legend', label: 'Leggenda dei Lupi', cost: 2500, badge: '/badges/wolf_legend.png' },
 ];
 
 export const SHOP_EFFECTS = [
@@ -721,9 +721,16 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                 )}
                             </div>
                             {user?.selected_title && (
-                                <p className="text-xs font-black text-blue-400 tracking-wider uppercase mt-0.5">
-                                    🏆 {SHOP_TITLES.find(t => t.id === user.selected_title)?.label || user.selected_title}
-                                </p>
+                                <div className="flex items-center gap-1.5 mt-0.5 justify-center sm:justify-start">
+                                    <img 
+                                        src={SHOP_TITLES.find(t => t.id === user.selected_title)?.badge} 
+                                        alt="" 
+                                        className="w-4 h-4 object-contain filter drop-shadow-[0_0_4px_rgba(59,130,246,0.5)]" 
+                                    />
+                                    <span className="text-xs font-black text-blue-400 tracking-wider uppercase">
+                                        {SHOP_TITLES.find(t => t.id === user.selected_title)?.label || user.selected_title}
+                                    </span>
+                                </div>
                             )}
                             <p className="text-xs text-gray-400">{user?.email}</p>
                         </div>
@@ -1379,19 +1386,24 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
 
                                         return (
                                             <div key={title.id} className="bg-white/[0.03] border border-white/5 rounded-xl p-4 flex flex-col justify-between hover:border-white/10 transition-all">
-                                                <div className="mb-4">
-                                                    <h4 className="text-sm font-black text-white uppercase tracking-wider">{title.label}</h4>
-                                                    <div className="mt-1 flex items-center gap-2">
-                                                        {title.cost > 0 ? (
-                                                            <span className="text-xs font-bold text-blue-400">{title.cost} 🐑</span>
-                                                        ) : (
-                                                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Gratis</span>
-                                                        )}
-                                                        {isUnlocked && (
-                                                            <span className="text-[9px] bg-green-500/10 text-green-400 border border-green-500/20 px-1.5 py-0.5 rounded font-bold uppercase tracking-tight">
-                                                                Sbloccato
-                                                            </span>
-                                                        )}
+                                                <div className="flex gap-3 mb-4">
+                                                    <div className="w-12 h-12 bg-blue-500/10 flex items-center justify-center rounded-xl border border-blue-500/20 shrink-0 overflow-hidden">
+                                                        <img src={title.badge} alt={title.label} className="w-10 h-10 object-contain filter drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-sm font-black text-white uppercase tracking-wider">{title.label}</h4>
+                                                        <div className="mt-1 flex items-center gap-2">
+                                                            {title.cost > 0 ? (
+                                                                <span className="text-xs font-bold text-blue-400">{title.cost} 🐑</span>
+                                                            ) : (
+                                                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Gratis</span>
+                                                            )}
+                                                            {isUnlocked && (
+                                                                <span className="text-[9px] bg-green-500/10 text-green-400 border border-green-500/20 px-1.5 py-0.5 rounded font-bold uppercase tracking-tight">
+                                                                    Sbloccato
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="pt-2 border-t border-white/5 flex gap-2">

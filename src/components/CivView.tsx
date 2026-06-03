@@ -748,8 +748,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <div className="flex items-center gap-2 mb-2 flex-wrap">
                 <span className="text-sm md:text-base font-black text-white uppercase tracking-tight select-text truncate">{a.user_nickname}</span>
                 {a.profile?.selected_title && (
-                  <span className="text-[9px] font-black text-blue-400 tracking-wider uppercase bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
-                    🏆 {SHOP_TITLES.find(t => t.id === a.profile.selected_title)?.label || a.profile.selected_title}
+                  <span className="text-[9px] font-black text-blue-400 tracking-wider uppercase bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20 flex items-center gap-1">
+                    <img src={SHOP_TITLES.find(t => t.id === a.profile.selected_title)?.badge} alt="" className="w-3.5 h-3.5 object-contain" />
+                    {SHOP_TITLES.find(t => t.id === a.profile.selected_title)?.label || a.profile.selected_title}
                   </span>
                 )}
                 {a.status === 'pending' && (
@@ -1930,8 +1931,9 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                    <div className="flex items-center gap-2 mb-2 flex-wrap">
                                     <span className="text-sm md:text-base font-black text-white uppercase tracking-tight select-text truncate">{q.user_nickname}</span>
                                      {q.profile?.selected_title && (
-                                       <span className="text-[9px] font-black text-blue-400 tracking-wider uppercase bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
-                                         🏆 {SHOP_TITLES.find(t => t.id === q.profile.selected_title)?.label || q.profile.selected_title}
+                                       <span className="text-[9px] font-black text-blue-400 tracking-wider uppercase bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20 flex items-center gap-1">
+                                         <img src={SHOP_TITLES.find(t => t.id === q.profile.selected_title)?.badge} alt="" className="w-3.5 h-3.5 object-contain" />
+                                         {SHOP_TITLES.find(t => t.id === q.profile.selected_title)?.label || q.profile.selected_title}
                                        </span>
                                      )}
                                      {q.status === 'pending' && (

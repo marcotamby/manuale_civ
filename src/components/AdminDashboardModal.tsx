@@ -1081,8 +1081,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                   {u.role === 'admin' && <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded font-black uppercase">Owner</span>}
                                   {u.role === 'editor' && <span className="text-[9px] px-1.5 py-0.5 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded font-black uppercase">Editor</span>}
                                   {u.selected_title && (
-                                    <span className="text-[9px] px-1.5 py-0.5 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded font-black uppercase">
-                                      🏆 {SHOP_TITLES.find(t => t.id === u.selected_title)?.label || u.selected_title}
+                                    <span className="text-[9px] px-1.5 py-0.5 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded font-black uppercase flex items-center gap-1">
+                                      <img src={SHOP_TITLES.find(t => t.id === u.selected_title)?.badge} alt="" className="w-3 h-3 object-contain" />
+                                      {SHOP_TITLES.find(t => t.id === u.selected_title)?.label || u.selected_title}
                                     </span>
                                   )}
                                 </div>
@@ -1213,8 +1214,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                         <div className="flex items-center gap-1.5 min-w-0">
                           <p className="text-white font-bold truncate">{p.nickname || 'Anonimo'}</p>
                           {p.selected_title && (
-                            <span className="text-[8px] px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black uppercase tracking-wider shrink-0">
-                              🏆 {SHOP_TITLES.find(t => t.id === p.selected_title)?.label || p.selected_title}
+                            <span className="text-[8px] px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black uppercase tracking-wider shrink-0 flex items-center gap-1">
+                              <img src={SHOP_TITLES.find(t => t.id === p.selected_title)?.badge} alt="" className="w-3 h-3 object-contain" />
+                              {SHOP_TITLES.find(t => t.id === p.selected_title)?.label || p.selected_title}
                             </span>
                           )}
                         </div>
