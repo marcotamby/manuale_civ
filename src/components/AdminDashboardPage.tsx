@@ -3361,9 +3361,9 @@ export default function AdminDashboardPage() {
                     return matchSearch;
                   })
                   .map(u => (
-                    <div key={u.id} className={`bg-[#0a0e1c]/60 border rounded-2xl p-4 flex flex-row items-center justify-between gap-4 group hover:bg-[#0a0e1c]/80 hover:border-cyan-500/40 shadow-xl transition-all duration-300 ${u.role === 'admin' ? 'border-cyan-500/20' : 'border-white/5'}`}>
+                    <div key={u.id} className={`bg-[#0a0e1c]/60 border rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group hover:bg-[#0a0e1c]/80 hover:border-cyan-500/40 shadow-xl transition-all duration-300 ${u.role === 'admin' ? 'border-cyan-500/20' : 'border-white/5'}`}>
                       {/* Left: Avatar & Info */}
-                      <div className="flex items-center gap-4 min-w-0 flex-1">
+                      <div className="flex items-center gap-4 min-w-0">
                         <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border text-base font-bold shrink-0 overflow-hidden shadow-md ${u.role === 'admin' ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
                           {u.avatar_url ? (
                             <img 
@@ -3427,7 +3427,8 @@ export default function AdminDashboardPage() {
                       </div>
 
                       {/* Right: Controls */}
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center justify-between sm:justify-end gap-3 pt-3 sm:pt-0 border-t sm:border-t-0 border-white/5 w-full sm:w-auto shrink-0">
+                        <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest sm:hidden">Permessi</span>
                         <div className="flex items-center gap-1 bg-black/40 p-1.5 rounded-2xl border border-white/5">
                           <button
                             onClick={() => handleToggleUserRole(u.email, 'can_manage_tournaments', !u.can_manage_tournaments)}
@@ -3525,32 +3526,40 @@ export default function AdminDashboardPage() {
                 {allProfiles
                   .filter(p => !userSearch || p.email?.toLowerCase().includes(userSearch.toLowerCase()) || p.nickname?.toLowerCase().includes(userSearch.toLowerCase()))
                   .map(p => (
-                    <div key={p.email} className="bg-[#0a0e1c]/60 border border-white/5 rounded-2xl p-4 flex flex-row items-center justify-between gap-4 hover:border-cyan-500/40 shadow-xl transition-all duration-300 group">
-                      {/* Left: Avatar & Info */}
-                      <div className="flex items-center gap-4 min-w-0 flex-1">
-                        <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold border border-cyan-500/20 overflow-hidden shadow-md shrink-0">
-                          {p.avatar_url ? (
-                            <img 
-                              src={p.avatar_url} 
-                              alt={p.nickname || p.email} 
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).style.display = 'none';
-                                (e.target as HTMLImageElement).parentElement!.innerHTML = `<span>${p.nickname?.[0] || p.email?.[0]}</span>`;
-                              }}
-                            />
-                          ) : (
-                            <span>{p.nickname?.[0] || p.email?.[0]}</span>
-                          )}
+                    <div key={p.email} className="bg-[#0a0e1c]/60 border border-white/5 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:border-cyan-500/40 shadow-xl transition-all duration-300 group">
+                      {/* Left: Avatar & Info & Mobile Balance */}
+                      <div className="flex items-center justify-between sm:justify-start gap-4 min-w-0 w-full sm:w-auto">
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold border border-cyan-500/20 overflow-hidden shadow-md shrink-0">
+                            {p.avatar_url ? (
+                              <img 
+                                src={p.avatar_url} 
+                                alt={p.nickname || p.email} 
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                  (e.target as HTMLImageElement).parentElement!.innerHTML = `<span>${p.nickname?.[0] || p.email?.[0]}</span>`;
+                                }}
+                              />
+                            ) : (
+                              <span>{p.nickname?.[0] || p.email?.[0]}</span>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-white font-black text-base truncate">{p.nickname || 'Anonimo'}</p>
+                            <p className="text-xs text-gray-400 truncate block mt-0.5">{p.email}</p>
+                          </div>
                         </div>
-                        <div className="min-w-0">
-                          <p className="text-white font-black text-base truncate">{p.nickname || 'Anonimo'}</p>
-                          <p className="text-xs text-gray-400 truncate block mt-0.5">{p.email}</p>
+
+                        {/* Mobile Balance Badge */}
+                        <div className="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10 shrink-0 sm:hidden">
+                          <span className="text-sm">🐑</span>
+                          <span className="text-xs font-black text-white tracking-tight">{p.sheep_balance || 0}</span>
                         </div>
                       </div>
                       
-                      {/* Middle: Sheep Balance */}
-                      <div className="flex items-center gap-2 shrink-0">
+                      {/* Middle: Sheep Balance (Desktop) */}
+                      <div className="hidden sm:flex items-center gap-2 shrink-0">
                         <div className="flex items-center gap-1.5 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
                           <span className="text-lg">🐑</span>
                           <span className="text-base font-black text-white tracking-tight">{p.sheep_balance || 0}</span>
@@ -3558,7 +3567,7 @@ export default function AdminDashboardPage() {
                       </div>
 
                       {/* Right: Controls & Actions */}
-                      <div className="flex items-center gap-3 shrink-0">
+                      <div className="flex items-center justify-between sm:justify-end gap-3 pt-3 sm:pt-0 border-t sm:border-t-0 border-white/5 w-full sm:w-auto shrink-0">
                         <div className="flex items-center gap-1 bg-[#111218] p-1 rounded-2xl border border-white/10 shadow-md">
                           <button
                             onClick={() => {
@@ -3589,7 +3598,7 @@ export default function AdminDashboardPage() {
                         <button
                           onClick={() => handleSheepRefill(p.email, perUserRefillAmounts[p.email] ?? 100)}
                           disabled={isRefilling === p.email}
-                          className="px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white rounded-xl text-xs font-black border-0 shadow-md transition-all uppercase tracking-widest active:scale-95 disabled:opacity-40 flex items-center gap-1 group/btn min-w-[125px] justify-center"
+                          className="px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white rounded-xl text-xs font-black border-0 shadow-md transition-all uppercase tracking-widest active:scale-95 disabled:opacity-40 flex items-center gap-1 group/btn min-w-[110px] sm:min-w-[125px] justify-center"
                         >
                           {isRefilling === p.email ? (
                             <Loader2 size={14} className="animate-spin" />
@@ -5720,8 +5729,8 @@ export default function AdminDashboardPage() {
                         
                         <div className="space-y-2">
                           <label className="text-[10px] font-black text-gray-400 block uppercase tracking-wider">Bilancio Pecore ({selectedCrmUser.sheep_balance ?? 100})</label>
-                          <div className="flex flex-col sm:flex-row gap-2">
-                            <div className="flex items-center bg-[#111218] border border-white/10 rounded-xl px-2 py-1 justify-between max-w-[140px] w-full">
+                          <div className="flex flex-col xs:flex-row gap-2 w-full">
+                            <div className="flex items-center bg-[#111218] border border-white/10 rounded-xl px-2 py-1 justify-between w-full xs:max-w-[140px] shrink-0">
                               <button
                                 type="button"
                                 disabled={!isAdmin || (isSuperAdminEmail(selectedCrmUser.email) && !isSuperAdmin)}
@@ -5753,7 +5762,7 @@ export default function AdminDashboardPage() {
                                 <Plus size={12} />
                               </button>
                             </div>
-                            <div className="flex gap-2 flex-1">
+                            <div className="flex gap-2 w-full xs:w-auto flex-1">
                               <button
                                 disabled={crmSheepAmount === '' || !isAdmin || (isSuperAdminEmail(selectedCrmUser.email) && !isSuperAdmin)}
                                 onClick={() => handleCrmAdjustSheep(selectedCrmUser.email, Number(crmSheepAmount))}
@@ -5801,8 +5810,8 @@ export default function AdminDashboardPage() {
                               { field: 'can_manage_buildorders', label: 'Gestione Build Orders ⚡' },
                               { field: 'can_view_admin', label: 'Accesso Pannello Admin 🔑' }
                             ].map((perm) => (
-                              <div key={perm.field} className="flex items-center justify-between p-2 bg-[#111218] border border-white/5 rounded-xl">
-                                <span className="text-[10px] font-bold text-gray-300">{perm.label}</span>
+                              <div key={perm.field} className="flex items-center justify-between p-2 bg-[#111218] border border-white/5 rounded-xl gap-2">
+                                <span className="text-[10px] font-bold text-gray-300 min-w-0 flex-1 pr-2 break-words text-left">{perm.label}</span>
                                 <button
                                   type="button"
                                   disabled={!isSuperAdmin}

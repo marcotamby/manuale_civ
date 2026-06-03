@@ -647,25 +647,25 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
           </div>
 
           <div className="flex items-center justify-between md:justify-end w-full md:w-auto gap-4">
-            <div className="flex bg-black/40 p-1 rounded-xl border border-white/5">
+            <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 overflow-x-auto elegant-scrollbar flex-nowrap max-w-[calc(100vw-88px)] md:max-w-none shrink-0">
               <button
                 onClick={() => setActiveTab('proposte')}
-                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'proposte' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 shrink-0 ${activeTab === 'proposte' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
               >
                 Proposte
                 {suggestions.length > 0 && (
-                  <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] rounded-full">
+                  <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] rounded-full shrink-0">
                     {suggestions.length}
                   </span>
                 )}
               </button>
               <button
                 onClick={() => setActiveTab('qa')}
-                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'qa' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 shrink-0 ${activeTab === 'qa' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
               >
                 Q&A
                 {(questions.length + answers.length) > 0 && (
-                  <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-yellow-500 text-black text-[10px] rounded-full font-black">
+                  <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-yellow-500 text-black text-[10px] rounded-full font-black shrink-0">
                     {questions.length + answers.length}
                   </span>
                 )}
@@ -673,7 +673,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
               {isSuperAdmin && (
                 <button
                   onClick={() => setActiveTab('users')}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'users' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 shrink-0 ${activeTab === 'users' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
                 >
                   Permessi
                 </button>
@@ -681,9 +681,9 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
               {isSuperAdmin && (
                 <button
                   onClick={() => setActiveTab('pecore')}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'pecore' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 shrink-0 ${activeTab === 'pecore' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
                 >
-                  <span className="text-sm">🐑</span>
+                  <span className="text-sm shrink-0">🐑</span>
                   Pecore
                 </button>
               )}
@@ -1094,28 +1094,28 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                 {/* Tournaments */}
                                 <button
                                   onClick={() => handleToggleUserRole(u.email, 'can_manage_tournaments', !u.can_manage_tournaments)}
-                                  className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_tournaments ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                                  className={`w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_tournaments ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
                                   title="Gestione Tornei"
                                 >
-                                  <Trophy size={16} />
+                                  <Trophy size={14} />
                                 </button>
 
                                 {/* Civs */}
                                 <button
                                   onClick={() => handleToggleUserRole(u.email, 'can_manage_civs', !u.can_manage_civs)}
-                                  className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_civs ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                                  className={`w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_civs ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
                                   title="Gestione Civiltà"
                                 >
-                                  <BookOpen size={16} />
+                                  <BookOpen size={14} />
                                 </button>
 
                                 {/* Build Orders */}
                                 <button
                                   onClick={() => handleToggleUserRole(u.email, 'can_manage_buildorders', !u.can_manage_buildorders)}
-                                  className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_buildorders ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
+                                  className={`w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-lg transition-all ${u.can_manage_buildorders ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-white'}`}
                                   title="Gestione Build Orders"
                                 >
-                                  <Zap size={16} />
+                                  <Zap size={14} />
                                 </button>
 
                                 <div className="w-px h-4 bg-white/10 mx-1" />
@@ -1123,20 +1123,20 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                 {/* Streamer Toggle */}
                                 <button
                                   onClick={() => handleToggleUserRole(u.email, 'is_streamer', !u.is_streamer)}
-                                  className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${u.is_streamer ? 'bg-pink-600 text-white shadow-[0_0_15px_rgba(219,39,119,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-pink-400'}`}
+                                  className={`w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-lg transition-all ${u.is_streamer ? 'bg-pink-600 text-white shadow-[0_0_15px_rgba(219,39,119,0.3)]' : 'bg-gray-800/50 text-gray-500 hover:text-pink-400'}`}
                                   title={u.is_streamer ? 'Rimuovi Streamer' : 'Segna come Streamer'}
                                 >
-                                  <Radio size={16} />
+                                  <Radio size={14} />
                                 </button>
                                  {isSuperAdmin && (
                                   <>
                                     <div className="w-px h-4 bg-white/10 mx-1" />
                                     <button
                                       onClick={() => handleDeleteUser(u.email)}
-                                      className="w-9 h-9 flex items-center justify-center rounded-lg bg-red-500/10 text-red-500/50 hover:text-red-500 hover:bg-red-500/20 transition-all"
+                                      className="w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-lg bg-red-500/10 text-red-500/50 hover:text-red-500 hover:bg-red-500/20 transition-all"
                                       title="Elimina Utente"
                                     >
-                                      <Trash2 size={16} />
+                                      <Trash2 size={14} />
                                     </button>
                                   </>
                                  )}
