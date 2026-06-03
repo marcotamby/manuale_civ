@@ -63,7 +63,7 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
       <aside 
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className={`w-64 md:w-32 h-full flex flex-col py-6 px-4 md:px-3 lg:bg-transparent bg-black/90 backdrop-blur-xl border-r border-white/5 md:border-none transition-all duration-300 overflow-y-auto overflow-x-hidden no-scrollbar fixed top-0 bottom-0 left-0 md:static z-30
+        className={`w-64 md:w-32 h-full flex flex-col py-6 px-4 md:px-3 lg:bg-transparent bg-black/90 backdrop-blur-xl border-r border-white/5 md:border-none transition-all duration-300 overflow-y-auto overflow-x-hidden no-scrollbar absolute top-0 bottom-0 left-0 md:static z-30
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         ${hideOnMobile ? 'hidden md:flex' : ''}
       `}>
@@ -144,7 +144,7 @@ export function Sidebar({ selectedCiv, onSelectCiv, onSelectPage, isOpen, onClos
 
         {/* Main List - Hide on Home */}
         {currentPage !== 'home' && (
-          <nav className="flex flex-col w-full pb-52 md:pb-10 pr-1">
+          <nav className="flex flex-col w-full pb-28 md:pb-10 pr-1">
             {civilizationsData.map((civ) => (
               <Link
                 key={civ.id}
