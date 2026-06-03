@@ -6,7 +6,8 @@ import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
-import { getAvatarEffectClass, SHOP_TITLES } from './ProfileModal';
+import { getAvatarEffectClass } from './ProfileModal';
+import { TitleEmblemTooltip, SHOP_TITLES } from './TitleEmblemTooltip';
 import { sendNewBuildOrderWebhook } from '../utils/discordWebhook';
 
 export interface Suggestion {
@@ -1081,10 +1082,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                   {u.role === 'admin' && <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded font-black uppercase">Owner</span>}
                                   {u.role === 'editor' && <span className="text-[9px] px-1.5 py-0.5 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded font-black uppercase">Editor</span>}
                                   {u.selected_title && (
-                                    <span className="text-[9px] px-1.5 py-0.5 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded font-black uppercase flex items-center gap-1">
-                                      <img src={SHOP_TITLES.find(t => t.id === u.selected_title)?.badge} alt="" className="w-3 h-3 object-contain" />
-                                      {SHOP_TITLES.find(t => t.id === u.selected_title)?.label || u.selected_title}
-                                    </span>
+                                    <TitleEmblemTooltip titleId={u.selected_title} label={SHOP_TITLES.find(t => t.id === u.selected_title)?.label || u.selected_title} placement="top" />
                                   )}
                                 </div>
                                 <span className="text-xs md:text-sm text-gray-500 truncate block">{u.email}</span>
@@ -1214,10 +1212,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                         <div className="flex items-center gap-1.5 min-w-0">
                           <p className="text-white font-bold truncate">{p.nickname || 'Anonimo'}</p>
                           {p.selected_title && (
-                            <span className="text-[8px] px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black uppercase tracking-wider shrink-0 flex items-center gap-1">
-                              <img src={SHOP_TITLES.find(t => t.id === p.selected_title)?.badge} alt="" className="w-3 h-3 object-contain" />
-                              {SHOP_TITLES.find(t => t.id === p.selected_title)?.label || p.selected_title}
-                            </span>
+                            <TitleEmblemTooltip titleId={p.selected_title} label={SHOP_TITLES.find(t => t.id === p.selected_title)?.label || p.selected_title} placement="top" />
                           )}
                         </div>
                         <p className="text-[10px] text-gray-500 truncate">{p.email}</p>

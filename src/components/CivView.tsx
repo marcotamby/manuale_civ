@@ -11,7 +11,8 @@ import { Shield, Sword, Zap, Map, BarChart2, Pencil, ChevronDown, ChevronUp, Pla
 import { supabase } from '../lib/supabaseClient';
 import { ResourceText } from './ResourceText';
 import { SocialProofPopup } from './SocialProofPopup';
-import { RANK_ICONS, getAvatarEffectClass, SHOP_TITLES } from './ProfileModal';
+import { RANK_ICONS, getAvatarEffectClass } from './ProfileModal';
+import { TitleEmblemTooltip, SHOP_TITLES } from './TitleEmblemTooltip';
 import { EditSuggestionForm } from './EditSuggestionForm';
 import { SEO } from './SEO';
 
@@ -748,10 +749,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
               <div className="flex items-center gap-2 mb-2 flex-wrap">
                 <span className="text-sm md:text-base font-black text-white uppercase tracking-tight select-text truncate">{a.user_nickname}</span>
                 {a.profile?.selected_title && (
-                  <span className="text-[9px] font-black text-blue-400 tracking-wider uppercase bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20 flex items-center gap-1">
-                    <img src={SHOP_TITLES.find(t => t.id === a.profile.selected_title)?.badge} alt="" className="w-3.5 h-3.5 object-contain" />
-                    {SHOP_TITLES.find(t => t.id === a.profile.selected_title)?.label || a.profile.selected_title}
-                  </span>
+                  <TitleEmblemTooltip titleId={a.profile.selected_title} label={SHOP_TITLES.find(t => t.id === a.profile.selected_title)?.label || a.profile.selected_title} placement="top" />
                 )}
                 {a.status === 'pending' && (
                   <span className="text-[8px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-black rounded-full uppercase tracking-widest animate-pulse">In Approvazione</span>
@@ -1931,10 +1929,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                    <div className="flex items-center gap-2 mb-2 flex-wrap">
                                     <span className="text-sm md:text-base font-black text-white uppercase tracking-tight select-text truncate">{q.user_nickname}</span>
                                      {q.profile?.selected_title && (
-                                       <span className="text-[9px] font-black text-blue-400 tracking-wider uppercase bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20 flex items-center gap-1">
-                                         <img src={SHOP_TITLES.find(t => t.id === q.profile.selected_title)?.badge} alt="" className="w-3.5 h-3.5 object-contain" />
-                                         {SHOP_TITLES.find(t => t.id === q.profile.selected_title)?.label || q.profile.selected_title}
-                                       </span>
+                                       <TitleEmblemTooltip titleId={q.profile.selected_title} label={SHOP_TITLES.find(t => t.id === q.profile.selected_title)?.label || q.profile.selected_title} placement="top" />
                                      )}
                                      {q.status === 'pending' && (
                                        <span className="text-[9px] px-2 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-black rounded-full uppercase tracking-widest animate-pulse">In Approvazione</span>

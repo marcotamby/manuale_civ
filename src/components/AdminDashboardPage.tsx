@@ -13,7 +13,8 @@ import { useCivData } from './CivContext';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
 import { CustomSelect } from './CustomSelect';
-import { getAvatarEffectClass, SHOP_TITLES } from './ProfileModal';
+import { getAvatarEffectClass } from './ProfileModal';
+import { TitleEmblemTooltip, SHOP_TITLES } from './TitleEmblemTooltip';
 import { sendNewBuildOrderWebhook } from '../utils/discordWebhook';
 import { WYSIWYGEditor } from './TournamentsPage';
 import { WYSIWYGEditor as SharedWYSIWYGEditor } from './WYSIWYGEditor';
@@ -3422,10 +3423,7 @@ export default function AdminDashboardPage() {
                             {u.role === 'admin' && <span className="text-[8px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded font-black uppercase tracking-wider">Owner</span>}
                             {u.role === 'editor' && <span className="text-[8px] px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black uppercase tracking-wider">Editor</span>}
                             {u.selected_title && (
-                              <span className="text-[8px] px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black uppercase flex items-center gap-1">
-                                <img src={SHOP_TITLES.find(t => t.id === u.selected_title)?.badge} alt="" className="w-3 h-3 object-contain" />
-                                {SHOP_TITLES.find(t => t.id === u.selected_title)?.label || u.selected_title}
-                              </span>
+                              <TitleEmblemTooltip titleId={u.selected_title} label={SHOP_TITLES.find(t => t.id === u.selected_title)?.label || u.selected_title} placement="top" />
                             )}
                             <span className="text-[9px] font-black text-cyan-400/80 border border-cyan-500/20 px-2 py-0.5 rounded bg-cyan-500/5 uppercase tracking-wider">{u.rank || 'Unranked'}</span>
                           </div>
@@ -3556,10 +3554,7 @@ export default function AdminDashboardPage() {
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <p className="text-white font-black text-base truncate">{p.nickname || 'Anonimo'}</p>
                               {p.selected_title && (
-                                <span className="text-[8px] px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black uppercase tracking-wider shrink-0 flex items-center gap-1">
-                                  <img src={SHOP_TITLES.find(t => t.id === p.selected_title)?.badge} alt="" className="w-3 h-3 object-contain" />
-                                  {SHOP_TITLES.find(t => t.id === p.selected_title)?.label || p.selected_title}
-                                </span>
+                                <TitleEmblemTooltip titleId={p.selected_title} label={SHOP_TITLES.find(t => t.id === p.selected_title)?.label || p.selected_title} placement="top" />
                               )}
                             </div>
                             <p className="text-xs text-gray-400 truncate block mt-0.5">{p.email}</p>
@@ -5595,10 +5590,7 @@ export default function AdminDashboardPage() {
                                         <div className="flex items-center gap-1.5 min-w-0">
                                           <span className="text-sm font-bold text-white truncate max-w-[150px]">{u.nickname || 'Nessun nickname'}</span>
                                           {u.selected_title && (
-                                            <span className="text-[8px] px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black uppercase tracking-wider shrink-0 flex items-center gap-1">
-                                              <img src={SHOP_TITLES.find(t => t.id === u.selected_title)?.badge} alt="" className="w-3 h-3 object-contain" />
-                                              {SHOP_TITLES.find(t => t.id === u.selected_title)?.label || u.selected_title}
-                                            </span>
+                                            <TitleEmblemTooltip titleId={u.selected_title} label={SHOP_TITLES.find(t => t.id === u.selected_title)?.label || u.selected_title} placement="top" />
                                           )}
                                         </div>
                                         <span className="text-xs text-gray-400 truncate max-w-[150px]">{u.email}</span>
@@ -5715,15 +5707,8 @@ export default function AdminDashboardPage() {
                             </h3>
                           )}
                           {selectedCrmUser.selected_title && (
-                            <div className="flex items-center gap-1.5 justify-center mt-1">
-                              <img 
-                                src={SHOP_TITLES.find(t => t.id === selectedCrmUser.selected_title)?.badge} 
-                                alt="" 
-                                className="w-4 h-4 object-contain filter drop-shadow-[0_0_4px_rgba(59,130,246,0.5)]" 
-                              />
-                              <span className="text-xs font-black text-blue-400 tracking-wider uppercase">
-                                {SHOP_TITLES.find(t => t.id === selectedCrmUser.selected_title)?.label || selectedCrmUser.selected_title}
-                              </span>
+                            <div className="flex justify-center mt-2">
+                              <TitleEmblemTooltip titleId={selectedCrmUser.selected_title} label={SHOP_TITLES.find(t => t.id === selectedCrmUser.selected_title)?.label || selectedCrmUser.selected_title} placement="top" />
                             </div>
                           )}
                           <p className="text-xs text-gray-400 mt-1 truncate select-all">{selectedCrmUser.email}</p>

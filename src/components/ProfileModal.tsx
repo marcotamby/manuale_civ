@@ -6,6 +6,7 @@ import { useCivData } from './CivContext';
 import { supabase } from '../lib/supabaseClient';
 import type { Suggestion } from './AdminDashboardModal';
 import clsx from 'clsx';
+import { TitleEmblem, SHOP_TITLES } from './TitleEmblem';
 
 interface ProfileModalProps {
     isOpen: boolean;
@@ -54,14 +55,7 @@ export function getAvatarEffectClass(effect: string | null | undefined): string 
     }
 }
 
-export const SHOP_TITLES = [
-    { id: 'novice', label: 'Novizio del Gregge', cost: 0, badge: '/badges/novice.png' },
-    { id: 'shearer', label: 'Tosatore di Professione', cost: 150, badge: '/badges/shearer.png' },
-    { id: 'shepherd', label: 'Guardiano dei Pascoli', cost: 300, badge: '/badges/shepherd.png' },
-    { id: 'wool_magnate', label: 'Magnate della Lana', cost: 600, badge: '/badges/wool_magnate.png' },
-    { id: 'shepherd_king', label: 'Re dei Pastori', cost: 1200, badge: '/badges/shepherd_king.png' },
-    { id: 'wolf_legend', label: 'Leggenda dei Lupi', cost: 2500, badge: '/badges/wolf_legend.png' },
-];
+// SHOP_TITLES imported from TitleEmblem.tsx
 
 export const SHOP_EFFECTS = [
     { id: 'none', label: 'Nessun Effetto', cost: 0, className: '' },
@@ -722,11 +716,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                             </div>
                             {user?.selected_title && (
                                 <div className="flex items-center gap-1.5 mt-0.5 justify-center sm:justify-start">
-                                    <img 
-                                        src={SHOP_TITLES.find(t => t.id === user.selected_title)?.badge} 
-                                        alt="" 
-                                        className="w-4 h-4 object-contain filter drop-shadow-[0_0_4px_rgba(59,130,246,0.5)]" 
-                                    />
+                                    <TitleEmblem titleId={user.selected_title} size={16} className="filter drop-shadow-[0_0_4px_rgba(59,130,246,0.5)]" />
                                     <span className="text-xs font-black text-blue-400 tracking-wider uppercase">
                                         {SHOP_TITLES.find(t => t.id === user.selected_title)?.label || user.selected_title}
                                     </span>
@@ -1387,8 +1377,8 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                         return (
                                             <div key={title.id} className="bg-white/[0.03] border border-white/5 rounded-xl p-4 flex flex-col justify-between hover:border-white/10 transition-all">
                                                 <div className="flex gap-3 mb-4">
-                                                    <div className="w-12 h-12 bg-blue-500/10 flex items-center justify-center rounded-xl border border-blue-500/20 shrink-0 overflow-hidden">
-                                                        <img src={title.badge} alt={title.label} className="w-10 h-10 object-contain filter drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                                                    <div className="w-12 h-12 bg-blue-500/10 flex items-center justify-center rounded-xl border border-blue-500/20 shrink-0">
+                                                        <TitleEmblem titleId={title.id} size={32} className="filter drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
                                                     </div>
                                                     <div>
                                                         <h4 className="text-sm font-black text-white uppercase tracking-wider">{title.label}</h4>
