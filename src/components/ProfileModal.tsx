@@ -1717,7 +1717,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
 
                 {/* Instructions Modal popup */}
                 {showInstructionsModal && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/65 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowInstructionsModal(false)}>
+                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/65 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowInstructionsModal(false)}>
                         <div 
                             className="bg-[#0b0f19] border border-blue-500/30 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-[0_20px_50px_rgba(0,0,0,0.95)] animate-in zoom-in-95 duration-200 space-y-6 relative border-l-4 border-l-blue-500"
                             onClick={(e) => e.stopPropagation()}
