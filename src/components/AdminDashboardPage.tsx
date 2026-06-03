@@ -119,7 +119,7 @@ export default function AdminDashboardPage() {
   };
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; type: 'question' | 'answer' | 'user'; item: any } | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; type: 'question' | 'answer' | 'user' | 'announcement'; item?: any } | null>(null);
   const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
     isVisible: false,
     message: '',
@@ -1690,7 +1690,9 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleDeleteAnnouncement = async (id: string) => {
+
+  const executeDeleteAnnouncement = async (id: string) => {
+    setIsDeleting(true);
     try {
       const { error } = await supabase
         .from('announcements')
@@ -1707,11 +1709,19 @@ export default function AdminDashboardPage() {
         { announcement_id: id }
       );
 
-      setToast({ isVisible: true, message: 'Annuncio eliminato', type: 'success' });
+      setDeleteSuccess(true);
       fetchAnnouncements();
+
+      setTimeout(() => {
+        setDeleteConfirm(null);
+        setDeleteSuccess(false);
+        setIsDeleting(false);
+      }, 1500);
     } catch (err) {
       console.error('Error deleting announcement:', err);
+      setIsDeleting(false);
       setToast({ isVisible: true, message: 'Errore nell\'eliminazione', type: 'error' });
+      setDeleteConfirm(null);
     }
   };
 
@@ -6263,9 +6273,7 @@ export default function AdminDashboardPage() {
                                 </button>
                                 <button
                                   onClick={() => {
-                                    if (confirm('Sei sicuro di voler eliminare questo annuncio?')) {
-                                      handleDeleteAnnouncement(ann.id);
-                                    }
+                                    setDeleteConfirm({ id: ann.id, type: 'announcement' });
                                   }}
                                   className="p-1 hover:bg-red-500/10 hover:text-red-500 text-gray-500 rounded transition-colors"
                                 >
@@ -6777,6 +6785,8 @@ export default function AdminDashboardPage() {
                       } else if (deleteConfirm.type === 'answer') {
                         handleUpdateQAStatus(deleteConfirm.item, 'answer', 'deleted');
                         setDeleteConfirm(null);
+                      } else if (deleteConfirm.type === 'announcement') {
+                        executeDeleteAnnouncement(deleteConfirm.id);
                       }
                     }}
                     className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl transition-all text-xs font-bold uppercase shadow-lg shadow-red-600/20"
