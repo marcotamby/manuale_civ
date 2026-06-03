@@ -37,6 +37,10 @@ export default function AdminDashboardPage() {
   const { isAuthenticated, isAdmin, isSuperAdmin, canManageCivs, canManageBuildorders, canManageTournaments, user } = useAuth();
   const { refreshCivs } = useCivData();
 
+  const isSuperAdminEmail = (emailStr: string) => {
+    return emailStr?.toLowerCase() === 'marco.tamborrino.94@gmail.com';
+  };
+
   const bodyTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
   const [linkModalText, setLinkModalText] = useState('');
@@ -1215,6 +1219,10 @@ export default function AdminDashboardPage() {
       setToast({ isVisible: true, message: 'Solo gli amministratori possono bannare utenti', type: 'error' });
       return;
     }
+    if (isSuperAdminEmail(userEmail)) {
+      setToast({ isVisible: true, message: 'Non è possibile bloccare o bannare il super amministratore', type: 'error' });
+      return;
+    }
     const isBanned = currentRole === 'banned';
     const newRole = isBanned ? 'user' : 'banned';
     try {
@@ -1246,6 +1254,10 @@ export default function AdminDashboardPage() {
   };
 
   const handleCrmUpdateNickname = async (userEmail: string, newNickname: string) => {
+    if (isSuperAdminEmail(userEmail) && !isSuperAdmin) {
+      setToast({ isVisible: true, message: 'Non hai i permessi per modificare il nickname del super amministratore', type: 'error' });
+      return;
+    }
     try {
       const { error } = await supabase
         .from('profiles')
@@ -1278,6 +1290,10 @@ export default function AdminDashboardPage() {
   const handleCrmAdjustSheep = async (userEmail: string, amount: number, isSet = false) => {
     if (!isAdmin) {
       setToast({ isVisible: true, message: 'Solo gli amministratori possono modificare il bilancio', type: 'error' });
+      return;
+    }
+    if (isSuperAdminEmail(userEmail) && !isSuperAdmin) {
+      setToast({ isVisible: true, message: 'Non puoi modificare il bilancio del super amministratore', type: 'error' });
       return;
     }
     try {
@@ -1314,8 +1330,8 @@ export default function AdminDashboardPage() {
   };
 
   const handleCrmChangeRole = async (userEmail: string, role: string) => {
-    if (!isAdmin) {
-      setToast({ isVisible: true, message: 'Solo gli amministratori possono modificare i ruoli', type: 'error' });
+    if (!isSuperAdmin) {
+      setToast({ isVisible: true, message: 'Solo il super amministratore può modificare i ruoli', type: 'error' });
       return;
     }
     try {
@@ -1358,8 +1374,8 @@ export default function AdminDashboardPage() {
   };
 
   const handleCrmTogglePermission = async (userEmail: string, field: string, value: boolean) => {
-    if (!isAdmin) {
-      setToast({ isVisible: true, message: 'Solo gli amministratori possono modificare i permessi', type: 'error' });
+    if (!isSuperAdmin) {
+      setToast({ isVisible: true, message: 'Solo il super amministratore può modificare i permessi', type: 'error' });
       return;
     }
     try {
@@ -2132,6 +2148,10 @@ export default function AdminDashboardPage() {
   };
 
   const handleToggleUserRole = async (userEmail: string, field: string, value: any) => {
+    if (!isSuperAdmin) {
+      setToast({ isVisible: true, message: 'Solo il super amministratore può modificare i permessi dello staff', type: 'error' });
+      return;
+    }
     try {
       const user = users.find(u => u.email === userEmail);
       const updates: any = { [field]: value };
@@ -2169,6 +2189,7 @@ export default function AdminDashboardPage() {
   };
 
   const executeDeleteUser = async (email: string) => {
+    if (!isSuperAdmin) return;
     setIsDeleting(true);
     try {
       const { error } = await supabase
@@ -3079,7 +3100,7 @@ export default function AdminDashboardPage() {
                           </div>
                         </div>
 
-                        <div className="flex lg:flex-col gap-3 shrink-0 items-center lg:items-end justify-center">
+                        <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0 items-stretch sm:items-center lg:items-end justify-center w-full lg:w-auto">
                           {((sugg.section === 'build_order' && canManageBuildorders) || (sugg.section !== 'build_order' && canManageCivs)) && (
                             <button
                               onClick={() => handleUpdateStatus(sugg, 'implemented')}

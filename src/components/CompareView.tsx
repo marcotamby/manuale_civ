@@ -234,7 +234,7 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
         </div>
 
         {/* Row 2: Playstyle/Description */}
-        <div className="grid grid-cols-2 gap-3 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-8">
           {[civ1, civ2].map(civ => (
             <section key={`style-${civ!.id}`} className="glass p-4 md:p-6 rounded-2xl border border-white/5 h-full">
               <h3 className="text-[10px] md:text-sm font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
@@ -247,7 +247,7 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
         </div>
 
         {/* Row 3: Key Bonuses */}
-        <div className="grid grid-cols-2 gap-3 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-8">
           {[civ1, civ2].map(civ => (
             <section key={`bonuses-${civ!.id}`} className="space-y-4 h-full">
               <h3 className="text-[10px] md:text-sm font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
@@ -266,7 +266,7 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
         </div>
 
         {/* Row 3.5: Strengths */}
-        <div className="grid grid-cols-2 gap-3 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-8">
           {[civ1, civ2].map(civ => (
             <section key={`strengths-${civ!.id}`} className="space-y-4 h-full">
               <h3 className="text-[10px] md:text-sm font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
@@ -292,7 +292,7 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
         </div>
 
         {/* Row 3.6: Weaknesses */}
-        <div className="grid grid-cols-2 gap-3 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-8">
           {[civ1, civ2].map(civ => (
             <section key={`weaknesses-${civ!.id}`} className="space-y-4 h-full">
               <h3 className="text-[10px] md:text-sm font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
@@ -318,7 +318,7 @@ export function CompareView({ civIds, onClose }: CompareViewProps) {
         </div>
 
         {/* Row 4: Unique Units */}
-        <div className="grid grid-cols-2 gap-3 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-8">
           {[civ1, civ2].map(civ => (
             <section key={`units-${civ!.id}`} className="space-y-4 h-full">
               <h3 className="text-[10px] md:text-sm font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">

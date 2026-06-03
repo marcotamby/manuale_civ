@@ -75,7 +75,7 @@ export function Home({ onSelectCiv, onCompareCivs }: HomeProps) {
       />
       <header className="mb-4 md:mb-8 flex flex-col gap-2 md:gap-4 shrink-0">
         <div className="flex flex-col md:flex-row md:items-center justify-start gap-3 md:gap-4">
-          <div className="hidden lg:block">
+          <div className="w-full md:w-auto">
             <CustomSelect
               options={[
                 { value: 'Tutte', label: 'Tutte le civiltà' },

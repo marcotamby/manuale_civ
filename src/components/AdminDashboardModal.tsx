@@ -861,11 +861,11 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                         </div>
                       </div>
 
-                      <div className="flex md:flex-col gap-3 shrink-0 items-center md:items-end justify-center">
+                      <div className="flex flex-col sm:flex-row md:flex-col gap-3 shrink-0 items-stretch sm:items-center md:items-end justify-center w-full md:w-auto">
                         {((sugg.section === 'build_order' && canManageBuildorders) || (sugg.section !== 'build_order' && canManageCivs)) && (
                           <button
                             onClick={() => handleUpdateStatus(sugg, 'implemented')}
-                            className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-green-600/20 hover:bg-green-600/40 text-green-400 rounded-lg border border-green-500/30 transition-colors font-medium text-sm"
+                            className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600/20 hover:bg-green-600/40 text-green-400 rounded-lg border border-green-500/30 transition-colors font-medium text-sm"
                             title="Segna come completata"
                           >
                             <CheckCircle size={18} /> Approva
@@ -875,7 +875,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                         {((sugg.section === 'build_order' && canManageBuildorders) || (sugg.section !== 'build_order' && canManageCivs)) && (
                           <button
                             onClick={() => setRejectionModalSugg(sugg)}
-                            className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/40 text-red-400 rounded-lg border border-red-500/30 transition-colors font-medium text-sm"
+                            className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600/20 hover:bg-red-600/40 text-red-400 rounded-lg border border-red-500/30 transition-colors font-medium text-sm"
                             title="Rifiuta proposta"
                           >
                             <XCircle size={18} /> Scarta
