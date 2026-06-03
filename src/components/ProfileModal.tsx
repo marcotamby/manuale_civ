@@ -166,6 +166,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     const [qaUpdateTrigger, setQaUpdateTrigger] = useState(0);
     const [activeSubTab, setActiveSubTab] = useState<'profile' | 'shop'>('profile');
     const [shopToast, setShopToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+    const [showInstructionsModal, setShowInstructionsModal] = useState(false);
 
     const showToast = (message: string, type: 'success' | 'error') => {
         setShopToast({ message, type });
@@ -234,6 +235,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
             unlocked_services: updatedUnlocked
         });
         showToast("Servizio acquistato con successo! 🐑", "success");
+        setShowInstructionsModal(true);
     };
 
     // Local state for pending changes
@@ -1596,15 +1598,22 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                 </div>
                             </section>
 
-                            {/* Active Services Instructions */}
+                            {/* Active Services Instructions Banner */}
                             {user?.unlocked_services && user.unlocked_services.length > 0 && (
-                                <div className="p-4 rounded-xl border border-blue-500/20 bg-blue-600/5 space-y-2">
-                                    <h4 className="text-[11px] font-black text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
-                                        📢 Come utilizzare i tuoi servizi riscattati
-                                    </h4>
-                                    <p className="text-[10px] text-gray-300 leading-normal font-medium">
-                                        Hai riscattato con successo dei servizi! Per prenotare l'analisi del replay o l'ora di coaching, per favore <strong>unisciti al nostro server Discord</strong> e contatta un membro dello staff fornendo il tuo nickname (<strong>{user.nickname || 'Nessun nickname impostato'}</strong>). Lo staff concorderà data e ora direttamente con te.
-                                    </p>
+                                <div className="p-4 rounded-xl border border-blue-500/20 bg-blue-600/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-left">
+                                    <div className="space-y-0.5">
+                                        <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest block">Servizi Riscattati</span>
+                                        <p className="text-xs text-gray-300 font-bold">
+                                            Hai {user.unlocked_services.length} {user.unlocked_services.length === 1 ? 'servizio attivo' : 'servizi attivi'} da prenotare.
+                                        </p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowInstructionsModal(true)}
+                                        className="py-2 px-4 bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 cursor-pointer"
+                                    >
+                                        Leggi Istruzioni 📢
+                                    </button>
                                 </div>
                             )}
                         </div>
@@ -1650,6 +1659,67 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                     className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl transition-all font-bold text-xs uppercase shadow-lg shadow-red-600/20 flex items-center justify-center gap-2"
                                 >
                                     Esci Ora
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Instructions Modal popup */}
+                {showInstructionsModal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/65 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowInstructionsModal(false)}>
+                        <div 
+                            className="bg-[#0b0f19] border border-blue-500/30 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-[0_20px_50px_rgba(0,0,0,0.95)] animate-in zoom-in-95 duration-200 space-y-6 relative border-l-4 border-l-blue-500"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Close Button */}
+                            <button
+                                type="button"
+                                onClick={() => setShowInstructionsModal(false)}
+                                className="absolute top-4 right-4 p-2 text-gray-500 hover:text-white rounded-full hover:bg-white/5 transition-all cursor-pointer"
+                            >
+                                <X size={16} />
+                            </button>
+
+                            <div className="flex items-center gap-3">
+                                <span className="text-3xl shrink-0">📢</span>
+                                <h3 className="text-lg font-black text-blue-400 uppercase tracking-wider leading-tight">
+                                    Come Utilizzare i Servizi
+                                </h3>
+                            </div>
+
+                            <div className="text-sm md:text-base text-gray-200 space-y-4 font-medium leading-relaxed select-text text-left">
+                                <p>
+                                    Hai riscattato con successo il tuo servizio! Per prenotare l'analisi del replay o l'ora di coaching, segui questi passaggi:
+                                </p>
+                                <ol className="list-decimal list-inside space-y-3 pl-1 font-semibold">
+                                    <li>
+                                        Unisciti al nostro server <a 
+                                            href="https://discord.gg/8Tx2YdXrEu" 
+                                            target="_blank" 
+                                            rel="noopener noreferrer" 
+                                            className="text-blue-400 hover:text-blue-300 hover:underline font-black transition-colors"
+                                        >Discord AOE Italia 🔗</a>.
+                                    </li>
+                                    <li>
+                                        Contatta un membro dello staff in privato o tramite i canali di supporto.
+                                    </li>
+                                    <li>
+                                        Fornisci il tuo nickname registrato sul sito: <span className="text-white font-black bg-white/10 px-2 py-0.5 rounded text-xs select-all border border-white/5 inline-block">{user?.nickname || 'Nessun nickname impostato'}</span>.
+                                    </li>
+                                </ol>
+                                <p className="text-xs text-gray-400 italic font-normal">
+                                    Lo staff concorderà direttamente con te la data e l'ora per la sessione.
+                                </p>
+                            </div>
+
+                            <div className="pt-2 flex justify-end">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowInstructionsModal(false)}
+                                    className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20 active:scale-95 cursor-pointer"
+                                >
+                                    Ho Capito
                                 </button>
                             </div>
                         </div>
