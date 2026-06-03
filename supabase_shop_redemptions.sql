@@ -64,48 +64,42 @@ USING (
   )
 );
 
--- 5. Optional: Automatic Discord Webhook Notification Trigger
--- To use this trigger, replace 'YOUR_DISCORD_WEBHOOK_URL' below and uncomment the lines.
--- 
--- CREATE EXTENSION IF NOT EXISTS pg_net;
--- 
--- CREATE OR REPLACE FUNCTION notify_shop_redemption_discord()
--- RETURNS trigger AS $$
--- DECLARE
---   payload jsonb;
---   discord_url text := 'YOUR_DISCORD_WEBHOOK_URL';
--- BEGIN
---   IF discord_url = 'YOUR_DISCORD_WEBHOOK_URL' THEN
---     RETURN NEW;
---   END IF;
---   
---   payload := jsonb_build_object(
---     'content', format('🛒 **Nuovo riscatto sul Negozio Pecore!**' || chr(10) || 
---                       '- **Utente:** %s' || chr(10) ||
---                       '- **Servizio:** %s' || chr(10) ||
---                       '- **Costo:** %s 🐑' || chr(10) ||
---                       'Accedi al CRM Admin per gestire e completare l''erogazione!',
---                       NEW.user_email,
---                       CASE WHEN NEW.service_id = 'replay_review' THEN '🎥 Analisi Replay con lo Staff'
---                            WHEN NEW.service_id = 'coaching_1h' THEN '👨‍🏫 1h di Coaching'
---                            ELSE NEW.service_id
---                       END,
---                       NEW.cost::text)
---   );
---   
---   PERFORM net.http_post(
---     url := discord_url,
---     headers := '{"Content-Type": "application/json"}'::jsonb,
---     body := payload::text
---   );
---   RETURN NEW;
--- END;
--- $$ LANGUAGE plpgsql SECURITY DEFINER;
--- 
--- CREATE OR REPLACE TRIGGER trigger_notify_shop_redemption
--- AFTER INSERT ON public.service_redemptions
--- FOR EACH ROW
--- EXECUTE FUNCTION notify_shop_redemption_discord();
+-- 5. Automatic Discord Webhook Notification Trigger
+CREATE EXTENSION IF NOT EXISTS pg_net;
+
+CREATE OR REPLACE FUNCTION notify_shop_redemption_discord()
+RETURNS trigger AS $$
+DECLARE
+  payload jsonb;
+  discord_url text := 'https://discord.com/api/webhooks/1511719567590817954/k8yCVluVaJiJ7H_CeTFFldsUzdlAhnPE7kmr_Vr4KCU-gUDp7tRTLU9ov303ab60u0kg';
+BEGIN
+  payload := jsonb_build_object(
+    'content', format('🛒 **Nuovo riscatto sul Negozio Pecore!**' || chr(10) || 
+                      '- **Utente:** %s' || chr(10) ||
+                      '- **Servizio:** %s' || chr(10) ||
+                      '- **Costo:** %s 🐑' || chr(10) ||
+                      'Accedi al CRM Admin per gestire e completare l''erogazione!',
+                      NEW.user_email,
+                      CASE WHEN NEW.service_id = 'replay_review' THEN '🎥 Analisi Replay con lo Staff'
+                           WHEN NEW.service_id = 'coaching_1h' THEN '👨‍🏫 1h di Coaching'
+                           ELSE NEW.service_id
+                      END,
+                      NEW.cost::text)
+  );
+  
+  PERFORM net.http_post(
+    url := discord_url,
+    headers := '{"Content-Type": "application/json"}'::jsonb,
+    body := payload::text
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE TRIGGER trigger_notify_shop_redemption
+AFTER INSERT ON public.service_redemptions
+FOR EACH ROW
+EXECUTE FUNCTION notify_shop_redemption_discord();
 
 -- 6. Comments
 COMMENT ON TABLE public.service_redemptions IS 'Storico dei riscatti dei servizi dal negozio pecore';
