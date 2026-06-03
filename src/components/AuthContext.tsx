@@ -11,6 +11,10 @@ interface UserData {
   sheep_balance?: number;
   id?: string;
   aoe4_profile_id?: string | null;
+  selected_title?: string | null;
+  unlocked_titles?: string[];
+  selected_avatar_effect?: string | null;
+  unlocked_avatar_effects?: string[];
 }
 
 interface AuthContextType {
@@ -33,7 +37,17 @@ interface AuthContextType {
   logout: () => void;
   toggleFavorite: (civId: string) => void;
   updateRank: (rank: string) => void;
-  updateProfile: (data: { rank?: string; nickname?: string; avatar_url?: string | null; aoe4_profile_id?: string | null }) => void;
+  updateProfile: (data: { 
+    rank?: string; 
+    nickname?: string; 
+    avatar_url?: string | null; 
+    aoe4_profile_id?: string | null;
+    sheep_balance?: number;
+    selected_title?: string | null;
+    unlocked_titles?: string[];
+    selected_avatar_effect?: string | null;
+    unlocked_avatar_effects?: string[];
+  }) => void;
   refreshUser: () => Promise<void>;
   setUser: (user: UserData | null) => void;
 }
@@ -153,7 +167,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('nickname, rank, avatar_url, role, is_streamer, can_manage_tournaments, can_manage_civs, can_manage_buildorders, can_view_admin, sheep_balance, aoe4_profile_id')
+        .select('nickname, rank, avatar_url, role, is_streamer, can_manage_tournaments, can_manage_civs, can_manage_buildorders, can_view_admin, sheep_balance, aoe4_profile_id, selected_title, unlocked_titles, selected_avatar_effect, unlocked_avatar_effects')
         .ilike('email', userEmail)
         .maybeSingle();
       
@@ -178,7 +192,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
              can_manage_buildorders: data.can_manage_buildorders,
              can_view_admin: data.can_view_admin,
              sheep_balance: data.sheep_balance ?? 100,
-             aoe4_profile_id: currentAoe4Id
+             aoe4_profile_id: currentAoe4Id,
+             selected_title: data.selected_title || null,
+             unlocked_titles: data.unlocked_titles || [],
+             selected_avatar_effect: data.selected_avatar_effect || null,
+             unlocked_avatar_effects: data.unlocked_avatar_effects || []
            };
            localStorage.setItem('auth_user', JSON.stringify(updated));
            localStorage.setItem(`auth_user_${email}`, JSON.stringify(updated));
@@ -342,7 +360,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     updateProfile({ rank });
   };
 
-  const updateProfile = (data: { rank?: string; nickname?: string; avatar_url?: string | null; aoe4_profile_id?: string | null }) => {
+  const updateProfile = (data: { 
+    rank?: string; 
+    nickname?: string; 
+    avatar_url?: string | null; 
+    aoe4_profile_id?: string | null;
+    sheep_balance?: number;
+    selected_title?: string | null;
+    unlocked_titles?: string[];
+    selected_avatar_effect?: string | null;
+    unlocked_avatar_effects?: string[];
+  }) => {
     if (user) {
       const updatedUser = { ...user, ...data };
       const email = user.email?.toLowerCase() || 'guest';
@@ -369,16 +397,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Sync to Supabase
       if (user.email) {
+        const payload: any = { 
+          email: email, 
+          nickname: updatedUser.nickname || '', 
+          rank: updatedUser.rank || 'Unranked',
+          avatar_url: updatedUser.avatar_url || null,
+          aoe4_profile_id: updatedUser.aoe4_profile_id || null,
+          updated_at: new Date().toISOString()
+        };
+
+        if (data.sheep_balance !== undefined) payload.sheep_balance = data.sheep_balance;
+        if (data.selected_title !== undefined) payload.selected_title = data.selected_title;
+        if (data.unlocked_titles !== undefined) payload.unlocked_titles = data.unlocked_titles;
+        if (data.selected_avatar_effect !== undefined) payload.selected_avatar_effect = data.selected_avatar_effect;
+        if (data.unlocked_avatar_effects !== undefined) payload.unlocked_avatar_effects = data.unlocked_avatar_effects;
+
         supabase
           .from('profiles')
-          .upsert({ 
-            email: email, 
-            nickname: updatedUser.nickname || '', 
-            rank: updatedUser.rank || 'Unranked',
-            avatar_url: updatedUser.avatar_url || null,
-            aoe4_profile_id: updatedUser.aoe4_profile_id || null,
-            updated_at: new Date().toISOString()
-          })
+          .upsert(payload)
           .then(({ error }) => {
             if (error) console.error('Error syncing profile to DB:', error);
           });

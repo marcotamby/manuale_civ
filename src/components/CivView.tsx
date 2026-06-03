@@ -11,7 +11,7 @@ import { Shield, Sword, Zap, Map, BarChart2, Pencil, ChevronDown, ChevronUp, Pla
 import { supabase } from '../lib/supabaseClient';
 import { ResourceText } from './ResourceText';
 import { SocialProofPopup } from './SocialProofPopup';
-import { RANK_ICONS } from './ProfileModal';
+import { RANK_ICONS, getAvatarEffectClass, SHOP_TITLES } from './ProfileModal';
 import { EditSuggestionForm } from './EditSuggestionForm';
 import { SEO } from './SEO';
 
@@ -486,7 +486,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
       if (userEmails.size > 0) {
         const { data: profData } = await supabase
           .from('profiles')
-          .select('email, avatar_url, rank, nickname')
+          .select('email, avatar_url, rank, nickname, selected_title, selected_avatar_effect')
           .in('email', Array.from(userEmails));
         profiles = profData || [];
       }
@@ -734,7 +734,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
         <div className={`p-3 md:p-4 rounded-2xl group/a relative transition-all bg-white/[0.02] border-l-2 ${depth % 2 === 0 ? 'border-blue-500/30' : 'border-cyan-500/30'} ml-2 md:ml-12`}>
           <div className="flex items-start gap-2 md:gap-4">
             <div className="shrink-0">
-              <div className="w-9 h-9 md:w-12 md:h-12 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
+              <div className={`w-9 h-9 md:w-12 md:h-12 rounded-full bg-black flex items-center justify-center overflow-hidden border-2 border-transparent relative shrink-0 ${getAvatarEffectClass(a.profile?.selected_avatar_effect)}`}>
                 {a.profile?.avatar_url ? (
                   <img src={a.profile.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
                 ) : a.user_rank && getRankIcon(a.user_rank) ? (
@@ -747,6 +747,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2 flex-wrap">
                 <span className="text-sm md:text-base font-black text-white uppercase tracking-tight select-text truncate">{a.user_nickname}</span>
+                {a.profile?.selected_title && (
+                  <span className="text-[9px] font-black text-blue-400 tracking-wider uppercase bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
+                    🏆 {SHOP_TITLES.find(t => t.id === a.profile.selected_title)?.label || a.profile.selected_title}
+                  </span>
+                )}
                 {a.status === 'pending' && (
                   <span className="text-[8px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-black rounded-full uppercase tracking-widest animate-pulse">In Approvazione</span>
                 )}
@@ -1911,7 +1916,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                              
                              <div className="flex items-start gap-3 md:gap-5 mb-3">
                                <div className="shrink-0">
-                                  <div className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-black flex items-center justify-center overflow-hidden shadow-none border-none">
+                                  <div className={`w-10 h-10 md:w-14 md:h-14 rounded-full bg-black flex items-center justify-center overflow-hidden border-2 border-transparent relative shrink-0 ${getAvatarEffectClass(q.profile?.selected_avatar_effect)}`}>
                                     {q.profile?.avatar_url ? (
                                       <img src={q.profile.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
                                     ) : q.user_rank && getRankIcon(q.user_rank) ? (
@@ -1924,6 +1929,11 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                                <div className="flex-1 min-w-0">
                                    <div className="flex items-center gap-2 mb-2 flex-wrap">
                                     <span className="text-sm md:text-base font-black text-white uppercase tracking-tight select-text truncate">{q.user_nickname}</span>
+                                     {q.profile?.selected_title && (
+                                       <span className="text-[9px] font-black text-blue-400 tracking-wider uppercase bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
+                                         🏆 {SHOP_TITLES.find(t => t.id === q.profile.selected_title)?.label || q.profile.selected_title}
+                                       </span>
+                                     )}
                                      {q.status === 'pending' && (
                                        <span className="text-[9px] px-2 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-black rounded-full uppercase tracking-widest animate-pulse">In Approvazione</span>
                                      )}

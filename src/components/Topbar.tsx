@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabaseClient';
 import { Link, useLocation } from 'react-router-dom';
 import { Coffee, Radio as _Radio, HelpCircle, LogOut, Trophy, Monitor, Award, Swords } from 'lucide-react';
 import { usePresence } from './PresenceContext';
+import { getAvatarEffectClass } from './ProfileModal';
 
 export type FilterType = 'Tutte' | 'Fanteria' | 'Cavalleria' | 'Arcieri' | 'Assedio';
 
@@ -383,7 +384,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
                   }}
                   className="relative flex items-center gap-2 hover:opacity-80 transition-all group"
                 >
-                  <div className="w-7 h-7 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30 overflow-hidden relative">
+                  <div className={`w-7 h-7 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30 overflow-hidden relative ${getAvatarEffectClass(user?.selected_avatar_effect)}`}>
                     {user?.avatar_url ? <img src={user.avatar_url} alt="" className="w-full h-full object-cover" /> : <User size={14} className="text-yellow-500" />}
                   </div>
                   {notificationCount > 0 && (
@@ -486,9 +487,13 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
                 {/* 2. Profilo */}
                 <button 
                   onClick={() => (window as any).openProfileModal?.()} 
-                  className="w-10 h-10 bg-[#0d1424] rounded-xl border border-yellow-500/30 flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-lg"
+                  className={`w-10 h-10 bg-[#0d1424] rounded-xl border border-yellow-500/30 flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-lg overflow-hidden relative ${getAvatarEffectClass(user?.selected_avatar_effect)}`}
                 >
-                  <User size={20} className="text-yellow-500" />
+                  {user?.avatar_url ? (
+                    <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <User size={20} className="text-yellow-500" />
+                  )}
                 </button>
 
                 {/* 3. ESCI (Rightmost) */}

@@ -13,6 +13,7 @@ import { useCivData } from './CivContext';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
 import { CustomSelect } from './CustomSelect';
+import { getAvatarEffectClass, SHOP_TITLES } from './ProfileModal';
 import { sendNewBuildOrderWebhook } from '../utils/discordWebhook';
 import { WYSIWYGEditor } from './TournamentsPage';
 import { WYSIWYGEditor as SharedWYSIWYGEditor } from './WYSIWYGEditor';
@@ -3364,7 +3365,7 @@ export default function AdminDashboardPage() {
                     <div key={u.id} className={`bg-[#0a0e1c]/60 border rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group hover:bg-[#0a0e1c]/80 hover:border-cyan-500/40 shadow-xl transition-all duration-300 ${u.role === 'admin' ? 'border-cyan-500/20' : 'border-white/5'}`}>
                       {/* Left: Avatar & Info */}
                       <div className="flex items-center gap-4 min-w-0">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border text-base font-bold shrink-0 overflow-hidden shadow-md ${u.role === 'admin' ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border text-base font-bold shrink-0 overflow-hidden shadow-md ${u.role === 'admin' ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'} ${getAvatarEffectClass(u.selected_avatar_effect)}`}>
                           {u.avatar_url ? (
                             <img 
                               src={u.avatar_url} 
@@ -3420,6 +3421,11 @@ export default function AdminDashboardPage() {
                             )}
                             {u.role === 'admin' && <span className="text-[8px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded font-black uppercase tracking-wider">Owner</span>}
                             {u.role === 'editor' && <span className="text-[8px] px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black uppercase tracking-wider">Editor</span>}
+                            {u.selected_title && (
+                              <span className="text-[8px] px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black uppercase tracking-wider">
+                                🏆 {SHOP_TITLES.find(t => t.id === u.selected_title)?.label || u.selected_title}
+                              </span>
+                            )}
                             <span className="text-[9px] font-black text-cyan-400/80 border border-cyan-500/20 px-2 py-0.5 rounded bg-cyan-500/5 uppercase tracking-wider">{u.rank || 'Unranked'}</span>
                           </div>
                           <span className="text-xs text-gray-400 truncate mt-0.5">{u.email}</span>
@@ -3530,7 +3536,7 @@ export default function AdminDashboardPage() {
                       {/* Left: Avatar & Info & Mobile Balance */}
                       <div className="flex items-center justify-between sm:justify-start gap-4 min-w-0 w-full sm:w-auto">
                         <div className="flex items-center gap-4 min-w-0">
-                          <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold border border-cyan-500/20 overflow-hidden shadow-md shrink-0">
+                          <div className={`w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold border border-cyan-500/20 overflow-hidden shadow-md shrink-0 ${getAvatarEffectClass(p.selected_avatar_effect)}`}>
                             {p.avatar_url ? (
                               <img 
                                 src={p.avatar_url} 
@@ -3546,7 +3552,14 @@ export default function AdminDashboardPage() {
                             )}
                           </div>
                           <div className="min-w-0">
-                            <p className="text-white font-black text-base truncate">{p.nickname || 'Anonimo'}</p>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <p className="text-white font-black text-base truncate">{p.nickname || 'Anonimo'}</p>
+                              {p.selected_title && (
+                                <span className="text-[8px] px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black uppercase tracking-wider shrink-0">
+                                  🏆 {SHOP_TITLES.find(t => t.id === p.selected_title)?.label || p.selected_title}
+                                </span>
+                              )}
+                            </div>
                             <p className="text-xs text-gray-400 truncate block mt-0.5">{p.email}</p>
                           </div>
                         </div>
@@ -5569,7 +5582,7 @@ export default function AdminDashboardPage() {
                                 >
                                   <td className="py-3.5 px-4">
                                     <div className="flex items-center gap-3">
-                                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center border text-sm font-bold shrink-0 overflow-hidden shadow ${u.role === 'admin' ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : u.role === 'banned' ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
+                                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center border text-sm font-bold shrink-0 overflow-hidden shadow ${u.role === 'admin' ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : u.role === 'banned' ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'} ${getAvatarEffectClass(u.selected_avatar_effect)}`}>
                                         {u.avatar_url ? (
                                           <img src={u.avatar_url} alt="" className="w-full h-full object-cover" />
                                         ) : (
@@ -5577,7 +5590,14 @@ export default function AdminDashboardPage() {
                                         )}
                                       </div>
                                       <div className="flex flex-col min-w-0">
-                                        <span className="text-sm font-bold text-white truncate max-w-[150px]">{u.nickname || 'Nessun nickname'}</span>
+                                        <div className="flex items-center gap-1.5 min-w-0">
+                                          <span className="text-sm font-bold text-white truncate max-w-[150px]">{u.nickname || 'Nessun nickname'}</span>
+                                          {u.selected_title && (
+                                            <span className="text-[8px] px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black uppercase tracking-wider shrink-0">
+                                              🏆 {SHOP_TITLES.find(t => t.id === u.selected_title)?.label || u.selected_title}
+                                            </span>
+                                          )}
+                                        </div>
                                         <span className="text-xs text-gray-400 truncate max-w-[150px]">{u.email}</span>
                                       </div>
                                     </div>
@@ -5650,7 +5670,7 @@ export default function AdminDashboardPage() {
                       <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent"></div>
                       
                       <div className="flex flex-col items-center text-center pb-6 border-b border-white/5">
-                        <div className={`w-20 h-20 rounded-3xl flex items-center justify-center border-2 text-2xl font-bold overflow-hidden shadow-lg mb-4 ${selectedCrmUser.role === 'admin' ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400' : selectedCrmUser.role === 'banned' ? 'bg-red-500/10 border-red-500/30 text-red-500' : 'bg-blue-600/10 border-blue-500/30 text-blue-400'}`}>
+                        <div className={`w-20 h-20 rounded-3xl flex items-center justify-center border-2 text-2xl font-bold overflow-hidden shadow-lg mb-4 ${selectedCrmUser.role === 'admin' ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400' : selectedCrmUser.role === 'banned' ? 'bg-red-500/10 border-red-500/30 text-red-500' : 'bg-blue-600/10 border-blue-500/30 text-blue-400'} ${getAvatarEffectClass(selectedCrmUser.selected_avatar_effect)}`}>
                           {selectedCrmUser.avatar_url ? (
                             <img src={selectedCrmUser.avatar_url} alt="" className="w-full h-full object-cover" />
                           ) : (
@@ -5690,6 +5710,11 @@ export default function AdminDashboardPage() {
                                 </button>
                               )}
                             </h3>
+                          )}
+                          {selectedCrmUser.selected_title && (
+                            <p className="text-xs font-black text-blue-400 tracking-wider uppercase mt-1">
+                              🏆 {SHOP_TITLES.find(t => t.id === selectedCrmUser.selected_title)?.label || selectedCrmUser.selected_title}
+                            </p>
                           )}
                           <p className="text-xs text-gray-400 mt-1 truncate select-all">{selectedCrmUser.email}</p>
                           <p className="text-[9px] text-gray-500 uppercase tracking-widest font-black mt-2">

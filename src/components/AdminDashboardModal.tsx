@@ -6,6 +6,7 @@ import { useAuth } from './AuthContext';
 import { useCivData } from './CivContext';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
+import { getAvatarEffectClass, SHOP_TITLES } from './ProfileModal';
 import { sendNewBuildOrderWebhook } from '../utils/discordWebhook';
 
 export interface Suggestion {
@@ -1019,7 +1020,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                         .map(u => (
                           <div key={u.id} className={`bg-white/[0.03] border rounded-2xl p-5 flex flex-col gap-4 group hover:bg-white/[0.05] transition-all ${u.role === 'admin' ? 'border-yellow-500/20' : 'border-white/5'}`}>
                             <div className="flex items-center gap-4">
-                              <div className={`w-12 h-12 rounded-full flex items-center justify-center border text-xl font-bold shrink-0 overflow-hidden ${u.role === 'admin' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'}`}>
+                              <div className={`w-12 h-12 rounded-full flex items-center justify-center border text-xl font-bold shrink-0 overflow-hidden ${u.role === 'admin' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500' : 'bg-blue-600/10 border-blue-500/20 text-blue-400'} ${getAvatarEffectClass(u.selected_avatar_effect)}`}>
                                 {u.avatar_url ? (
                                   <img 
                                     src={u.avatar_url} 
@@ -1079,6 +1080,11 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                   )}
                                   {u.role === 'admin' && <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded font-black uppercase">Owner</span>}
                                   {u.role === 'editor' && <span className="text-[9px] px-1.5 py-0.5 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded font-black uppercase">Editor</span>}
+                                  {u.selected_title && (
+                                    <span className="text-[9px] px-1.5 py-0.5 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded font-black uppercase">
+                                      🏆 {SHOP_TITLES.find(t => t.id === u.selected_title)?.label || u.selected_title}
+                                    </span>
+                                  )}
                                 </div>
                                 <span className="text-xs md:text-sm text-gray-500 truncate block">{u.email}</span>
                                 <div className="flex items-center gap-2 mt-0.5">
@@ -1187,7 +1193,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                   .map(p => (
                   <div key={p.email} className="bg-white/[0.03] border border-white/5 rounded-2xl p-5 flex flex-col gap-4 hover:border-cyan-500/30 transition-all group">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold border border-cyan-500/20 group-hover:scale-110 transition-transform overflow-hidden">
+                      <div className={`w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold border border-cyan-500/20 group-hover:scale-110 transition-transform overflow-hidden shrink-0 ${getAvatarEffectClass(p.selected_avatar_effect)}`}>
                         {p.avatar_url ? (
                           <img 
                             src={p.avatar_url} 
@@ -1204,7 +1210,14 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-white font-bold truncate">{p.nickname || 'Anonimo'}</p>
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <p className="text-white font-bold truncate">{p.nickname || 'Anonimo'}</p>
+                          {p.selected_title && (
+                            <span className="text-[8px] px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black uppercase tracking-wider shrink-0">
+                              🏆 {SHOP_TITLES.find(t => t.id === p.selected_title)?.label || p.selected_title}
+                            </span>
+                          )}
+                        </div>
                         <p className="text-[10px] text-gray-500 truncate">{p.email}</p>
                       </div>
                     </div>

@@ -42,6 +42,36 @@ const RANK_ICONS: Record<string, string> = {
 
 export { RANK_ICONS };
 
+export function getAvatarEffectClass(effect: string | null | undefined): string {
+    if (!effect) return '';
+    switch (effect) {
+        case 'cyan-glow': return 'avatar-effect-cyan-glow';
+        case 'gold-glow': return 'avatar-effect-gold-glow';
+        case 'neon-pulse': return 'avatar-effect-neon-pulse';
+        case 'fire-ring': return 'avatar-effect-fire-ring';
+        case 'rainbow-rgb': return 'avatar-effect-rainbow-rgb';
+        default: return '';
+    }
+}
+
+export const SHOP_TITLES = [
+    { id: 'novice', label: 'Novizio del Gregge', cost: 0 },
+    { id: 'shearer', label: 'Tosatore di Professione', cost: 150 },
+    { id: 'shepherd', label: 'Guardiano dei Pascoli', cost: 300 },
+    { id: 'wool_magnate', label: 'Magnate della Lana', cost: 600 },
+    { id: 'shepherd_king', label: 'Re dei Pastori', cost: 1200 },
+    { id: 'wolf_legend', label: 'Leggenda dei Lupi', cost: 2500 },
+];
+
+export const SHOP_EFFECTS = [
+    { id: 'none', label: 'Nessun Effetto', cost: 0, className: '' },
+    { id: 'cyan-glow', label: 'Aura Ciano', cost: 250, className: 'avatar-effect-cyan-glow' },
+    { id: 'gold-glow', label: 'Bagliore Dorato', cost: 500, className: 'avatar-effect-gold-glow' },
+    { id: 'neon-pulse', label: 'Neon Pulsante', cost: 800, className: 'avatar-effect-neon-pulse' },
+    { id: 'fire-ring', label: 'Anello di Fuoco', cost: 1500, className: 'avatar-effect-fire-ring' },
+    { id: 'rainbow-rgb', label: 'Arcobaleno RGB', cost: 3000, className: 'avatar-effect-rainbow-rgb' },
+];
+
 const RANK_GROUPS = [
     { label: 'Bronze', ranks: ['Bronze I', 'Bronze II', 'Bronze III'] },
     { label: 'Silver', ranks: ['Silver I', 'Silver II', 'Silver III'] },
@@ -135,7 +165,62 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
     const [isLoading, setIsLoading] = useState(false);
     const [isQaLoading, setIsQaLoading] = useState(false);
     const [qaUpdateTrigger, setQaUpdateTrigger] = useState(0);
-    
+    const [activeSubTab, setActiveSubTab] = useState<'profile' | 'shop'>('profile');
+    const [shopToast, setShopToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+    const showToast = (message: string, type: 'success' | 'error') => {
+        setShopToast({ message, type });
+        setTimeout(() => setShopToast(null), 3000);
+    };
+
+    const handleBuyTitle = (titleId: string, cost: number) => {
+        if (!user) return;
+        const currentBalance = user.sheep_balance ?? 100;
+        if (currentBalance < cost) {
+            showToast("Non hai abbastanza pecore! 🐑", "error");
+            return;
+        }
+        const updatedUnlocked = [...(user.unlocked_titles || []), titleId];
+        const updatedBalance = currentBalance - cost;
+        updateProfile({
+            sheep_balance: updatedBalance,
+            unlocked_titles: updatedUnlocked
+        });
+        showToast("Titolo acquistato con successo! 🐑", "success");
+    };
+
+    const handleEquipTitle = (titleId: string | null) => {
+        if (!user) return;
+        updateProfile({
+            selected_title: titleId
+        });
+        showToast(titleId ? "Titolo equipaggiato! 🏆" : "Titolo rimosso!", "success");
+    };
+
+    const handleBuyEffect = (effectId: string, cost: number) => {
+        if (!user) return;
+        const currentBalance = user.sheep_balance ?? 100;
+        if (currentBalance < cost) {
+            showToast("Non hai abbastanza pecore! 🐑", "error");
+            return;
+        }
+        const updatedUnlocked = [...(user.unlocked_avatar_effects || []), effectId];
+        const updatedBalance = currentBalance - cost;
+        updateProfile({
+            sheep_balance: updatedBalance,
+            unlocked_avatar_effects: updatedUnlocked
+        });
+        showToast("Effetto avatar acquistato con successo! ✨", "success");
+    };
+
+    const handleEquipEffect = (effectId: string | null) => {
+        if (!user) return;
+        updateProfile({
+            selected_avatar_effect: effectId
+        });
+        showToast(effectId && effectId !== 'none' ? "Effetto avatar equipaggiato! ✨" : "Effetto rimosso!", "success");
+    };
+
     // Local state for pending changes
     const [pendingNickname, setPendingNickname] = useState(user?.nickname || '');
     const [pendingRank, setPendingRank] = useState(user?.rank || 'Unranked');
@@ -580,7 +665,10 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                     <div className="flex items-center gap-4">
                         <div className="flex flex-col items-center gap-2">
                             <div className="relative group/avatar cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                                <div className="w-20 h-20 rounded-full bg-blue-600/10 flex items-center justify-center border-2 border-blue-500/30 text-blue-400 overflow-hidden group-hover/avatar:border-blue-400 group-hover/avatar:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
+                                <div className={clsx(
+                                    "w-20 h-20 rounded-full bg-blue-600/10 flex items-center justify-center border-2 border-blue-500/30 text-blue-400 overflow-hidden group-hover/avatar:border-blue-400 group-hover/avatar:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all",
+                                    getAvatarEffectClass(user?.selected_avatar_effect)
+                                )}>
                                     {isUploading ? (
                                         <Loader2 size={24} className="animate-spin" />
                                     ) : pendingAvatar ? (
@@ -625,21 +713,54 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                         </div>
                         <div>
                             <div className="flex items-center gap-2">
-                                <h2 className="text-xl font-bold text-white uppercase tracking-wider">Il Tuo Profilo</h2>
+                                <h2 className="text-xl font-bold text-white uppercase tracking-wider">{user?.nickname || 'Il Tuo Profilo'}</h2>
                                 {isAdmin && (
                                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-bold uppercase tracking-widest">
                                         {isSuperAdmin ? 'Admin' : 'Editor'}
                                     </span>
                                 )}
                             </div>
+                            {user?.selected_title && (
+                                <p className="text-xs font-black text-blue-400 tracking-wider uppercase mt-0.5">
+                                    🏆 {SHOP_TITLES.find(t => t.id === user.selected_title)?.label || user.selected_title}
+                                </p>
+                            )}
                             <p className="text-xs text-gray-400">{user?.email}</p>
                         </div>
                     </div>
                 </div>
 
+                {/* Tabs */}
+                <div className="flex border-b border-white/10 bg-black/10 shrink-0">
+                    <button
+                        onClick={() => setActiveSubTab('profile')}
+                        className={clsx(
+                            "flex-grow py-3 text-xs font-black uppercase tracking-widest border-b-2 transition-all text-center",
+                            activeSubTab === 'profile' 
+                                ? "border-blue-500 text-blue-400 bg-blue-500/5" 
+                                : "border-transparent text-gray-400 hover:text-white hover:bg-white/5"
+                        )}
+                    >
+                        Profilo & Attività
+                    </button>
+                    <button
+                        onClick={() => setActiveSubTab('shop')}
+                        className={clsx(
+                            "flex-grow py-3 text-xs font-black uppercase tracking-widest border-b-2 transition-all text-center flex items-center justify-center gap-1.5",
+                            activeSubTab === 'shop' 
+                                ? "border-blue-500 text-blue-400 bg-blue-500/5" 
+                                : "border-transparent text-gray-400 hover:text-white hover:bg-white/5"
+                        )}
+                    >
+                        Negozio Pecore 🐑
+                    </button>
+                </div>
+
                 <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 custom-scrollbar">
 
-                    {/* Il Tuo Gregge */}
+                    {activeSubTab === 'profile' ? (
+                        <>
+                            {/* Il Tuo Gregge */}
                     <section className="relative overflow-hidden group">
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/5 to-transparent -z-10 rounded-2xl" />
                         <div className="flex items-center justify-between p-6 bg-white/[0.03] border border-blue-500/20 rounded-2xl shadow-xl">
@@ -1213,6 +1334,182 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                 </div>
                             )}
                         </section>
+                    )}
+                    </>
+                    ) : (
+                        <div className="space-y-8 animate-in fade-in duration-300">
+                            {/* Toast overlay/notification */}
+                            {shopToast && (
+                                <div className={clsx(
+                                    "p-4 rounded-xl border text-center text-xs font-black uppercase tracking-widest animate-in slide-in-from-top duration-300",
+                                    shopToast.type === 'success' 
+                                        ? "bg-green-500/10 text-green-400 border-green-500/20" 
+                                        : "bg-red-500/10 text-red-400 border-red-500/20"
+                                )}>
+                                    {shopToast.message}
+                                </div>
+                            )}
+
+                            {/* Shop Balance Card */}
+                            <div className="relative overflow-hidden rounded-2xl border border-blue-500/20 bg-gradient-to-r from-blue-600/10 via-purple-600/5 to-transparent p-6 shadow-xl">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">Pecore Disponibili</span>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <span className="text-3xl font-black text-white">{user?.sheep_balance ?? 100}</span>
+                                            <span className="text-2xl animate-bounce">🐑</span>
+                                        </div>
+                                    </div>
+                                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider max-w-[200px] text-right">
+                                        Usa le scommesse sportive o le attività sul sito per guadagnare altre pecore!
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Titles Section */}
+                            <section className="space-y-4">
+                                <h3 className="text-xs font-black text-blue-400 tracking-widest uppercase flex items-center gap-2">
+                                    🏆 Emblemi & Titoli
+                                </h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {SHOP_TITLES.map(title => {
+                                        const isUnlocked = title.cost === 0 || (user?.unlocked_titles || []).includes(title.id);
+                                        const isEquipped = user?.selected_title === title.id;
+                                        const canAfford = (user?.sheep_balance ?? 100) >= title.cost;
+
+                                        return (
+                                            <div key={title.id} className="bg-white/[0.03] border border-white/5 rounded-xl p-4 flex flex-col justify-between hover:border-white/10 transition-all">
+                                                <div className="mb-4">
+                                                    <h4 className="text-sm font-black text-white uppercase tracking-wider">{title.label}</h4>
+                                                    <div className="mt-1 flex items-center gap-2">
+                                                        {title.cost > 0 ? (
+                                                            <span className="text-xs font-bold text-blue-400">{title.cost} 🐑</span>
+                                                        ) : (
+                                                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Gratis</span>
+                                                        )}
+                                                        {isUnlocked && (
+                                                            <span className="text-[9px] bg-green-500/10 text-green-400 border border-green-500/20 px-1.5 py-0.5 rounded font-bold uppercase tracking-tight">
+                                                                Sbloccato
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="pt-2 border-t border-white/5 flex gap-2">
+                                                    {isUnlocked ? (
+                                                        isEquipped ? (
+                                                            <button
+                                                                onClick={() => handleEquipTitle(null)}
+                                                                className="w-full py-2 bg-red-600/10 hover:bg-red-600/20 text-red-400 hover:text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition-all"
+                                                            >
+                                                                Rimuovi
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => handleEquipTitle(title.id)}
+                                                                className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition-all"
+                                                            >
+                                                                Equipaggia
+                                                            </button>
+                                                        )
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => handleBuyTitle(title.id, title.cost)}
+                                                            disabled={!canAfford}
+                                                            className={clsx(
+                                                                "w-full py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                                                canAfford 
+                                                                    ? "bg-yellow-500 text-black hover:bg-yellow-400" 
+                                                                    : "bg-white/5 text-gray-600 cursor-not-allowed"
+                                                            )}
+                                                        >
+                                                            Sblocca a {title.cost} 🐑
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </section>
+
+                            {/* Effects Section */}
+                            <section className="space-y-4">
+                                <h3 className="text-xs font-black text-blue-400 tracking-widest uppercase flex items-center gap-2">
+                                    ✨ Bordi Avatar Animati
+                                </h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {SHOP_EFFECTS.map(effect => {
+                                        const isUnlocked = effect.cost === 0 || (user?.unlocked_avatar_effects || []).includes(effect.id);
+                                        const isEquipped = (user?.selected_avatar_effect === effect.id) || (!user?.selected_avatar_effect && effect.id === 'none');
+                                        const canAfford = (user?.sheep_balance ?? 100) >= effect.cost;
+
+                                        return (
+                                            <div key={effect.id} className="bg-white/[0.03] border border-white/5 rounded-xl p-4 flex flex-col justify-between hover:border-white/10 transition-all">
+                                                <div className="flex items-center gap-3 mb-4">
+                                                    <div className={clsx(
+                                                        "w-12 h-12 rounded-full bg-blue-600/10 flex items-center justify-center border-2 border-blue-500/30 text-blue-400 overflow-hidden shrink-0",
+                                                        getAvatarEffectClass(effect.id)
+                                                    )}>
+                                                        {pendingAvatar ? (
+                                                            <img src={pendingAvatar} alt="Preview" className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <User size={20} className="text-blue-500/50" />
+                                                        )}
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-sm font-black text-white uppercase tracking-wider">{effect.label}</h4>
+                                                        <div className="mt-1 flex items-center gap-2">
+                                                            {effect.cost > 0 ? (
+                                                                <span className="text-xs font-bold text-blue-400">{effect.cost} 🐑</span>
+                                                            ) : (
+                                                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Gratis</span>
+                                                            )}
+                                                            {isUnlocked && (
+                                                                <span className="text-[9px] bg-green-500/10 text-green-400 border border-green-500/20 px-1.5 py-0.5 rounded font-bold uppercase tracking-tight">
+                                                                    Sbloccato
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="pt-2 border-t border-white/5 flex gap-2">
+                                                    {isUnlocked ? (
+                                                        isEquipped ? (
+                                                            <button
+                                                                onClick={() => handleEquipEffect(null)}
+                                                                className="w-full py-2 bg-red-600/10 hover:bg-red-600/20 text-red-400 hover:text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition-all"
+                                                            >
+                                                                Rimuovi
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => handleEquipEffect(effect.id)}
+                                                                className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition-all"
+                                                            >
+                                                                Equipaggia
+                                                            </button>
+                                                        )
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => handleBuyEffect(effect.id, effect.cost)}
+                                                            disabled={!canAfford}
+                                                            className={clsx(
+                                                                "w-full py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                                                canAfford 
+                                                                    ? "bg-yellow-500 text-black hover:bg-yellow-400" 
+                                                                    : "bg-white/5 text-gray-600 cursor-not-allowed"
+                                                            )}
+                                                        >
+                                                            Sblocca a {effect.cost} 🐑
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </section>
+                        </div>
                     )}
                 </div>
 
