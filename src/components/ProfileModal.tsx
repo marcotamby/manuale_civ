@@ -1506,7 +1506,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                                             className={clsx(
                                                                 "w-full py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
                                                                 canAfford 
-                                                                    ? "bg-yellow-500 text-black hover:bg-yellow-400" 
+                                                                    ? "bg-emerald-600 text-white hover:bg-emerald-500" 
                                                                     : "bg-white/5 text-gray-600 cursor-not-allowed"
                                                             )}
                                                         >
@@ -1584,7 +1584,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                                             className={clsx(
                                                                 "w-full py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
                                                                 canAfford 
-                                                                    ? "bg-yellow-500 text-black hover:bg-yellow-400" 
+                                                                    ? "bg-emerald-600 text-white hover:bg-emerald-500" 
                                                                     : "bg-white/5 text-gray-600 cursor-not-allowed"
                                                             )}
                                                         >
@@ -1635,7 +1635,7 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
                                                         className={clsx(
                                                             "w-full py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
                                                             canAfford 
-                                                                ? "bg-yellow-500 text-black hover:bg-yellow-400" 
+                                                                ? "bg-emerald-600 text-white hover:bg-emerald-500" 
                                                                 : "bg-white/5 text-gray-600 cursor-not-allowed"
                                                         )}
                                                     >
