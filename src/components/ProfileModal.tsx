@@ -297,7 +297,21 @@ export function ProfileModal({ isOpen, onClose, onSelectCiv }: ProfileModalProps
             setShowSaveSuccess(false);
 
             if (user?.aoe4_profile_id) {
-                fetchAoe4Stats(user.aoe4_profile_id);
+                fetchAoe4Stats(user.aoe4_profile_id).then(data => {
+                    if (data) {
+                        const rmSoloRank = data.modes?.rm_solo?.rank_level;
+                        const rmTeamRank = data.modes?.rm_team?.rank_level;
+                        const finalRankLevel = rmSoloRank && rmSoloRank !== 'unranked' ? rmSoloRank : rmTeamRank;
+                        if (finalRankLevel) {
+                            const mappedRank = mapAoe4RankToLocal(finalRankLevel);
+                            setPendingRank(mappedRank);
+                            if (mappedRank !== user.rank) {
+                                console.log(`🔄 Auto-syncing rank in modal: ${user.rank} -> ${mappedRank}`);
+                                updateProfile({ rank: mappedRank });
+                            }
+                        }
+                    }
+                });
             } else {
                 setAoe4Stats(null);
             }

@@ -56,6 +56,18 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const mapAoe4RankToLocal = (aoe4Rank: string): string => {
+  if (!aoe4Rank || aoe4Rank === 'unranked') return 'Unranked';
+  const parts = aoe4Rank.split('_');
+  const name = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+  const tier = parts[1];
+  let roman = '';
+  if (tier === '1') roman = 'I';
+  else if (tier === '2') roman = 'II';
+  else if (tier === '3') roman = 'III';
+  return `${name} ${roman}`.trim();
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -175,9 +187,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       if (!error && data) {
         const email = userEmail.toLowerCase();
-        const currentRank = data.rank || 'Unranked';
+        let currentRank = data.rank || 'Unranked';
         const currentNickname = data.nickname || '';
         const currentAoe4Id = data.aoe4_profile_id || null;
+
+        // Auto-sync rank from AoE4 World if profile ID is linked and not synced in this session
+        if (currentAoe4Id && !sessionStorage.getItem('aoe4_rank_synced')) {
+          sessionStorage.setItem('aoe4_rank_synced', 'true');
+          try {
+            const response = await fetch(`https://aoe4world.com/api/v0/players/${currentAoe4Id}`);
+            if (response.ok) {
+              const aoe4Data = await response.json();
+              const rmSoloRank = aoe4Data.modes?.rm_solo?.rank_level;
+              const rmTeamRank = aoe4Data.modes?.rm_team?.rank_level;
+              const finalRankLevel = rmSoloRank && rmSoloRank !== 'unranked' ? rmSoloRank : rmTeamRank;
+              if (finalRankLevel) {
+                const mappedRank = mapAoe4RankToLocal(finalRankLevel);
+                if (mappedRank !== currentRank) {
+                  console.log(`🔄 Auto-syncing rank from AoE4 World on startup: ${currentRank} -> ${mappedRank}`);
+                  currentRank = mappedRank;
+                  // Update Supabase DB
+                  await supabase
+                    .from('profiles')
+                    .update({ rank: mappedRank })
+                    .eq('email', email);
+                }
+              }
+            }
+          } catch (apiErr) {
+            console.error('Error auto-syncing with AoE4 World API on startup:', apiErr);
+          }
+        }
         
         const storedUser = localStorage.getItem('auth_user');
         if (storedUser) {
@@ -209,9 +249,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         // Profile doesn't exist yet, create it with local values
         const email = userEmail.toLowerCase();
-        const rank = localStorage.getItem(`auth_user_rank_${email}`) || localStorage.getItem('auth_user_rank') || 'Unranked';
+        let rank = localStorage.getItem(`auth_user_rank_${email}`) || localStorage.getItem('auth_user_rank') || 'Unranked';
         const nickname = localStorage.getItem(`auth_user_nickname_${email}`) || localStorage.getItem('auth_user_nickname') || '';
         const aoe4Id = localStorage.getItem(`auth_user_aoe4_id_${email}`) || null;
+
+        // Auto-sync rank if profile ID is linked and not synced in this session
+        if (aoe4Id && !sessionStorage.getItem('aoe4_rank_synced')) {
+          sessionStorage.setItem('aoe4_rank_synced', 'true');
+          try {
+            const response = await fetch(`https://aoe4world.com/api/v0/players/${aoe4Id}`);
+            if (response.ok) {
+              const aoe4Data = await response.json();
+              const rmSoloRank = aoe4Data.modes?.rm_solo?.rank_level;
+              const rmTeamRank = aoe4Data.modes?.rm_team?.rank_level;
+              const finalRankLevel = rmSoloRank && rmSoloRank !== 'unranked' ? rmSoloRank : rmTeamRank;
+              if (finalRankLevel) {
+                const mappedRank = mapAoe4RankToLocal(finalRankLevel);
+                rank = mappedRank;
+              }
+            }
+          } catch (apiErr) {
+            console.error('Error auto-syncing new profile with AoE4 World API on startup:', apiErr);
+          }
+        }
         
         const { data: newProfile } = await supabase
           .from('profiles')
@@ -227,7 +287,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .maybeSingle();
 
         if (newProfile) {
-          setUser(prev => prev ? ({ ...prev, sheep_balance: 100 }) : null);
+          setUser(prev => prev ? ({ ...prev, sheep_balance: 100, rank }) : null);
         }
       }
     } catch (err) {
