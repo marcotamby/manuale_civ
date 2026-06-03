@@ -276,6 +276,10 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
   };
 
   const handleToggleUserRole = async (userEmail: string, field: string, value: any) => {
+    if (!isSuperAdmin) {
+      setToast({ isVisible: true, message: 'Solo il super amministratore può modificare i permessi dello staff', type: 'error' });
+      return;
+    }
     try {
       const user = users.find(u => u.email === userEmail);
       const updates: any = { [field]: value };
@@ -310,6 +314,7 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
 
 
   const executeDeleteUser = async (email: string) => {
+    if (!isSuperAdmin) return;
     setIsDeleting(true);
     try {
       const { error } = await supabase

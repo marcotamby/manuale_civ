@@ -5672,12 +5672,14 @@ export default function AdminDashboardPage() {
                           ) : (
                             <h3 className="text-base font-black text-white flex items-center justify-center gap-2">
                               {selectedCrmUser.nickname || 'Nessun Nickname'}
-                              <button 
-                                onClick={() => setCrmEditingNickname(true)} 
-                                className="p-1 text-gray-400 hover:text-white transition-colors"
-                              >
-                                <Edit2 size={12} />
-                              </button>
+                              {(!isSuperAdminEmail(selectedCrmUser.email) || isSuperAdmin) && (
+                                <button 
+                                  onClick={() => setCrmEditingNickname(true)} 
+                                  className="p-1 text-gray-400 hover:text-white transition-colors"
+                                >
+                                  <Edit2 size={12} />
+                                </button>
+                              )}
                             </h3>
                           )}
                           <p className="text-xs text-gray-400 mt-1 truncate select-all">{selectedCrmUser.email}</p>
@@ -5722,42 +5724,45 @@ export default function AdminDashboardPage() {
                             <div className="flex items-center bg-[#111218] border border-white/10 rounded-xl px-2 py-1 justify-between max-w-[140px] w-full">
                               <button
                                 type="button"
+                                disabled={!isAdmin || (isSuperAdminEmail(selectedCrmUser.email) && !isSuperAdmin)}
                                 onClick={() => {
                                   const current = crmSheepAmount === '' ? 0 : Number(crmSheepAmount);
                                   setCrmSheepAmount(current - 10);
                                 }}
-                                className="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-xl text-cyan-400 transition-colors active:scale-95"
+                                className="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-xl text-cyan-400 transition-colors active:scale-95 disabled:opacity-30 disabled:pointer-events-none"
                               >
                                 <Minus size={12} />
                               </button>
                               <input
                                 type="number"
                                 placeholder="0"
+                                disabled={!isAdmin || (isSuperAdminEmail(selectedCrmUser.email) && !isSuperAdmin)}
                                 value={crmSheepAmount}
                                 onChange={(e) => setCrmSheepAmount(e.target.value === '' ? '' : Number(e.target.value))}
-                                className="w-12 bg-transparent text-xs text-white font-black text-center outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                className="w-12 bg-transparent text-xs text-white font-black text-center outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50"
                               />
                               <button
                                 type="button"
+                                disabled={!isAdmin || (isSuperAdminEmail(selectedCrmUser.email) && !isSuperAdmin)}
                                 onClick={() => {
                                   const current = crmSheepAmount === '' ? 0 : Number(crmSheepAmount);
                                   setCrmSheepAmount(current + 10);
                                 }}
-                                className="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-xl text-cyan-400 transition-colors active:scale-95"
+                                className="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-xl text-cyan-400 transition-colors active:scale-95 disabled:opacity-30 disabled:pointer-events-none"
                               >
                                 <Plus size={12} />
                               </button>
                             </div>
                             <div className="flex gap-2 flex-1">
                               <button
-                                disabled={crmSheepAmount === ''}
+                                disabled={crmSheepAmount === '' || !isAdmin || (isSuperAdminEmail(selectedCrmUser.email) && !isSuperAdmin)}
                                 onClick={() => handleCrmAdjustSheep(selectedCrmUser.email, Number(crmSheepAmount))}
                                 className="flex-1 py-2 px-3 bg-cyan-600/20 hover:bg-cyan-600 border border-cyan-500/30 text-cyan-400 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider disabled:opacity-30 disabled:pointer-events-none transition-all text-center"
                               >
                                 Aggiungi
                               </button>
                               <button
-                                disabled={crmSheepAmount === ''}
+                                disabled={crmSheepAmount === '' || !isAdmin || (isSuperAdminEmail(selectedCrmUser.email) && !isSuperAdmin)}
                                 onClick={() => handleCrmAdjustSheep(selectedCrmUser.email, Number(crmSheepAmount), true)}
                                 className="flex-1 py-2 px-3 bg-cyan-600/10 hover:bg-cyan-600 border border-cyan-500/15 text-cyan-400 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider disabled:opacity-30 disabled:pointer-events-none transition-all text-center"
                               >
@@ -5773,9 +5778,13 @@ export default function AdminDashboardPage() {
                             {['user', 'staff', 'editor', 'admin'].map((role) => (
                               <button
                                 key={role}
-                                disabled={!isAdmin}
+                                disabled={!isSuperAdmin}
                                 onClick={() => handleCrmChangeRole(selectedCrmUser.email, role)}
-                                className={`py-2 rounded-xl text-[10px] font-black uppercase border transition-all ${selectedCrmUser.role === role ? 'bg-cyan-600/20 border-cyan-500/50 text-cyan-400 font-bold' : 'bg-black/10 border-white/5 text-gray-400 hover:bg-white/5'}`}
+                                className={`py-2 rounded-xl text-[10px] font-black uppercase border transition-all ${
+                                  selectedCrmUser.role === role 
+                                    ? 'bg-cyan-600/20 border-cyan-500/50 text-cyan-400 font-bold' 
+                                    : 'bg-black/10 border-white/5 text-gray-400 hover:bg-white/5'
+                                } ${!isSuperAdmin ? 'opacity-50 cursor-not-allowed' : ''}`}
                               >
                                 {role}
                               </button>
@@ -5796,9 +5805,9 @@ export default function AdminDashboardPage() {
                                 <span className="text-[10px] font-bold text-gray-300">{perm.label}</span>
                                 <button
                                   type="button"
-                                  disabled={!isAdmin}
+                                  disabled={!isSuperAdmin}
                                   onClick={() => handleCrmTogglePermission(selectedCrmUser.email, perm.field, !selectedCrmUser[perm.field])}
-                                  className={`w-9 h-5 rounded-full relative transition-all flex-shrink-0 outline-none ${!isAdmin ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${selectedCrmUser[perm.field] ? 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)]' : 'bg-white/10'}`}
+                                  className={`w-9 h-5 rounded-full relative transition-all flex-shrink-0 outline-none ${!isSuperAdmin ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${selectedCrmUser[perm.field] ? 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)]' : 'bg-white/10'}`}
                                 >
                                   <div className={`absolute top-[2px] w-4 h-4 bg-white rounded-full transition-all ${selectedCrmUser[perm.field] ? 'left-[18px]' : 'left-[2px]'}`} />
                                 </button>
@@ -5810,17 +5819,17 @@ export default function AdminDashboardPage() {
                         <div className="pt-2">
                           {selectedCrmUser.role === 'banned' ? (
                             <button
-                              disabled={!isAdmin}
+                              disabled={!isAdmin || isSuperAdminEmail(selectedCrmUser.email)}
                               onClick={() => handleCrmToggleBan(selectedCrmUser.email, 'banned')}
-                              className="w-full flex items-center justify-center gap-2 py-3 bg-green-500/10 hover:bg-green-600 border border-green-500/20 hover:border-green-500 text-green-400 hover:text-white rounded-2xl transition-all font-black text-xs uppercase tracking-wider"
+                              className={`w-full flex items-center justify-center gap-2 py-3 bg-green-500/10 hover:bg-green-600 border border-green-500/20 hover:border-green-500 text-green-400 hover:text-white rounded-2xl transition-all font-black text-xs uppercase tracking-wider ${isSuperAdminEmail(selectedCrmUser.email) ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                               <Unlock size={14} /> Sblocca Account
                             </button>
                           ) : (
                             <button
-                              disabled={!isAdmin}
+                              disabled={!isAdmin || isSuperAdminEmail(selectedCrmUser.email)}
                               onClick={() => handleCrmToggleBan(selectedCrmUser.email, selectedCrmUser.role || 'user')}
-                              className="w-full flex items-center justify-center gap-2 py-3 bg-red-500/10 hover:bg-red-600 border border-red-500/20 hover:border-red-500 text-red-400 hover:text-white rounded-2xl transition-all font-black text-xs uppercase tracking-wider shadow-lg shadow-red-950/20"
+                              className={`w-full flex items-center justify-center gap-2 py-3 bg-red-500/10 hover:bg-red-600 border border-red-500/20 hover:border-red-500 text-red-400 hover:text-white rounded-2xl transition-all font-black text-xs uppercase tracking-wider shadow-lg shadow-red-950/20 ${isSuperAdminEmail(selectedCrmUser.email) ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                               <Lock size={14} /> Blocca / Banna Utente
                             </button>
