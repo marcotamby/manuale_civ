@@ -2663,11 +2663,11 @@ export default function AdminDashboardPage() {
                 <h4 className="text-[11px] font-black uppercase text-gray-500 tracking-[0.2em]">⚠️ Cose che richiedono la tua attenzione</h4>
                 
                 {suggestions.length === 0 && questions.length === 0 && answers.length === 0 && (!isAdmin || pendingNotifCount === 0) ? (
-                  <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl py-4 px-6 flex items-center justify-center gap-4 shadow-sm backdrop-blur-sm transition-all hover:bg-emerald-500/10">
+                  <div className="max-w-2xl w-full bg-emerald-500/5 border border-emerald-500/20 rounded-2xl py-5 px-6 flex items-center gap-4 shadow-sm backdrop-blur-sm transition-all hover:bg-emerald-500/10">
                     <CheckCircle className="text-emerald-400 animate-pulse shrink-0" size={24} />
                     <div className="text-left">
-                      <h5 className="text-xs font-black text-white uppercase tracking-wider">Tutto sotto controllo!</h5>
-                      <p className="text-[10px] text-gray-400 mt-0.5 max-w-md">
+                      <h5 className="text-sm font-black text-white uppercase tracking-wider">Tutto sotto controllo!</h5>
+                      <p className="text-xs text-gray-400 mt-1">
                         Non ci sono proposte pendenti, contributi Q&A da moderare o notifiche in attesa di invio.
                       </p>
                     </div>
@@ -2862,11 +2862,11 @@ export default function AdminDashboardPage() {
                   <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Caricamento proposte...</span>
                 </div>
               ) : suggestions.length === 0 ? (
-                <div className="flex items-center justify-center py-6 px-6 bg-white/[0.02] border border-white/5 rounded-2xl text-gray-500 shadow-sm gap-4 hover:bg-white/[0.03] transition-colors">
+                <div className="max-w-2xl w-full flex items-center py-5 px-6 bg-white/[0.02] border border-white/5 rounded-2xl text-gray-500 shadow-sm gap-4 hover:bg-white/[0.03] transition-colors">
                   <Inbox size={24} className="text-gray-500 opacity-60 animate-pulse shrink-0" />
                   <div className="text-left">
-                    <h3 className="text-xs font-black text-white uppercase tracking-wider">Tutto gestito!</h3>
-                    <p className="text-[10px] text-gray-500 mt-0.5">Non ci sono proposte in sospeso da approvare.</p>
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Tutto gestito!</h3>
+                    <p className="text-xs text-gray-400 mt-1">Non ci sono proposte in sospeso da approvare.</p>
                   </div>
                 </div>
               ) : (
@@ -3071,9 +3071,9 @@ export default function AdminDashboardPage() {
                       <MessageSquare size={16} className="text-yellow-500 shrink-0" /> Domande da Approvare ({questions.length})
                     </h3>
                     {questions.length === 0 ? (
-                      <div className="flex items-center gap-3 py-3 px-5 bg-white/[0.02] border border-white/5 rounded-xl text-gray-500">
-                        <MessageSquare size={16} className="text-gray-500 opacity-50 shrink-0" />
-                        <span className="text-[11px] font-medium">Nessuna domanda in sospeso.</span>
+                      <div className="max-w-2xl w-full flex items-center gap-3 py-4 px-5 bg-white/[0.02] border border-white/5 rounded-xl text-gray-400">
+                        <MessageSquare size={18} className="text-gray-500 opacity-50 shrink-0" />
+                        <span className="text-sm font-medium">Nessuna domanda in sospeso.</span>
                       </div>
                     ) : (
                       <div className="grid gap-4">
@@ -3129,9 +3129,9 @@ export default function AdminDashboardPage() {
                       <Send size={16} className="text-blue-400 shrink-0" /> Risposte da Approvare ({answers.length})
                     </h3>
                     {answers.length === 0 ? (
-                      <div className="flex items-center gap-3 py-3 px-5 bg-white/[0.02] border border-white/5 rounded-xl text-gray-500">
-                        <Send size={16} className="text-gray-500 opacity-50 shrink-0" />
-                        <span className="text-[11px] font-medium">Nessuna risposta in sospeso.</span>
+                      <div className="max-w-2xl w-full flex items-center gap-3 py-4 px-5 bg-white/[0.02] border border-white/5 rounded-xl text-gray-400">
+                        <Send size={18} className="text-gray-500 opacity-50 shrink-0" />
+                        <span className="text-sm font-medium">Nessuna risposta in sospeso.</span>
                       </div>
                     ) : (
                       <div className="grid gap-4">
