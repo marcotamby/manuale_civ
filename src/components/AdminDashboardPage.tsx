@@ -144,6 +144,8 @@ export default function AdminDashboardPage() {
   const [allProfiles, setAllProfiles] = useState<any[]>([]);
   const [isRefilling, setIsRefilling] = useState<string | null>(null);
   const [perUserRefillAmounts, setPerUserRefillAmounts] = useState<Record<string, number>>({});
+  const [isBulkRefilling, setIsBulkRefilling] = useState(false);
+  const [isBulkRefillConfirmOpen, setIsBulkRefillConfirmOpen] = useState(false);
 
   // Tournaments states
   const [tournaments, setTournaments] = useState<any[]>([]);
@@ -1016,6 +1018,56 @@ export default function AdminDashboardPage() {
       setToast({ isVisible: true, message: `Errore: ${err.message}`, type: 'error' });
     } finally {
       setIsRefilling(null);
+    }
+  };
+
+  const handleBulkSheepRefill = async () => {
+    try {
+      setIsBulkRefilling(true);
+      if (allProfiles.length === 0) {
+        setToast({ isVisible: true, message: 'Nessun pastore attivo da ricaricare', type: 'error' });
+        return;
+      }
+
+      // Update all shepherd profiles in parallel
+      const updatePromises = allProfiles.map(async (profile) => {
+        const newBalance = (profile.sheep_balance || 0) + 100;
+        const { error } = await supabase
+          .from('profiles')
+          .update({ sheep_balance: newBalance })
+          .eq('email', profile.email);
+        
+        if (error) throw error;
+        return { email: profile.email, previous: profile.sheep_balance, new: newBalance };
+      });
+
+      const results = await Promise.all(updatePromises);
+
+      // Log a single bulk action in the audit log
+      await logAdminAction(
+        'SHEEP_BULK_REFILL',
+        'profiles',
+        'all_active',
+        `Ricarica massiva: +100 pecore 🐑 a tutti i ${allProfiles.length} pastori attivi`,
+        { 
+          amount: 100, 
+          shepherds_count: allProfiles.length,
+          refilled_users: results.map(r => ({ email: r.email, previous: r.previous, new: r.new }))
+        }
+      );
+
+      // Update state locally
+      setAllProfiles(allProfiles.map(p => {
+        const match = results.find(r => r.email === p.email);
+        return match ? { ...p, sheep_balance: match.new } : p;
+      }));
+
+      setToast({ isVisible: true, message: `Ricarica di 100 pecore completata per tutti i ${allProfiles.length} pastori!`, type: 'success' });
+    } catch (err: any) {
+      setToast({ isVisible: true, message: `Errore nella ricarica massiva: ${err.message}`, type: 'error' });
+    } finally {
+      setIsBulkRefilling(false);
+      setIsBulkRefillConfirmOpen(false);
     }
   };
 
@@ -3433,9 +3485,18 @@ export default function AdminDashboardPage() {
                     className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl py-3 pl-11 pr-4 text-xs text-white focus:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all outline-none font-bold placeholder:text-gray-600"
                   />
                 </div>
-                <div className="flex items-center gap-3 bg-cyan-500/5 px-4 py-2.5 rounded-2xl border border-cyan-500/15 shrink-0">
-                  <span className="text-[9px] font-black text-cyan-400 uppercase tracking-widest">Totale Pastori:</span>
-                  <span className="text-xs font-black text-white">{allProfiles.length}</span>
+                <div className="flex items-center gap-4 shrink-0 flex-wrap justify-center md:justify-end">
+                  <div className="flex items-center gap-3 bg-cyan-500/5 px-4 py-2.5 rounded-2xl border border-cyan-500/15 shrink-0">
+                    <span className="text-[9px] font-black text-cyan-400 uppercase tracking-widest">Totale Pastori:</span>
+                    <span className="text-xs font-black text-white">{allProfiles.length}</span>
+                  </div>
+                  <button
+                    onClick={() => setIsBulkRefillConfirmOpen(true)}
+                    className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-black rounded-2xl text-xs border-0 shadow-lg shadow-amber-500/15 transition-all uppercase tracking-widest active:scale-95 flex items-center gap-2 hover:-translate-y-0.5 cursor-pointer"
+                  >
+                    <Zap size={12} className="fill-black animate-pulse" />
+                    <span>Ricarica Tutti (+100 🐑)</span>
+                  </button>
                 </div>
               </div>
 
@@ -3522,6 +3583,51 @@ export default function AdminDashboardPage() {
                     </div>
                   ))}
               </div>
+
+              {/* Modale Ricarica Massiva Pecore */}
+              {isBulkRefillConfirmOpen && (
+                <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
+                  <div className="bg-[#0a0e1c] border border-amber-500/30 p-8 rounded-3xl max-w-md w-full shadow-2xl text-center relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-amber-500/50 to-transparent"></div>
+                    <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-amber-500/20">
+                      <Zap className="text-amber-400 animate-bounce" size={32} />
+                    </div>
+                    <h3 className="text-xl font-black text-white uppercase mb-2">Ricarica Massiva Pastori</h3>
+                    <p className="text-xs text-gray-400 mb-6 leading-relaxed">
+                      Stai per accreditare <span className="text-amber-400 font-bold">100 pecore 🐑</span> a ciascuno dei{' '}
+                      <span className="text-white font-bold">{allProfiles.length} pastori attivi</span> (totale:{' '}
+                      <span className="text-cyan-400 font-bold">{allProfiles.length * 100} pecore</span>).
+                      Questa operazione verrà registrata nel log delle attività ed è ideale prima dell'inizio di un nuovo torneo.
+                    </p>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setIsBulkRefillConfirmOpen(false)}
+                        className="flex-1 py-3 border-2 border-white/10 text-gray-400 hover:text-white rounded-xl transition-all text-xs font-black uppercase tracking-wider active:scale-95 cursor-pointer"
+                        disabled={isBulkRefilling}
+                      >
+                        Annulla
+                      </button>
+                      <button
+                        onClick={handleBulkSheepRefill}
+                        className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-black rounded-xl transition-all text-xs uppercase tracking-wider active:scale-95 shadow-lg shadow-amber-500/20 flex items-center justify-center gap-1.5 cursor-pointer"
+                        disabled={isBulkRefilling}
+                      >
+                        {isBulkRefilling ? (
+                          <>
+                            <Loader2 size={14} className="animate-spin" />
+                            <span>Elaborazione...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Zap size={14} className="fill-black" />
+                            <span>Conferma (+100 🐑)</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
