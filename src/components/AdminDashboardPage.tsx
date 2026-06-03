@@ -4275,7 +4275,22 @@ export default function AdminDashboardPage() {
                 {/* Sidebar Civiltà */}
                 <div className="lg:col-span-3 bg-[#0a0e1c]/60 border border-cyan-500/15 rounded-3xl p-6 space-y-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500/35 to-transparent"></div>
-                  <h3 className="text-xs font-black text-cyan-400 uppercase tracking-[0.25em] border-b border-white/5 pb-3">Lista Civiltà</h3>
+                  <div className="flex justify-between items-center border-b border-white/5 pb-3">
+                    <h3 className="text-xs font-black text-cyan-400 uppercase tracking-[0.25em]">Lista Civiltà</h3>
+                    <button
+                      onClick={() => {
+                        setIsAddingCiv(true);
+                        setSelectedCiv(null);
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all flex items-center gap-1 active:scale-95 border ${
+                        isAddingCiv
+                          ? 'bg-cyan-600 text-white border-cyan-500/50 shadow-lg shadow-cyan-600/15'
+                          : 'bg-[#111218] hover:bg-white/5 text-cyan-400 hover:text-cyan-300 border-cyan-500/20'
+                      }`}
+                    >
+                      <Plus size={10} strokeWidth={3} /> Nuova Civ
+                    </button>
+                  </div>
                   {civsLoading ? (
                     <div className="flex flex-col items-center justify-center py-20">
                       <Loader2 className="animate-spin text-cyan-400 mb-2" size={32} />
@@ -4332,22 +4347,6 @@ export default function AdminDashboardPage() {
                           </button>
                         );
                       })}
-                      
-                      <div className="pt-4 border-t border-white/5">
-                        <button
-                          onClick={() => {
-                            setIsAddingCiv(true);
-                            setSelectedCiv(null);
-                          }}
-                          className={`w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95 ${
-                            isAddingCiv
-                              ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15 border border-cyan-500/50'
-                              : 'bg-white/5 hover:bg-white/10 text-cyan-400 hover:text-cyan-300 border border-cyan-500/20'
-                          }`}
-                        >
-                          <Plus size={14} strokeWidth={3} /> Nuova Civiltà
-                        </button>
-                      </div>
                     </div>
                   )}
                 </div>
