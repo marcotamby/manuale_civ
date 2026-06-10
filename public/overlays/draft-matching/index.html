@@ -230,6 +230,31 @@
             transition: all 0.3s ease;
         }
 
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .coach-civ-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            justify-content: flex-end;
+            max-width: 220px;
+        }
+
+        .coach-civ-icon {
+            width: 42px;
+            height: 28px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 0 12px rgba(255,255,255,0.08);
+        }
+
         /* SINGLE CASTER AREA - Positioned Centrally at the Bottom */
         #casters-container {
             position: absolute;
@@ -360,6 +385,44 @@
             '#a2ff00', // Lime Green
             '#ff00d4'  // Magenta
         ];
+
+        const CIV_DATA = {
+            'abbasid': { flag: 'Abbasid Dynasty.webp' },
+            'ayyubids': { flag: 'Ayyubids.webp' },
+            'byzantines': { flag: 'Byzantines.webp' },
+            'chinese': { flag: 'Chinese.webp' },
+            'delhi': { flag: 'Delhi Sultanate.webp' },
+            'english': { flag: 'English.webp' },
+            'french': { flag: 'French.webp' },
+            'goldenhorde': { flag: 'Golden Horde.webp' },
+            'hre': { flag: 'Holy Roman Empire.webp' },
+            'japanese': { flag: 'Japanese.webp' },
+            'jeannedarc': { flag: 'jeannedarc.webp' },
+            'lancaster': { flag: 'House of Lancaster.webp' },
+            'malians': { flag: 'Malians.webp' },
+            'mongols': { flag: 'Mongols.webp' },
+            'orderofthedragon': { flag: 'Order of the Dragon.webp' },
+            'ottomans': { flag: 'Ottomans.webp' },
+            'rus': { flag: 'Rus.webp' },
+            'templar': { flag: 'Knights Templar.webp' },
+            'zhuxi': { flag: 'Zhu Xis Legacy.webp' },
+            'tughlaq': { flag: 'Tughlaq Dynasty.webp' },
+            'sengoku': { flag: 'Sengoku Daimyo.webp' },
+            'macedonian': { flag: 'Macedonian Dynasty.webp' },
+            'jin-dynasty': { flag: '/civs/Jin Dynasty.png' }
+        };
+
+        function getCivFlagUrl(id) {
+            if (!id) return '';
+            if (id.startsWith('/civs/') || id.startsWith('/') || id.endsWith('.webp') || id.endsWith('.png')) {
+                return id.startsWith('/') ? id : `/${id}`;
+            }
+            const data = CIV_DATA[id.toLowerCase()];
+            if (data) {
+                return data.flag.startsWith('/') ? data.flag : `/civs/${data.flag}`;
+            }
+            return `/civs/${id}.webp`;
+        }
 
         function updateConnectingLines() {
             const svg = document.getElementById('connections-svg');
@@ -583,9 +646,17 @@
                 const isPaired = pairingIndex !== -1;
                 const pairingColor = isPaired ? PAIRING_COLORS[pairingIndex % PAIRING_COLORS.length] : '';
                 const styleStr = isPaired ? `style="border-color: ${pairingColor}33; border-left-color: ${pairingColor}; box-shadow: 0 12px 32px ${pairingColor}15, 0 0 15px ${pairingColor}08;"` : '';
+                const civIds = Array.isArray(coach.civIds) ? coach.civIds : coach.civId ? [coach.civId] : [];
+                const civImgs = civIds.map(id => {
+                    const civUrl = getCivFlagUrl(id);
+                    return civUrl ? `<img src="${civUrl}" alt="civ" class="coach-civ-icon" />` : '';
+                }).join('');
                 return `
                     <div id="coach-${coach.id}" class="card coach-card ${isPaired ? 'paired' : ''}" ${styleStr}>
-                        <div class="card-name">${coach.name}</div>
+                        <div class="card-meta">
+                            <div class="card-name">${coach.name}</div>
+                            <div class="coach-civ-list">${civImgs}</div>
+                        </div>
                     </div>
                 `;
             }).join('');

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Save, Plus, X, ChevronDown, Loader2, RefreshCcw, Sparkles, Users, HelpCircle, Trash2, Edit2, Check } from 'lucide-react';
+import { civilizationsData } from '../data/aoe4Data';
 import { overlayService } from '../services/overlayService';
 
 interface DraftMatchingDashboardProps {
@@ -9,6 +10,7 @@ interface DraftMatchingDashboardProps {
 interface Coach {
   id: string;
   name: string;
+  civIds: string[];
 }
 
 interface Student {
@@ -100,7 +102,10 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
           setState({
             ...DEFAULT_STATE,
             ...savedState,
-            coaches: savedState.coaches || [],
+            coaches: (savedState.coaches || []).map((c: any) => ({
+              ...c,
+              civIds: Array.isArray(c.civIds) ? c.civIds : (c.civId ? [c.civId] : [])
+            })),
             students: savedState.students || [],
             pairings: savedState.pairings || [],
             casters: savedState.casters || DEFAULT_STATE.casters,
@@ -184,13 +189,21 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
     if (!newCoachName.trim()) return;
     const newCoach: Coach = {
       id: `c-${Date.now()}`,
-      name: newCoachName.trim()
+      name: newCoachName.trim(),
+      civIds: []
     };
     setState(prev => ({
       ...prev,
       coaches: [...prev.coaches, newCoach]
     }));
     setNewCoachName('');
+  };
+
+  const handleCoachCivChange = (coachId: string, civIds: string[]) => {
+    setState(prev => ({
+      ...prev,
+      coaches: prev.coaches.map(coach => coach.id === coachId ? { ...coach, civIds } : coach)
+    }));
   };
 
   const deleteCoach = (id: string) => {
@@ -440,10 +453,46 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                           </button>
                         </div>
                       ) : (
-                        <>
-                          <span className="font-bold text-xs uppercase tracking-wide truncate max-w-[200px]">
-                            {coach.name}
-                          </span>
+                        <div className="flex items-center justify-between gap-3 w-full">
+                          <div className="min-w-0">
+                            <span className="font-bold text-xs uppercase tracking-wide truncate max-w-[200px]">
+                              {coach.name}
+                            </span>
+                            <div className="mt-2 flex flex-col gap-2">
+                              {coach.civIds.length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                  {coach.civIds.map(civId => {
+                                    const civ = civilizationsData.find(c => c.id === civId);
+                                    return civ ? (
+                                      <img
+                                        key={civId}
+                                        src={civ.flag}
+                                        alt={civ.name}
+                                        title={civ.name}
+                                        className="w-8 h-6 rounded-md border border-white/10 object-cover"
+                                      />
+                                    ) : null;
+                                  })}
+                                </div>
+                              )}
+                              <select
+                                multiple
+                                size={4}
+                                value={coach.civIds}
+                                onChange={(e) => {
+                                  const selected = Array.from(e.target.selectedOptions).map(opt => opt.value);
+                                  handleCoachCivChange(coach.id, selected);
+                                }}
+                                className="min-w-[160px] bg-[#0d111a] border border-white/10 rounded-xl px-3 py-2 text-[10px] text-white uppercase tracking-wider outline-none transition-all"
+                              >
+                                {civilizationsData.map(civ => (
+                                  <option key={civ.id} value={civ.id}>
+                                    {civ.name}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button 
                               onClick={() => startEditCoach(coach)}
@@ -460,7 +509,7 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                               <Trash2 size={18} />
                             </button>
                           </div>
-                        </>
+                        </div>
                       )}
                     </div>
                   );
