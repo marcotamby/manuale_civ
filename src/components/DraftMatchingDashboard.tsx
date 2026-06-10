@@ -329,21 +329,20 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
           <button
             onClick={handleSaveManual}
             disabled={isSaving}
-            className={`flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg ${
-              isSaving 
-                ? 'bg-gray-800 text-gray-500' 
-                : showSuccess 
-                  ? 'bg-green-600 text-white shadow-green-500/20' 
+            className={`flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg ${isSaving
+                ? 'bg-gray-800 text-gray-500'
+                : showSuccess
+                  ? 'bg-green-600 text-white shadow-green-500/20'
                   : 'bg-blue-600 text-white hover:bg-blue-500 shadow-blue-500/20'
-            }`}
+              }`}
           >
             {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
             {isSaving ? 'Salvataggio...' : showSuccess ? 'Salvato!' : 'Salva Overlay'}
           </button>
-          
+
           {!showResetConfirm ? (
-            <button 
-              onClick={() => setShowResetConfirm(true)} 
+            <button
+              onClick={() => setShowResetConfirm(true)}
               className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-600/10 border border-red-600/30 text-red-500 hover:bg-red-600 hover:text-white transition-all font-black text-xs uppercase tracking-widest"
             >
               <RefreshCcw size={14} />
@@ -352,17 +351,17 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
           ) : (
             <div className="flex items-center gap-2 bg-red-600 p-1 rounded-xl shadow-lg animate-in zoom-in-95 duration-200">
               <span className="text-[10px] font-black text-white px-3 uppercase tracking-tighter">Confermi?</span>
-              <button 
-                onClick={handleReset} 
+              <button
+                onClick={handleReset}
                 className="bg-white text-red-600 px-4 py-2 rounded-lg font-black text-[10px] uppercase hover:bg-gray-100 transition-all"
               >
                 SI, RESET
               </button>
-              <button 
-                onClick={() => setShowResetConfirm(false)} 
+              <button
+                onClick={() => setShowResetConfirm(false)}
                 className="bg-black/20 text-white w-8 h-8 flex items-center justify-center rounded-lg hover:bg-black/30"
               >
-                <X size={14}/>
+                <X size={14} />
               </button>
             </div>
           )}
@@ -379,8 +378,8 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
             </span>
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Sincronizzazione Live</span>
           </div>
-          <div 
-            onClick={handleToggleLiveSync} 
+          <div
+            onClick={handleToggleLiveSync}
             className={`w-12 h-6 rounded-full relative cursor-pointer transition-all ${state.liveSync ? 'bg-emerald-500 shadow-lg shadow-emerald-500/20' : 'bg-white/10'}`}
           >
             <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${state.liveSync ? 'left-7' : 'left-1'}`}></div>
@@ -389,10 +388,10 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
       </div>
 
       <div className="p-8 pb-32 space-y-8">
-        
+
         {/* Row 1: Coaches, Students, Pairings */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           {/* Column 1: Coaches */}
           <div className="bg-[#0a0f1a] border border-white/10 rounded-3xl p-6 shadow-2xl flex flex-col h-[650px]">
             <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-3">
@@ -434,7 +433,7 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                   const pairingColor = isPaired ? PAIRING_COLORS[pairingIndex % PAIRING_COLORS.length] : null;
 
                   return (
-                    <div 
+                    <div
                       key={coach.id}
                       style={pairingColor ? { borderColor: `${pairingColor}33`, borderLeftColor: pairingColor, borderLeftWidth: '4px', borderLeftStyle: 'solid' } : undefined}
                       className="bg-black/30 border border-white/5 hover:border-amber-500/20 rounded-xl p-3 flex items-center justify-between group transition-all"
@@ -494,14 +493,14 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                             </div>
                           </div>
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button 
+                            <button
                               onClick={() => startEditCoach(coach)}
                               className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-amber-500 transition-all"
                               title="Modifica"
                             >
                               <Edit2 size={18} />
                             </button>
-                            <button 
+                            <button
                               onClick={() => deleteCoach(coach.id)}
                               className="p-2 hover:bg-red-500/20 rounded-lg text-gray-500 hover:text-red-400 transition-all"
                               title="Elimina"
@@ -559,55 +558,55 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                   const pairingColor = isPaired ? PAIRING_COLORS[pairingIndex % PAIRING_COLORS.length] : null;
 
                   return (
-                    <div 
+                    <div
                       key={student.id}
                       style={pairingColor ? { borderColor: `${pairingColor}33`, borderRightColor: pairingColor, borderRightWidth: '4px', borderRightStyle: 'solid' } : undefined}
                       className="bg-black/30 border border-white/5 hover:border-blue-500/20 rounded-xl p-3 flex items-center justify-between group transition-all"
                     >
-                    {editingStudentId === student.id ? (
-                      <div className="flex items-center gap-2 w-full">
-                        <input
-                          type="text"
-                          value={editingStudentName}
-                          onChange={(e) => setEditingStudentName(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && saveEditStudent()}
-                          className="flex-1 bg-black/60 border border-blue-500/50 rounded-lg px-2 py-1.5 text-xs text-white uppercase font-bold outline-none"
-                        />
-                        <button onClick={saveEditStudent} className="p-1.5 bg-green-600 text-white rounded-md hover:bg-green-500">
-                          <Check size={16} />
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="flex flex-col min-w-0">
-                          <span className="font-bold text-xs uppercase tracking-wide truncate max-w-[180px]">
-                            {student.name}
-                          </span>
-                          {getPairedCoachName(student.id) && (
-                            <span className="text-[8px] font-bold text-cyan-400/80 uppercase tracking-widest mt-0.5">
-                              Abbinato a: {getPairedCoachName(student.id)}
+                      {editingStudentId === student.id ? (
+                        <div className="flex items-center gap-2 w-full">
+                          <input
+                            type="text"
+                            value={editingStudentName}
+                            onChange={(e) => setEditingStudentName(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && saveEditStudent()}
+                            className="flex-1 bg-black/60 border border-blue-500/50 rounded-lg px-2 py-1.5 text-xs text-white uppercase font-bold outline-none"
+                          />
+                          <button onClick={saveEditStudent} className="p-1.5 bg-green-600 text-white rounded-md hover:bg-green-500">
+                            <Check size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex flex-col min-w-0">
+                            <span className="font-bold text-xs uppercase tracking-wide truncate max-w-[180px]">
+                              {student.name}
                             </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button 
-                            onClick={() => startEditStudent(student)}
-                            className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-blue-400 transition-all"
-                            title="Modifica"
-                          >
-                            <Edit2 size={18} />
-                          </button>
-                          <button 
-                            onClick={() => deleteStudent(student.id)}
-                            className="p-2 hover:bg-red-500/20 rounded-lg text-gray-500 hover:text-red-400 transition-all"
-                            title="Elimina"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
+                            {getPairedCoachName(student.id) && (
+                              <span className="text-[8px] font-bold text-cyan-400/80 uppercase tracking-widest mt-0.5">
+                                Abbinato a: {getPairedCoachName(student.id)}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => startEditStudent(student)}
+                              className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-blue-400 transition-all"
+                              title="Modifica"
+                            >
+                              <Edit2 size={18} />
+                            </button>
+                            <button
+                              onClick={() => deleteStudent(student.id)}
+                              className="p-2 hover:bg-red-500/20 rounded-lg text-gray-500 hover:text-red-400 transition-all"
+                              title="Elimina"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
                   );
                 })
               }
@@ -619,7 +618,7 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
             <h3 className="text-sm font-black text-amber-500 uppercase tracking-widest mb-4 border-b border-white/5 pb-3 flex items-center gap-2">
               <Sparkles size={16} /> Abbinamenti ({state.pairings.length})
             </h3>
-            
+
             <div className="flex-1 overflow-y-auto elegant-scrollbar space-y-4 pr-1">
               {state.coaches.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-gray-600 gap-2 text-center p-4">
@@ -635,9 +634,9 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                   const pairingIndex = state.pairings.findIndex(p => p.coachId === coach.id);
                   const isPaired = pairingIndex !== -1;
                   const pairingColor = isPaired ? PAIRING_COLORS[pairingIndex % PAIRING_COLORS.length] : null;
-                  
+
                   return (
-                    <div 
+                    <div
                       key={coach.id}
                       style={pairingColor ? { borderColor: `${pairingColor}33`, borderLeftColor: pairingColor, borderLeftWidth: '4px', borderLeftStyle: 'solid' } : undefined}
                       className="bg-black/30 border border-white/5 rounded-2xl p-4 space-y-2 hover:border-amber-500/20 transition-all"
@@ -666,10 +665,10 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                           {state.students.map(student => {
                             const pairedCoach = getPairedCoachName(student.id);
                             const isPairedElsewhere = pairedCoach && selectedStudentId !== student.id;
-                            
+
                             return (
-                              <option 
-                                key={student.id} 
+                              <option
+                                key={student.id}
                                 value={student.id}
                                 className="bg-[#0d111a]"
                               >
@@ -701,15 +700,15 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                 <div key={idx} className="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-white/5 hover:border-blue-500/20 transition-all group overflow-hidden">
                   <div className="flex-1 min-w-0">
                     <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block mb-1">Nome Caster</span>
-                    <input 
-                      type="text" 
-                      value={c.name} 
-                      onChange={(e) => handleCasterNameChange(idx, e.target.value)} 
-                      placeholder="Nome Caster" 
-                      className="w-full bg-transparent text-xs font-black text-white outline-none placeholder:text-gray-700 uppercase tracking-wider" 
+                    <input
+                      type="text"
+                      value={c.name}
+                      onChange={(e) => handleCasterNameChange(idx, e.target.value)}
+                      placeholder="Nome Caster"
+                      className="w-full bg-transparent text-xs font-black text-white outline-none placeholder:text-gray-700 uppercase tracking-wider"
                     />
                   </div>
-                  <div 
+                  <div
                     onClick={() => handleCasterActiveChange(idx, !c.active)}
                     className={`w-12 h-6 rounded-full relative cursor-pointer transition-all flex-shrink-0 ${c.active ? 'bg-cyan-500 shadow-lg shadow-cyan-500/20' : 'bg-white/10'}`}
                   >
@@ -726,17 +725,17 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
               <h3 className="text-sm font-black text-purple-400 uppercase tracking-widest mb-4 border-b border-white/5 pb-3 flex items-center gap-2">
                 <Sparkles size={16} className="text-purple-400" /> Impostazioni Titolo Overlay
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Title Text Input */}
                 <div className="space-y-1">
                   <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block font-bold">Testo Titolo</span>
-                  <input 
-                    type="text" 
-                    value={state.titleText} 
-                    onChange={(e) => setState(prev => ({ ...prev, titleText: e.target.value }))} 
-                    placeholder="Esempio: MATCHMAKING DRAFT" 
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:border-purple-500/50 outline-none transition-all placeholder:text-gray-700 font-bold uppercase" 
+                  <input
+                    type="text"
+                    value={state.titleText}
+                    onChange={(e) => setState(prev => ({ ...prev, titleText: e.target.value }))}
+                    placeholder="Esempio: MATCHMAKING DRAFT"
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:border-purple-500/50 outline-none transition-all placeholder:text-gray-700 font-bold uppercase"
                   />
                 </div>
 
@@ -778,11 +777,10 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                                 setState(prev => ({ ...prev, titleFont: item.value }));
                                 setFontMenuOpen(false);
                               }}
-                              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all text-left ${
-                                isSelected 
-                                  ? 'bg-purple-600/20 border border-purple-500/30 text-white' 
+                              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all text-left ${isSelected
+                                  ? 'bg-purple-600/20 border border-purple-500/30 text-white'
                                   : 'hover:bg-white/5 border border-transparent text-gray-300 hover:text-white'
-                              }`}
+                                }`}
                             >
                               <div className="flex flex-col">
                                 <span style={{ fontFamily: item.value }} className="text-xs font-bold uppercase tracking-wider">
@@ -813,11 +811,11 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                 <div className="space-y-1">
                   <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block font-bold">Dimensione Carattere ({state.titleFontSize}px)</span>
                   <div className="flex items-center gap-4 bg-black/40 px-4 py-2 rounded-xl border border-white/5">
-                    <input 
-                      type="range" 
-                      min="16" 
-                      max="64" 
-                      value={state.titleFontSize} 
+                    <input
+                      type="range"
+                      min="16"
+                      max="64"
+                      value={state.titleFontSize}
                       onChange={(e) => setState(prev => ({ ...prev, titleFontSize: parseInt(e.target.value) }))}
                       className="flex-1 accent-purple-500 h-1 bg-white/10 rounded-lg cursor-pointer"
                     />
@@ -829,11 +827,11 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                 <div className="space-y-1">
                   <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block font-bold">Spessore Contorno ({state.titleBorderWidth || 0}px)</span>
                   <div className="flex items-center gap-4 bg-black/40 px-4 py-2 rounded-xl border border-white/5">
-                    <input 
-                      type="range" 
-                      min="0" 
-                      max="8" 
-                      value={state.titleBorderWidth || 0} 
+                    <input
+                      type="range"
+                      min="0"
+                      max="8"
+                      value={state.titleBorderWidth || 0}
                       onChange={(e) => setState(prev => ({ ...prev, titleBorderWidth: parseInt(e.target.value) }))}
                       className="flex-1 accent-purple-500 h-1 bg-white/10 rounded-lg cursor-pointer"
                     />
@@ -848,11 +846,11 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                 <div className="space-y-1">
                   <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block font-bold">Colore Riempimento</span>
                   <div className="flex items-center gap-3 bg-black/40 border border-white/10 rounded-xl px-3 py-2">
-                    <input 
-                      type="color" 
-                      value={state.titleColor || '#ffffff'} 
-                      onChange={(e) => setState(prev => ({ ...prev, titleColor: e.target.value }))} 
-                      className="w-8 h-8 bg-transparent border-0 rounded cursor-pointer shrink-0" 
+                    <input
+                      type="color"
+                      value={state.titleColor || '#ffffff'}
+                      onChange={(e) => setState(prev => ({ ...prev, titleColor: e.target.value }))}
+                      className="w-8 h-8 bg-transparent border-0 rounded cursor-pointer shrink-0"
                     />
                     <span className="text-xs font-mono uppercase text-gray-300">{state.titleColor || '#ffffff'}</span>
                   </div>
@@ -862,11 +860,11 @@ export function DraftMatchingDashboard({ onError }: DraftMatchingDashboardProps)
                 <div className="space-y-1">
                   <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block font-bold">Colore Contorno</span>
                   <div className="flex items-center gap-3 bg-black/40 border border-white/10 rounded-xl px-3 py-2">
-                    <input 
-                      type="color" 
-                      value={state.titleBorderColor || '#000000'} 
-                      onChange={(e) => setState(prev => ({ ...prev, titleBorderColor: e.target.value }))} 
-                      className="w-8 h-8 bg-transparent border-0 rounded cursor-pointer shrink-0" 
+                    <input
+                      type="color"
+                      value={state.titleBorderColor || '#000000'}
+                      onChange={(e) => setState(prev => ({ ...prev, titleBorderColor: e.target.value }))}
+                      className="w-8 h-8 bg-transparent border-0 rounded cursor-pointer shrink-0"
                     />
                     <span className="text-xs font-mono uppercase text-gray-300">{state.titleBorderColor || '#000000'}</span>
                   </div>

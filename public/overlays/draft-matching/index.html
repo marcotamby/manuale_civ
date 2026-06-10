@@ -201,6 +201,35 @@
 
         .coach-card {
             /* Neutral by default */
+            overflow: hidden;
+        }
+
+        .coach-civ-background {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .coach-civ-panel {
+            flex: 1 1 0;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .coach-civ-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background: linear-gradient(135deg, rgba(5, 8, 15, 0.94) 0%, rgba(5, 8, 15, 0.72) 45%, rgba(5, 8, 15, 0.94) 100%);
+        }
+
+        .coach-card-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
         }
 
         .coach-card.paired {
@@ -645,17 +674,18 @@
                 const pairingIndex = (state.pairings || []).findIndex(p => p.coachId === coach.id);
                 const isPaired = pairingIndex !== -1;
                 const pairingColor = isPaired ? PAIRING_COLORS[pairingIndex % PAIRING_COLORS.length] : '';
-                const styleStr = isPaired ? `style="border-color: ${pairingColor}33; border-left-color: ${pairingColor}; box-shadow: 0 12px 32px ${pairingColor}15, 0 0 15px ${pairingColor}08;"` : '';
                 const civIds = Array.isArray(coach.civIds) ? coach.civIds : coach.civId ? [coach.civId] : [];
-                const civImgs = civIds.map(id => {
-                    const civUrl = getCivFlagUrl(id);
-                    return civUrl ? `<img src="${civUrl}" alt="civ" class="coach-civ-icon" />` : '';
-                }).join('');
+                const coachBackgrounds = civIds.map(id => getCivFlagUrl(id)).filter(Boolean);
+                const pairedStyle = isPaired ? `border-color: ${pairingColor}33; border-left-color: ${pairingColor}; box-shadow: 0 12px 32px ${pairingColor}15, 0 0 15px ${pairingColor}08; ` : '';
+                const backgroundMarkup = coachBackgrounds.length > 0
+                    ? `<div class="coach-civ-background">${coachBackgrounds.map(url => `<div class="coach-civ-panel" style="background-image: url('${url}');"></div>`).join('')}<div class="coach-civ-overlay"></div></div>`
+                    : '';
+                const coachStyleStr = pairedStyle ? `style="${pairedStyle}"` : '';
                 return `
-                    <div id="coach-${coach.id}" class="card coach-card ${isPaired ? 'paired' : ''}" ${styleStr}>
-                        <div class="card-meta">
+                    <div id="coach-${coach.id}" class="card coach-card ${isPaired ? 'paired' : ''}" ${coachStyleStr}>
+                        ${backgroundMarkup}
+                        <div class="card-meta coach-card-content">
                             <div class="card-name">${coach.name}</div>
-                            <div class="coach-civ-list">${civImgs}</div>
                         </div>
                     </div>
                 `;
