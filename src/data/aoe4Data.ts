@@ -81,7 +81,7 @@ export interface Civilization {
 
 export const unitsList: Unit[] = []; // Pulled units logic could be here but for now empty to avoid redundancy
 
-export const civilizationsData: Civilization[] = [
+const civilizationsDataRaw: Civilization[] = [
   {
     "id": "abbasid",
     "name": "Abbasidi",
@@ -6969,3 +6969,7 @@ export const civilizationsData: Civilization[] = [
     "primaryColor": "#3b82f6"
   }
 ];
+
+export const civilizationsData: Civilization[] = Array.from(
+  new Map(civilizationsDataRaw.map((civilization) => [civilization.id, civilization])).values()
+);
