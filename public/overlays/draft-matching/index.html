@@ -137,12 +137,12 @@
             position: absolute;
             top: 45%;
             transform: translateY(-50%);
-            width: 360px;
+            width: 400px;
             display: flex;
             flex-direction: column;
             z-index: 10;
             height: auto;
-            max-height: 600px;
+            max-height: 840px;
         }
 
         #coaches-container {
@@ -155,15 +155,15 @@
 
         /* Distinct and themed solid background for column titles (not blurred, narrower - 200px) */
         .column-title {
-            font-size: 18px;
+            font-size: 28px;
             font-weight: 900;
             letter-spacing: 5px;
-            margin-bottom: 20px;
+            margin-bottom: 26px;
             text-align: center;
             text-transform: uppercase;
-            padding: 10px 16px;
-            border-radius: 12px;
-            width: 200px;
+            padding: 16px 22px;
+            border-radius: 18px;
+            width: 320px;
             margin-left: auto;
             margin-right: auto;
             transition: all 0.3s ease;
@@ -197,7 +197,7 @@
         .names-list {
             display: flex;
             flex-direction: column;
-            gap: var(--card-gap, 16px);
+            gap: var(--card-gap, 24px);
             transition: all 0.3s ease;
         }
 
@@ -205,14 +205,14 @@
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(12px);
-            border-radius: var(--card-border-radius, 16px);
-            padding: var(--card-padding, 20px 24px);
+            border-radius: var(--card-border-radius, 24px);
+            padding: var(--card-padding, 32px 40px);
             display: flex;
             align-items: center;
             position: relative;
             box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            height: var(--card-height, 64px);
+            height: var(--card-height, 120px);
             width: 100%;
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
@@ -265,10 +265,10 @@
         }
 
         .card-name {
-            font-size: var(--card-font-size, 18px);
+            font-size: var(--card-font-size, 36px);
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             color: #ffffff;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
             white-space: nowrap;
@@ -280,7 +280,7 @@
         .card-meta {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 18px;
             width: 100%;
         }
 
@@ -294,9 +294,9 @@
         }
 
         .coach-civ-icon {
-            width: 42px;
-            height: 28px;
-            border-radius: 8px;
+            width: 72px;
+            height: 48px;
+            border-radius: 12px;
             object-fit: cover;
             border: 1px solid rgba(255, 255, 255, 0.12);
             box-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
@@ -379,9 +379,9 @@
 
 <body>
     <div id="header-container">
+        <h1 id="header-title">MATCHMAKING DRAFT</h1>
         <img id="header-logo" src="https://aoeitalia.com/static/media/logo.30a80edc8f4f80a7d3a2.png"
             alt="Age of Empires Italia" />
-        <h1 id="header-title">MATCHMAKING DRAFT</h1>
     </div>
 
     <!-- Connection SVG layer -->
@@ -643,41 +643,41 @@
             const studentsList = document.getElementById('students-list');
 
             let cardHeight = 64;
-            let gap = 16;
-            let fontSize = 18;
-            let borderRadius = 16;
-            let padding = "20px 24px";
+            let gap = 24;
+            let fontSize = 36;
+            let borderRadius = 24;
+            let padding = "32px 40px";
 
             if (N >= 15) {
-                cardHeight = 24;
-                gap = 3;
-                fontSize = 10;
-                borderRadius = 6;
-                padding = "4px 8px";
-            } else if (N >= 12) {
-                cardHeight = 32;
-                gap = 5;
-                fontSize = 11;
-                borderRadius = 8;
-                padding = "6px 12px";
-            } else if (N >= 10) {
-                cardHeight = 40;
-                gap = 8;
-                fontSize = 13;
-                borderRadius = 10;
-                padding = "8px 14px";
-            } else if (N === 9) {
                 cardHeight = 48;
-                gap = 10;
-                fontSize = 15;
+                gap = 3;
+                fontSize = 18;
+                borderRadius = 10;
+                padding = "10px 16px";
+            } else if (N >= 12) {
+                cardHeight = 60;
+                gap = 5;
+                fontSize = 22;
                 borderRadius = 12;
-                padding = "12px 16px";
-            } else if (N === 8) {
-                cardHeight = 54;
+                padding = "12px 18px";
+            } else if (N >= 10) {
+                cardHeight = 78;
                 gap = 12;
-                fontSize = 16;
-                borderRadius = 14;
-                padding = "14px 20px";
+                fontSize = 26;
+                borderRadius = 16;
+                padding = "16px 24px";
+            } else if (N === 9) {
+                cardHeight = 96;
+                gap = 16;
+                fontSize = 30;
+                borderRadius = 20;
+                padding = "24px 30px";
+            } else if (N === 8) {
+                cardHeight = 120;
+                gap = 20;
+                fontSize = 36;
+                borderRadius = 24;
+                padding = "32px 40px";
             }
 
             [coachesList, studentsList].forEach(listEl => {

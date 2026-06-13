@@ -663,7 +663,7 @@ export function ClassificaPage() {
               <h1 className="text-3xl md:text-4xl font-black text-white uppercase tracking-wider">Classifica</h1>
             </div>
             <p className="text-gray-400 text-sm md:text-base">Per essere aggiunto, clicca il bottone a destra. Non usare Firefox.
-</p>
+            </p>
           </div>
 
           <a
