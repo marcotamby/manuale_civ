@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,14 +10,17 @@
     <meta http-equiv="Expires" content="0" />
     <title>Draft Matching Overlay</title>
     <!-- Import Dynamic Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;700&family=Montserrat:wght@400;700;900&family=Cinzel:wght@700;900&family=Orbitron:wght@700;900&family=Bebas+Neue&family=Russo+One&family=Teko:wght@700&family=Press+Start+2P&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;700&family=Montserrat:wght@400;700;900&family=Cinzel:wght@700;900&family=Orbitron:wght@700;900&family=Bebas+Neue&family=Russo+One&family=Teko:wght@700&family=Press+Start+2P&family=Cinzel+Decorative:wght@700;900&display=swap"
+        rel="stylesheet">
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --gold: #d4af37;
             --gold-bright: #ffed4a;
-            --blue: #00f0ff; /* Lighter, more luminous neon cyan-blue */
+            --blue: #00f0ff;
+            /* Lighter, more luminous neon cyan-blue */
             --bg-dark: #05080f;
             --card-bg: rgba(10, 15, 26, 0.85);
             --border-glow-gold: rgba(212, 175, 55, 0.4);
@@ -61,6 +65,7 @@
             from {
                 stroke-dashoffset: var(--path-length, 1200);
             }
+
             to {
                 stroke-dashoffset: 0;
             }
@@ -103,6 +108,17 @@
             transform: translateX(-50%);
             text-align: center;
             z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #header-logo {
+            width: 160px;
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.7));
         }
 
         #header-title {
@@ -111,7 +127,7 @@
             text-transform: uppercase;
             letter-spacing: 6px;
             color: #ffffff;
-            text-shadow: 0 4px 12px rgba(0,0,0,0.8), 0 0 20px rgba(255,255,255,0.1);
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
             paint-order: stroke fill;
         }
@@ -154,13 +170,15 @@
         }
 
         #coaches-container .column-title {
-            background: #1a140a; /* solid dark amber */
+            background: #1a140a;
+            /* solid dark amber */
             border: 1.5px solid rgba(212, 175, 55, 0.5);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
         }
 
         #students-container .column-title {
-            background: #06121a; /* solid dark cyan-blue */
+            background: #06121a;
+            /* solid dark cyan-blue */
             border: 1.5px solid rgba(0, 240, 255, 0.5);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
         }
@@ -252,7 +270,7 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             color: #ffffff;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -280,8 +298,8 @@
             height: 28px;
             border-radius: 8px;
             object-fit: cover;
-            border: 1px solid rgba(255,255,255,0.12);
-            box-shadow: 0 0 12px rgba(255,255,255,0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
         }
 
         /* SINGLE CASTER AREA - Positioned Centrally at the Bottom */
@@ -323,9 +341,9 @@
             background: rgba(10, 15, 28, 0.4);
             backdrop-filter: blur(8px);
             border-radius: 0px;
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), 
-                        0 0 25px rgba(208, 225, 249, 0.35), 
-                        inset 0 0 24px rgba(208, 225, 249, 0.2);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85),
+                0 0 25px rgba(208, 225, 249, 0.35),
+                inset 0 0 24px rgba(208, 225, 249, 0.2);
             position: relative;
             overflow: hidden;
         }
@@ -358,8 +376,11 @@
         }
     </style>
 </head>
+
 <body>
     <div id="header-container">
+        <img id="header-logo" src="https://aoeitalia.com/static/media/logo.30a80edc8f4f80a7d3a2.png"
+            alt="Age of Empires Italia" />
         <h1 id="header-title">MATCHMAKING DRAFT</h1>
     </div>
 
@@ -389,7 +410,7 @@
     <script>
         const SUB_URL = "https://laliiuqjpxanhwhxajlm.supabase.co";
         const SUB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhbGlpdXFqcHhhbmh3aHhhamxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjQ5MjEsImV4cCI6MjA4ODU0MDkyMX0.1xIE1MXy1JxgGzpP0Hitotz8o3aMwASV8NUr06bQjkA";
-        
+
         const { createClient } = window.supabase;
         const client = createClient(SUB_URL, SUB_KEY);
         let lastState = null;
@@ -455,37 +476,37 @@
 
         function updateConnectingLines() {
             const svg = document.getElementById('connections-svg');
-            
+
             if (!lastState || !lastState.pairings || lastState.pairings.length === 0) {
                 svg.innerHTML = '';
                 return;
             }
 
             const activeIds = new Set();
-            
+
             lastState.pairings.forEach((pairing, index) => {
                 const coachEl = document.getElementById(`coach-${pairing.coachId}`);
                 const studentEl = document.getElementById(`student-${pairing.studentId}`);
-                
+
                 if (!coachEl || !studentEl) return;
-                
+
                 const coachRect = coachEl.getBoundingClientRect();
                 const studentRect = studentEl.getBoundingClientRect();
-                
+
                 // Get absolute coordinates
                 const x1 = coachRect.right;
                 const y1 = coachRect.top + coachRect.height / 2;
-                
+
                 const x2 = studentRect.left;
                 const y2 = studentRect.top + studentRect.height / 2;
-                
+
                 const dx = x2 - x1;
                 const dy = y2 - y1;
-                
+
                 // Decoy student logic for visual suspense (heads towards wrong student first, then hooks to correct one)
                 const allStudentCards = Array.from(document.querySelectorAll('.student-card'));
                 const correctIndex = allStudentCards.findIndex(el => el.id === `student-${pairing.studentId}`);
-                
+
                 let decoyY = y2;
                 if (allStudentCards.length > 1 && correctIndex !== -1) {
                     // Try to pick the adjacent student card (above or below)
@@ -500,23 +521,23 @@
                 // Winding "ghirigoro" path that sweeps towards decoyY before hooking to y2
                 // Double S-curve with continuous horizontal tangents to guarantee perfect smoothness (no sharp turns)
                 const x_join = x1 + dx * 0.68;
-                
+
                 const cp1_x1 = x1 + dx * 0.3;
                 const cp1_y1 = y1;
-                
+
                 const cp2_x1 = x_join - dx * 0.15;
                 const cp2_y1 = decoyY;
-                
+
                 const cp1_x2 = x_join + dx * 0.12;
                 const cp1_y2 = decoyY;
-                
+
                 const cp2_x2 = x2 - dx * 0.12;
                 const cp2_y2 = y2;
-                
+
                 const pathData = `M ${x1} ${y1} ` +
-                                 `C ${cp1_x1} ${cp1_y1}, ${cp2_x1} ${cp2_y1}, ${x_join} ${decoyY} ` +
-                                 `C ${cp1_x2} ${cp1_y2}, ${cp2_x2} ${cp2_y2}, ${x2} ${y2}`;
-                
+                    `C ${cp1_x1} ${cp1_y1}, ${cp2_x1} ${cp2_y1}, ${x_join} ${decoyY} ` +
+                    `C ${cp1_x2} ${cp1_y2}, ${cp2_x2} ${cp2_y2}, ${x2} ${y2}`;
+
                 const pairingId = `pair-${pairing.coachId}-${pairing.studentId}`;
                 activeIds.add(pairingId);
 
@@ -602,12 +623,12 @@
                 titleEl.innerText = state.titleText !== undefined ? state.titleText : "MATCHMAKING DRAFT";
                 titleEl.style.fontFamily = state.titleFont ? `'${state.titleFont}', sans-serif` : "'Outfit', sans-serif";
                 titleEl.style.fontSize = state.titleFontSize ? `${state.titleFontSize}px` : "32px";
-                
+
                 // Custom colors and border styling
                 titleEl.style.color = state.titleColor || '#ffffff';
                 titleEl.style.webkitTextStrokeColor = state.titleBorderColor || '#000000';
                 titleEl.style.webkitTextStrokeWidth = state.titleBorderWidth !== undefined ? `${state.titleBorderWidth}px` : '0px';
-                
+
                 // Hide header title if text is completely empty
                 if (state.titleText === '') {
                     titleEl.style.display = 'none';
@@ -799,4 +820,5 @@
         init();
     </script>
 </body>
+
 </html>
