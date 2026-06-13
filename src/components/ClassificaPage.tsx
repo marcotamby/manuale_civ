@@ -37,6 +37,8 @@ interface PlayerMode {
 
 type LeaderboardType = 'singolo' | 'team' | 'elo';
 
+const DISCORD_AUTH_URL = 'https://backend.aoeitalia.com:8443/oauth2/authorization/discord';
+
 export function ClassificaPage() {
   const [activeTab, setActiveTab] = useState<LeaderboardType>('elo');
   const [loading, setLoading] = useState(true);
@@ -654,11 +656,40 @@ export function ClassificaPage() {
     <div className="w-full min-h-screen bg-[#000000]">
       {/* Header */}
       <div className="bg-gradient-to-b from-neutral-900 to-transparent pt-8 pb-6 px-6 md:px-20 border-b border-white/10">
-        <div className="flex items-center gap-3 mb-2">
-          <Award size={32} className="text-amber-400" />
-          <h1 className="text-3xl md:text-4xl font-black text-white uppercase tracking-wider">Classifica</h1>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Award size={32} className="text-amber-400" />
+              <h1 className="text-3xl md:text-4xl font-black text-white uppercase tracking-wider">Classifica</h1>
+            </div>
+            <p className="text-gray-400 text-sm md:text-base">Per essere aggiunto, clicca il bottone a destra. Non usare Firefox.
+</p>
+          </div>
+
+          <a
+            href={DISCORD_AUTH_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 rounded-md border border-white/10 bg-[#5865F2] px-4 py-3 font-semibold text-white shadow-lg shadow-[#5865F2]/20 transition-transform hover:-translate-y-0.5 hover:bg-[#4752c4]"
+          >
+            <svg
+              data-prefix="fab"
+              data-icon="discord"
+              className="svg-inline--fa fa-discord"
+              role="img"
+              viewBox="0 0 576 512"
+              aria-hidden="true"
+              width="18"
+              height="18"
+            >
+              <path
+                fill="currentColor"
+                d="M492.5 69.8c-.2-.3-.4-.6-.8-.7-38.1-17.5-78.4-30-119.7-37.1-.4-.1-.8 0-1.1 .1s-.6 .4-.8 .8c-5.5 9.9-10.5 20.2-14.9 30.6-44.6-6.8-89.9-6.8-134.4 0-4.5-10.5-9.5-20.7-15.1-30.6-.2-.3-.5-.6-.8-.8s-.7-.2-1.1-.2c-41.3 7.1-81.6 19.6-119.7 37.1-.3 .1-.6 .4-.8 .7-76.2 113.8-97.1 224.9-86.9 334.5 0 .3 .1 .5 .2 .8s.3 .4 .5 .6c44.4 32.9 94 58 146.8 74.2 .4 .1 .8 .1 1.1 0s.7-.4 .9-.7c11.3-15.4 21.4-31.8 30-48.8 .1-.2 .2-.5 .2-.8s0-.5-.1-.8-.2-.5-.4-.6-.4-.3-.7-.4c-15.8-6.1-31.2-13.4-45.9-21.9-.3-.2-.5-.4-.7-.6s-.3-.6-.3-.9 0-.6 .2-.9 .3-.5 .6-.7c3.1-2.3 6.2-4.7 9.1-7.1 .3-.2 .6-.4 .9-.4s.7 0 1 .1c96.2 43.9 200.4 43.9 295.5 0 .3-.1 .7-.2 1-.2s.7 .2 .9 .4c2.9 2.4 6 4.9 9.1 7.2 .2 .2 .4 .4 .6 .7s.2 .6 .2 .9-.1 .6-.3 .9-.4 .5-.6 .6c-14.7 8.6-30 15.9-45.9 21.8-.2 .1-.5 .2-.7 .4s-.3 .4-.4 .7-.1 .5-.1 .8 .1 .5 .2 .8c8.8 17 18.8 33.3 30 48.8 .2 .3 .6 .6 .9 .7s.8 .1 1.1 0c52.9-16.2 102.6-41.3 147.1-74.2 .2-.2 .4-.4 .5-.6s.2-.5 .2-.8c12.3-126.8-20.5-236.9-86.9-334.5zm-302 267.7c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.4 59.2-52.8 59.2zm195.4 0c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.2 59.2-52.8 59.2z"
+              ></path>
+            </svg>
+            Iscriviti alle Classifiche
+          </a>
         </div>
-        <p className="text-gray-400 text-sm md:text-base">AoeItalia.com</p>
       </div>
 
       {/* Tabs */}
