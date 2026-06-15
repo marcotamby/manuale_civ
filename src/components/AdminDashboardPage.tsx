@@ -2605,7 +2605,9 @@ export default function AdminDashboardPage() {
 
       {/* Sidebar di Navigazione Dashboard */}
       <aside className={`fixed inset-y-0 left-0 w-64 bg-[#080b16] border-r border-cyan-500/15 flex flex-col shrink-0 z-50 transform md:translate-x-0 md:static md:flex transition-transform duration-300 ease-in-out ${
-        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        isMobileMenuOpen 
+          ? 'translate-x-0 pointer-events-auto' 
+          : '-translate-x-full pointer-events-none md:translate-x-0 md:pointer-events-auto'
       }`}>
         <div className="p-6 border-b border-white/5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
