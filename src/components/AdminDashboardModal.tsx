@@ -1254,20 +1254,36 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                         </div>
                       </div>
                       
-                      <button
-                        onClick={() => handleSheepRefill(p.email, perUserRefillAmounts[p.email] ?? 100)}
-                        disabled={isRefilling === p.email}
-                        className="w-full flex items-center justify-center gap-2 py-3 bg-cyan-500/10 text-cyan-400 rounded-xl text-xs font-black border border-cyan-500/20 hover:bg-cyan-500/20 transition-all uppercase tracking-widest active:scale-95 group/btn"
-                      >
-                        {isRefilling === p.email ? (
-                          <Loader2 size={16} className="animate-spin" />
-                        ) : (
-                          <>
-                            <Zap size={14} className="group-hover/btn:fill-cyan-400 transition-all" />
-                            <span>Ricarica +{perUserRefillAmounts[p.email] ?? 100}</span>
-                          </>
-                        )}
-                      </button>
+                      <div className="flex gap-2 w-full">
+                        <button
+                          onClick={() => handleSheepRefill(p.email, Math.abs(perUserRefillAmounts[p.email] ?? 100))}
+                          disabled={isRefilling === p.email}
+                          className="flex-1 flex items-center justify-center gap-1.5 py-3 bg-emerald-600/20 hover:bg-emerald-600 border border-emerald-500/30 text-emerald-400 hover:text-white rounded-xl text-xs font-black transition-all uppercase tracking-wider active:scale-95 disabled:opacity-40 cursor-pointer group/btn"
+                        >
+                          {isRefilling === p.email ? (
+                            <Loader2 size={14} className="animate-spin" />
+                          ) : (
+                            <>
+                              <Plus size={12} className="group-hover/btn:scale-125 transition-all" />
+                              <span>Aggiungi</span>
+                            </>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => handleSheepRefill(p.email, -Math.abs(perUserRefillAmounts[p.email] ?? 100))}
+                          disabled={isRefilling === p.email}
+                          className="flex-1 flex items-center justify-center gap-1.5 py-3 bg-red-600/20 hover:bg-red-600 border border-red-500/30 text-red-400 hover:text-white rounded-xl text-xs font-black transition-all uppercase tracking-wider active:scale-95 disabled:opacity-40 cursor-pointer group/btn"
+                        >
+                          {isRefilling === p.email ? (
+                            <Loader2 size={14} className="animate-spin" />
+                          ) : (
+                            <>
+                              <Minus size={12} className="group-hover/btn:scale-125 transition-all" />
+                              <span>Sottrai</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}

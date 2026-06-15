@@ -3727,20 +3727,38 @@ export default function AdminDashboardPage() {
                           </button>
                         </div>
                         
-                        <button
-                          onClick={() => handleSheepRefill(p.email, perUserRefillAmounts[p.email] ?? 100)}
-                          disabled={isRefilling === p.email}
-                          className="px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white rounded-xl text-xs font-black border-0 shadow-md transition-all uppercase tracking-widest active:scale-95 disabled:opacity-40 flex items-center gap-1 group/btn min-w-[110px] sm:min-w-[125px] justify-center"
-                        >
-                          {isRefilling === p.email ? (
-                            <Loader2 size={14} className="animate-spin" />
-                          ) : (
-                            <>
-                              <Zap size={12} className="group-hover/btn:fill-cyan-400 transition-all animate-pulse" />
-                              <span>Ricarica</span>
-                            </>
-                          )}
-                        </button>
+                          <div className="flex gap-2 shrink-0">
+                            <button
+                              onClick={() => handleSheepRefill(p.email, Math.abs(perUserRefillAmounts[p.email] ?? 100))}
+                              disabled={isRefilling === p.email}
+                              className="px-3 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-[10px] font-black border-0 shadow-md transition-all uppercase tracking-wider active:scale-95 disabled:opacity-40 flex items-center gap-1 group/btn min-w-[85px] justify-center cursor-pointer"
+                              title="Aggiungi pecore"
+                            >
+                              {isRefilling === p.email ? (
+                                <Loader2 size={12} className="animate-spin" />
+                              ) : (
+                                <>
+                                  <Plus size={10} className="group-hover/btn:scale-125 transition-all" />
+                                  <span>Aggiungi</span>
+                                </>
+                              )}
+                            </button>
+                            <button
+                              onClick={() => handleSheepRefill(p.email, -Math.abs(perUserRefillAmounts[p.email] ?? 100))}
+                              disabled={isRefilling === p.email}
+                              className="px-3 py-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl text-[10px] font-black border-0 shadow-md transition-all uppercase tracking-wider active:scale-95 disabled:opacity-40 flex items-center gap-1 group/btn min-w-[85px] justify-center cursor-pointer"
+                              title="Sottrai pecore"
+                            >
+                              {isRefilling === p.email ? (
+                                <Loader2 size={12} className="animate-spin" />
+                              ) : (
+                                <>
+                                  <Minus size={10} className="group-hover/btn:scale-125 transition-all" />
+                                  <span>Sottrai</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
                       </div>
                     </div>
                   ))}
@@ -6031,18 +6049,25 @@ export default function AdminDashboardPage() {
                                 <Plus size={12} />
                               </button>
                             </div>
-                            <div className="flex gap-2 w-full xs:w-auto flex-1">
+                            <div className="flex gap-1.5 w-full xs:w-auto flex-1 flex-wrap">
                               <button
                                 disabled={crmSheepAmount === '' || !isAdmin || (isSuperAdminEmail(selectedCrmUser.email) && !isSuperAdmin)}
-                                onClick={() => handleCrmAdjustSheep(selectedCrmUser.email, Number(crmSheepAmount))}
-                                className="flex-1 py-2 px-3 bg-cyan-600/20 hover:bg-cyan-600 border border-cyan-500/30 text-cyan-400 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider disabled:opacity-30 disabled:pointer-events-none transition-all text-center"
+                                onClick={() => handleCrmAdjustSheep(selectedCrmUser.email, Math.abs(Number(crmSheepAmount)))}
+                                className="flex-1 py-2 px-2 bg-emerald-600/20 hover:bg-emerald-600 border border-emerald-500/30 text-emerald-400 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-wider disabled:opacity-30 disabled:pointer-events-none transition-all text-center min-w-[70px]"
                               >
                                 Aggiungi
                               </button>
                               <button
                                 disabled={crmSheepAmount === '' || !isAdmin || (isSuperAdminEmail(selectedCrmUser.email) && !isSuperAdmin)}
+                                onClick={() => handleCrmAdjustSheep(selectedCrmUser.email, -Math.abs(Number(crmSheepAmount)))}
+                                className="flex-1 py-2 px-2 bg-red-600/20 hover:bg-red-600 border border-red-500/30 text-red-400 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-wider disabled:opacity-30 disabled:pointer-events-none transition-all text-center min-w-[70px]"
+                              >
+                                Sottrai
+                              </button>
+                              <button
+                                disabled={crmSheepAmount === '' || !isAdmin || (isSuperAdminEmail(selectedCrmUser.email) && !isSuperAdmin)}
                                 onClick={() => handleCrmAdjustSheep(selectedCrmUser.email, Number(crmSheepAmount), true)}
-                                className="flex-1 py-2 px-3 bg-cyan-600/10 hover:bg-cyan-600 border border-cyan-500/15 text-cyan-400 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider disabled:opacity-30 disabled:pointer-events-none transition-all text-center"
+                                className="flex-1 py-2 px-2 bg-cyan-600/10 hover:bg-cyan-600 border border-cyan-500/15 text-cyan-400 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-wider disabled:opacity-30 disabled:pointer-events-none transition-all text-center min-w-[70px]"
                               >
                                 Imposta
                               </button>
