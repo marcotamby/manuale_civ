@@ -119,13 +119,28 @@ export function TournamentDetail() {
     loadTournament();
   }, [slug]);
 
-  // Auto-redirect for Challonge only (to preserve legacy behavior)
+  // Auto-redirect for Challonge and local tournaments
   useEffect(() => {
+    if (loading) return;
     const isChallonge = source === 'challonge' || tournament?.db?.source === 'challonge';
-    if (!loading && !selectedPhase && tournament?.db?.direct_link && isChallonge) {
+    if (!selectedPhase && tournament?.db?.direct_link && isChallonge) {
       window.location.replace(tournament.db.direct_link);
+      return;
     }
-  }, [loading, selectedPhase, tournament, source]);
+    
+    // Redirect local tournaments that don't have brackets
+    const hasSyncLink = !!(
+      tournament?.db?.direct_link && 
+      (tournament.db.direct_link.toLowerCase().includes('start.gg') || tournament.db.direct_link.toLowerCase().includes('challonge.com'))
+    );
+    if (!selectedPhase && !hasSyncLink && tournament?.db) {
+      if (tournament.db.has_regolamento) {
+        navigate(`/tornei/${slug}/regolamento`, { replace: true });
+      } else {
+        navigate('/tornei', { replace: true });
+      }
+    }
+  }, [loading, selectedPhase, tournament, source, slug, navigate]);
 
   if (loading) {
     return (

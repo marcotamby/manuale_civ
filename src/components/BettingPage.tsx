@@ -51,6 +51,9 @@ export function BettingPage() {
   const [totalStats, setTotalStats] = useState({ count: 0, sheep: 0, pastori: 0 });
   const [filterCategory, setFilterCategory] = useState('all');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [isCustomType, setIsCustomType] = useState(false);
+  const [profileNicknames, setProfileNicknames] = useState<string[]>([]);
+  const [existingOptionsLabels, setExistingOptionsLabels] = useState<string[]>([]);
   const [adminForm, setAdminForm] = useState({
     title: '',
     description: '',
@@ -62,6 +65,28 @@ export function BettingPage() {
   });
 
   const cleanSlug = (slug || '').split('?')[0].trim().replace(/\/$/, '');
+
+  const resetAdminForm = () => {
+    setEditingMarketId(null);
+    setIsCustomType(false);
+    setAdminForm({
+      title: '',
+      description: '',
+      type: 'Match Winner',
+      eventLevel: 'High Elo',
+      teamA: '',
+      teamB: '',
+      options: [{ label: '', weight: 100, is_disabled: false }, { label: '', weight: 100, is_disabled: false }]
+    });
+  };
+
+  const allParticipants = Array.from(
+    new Set([
+      ...Object.values(participantsByLevel).flat(),
+      ...existingOptionsLabels,
+      ...profileNicknames
+    ])
+  ).filter(Boolean).sort();
 
   useEffect(() => {
     loadData();
@@ -150,6 +175,38 @@ export function BettingPage() {
       console.log('📊 Markets found:', marketData?.length || 0, marketData);
       
       setMarkets(marketData || []);
+
+      // Load all profile nicknames for autocomplete/datalist
+      try {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('nickname')
+          .not('nickname', 'is', null);
+        if (profiles) {
+          setProfileNicknames(profiles.map((p: any) => p.nickname).filter(Boolean));
+        }
+      } catch (err) {
+        console.warn("Could not fetch profile nicknames for datalist:", err);
+      }
+
+      // Load existing option labels for autocomplete
+      if (marketData) {
+        const labels: string[] = [];
+        marketData.forEach(m => {
+          m.options?.forEach((o: any) => {
+            if (o.label) {
+              if (o.label.includes('(') && o.label.includes(' vs ') && o.label.includes(')')) {
+                const parts = o.label.split('(')[1].split(')')[0].split(' vs ');
+                if (parts[0]) labels.push(parts[0].trim());
+                if (parts[1]) labels.push(parts[1].trim());
+              } else {
+                labels.push(o.label.trim());
+              }
+            }
+          });
+        });
+        setExistingOptionsLabels(labels);
+      }
 
       let finalUserEmail = user?.email;
       if (!finalUserEmail) {
@@ -645,16 +702,7 @@ export function BettingPage() {
                 </h2>
                 <button onClick={() => {
                   setShowAdminTools(false);
-                  setEditingMarketId(null);
-                  setAdminForm({
-                    title: '',
-                    description: '',
-                    type: 'Match Winner',
-                    eventLevel: 'High Elo',
-                    teamA: '',
-                    teamB: '',
-                    options: [{ label: '', weight: 100 }]
-                  });
+                  resetAdminForm();
                 }} className="text-gray-500 hover:text-white transition-colors ml-4">
                   <X size={24} />
                 </button>
@@ -669,33 +717,61 @@ export function BettingPage() {
                   <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Tipo di Scommessa</label>
                   <div className="relative">
                     <select 
-                      value={adminForm.type}
+                      value={isCustomType ? 'Custom' : adminForm.type}
                       onChange={(e) => {
                         const type = e.target.value;
-                        let newOpts = [{ label: '', weight: 100 }, { label: '', weight: 100 }];
-                        if (type === 'Tournament Winner') newOpts = [{ label: 'Team 1', weight: 100 }, { label: 'Team 2', weight: 100 }, { label: 'Team 3', weight: 100 }];
-                        setAdminForm({...adminForm, type, options: (newOpts as any)});
+                        if (type === 'Custom') {
+                          setIsCustomType(true);
+                          setAdminForm({...adminForm, type: '', options: [{ label: '', weight: 100 }, { label: '', weight: 100 }]});
+                        } else {
+                          setIsCustomType(false);
+                          let newOpts = [{ label: '', weight: 100 }, { label: '', weight: 100 }];
+                          if (type === 'Tournament Winner') newOpts = [{ label: 'Team 1', weight: 100 }, { label: 'Team 2', weight: 100 }, { label: 'Team 3', weight: 100 }];
+                          setAdminForm({...adminForm, type, options: (newOpts as any)});
+                        }
                       }}
                       className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-cyan-500 transition-all appearance-none cursor-pointer"
                     >
-                      <option value="Tournament Winner" className="bg-[#111218]">Vincitore Torneo</option>
                       <option value="Match Winner" className="bg-[#111218]">Vincitore Match</option>
                       <option value="Final Score" className="bg-[#111218]">Punteggio Finale Match</option>
+                      <option value="Tournament Winner" className="bg-[#111218]">Vincitore Torneo</option>
+                      <option value="Custom" className="bg-[#111218]">Altro... (Personalizzato)</option>
                     </select>
                     <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-cyan-400 pointer-events-none" size={20} />
                   </div>
+                  {isCustomType && (
+                    <div className="mt-4">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase mb-2 block tracking-widest">Specifica Tipo Scommessa Personalizzato</label>
+                      <input 
+                        type="text" 
+                        value={adminForm.type}
+                        onChange={(e) => setAdminForm({...adminForm, type: e.target.value})}
+                        placeholder="Es: Draft Coach, Livello Civ, ecc."
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 placeholder:text-white/20"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div>
                   <label className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-[0.2em] mb-3">Livello Evento</label>
-                  <div className="flex gap-2">
-                    {['High Elo', 'Low Elo'].map(lvl => (
+                  <input
+                    type="text"
+                    list="levels-list"
+                    value={adminForm.eventLevel}
+                    onChange={(e) => setAdminForm({...adminForm, eventLevel: e.target.value})}
+                    placeholder="Es: High Elo, Low Elo, Esploratori, Lancieri..."
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-cyan-500 transition-all placeholder:text-white/20"
+                  />
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {['High Elo', 'Low Elo', 'Esploratori', 'Lancieri'].map(lvl => (
                       <button
                         key={lvl}
+                        type="button"
                         onClick={() => setAdminForm({...adminForm, eventLevel: lvl})}
                         className={clsx(
-                          "flex-1 py-3 rounded-xl border transition-all font-black text-[10px] uppercase tracking-widest",
-                          adminForm.eventLevel === lvl ? "bg-cyan-500 border-cyan-400 text-black shadow-[0_0_15px_rgba(6,182,212,0.3)]" : "bg-white/5 border-white/10 text-gray-500"
+                          "flex-grow py-2 px-3 rounded-lg border transition-all font-black text-[9px] uppercase tracking-widest min-w-[70px]",
+                          adminForm.eventLevel === lvl ? "bg-cyan-500 border-cyan-400 text-black shadow-[0_0_10px_rgba(6,182,212,0.2)]" : "bg-white/5 border-white/10 text-gray-500 hover:text-white"
                         )}
                       >
                         {lvl}
@@ -708,32 +784,26 @@ export function BettingPage() {
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-[10px] font-bold text-gray-500 uppercase mb-2 block tracking-widest">Team A</label>
-                        <div className="relative">
-                          <select 
-                            value={adminForm.teamA}
-                            onChange={(e) => setAdminForm({...adminForm, teamA: e.target.value})}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 appearance-none cursor-pointer"
-                          >
-                            <option value="" className="bg-[#111218] text-white/50">Seleziona Team</option>
-                            {(participantsByLevel[adminForm.eventLevel] || []).map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
-                          </select>
-                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/50 pointer-events-none" size={16} />
-                        </div>
+                        <label className="text-[10px] font-bold text-gray-500 uppercase mb-2 block tracking-widest">Team A / Giocatore A</label>
+                        <input 
+                          type="text"
+                          list="all-participants-list"
+                          value={adminForm.teamA}
+                          onChange={(e) => setAdminForm({...adminForm, teamA: e.target.value})}
+                          placeholder="Scrivi o seleziona"
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 transition-all placeholder:text-white/20"
+                        />
                       </div>
                       <div>
-                        <label className="text-[10px] font-bold text-gray-500 uppercase mb-2 block tracking-widest">Team B</label>
-                        <div className="relative">
-                          <select 
-                            value={adminForm.teamB}
-                            onChange={(e) => setAdminForm({...adminForm, teamB: e.target.value})}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 appearance-none cursor-pointer"
-                          >
-                            <option value="" className="bg-[#111218] text-white/50">Seleziona Team</option>
-                            {(participantsByLevel[adminForm.eventLevel] || []).map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
-                          </select>
-                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/50 pointer-events-none" size={16} />
-                        </div>
+                        <label className="text-[10px] font-bold text-gray-500 uppercase mb-2 block tracking-widest">Team B / Giocatore B</label>
+                        <input 
+                          type="text"
+                          list="all-participants-list"
+                          value={adminForm.teamB}
+                          onChange={(e) => setAdminForm({...adminForm, teamB: e.target.value})}
+                          placeholder="Scrivi o seleziona"
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 transition-all placeholder:text-white/20"
+                        />
                       </div>
                     </div>
                   </>
@@ -905,22 +975,22 @@ export function BettingPage() {
                           <div key={idx} className="bg-white/[0.02] border border-white/5 rounded-xl p-3 space-y-3">
                             <div className="flex gap-2">
                               <div className="relative flex-grow">
-                                <select 
+                                <input 
+                                  type="text"
+                                  list="all-participants-list"
                                   value={opt.label}
                                   onChange={(e) => {
                                     const newOpts = [...adminForm.options];
                                     newOpts[idx] = { ...newOpts[idx], label: e.target.value };
                                     setAdminForm({...adminForm, options: newOpts});
                                   }}
-                                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 appearance-none cursor-pointer"
-                                >
-                                  <option value="" className="bg-[#111218] text-white/50">Seleziona Team</option>
-                                  {(participantsByLevel[adminForm.eventLevel] || []).map(p => <option key={p} value={p} className="bg-[#111218]">{p}</option>)}
-                                </select>
-                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/50 pointer-events-none" size={16} />
+                                  placeholder="Scrivi o seleziona opzione"
+                                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 transition-all placeholder:text-white/20"
+                                />
                               </div>
                               {adminForm.options.length > 2 && (
                                 <button 
+                                  type="button"
                                   onClick={() => setAdminForm({...adminForm, options: adminForm.options.filter((_, i) => i !== idx)})}
                                   className="p-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors"
                                 >
@@ -959,6 +1029,7 @@ export function BettingPage() {
                             <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/5">
                                <label className="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex-1">Status Opzione:</label>
                                <button
+                                 type="button"
                                  onClick={() => {
                                    const newOpts = [...adminForm.options];
                                    newOpts[idx] = { ...newOpts[idx], is_disabled: !newOpts[idx]?.is_disabled };
@@ -979,12 +1050,13 @@ export function BettingPage() {
                       </div>
                     )}
                     
-                    {adminForm.type === 'Tournament Winner' && (
+                    {(adminForm.type === 'Tournament Winner' || (adminForm.type !== 'Match Winner' && adminForm.type !== 'Final Score')) && (
                       <button 
+                        type="button"
                         onClick={() => setAdminForm({...adminForm, options: [...adminForm.options, { label: '', weight: 100 }]})}
                         className="w-full py-3 border-2 border-dashed border-white/10 rounded-xl text-gray-500 hover:border-cyan-500/50 hover:text-cyan-500 transition-all text-[10px] font-black uppercase tracking-widest"
                       >
-                        + Aggiungi Team
+                        + Aggiungi Opzione
                       </button>
                     )}
                   </div>
@@ -1090,7 +1162,7 @@ export function BettingPage() {
               <h3 className="text-xl font-bold text-white mb-6 uppercase tracking-tighter">Nessuna Scommessa Aperta</h3>
               {canManageTournaments && (
                 <button 
-                  onClick={() => setShowAdminTools(true)}
+                  onClick={() => { resetAdminForm(); setShowAdminTools(true); }}
                   className="px-8 py-4 bg-gradient-to-b from-slate-200 to-slate-400 hover:from-white hover:to-slate-300 text-slate-900 font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl active:scale-95 flex items-center gap-3 border border-white/20"
                 >
                   <Plus size={20} strokeWidth={3} /> Crea Mercato
@@ -1102,7 +1174,7 @@ export function BettingPage() {
                 {canManageTournaments && !showAdminTools && (
                   <div className="flex justify-end mb-4">
                     <button 
-                      onClick={() => setShowAdminTools(true)}
+                      onClick={() => { resetAdminForm(); setShowAdminTools(true); }}
                       className="w-full md:w-auto px-6 py-3.5 bg-gradient-to-b from-slate-200 to-slate-400 hover:from-white hover:to-slate-300 text-slate-900 font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 border border-white/20"
                     >
                       <Plus size={16} strokeWidth={3} /> Nuova Scommessa
@@ -1190,6 +1262,8 @@ export function BettingPage() {
                                onClick={() => {
                                  window.scrollTo({ top: 0, behavior: 'smooth' });
                                  setEditingMarketId(market.id);
+                                 const isCustom = !['Match Winner', 'Final Score', 'Tournament Winner'].includes(market.type);
+                                 setIsCustomType(isCustom);
                                  setAdminForm({
                                    title: market.title,
                                    description: market.description || '',
@@ -1505,6 +1579,19 @@ export function BettingPage() {
           </div>
         </div>
       )}
+
+      {/* Autocomplete Datalists */}
+      <datalist id="levels-list">
+        <option value="High Elo" />
+        <option value="Low Elo" />
+        <option value="Esploratori" />
+        <option value="Lancieri" />
+      </datalist>
+      <datalist id="all-participants-list">
+        {allParticipants.map(p => (
+          <option key={p} value={p} />
+        ))}
+      </datalist>
     </div>
   );
 }

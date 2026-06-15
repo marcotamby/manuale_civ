@@ -122,10 +122,12 @@ function SortableTournamentCard({
         )}
       >
         {(() => {
-          const isExternal = t.config?.directLink && 
-            !t.config.directLink.includes('start.gg/') && 
-            !t.config.directLink.includes('challonge.com/');
-          const canRenderInternal = !isExternal && (
+          const hasSyncLink = !!(
+            t.config?.directLink && 
+            (t.config.directLink.includes('start.gg/') || t.config.directLink.includes('challonge.com/'))
+          );
+          const isExternal = t.config?.directLink && !hasSyncLink;
+          const canRenderInternal = hasSyncLink && !isExternal && (
             (t.events?.length > 0) || 
             (t.config?.source === 'challonge' && t.slug && !t.config.slug.startsWith('tb-'))
           );
@@ -402,12 +404,14 @@ function SortableTournamentCard({
                 </Link>
               )}
               {(() => {
-                const isExternal = t.config?.directLink && 
-                  !t.config.directLink.includes('start.gg/') && 
-                  !t.config.directLink.includes('challonge.com/');
+                const hasSyncLink = !!(
+                  t.config?.directLink && 
+                  (t.config.directLink.includes('start.gg/') || t.config.directLink.includes('challonge.com/'))
+                );
+                const isExternal = t.config?.directLink && !hasSyncLink;
                 const hasEvents = t.events && t.events.length > 0;
-                const isChallongeWithSlug = !isExternal && t.config.source === 'challonge' && t.slug && !t.config.slug.startsWith('tb-');
-                const isStartGGWithEvents = !isExternal && t.config.source === 'startgg' && (hasEvents || (t.slug && t.slug.startsWith('tournament/')));
+                const isChallongeWithSlug = hasSyncLink && !isExternal && t.config.source === 'challonge' && t.slug && !t.config.slug.startsWith('tb-');
+                const isStartGGWithEvents = hasSyncLink && !isExternal && t.config.source === 'startgg' && (hasEvents || (t.slug && t.slug.startsWith('tournament/')));
                 
                 const commonClasses = clsx(
                   "flex-grow h-full bg-white/5 hover:bg-white/10 rounded-2xl text-white font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/det shadow-lg active:scale-95",
@@ -646,11 +650,17 @@ export function TournamentsPage() {
             } as any;
           }
 
+          const hasSyncLink = !!(
+            config.directLink && 
+            (config.directLink.includes('start.gg/') || config.directLink.includes('challonge.com/'))
+          );
           let tournamentData: any = null;
-          if (config.source === 'startgg') {
-            tournamentData = await fetchTournament(config.slug);
-          } else if (config.source === 'challonge' && !config.slug.startsWith('tb-')) {
-            tournamentData = await fetchChallongeTournament(config.slug);
+          if (hasSyncLink) {
+            if (config.source === 'startgg') {
+              tournamentData = await fetchTournament(config.slug);
+            } else if (config.source === 'challonge' && !config.slug.startsWith('tb-')) {
+              tournamentData = await fetchChallongeTournament(config.slug);
+            }
           }
 
           if (tournamentData) {
