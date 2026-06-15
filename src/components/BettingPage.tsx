@@ -733,8 +733,8 @@ export function BettingPage() {
                             if (newOpts.length < 3) {
                               newOpts = [
                                 ...newOpts,
-                                ...Array(3 - newOpts.length).fill(null).map((_, idx) => ({
-                                  label: `Giocatore ${newOpts.length + idx + 1}`,
+                                ...Array(3 - newOpts.length).fill(null).map(() => ({
+                                  label: '',
                                   weight: 100
                                 }))
                               ];
