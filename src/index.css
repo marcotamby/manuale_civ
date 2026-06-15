@@ -311,3 +311,9 @@ html, body, .elegant-scrollbar {
   0% { filter: hue-rotate(0deg); }
   100% { filter: hue-rotate(360deg); }
 }
+
+/* Hide the default browser datalist arrow picker indicator on text inputs */
+input::-webkit-calendar-picker-indicator {
+  display: none !important;
+  -webkit-appearance: none;
+}

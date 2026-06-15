@@ -6,6 +6,7 @@ import { useParams, useLocation, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { fetchTournament } from '../services/startgg';
+import { fetchChallongeData } from '../services/challonge';
 import { Loader2, ArrowLeft, ArrowRight, Trophy, Users, AlertCircle, Plus, X, Zap, ChevronDown, Trash2, Edit2, Filter, Check } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import clsx from 'clsx';
@@ -52,13 +53,11 @@ export function BettingPage() {
   const [filterCategory, setFilterCategory] = useState('all');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [isCustomType, setIsCustomType] = useState(false);
-  const [profileNicknames, setProfileNicknames] = useState<string[]>([]);
-  const [existingOptionsLabels, setExistingOptionsLabels] = useState<string[]>([]);
   const [adminForm, setAdminForm] = useState({
     title: '',
     description: '',
     type: 'Match Winner',
-    eventLevel: 'High Elo',
+    eventLevel: '',
     teamA: '',
     teamB: '',
     options: [{ label: '', weight: 100, is_disabled: false }] as any[]
@@ -73,7 +72,7 @@ export function BettingPage() {
       title: '',
       description: '',
       type: 'Match Winner',
-      eventLevel: 'High Elo',
+      eventLevel: '',
       teamA: '',
       teamB: '',
       options: [{ label: '', weight: 100, is_disabled: false }, { label: '', weight: 100, is_disabled: false }]
@@ -82,9 +81,7 @@ export function BettingPage() {
 
   const allParticipants = Array.from(
     new Set([
-      ...Object.values(participantsByLevel).flat(),
-      ...existingOptionsLabels,
-      ...profileNicknames
+      ...Object.values(participantsByLevel).flat()
     ])
   ).filter(Boolean).sort();
 
@@ -130,35 +127,51 @@ export function BettingPage() {
         
       setTournament(tourney);
 
-      // Fetch participants for admin tools
+      // Fetch participants for admin tools from start.gg or Challonge
       try {
+        const activeSource = tourney?.source || 'startgg';
         const startggSlug = tourney?.slug || (window.location.pathname.includes('/tournament/') ? `tournament/${cleanSlug}` : cleanSlug);
-        const startggData = await fetchTournament(startggSlug);
-        if (startggData?.events) {
-          const mapping: { [level: string]: string[] } = { 'High Elo': [], 'Low Elo': [] };
-          startggData.events.forEach((e: any) => {
-            const eventName = e.name.toLowerCase();
-            let level = '';
-            if (eventName.includes('high')) level = 'High Elo';
-            else if (eventName.includes('low')) level = 'Low Elo';
-            
-            if (level && e.entrants?.nodes) {
-              e.entrants.nodes.forEach((n: any) => {
-                if (!mapping[level].includes(n.name)) mapping[level].push(n.name);
-              });
-            } else if (!level && e.entrants?.nodes) {
-              // Fallback: if no level in name, add to both if empty or handle as generic
-              e.entrants.nodes.forEach((n: any) => {
-                if (!mapping['High Elo'].includes(n.name)) mapping['High Elo'].push(n.name);
-                if (!mapping['Low Elo'].includes(n.name)) mapping['Low Elo'].push(n.name);
-              });
-            }
-          });
-          setParticipantsByLevel({
-            'High Elo': mapping['High Elo'].sort(),
-            'Low Elo': mapping['Low Elo'].sort()
-          });
+        
+        const mapping: { [level: string]: string[] } = { 'High Elo': [], 'Low Elo': [] };
+        
+        if (activeSource === 'challonge') {
+          const challongeData = await fetchChallongeData(cleanSlug);
+          if (challongeData?.participants) {
+            challongeData.participants.forEach((p: any) => {
+              const pName = p.attributes?.name || p.name;
+              if (pName) {
+                if (!mapping['High Elo'].includes(pName)) mapping['High Elo'].push(pName);
+                if (!mapping['Low Elo'].includes(pName)) mapping['Low Elo'].push(pName);
+              }
+            });
+          }
+        } else {
+          const startggData = await fetchTournament(startggSlug);
+          if (startggData?.events) {
+            startggData.events.forEach((e: any) => {
+              const eventName = e.name.toLowerCase();
+              let level = '';
+              if (eventName.includes('high')) level = 'High Elo';
+              else if (eventName.includes('low')) level = 'Low Elo';
+              
+              if (level && e.entrants?.nodes) {
+                e.entrants.nodes.forEach((n: any) => {
+                  if (!mapping[level].includes(n.name)) mapping[level].push(n.name);
+                });
+              } else if (!level && e.entrants?.nodes) {
+                e.entrants.nodes.forEach((n: any) => {
+                  if (!mapping['High Elo'].includes(n.name)) mapping['High Elo'].push(n.name);
+                  if (!mapping['Low Elo'].includes(n.name)) mapping['Low Elo'].push(n.name);
+                });
+              }
+            });
+          }
         }
+        
+        setParticipantsByLevel({
+          'High Elo': mapping['High Elo'].sort(),
+          'Low Elo': mapping['Low Elo'].sort()
+        });
       } catch (e) {
         console.warn("Could not fetch entrants for dropdowns", e);
       }
@@ -175,38 +188,6 @@ export function BettingPage() {
       console.log('📊 Markets found:', marketData?.length || 0, marketData);
       
       setMarkets(marketData || []);
-
-      // Load all profile nicknames for autocomplete/datalist
-      try {
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('nickname')
-          .not('nickname', 'is', null);
-        if (profiles) {
-          setProfileNicknames(profiles.map((p: any) => p.nickname).filter(Boolean));
-        }
-      } catch (err) {
-        console.warn("Could not fetch profile nicknames for datalist:", err);
-      }
-
-      // Load existing option labels for autocomplete
-      if (marketData) {
-        const labels: string[] = [];
-        marketData.forEach(m => {
-          m.options?.forEach((o: any) => {
-            if (o.label) {
-              if (o.label.includes('(') && o.label.includes(' vs ') && o.label.includes(')')) {
-                const parts = o.label.split('(')[1].split(')')[0].split(' vs ');
-                if (parts[0]) labels.push(parts[0].trim());
-                if (parts[1]) labels.push(parts[1].trim());
-              } else {
-                labels.push(o.label.trim());
-              }
-            }
-          });
-        });
-        setExistingOptionsLabels(labels);
-      }
 
       let finalUserEmail = user?.email;
       if (!finalUserEmail) {
