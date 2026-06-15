@@ -346,7 +346,11 @@ export function TournamentDetail() {
                 
                 {tournament.db?.direct_link ? (
                   <button 
-                    onClick={() => window.open(tournament.db.direct_link, '_blank')}
+                    onClick={() => {
+                      const url = tournament.db.direct_link;
+                      const formatted = url.startsWith('http') ? url : `https://${url}`;
+                      window.open(formatted, '_blank');
+                    }}
                     className="flex items-center justify-center gap-3 w-full py-5 bg-white/5 hover:bg-white/10 rounded-2xl text-white font-black uppercase text-xs tracking-wider transition-all border border-white/10 shadow-lg active:scale-95 group/btn"
                   >
                     {(source === 'challonge' || tournament?.db?.source === 'challonge') ? 'Tabellone' : 'Tabellone su startgg'} <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />

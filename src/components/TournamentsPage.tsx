@@ -127,10 +127,7 @@ function SortableTournamentCard({
             t.config.directLink.includes('start.gg/')
           );
           const isExternal = t.config?.directLink && !hasSyncLink;
-          const canRenderInternal = hasSyncLink && !isExternal && (
-            (t.events?.length > 0) || 
-            (t.config?.source === 'challonge' && t.slug && !t.config.slug.startsWith('tb-'))
-          );
+          const canRenderInternal = hasSyncLink && !isExternal && (t.events?.length > 0);
           const bannerContent = (
             <>
               <img 
@@ -161,9 +158,10 @@ function SortableTournamentCard({
               </Link>
             );
           } else if (t.config.directLink) {
+            const formattedHref = t.config.directLink.startsWith('http') ? t.config.directLink : `https://${t.config.directLink}`;
             return (
               <a 
-                href={t.config.directLink}
+                href={formattedHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="h-48 relative overflow-hidden cursor-pointer block rounded-t-3xl"
@@ -410,7 +408,6 @@ function SortableTournamentCard({
                 );
                 const isExternal = t.config?.directLink && !hasSyncLink;
                 const hasEvents = t.events && t.events.length > 0;
-                const isChallongeWithSlug = hasSyncLink && !isExternal && t.config.source === 'challonge' && t.slug && !t.config.slug.startsWith('tb-');
                 const isStartGGWithEvents = hasSyncLink && !isExternal && t.config.source === 'startgg' && (hasEvents || (t.slug && t.slug.startsWith('tournament/')));
                 
                 const commonClasses = clsx(
@@ -418,7 +415,7 @@ function SortableTournamentCard({
                   t.config.hasRegolamento ? "text-[10px]" : "text-xs"
                 );
 
-                if (isStartGGWithEvents || isChallongeWithSlug) {
+                if (isStartGGWithEvents) {
                   return (
                     <Link to={`/tornei/${t.slug}`} className={commonClasses}>
                       {bracketErrorId === t.id ? (
@@ -431,8 +428,9 @@ function SortableTournamentCard({
                     </Link>
                   );
                 } else if (t.config.directLink) {
+                  const formattedHref = t.config.directLink.startsWith('http') ? t.config.directLink : `https://${t.config.directLink}`;
                   return (
-                    <a href={t.config.directLink} target="_blank" rel="noopener noreferrer" className={commonClasses}>
+                    <a href={formattedHref} target="_blank" rel="noopener noreferrer" className={commonClasses}>
                       <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
                     </a>
                   );
@@ -1049,9 +1047,39 @@ export function TournamentsPage() {
           bannerPositionX: editForm.bannerPositionX,
           bannerPositionY: editForm.bannerPositionY,
           vods: editForm.vods,
-          isArchived: editForm.isArchived
+          isArchived: editForm.isArchived,
+          directLink: editForm.externalUrl || undefined,
+          externalUrl: editForm.externalUrl || undefined
         }
       }) : null);
+
+      setTournaments((prevList: any[]) => prevList.map(t => {
+        if (t.id === editingTournament?.id || t.slug === finalSlug) {
+          return {
+            ...t,
+            name: editForm.name,
+            config: {
+              ...t.config,
+              name: editForm.name,
+              organizer: editForm.organizer,
+              period: editForm.period,
+              bannerUrl: editForm.bannerUrl,
+              status: editForm.status,
+              type: editForm.type,
+              podium: editForm.podium,
+              hasRegolamento: editForm.hasRegolamento,
+              regolamentoContent: editForm.regolamentoContent,
+              bannerPositionX: editForm.bannerPositionX,
+              bannerPositionY: editForm.bannerPositionY,
+              vods: editForm.vods,
+              isArchived: editForm.isArchived,
+              directLink: editForm.externalUrl || undefined,
+              externalUrl: editForm.externalUrl || undefined
+            }
+          };
+        }
+        return t;
+      }));
 
       loadTournaments(true); // Silent refresh to avoid jump
       setTimeout(() => {
