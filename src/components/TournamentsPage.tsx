@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
-import { fetchChallongeTournament, fetchChallongeData } from '../services/challonge';
+import { fetchChallongeTournament } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
 import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink, MoveVertical, Youtube, Trophy, GripVertical, Archive } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -124,7 +124,7 @@ function SortableTournamentCard({
         {(() => {
           const hasSyncLink = !!(
             t.config?.directLink && 
-            (t.config.directLink.includes('start.gg/') || t.config.directLink.includes('challonge.com/'))
+            t.config.directLink.includes('start.gg/')
           );
           const isExternal = t.config?.directLink && !hasSyncLink;
           const canRenderInternal = hasSyncLink && !isExternal && (
@@ -406,7 +406,7 @@ function SortableTournamentCard({
               {(() => {
                 const hasSyncLink = !!(
                   t.config?.directLink && 
-                  (t.config.directLink.includes('start.gg/') || t.config.directLink.includes('challonge.com/'))
+                  t.config.directLink.includes('start.gg/')
                 );
                 const isExternal = t.config?.directLink && !hasSyncLink;
                 const hasEvents = t.events && t.events.length > 0;
@@ -652,7 +652,7 @@ export function TournamentsPage() {
 
           const hasSyncLink = !!(
             config.directLink && 
-            (config.directLink.includes('start.gg/') || config.directLink.includes('challonge.com/'))
+            config.directLink.includes('start.gg/')
           );
           let tournamentData: any = null;
           if (hasSyncLink) {
@@ -900,37 +900,13 @@ export function TournamentsPage() {
           setTimeout(() => setSyncStatus('idle'), 3000);
         }
       } else if (source === 'challonge') {
-        const [data, detailData] = await Promise.all([
-          fetchChallongeTournament(slug),
-          fetchChallongeData(slug)
-        ]);
-        
-        if (data) {
-          let podiumData = editForm.podium;
-          if (detailData?.participants) {
-            // Map participants with final_rank 1, 2, 3 to podium format
-            const winners = detailData.participants
-              .filter((p: any) => p.attributes.final_rank && p.attributes.final_rank <= 3)
-              .sort((a: any, b: any) => (a.attributes.final_rank || 99) - (b.attributes.final_rank || 99))
-              .map((p: any) => ({
-                entrant: { name: p.attributes.name },
-                placement: p.attributes.final_rank
-              }));
-            
-            if (winners.length > 0) {
-              podiumData = winners;
-            }
-          }
-
-          setEditForm(prev => ({
-            ...prev,
-            name: data.attributes?.name || prev.name,
-            podium: podiumData,
-            externalUrl: url
-          }));
-          setSyncStatus('synced');
-          setTimeout(() => setSyncStatus('idle'), 3000);
-        }
+        setEditForm(prev => ({
+          ...prev,
+          externalUrl: url
+        }));
+        setSyncStatus('synced');
+        toast.success('Challonge registrato come link esterno.');
+        setTimeout(() => setSyncStatus('idle'), 3000);
       }
     } catch (err: any) {
       console.error('Sync error:', err);
