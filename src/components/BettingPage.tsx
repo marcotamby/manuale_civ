@@ -585,14 +585,19 @@ export function BettingPage() {
                  <div className="flex items-center gap-3">
                    <Filter size={16} className="text-cyan-400" />
                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
-                     {filterCategory === 'all' ? 'Filtra Scommesse' :
-                      filterCategory === 'open' ? 'Bet Aperte' :
-                      filterCategory === 'closed' ? 'Bet Chiuse' :
-                      filterCategory === 'high' ? 'High Elo' :
-                      filterCategory === 'low' ? 'Low Elo' :
-                      filterCategory === 'tournament' ? 'Vincitore Torneo' :
-                      filterCategory === 'match' ? 'Vincitore Match' : 'Punteggio Finale'}
-                   </span>
+                      {(() => {
+                        if (filterCategory === 'all') return 'Filtra Scommesse';
+                        if (filterCategory === 'open') return 'Bet Aperte';
+                        if (filterCategory === 'closed') return 'Bet Chiuse';
+                        if (filterCategory === 'tournament') return 'Vincitore Torneo';
+                        if (filterCategory === 'match') return 'Vincitore Match';
+                        if (filterCategory === 'score') return 'Punteggio Finale';
+                        if (filterCategory.startsWith('level-')) {
+                          return filterCategory.replace('level-', '');
+                        }
+                        return 'Filtra Scommesse';
+                      })()}
+                    </span>
                  </div>
                  <ChevronDown size={16} className={clsx("text-gray-600 transition-transform duration-300", showFilterDropdown && "rotate-180")} />
                </button>
@@ -601,33 +606,44 @@ export function BettingPage() {
                  <>
                    <div className="fixed inset-0 z-40" onClick={() => setShowFilterDropdown(false)} />
                    <div className="absolute top-full left-0 w-full mt-2 bg-[#111218] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                     {[
-                       { id: 'all', label: 'Tutte le Scommesse' },
-                       { id: 'high', label: 'High Elo' },
-                       { id: 'low', label: 'Low Elo' },
-                       { id: 'tournament', label: 'Vincitore Torneo' },
-                       { id: 'match', label: 'Vincitore Match' },
-                       { id: 'score', label: 'Punteggio Finale' },
-                       { id: 'open', label: 'Bet Aperte' },
-                       { id: 'closed', label: 'Bet Chiuse' }
-                     ].map((opt) => (
-                       <button
-                         key={opt.id}
-                         onClick={() => {
-                           setFilterCategory(opt.id);
-                           setShowFilterDropdown(false);
-                         }}
-                         className="w-full px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-colors group"
-                       >
-                         <span className={clsx(
-                           "text-[10px] font-bold uppercase tracking-widest transition-colors",
-                           filterCategory === opt.id ? "text-cyan-400" : "text-gray-500 group-hover:text-white"
-                         )}>
-                           {opt.label}
-                         </span>
-                         {filterCategory === opt.id && <Check size={14} className="text-cyan-400" />}
-                       </button>
-                     ))}
+                     {(() => {
+                        const activeEventLevels = Array.from(
+                          new Set(markets.map(m => m.event_level || '').filter(Boolean))
+                        ).sort();
+
+                        const filterOptions = [
+                          { id: 'all', label: 'Tutte le Scommesse' },
+                          ...activeEventLevels.map(lvl => ({
+                            id: `level-${lvl}`,
+                            label: lvl
+                          })),
+                          { id: 'tournament', label: 'Vincitore Torneo' },
+                          { id: 'match', label: 'Vincitore Match' },
+                          { id: 'score', label: 'Punteggio Finale' },
+                          { id: 'open', label: 'Bet Aperte' },
+                          { id: 'closed', label: 'Bet Chiuse' }
+                        ];
+
+                        return filterOptions.map((opt) => (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => {
+                              setFilterCategory(opt.id);
+                              setShowFilterDropdown(false);
+                            }}
+                            className="w-full px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-colors group"
+                          >
+                            <span className={clsx(
+                              "text-[10px] font-bold uppercase tracking-widest transition-colors",
+                              filterCategory === opt.id ? "text-cyan-400" : "text-gray-500 group-hover:text-white"
+                            )}>
+                              {opt.label}
+                            </span>
+                            {filterCategory === opt.id && <Check size={14} className="text-cyan-400" />}
+                          </button>
+                        ));
+                      })()}
                    </div>
                  </>
                )}
@@ -703,12 +719,52 @@ export function BettingPage() {
                         const type = e.target.value;
                         if (type === 'Custom') {
                           setIsCustomType(true);
-                          setAdminForm({...adminForm, type: '', options: [{ label: '', weight: 100 }, { label: '', weight: 100 }]});
+                          // Preserve existing options if any, otherwise default to two empty ones
+                          setAdminForm(prev => ({
+                            ...prev,
+                            type: '',
+                            options: prev.options.length > 0 ? prev.options : [{ label: '', weight: 100 }, { label: '', weight: 100 }]
+                          }));
                         } else {
                           setIsCustomType(false);
-                          let newOpts = [{ label: '', weight: 100 }, { label: '', weight: 100 }];
-                          if (type === 'Tournament Winner') newOpts = [{ label: 'Team 1', weight: 100 }, { label: 'Team 2', weight: 100 }, { label: 'Team 3', weight: 100 }];
-                          setAdminForm({...adminForm, type, options: (newOpts as any)});
+                          let newOpts = [...adminForm.options];
+                          if (type === 'Tournament Winner') {
+                            // If tournament winner, make sure we have at least 3 options
+                            if (newOpts.length < 3) {
+                              newOpts = [
+                                ...newOpts,
+                                ...Array(3 - newOpts.length).fill(null).map((_, idx) => ({
+                                  label: `Giocatore ${newOpts.length + idx + 1}`,
+                                  weight: 100
+                                }))
+                              ];
+                            }
+                          } else if (type === 'Match Winner' || type === 'Final Score') {
+                            if (newOpts.length < 2) {
+                              newOpts = [
+                                ...newOpts,
+                                ...Array(2 - newOpts.length).fill(null).map(() => ({
+                                  label: '',
+                                  weight: 100
+                                }))
+                              ];
+                            }
+                          }
+                          
+                          let tA = adminForm.teamA;
+                          let tB = adminForm.teamB;
+                          if (type === 'Match Winner' || type === 'Final Score') {
+                            if (!tA && newOpts[0]?.label) tA = newOpts[0].label;
+                            if (!tB && newOpts[1]?.label) tB = newOpts[1].label;
+                          }
+
+                          setAdminForm(prev => ({
+                            ...prev,
+                            type,
+                            teamA: tA,
+                            teamB: tB,
+                            options: newOpts
+                          }));
                         }
                       }}
                       className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-cyan-500 transition-all appearance-none cursor-pointer"
@@ -765,23 +821,51 @@ export function BettingPage() {
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-[10px] font-bold text-gray-500 uppercase mb-2 block tracking-widest">Team A / Giocatore A</label>
+                        <label className="text-[10px] font-bold text-gray-500 uppercase mb-2 block tracking-widest">Giocatore A / Team A</label>
                         <input 
                           type="text"
                           list="all-participants-list"
                           value={adminForm.teamA}
-                          onChange={(e) => setAdminForm({...adminForm, teamA: e.target.value})}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const newOpts = [...adminForm.options];
+                            if (!newOpts[0]) newOpts[0] = { label: '', weight: 100 };
+                            newOpts[0] = { ...newOpts[0], label: val };
+                            const updatedOpts = newOpts.map(opt => {
+                              const match = opt.label.match(/^(\d+-\d+)\s*\((.*?)\s+vs\s+(.*?)\)$/);
+                              if (match) {
+                                const [, score, , oldB] = match;
+                                return { ...opt, label: `${score} (${val} vs ${oldB})` };
+                              }
+                              return opt;
+                            });
+                            setAdminForm({ ...adminForm, teamA: val, options: updatedOpts });
+                          }}
                           placeholder="Scrivi o seleziona"
                           className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 transition-all placeholder:text-white/20"
                         />
                       </div>
                       <div>
-                        <label className="text-[10px] font-bold text-gray-500 uppercase mb-2 block tracking-widest">Team B / Giocatore B</label>
+                        <label className="text-[10px] font-bold text-gray-500 uppercase mb-2 block tracking-widest">Giocatore B / Team B</label>
                         <input 
                           type="text"
                           list="all-participants-list"
                           value={adminForm.teamB}
-                          onChange={(e) => setAdminForm({...adminForm, teamB: e.target.value})}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const newOpts = [...adminForm.options];
+                            if (!newOpts[1]) newOpts[1] = { label: '', weight: 100 };
+                            newOpts[1] = { ...newOpts[1], label: val };
+                            const updatedOpts = newOpts.map(opt => {
+                              const match = opt.label.match(/^(\d+-\d+)\s*\((.*?)\s+vs\s+(.*?)\)$/);
+                              if (match) {
+                                const [, score, oldA] = match;
+                                return { ...opt, label: `${score} (${oldA} vs ${val})` };
+                              }
+                              return opt;
+                            });
+                            setAdminForm({ ...adminForm, teamB: val, options: updatedOpts });
+                          }}
                           placeholder="Scrivi o seleziona"
                           className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-cyan-500 transition-all placeholder:text-white/20"
                         />
@@ -822,8 +906,8 @@ export function BettingPage() {
                     {adminForm.type === 'Match Winner' ? (
                       <div className="grid grid-cols-1 gap-4">
                         {[
-                          { key: 'teamA', label: adminForm.teamA || 'Team A' },
-                          { key: 'teamB', label: adminForm.teamB || 'Team B' }
+                          { key: 'teamA', label: adminForm.teamA || 'Giocatore A' },
+                          { key: 'teamB', label: adminForm.teamB || 'Giocatore B' }
                         ].map((team, i) => (
                           <div key={i} className="bg-cyan-500/5 border border-cyan-500/20 rounded-xl p-4">
                             <div className="flex items-center justify-between mb-3">
@@ -1048,8 +1132,20 @@ export function BettingPage() {
                     let finalOptions: any[] = adminForm.options;
                     if (adminForm.type === 'Match Winner') {
                       finalOptions = [
-                        { label: adminForm.teamA || 'Team A', weight: adminForm.options[0]?.weight || 100, is_disabled: adminForm.options[0]?.is_disabled },
-                        { label: adminForm.teamB || 'Team B', weight: adminForm.options[1]?.weight || 100, is_disabled: adminForm.options[1]?.is_disabled }
+                        { 
+                          id: adminForm.options[0]?.id,
+                          label: adminForm.teamA || 'Giocatore A', 
+                          weight: adminForm.options[0]?.weight || 100, 
+                          is_disabled: adminForm.options[0]?.is_disabled,
+                          total_bet: adminForm.options[0]?.total_bet
+                        },
+                        { 
+                          id: adminForm.options[1]?.id,
+                          label: adminForm.teamB || 'Giocatore B', 
+                          weight: adminForm.options[1]?.weight || 100, 
+                          is_disabled: adminForm.options[1]?.is_disabled,
+                          total_bet: adminForm.options[1]?.total_bet
+                        }
                       ];
                     }
                     
@@ -1173,17 +1269,9 @@ export function BettingPage() {
                       if (filterCategory === 'all') return true;
                       if (filterCategory === 'open') return market.status === 'open';
                       if (filterCategory === 'closed') return market.status === 'closed';
-                      if (filterCategory === 'high') {
-                        const titleLower = market.title.toLowerCase();
-                        if (titleLower.includes('low')) return false;
-                        if (titleLower.includes('high')) return true;
-                        return market.event_level === 'High Elo';
-                      }
-                      if (filterCategory === 'low') {
-                        const titleLower = market.title.toLowerCase();
-                        if (titleLower.includes('high')) return false;
-                        if (titleLower.includes('low')) return true;
-                        return market.event_level === 'Low Elo';
+                      if (filterCategory.startsWith('level-')) {
+                        const targetLevel = filterCategory.replace('level-', '');
+                        return market.event_level === targetLevel;
                       }
                       if (filterCategory === 'tournament') return market.type === 'Tournament Winner';
                       if (filterCategory === 'match') return market.type === 'Match Winner';
