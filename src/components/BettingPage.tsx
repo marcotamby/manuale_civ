@@ -1469,7 +1469,7 @@ export function BettingPage() {
 
                     {/* Bet Input Area - INTEGRATED */}
                     {selectedBets[market.id] && market.status === 'open' && (
-                      <div className="mt-auto pt-6 border-t border-white/5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                      <div className="pt-6 border-t border-white/5 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div className="flex flex-col gap-3">
                           <div className="flex items-stretch gap-2">
                             <div className="flex-grow flex items-center bg-black/40 border border-white/10 rounded-xl overflow-hidden h-12">
@@ -1568,7 +1568,7 @@ export function BettingPage() {
                     )}
 
                     {!isAuthenticated && market.status === 'open' && (
-                      <div className="mt-auto pt-6 text-center">
+                      <div className="pt-6 text-center">
                         <p className="text-cyan-400/50 text-[10px] font-black uppercase tracking-[0.15em] border border-cyan-500/10 py-3 rounded-xl bg-cyan-500/5">Effettua il login per scommettere</p>
                       </div>
                     )}
