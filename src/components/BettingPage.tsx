@@ -187,8 +187,6 @@ export function BettingPage() {
       if (marketError) console.error('❌ Error fetching markets:', marketError);
       console.log('📊 Markets found:', marketData?.length || 0, marketData);
       
-      setMarkets(marketData || []);
-
       let finalUserEmail = user?.email;
       if (!finalUserEmail) {
         try {
@@ -211,15 +209,36 @@ export function BettingPage() {
 
       // Calculate Total Stats & Tournament Leaderboard
       if (marketData && marketData.length > 0) {
-        const totalSheep = marketData.reduce((acc, m) => 
-          acc + (m.options?.reduce((sum: number, opt: any) => sum + (Number(opt.total_bet) || 0), 0) || 0)
-        , 0);
-
         const marketIds = marketData.map(m => m.id);
         const { data: tourneyBets } = await supabase
           .from('user_bets')
           .select('user_email, amount, payout, status, option_id, market_id')
           .in('market_id', marketIds);
+
+        // Enrich markets with the actual real-time bet sums per option from user_bets
+        const enrichedMarketData = marketData.map((market: any) => {
+          const enrichedOptions = market.options?.map((opt: any) => {
+            const totalBetForOption = tourneyBets
+              ? tourneyBets
+                  .filter((b: any) => b.market_id === market.id && b.option_id === opt.id && b.status !== 'cancelled')
+                  .reduce((sum: number, b: any) => sum + (Number(b.amount) || 0), 0)
+              : 0;
+            return {
+              ...opt,
+              total_bet: totalBetForOption
+            };
+          });
+          return {
+            ...market,
+            options: enrichedOptions || []
+          };
+        });
+
+        setMarkets(enrichedMarketData);
+
+        const totalSheep = enrichedMarketData.reduce((acc, m) => 
+          acc + (m.options?.reduce((sum: number, opt: any) => sum + (Number(opt.total_bet) || 0), 0) || 0)
+        , 0);
 
         if (tourneyBets) {
           if (finalUserEmail) {
@@ -267,6 +286,7 @@ export function BettingPage() {
           }
         }
       } else {
+        setMarkets([]);
         setTotalStats({ count: 0, sheep: 0, pastori: 0 });
         setLeaderboard([]);
       }
