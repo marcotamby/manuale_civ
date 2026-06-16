@@ -384,8 +384,10 @@ function App() {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
             </span>
             <span className="text-cyan-400 uppercase tracking-widest text-[9px] font-black border border-cyan-400/30 px-1.5 py-0.5 rounded shrink-0">Annuncio</span>
-            <span className="font-semibold text-gray-200">{activeBanner.title}</span>
-            <span className="text-gray-300 font-normal">{renderTextWithLinks(activeBanner.body)}</span>
+            <span className="text-gray-300 font-normal">
+              <span className="font-semibold text-gray-200 mr-1.5">{activeBanner.title}</span>
+              {renderTextWithLinks(activeBanner.body)}
+            </span>
           </div>
           <button 
             onClick={handleDismissBanner}
