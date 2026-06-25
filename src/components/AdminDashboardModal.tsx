@@ -776,11 +776,13 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                         </p>
                                       ))}
                                     </div>
-                                    {currentEdits.source && (
-                                      <div className="text-[10px] text-blue-400/60 truncate mt-2 font-mono italic">
-                                        Fonte: {currentEdits.source}
-                                      </div>
-                                    )}
+                                    {((currentEdits.sources && currentEdits.sources.length > 0) || currentEdits.source) && (
+                                       <div className="text-[10px] text-blue-400/60 truncate mt-2 font-mono italic">
+                                         Fonti: {(currentEdits.sources && currentEdits.sources.length > 0
+                                           ? currentEdits.sources.join(', ')
+                                           : currentEdits.source)}
+                                       </div>
+                                     )}
                                   </div>
                                 );
                               }
@@ -820,26 +822,51 @@ export function AdminDashboardModal({ isOpen, onClose }: AdminDashboardModalProp
                                     ))}
                                   </div>
                                   <div>
-                                    <label className="text-[10px] text-gray-500 uppercase font-bold mb-1.5 block">Fonte / Link YouTube</label>
+                                    <label className="text-[10px] text-gray-500 uppercase font-bold mb-1.5 block">Fonte / Link YouTube (separa con virgole per più video)</label>
                                     <input
                                       className="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-yellow-400/80 focus:border-blue-500 outline-none"
                                       value={currentEdits.source}
-                                      onChange={(e) => updateBOField('source', e.target.value)}
+                                      onChange={(e) => {
+                                        const val = e.target.value;
+                                        const urls = val.split(/[\s,]+/)
+                                          .map(u => u.trim())
+                                          .filter(u => u.startsWith('http://') || u.startsWith('https://') || (u.length === 11 && !u.includes('/') && !u.includes('.')))
+                                          .map(u => (u.length === 11 && !u.includes('/') && !u.includes('.')) ? `https://www.youtube.com/watch?v=${u}` : u);
+                                        
+                                        setEditingBOs(prev => ({
+                                          ...prev,
+                                          [sugg.id]: {
+                                            ...(prev[sugg.id] || boData),
+                                            source: val,
+                                            sources: urls.length > 0 ? urls : (val.trim() ? [val.trim()] : [])
+                                          }
+                                        }));
+                                      }}
                                     />
-                                    {currentEdits.source && getYoutubeId(currentEdits.source) && (
-                                      <div className="mt-3 relative aspect-video w-full max-w-[240px] rounded-lg overflow-hidden border border-white/10 group">
-                                        <img
-                                          src={`https://img.youtube.com/vi/${getYoutubeId(currentEdits.source)}/mqdefault.jpg`}
-                                          alt="Preview"
-                                          className="w-full h-full object-cover"
-                                        />
-                                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                                          <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center shadow-lg">
-                                            <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white border-b-[6px] border-b-transparent ml-1" />
+                                    {/* Video Preview grid */}
+                                    <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                      {(currentEdits.sources && currentEdits.sources.length > 0
+                                        ? currentEdits.sources
+                                        : (currentEdits.source ? [currentEdits.source] : [])
+                                      ).filter(Boolean).map((vUrl: string, vIdx: number) => {
+                                        const ytid = getYoutubeId(vUrl);
+                                        if (!ytid) return null;
+                                        return (
+                                          <div key={vIdx} className="relative aspect-video w-full rounded-lg overflow-hidden border border-white/10 group">
+                                            <img
+                                              src={`https://img.youtube.com/vi/${ytid}/mqdefault.jpg`}
+                                              alt={`Preview ${vIdx + 1}`}
+                                              className="w-full h-full object-cover"
+                                            />
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                              <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center shadow-lg">
+                                                <div className="w-0 h-0 border-t-[5px] border-t-transparent border-l-[8px] border-l-white border-b-[5px] border-b-transparent ml-0.5" />
+                                              </div>
+                                            </div>
                                           </div>
-                                        </div>
-                                      </div>
-                                    )}
+                                        );
+                                      })}
+                                    </div>
                                   </div>
                                 </div>
                               );

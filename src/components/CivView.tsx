@@ -1552,30 +1552,46 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
                         </div>
 
                         {/* Video / Source */}
-                        {selectedBO.source && (
+                        {((selectedBO.sources && selectedBO.sources.length > 0) || selectedBO.source) && (
                           <div className="bg-white/5 rounded-3xl border border-white/5 py-3 px-4 space-y-3">
-                            <h4 className="text-[10px] font-black text-red-500 uppercase tracking-widest">Video Tutorial</h4>
-                            {getYoutubeId(selectedBO.source) ? (
-                              <div className="relative aspect-video rounded-2xl overflow-hidden border border-white/10 group cursor-pointer"
-                                   onClick={() => window.open(selectedBO.source, '_blank')}>
-                                <img 
-                                  src={`https://img.youtube.com/vi/${getYoutubeId(selectedBO.source)}/maxresdefault.jpg`} 
-                                  alt="Tutorial Preview" 
-                                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/20 md:bg-black/40 md:group-hover:bg-black/20 transition-all">
-                                  <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center shadow-xl shadow-black/50 group-hover:scale-110 transition-transform">
-                                    <Play size={24} className="text-white fill-white ml-1" />
+                            <h4 className="text-[10px] font-black text-red-500 uppercase tracking-widest">
+                              {(selectedBO.sources && selectedBO.sources.length > 1) ? 'Video Tutorials' : 'Video Tutorial'}
+                            </h4>
+                            <div className="space-y-3">
+                              {(selectedBO.sources && selectedBO.sources.length > 0
+                                ? selectedBO.sources
+                                : (selectedBO.source ? [selectedBO.source] : [])
+                              ).map((videoUrl, idx) => {
+                                const ytid = getYoutubeId(videoUrl);
+                                return ytid ? (
+                                  <div key={idx} className="relative aspect-video rounded-2xl overflow-hidden border border-white/10 group cursor-pointer"
+                                       onClick={() => window.open(videoUrl, '_blank')}>
+                                    <img 
+                                      src={`https://img.youtube.com/vi/${ytid}/maxresdefault.jpg`} 
+                                      alt={`Tutorial Preview ${idx + 1}`} 
+                                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                      onLoad={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        if (target.naturalWidth === 120 && target.naturalHeight === 90) {
+                                          target.src = `https://img.youtube.com/vi/${ytid}/hqdefault.jpg`;
+                                        }
+                                      }}
+                                    />
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 md:bg-black/40 md:group-hover:bg-black/20 transition-all">
+                                      <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center shadow-xl shadow-black/50 group-hover:scale-110 transition-transform">
+                                        <Play size={24} className="text-white fill-white ml-1" />
+                                      </div>
+                                    </div>
                                   </div>
-                                </div>
-                              </div>
-                            ) : (
-                              <a href={selectedBO.source} target="_blank" rel="noopener noreferrer" 
-                                 className="flex items-center gap-3 p-4 bg-black/40 rounded-2xl border border-white/5 text-blue-400 hover:text-blue-300 transition-colors group">
-                                <ExternalLink size={20} className="group-hover:scale-110 transition-transform" />
-                                <span className="text-sm font-bold truncate">{selectedBO.source}</span>
-                              </a>
-                            )}
+                                ) : (
+                                  <a key={idx} href={videoUrl} target="_blank" rel="noopener noreferrer" 
+                                     className="flex items-center gap-3 p-4 bg-black/40 rounded-2xl border border-white/5 text-blue-400 hover:text-blue-300 transition-colors group">
+                                    <ExternalLink size={20} className="group-hover:scale-110 transition-transform" />
+                                    <span className="text-sm font-bold truncate">{videoUrl}</span>
+                                  </a>
+                                );
+                              })}
+                            </div>
                           </div>
                         )}
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, X, Loader2, Map, Plus, Clock, Zap, Upload, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2, ChevronUp, ChevronDown, AlertTriangle, BrainCircuit, FileText, PlayCircle, Play, MousePointer2 } from 'lucide-react';
+import { Save, X, Loader2, Map, Plus, Clock, Zap, Upload, MoveVertical, Shield, User, Star, Type, Youtube, CheckCircle2, ChevronUp, ChevronDown, AlertTriangle, BrainCircuit, FileText, Play, MousePointer2, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { usePresence } from './PresenceContext';
@@ -40,6 +40,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     author_rank: user?.rank || '',
     author_id: user?.email || '',
     source: '',
+    sources: [],
     map: ''
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -52,7 +53,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [manualText, setManualText] = useState('');
-  const [videoAddedStatus, setVideoAddedStatus] = useState(false);
+  const [newVideoUrl, setNewVideoUrl] = useState('');
   const initialDataRef = useRef<string>('');
   const mapDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -60,7 +61,11 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
   useEffect(() => {
     if (isOpen) {
       if (boIndex !== null && civ.buildOrders?.[boIndex]) {
-        setEditedBO({ ...civ.buildOrders[boIndex] });
+        const bo = civ.buildOrders[boIndex];
+        setEditedBO({ 
+          ...bo,
+          sources: bo.sources || (bo.source ? [bo.source] : [])
+        });
       } else {
         setEditedBO({
           id: `bo-${Date.now()}`,
@@ -74,11 +79,16 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
           author_nickname: user?.nickname || '',
           author_rank: user?.rank || '',
           source: '',
+          sources: [],
           map: ''
         });
       }
       setTimeout(() => {
-        initialDataRef.current = JSON.stringify(boIndex !== null && civ.buildOrders?.[boIndex] ? { ...civ.buildOrders[boIndex] } : {
+        const initialBO = boIndex !== null && civ.buildOrders?.[boIndex] ? { ...civ.buildOrders[boIndex] } : null;
+        initialDataRef.current = JSON.stringify(initialBO ? {
+          ...initialBO,
+          sources: initialBO.sources || (initialBO.source ? [initialBO.source] : [])
+        } : {
           id: editedBO.id,
           title: '',
           difficulty: 2,
@@ -90,6 +100,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
           author_nickname: user?.nickname || '',
           author_rank: user?.rank || '',
           source: '',
+          sources: [],
           map: ''
         });
       }, 0);
@@ -178,6 +189,45 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|yewtu.be\/watch\?v=)([^#&?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
+  };
+
+  const handleAddVideo = () => {
+    const url = newVideoUrl.trim();
+    if (!url) return;
+    
+    let finalUrl = url;
+    if (url.length === 11 && !url.includes('/') && !url.includes('.')) {
+      finalUrl = `https://www.youtube.com/watch?v=${url}`;
+    } else if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      toast.error("Link video non valido");
+      return;
+    }
+
+    const currentSources = editedBO.sources || (editedBO.source ? [editedBO.source] : []);
+    if (currentSources.includes(finalUrl)) {
+      toast.error("Video già aggiunto");
+      return;
+    }
+
+    const newSources = [...currentSources, finalUrl];
+    setEditedBO(prev => ({
+      ...prev,
+      sources: newSources,
+      source: newSources[0] || ''
+    }));
+    setNewVideoUrl('');
+    toast.success("Video aggiunto!");
+  };
+
+  const handleRemoveVideo = (idxToRemove: number) => {
+    const currentSources = editedBO.sources || (editedBO.source ? [editedBO.source] : []);
+    const newSources = currentSources.filter((_, idx) => idx !== idxToRemove);
+    setEditedBO(prev => ({
+      ...prev,
+      sources: newSources,
+      source: newSources[0] || ''
+    }));
+    toast.success("Video rimosso");
   };
 
 
@@ -352,8 +402,6 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
   };
 
   if (!isOpen) return null;
-
-  const currentYoutubeId = getYoutubeId(editedBO.source || '');
 
   return (
     <div className="fixed inset-0 z-[6000] flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
@@ -554,65 +602,79 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
           </div>
 
           {/* YouTube Section */}
-          <div className="bg-red-500/5 border border-red-500/20 rounded-3xl p-8 space-y-8">
-            <div className="space-y-6">
+          <div className="bg-red-500/5 border border-red-500/20 rounded-3xl p-8 space-y-6">
+            <div className="space-y-4">
               <label className="flex items-center gap-2 text-xs font-black text-red-500 uppercase tracking-[0.2em]">
-                <Youtube size={16} /> Link Video Guida
+                <Youtube size={16} /> Link Video Guida (YouTube)
               </label>
               <div className="flex gap-4">
                 <input
                   type="text"
-                  value={editedBO.source || ''}
-                  onChange={e => setEditedBO(prev => ({ ...prev, source: e.target.value }))}
-                  placeholder="https://www.youtube.com/watch?v=..."
+                  value={newVideoUrl}
+                  onChange={e => setNewVideoUrl(e.target.value)}
+                  placeholder="Incolla link video o ID..."
                   className="flex-1 bg-black/40 border-2 border-white/10 rounded-2xl px-6 py-4 text-sm text-red-200 outline-none focus:border-red-500/50 transition-all"
-                />
-                <button
-                  onClick={() => {
-                    if (currentYoutubeId) {
-                      setVideoAddedStatus(true);
-                      setTimeout(() => setVideoAddedStatus(false), 3000);
-                    } else {
-                      toast.error("Link video non valido");
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddVideo();
                     }
                   }}
-                  disabled={!editedBO.source}
-                  className={`px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 transition-all active:scale-95 border-2 ${
-                    videoAddedStatus 
-                    ? 'bg-green-600 border-green-400 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]' 
-                    : 'bg-[#FF0000] border-[#FF0000] text-white hover:bg-[#CC0000] hover:border-[#CC0000] shadow-[0_0_20px_rgba(255,0,0,0.2)]'
-                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={handleAddVideo}
+                  disabled={!newVideoUrl.trim()}
+                  className="px-6 py-3 bg-[#FF0000] border-2 border-[#FF0000] hover:bg-[#CC0000] hover:border-[#CC0000] text-white rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 transition-all active:scale-95 disabled:opacity-50 shadow-[0_0_20px_rgba(255,0,0,0.2)]"
                 >
-                  {videoAddedStatus ? (
-                    <><CheckCircle2 size={14} strokeWidth={3} /> Video Aggiunto!</>
-                  ) : (
-                    <><PlayCircle size={14} /> Aggiungi Video Guida</>
-                  )}
+                  <Plus size={14} /> Aggiungi
                 </button>
               </div>
 
-               {/* Video Preview inside Modal - High Res Thumbnail instead of blurry iframe */}
-               {currentYoutubeId && (
-                 <div className="mt-4 animate-in fade-in zoom-in-95 duration-500 flex justify-start">
-                    <div className="relative aspect-video w-full max-w-[320px] rounded-xl overflow-hidden border-2 border-red-500/30 shadow-[0_0_30px_rgba(239,68,68,0.1)] group cursor-pointer">
-                      <img 
-                        src={`https://img.youtube.com/vi/${currentYoutubeId}/maxresdefault.jpg`} 
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        alt="Video Preview"
-                        onError={(e) => {
-                          // Fallback to hqdefault if maxres isn't available
-                          (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${currentYoutubeId}/hqdefault.jpg`;
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                        <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-transform">
-                          <Play fill="white" className="text-white ml-1" size={24} />
-                        </div>
+              {/* Video List */}
+              <div className="space-y-2 mt-4 max-h-[300px] overflow-y-auto pr-1">
+                {(editedBO.sources && editedBO.sources.length > 0
+                  ? editedBO.sources
+                  : (editedBO.source ? [editedBO.source] : [])
+                ).map((videoUrl, idx) => {
+                  const ytid = getYoutubeId(videoUrl);
+                  return (
+                    <div key={idx} className="flex items-center justify-between gap-4 p-3 bg-black/45 rounded-2xl border border-white/5 hover:border-red-500/20 transition-all animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="flex items-center gap-3 min-w-0">
+                        {ytid ? (
+                          <div className="w-16 aspect-video rounded overflow-hidden bg-black shrink-0 border border-white/10 relative">
+                            <img 
+                              src={`https://img.youtube.com/vi/${ytid}/mqdefault.jpg`} 
+                              className="w-full h-full object-cover" 
+                              alt="preview" 
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/25">
+                              <Play size={12} fill="white" className="text-white ml-0.5" />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="w-16 aspect-video rounded bg-black shrink-0 border border-white/10 flex items-center justify-center text-red-500">
+                            <Youtube size={20} />
+                          </div>
+                        )}
+                        <span className="text-xs text-red-200/90 truncate font-mono">{videoUrl}</span>
                       </div>
-                      <div className="absolute top-2 left-2 px-2 py-0.5 bg-red-600 text-white text-[8px] font-black uppercase rounded shadow-lg">Preview HD</div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveVideo(idx)}
+                        className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
-                 </div>
-               )}
+                  );
+                })}
+                {(!editedBO.sources || editedBO.sources.length === 0) && !editedBO.source && (
+                  <div className="py-6 text-center text-gray-500 text-xs border border-dashed border-white/5 rounded-2xl">
+                    Nessun video tutorial aggiunto
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="h-px bg-white/5 w-full" />

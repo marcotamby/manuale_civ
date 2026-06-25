@@ -266,6 +266,21 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
 
       let submissionText = '';
       if (section === 'build_order') {
+        const videoUrls = source.split(/[\s,]+/)
+          .map(url => url.trim())
+          .filter(url => {
+            if (!url) return false;
+            if (url.startsWith('http://') || url.startsWith('https://')) return true;
+            if (url.length === 11 && !url.includes('/') && !url.includes('.')) return true;
+            return false;
+          })
+          .map(url => {
+            if (url.length === 11 && !url.includes('/') && !url.includes('.')) {
+              return `https://www.youtube.com/watch?v=${url}`;
+            }
+            return url;
+          });
+
         const boData = {
           title: title.trim() || '',
           description: description,
@@ -273,7 +288,8 @@ export function EditSuggestionForm({ civName }: SuggestionFormProps) {
           banner_url: bannerUrl,
           banner_position: bannerPosition,
           steps: boSteps,
-          source: source,
+          source: videoUrls[0] || source.trim(),
+          sources: videoUrls.length > 0 ? videoUrls : (source.trim() ? [source.trim()] : []),
           map: map
         };
         submissionText = JSON.stringify(boData);

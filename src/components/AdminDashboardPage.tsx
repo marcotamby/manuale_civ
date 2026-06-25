@@ -267,9 +267,11 @@ export default function AdminDashboardPage() {
     banner_url: '',
     banner_position: 50,
     source: '',
+    sources: [],
     steps: []
   });
   const [boManualText, setBoManualText] = useState('');
+  const [newBoVideoUrl, setNewBoVideoUrl] = useState('');
   const [isAnalyzingBO, setIsAnalyzingBO] = useState(false);
   const [boAnalysisProgress, setBoAnalysisProgress] = useState(0);
 
@@ -817,9 +819,11 @@ export default function AdminDashboardPage() {
         banner_url: '',
         banner_position: 50,
         source: '',
+        sources: [],
         steps: []
       });
       setBoManualText('');
+      setNewBoVideoUrl('');
     } else {
       const bo = selectedCiv.build_orders[index];
       setBoForm({
@@ -833,10 +837,51 @@ export default function AdminDashboardPage() {
         banner_url: bo.banner_url || '',
         banner_position: bo.banner_position || 50,
         source: bo.source || '',
+        sources: bo.sources || (bo.source ? [bo.source] : []),
         steps: bo.steps || []
       });
       setBoManualText('');
+      setNewBoVideoUrl('');
     }
+  };
+
+  const handleAddBoVideo = () => {
+    const url = newBoVideoUrl.trim();
+    if (!url) return;
+
+    let finalUrl = url;
+    if (url.length === 11 && !url.includes('/') && !url.includes('.')) {
+      finalUrl = `https://www.youtube.com/watch?v=${url}`;
+    } else if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      setToast({ isVisible: true, message: 'Link video non valido', type: 'error' });
+      return;
+    }
+
+    const currentSources = boForm.sources || (boForm.source ? [boForm.source] : []);
+    if (currentSources.includes(finalUrl)) {
+      setToast({ isVisible: true, message: 'Video già aggiunto', type: 'error' });
+      return;
+    }
+
+    const newSources = [...currentSources, finalUrl];
+    setBoForm((prev: any) => ({
+      ...prev,
+      sources: newSources,
+      source: newSources[0] || ''
+    }));
+    setNewBoVideoUrl('');
+    setToast({ isVisible: true, message: 'Video aggiunto!', type: 'success' });
+  };
+
+  const handleRemoveBoVideo = (idxToRemove: number) => {
+    const currentSources = boForm.sources || (boForm.source ? [boForm.source] : []);
+    const newSources = currentSources.filter((_: string, idx: number) => idx !== idxToRemove);
+    setBoForm((prev: any) => ({
+      ...prev,
+      sources: newSources,
+      source: newSources[0] || ''
+    }));
+    setToast({ isVisible: true, message: 'Video rimosso', type: 'success' });
   };
 
   const handleSaveBO = async () => {
@@ -3130,9 +3175,11 @@ export default function AdminDashboardPage() {
                                           </p>
                                         ))}
                                       </div>
-                                      {currentEdits.source && (
+                                      {((currentEdits.sources && currentEdits.sources.length > 0) || currentEdits.source) && (
                                         <div className="text-[10px] text-blue-400/60 truncate mt-2 font-mono italic">
-                                          Fonte: {currentEdits.source}
+                                          Fonti: {(currentEdits.sources && currentEdits.sources.length > 0
+                                            ? currentEdits.sources.join(', ')
+                                            : currentEdits.source)}
                                         </div>
                                       )}
                                     </div>
@@ -3176,26 +3223,51 @@ export default function AdminDashboardPage() {
                                       </div>
                                     </div>
                                     <div>
-                                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Fonte / Link YouTube Video</label>
+                                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Fonte / Link YouTube Video (separa con virgole per più video)</label>
                                       <input
                                         className="w-full bg-[#111218] border-2 border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-2xl px-4 py-2 text-xs text-cyan-400/80 focus:shadow-[0_0_15px_rgba(59,130,246,0.15)] outline-none"
                                         value={currentEdits.source}
-                                        onChange={(e) => updateBOField('source', e.target.value)}
+                                        onChange={(e) => {
+                                          const val = e.target.value;
+                                          const urls = val.split(/[\s,]+/)
+                                            .map(u => u.trim())
+                                            .filter(u => u.startsWith('http://') || u.startsWith('https://') || (u.length === 11 && !u.includes('/') && !u.includes('.')))
+                                            .map(u => (u.length === 11 && !u.includes('/') && !u.includes('.')) ? `https://www.youtube.com/watch?v=${u}` : u);
+                                          
+                                          setEditingBOs(prev => ({
+                                            ...prev,
+                                            [sugg.id]: {
+                                              ...(prev[sugg.id] || boData),
+                                              source: val,
+                                              sources: urls.length > 0 ? urls : (val.trim() ? [val.trim()] : [])
+                                            }
+                                          }));
+                                        }}
                                       />
-                                      {currentEdits.source && getYoutubeId(currentEdits.source) && (
-                                        <div className="mt-4 relative aspect-video w-full max-w-[240px] rounded-2xl overflow-hidden border border-white/10 shadow-lg">
-                                          <img
-                                            src={`https://img.youtube.com/vi/${getYoutubeId(currentEdits.source)}/mqdefault.jpg`}
-                                            alt="Preview"
-                                            className="w-full h-full object-cover"
-                                          />
-                                          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                                            <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center shadow-lg">
-                                              <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white border-b-[6px] border-b-transparent ml-1" />
+                                      {/* Video Preview grid */}
+                                      <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                        {(currentEdits.sources && currentEdits.sources.length > 0
+                                          ? currentEdits.sources
+                                          : (currentEdits.source ? [currentEdits.source] : [])
+                                        ).filter(Boolean).map((vUrl: string, vIdx: number) => {
+                                          const ytid = getYoutubeId(vUrl);
+                                          if (!ytid) return null;
+                                          return (
+                                            <div key={vIdx} className="relative aspect-video w-full rounded-2xl overflow-hidden border border-white/10 shadow-lg">
+                                              <img
+                                                src={`https://img.youtube.com/vi/${ytid}/mqdefault.jpg`}
+                                                alt={`Preview ${vIdx + 1}`}
+                                                className="w-full h-full object-cover"
+                                              />
+                                              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                                <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center shadow-lg">
+                                                  <div className="w-0 h-0 border-t-[5px] border-t-transparent border-l-[8px] border-l-white border-b-[5px] border-b-transparent ml-0.5" />
+                                                </div>
+                                              </div>
                                             </div>
-                                          </div>
-                                        </div>
-                                      )}
+                                          );
+                                        })}
+                                      </div>
                                     </div>
                                   </div>
                                 );
@@ -5168,14 +5240,71 @@ export default function AdminDashboardPage() {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Link YouTube Video Guida</label>
-                                  <input
-                                    type="text"
-                                    value={boForm.source}
-                                    onChange={(e) => setBoForm({ ...boForm, source: e.target.value })}
-                                    className="w-full bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none"
-                                    placeholder="https://youtube.com/watch?v=..."
-                                  />
+                                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Link Video Guida (YouTube)</label>
+                                  <div className="flex gap-2">
+                                    <input
+                                      type="text"
+                                      value={newBoVideoUrl}
+                                      onChange={(e) => setNewBoVideoUrl(e.target.value)}
+                                      className="flex-1 bg-white/[0.02] border-2 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-2xl px-4 py-3 text-xs text-white focus:bg-white/[0.04] focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all outline-none"
+                                      placeholder="Incolla link video o ID..."
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                          e.preventDefault();
+                                          handleAddBoVideo();
+                                        }
+                                      }}
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={handleAddBoVideo}
+                                      className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-2xl text-xs font-bold transition-all"
+                                    >
+                                      Aggiungi
+                                    </button>
+                                  </div>
+
+                                  {/* Video List */}
+                                  <div className="space-y-1.5 mt-3 max-h-[180px] overflow-y-auto pr-1">
+                                    {(boForm.sources && boForm.sources.length > 0
+                                      ? boForm.sources
+                                      : (boForm.source ? [boForm.source] : [])
+                                    ).map((videoUrl: string, idx: number) => {
+                                      const ytid = getYoutubeId(videoUrl);
+                                      return (
+                                        <div key={idx} className="flex items-center justify-between gap-3 p-2 bg-white/[0.01] rounded-xl border border-white/5 hover:border-red-500/10 transition-all">
+                                          <div className="flex items-center gap-2 min-w-0">
+                                            {ytid ? (
+                                              <div className="w-12 aspect-video rounded overflow-hidden bg-black shrink-0 border border-white/10 relative">
+                                                <img 
+                                                  src={`https://img.youtube.com/vi/${ytid}/mqdefault.jpg`} 
+                                                  className="w-full h-full object-cover" 
+                                                  alt="preview" 
+                                                />
+                                              </div>
+                                            ) : (
+                                              <div className="w-12 aspect-video rounded bg-black shrink-0 border border-white/10 flex items-center justify-center text-red-500">
+                                                <Youtube size={14} />
+                                              </div>
+                                            )}
+                                            <span className="text-[10px] text-red-200/80 truncate font-mono">{videoUrl}</span>
+                                          </div>
+                                          <button
+                                            type="button"
+                                            onClick={() => handleRemoveBoVideo(idx)}
+                                            className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                                          >
+                                            <Trash2 size={14} />
+                                          </button>
+                                        </div>
+                                      );
+                                    })}
+                                    {(!boForm.sources || boForm.sources.length === 0) && !boForm.source && (
+                                      <div className="py-4 text-center text-gray-500 text-[10px] border border-dashed border-white/5 rounded-xl uppercase tracking-widest font-bold">
+                                        Nessun video tutorial aggiunto
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
 

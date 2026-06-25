@@ -52,6 +52,7 @@ export interface BuildOrder {
   difficulty: 1 | 2 | 3 | string; 
   steps: BuildOrderStep[];
   source?: string;
+  sources?: string[];
   author_id?: string;
   author_nickname?: string;
   author_rank?: string;
