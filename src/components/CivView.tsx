@@ -1674,78 +1674,126 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           </div>
         )}
 
-        {activeTab === 'video' && (
-          <div className="w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex flex-col md:flex-row md:items-center gap-6 mb-2">
-              <div className="flex flex-col">
-                <h2 className="text-3xl font-bold text-white flex items-center gap-3">
-                  <Play className="text-red-500" size={32} />
+        {activeTab === 'video' && (() => {
+          const defaultChannelName = 'marcotamby_aoe';
+          const defaultChannelUrl = 'https://www.youtube.com/@marcotamby_aoe';
+
+          interface GroupedChannel {
+            channelName: string;
+            channelUrl: string;
+            videos: string[];
+          }
+
+          const groups: GroupedChannel[] = [];
+          if (civ.videos && civ.videos.length > 0) {
+            civ.videos.forEach((vidStr) => {
+              const parts = vidStr.split('|');
+              const rawId = parts[0] || '';
+              const channelName = parts[1]?.trim() || defaultChannelName;
+              const channelUrl = parts[2]?.trim() || defaultChannelUrl;
+
+              let finalId = rawId.trim();
+              if (finalId.includes('youtube.com') || finalId.includes('youtu.be')) {
+                try {
+                  const url = new URL(finalId);
+                  finalId = url.searchParams.get('v') || url.pathname.slice(1) || finalId;
+                } catch (e) {
+                  // ignore
+                }
+              }
+
+              if (!finalId) return;
+
+              let group = groups.find(
+                (g) => g.channelName.toLowerCase() === channelName.toLowerCase()
+              );
+              if (!group) {
+                group = {
+                  channelName,
+                  channelUrl,
+                  videos: [],
+                };
+                groups.push(group);
+              }
+              group.videos.push(finalId);
+            });
+          }
+
+          return (
+            <div className="w-full space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="flex items-center gap-3 mb-2">
+                <Play className="text-red-500" size={32} />
+                <h2 className="text-3xl font-bold text-white">
                   Video Guide & Gameplay
                 </h2>
-                <p className="text-gray-400 mt-1">Tutorial e partite commentate da <span className="text-red-500 font-bold">marcotamby_aoe</span>.</p>
               </div>
-              <a
-                href="https://www.youtube.com/@marcotamby_aoe"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-6 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-[11px] uppercase tracking-wider font-extrabold transition-all shadow-lg shadow-red-600/20 hover:scale-105 active:scale-95 self-start md:self-center"
-              >
-                <Play size={14} fill="currentColor" />
-                VISITA IL CANALE YOUTUBE
-              </a>
-            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-              {civ.videos && civ.videos.length > 0 ? (
-                civ.videos.map((vidId, index) => {
-                  let finalId = vidId.trim();
-                  if (finalId.includes('youtube.com') || finalId.includes('youtu.be')) {
-                    try {
-                      const url = new URL(finalId);
-                      finalId = url.searchParams.get('v') || url.pathname.slice(1) || finalId;
-                    } catch (e) {
-          // Silently ignore parsing errors
-        }
-                  }
-                  return (
-                    <div key={`${finalId}-${index}`} className="flex flex-col h-full">
-                      <a
-                        href={`https://www.youtube.com/watch?v=${finalId}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group relative block aspect-video w-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black transition-transform hover:scale-105 hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]"
-                      >
-                        <img
-                          src={`https://img.youtube.com/vi/${finalId}/maxresdefault.jpg`}
-                          alt="Video Thumbnail"
-                          className="w-full h-full object-cover opacity-100 md:opacity-80 md:group-hover:opacity-100 transition-opacity"
-                          style={{ objectPosition: 'center center' }}
-                          onLoad={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            if (target.naturalWidth === 120 && target.naturalHeight === 90) {
-                              target.src = `https://img.youtube.com/vi/${finalId}/hqdefault.jpg`;
-                            }
-                          }}
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-12 h-9 bg-red-600/90 rounded-2xl flex items-center justify-center group-hover:bg-red-500 transition-colors shadow-lg">
-                            <Play size={18} fill="currentColor" className="text-white ml-0.5" />
-                          </div>
-                        </div>
-                      </a>
+              {groups.length > 0 ? (
+                groups.map((group, groupIdx) => (
+                  <div key={`${group.channelName}-${groupIdx}`} className="space-y-6 border-b border-white/5 pb-8 last:border-b-0 last:pb-0">
+                    <div className="flex flex-col md:flex-row md:items-center gap-6 mb-2">
+                      <div className="flex flex-col">
+                        <p className="text-gray-400 mt-1">
+                          Tutorial e partite commentate da <span className="text-red-500 font-bold">{group.channelName}</span>.
+                        </p>
+                      </div>
+                      {group.channelUrl && (
+                        <a
+                          href={group.channelUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 px-6 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-[11px] uppercase tracking-wider font-extrabold transition-all shadow-lg shadow-red-600/20 hover:scale-105 active:scale-95 self-start md:self-center"
+                        >
+                          <Play size={14} fill="currentColor" />
+                          VISITA IL CANALE YOUTUBE
+                        </a>
+                      )}
                     </div>
-                  );
-                })
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                      {group.videos.map((finalId, index) => (
+                        <div key={`${finalId}-${index}`} className="flex flex-col h-full">
+                          <a
+                            href={`https://www.youtube.com/watch?v=${finalId}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group relative block aspect-video w-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black transition-transform hover:scale-105 hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]"
+                          >
+                            <img
+                              src={`https://img.youtube.com/vi/${finalId}/maxresdefault.jpg`}
+                              alt="Video Thumbnail"
+                              className="w-full h-full object-cover opacity-100 md:opacity-80 md:group-hover:opacity-100 transition-opacity"
+                              style={{ objectPosition: 'center center' }}
+                              onLoad={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                if (target.naturalWidth === 120 && target.naturalHeight === 90) {
+                                  target.src = `https://img.youtube.com/vi/${finalId}/hqdefault.jpg`;
+                                }
+                              }}
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="w-12 h-9 bg-red-600/90 rounded-2xl flex items-center justify-center group-hover:bg-red-500 transition-colors shadow-lg">
+                                <Play size={18} fill="currentColor" className="text-white ml-0.5" />
+                              </div>
+                            </div>
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))
               ) : (
-                <div className="glass p-8 rounded-2xl border border-white/5 text-center flex flex-col items-center justify-center aspect-video max-w-[300px] bg-black/20">
-                  <Play size={32} className="text-gray-600 mb-3" />
-                  <h3 className="text-base font-bold text-gray-400 mb-1">Video in arrivo</h3>
-                  <p className="text-xs text-gray-500 px-4 leading-tight">Guide dedicate in fase di preparazione.</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                  <div className="glass p-8 rounded-2xl border border-white/5 text-center flex flex-col items-center justify-center aspect-video max-w-[300px] bg-black/20">
+                    <Play size={32} className="text-gray-600 mb-3" />
+                    <h3 className="text-base font-bold text-gray-400 mb-1">Video in arrivo</h3>
+                    <p className="text-xs text-gray-500 px-4 leading-tight">Guide dedicate in fase di preparazione.</p>
+                  </div>
                 </div>
               )}
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {activeTab === 'domande' && (
           <div className="max-w-6xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">

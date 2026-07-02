@@ -5043,11 +5043,17 @@ export default function AdminDashboardPage() {
                             </div>
                             
                             {(civForm.videos || []).map((video: any, idx: number) => {
-                              const videoId = typeof video === 'string' 
-                                ? (video.match(/(?:youtu\.be\/|v=)([^&\s]+)/)?.[1] || '')
-                                : (video.url?.match(/(?:youtu\.be\/|v=)([^&\s]+)/)?.[1] || '');
-                              const videoUrl = typeof video === 'string' ? video : video.url;
-                              const videoTitle = typeof video === 'string' ? '' : (video.title || '');
+                              const videoStr = typeof video === 'string' ? video : (video.url || '');
+                              const parts = videoStr.split('|');
+                              const actualIdOrUrl = parts[0] || '';
+                              const channelName = parts[1] || '';
+                              const channelUrl = parts[2] || '';
+                              
+                              let videoId = actualIdOrUrl;
+                              if (videoId.includes('youtube.com') || videoId.includes('youtu.be')) {
+                                const match = videoId.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+                                if (match) videoId = match[1];
+                              }
                               
                               return (
                                 <div key={idx} className="flex items-start gap-3 bg-black/30 rounded-2xl p-3 border border-white/5">
@@ -5056,38 +5062,64 @@ export default function AdminDashboardPage() {
                                       src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} 
                                       alt="Thumbnail" 
                                       className="w-28 h-16 rounded-lg object-cover border border-white/10 shrink-0"
+                                      onError={(e) => {
+                                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/120x67?text=Invalid+ID';
+                                      }}
                                     />
                                   )}
                                   <div className="flex-1 space-y-2 min-w-0">
                                     <input
                                       type="text"
-                                      placeholder="Titolo video (opzionale)"
-                                      value={videoTitle}
+                                      placeholder="https://www.youtube.com/watch?v=... o ID video"
+                                      value={actualIdOrUrl}
                                       onChange={(e) => {
+                                        const val = e.target.value;
+                                        const newParts = [val, channelName, channelUrl];
+                                        while (newParts.length > 1 && !newParts[newParts.length - 1]) {
+                                          newParts.pop();
+                                        }
                                         const newVideos = [...(civForm.videos || [])];
-                                        const v = typeof newVideos[idx] === 'string' ? { url: newVideos[idx], title: '' } : { ...newVideos[idx] };
-                                        v.title = e.target.value;
-                                        newVideos[idx] = v;
+                                        newVideos[idx] = newParts.join('|');
                                         setCivForm({ ...civForm, videos: newVideos });
                                       }}
-                                      className="w-full bg-white/[0.01] border border-white/10 rounded-xl px-3 py-1.5 text-[11px] text-white outline-none focus:border-red-500/50 transition-all"
+                                      className="w-full bg-white/[0.01] border border-white/10 rounded-xl px-3 py-1.5 text-[11px] text-white outline-none focus:border-red-500/50 transition-all font-mono"
                                     />
-                                    <input
-                                      type="text"
-                                      placeholder="https://www.youtube.com/watch?v=..."
-                                      value={videoUrl}
-                                      onChange={(e) => {
-                                        const newVideos = [...(civForm.videos || [])];
-                                        const v = typeof newVideos[idx] === 'string' ? { url: '', title: '' } : { ...newVideos[idx] };
-                                        v.url = e.target.value;
-                                        newVideos[idx] = v;
-                                        setCivForm({ ...civForm, videos: newVideos });
-                                      }}
-                                      className="w-full bg-white/[0.01] border border-white/10 rounded-xl px-3 py-1.5 text-[11px] text-gray-400 outline-none focus:border-red-500/50 transition-all"
-                                    />
+                                    <div className="flex gap-2">
+                                      <input
+                                        type="text"
+                                        placeholder="Nome Canale (opzionale)"
+                                        value={channelName}
+                                        onChange={(e) => {
+                                          const newParts = [actualIdOrUrl, e.target.value, channelUrl];
+                                          while (newParts.length > 1 && !newParts[newParts.length - 1]) {
+                                            newParts.pop();
+                                          }
+                                          const newVideos = [...(civForm.videos || [])];
+                                          newVideos[idx] = newParts.join('|');
+                                          setCivForm({ ...civForm, videos: newVideos });
+                                        }}
+                                        className="flex-1 bg-white/[0.01] border border-white/10 rounded-xl px-3 py-1.5 text-[10px] text-gray-300 outline-none focus:border-red-500/30 transition-all"
+                                      />
+                                      <input
+                                        type="text"
+                                        placeholder="Link Canale (opzionale)"
+                                        value={channelUrl}
+                                        onChange={(e) => {
+                                          const newParts = [actualIdOrUrl, channelName, e.target.value];
+                                          while (newParts.length > 1 && !newParts[newParts.length - 1]) {
+                                            newParts.pop();
+                                          }
+                                          const newVideos = [...(civForm.videos || [])];
+                                          newVideos[idx] = newParts.join('|');
+                                          setCivForm({ ...civForm, videos: newVideos });
+                                        }}
+                                        className="flex-1 bg-white/[0.01] border border-white/10 rounded-xl px-3 py-1.5 text-[10px] text-gray-300 outline-none focus:border-red-500/30 transition-all"
+                                      />
+                                    </div>
                                   </div>
                                   <div className="flex flex-col gap-1 shrink-0">
                                     <button
+                                      type="button"
                                       onClick={() => {
                                         if (idx > 0) {
                                           const newVideos = [...(civForm.videos || [])];
@@ -5101,6 +5133,7 @@ export default function AdminDashboardPage() {
                                       <ChevronUp size={14} />
                                     </button>
                                     <button
+                                      type="button"
                                       onClick={() => {
                                         if (idx < (civForm.videos || []).length - 1) {
                                           const newVideos = [...(civForm.videos || [])];
@@ -5114,6 +5147,7 @@ export default function AdminDashboardPage() {
                                       <ChevronDown size={14} />
                                     </button>
                                     <button
+                                      type="button"
                                       onClick={() => {
                                         const newVideos = (civForm.videos || []).filter((_: any, i: number) => i !== idx);
                                         setCivForm({ ...civForm, videos: newVideos });
@@ -5128,7 +5162,8 @@ export default function AdminDashboardPage() {
                             })}
                             
                             <button
-                              onClick={() => setCivForm({ ...civForm, videos: [...(civForm.videos || []), { url: '', title: '' }] })}
+                              type="button"
+                              onClick={() => setCivForm({ ...civForm, videos: [...(civForm.videos || []), ''] })}
                               className="text-xs text-red-500 font-black uppercase tracking-wider hover:underline flex items-center gap-1.5 pt-2"
                             >
                               <Plus size={14} strokeWidth={3} /> Aggiungi Video Guida

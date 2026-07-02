@@ -58,22 +58,43 @@ function SortableVideoItem({ id, videoId, idx, onRemove, onUpdate }: {
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const parts = videoId.split('|');
+  const actualVideoId = parts[0] || '';
+  const channelName = parts[1] || '';
+  const channelUrl = parts[2] || '';
+
+  const handleFieldChange = (newVidId: string, newChanName: string, newChanUrl: string) => {
+    let cleanId = newVidId.trim();
+    if (cleanId.includes('youtube.com') || cleanId.includes('youtu.be')) {
+      const match = cleanId.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+      if (match) cleanId = match[1];
+    }
+    const cName = newChanName;
+    const cUrl = newChanUrl;
+    
+    const combinedParts = [cleanId, cName, cUrl];
+    while (combinedParts.length > 1 && !combinedParts[combinedParts.length - 1]) {
+      combinedParts.pop();
+    }
+    onUpdate(idx, combinedParts.join('|'));
+  };
+
   return (
     <div 
       ref={setNodeRef} 
       style={style} 
-      className={`flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg p-2 group hover:border-red-500/30 transition-all mb-2 ${isDragging ? 'shadow-2xl ring-2 ring-red-500/50' : ''}`}
+      className={`flex items-start gap-2 bg-white/5 border border-white/10 rounded-lg p-2 group hover:border-red-500/30 transition-all mb-2 ${isDragging ? 'shadow-2xl ring-2 ring-red-500/50' : ''}`}
     >
       <div 
         {...attributes} 
         {...listeners} 
-        className="cursor-grab active:cursor-grabbing p-1 text-gray-500 hover:text-white transition-colors"
+        className="cursor-grab active:cursor-grabbing p-1 text-gray-500 hover:text-white transition-colors mt-1"
       >
         <GripVertical size={16} />
       </div>
-      <div className="w-16 aspect-video rounded bg-black overflow-hidden shrink-0 border border-white/10">
+      <div className="w-16 aspect-video rounded bg-black overflow-hidden shrink-0 border border-white/10 mt-1">
         <img 
-          src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} 
+          src={`https://img.youtube.com/vi/${actualVideoId}/mqdefault.jpg`} 
           alt="Thumbnail" 
           className="w-full h-full object-cover"
           onError={(e) => {
@@ -81,18 +102,37 @@ function SortableVideoItem({ id, videoId, idx, onRemove, onUpdate }: {
           }}
         />
       </div>
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 flex flex-col gap-1.5">
         <input 
           type="text" 
-          value={videoId}
-          onChange={(e) => onUpdate(idx, e.target.value)}
+          placeholder="ID Video o Link..."
+          value={actualVideoId}
+          onChange={(e) => handleFieldChange(e.target.value, channelName, channelUrl)}
           onPointerDown={(e) => e.stopPropagation()} // Prevent drag when clicking input
-          className="bg-transparent border-none text-xs text-white w-full focus:ring-0 p-0 font-mono"
+          className="bg-black/20 border border-white/10 rounded px-2 py-0.5 text-xs text-white w-full focus:border-red-500/50 outline-none font-mono"
         />
+        <div className="flex gap-2">
+          <input 
+            type="text" 
+            placeholder="Canale (opzionale)"
+            value={channelName}
+            onChange={(e) => handleFieldChange(actualVideoId, e.target.value, channelUrl)}
+            onPointerDown={(e) => e.stopPropagation()}
+            className="flex-1 bg-black/20 border border-white/10 rounded px-2 py-0.5 text-[10px] text-gray-300 outline-none focus:border-red-500/30"
+          />
+          <input 
+            type="text" 
+            placeholder="URL Canale (opzionale)"
+            value={channelUrl}
+            onChange={(e) => handleFieldChange(actualVideoId, channelName, e.target.value)}
+            onPointerDown={(e) => e.stopPropagation()}
+            className="flex-1 bg-black/20 border border-white/10 rounded px-2 py-0.5 text-[10px] text-gray-300 outline-none focus:border-red-500/30"
+          />
+        </div>
       </div>
       <button
         onClick={() => onRemove(idx)}
-        className="p-1.5 rounded bg-red-500/10 hover:bg-red-500/20 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="p-1.5 rounded bg-red-500/10 hover:bg-red-500/20 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity mt-1"
       >
         <Trash2 size={14} />
       </button>
