@@ -507,24 +507,27 @@ export function AdminCivEditorModal({ civ, isOpen, onClose, onSave, initialSecti
                         items={editedCiv.videos || []}
                         strategy={verticalListSortingStrategy}
                       >
-                        {(editedCiv.videos || []).map((videoId: string, idx: number) => (
-                          <SortableVideoItem 
-                            key={videoId}
-                            id={videoId}
-                            videoId={videoId}
-                            idx={idx}
-                            onUpdate={(i, val) => {
-                              const newVideos = [...(editedCiv.videos || [])];
-                              newVideos[i] = val;
-                              setEditedCiv({ ...editedCiv, videos: newVideos });
-                            }}
-                            onRemove={(i) => {
-                              const newVideos = [...(editedCiv.videos || [])];
-                              newVideos.splice(i, 1);
-                              setEditedCiv({ ...editedCiv, videos: newVideos });
-                            }}
-                          />
-                        ))}
+                        {(editedCiv.videos || []).map((videoId: string, idx: number) => {
+                           const actualVideoId = videoId.split('|')[0] || '';
+                           return (
+                             <SortableVideoItem 
+                               key={`${actualVideoId}-${idx}`}
+                               id={videoId}
+                               videoId={videoId}
+                               idx={idx}
+                               onUpdate={(i, val) => {
+                                 const newVideos = [...(editedCiv.videos || [])];
+                                 newVideos[i] = val;
+                                 setEditedCiv({ ...editedCiv, videos: newVideos });
+                               }}
+                               onRemove={(i) => {
+                                 const newVideos = [...(editedCiv.videos || [])];
+                                 newVideos.splice(i, 1);
+                                 setEditedCiv({ ...editedCiv, videos: newVideos });
+                               }}
+                             />
+                           );
+                         })}
                       </SortableContext>
                     </DndContext>
                   ) : (
