@@ -194,9 +194,9 @@ export function TournamentDetail() {
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0b] via-[#0a0a0b]/60 to-transparent"></div>
         
         {/* Top-aligned Navigation Row spanning to the edges */}
-        <div className="absolute top-6 md:top-8 left-0 right-0 w-full pl-6 md:pl-12 pr-2 md:pr-4 flex justify-between items-start z-30">
+        <div className="absolute top-6 md:top-8 left-0 right-0 w-full px-6 md:pl-12 md:pr-4 flex flex-col sm:flex-row justify-between items-start gap-3 z-30">
           {/* Left Side */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 w-full sm:w-auto">
             <button 
               onClick={() => navigate('/tornei')}
               className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
@@ -207,7 +207,7 @@ export function TournamentDetail() {
           </div>
 
           {/* Right Side */}
-          <div className="flex flex-col items-end gap-3 text-right">
+          <div className="flex flex-col items-start sm:items-end gap-3 text-left sm:text-right w-full sm:w-auto">
             {hasMarkets && (
               <button 
                 onClick={() => navigate(`/tornei/${window.location.pathname.includes('/tournament/') ? `tournament/${slug}` : slug}/scommetti${window.location.search}`)}

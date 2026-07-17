@@ -693,7 +693,7 @@ export function ClassificaPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-0 border-b border-white/10 px-6 md:px-20 bg-white/[0.02]">
+      <div className="flex gap-0 border-b border-white/10 px-6 md:px-20 bg-white/[0.02] overflow-x-auto scrollbar-none whitespace-nowrap">
         {[
           { id: 'elo' as LeaderboardType, label: 'Elo Classificate' },
           { id: 'singolo' as LeaderboardType, label: 'Classifica Singolo' },
@@ -706,7 +706,7 @@ export function ClassificaPage() {
               setSortColumn(tab.id === 'elo' ? '_scudi_totali' : 'rating');
               setSortDirection('desc');
             }}
-            className={`px-4 md:px-6 py-4 font-bold uppercase tracking-wider text-sm border-b-2 transition-all ${activeTab === tab.id
+            className={`px-4 md:px-6 py-4 font-bold uppercase tracking-wider text-sm border-b-2 flex-shrink-0 transition-all ${activeTab === tab.id
               ? 'border-slate-300 text-white'
               : 'border-transparent text-gray-400 hover:text-white'
               }`}

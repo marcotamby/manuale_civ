@@ -503,9 +503,9 @@ export function BettingPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 animate-in fade-in duration-700">
-      <div className="flex justify-between items-start mb-6 w-full gap-4 px-4 md:px-0">
+      <div className="flex flex-col sm:flex-row justify-between items-start mb-6 w-full gap-4 px-4 md:px-0">
         {/* Left Side */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 w-full sm:w-auto">
           <Link 
             to="/tornei"
             className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
@@ -515,7 +515,7 @@ export function BettingPage() {
         </div>
 
         {/* Right Side */}
-        <div className="flex flex-col items-end gap-3 text-right">
+        <div className="flex flex-col items-start sm:items-end gap-3 text-left sm:text-right w-full sm:w-auto">
           {hasIntegratedBracket ? (
             <Link 
               to={`/tornei/${window.location.pathname.includes('/tournament/') ? `tournament/${slug}` : slug}${location.search}`}
