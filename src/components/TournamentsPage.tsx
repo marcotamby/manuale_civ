@@ -1794,7 +1794,7 @@ export function TournamentsPage() {
                           
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div className="space-y-1">
-                              <label className="text-[9px] text-gray-500 font-bold uppercase ml-1">Titolo Match / Giocatori</label>
+                              <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center h-4">Titolo Match / Giocatori</label>
                               <input 
                                 type="text" 
                                 value={v.title || ''} 
@@ -1809,7 +1809,7 @@ export function TournamentsPage() {
                             </div>
                             
                             <div className="space-y-1">
-                              <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-1.5"><Youtube size={12}/> Link YouTube</label>
+                              <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-1.5 h-4"><Youtube size={12}/> Link YouTube</label>
                               <input 
                                 type="text" 
                                 value={v.url || ''} 
