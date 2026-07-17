@@ -129,18 +129,18 @@ export function TournamentMatchesPage() {
       />
       
       {/* Hero Header */}
-      <div className="relative h-[220px] md:h-[300px] overflow-hidden">
+      <div className="relative min-h-[220px] md:min-h-[300px] flex items-end overflow-hidden">
         <img 
           src={banner} 
-          className="w-full h-full object-cover opacity-35 blur-sm scale-105" 
+          className="absolute inset-0 w-full h-full object-cover opacity-35 blur-sm scale-105" 
           style={{ objectPosition: `${tournament.banner_position_x || 50}% ${tournament.banner_position_y || 50}%` }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0b] via-[#0a0a0b]/60 to-transparent"></div>
         
-        <div className="absolute bottom-0 left-0 right-0 max-w-7xl mx-auto px-4 pb-6 md:pb-10">
-          <div className="flex justify-between items-start mb-6 w-full gap-4">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 pt-6 pb-6 md:pb-10">
+          <div className="flex flex-col sm:flex-row justify-between items-start mb-6 w-full gap-4">
             {/* Left Side */}
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 w-full sm:w-auto">
               <button 
                 onClick={() => navigate('/tornei')}
                 className="flex items-center gap-2 text-gray-200 hover:text-white transition-all duration-300 ease-in-out hover:translate-x-[2px] group text-sm uppercase tracking-widest font-bold hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] w-fit"
@@ -151,7 +151,7 @@ export function TournamentMatchesPage() {
             </div>
             
             {/* Right Side */}
-            <div className="flex flex-col items-end gap-3 text-right">
+            <div className="flex flex-col items-start sm:items-end gap-3 text-left sm:text-right w-full sm:w-auto">
               {hasIntegratedBracket ? (
                 <button 
                   onClick={() => navigate(`/tornei/${window.location.pathname.includes('/tournament/') ? `tournament/${slug}` : slug}${window.location.search}`)}

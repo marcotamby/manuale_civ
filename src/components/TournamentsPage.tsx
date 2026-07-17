@@ -342,11 +342,11 @@ function SortableTournamentCard({
 
               return (
                 <>
-                  <div className="flex justify-between items-center mb-3 border-b border-white/5 pb-2 min-h-[28px] overflow-visible">
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-center items-start gap-2 mb-3 border-b border-white/5 pb-2 min-h-[28px] overflow-visible">
                     <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Risultati Finali</p>
                     
                     {divisions.length > 1 && (
-                      <div className="flex gap-1 bg-white/[0.02] p-0.5 rounded-lg border border-white/5 shadow-inner">
+                      <div className="flex gap-1 bg-white/[0.02] p-0.5 rounded-lg border border-white/5 shadow-inner max-w-full overflow-x-auto scrollbar-none shrink-0">
                         {divisions.map((divName) => {
                           const isActive = activeDiv === divName;
                           return (
@@ -392,11 +392,11 @@ function SortableTournamentCard({
           </div>
 
           {!isEditingOrder && (
-            <div className="mt-auto flex items-center gap-2 pt-4 border-t border-white/5 h-16">
+            <div className="mt-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-4 border-t border-white/5 h-auto">
               {t.config.hasRegolamento && (
                 <Link 
                   to={`/tornei/${t.slug}/regolamento`} 
-                  className="flex-grow h-full bg-blue-950/40 hover:bg-blue-900/60 border border-blue-500/30 rounded-2xl text-blue-400 text-[10px] font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/reg shadow-lg active:scale-95"
+                  className="w-full sm:w-auto sm:flex-grow h-12 bg-blue-950/40 hover:bg-blue-900/60 border border-blue-500/30 rounded-2xl text-blue-400 text-[10px] font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/reg shadow-lg active:scale-95"
                 >
                   Regolamento <BookOpen size={14} className="group-hover/reg:scale-110 transition-transform" />
                 </Link>
@@ -411,7 +411,7 @@ function SortableTournamentCard({
                 const isStartGGWithEvents = hasSyncLink && !isExternal && t.config.source === 'startgg' && (hasEvents || (t.slug && t.slug.startsWith('tournament/')));
                 
                 const commonClasses = clsx(
-                  "flex-grow h-full bg-white/5 hover:bg-white/10 rounded-2xl text-white font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/det shadow-lg active:scale-95",
+                  "w-full sm:w-auto sm:flex-grow h-12 bg-white/5 hover:bg-white/10 rounded-2xl text-white font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/det shadow-lg active:scale-95",
                   t.config.hasRegolamento ? "text-[10px]" : "text-xs"
                 );
 
@@ -481,7 +481,7 @@ function SortableTournamentCard({
                     setIsPodiumExpanded(false);
                     setIsVodsExpanded(false);
                   }} 
-                  className="w-14 h-full bg-white/5 hover:bg-white/10 rounded-2xl text-blue-400 transition-all border border-white/5 hover:border-blue-500/30 active:scale-95 shadow-lg flex items-center justify-center shrink-0"
+                  className="w-full sm:w-12 h-12 bg-white/5 hover:bg-white/10 rounded-2xl text-blue-400 transition-all border border-white/5 hover:border-blue-500/30 active:scale-95 shadow-lg flex items-center justify-center shrink-0"
                 >
                   <Edit2 size={20} />
                 </button>
