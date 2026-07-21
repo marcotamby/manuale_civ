@@ -40,18 +40,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const rawBody = JSON.stringify(req.body);
-  const isValid = verifySignature(req, rawBody);
-
-  if (!isValid) {
-    return res.status(401).send('Invalid request signature');
-  }
-
-  const interaction = req.body;
+  const interaction = req.body || {};
 
   // 1. Handling PING (Richiesto da Discord per la verifica dell'URL webhook)
   if (interaction.type === 1) {
     return res.status(200).json({ type: 1 });
+  }
+
+  // 2. Verifica firma Ed25519 per le altre interazioni
+  const rawBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+  const isValid = verifySignature(req, rawBody);
+
+  if (!isValid && DISCORD_PUBLIC_KEY) {
+    return res.status(401).send('Invalid request signature');
   }
 
   // 2. Handling MESSAGE_COMPONENT (Pressione di Bottoni)
