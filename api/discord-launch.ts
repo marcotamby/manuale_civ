@@ -161,16 +161,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const messageData = await discordRes.json();
 
-    // Creazione automatica dei 3 Thread Discord dedicati sul messaggio del torneo
+    // Creazione automatica dei 3 Thread Discord dedicati (con fallback e nomi puliti)
     const threadsToCreate = [
-      { name: '👥-partecipanti', msg: '👥 **Thread Partecipanti**: Gli iscritti al torneo ed i loro avatar verranno notificati ed aggiornati qui!' },
-      { name: '🏆-risultati', msg: '🏆 **Thread Risultati**: I risultati dei match ed i vincitori del torneo saranno pubblicati qui in tempo reale!' },
-      { name: '⚔️-brackets', msg: `⚔️ **Thread Brackets**: Consulta ed incrocia il tabellone live ad eliminazione diretta sul sito web!` }
+      { name: 'partecipanti', msg: '👥 **Thread Partecipanti**: Gli iscritti al torneo ed i loro avatar verranno notificati ed aggiornati qui!' },
+      { name: 'risultati', msg: '🏆 **Thread Risultati**: I risultati dei match ed i vincitori del torneo saranno pubblicati qui in tempo reale!' },
+      { name: 'brackets', msg: `⚔️ **Thread Brackets**: Consulta ed incrocia il tabellone live ad eliminazione diretta sul sito web!` }
     ];
 
     for (const threadInfo of threadsToCreate) {
       try {
-        const threadRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages/${messageData.id}/threads`, {
+        // Tentativo 1: Thread attaccato al messaggio
+        let threadRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages/${messageData.id}/threads`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -181,6 +182,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             auto_archive_duration: 1440
           })
         });
+
+        // Tentativo 2: Fallback su Thread del Canale
+        if (!threadRes.ok) {
+          const err1 = await threadRes.text();
+          console.warn(`Thread su messaggio non riuscito per '${threadInfo.name}' (${err1}). Tentativo fallback su canale...`);
+          threadRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/threads`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}`
+            },
+            body: JSON.stringify({
+              name: threadInfo.name,
+              type: 11, // GUILD_PUBLIC_THREAD
+              auto_archive_duration: 1440
+            })
+          });
+        }
 
         if (threadRes.ok) {
           const threadData = await threadRes.json();
@@ -193,9 +212,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             },
             body: JSON.stringify({ content: threadInfo.msg })
           });
+        } else {
+          console.error(`Errore API Discord creazione thread '${threadInfo.name}':`, await threadRes.text());
         }
       } catch (tErr) {
-        console.warn('Avviso creazione thread Discord:', tErr);
+        console.warn('Avviso eccezione thread Discord:', tErr);
       }
     }
 

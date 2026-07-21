@@ -32,12 +32,28 @@ export function TournamentDetail() {
         const [baseSlug] = (slug || '').split('?');
         const cleanSlug = baseSlug.trim().replace(/\/$/, '');
         
-        // Cerca il record nel database in modo estremo: esatto, parziale o con slash
-        const { data: dbTournament } = await supabase
+        // Cerca il record nel database in modo sicuro: prima match esatto, poi fallback
+        let dbTournament: any = null;
+        
+        const { data: exactMatch } = await supabase
           .from('tournaments')
           .select('*')
-          .or(`slug.eq.${cleanSlug},slug.ilike.${cleanSlug},slug.ilike.%${cleanSlug}%`)
+          .eq('slug', cleanSlug)
           .maybeSingle();
+
+        if (exactMatch) {
+          dbTournament = exactMatch;
+        } else {
+          const { data: listMatch } = await supabase
+            .from('tournaments')
+            .select('*')
+            .or(`id.eq.${cleanSlug},slug.ilike.${cleanSlug},slug.ilike.%${cleanSlug}%`)
+            .limit(1);
+
+          if (listMatch && listMatch.length > 0) {
+            dbTournament = listMatch[0];
+          }
+        }
 
         const activeSource = dbTournament?.source || source;
 
