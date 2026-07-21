@@ -537,6 +537,9 @@ export function TournamentsPage() {
   const [isPodiumExpanded, setIsPodiumExpanded] = useState(false);
   const [isVodsExpanded, setIsVodsExpanded] = useState(false);
   const [isDiscordSectionExpanded, setIsDiscordSectionExpanded] = useState(true);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [calendarYear, setCalendarYear] = useState(() => new Date().getFullYear());
+  const [calendarMonth, setCalendarMonth] = useState(() => new Date().getMonth());
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'synced'>('idle');
   const [bracketErrorId, setBracketErrorId] = useState<string | null>(null);
@@ -1685,59 +1688,119 @@ export function TournamentsPage() {
                           </div>
                         </div>
 
-                        {/* Data Torneo (Calendario Clickabile) */}
-                        <div className="space-y-1">
+                        {/* Data Torneo (Calendario Custom Dark Premium) */}
+                        <div className="space-y-1 relative">
                           <label className="text-[10px] text-gray-300 font-black uppercase tracking-wider ml-1 flex items-center gap-1">
                             <Calendar size={12} className="text-cyan-400" /> Data Evento
                           </label>
+                          
+                          {/* Box Trigger Calendario */}
                           <div 
-                            onClick={(e) => {
-                              const input = e.currentTarget.querySelector('input');
-                              if (input && 'showPicker' in input) {
-                                try { input.showPicker(); } catch (err) {}
-                              }
-                            }}
-                            className="relative group cursor-pointer"
+                            onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+                            className="w-full bg-black/70 border border-cyan-500/40 p-3 rounded-xl text-white flex items-center justify-between cursor-pointer hover:border-cyan-400 transition-all text-xs font-semibold shadow-inner"
                           >
-                            <input
-                              type="date"
-                              value={editForm.eventDate}
-                              onChange={e => setEditForm({ ...editForm, eventDate: e.target.value })}
-                              onClick={e => {
-                                if ('showPicker' in e.currentTarget) {
-                                  try { e.currentTarget.showPicker(); } catch (err) {}
-                                }
-                              }}
-                              className="w-full bg-black/70 border border-cyan-500/40 p-3 pr-10 rounded-xl text-white outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-xs font-semibold cursor-pointer shadow-inner [color-scheme:dark]"
-                            />
-                            <Calendar size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400 pointer-events-none" />
+                            <span>
+                              {editForm.eventDate 
+                                ? new Date(editForm.eventDate + 'T00:00:00').toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }) 
+                                : 'Seleziona Data...'}
+                            </span>
+                            <Calendar size={14} className="text-cyan-400" />
                           </div>
+
+                          {/* Popover Calendario Custom Dark */}
+                          {isCalendarOpen && (
+                            <div className="absolute left-0 top-full mt-2 z-50 w-72 bg-[#0a0d14]/95 border border-cyan-500/50 p-4 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.9)] backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-200">
+                              {/* Header Mese ed Anno */}
+                              <div className="flex items-center justify-between mb-3 text-xs font-black uppercase tracking-wider text-cyan-400">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (calendarMonth === 0) {
+                                      setCalendarMonth(11);
+                                      setCalendarYear(y => y - 1);
+                                    } else {
+                                      setCalendarMonth(m => m - 1);
+                                    }
+                                  }}
+                                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/5 hover:bg-cyan-500/20 text-white font-bold transition-all"
+                                >
+                                  &lt;
+                                </button>
+                                <span>
+                                  {['GENNAIO', 'FEBBRAIO', 'MARZO', 'APRILE', 'MAGGIO', 'GIUGNO', 'LUGLIO', 'AGOSTO', 'SETTEMBRE', 'OTTOBRE', 'NOVEMBRE', 'DICEMBRE'][calendarMonth]} {calendarYear}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (calendarMonth === 11) {
+                                      setCalendarMonth(0);
+                                      setCalendarYear(y => y + 1);
+                                    } else {
+                                      setCalendarMonth(m => m + 1);
+                                    }
+                                  }}
+                                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/5 hover:bg-cyan-500/20 text-white font-bold transition-all"
+                                >
+                                  &gt;
+                                </button>
+                              </div>
+
+                              {/* Intestazione Giorni della Settimana */}
+                              <div className="grid grid-cols-7 gap-1 text-center mb-2">
+                                {['LU', 'MA', 'ME', 'GI', 'VE', 'SA', 'DO'].map(d => (
+                                  <span key={d} className="text-[9px] font-black text-gray-400">{d}</span>
+                                ))}
+                              </div>
+
+                              {/* Griglia dei Giorni */}
+                              <div className="grid grid-cols-7 gap-1">
+                                {Array.from({ length: (new Date(calendarYear, calendarMonth, 1).getDay() + 6) % 7 }).map((_, i) => (
+                                  <div key={`empty-${i}`} />
+                                ))}
+                                {Array.from({ length: new Date(calendarYear, calendarMonth + 1, 0).getDate() }).map((_, i) => {
+                                  const dayNum = i + 1;
+                                  const formattedDay = String(dayNum).padStart(2, '0');
+                                  const formattedMonth = String(calendarMonth + 1).padStart(2, '0');
+                                  const dateStr = `${calendarYear}-${formattedMonth}-${formattedDay}`;
+                                  const isSelected = editForm.eventDate === dateStr;
+
+                                  return (
+                                    <button
+                                      key={dayNum}
+                                      type="button"
+                                      onClick={() => {
+                                        setEditForm(f => ({ ...f, eventDate: dateStr }));
+                                        setIsCalendarOpen(false);
+                                      }}
+                                      className={clsx(
+                                        "h-8 rounded-lg text-xs font-bold transition-all flex items-center justify-center border",
+                                        isSelected
+                                          ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-black border-cyan-400 font-black shadow-[0_0_10px_rgba(6,182,212,0.6)] scale-105"
+                                          : "bg-white/5 border-white/5 text-gray-200 hover:bg-cyan-500/20 hover:text-cyan-300 hover:border-cyan-500/30"
+                                      )}
+                                    >
+                                      {dayNum}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
                         </div>
 
-                        {/* Orario Torneo */}
+                        {/* Orario Torneo (Digitazione Diretta Senza Popover) */}
                         <div className="space-y-1">
                           <label className="text-[10px] text-gray-300 font-black uppercase tracking-wider ml-1 flex items-center gap-1">
                             <Clock size={12} className="text-cyan-400" /> Orario Inizio
                           </label>
-                          <div 
-                            onClick={(e) => {
-                              const input = e.currentTarget.querySelector('input');
-                              if (input && 'showPicker' in input) {
-                                try { input.showPicker(); } catch (err) {}
-                              }
-                            }}
-                            className="relative group cursor-pointer"
-                          >
+                          <div className="relative">
                             <input
-                              type="time"
+                              type="text"
                               value={editForm.eventTime}
                               onChange={e => setEditForm({ ...editForm, eventTime: e.target.value })}
-                              onClick={e => {
-                                if ('showPicker' in e.currentTarget) {
-                                  try { e.currentTarget.showPicker(); } catch (err) {}
-                                }
-                              }}
-                              className="w-full bg-black/70 border border-cyan-500/40 p-3 pr-10 rounded-xl text-white outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-xs font-mono cursor-pointer shadow-inner [color-scheme:dark]"
+                              placeholder="Es: 21:00"
+                              maxLength={8}
+                              className="w-full bg-black/70 border border-cyan-500/40 p-3 pr-10 rounded-xl text-white outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-xs font-mono shadow-inner placeholder:text-gray-600"
                             />
                             <Clock size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400 pointer-events-none" />
                           </div>
