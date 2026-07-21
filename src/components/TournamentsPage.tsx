@@ -1017,25 +1017,23 @@ export function TournamentsPage() {
         let result = await execute(data);
         
         if (result.error) {
-          const errorMsg = result.error.message;
-          // If columns are missing, retry without them and warn the user
-          if (errorMsg.includes('display_order') || errorMsg.includes('banner_position_x') || errorMsg.includes('banner_position_y') || errorMsg.includes('is_archived')) {
-            console.warn("Missing database columns, retrying safe update:", errorMsg);
-            
-            const safeData = { ...data };
-            delete (safeData as any).display_order;
-            delete (safeData as any).banner_position_x;
-            delete (safeData as any).banner_position_y;
-            delete (safeData as any).is_archived;
+          const errorMsg = result.error.message || '';
+          console.warn("Possibili colonne mancanti nel DB Supabase, tentativo di salvataggio sicuro:", errorMsg);
+          
+          const safeData = { ...data };
+          if (errorMsg.includes('event_date') || errorMsg.includes('event_time') || errorMsg.includes('map') || errorMsg.includes('max_participants') || errorMsg.includes('discord_channel_id') || errorMsg.includes('display_order') || errorMsg.includes('banner_position_x') || errorMsg.includes('banner_position_y') || errorMsg.includes('is_archived')) {
+            // Rimuovi progressivamente solo le colonne mancanti che generano l'errore
+            delete safeData.event_date;
+            delete safeData.event_time;
+            delete safeData.map;
+            delete safeData.max_participants;
+            delete safeData.discord_channel_id;
+            delete safeData.display_order;
+            delete safeData.banner_position_x;
+            delete safeData.banner_position_y;
+            delete safeData.is_archived;
             
             result = await execute(safeData);
-            
-            if (!result.error) {
-              toast.error(
-                "Attenzione: Database non aggiornato! Le impostazioni aggiuntive (posizione banner, ordine, archiviato) non verranno salvate. Contatta l'amministratore per eseguire lo script SQL.",
-                { duration: 6000 }
-              );
-            }
           }
         }
 
@@ -1707,17 +1705,56 @@ export function TournamentsPage() {
                           </div>
                         </div>
 
-                        {/* Data Torneo */}
+                        {/* Data Torneo (Calendario Premium) */}
                         <div className="space-y-1">
                           <label className="text-[10px] text-gray-300 font-black uppercase tracking-wider ml-1 flex items-center gap-1">
                             <Calendar size={12} className="text-cyan-400" /> Data Evento
                           </label>
-                          <input
-                            type="date"
-                            value={editForm.eventDate}
-                            onChange={e => setEditForm({ ...editForm, eventDate: e.target.value })}
-                            className="w-full bg-black/60 border border-cyan-500/30 p-3 rounded-xl text-white outline-none focus:border-cyan-400 transition-colors text-xs"
-                          />
+                          <div className="relative group">
+                            <input
+                              type="date"
+                              value={editForm.eventDate}
+                              onChange={e => setEditForm({ ...editForm, eventDate: e.target.value })}
+                              className="w-full bg-black/70 border border-cyan-500/40 p-3 rounded-xl text-white outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-xs font-semibold cursor-pointer shadow-inner [color-scheme:dark]"
+                            />
+                          </div>
+                          {/* Pillole Rapide Data */}
+                          <div className="flex items-center gap-1 pt-1 flex-wrap">
+                            <span className="text-[9px] text-gray-500 font-bold uppercase">Rapidi:</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const today = new Date().toISOString().split('T')[0];
+                                setEditForm(f => ({ ...f, eventDate: today }));
+                              }}
+                              className="px-2 py-0.5 bg-white/5 hover:bg-cyan-500/20 text-gray-300 hover:text-cyan-300 rounded text-[9px] font-bold border border-white/10"
+                            >
+                              Oggi
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+                                setEditForm(f => ({ ...f, eventDate: tomorrow }));
+                              }}
+                              className="px-2 py-0.5 bg-white/5 hover:bg-cyan-500/20 text-gray-300 hover:text-cyan-300 rounded text-[9px] font-bold border border-white/10"
+                            >
+                              Domani
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const d = new Date();
+                                const day = d.getDay();
+                                const diff = d.getDate() + (6 - day + 7) % 7;
+                                const sat = new Date(d.setDate(diff)).toISOString().split('T')[0];
+                                setEditForm(f => ({ ...f, eventDate: sat }));
+                              }}
+                              className="px-2 py-0.5 bg-white/5 hover:bg-cyan-500/20 text-gray-300 hover:text-cyan-300 rounded text-[9px] font-bold border border-white/10"
+                            >
+                              Questo Sabato
+                            </button>
+                          </div>
                         </div>
 
                         {/* Orario Torneo */}
@@ -1725,12 +1762,33 @@ export function TournamentsPage() {
                           <label className="text-[10px] text-gray-300 font-black uppercase tracking-wider ml-1 flex items-center gap-1">
                             <Clock size={12} className="text-cyan-400" /> Orario Inizio
                           </label>
-                          <input
-                            type="time"
-                            value={editForm.eventTime}
-                            onChange={e => setEditForm({ ...editForm, eventTime: e.target.value })}
-                            className="w-full bg-black/60 border border-cyan-500/30 p-3 rounded-xl text-white outline-none focus:border-cyan-400 transition-colors text-xs"
-                          />
+                          <div className="relative">
+                            <input
+                              type="time"
+                              value={editForm.eventTime}
+                              onChange={e => setEditForm({ ...editForm, eventTime: e.target.value })}
+                              className="w-full bg-black/70 border border-cyan-500/40 p-3 rounded-xl text-white outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-xs font-mono cursor-pointer shadow-inner [color-scheme:dark]"
+                            />
+                          </div>
+                          {/* Preset Orario */}
+                          <div className="flex items-center gap-1 pt-1 flex-wrap">
+                            <span className="text-[9px] text-gray-500 font-bold uppercase">Preset:</span>
+                            {['15:00', '18:00', '20:30', '21:00', '21:30'].map(t => (
+                              <button
+                                key={t}
+                                type="button"
+                                onClick={() => setEditForm(f => ({ ...f, eventTime: t }))}
+                                className={clsx(
+                                  "px-2 py-0.5 rounded text-[9px] font-bold border transition-colors",
+                                  editForm.eventTime === t
+                                    ? "bg-cyan-500 text-black border-cyan-400"
+                                    : "bg-white/5 text-gray-300 hover:bg-white/10 border-white/10"
+                                )}
+                              >
+                                {t}
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </div>
 
