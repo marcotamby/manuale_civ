@@ -162,64 +162,125 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const messageData = await discordRes.json();
 
-    // Creazione automatica dei 3 Thread Discord dedicati (con fallback e nomi puliti)
-    const threadsToCreate = [
-      { name: 'partecipanti', msg: '👥 **Thread Partecipanti**: Gli iscritti al torneo ed i loro avatar verranno notificati ed aggiornati qui!' },
-      { name: 'risultati', msg: '🏆 **Thread Risultati**: I risultati dei match ed i vincitori del torneo saranno pubblicati qui in tempo reale!' },
-      { name: 'brackets', msg: `⚔️ **Thread Brackets**: Consulta ed incrocia il tabellone live ad eliminazione diretta sul sito web!` }
+    // Creazione automatica della Categoria e dei 3 Canali Testuali Reali su Discord
+    const channelsToCreate = [
+      { name: '👥-partecipanti', msg: '👥 **Canale Partecipanti**: Gli iscritti al torneo ed i loro avatar verranno notificati ed aggiornati qui!' },
+      { name: '🏆-risultati', msg: '🏆 **Canale Risultati**: I risultati dei match ed i vincitori del torneo saranno pubblicati qui in tempo reale!' },
+      { name: '⚔️-brackets', msg: `⚔️ **Canale Brackets**: Consulta ed incrocia il tabellone live ad eliminazione diretta sul sito web!` }
     ];
 
-    const createdThreads: string[] = [];
+    const createdChannels: string[] = [];
 
-    for (const threadInfo of threadsToCreate) {
-      try {
-        // Tentativo 1: Thread attaccato al messaggio
-        let threadRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages/${messageData.id}/threads`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}`
-          },
-          body: JSON.stringify({
-            name: threadInfo.name
-          })
-        });
+    try {
+      // 1. Recupera il Server ID (guild_id) e la Categoria attuale dal canale d'invio
+      const channelInfoRes = await fetch(`https://discord.com/api/v10/channels/${channelId}`, {
+        headers: { 'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}` }
+      });
 
-        // Tentativo 2: Fallback su Thread del Canale
-        if (!threadRes.ok) {
-          const err1 = await threadRes.text();
-          console.warn(`Thread su messaggio non riuscito per '${threadInfo.name}' (${err1}). Tentativo fallback su canale...`);
-          threadRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/threads`, {
+      if (channelInfoRes.ok) {
+        const channelInfo = await channelInfoRes.json();
+        const guildId = channelInfo.guild_id;
+        let targetCategoryId = channelInfo.parent_id || null;
+
+        if (guildId) {
+          // 2. Crea una Categoria dedicata per il Torneo nel Server Discord
+          const categoryRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}`
             },
             body: JSON.stringify({
-              name: threadInfo.name,
-              type: 11 // GUILD_PUBLIC_THREAD
+              name: `🏆 ${name ? name.toUpperCase() : 'TORNEO'}`,
+              type: 4 // 4 = GUILD_CATEGORY
             })
           });
+
+          if (categoryRes.ok) {
+            const categoryData = await categoryRes.json();
+            targetCategoryId = categoryData.id;
+          }
+
+          // 3. Crea i 3 Canali Testuali Reali (GUILD_TEXT type 0) all'interno della Categoria
+          for (const ch of channelsToCreate) {
+            try {
+              const textChannelRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}`
+                },
+                body: JSON.stringify({
+                  name: ch.name,
+                  type: 0, // 0 = GUILD_TEXT (Canale Testuale Reale)
+                  parent_id: targetCategoryId || undefined
+                })
+              });
+
+              if (textChannelRes.ok) {
+                const textChannelData = await textChannelRes.json();
+                createdChannels.push(ch.name);
+
+                // Invia il messaggio iniziale di benvenuto nel canale testuale appena creato
+                await fetch(`https://discord.com/api/v10/channels/${textChannelData.id}/messages`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}`
+                  },
+                  body: JSON.stringify({ content: ch.msg })
+                });
+              } else {
+                console.warn(`Creazione canale testuale ${ch.name} fallito, fallback su Thread...`);
+              }
+            } catch (chErr) {
+              console.warn(`Errore creazione canale ${ch.name}:`, chErr);
+            }
+          }
         }
+      }
+    } catch (gErr) {
+      console.warn('Avviso creazione canali testuali Discord:', gErr);
+    }
 
-        if (threadRes.ok) {
-          const threadData = await threadRes.json();
-          createdThreads.push(threadInfo.name);
-
-          // Invia messaggio iniziale nel thread
-          await fetch(`https://discord.com/api/v10/channels/${threadData.id}/messages`, {
+    // Fallback: Se la creazione dei canali testuali fallisce o non ha permessi sufficienti, crea i Thread sul messaggio
+    if (createdChannels.length === 0) {
+      for (const threadInfo of channelsToCreate) {
+        try {
+          let threadRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages/${messageData.id}/threads`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}`
             },
-            body: JSON.stringify({ content: threadInfo.msg })
+            body: JSON.stringify({ name: threadInfo.name })
           });
-        } else {
-          console.error(`Errore API Discord creazione thread '${threadInfo.name}':`, await threadRes.text());
+
+          if (!threadRes.ok) {
+            threadRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/threads`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}`
+              },
+              body: JSON.stringify({ name: threadInfo.name, type: 11 })
+            });
+          }
+
+          if (threadRes.ok) {
+            const threadData = await threadRes.json();
+            await fetch(`https://discord.com/api/v10/channels/${threadData.id}/messages`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}`
+              },
+              body: JSON.stringify({ content: threadInfo.msg })
+            });
+          }
+        } catch (tErr) {
+          console.warn('Avviso eccezione thread fallback:', tErr);
         }
-      } catch (tErr) {
-        console.warn('Avviso eccezione thread Discord:', tErr);
       }
     }
 
