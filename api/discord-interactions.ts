@@ -41,7 +41,7 @@ function verifyDiscordSignature(req: VercelRequest): boolean {
 /**
  * Aggiorna in tempo reale l'Embed del messaggio Discord con il conteggio iscritti aggiornato
  */
-async function updateDiscordMessageCount(tournamentId: string) {
+async function updateDiscordMessageCount(tournamentId: string, fallbackChannelId?: string, fallbackMessageId?: string) {
   if (!DISCORD_BOT_TOKEN) return;
 
   const { data: tournament } = await supabase
@@ -50,7 +50,13 @@ async function updateDiscordMessageCount(tournamentId: string) {
     .eq('id', tournamentId)
     .single();
 
-  if (!tournament || !tournament.discord_channel_id || !tournament.discord_message_id) return;
+  const channelId = tournament?.discord_channel_id || fallbackChannelId;
+  const messageId = tournament?.discord_message_id || fallbackMessageId;
+
+  if (!channelId || !messageId) {
+    console.error('Channel ID o Message ID mancante per l\'aggiornamento dell\'embed Discord', { channelId, messageId });
+    return;
+  }
 
   const { count } = await supabase
     .from('tournament_participants')
@@ -58,7 +64,7 @@ async function updateDiscordMessageCount(tournamentId: string) {
     .eq('tournament_id', tournamentId);
 
   const currentCount = count || 0;
-  const max = tournament.max_participants || 8;
+  const max = tournament?.max_participants || 8;
   const isFull = currentCount >= max;
 
   const fields: any[] = [
@@ -248,7 +254,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       // Aggiorna l'embed Discord in tempo reale
-      await updateDiscordMessageCount(tournamentId);
+      await updateDiscordMessageCount(tournamentId, interaction.channel_id, interaction.message?.id);
 
       return res.status(200).json({
         type: 4,
@@ -277,7 +283,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       // Aggiorna l'embed Discord in tempo reale
-      await updateDiscordMessageCount(tournamentId);
+      await updateDiscordMessageCount(tournamentId, interaction.channel_id, interaction.message?.id);
 
       return res.status(200).json({
         type: 4,

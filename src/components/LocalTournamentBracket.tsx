@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { Loader2, Trophy, RefreshCw, Users, Calendar, Clock, MapPin, UserCheck, Sparkles } from 'lucide-react';
+import { Loader2, Trophy, RefreshCw, Users, Calendar, Clock, MapPin, UserCheck, Sparkles, Play } from 'lucide-react';
 import { clsx } from 'clsx';
 import type { TournamentMatch, TournamentParticipant } from '../services/bracketEngine';
+import { generateSingleEliminationBracket } from '../services/bracketEngine';
+import { toast } from 'react-hot-toast';
 
 interface LocalTournamentBracketProps {
   tournamentId: string;
@@ -216,13 +218,36 @@ export function LocalTournamentBracket({ tournamentId }: LocalTournamentBracketP
 
       {/* SEZIONE 2: GRIGLIA PARTECIPANTI ISCRITTI IN TEMPO REALE (Si popola uno per uno) */}
       <div className="space-y-6">
-        <div className="flex items-center justify-between border-b border-white/5 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-4">
           <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
             <UserCheck size={16} className="text-cyan-400" /> Lista Iscritti in Tempo Reale ({currentCount} / {maxSlots})
           </h3>
-          <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
-            Aggiornato da Discord Bot
-          </span>
+          
+          <div className="flex items-center gap-3">
+            {matches.length === 0 && participants.length >= 2 && (
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    toast.loading('Generazione tabellone in corso...');
+                    await generateSingleEliminationBracket(tournamentId, participants);
+                    toast.dismiss();
+                    toast.success('🏆 Tabellone generato con successo!');
+                    fetchData();
+                  } catch (err: any) {
+                    toast.dismiss();
+                    toast.error(`Errore generazione: ${err.message}`);
+                  }
+                }}
+                className="px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:brightness-110 text-black font-black uppercase text-[10px] tracking-widest rounded-xl transition-all shadow-lg flex items-center gap-2 active:scale-95"
+              >
+                <Play size={12} fill="black" /> Genera Tabellone Match Ora
+              </button>
+            )}
+            <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold hidden sm:inline-block">
+              Aggiornato da Discord Bot
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">

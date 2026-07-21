@@ -324,14 +324,14 @@ export function TournamentDetail() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-full">
-        {selectedPhase ? (
+        {tournament?.db?.id ? (
+          <LocalTournamentBracket tournamentId={tournament.db.id} />
+        ) : selectedPhase ? (
           <TournamentBracket 
             phase={selectedPhase} 
             tournamentSlug={tournament?.slug || slug} 
             directLink={tournament?.db?.direct_link} 
           />
-        ) : tournament?.db?.id ? (
-          <LocalTournamentBracket tournamentId={tournament.db.id} />
         ) : (
           <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
             <div className="glass p-12 rounded-[3rem] border border-white/10 max-w-lg w-full shadow-2xl relative overflow-hidden group">
