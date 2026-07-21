@@ -9,8 +9,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 async function checkVideos() {
   const { data, error } = await supabase
     .from('civilizations')
-    .select('id, name, videos')
-    .in('id', ['english', 'lancaster']);
+    .select('id, name, videos');
 
   if (error) {
     console.error('Error:', error);

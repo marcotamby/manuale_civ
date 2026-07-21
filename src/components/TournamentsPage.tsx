@@ -8,6 +8,7 @@ import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckC
 import { clsx } from 'clsx';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
+import { launchTournamentOnDiscord } from '../services/discordBot';
 import { toast } from 'react-hot-toast';
 import {
   DndContext, 
@@ -522,7 +523,9 @@ export function TournamentsPage() {
     bannerPositionX: 50,
     bannerPositionY: 50,
     vods: [] as any[],
-    isArchived: false
+    isArchived: false,
+    maxParticipants: 16,
+    discordChannelId: ''
   });
   const [isUploading, setIsUploading] = useState(false);
   const [dragState, setDragState] = useState<{ startX: number; startY: number; startPosX: number; startPosY: number } | null>(null);
@@ -733,7 +736,9 @@ export function TournamentsPage() {
       bannerPositionX: t.config?.bannerPositionX || 50,
       bannerPositionY: t.config?.bannerPositionY || 50,
       vods: t.config?.vods || [],
-      isArchived: t.config?.isArchived || false
+      isArchived: t.config?.isArchived || false,
+      maxParticipants: t.config?.maxParticipants || t.config?.max_participants || 16,
+      discordChannelId: t.config?.discordChannelId || t.config?.discord_channel_id || ''
     });
     setShowEditModal(true);
     const params = new URLSearchParams(window.location.search);
@@ -1246,7 +1251,9 @@ export function TournamentsPage() {
                       bannerPositionX: 50,
                       bannerPositionY: 50,
                       vods: [],
-                      isArchived: false
+                      isArchived: false,
+                      maxParticipants: 16,
+                      discordChannelId: ''
                     });
                     setShowEditModal(true);
                     setIsRegEditorExpanded(false);
@@ -1561,6 +1568,64 @@ export function TournamentsPage() {
                       </button>
                     ))}
                   </div>
+                </div>
+
+                {/* Discord Integration Section */}
+                <div className="space-y-4 p-5 bg-cyan-500/5 border border-cyan-500/20 rounded-2xl">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-black text-cyan-400 uppercase tracking-widest flex items-center gap-2">
+                      💬 Iscrizioni & Discord Bot
+                    </label>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-[10px] text-gray-400 font-bold uppercase ml-1">Tetto Max Partecipanti</label>
+                      <input 
+                        type="number" 
+                        value={editForm.maxParticipants} 
+                        onChange={e => setEditForm({...editForm, maxParticipants: parseInt(e.target.value) || 16})} 
+                        className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-cyan-500 transition-colors text-xs" 
+                        placeholder="16"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] text-gray-400 font-bold uppercase ml-1">ID Canale Discord</label>
+                      <input 
+                        type="text" 
+                        value={editForm.discordChannelId} 
+                        onChange={e => setEditForm({...editForm, discordChannelId: e.target.value})} 
+                        placeholder="Es: 123456789012345678" 
+                        className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-cyan-500 transition-colors text-xs" 
+                      />
+                    </div>
+                  </div>
+                  
+                  {editingTournament?.id && editForm.discordChannelId && (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          toast.loading('Invio messaggio su Discord in corso...');
+                          await launchTournamentOnDiscord({
+                            tournamentId: editingTournament.id,
+                            name: editForm.name || editingTournament.name || 'Torneo',
+                            maxParticipants: editForm.maxParticipants || 16,
+                            channelId: editForm.discordChannelId,
+                            description: editForm.period ? `Periodo: ${editForm.period}` : undefined,
+                            bannerUrl: editForm.bannerUrl || undefined
+                          });
+                          toast.dismiss();
+                          toast.success('🚀 Torneo lanciato con successo su Discord!');
+                        } catch (err: any) {
+                          toast.dismiss();
+                          toast.error(`Errore invio Discord: ${err.message}`);
+                        }
+                      }}
+                      className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-black uppercase text-xs tracking-widest rounded-xl transition-all shadow-lg shadow-cyan-500/20 active:scale-95 flex items-center justify-center gap-2"
+                    >
+                      🚀 Lancia Torneo su Discord (Invia Embed con Bottoni)
+                    </button>
+                  )}
                 </div>
 
                 <div className="space-y-4 p-4 rounded-2xl bg-white/5 border border-white/10">

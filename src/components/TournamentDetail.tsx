@@ -7,6 +7,7 @@ import { fetchChallongeTournament, fetchChallongeData, mapChallongeToUnified } f
 // I tipi vengono gestiti internamente come any per compatibilità Start.gg/Challonge
 import { Loader2, ArrowLeft, Trophy, Users, Shield, ArrowRight } from 'lucide-react';
 import { TournamentBracket } from './TournamentBracket';
+import { LocalTournamentBracket } from './LocalTournamentBracket';
 
 export function TournamentDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -329,6 +330,8 @@ export function TournamentDetail() {
             tournamentSlug={tournament?.slug || slug} 
             directLink={tournament?.db?.direct_link} 
           />
+        ) : tournament?.db?.id ? (
+          <LocalTournamentBracket tournamentId={tournament.db.id} />
         ) : (
           <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
             <div className="glass p-12 rounded-[3rem] border border-white/10 max-w-lg w-full shadow-2xl relative overflow-hidden group">
