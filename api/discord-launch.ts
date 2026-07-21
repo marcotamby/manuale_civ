@@ -104,11 +104,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!discordRes.ok) {
       const errText = await discordRes.text();
       console.error('Errore API Discord:', errText);
+      let detailsMessage = errText;
+      if (errText.includes('50001') || errText.includes('Missing Access')) {
+        detailsMessage = 'Il Bot Discord non ha i permessi per accedere a questo canale o non è stato ancora aggiunto a questo Server Discord. Verifica che il Bot sia nel server ed abbia i permessi "Vedi Canale" e "Invia Messaggi".';
+      } else if (errText.includes('50013') || errText.includes('Missing Permissions')) {
+        detailsMessage = 'Il Bot non ha i permessi di invio messaggi / embed in questo canale.';
+      } else if (errText.includes('Unknown Channel') || errText.includes('10003')) {
+        detailsMessage = 'ID Canale non valido o canale inesistente.';
+      }
       return res.status(discordRes.status).json({
         error: `Discord API errore (${discordRes.status})`,
-        details: errText.includes('Unknown Channel') 
-          ? 'Canale non trovato o il Bot non ha permessi di accesso a quel canale Discord.' 
-          : errText
+        details: detailsMessage
       });
     }
 
