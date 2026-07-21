@@ -169,6 +169,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       { name: 'brackets', msg: `⚔️ **Thread Brackets**: Consulta ed incrocia il tabellone live ad eliminazione diretta sul sito web!` }
     ];
 
+    const createdThreads: string[] = [];
+
     for (const threadInfo of threadsToCreate) {
       try {
         // Tentativo 1: Thread attaccato al messaggio
@@ -179,8 +181,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}`
           },
           body: JSON.stringify({
-            name: threadInfo.name,
-            auto_archive_duration: 1440
+            name: threadInfo.name
           })
         });
 
@@ -196,14 +197,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             },
             body: JSON.stringify({
               name: threadInfo.name,
-              type: 11, // GUILD_PUBLIC_THREAD
-              auto_archive_duration: 1440
+              type: 11 // GUILD_PUBLIC_THREAD
             })
           });
         }
 
         if (threadRes.ok) {
           const threadData = await threadRes.json();
+          createdThreads.push(threadInfo.name);
+
           // Invia messaggio iniziale nel thread
           await fetch(`https://discord.com/api/v10/channels/${threadData.id}/messages`, {
             method: 'POST',

@@ -195,7 +195,7 @@ export function LocalTournamentBracket({ tournamentId }: LocalTournamentBracketP
         </div>
       </div>
 
-      {/* SEZIONE 1: TABELLONE MATCH (se i match sono generati) */}
+      {/* SEZIONE 1: TABELLONE MATCH */}
       {matches.length > 0 ? (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
@@ -231,7 +231,21 @@ export function LocalTournamentBracket({ tournamentId }: LocalTournamentBracketP
             })}
           </div>
         </div>
-      ) : null}
+      ) : (
+        <div className="bg-gradient-to-r from-cyan-950/30 via-black/60 to-cyan-950/30 border border-cyan-500/30 p-8 rounded-3xl shadow-xl text-center space-y-3 backdrop-blur-md relative overflow-hidden">
+          <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mx-auto text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+            <Trophy size={24} />
+          </div>
+          <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">
+            Tabellone ad Eliminazione Diretta (In Attesa Iscritti)
+          </h3>
+          <p className="text-xs text-gray-400 max-w-lg mx-auto font-medium leading-relaxed">
+            {currentCount === 0 
+              ? "Le iscrizioni al torneo sono aperte su Discord! I partecipanti appariranno in tempo reale nella griglia qui sotto. Appena la griglia si popola o desideri avviare le sfide, potrai generare l'abbinamento del tabellone."
+              : `Ci sono attualmente ${currentCount} iscritti su ${maxSlots}. Clicca "Genera Tabellone Match Ora" per generare le sfide ad eliminazione diretta.`}
+          </p>
+        </div>
+      )}
 
       {/* SEZIONE 2: GRIGLIA PARTECIPANTI ISCRITTI IN TEMPO REALE (Si popola uno per uno) */}
       <div className="space-y-6">

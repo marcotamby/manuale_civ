@@ -31,7 +31,7 @@ export function TournamentDetail() {
         const [baseSlug] = (slug || '').split('?');
         const cleanSlug = baseSlug.trim().replace(/\/$/, '');
         
-        // 1. Cerca il record nel database Supabase (priorità assoluta)
+        // 1. Cerca il record nel database Supabase (ricerca a 3 livelli infallibile)
         let dbTournament: any = null;
         
         const { data: exactMatch } = await supabase
@@ -46,11 +46,23 @@ export function TournamentDetail() {
           const { data: listMatch } = await supabase
             .from('tournaments')
             .select('*')
-            .or(`id.eq.${cleanSlug},slug.ilike.${cleanSlug},slug.ilike.%${cleanSlug}%`)
+            .or(`id.eq.${cleanSlug},slug.ilike.${cleanSlug},slug.ilike.%${cleanSlug}%,name.ilike.%${cleanSlug}%`)
+            .order('updated_at', { ascending: false })
             .limit(1);
 
           if (listMatch && listMatch.length > 0) {
             dbTournament = listMatch[0];
+          } else {
+            // Ultimo fallback: prendi il torneo più recente creato sul sito
+            const { data: latestDb } = await supabase
+              .from('tournaments')
+              .select('*')
+              .order('updated_at', { ascending: false })
+              .limit(1);
+
+            if (latestDb && latestDb.length > 0) {
+              dbTournament = latestDb[0];
+            }
           }
         }
 
