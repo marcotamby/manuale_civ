@@ -1630,8 +1630,8 @@ export function TournamentsPage() {
                               </button>
                               <input 
                                 type="number" 
-                                value={editForm.maxParticipants} 
-                                onChange={e => setEditForm({ ...editForm, maxParticipants: Math.max(2, parseInt(e.target.value) || 2) })} 
+                                value={editForm.maxParticipants || 8} 
+                                onChange={e => setEditForm({ ...editForm, maxParticipants: Math.max(2, parseInt(e.target.value) || 8) })} 
                                 className="w-full text-center bg-transparent text-white font-black text-sm outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                               />
                               <button
@@ -1642,26 +1642,6 @@ export function TournamentsPage() {
                                 +
                               </button>
                             </div>
-                          </div>
-
-                          {/* Scelta Rapida (Pillole Presets) */}
-                          <div className="flex items-center gap-1.5 pt-1">
-                            <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tight mr-1">Preset:</span>
-                            {[4, 8, 16, 32].map(num => (
-                              <button
-                                key={num}
-                                type="button"
-                                onClick={() => setEditForm({ ...editForm, maxParticipants: num })}
-                                className={clsx(
-                                  "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase transition-all border",
-                                  editForm.maxParticipants === num
-                                    ? "bg-cyan-500 text-black border-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.4)] scale-105"
-                                    : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border-white/10"
-                                )}
-                              >
-                                {num}
-                              </button>
-                            ))}
                           </div>
                         </div>
 
@@ -1696,7 +1676,7 @@ export function TournamentsPage() {
                               onChange={e => setEditForm({ ...editForm, map: e.target.value })}
                               className="w-full bg-black/60 border border-cyan-500/30 p-3 rounded-xl text-white outline-none focus:border-cyan-400 transition-colors appearance-none cursor-pointer text-xs"
                             >
-                              <option value="" className="bg-[#0a0d14] text-gray-400">-- Seleziona Mappa (Opzionale) --</option>
+                              <option value="" className="bg-[#0a0d14] text-gray-400">-- Seleziona Mappa --</option>
                               {AOE4_MAPS.map(m => (
                                 <option key={m} value={m} className="bg-[#0a0d14] text-white">{m}</option>
                               ))}
@@ -1705,55 +1685,32 @@ export function TournamentsPage() {
                           </div>
                         </div>
 
-                        {/* Data Torneo (Calendario Premium) */}
+                        {/* Data Torneo (Calendario Clickabile) */}
                         <div className="space-y-1">
                           <label className="text-[10px] text-gray-300 font-black uppercase tracking-wider ml-1 flex items-center gap-1">
                             <Calendar size={12} className="text-cyan-400" /> Data Evento
                           </label>
-                          <div className="relative group">
+                          <div 
+                            onClick={(e) => {
+                              const input = e.currentTarget.querySelector('input');
+                              if (input && 'showPicker' in input) {
+                                try { input.showPicker(); } catch (err) {}
+                              }
+                            }}
+                            className="relative group cursor-pointer"
+                          >
                             <input
                               type="date"
                               value={editForm.eventDate}
                               onChange={e => setEditForm({ ...editForm, eventDate: e.target.value })}
-                              className="w-full bg-black/70 border border-cyan-500/40 p-3 rounded-xl text-white outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-xs font-semibold cursor-pointer shadow-inner [color-scheme:dark]"
+                              onClick={e => {
+                                if ('showPicker' in e.currentTarget) {
+                                  try { e.currentTarget.showPicker(); } catch (err) {}
+                                }
+                              }}
+                              className="w-full bg-black/70 border border-cyan-500/40 p-3 pr-10 rounded-xl text-white outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-xs font-semibold cursor-pointer shadow-inner [color-scheme:dark]"
                             />
-                          </div>
-                          {/* Pillole Rapide Data */}
-                          <div className="flex items-center gap-1 pt-1 flex-wrap">
-                            <span className="text-[9px] text-gray-500 font-bold uppercase">Rapidi:</span>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const today = new Date().toISOString().split('T')[0];
-                                setEditForm(f => ({ ...f, eventDate: today }));
-                              }}
-                              className="px-2 py-0.5 bg-white/5 hover:bg-cyan-500/20 text-gray-300 hover:text-cyan-300 rounded text-[9px] font-bold border border-white/10"
-                            >
-                              Oggi
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-                                setEditForm(f => ({ ...f, eventDate: tomorrow }));
-                              }}
-                              className="px-2 py-0.5 bg-white/5 hover:bg-cyan-500/20 text-gray-300 hover:text-cyan-300 rounded text-[9px] font-bold border border-white/10"
-                            >
-                              Domani
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const d = new Date();
-                                const day = d.getDay();
-                                const diff = d.getDate() + (6 - day + 7) % 7;
-                                const sat = new Date(d.setDate(diff)).toISOString().split('T')[0];
-                                setEditForm(f => ({ ...f, eventDate: sat }));
-                              }}
-                              className="px-2 py-0.5 bg-white/5 hover:bg-cyan-500/20 text-gray-300 hover:text-cyan-300 rounded text-[9px] font-bold border border-white/10"
-                            >
-                              Questo Sabato
-                            </button>
+                            <Calendar size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400 pointer-events-none" />
                           </div>
                         </div>
 
@@ -1762,32 +1719,27 @@ export function TournamentsPage() {
                           <label className="text-[10px] text-gray-300 font-black uppercase tracking-wider ml-1 flex items-center gap-1">
                             <Clock size={12} className="text-cyan-400" /> Orario Inizio
                           </label>
-                          <div className="relative">
+                          <div 
+                            onClick={(e) => {
+                              const input = e.currentTarget.querySelector('input');
+                              if (input && 'showPicker' in input) {
+                                try { input.showPicker(); } catch (err) {}
+                              }
+                            }}
+                            className="relative group cursor-pointer"
+                          >
                             <input
                               type="time"
                               value={editForm.eventTime}
                               onChange={e => setEditForm({ ...editForm, eventTime: e.target.value })}
-                              className="w-full bg-black/70 border border-cyan-500/40 p-3 rounded-xl text-white outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-xs font-mono cursor-pointer shadow-inner [color-scheme:dark]"
+                              onClick={e => {
+                                if ('showPicker' in e.currentTarget) {
+                                  try { e.currentTarget.showPicker(); } catch (err) {}
+                                }
+                              }}
+                              className="w-full bg-black/70 border border-cyan-500/40 p-3 pr-10 rounded-xl text-white outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-xs font-mono cursor-pointer shadow-inner [color-scheme:dark]"
                             />
-                          </div>
-                          {/* Preset Orario */}
-                          <div className="flex items-center gap-1 pt-1 flex-wrap">
-                            <span className="text-[9px] text-gray-500 font-bold uppercase">Preset:</span>
-                            {['15:00', '18:00', '20:30', '21:00', '21:30'].map(t => (
-                              <button
-                                key={t}
-                                type="button"
-                                onClick={() => setEditForm(f => ({ ...f, eventTime: t }))}
-                                className={clsx(
-                                  "px-2 py-0.5 rounded text-[9px] font-bold border transition-colors",
-                                  editForm.eventTime === t
-                                    ? "bg-cyan-500 text-black border-cyan-400"
-                                    : "bg-white/5 text-gray-300 hover:bg-white/10 border-white/10"
-                                )}
-                              >
-                                {t}
-                              </button>
-                            ))}
+                            <Clock size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400 pointer-events-none" />
                           </div>
                         </div>
                       </div>
