@@ -1588,7 +1588,10 @@ export function TournamentsPage() {
                 </div>
 
                 {/* Discord Integration Section (Collassabile) */}
-                <div className="bg-gradient-to-b from-cyan-950/30 to-black/40 border border-cyan-500/30 rounded-3xl shadow-xl backdrop-blur-md overflow-hidden transition-all">
+                <div className={clsx(
+                  "bg-gradient-to-b from-cyan-950/30 to-black/40 border border-cyan-500/30 rounded-3xl shadow-xl backdrop-blur-md transition-all relative",
+                  isDiscordSectionExpanded ? "overflow-visible" : "overflow-hidden"
+                )}>
                   {/* Header Collassabile */}
                   <button
                     type="button"
@@ -1688,7 +1691,7 @@ export function TournamentsPage() {
                           </div>
                         </div>
 
-                        {/* Data Torneo (Calendario Custom Dark Premium) */}
+                        {/* Data Torneo (Calendario Custom Dark Premium Popover SOPRA) */}
                         <div className="space-y-1 relative">
                           <label className="text-[10px] text-gray-300 font-black uppercase tracking-wider ml-1 flex items-center gap-1">
                             <Calendar size={12} className="text-cyan-400" /> Data Evento
@@ -1707,9 +1710,9 @@ export function TournamentsPage() {
                             <Calendar size={14} className="text-cyan-400" />
                           </div>
 
-                          {/* Popover Calendario Custom Dark */}
+                          {/* Popover Calendario Custom Dark (Posizionato SOPRA) */}
                           {isCalendarOpen && (
-                            <div className="absolute left-0 top-full mt-2 z-50 w-72 bg-[#0a0d14]/95 border border-cyan-500/50 p-4 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.9)] backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-200">
+                            <div className="absolute left-0 bottom-full mb-3 z-[100] w-72 bg-[#080b10]/98 border border-cyan-500/60 p-4 rounded-2xl shadow-[0_-10px_40px_rgba(0,0,0,0.95)] backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-2 duration-200">
                               {/* Header Mese ed Anno */}
                               <div className="flex items-center justify-between mb-3 text-xs font-black uppercase tracking-wider text-cyan-400">
                                 <button
