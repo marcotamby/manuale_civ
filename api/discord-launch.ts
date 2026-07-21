@@ -7,12 +7,23 @@ const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN || process.env.VITE_DISC
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+function cleanChannelId(input: string): string {
+  if (!input) return '';
+  const trimmed = input.trim();
+  const matches = trimmed.match(/\d+/g);
+  if (matches && matches.length > 0) {
+    return matches[matches.length - 1];
+  }
+  return trimmed;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { tournamentId, name, maxParticipants, channelId, description, bannerUrl } = req.body;
+  const { tournamentId, name, maxParticipants, channelId: rawChannelId, description, bannerUrl } = req.body;
+  const channelId = cleanChannelId(rawChannelId);
 
   if (!channelId) {
     return res.status(400).json({ error: 'ID Canale Discord mancante.' });

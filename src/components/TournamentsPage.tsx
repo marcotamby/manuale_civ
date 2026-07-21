@@ -524,7 +524,7 @@ export function TournamentsPage() {
     bannerPositionY: 50,
     vods: [] as any[],
     isArchived: false,
-    maxParticipants: 16,
+    maxParticipants: 8,
     discordChannelId: ''
   });
   const [isUploading, setIsUploading] = useState(false);
@@ -737,7 +737,7 @@ export function TournamentsPage() {
       bannerPositionY: t.config?.bannerPositionY || 50,
       vods: t.config?.vods || [],
       isArchived: t.config?.isArchived || false,
-      maxParticipants: t.config?.maxParticipants || t.config?.max_participants || 16,
+      maxParticipants: t.config?.maxParticipants || t.config?.max_participants || 8,
       discordChannelId: t.config?.discordChannelId || t.config?.discord_channel_id || ''
     });
     setShowEditModal(true);
@@ -1252,7 +1252,7 @@ export function TournamentsPage() {
                       bannerPositionY: 50,
                       vods: [],
                       isArchived: false,
-                      maxParticipants: 16,
+                      maxParticipants: 8,
                       discordChannelId: ''
                     });
                     setShowEditModal(true);
