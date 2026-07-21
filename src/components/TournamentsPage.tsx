@@ -1571,35 +1571,90 @@ export function TournamentsPage() {
                 </div>
 
                 {/* Discord Integration Section */}
-                <div className="space-y-4 p-5 bg-cyan-500/5 border border-cyan-500/20 rounded-2xl">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[11px] font-black text-cyan-400 uppercase tracking-widest flex items-center gap-2">
+                <div className="space-y-5 p-6 bg-gradient-to-b from-cyan-950/30 to-black/40 border border-cyan-500/30 rounded-3xl shadow-xl backdrop-blur-md">
+                  <div className="flex items-center justify-between border-b border-cyan-500/10 pb-3">
+                    <label className="text-xs font-black text-cyan-400 uppercase tracking-widest flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
                       💬 Iscrizioni & Discord Bot
                     </label>
+                    <span className="text-[9px] font-bold text-cyan-500/70 uppercase tracking-wider bg-cyan-500/10 px-2.5 py-1 rounded-full border border-cyan-500/20">
+                      Sincronizzazione Live
+                    </span>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-[10px] text-gray-400 font-bold uppercase ml-1">Tetto Max Partecipanti</label>
-                      <input 
-                        type="number" 
-                        value={editForm.maxParticipants} 
-                        onChange={e => setEditForm({...editForm, maxParticipants: parseInt(e.target.value) || 16})} 
-                        className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-cyan-500 transition-colors text-xs" 
-                        placeholder="16"
-                      />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {/* Tetto Max Partecipanti (Stepper Premium) */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] text-gray-300 font-black uppercase tracking-wider ml-1 block">
+                        Tetto Max Partecipanti
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center bg-black/60 border border-cyan-500/30 rounded-2xl p-1 shadow-inner flex-1">
+                          <button
+                            type="button"
+                            onClick={() => setEditForm(f => ({ ...f, maxParticipants: Math.max(2, (f.maxParticipants || 16) - 1) }))}
+                            className="w-10 h-10 rounded-xl bg-white/5 hover:bg-cyan-500/20 text-cyan-400 hover:text-white font-black text-lg flex items-center justify-center transition-all active:scale-90 border border-white/5"
+                          >
+                            -
+                          </button>
+                          <input 
+                            type="number" 
+                            value={editForm.maxParticipants} 
+                            onChange={e => setEditForm({ ...editForm, maxParticipants: Math.max(2, parseInt(e.target.value) || 2) })} 
+                            className="w-full text-center bg-transparent text-white font-black text-sm outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setEditForm(f => ({ ...f, maxParticipants: (f.maxParticipants || 16) + 1 }))}
+                            className="w-10 h-10 rounded-xl bg-white/5 hover:bg-cyan-500/20 text-cyan-400 hover:text-white font-black text-lg flex items-center justify-center transition-all active:scale-90 border border-white/5"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Scelta Rapida (Pillole Presets) */}
+                      <div className="flex items-center gap-1.5 pt-1">
+                        <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tight mr-1">Preset:</span>
+                        {[4, 8, 16, 32].map(num => (
+                          <button
+                            key={num}
+                            type="button"
+                            onClick={() => setEditForm({ ...editForm, maxParticipants: num })}
+                            className={clsx(
+                              "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase transition-all border",
+                              editForm.maxParticipants === num
+                                ? "bg-cyan-500 text-black border-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.4)] scale-105"
+                                : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border-white/10"
+                            )}
+                          >
+                            {num}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] text-gray-400 font-bold uppercase ml-1">ID Canale Discord</label>
-                      <input 
-                        type="text" 
-                        value={editForm.discordChannelId} 
-                        onChange={e => setEditForm({...editForm, discordChannelId: e.target.value})} 
-                        placeholder="Es: 123456789012345678" 
-                        className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-cyan-500 transition-colors text-xs" 
-                      />
+
+                    {/* ID Canale Discord */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] text-gray-300 font-black uppercase tracking-wider ml-1 block">
+                        ID Canale Discord
+                      </label>
+                      <div className="relative">
+                        <input 
+                          type="text" 
+                          value={editForm.discordChannelId} 
+                          onChange={e => setEditForm({ ...editForm, discordChannelId: e.target.value.trim() })} 
+                          placeholder="Es: 1529037495746953329" 
+                          className="w-full bg-black/60 border border-cyan-500/30 p-3.5 rounded-2xl text-white outline-none focus:border-cyan-400 transition-colors text-xs font-mono tracking-wide placeholder:text-gray-600 shadow-inner" 
+                        />
+                      </div>
+                      <p className="text-[9px] text-gray-500 italic pl-1">
+                        Fai tasto destro sul canale Discord ➔ Copia ID canale
+                      </p>
                     </div>
                   </div>
-                  
+
+                  {/* Pulsante Lancio Torneo */}
                   {editingTournament?.id && editForm.discordChannelId && (
                     <button
                       type="button"
@@ -1621,7 +1676,7 @@ export function TournamentsPage() {
                           toast.error(`Errore invio Discord: ${err.message}`);
                         }
                       }}
-                      className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-black uppercase text-xs tracking-widest rounded-xl transition-all shadow-lg shadow-cyan-500/20 active:scale-95 flex items-center justify-center gap-2"
+                      className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-black uppercase text-xs tracking-[0.15em] rounded-2xl transition-all shadow-[0_0_25px_rgba(6,182,212,0.3)] active:scale-[0.98] flex items-center justify-center gap-2 mt-2"
                     >
                       🚀 Lancia Torneo su Discord (Invia Embed con Bottoni)
                     </button>
