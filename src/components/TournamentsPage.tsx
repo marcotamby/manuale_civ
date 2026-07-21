@@ -537,6 +537,8 @@ export function TournamentsPage() {
   const [isPodiumExpanded, setIsPodiumExpanded] = useState(false);
   const [isVodsExpanded, setIsVodsExpanded] = useState(false);
   const [isDiscordSectionExpanded, setIsDiscordSectionExpanded] = useState(true);
+  const [discordLaunchStatus, setDiscordLaunchStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [discordLaunchError, setDiscordLaunchError] = useState<string | null>(null);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [calendarYear, setCalendarYear] = useState(() => new Date().getFullYear());
   const [calendarMonth, setCalendarMonth] = useState(() => new Date().getMonth());
@@ -1810,13 +1812,15 @@ export function TournamentsPage() {
                         </div>
                       </div>
 
-                      {/* Pulsante Lancio Torneo */}
+                      {/* Pulsante Lancio Torneo (Conferma e stato INTEGRATO DENTRO IL BOTTONE) */}
                       {editingTournament?.id && editForm.discordChannelId && (
                         <button
                           type="button"
+                          disabled={discordLaunchStatus === 'sending'}
                           onClick={async () => {
+                            setDiscordLaunchStatus('sending');
+                            setDiscordLaunchError(null);
                             try {
-                              toast.loading('Invio messaggio su Discord in corso...');
                               await launchTournamentOnDiscord({
                                 tournamentId: editingTournament.id,
                                 name: editForm.name || editingTournament.name || 'Torneo',
@@ -1830,16 +1834,41 @@ export function TournamentsPage() {
                                 bannerUrl: editForm.bannerUrl || undefined,
                                 hasRegolamento: editForm.hasRegolamento
                               });
-                              toast.dismiss();
-                              toast.success('🚀 Torneo lanciato con successo su Discord!');
+                              setDiscordLaunchStatus('success');
+                              setTimeout(() => setDiscordLaunchStatus('idle'), 6000);
                             } catch (err: any) {
-                              toast.dismiss();
-                              toast.error(`Errore invio Discord: ${err.message}`);
+                              setDiscordLaunchStatus('error');
+                              setDiscordLaunchError(err.message || 'Errore invio Discord');
                             }
                           }}
-                          className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-black uppercase text-xs tracking-[0.15em] rounded-2xl transition-all shadow-[0_0_25px_rgba(6,182,212,0.3)] active:scale-[0.98] flex items-center justify-center gap-2 mt-3"
+                          className={clsx(
+                            "w-full py-4 text-xs font-black uppercase tracking-[0.15em] rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 mt-3 text-black",
+                            discordLaunchStatus === 'sending' && "bg-cyan-600/80 cursor-wait animate-pulse text-white",
+                            discordLaunchStatus === 'success' && "bg-gradient-to-r from-emerald-400 to-teal-500 text-black shadow-[0_0_25px_rgba(16,185,129,0.5)]",
+                            discordLaunchStatus === 'error' && "bg-gradient-to-r from-rose-500 to-red-600 text-white shadow-[0_0_25px_rgba(244,63,94,0.5)]",
+                            discordLaunchStatus === 'idle' && "bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black shadow-[0_0_25px_rgba(6,182,212,0.3)] active:scale-[0.98]"
+                          )}
                         >
-                          🚀 Lancia Torneo su Discord (Invia Embed con Bottoni)
+                          {discordLaunchStatus === 'sending' && (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" /> Invio Embed & Creazione Thread Discord...
+                            </>
+                          )}
+                          {discordLaunchStatus === 'success' && (
+                            <>
+                              <CheckCircle2 className="w-4 h-4" /> ✅ Embed & 3 Thread Lanciati con Successo su Discord!
+                            </>
+                          )}
+                          {discordLaunchStatus === 'error' && (
+                            <>
+                              <AlertCircle className="w-4 h-4" /> ❌ Errore Invio: {discordLaunchError}
+                            </>
+                          )}
+                          {discordLaunchStatus === 'idle' && (
+                            <>
+                              🚀 Lancia Torneo su Discord (Invia Embed con Bottoni)
+                            </>
+                          )}
                         </button>
                       )}
 
