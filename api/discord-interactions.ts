@@ -5,11 +5,12 @@ import { createClient } from '@supabase/supabase-js';
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
 const DISCORD_PUBLIC_KEY = (process.env.DISCORD_PUBLIC_KEY || '').trim();
+const DISCORD_BOT_TOKEN = (process.env.DISCORD_BOT_TOKEN || process.env.VITE_DISCORD_BOT_TOKEN || '').trim();
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 /**
- * Verifica la firma Ed25519 proveniente da Discord in modo conforme agli standard di sicurezza Discord
+ * Verifica la firma Ed25519 proveniente da Discord
  */
 function verifyDiscordSignature(req: VercelRequest): boolean {
   if (!DISCORD_PUBLIC_KEY) return true;
@@ -37,13 +38,126 @@ function verifyDiscordSignature(req: VercelRequest): boolean {
   }
 }
 
+/**
+ * Aggiorna in tempo reale l'Embed del messaggio Discord con il conteggio iscritti aggiornato
+ */
+async function updateDiscordMessageCount(tournamentId: string) {
+  if (!DISCORD_BOT_TOKEN) return;
+
+  const { data: tournament } = await supabase
+    .from('tournaments')
+    .select('*')
+    .eq('id', tournamentId)
+    .single();
+
+  if (!tournament || !tournament.discord_channel_id || !tournament.discord_message_id) return;
+
+  const { count } = await supabase
+    .from('tournament_participants')
+    .select('*', { count: 'exact', head: true })
+    .eq('tournament_id', tournamentId);
+
+  const currentCount = count || 0;
+  const max = tournament.max_participants || 8;
+  const isFull = currentCount >= max;
+
+  const fields: any[] = [
+    {
+      name: '👥 Posti Iscritti',
+      value: `**${currentCount} / ${max}** ${isFull ? '🔴 (ISCRIZIONI CHIUSE)' : ''}`,
+      inline: true
+    },
+    {
+      name: '⚔️ Tipologia',
+      value: tournament.type || '1v1',
+      inline: true
+    }
+  ];
+
+  if (tournament.map) {
+    fields.push({
+      name: '🗺️ Mappe Torneo',
+      value: tournament.map,
+      inline: true
+    });
+  }
+
+  if (tournament.event_date || tournament.event_time) {
+    const formattedDate = [tournament.event_date, tournament.event_time ? `ore ${tournament.event_time}` : ''].filter(Boolean).join(' - ');
+    fields.push({
+      name: '📅 Data & Orario',
+      value: formattedDate,
+      inline: false
+    });
+  }
+
+  fields.push({
+    name: '⚙️ Formato',
+    value: 'Eliminazione Diretta',
+    inline: true
+  });
+
+  const embed: any = {
+    title: `🏆 TORNEO UFFICIALE: ${(tournament.name || tournament.title || 'TORNEO').toUpperCase()}`,
+    description: isFull 
+      ? `🔒 **ISCRIZIONI CHIUSE!**\nIl tetto massimo di ${max} partecipanti è stato raggiunto. Il tabellone è popolato ed attivo sul sito web!`
+      : (tournament.description || `Sono aperte le iscrizioni per il torneo! Clicca sul bottone qui sotto per iscriverti direttamente da Discord.`),
+    color: isFull ? 0x10b981 : 0x06b6d4, // Verde se completo, Cyan se aperto
+    fields,
+    footer: {
+      text: 'Manuale Civ • Age of Empires IV',
+      icon_url: 'https://aoe4guide.it/favicon.ico'
+    },
+    timestamp: new Date().toISOString()
+  };
+
+  if (tournament.banner_url) {
+    embed.image = { url: tournament.banner_url };
+  }
+
+  const components = isFull ? [] : [
+    {
+      type: 1,
+      components: [
+        {
+          type: 2,
+          style: 1,
+          label: '📝 Iscriviti al Torneo',
+          custom_id: `tr_reg_${tournamentId}`
+        },
+        {
+          type: 2,
+          style: 4,
+          label: '❌ Cancella Iscrizione',
+          custom_id: `tr_unreg_${tournamentId}`
+        }
+      ]
+    }
+  ];
+
+  try {
+    await fetch(`https://discord.com/api/v10/channels/${tournament.discord_channel_id}/messages/${tournament.discord_message_id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bot ${DISCORD_BOT_TOKEN}`
+      },
+      body: JSON.stringify({
+        embeds: [embed],
+        components
+      })
+    });
+  } catch (err) {
+    console.error('Errore aggiornamento embed Discord:', err);
+  }
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   // 1. REQUISITO DI SICUREZZA DISCORD:
-  // La firma Ed25519 DEVE essere verificata PRIMA di processare qualsiasi tipo di interazione (incluso il PING)!
   const isValid = verifyDiscordSignature(req);
 
   if (!isValid) {
@@ -52,7 +166,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const interaction = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
 
-  // 2. Risposta al PING di verifica di Discord (type: 1)
+  // 2. Risposta al PING (type: 1)
   if (interaction.type === 1) {
     return res.status(200).json({ type: 1 });
   }
@@ -80,7 +194,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (customId.startsWith('tr_reg_')) {
       const tournamentId = customId.replace('tr_reg_', '');
 
-      // Recupera il torneo
       const { data: tournament } = await supabase
         .from('tournaments')
         .select('*')
@@ -94,13 +207,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
-      if (tournament.status !== 'open') {
-        return res.status(200).json({
-          type: 4,
-          data: { content: '🔒 Le iscrizioni per questo torneo sono chiuse.', flags: 64 }
-        });
-      }
-
       // Conteggio iscritti attuali
       const { count } = await supabase
         .from('tournament_participants')
@@ -108,7 +214,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .eq('tournament_id', tournamentId);
 
       const currentCount = count || 0;
-      const max = tournament.max_participants || 16;
+      const max = tournament.max_participants || 8;
 
       if (currentCount >= max) {
         return res.status(200).json({
@@ -141,12 +247,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
-      // Risposta all'utente
+      // Aggiorna l'embed Discord in tempo reale
+      await updateDiscordMessageCount(tournamentId);
+
       return res.status(200).json({
         type: 4,
         data: {
           content: `🎉 **Iscrizione confermata!** Benvenuto nel torneo *${tournament.name || tournament.title}*!`,
-          flags: 64 // Ephemeral (visibile solo all'utente)
+          flags: 64 // Ephemeral
         }
       });
     }
@@ -168,6 +276,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
+      // Aggiorna l'embed Discord in tempo reale
+      await updateDiscordMessageCount(tournamentId);
+
       return res.status(200).json({
         type: 4,
         data: { content: '🗑️ La tua iscrizione al torneo è stata cancellata.', flags: 64 }
@@ -180,7 +291,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const matchId = parts[0];
       const winnerParticipantId = parts[1];
 
-      // Recupera il match con i dati dei partecipanti
       const { data: match } = await supabase
         .from('tournament_matches')
         .select('*, p1:player1_id(*), p2:player2_id(*)')
@@ -194,7 +304,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
-      // Verifica se l'utente che clicca è uno dei due giocatori o ha permessi Admin
       const p1Discord = match.p1?.discord_user_id;
       const p2Discord = match.p2?.discord_user_id;
 
@@ -206,11 +315,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
-      // Determina i punteggi (es: 1 - 0)
       const score1 = winnerParticipantId === match.player1_id ? 1 : 0;
       const score2 = winnerParticipantId === match.player2_id ? 1 : 0;
 
-      // Aggiorna match e fa avanzare il vincitore al turno successivo
       const { error: updateErr } = await supabase
         .from('tournament_matches')
         .update({
@@ -229,7 +336,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
-      // Avanza il vincitore al match successivo se esiste
       if (match.next_match_id) {
         const updatePayload = match.next_match_slot === 1 
           ? { player1_id: winnerParticipantId, status: 'in_progress' } 
@@ -247,7 +353,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         type: 4,
         data: {
           content: `🏆 **Risultato registrato con successo!** Vincitore: **${winnerName}**! Il tabellone sul sito si è aggiornato in tempo reale!`,
-          flags: 0 // Messaggio pubblico nel canale
+          flags: 0
         }
       });
     }

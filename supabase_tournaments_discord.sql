@@ -3,11 +3,14 @@
 -- ============================================================
 
 -- 1. Aggiornamento Tabella Tournaments
-ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS max_participants INTEGER DEFAULT 16;
-ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'open'; -- 'draft', 'open', 'in_progress', 'completed'
+ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS max_participants INTEGER DEFAULT 8;
+ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'Programmato'; -- 'Programmato', 'In corso', 'Concluso'
 ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS discord_channel_id TEXT;
 ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS discord_message_id TEXT;
 ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS auto_bracket BOOLEAN DEFAULT TRUE;
+ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS map TEXT;
+ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS event_date TEXT;
+ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS event_time TEXT;
 
 -- 2. Tabella Partecipanti Torneo (Iscritti da Discord)
 CREATE TABLE IF NOT EXISTS tournament_participants (

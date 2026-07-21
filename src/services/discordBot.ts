@@ -4,11 +4,15 @@ import { generateSingleEliminationBracket } from './bracketEngine';
 export interface LaunchTournamentParams {
   tournamentId: string;
   name: string;
+  type?: string;
+  map?: string;
+  eventDate?: string;
+  eventTime?: string;
   maxParticipants: number;
   channelId: string;
   description?: string;
   bannerUrl?: string;
-  regolamentoContent?: string;
+  hasRegolamento?: boolean;
 }
 
 /**

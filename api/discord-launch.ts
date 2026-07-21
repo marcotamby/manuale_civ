@@ -22,7 +22,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { tournamentId, name, maxParticipants, channelId: rawChannelId, description, bannerUrl } = req.body;
+  const { 
+    tournamentId, 
+    name, 
+    type,
+    map,
+    eventDate, 
+    eventTime, 
+    maxParticipants, 
+    channelId: rawChannelId, 
+    description, 
+    bannerUrl,
+    hasRegolamento
+  } = req.body;
+
   const channelId = cleanChannelId(rawChannelId);
 
   if (!channelId) {
@@ -36,27 +49,55 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
+  const fields: any[] = [
+    {
+      name: '👥 Posti Iscritti',
+      value: `**0 / ${maxParticipants || 8}**`,
+      inline: true
+    },
+    {
+      name: '⚔️ Tipologia',
+      value: type || '1v1',
+      inline: true
+    }
+  ];
+
+  if (map) {
+    fields.push({
+      name: '🗺️ Mappe Torneo',
+      value: map,
+      inline: true
+    });
+  }
+
+  if (eventDate || eventTime) {
+    const formattedDate = [eventDate, eventTime ? `ore ${eventTime}` : ''].filter(Boolean).join(' - ');
+    fields.push({
+      name: '📅 Data & Orario',
+      value: formattedDate || 'Da definire',
+      inline: false
+    });
+  }
+
+  fields.push({
+    name: '⚙️ Formato',
+    value: 'Eliminazione Diretta',
+    inline: true
+  });
+
+  if (hasRegolamento) {
+    fields.push({
+      name: '📜 Regolamento',
+      value: 'Consulta il regolamento ufficiale sulla pagina del torneo sul sito web.',
+      inline: false
+    });
+  }
+
   const embed: any = {
     title: `🏆 TORNEO UFFICIALE: ${(name || 'TORNEO').toUpperCase()}`,
     description: description || `Sono aperte le iscrizioni per il torneo! Clicca sul bottone qui sotto per iscriverti direttamente da Discord.`,
     color: 0x06b6d4, // Cyan
-    fields: [
-      {
-        name: '👥 Posti Iscritti',
-        value: `**0 / ${maxParticipants || 16}**`,
-        inline: true
-      },
-      {
-        name: '⚙️ Formato',
-        value: 'Eliminazione Diretta',
-        inline: true
-      },
-      {
-        name: '📜 Regolamento',
-        value: 'Consulta le regole sul sito prima di giocare.',
-        inline: false
-      }
-    ],
+    fields,
     footer: {
       text: 'Manuale Civ • Age of Empires IV',
       icon_url: 'https://aoe4guide.it/favicon.ico'
@@ -120,15 +161,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const messageData = await discordRes.json();
 
-    // Salva l'ID del messaggio e del canale nel DB Supabase
+    // Salva l'ID del messaggio e del canale nel DB Supabase mantenendo lo stato 'Programmato'
     if (tournamentId) {
       await supabase
         .from('tournaments')
         .update({
           discord_channel_id: channelId,
           discord_message_id: messageData.id,
-          max_participants: maxParticipants || 16,
-          status: 'open'
+          max_participants: maxParticipants || 8,
+          map: map || null,
+          event_date: eventDate || null,
+          event_time: eventTime || null,
+          status: 'Programmato'
         })
         .eq('id', tournamentId);
     }

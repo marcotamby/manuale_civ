@@ -4,11 +4,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import { fetchTournament } from '../services/startgg';
 import { fetchChallongeTournament } from '../services/challonge';
 import type { StartGGTournament } from '../services/startgg';
-import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink, MoveVertical, Youtube, Trophy, GripVertical, Archive } from 'lucide-react';
+import { Calendar, Users, ArrowRight, Loader2, Plus, Link as LinkIcon, X, CheckCircle2, Edit2, Save, Trash2, Image as ImageIcon, ChevronDown, ChevronUp, Clock, MapPin, Upload, BookOpen, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertCircle, Settings, ExternalLink, MoveVertical, Youtube, Trophy, GripVertical, Archive } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabaseClient';
 import { launchTournamentOnDiscord } from '../services/discordBot';
+import { AOE4_MAPS } from '../data/aoe4Maps';
 import { toast } from 'react-hot-toast';
 import {
   DndContext, 
@@ -525,13 +526,17 @@ export function TournamentsPage() {
     vods: [] as any[],
     isArchived: false,
     maxParticipants: 8,
-    discordChannelId: ''
+    discordChannelId: '',
+    map: '',
+    eventDate: '',
+    eventTime: ''
   });
   const [isUploading, setIsUploading] = useState(false);
   const [dragState, setDragState] = useState<{ startX: number; startY: number; startPosX: number; startPosY: number } | null>(null);
   const [isRegEditorExpanded, setIsRegEditorExpanded] = useState(false);
   const [isPodiumExpanded, setIsPodiumExpanded] = useState(false);
   const [isVodsExpanded, setIsVodsExpanded] = useState(false);
+  const [isDiscordSectionExpanded, setIsDiscordSectionExpanded] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'synced'>('idle');
   const [bracketErrorId, setBracketErrorId] = useState<string | null>(null);
@@ -738,7 +743,10 @@ export function TournamentsPage() {
       vods: t.config?.vods || [],
       isArchived: t.config?.isArchived || false,
       maxParticipants: t.config?.maxParticipants || t.config?.max_participants || 8,
-      discordChannelId: t.config?.discordChannelId || t.config?.discord_channel_id || ''
+      discordChannelId: t.config?.discordChannelId || t.config?.discord_channel_id || '',
+      map: t.config?.map || t.map || '',
+      eventDate: t.config?.eventDate || t.event_date || '',
+      eventTime: t.config?.eventTime || t.event_time || ''
     });
     setShowEditModal(true);
     const params = new URLSearchParams(window.location.search);
@@ -968,6 +976,11 @@ export function TournamentsPage() {
         banner_position_y: editForm.bannerPositionY,
         updated_at: new Date().toISOString(),
         is_archived: editForm.isArchived,
+        max_participants: editForm.maxParticipants || 8,
+        map: editForm.map || null,
+        event_date: editForm.eventDate || null,
+        event_time: editForm.eventTime || null,
+        discord_channel_id: editForm.discordChannelId || null,
         vods: editForm.vods.map(v => ({
           id: v.id || `vod-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           title: (v.title || '').trim(),
@@ -1253,7 +1266,10 @@ export function TournamentsPage() {
                       vods: [],
                       isArchived: false,
                       maxParticipants: 8,
-                      discordChannelId: ''
+                      discordChannelId: '',
+                      map: '',
+                      eventDate: '',
+                      eventTime: ''
                     });
                     setShowEditModal(true);
                     setIsRegEditorExpanded(false);
@@ -1570,116 +1586,188 @@ export function TournamentsPage() {
                   </div>
                 </div>
 
-                {/* Discord Integration Section */}
-                <div className="space-y-5 p-6 bg-gradient-to-b from-cyan-950/30 to-black/40 border border-cyan-500/30 rounded-3xl shadow-xl backdrop-blur-md">
-                  <div className="flex items-center justify-between border-b border-cyan-500/10 pb-3">
-                    <label className="text-xs font-black text-cyan-400 uppercase tracking-widest flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                      💬 Iscrizioni & Discord Bot
-                    </label>
-                    <span className="text-[9px] font-bold text-cyan-500/70 uppercase tracking-wider bg-cyan-500/10 px-2.5 py-1 rounded-full border border-cyan-500/20">
-                      Sincronizzazione Live
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    {/* Tetto Max Partecipanti (Stepper Premium) */}
-                    <div className="space-y-2">
-                      <label className="text-[10px] text-gray-300 font-black uppercase tracking-wider ml-1 block">
-                        Tetto Max Partecipanti
+                {/* Discord Integration Section (Collassabile) */}
+                <div className="bg-gradient-to-b from-cyan-950/30 to-black/40 border border-cyan-500/30 rounded-3xl shadow-xl backdrop-blur-md overflow-hidden transition-all">
+                  {/* Header Collassabile */}
+                  <button
+                    type="button"
+                    onClick={() => setIsDiscordSectionExpanded(!isDiscordSectionExpanded)}
+                    className="w-full p-5 flex items-center justify-between hover:bg-white/[0.02] transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
+                      <label className="text-xs font-black text-cyan-400 uppercase tracking-widest cursor-pointer">
+                        💬 Iscrizioni & Discord Bot
                       </label>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center bg-black/60 border border-cyan-500/30 rounded-2xl p-1 shadow-inner flex-1">
-                          <button
-                            type="button"
-                            onClick={() => setEditForm(f => ({ ...f, maxParticipants: Math.max(2, (f.maxParticipants || 16) - 1) }))}
-                            className="w-10 h-10 rounded-xl bg-white/5 hover:bg-cyan-500/20 text-cyan-400 hover:text-white font-black text-lg flex items-center justify-center transition-all active:scale-90 border border-white/5"
-                          >
-                            -
-                          </button>
+                      <span className="text-[9px] font-bold text-cyan-500/80 uppercase tracking-wider bg-cyan-500/10 px-2.5 py-1 rounded-full border border-cyan-500/20 hidden sm:inline-block">
+                        Sincronizzazione Live
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-400">
+                      <span className="text-[10px] font-bold uppercase tracking-wider">
+                        {isDiscordSectionExpanded ? 'Riduci' : 'Espandi'}
+                      </span>
+                      {isDiscordSectionExpanded ? <ChevronUp size={16} className="text-cyan-400" /> : <ChevronDown size={16} className="text-cyan-400" />}
+                    </div>
+                  </button>
+
+                  {/* Body Collassabile */}
+                  {isDiscordSectionExpanded && (
+                    <div className="p-6 pt-0 space-y-5 border-t border-cyan-500/10 animate-in fade-in duration-300">
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-3">
+                        {/* Tetto Max Partecipanti (Stepper Premium) */}
+                        <div className="space-y-2">
+                          <label className="text-[10px] text-gray-300 font-black uppercase tracking-wider ml-1 block">
+                            Tetto Max Partecipanti
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center bg-black/60 border border-cyan-500/30 rounded-2xl p-1 shadow-inner flex-1">
+                              <button
+                                type="button"
+                                onClick={() => setEditForm(f => ({ ...f, maxParticipants: Math.max(2, (f.maxParticipants || 8) - 1) }))}
+                                className="w-10 h-10 rounded-xl bg-white/5 hover:bg-cyan-500/20 text-cyan-400 hover:text-white font-black text-lg flex items-center justify-center transition-all active:scale-90 border border-white/5"
+                              >
+                                -
+                              </button>
+                              <input 
+                                type="number" 
+                                value={editForm.maxParticipants} 
+                                onChange={e => setEditForm({ ...editForm, maxParticipants: Math.max(2, parseInt(e.target.value) || 2) })} 
+                                className="w-full text-center bg-transparent text-white font-black text-sm outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setEditForm(f => ({ ...f, maxParticipants: (f.maxParticipants || 8) + 1 }))}
+                                className="w-10 h-10 rounded-xl bg-white/5 hover:bg-cyan-500/20 text-cyan-400 hover:text-white font-black text-lg flex items-center justify-center transition-all active:scale-90 border border-white/5"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Scelta Rapida (Pillole Presets) */}
+                          <div className="flex items-center gap-1.5 pt-1">
+                            <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tight mr-1">Preset:</span>
+                            {[4, 8, 16, 32].map(num => (
+                              <button
+                                key={num}
+                                type="button"
+                                onClick={() => setEditForm({ ...editForm, maxParticipants: num })}
+                                className={clsx(
+                                  "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase transition-all border",
+                                  editForm.maxParticipants === num
+                                    ? "bg-cyan-500 text-black border-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.4)] scale-105"
+                                    : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border-white/10"
+                                )}
+                              >
+                                {num}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* ID Canale Discord */}
+                        <div className="space-y-2">
+                          <label className="text-[10px] text-gray-300 font-black uppercase tracking-wider ml-1 block">
+                            ID Canale Discord
+                          </label>
                           <input 
-                            type="number" 
-                            value={editForm.maxParticipants} 
-                            onChange={e => setEditForm({ ...editForm, maxParticipants: Math.max(2, parseInt(e.target.value) || 2) })} 
-                            className="w-full text-center bg-transparent text-white font-black text-sm outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                            type="text" 
+                            value={editForm.discordChannelId} 
+                            onChange={e => setEditForm({ ...editForm, discordChannelId: e.target.value.trim() })} 
+                            placeholder="Es: 1529037495746953329" 
+                            className="w-full bg-black/60 border border-cyan-500/30 p-3.5 rounded-2xl text-white outline-none focus:border-cyan-400 transition-colors text-xs font-mono tracking-wide placeholder:text-gray-600 shadow-inner" 
                           />
-                          <button
-                            type="button"
-                            onClick={() => setEditForm(f => ({ ...f, maxParticipants: (f.maxParticipants || 16) + 1 }))}
-                            className="w-10 h-10 rounded-xl bg-white/5 hover:bg-cyan-500/20 text-cyan-400 hover:text-white font-black text-lg flex items-center justify-center transition-all active:scale-90 border border-white/5"
-                          >
-                            +
-                          </button>
+                          <p className="text-[9px] text-gray-500 italic pl-1">
+                            Fai tasto destro sul canale Discord ➔ Copia ID canale
+                          </p>
                         </div>
                       </div>
 
-                      {/* Scelta Rapida (Pillole Presets) */}
-                      <div className="flex items-center gap-1.5 pt-1">
-                        <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tight mr-1">Preset:</span>
-                        {[4, 8, 16, 32].map(num => (
-                          <button
-                            key={num}
-                            type="button"
-                            onClick={() => setEditForm({ ...editForm, maxParticipants: num })}
-                            className={clsx(
-                              "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase transition-all border",
-                              editForm.maxParticipants === num
-                                ? "bg-cyan-500 text-black border-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.4)] scale-105"
-                                : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border-white/10"
-                            )}
-                          >
-                            {num}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                      {/* Riga Mappa e Data/Orario */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-white/5 pt-4">
+                        {/* Mappa Torneo (Dropdown Premium) */}
+                        <div className="space-y-1">
+                          <label className="text-[10px] text-gray-300 font-black uppercase tracking-wider ml-1 flex items-center gap-1">
+                            <MapPin size={12} className="text-cyan-400" /> Mappa Torneo
+                          </label>
+                          <div className="relative">
+                            <select
+                              value={editForm.map}
+                              onChange={e => setEditForm({ ...editForm, map: e.target.value })}
+                              className="w-full bg-black/60 border border-cyan-500/30 p-3 rounded-xl text-white outline-none focus:border-cyan-400 transition-colors appearance-none cursor-pointer text-xs"
+                            >
+                              <option value="" className="bg-[#0a0d14] text-gray-400">-- Seleziona Mappa (Opzionale) --</option>
+                              {AOE4_MAPS.map(m => (
+                                <option key={m} value={m} className="bg-[#0a0d14] text-white">{m}</option>
+                              ))}
+                            </select>
+                            <ChevronDown size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-cyan-400 pointer-events-none" />
+                          </div>
+                        </div>
 
-                    {/* ID Canale Discord */}
-                    <div className="space-y-2">
-                      <label className="text-[10px] text-gray-300 font-black uppercase tracking-wider ml-1 block">
-                        ID Canale Discord
-                      </label>
-                      <div className="relative">
-                        <input 
-                          type="text" 
-                          value={editForm.discordChannelId} 
-                          onChange={e => setEditForm({ ...editForm, discordChannelId: e.target.value.trim() })} 
-                          placeholder="Es: 1529037495746953329" 
-                          className="w-full bg-black/60 border border-cyan-500/30 p-3.5 rounded-2xl text-white outline-none focus:border-cyan-400 transition-colors text-xs font-mono tracking-wide placeholder:text-gray-600 shadow-inner" 
-                        />
-                      </div>
-                      <p className="text-[9px] text-gray-500 italic pl-1">
-                        Fai tasto destro sul canale Discord ➔ Copia ID canale
-                      </p>
-                    </div>
-                  </div>
+                        {/* Data Torneo */}
+                        <div className="space-y-1">
+                          <label className="text-[10px] text-gray-300 font-black uppercase tracking-wider ml-1 flex items-center gap-1">
+                            <Calendar size={12} className="text-cyan-400" /> Data Evento
+                          </label>
+                          <input
+                            type="date"
+                            value={editForm.eventDate}
+                            onChange={e => setEditForm({ ...editForm, eventDate: e.target.value })}
+                            className="w-full bg-black/60 border border-cyan-500/30 p-3 rounded-xl text-white outline-none focus:border-cyan-400 transition-colors text-xs"
+                          />
+                        </div>
 
-                  {/* Pulsante Lancio Torneo */}
-                  {editingTournament?.id && editForm.discordChannelId && (
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        try {
-                          toast.loading('Invio messaggio su Discord in corso...');
-                          await launchTournamentOnDiscord({
-                            tournamentId: editingTournament.id,
-                            name: editForm.name || editingTournament.name || 'Torneo',
-                            maxParticipants: editForm.maxParticipants || 16,
-                            channelId: editForm.discordChannelId,
-                            description: editForm.period ? `Periodo: ${editForm.period}` : undefined,
-                            bannerUrl: editForm.bannerUrl || undefined
-                          });
-                          toast.dismiss();
-                          toast.success('🚀 Torneo lanciato con successo su Discord!');
-                        } catch (err: any) {
-                          toast.dismiss();
-                          toast.error(`Errore invio Discord: ${err.message}`);
-                        }
-                      }}
-                      className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-black uppercase text-xs tracking-[0.15em] rounded-2xl transition-all shadow-[0_0_25px_rgba(6,182,212,0.3)] active:scale-[0.98] flex items-center justify-center gap-2 mt-2"
-                    >
-                      🚀 Lancia Torneo su Discord (Invia Embed con Bottoni)
-                    </button>
+                        {/* Orario Torneo */}
+                        <div className="space-y-1">
+                          <label className="text-[10px] text-gray-300 font-black uppercase tracking-wider ml-1 flex items-center gap-1">
+                            <Clock size={12} className="text-cyan-400" /> Orario Inizio
+                          </label>
+                          <input
+                            type="time"
+                            value={editForm.eventTime}
+                            onChange={e => setEditForm({ ...editForm, eventTime: e.target.value })}
+                            className="w-full bg-black/60 border border-cyan-500/30 p-3 rounded-xl text-white outline-none focus:border-cyan-400 transition-colors text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Pulsante Lancio Torneo */}
+                      {editingTournament?.id && editForm.discordChannelId && (
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              toast.loading('Invio messaggio su Discord in corso...');
+                              await launchTournamentOnDiscord({
+                                tournamentId: editingTournament.id,
+                                name: editForm.name || editingTournament.name || 'Torneo',
+                                type: editForm.type || '1v1',
+                                map: editForm.map || undefined,
+                                eventDate: editForm.eventDate || undefined,
+                                eventTime: editForm.eventTime || undefined,
+                                maxParticipants: editForm.maxParticipants || 8,
+                                channelId: editForm.discordChannelId,
+                                description: editForm.period ? `Periodo: ${editForm.period}` : undefined,
+                                bannerUrl: editForm.bannerUrl || undefined,
+                                hasRegolamento: editForm.hasRegolamento
+                              });
+                              toast.dismiss();
+                              toast.success('🚀 Torneo lanciato con successo su Discord!');
+                            } catch (err: any) {
+                              toast.dismiss();
+                              toast.error(`Errore invio Discord: ${err.message}`);
+                            }
+                          }}
+                          className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-black uppercase text-xs tracking-[0.15em] rounded-2xl transition-all shadow-[0_0_25px_rgba(6,182,212,0.3)] active:scale-[0.98] flex items-center justify-center gap-2 mt-3"
+                        >
+                          🚀 Lancia Torneo su Discord (Invia Embed con Bottoni)
+                        </button>
+                      )}
+
+                    </div>
                   )}
                 </div>
 
