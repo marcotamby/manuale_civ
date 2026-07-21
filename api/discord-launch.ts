@@ -36,17 +36,44 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     hasRegolamento
   } = req.body;
 
-  const channelId = cleanChannelId(rawChannelId);
-
-  if (!channelId) {
-    return res.status(400).json({ error: 'ID Canale Discord mancante.' });
-  }
+  let channelId = cleanChannelId(rawChannelId);
 
   if (!DISCORD_BOT_TOKEN) {
     return res.status(500).json({ 
       error: 'VITE_DISCORD_BOT_TOKEN non configurato su Vercel.',
       details: 'Verifica di aver inserito VITE_DISCORD_BOT_TOKEN nelle Environment Variables di Vercel.' 
     });
+  }
+
+  // Se l'ID Canale non è stato specificato, trova automaticamente il primo canale del primo Server del Bot
+  if (!channelId) {
+    try {
+      const guildsRes = await fetch('https://discord.com/api/v10/users/@me/guilds', {
+        headers: { 'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}` }
+      });
+      if (guildsRes.ok) {
+        const guilds = await guildsRes.json();
+        if (guilds && guilds.length > 0) {
+          const guildId = guilds[0].id;
+          const channelsRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
+            headers: { 'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}` }
+          });
+          if (channelsRes.ok) {
+            const channels = await channelsRes.json();
+            const textChannel = channels.find((c: any) => c.type === 0 && (c.name.includes('torne') || c.name.includes('general') || c.name.includes('chat') || true));
+            if (textChannel) {
+              channelId = textChannel.id;
+            }
+          }
+        }
+      }
+    } catch (autoErr) {
+      console.warn('Autodiscovery canale Discord fallito:', autoErr);
+    }
+  }
+
+  if (!channelId) {
+    return res.status(400).json({ error: 'Nessun canale Discord trovato. Inserisci un ID Canale valido.' });
   }
 
   const fields: any[] = [

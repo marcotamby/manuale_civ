@@ -1813,7 +1813,7 @@ export function TournamentsPage() {
                       </div>
 
                       {/* Pulsante Lancio Torneo (Conferma e stato INTEGRATO DENTRO IL BOTTONE) */}
-                      {editingTournament?.id && editForm.discordChannelId && (
+                      {editingTournament?.id && (
                         <button
                           type="button"
                           disabled={discordLaunchStatus === 'sending'}
