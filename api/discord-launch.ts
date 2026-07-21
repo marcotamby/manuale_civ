@@ -161,6 +161,44 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const messageData = await discordRes.json();
 
+    // Creazione automatica dei 3 Thread Discord dedicati sul messaggio del torneo
+    const threadsToCreate = [
+      { name: '👥-partecipanti', msg: '👥 **Thread Partecipanti**: Gli iscritti al torneo ed i loro avatar verranno notificati ed aggiornati qui!' },
+      { name: '🏆-risultati', msg: '🏆 **Thread Risultati**: I risultati dei match ed i vincitori del torneo saranno pubblicati qui in tempo reale!' },
+      { name: '⚔️-brackets', msg: `⚔️ **Thread Brackets**: Consulta ed incrocia il tabellone live ad eliminazione diretta sul sito web!` }
+    ];
+
+    for (const threadInfo of threadsToCreate) {
+      try {
+        const threadRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages/${messageData.id}/threads`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}`
+          },
+          body: JSON.stringify({
+            name: threadInfo.name,
+            auto_archive_duration: 1440
+          })
+        });
+
+        if (threadRes.ok) {
+          const threadData = await threadRes.json();
+          // Invia messaggio iniziale nel thread
+          await fetch(`https://discord.com/api/v10/channels/${threadData.id}/messages`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}`
+            },
+            body: JSON.stringify({ content: threadInfo.msg })
+          });
+        }
+      } catch (tErr) {
+        console.warn('Avviso creazione thread Discord:', tErr);
+      }
+    }
+
     // Salva l'ID del messaggio e del canale nel DB Supabase mantenendo lo stato 'Programmato'
     if (tournamentId) {
       await supabase

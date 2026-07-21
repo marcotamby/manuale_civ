@@ -19,26 +19,42 @@ export function LocalTournamentBracket({ tournamentId }: LocalTournamentBracketP
 
   const fetchData = useCallback(async () => {
     try {
-      // 1. Torneo info
-      const { data: tData } = await supabase
-        .from('tournaments')
-        .select('*')
-        .eq('id', tournamentId)
-        .single();
+      // 1. Torneo info (Supporta sia UUID che Slug)
+      let tData: any = null;
+      if (tournamentId.length > 20) {
+        const { data } = await supabase
+          .from('tournaments')
+          .select('*')
+          .eq('id', tournamentId)
+          .maybeSingle();
+        tData = data;
+      }
+
+      if (!tData) {
+        const { data } = await supabase
+          .from('tournaments')
+          .select('*')
+          .or(`slug.eq.${tournamentId},slug.ilike.%${tournamentId}%`)
+          .maybeSingle();
+        tData = data;
+      }
 
       if (tData) setTournament(tData);
 
+      const targetId = tData?.id || tournamentId;
+
       // 2. Partecipanti Iscritti
-      const { data: pData } = await supabase
+      const { data: pData, error: pErr } = await supabase
         .from('tournament_participants')
         .select('*')
-        .eq('tournament_id', tournamentId)
+        .eq('tournament_id', targetId)
         .order('registered_at', { ascending: true });
 
+      if (pErr) console.warn("Errore caricamento partecipanti:", pErr);
       if (pData) setParticipants(pData as any[]);
 
       // 3. Match Generati
-      const { data: mData } = await supabase
+      const { data: mData, error: mErr } = await supabase
         .from('tournament_matches')
         .select(`
           *,
@@ -46,10 +62,11 @@ export function LocalTournamentBracket({ tournamentId }: LocalTournamentBracketP
           player2:player2_id(id, display_name, discord_username, avatar_url),
           winner:winner_id(id, display_name, discord_username)
         `)
-        .eq('tournament_id', tournamentId)
+        .eq('tournament_id', targetId)
         .order('round', { ascending: true })
         .order('match_number', { ascending: true });
 
+      if (mErr) console.warn("Errore caricamento match:", mErr);
       if (mData) setMatches(mData as any[]);
     } catch (err) {
       console.error('Errore caricamento dati torneo:', err);
