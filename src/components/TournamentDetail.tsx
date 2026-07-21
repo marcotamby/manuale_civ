@@ -12,7 +12,6 @@ import { LocalTournamentBracket } from './LocalTournamentBracket';
 export function TournamentDetail() {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
-  const eventParam = searchParams.get('event');
   const source = searchParams.get('source') || 'startgg';
   const organizer = searchParams.get('organizer') || 'marcotamby';
   
@@ -32,7 +31,7 @@ export function TournamentDetail() {
         const [baseSlug] = (slug || '').split('?');
         const cleanSlug = baseSlug.trim().replace(/\/$/, '');
         
-        // Cerca il record nel database in modo sicuro: prima match esatto, poi fallback
+        // 1. Cerca il record nel database Supabase (priorità assoluta)
         let dbTournament: any = null;
         
         const { data: exactMatch } = await supabase
@@ -55,9 +54,24 @@ export function TournamentDetail() {
           }
         }
 
+        // Imposta lo stato locale con i dati del DB se presente
+        if (dbTournament) {
+          setTournament({ 
+            name: dbTournament.name || dbTournament.title, 
+            db: dbTournament, 
+            events: [], 
+            images: [{ url: dbTournament.banner_url, type: 'banner' }] 
+          });
+        }
+
         const activeSource = dbTournament?.source || source;
 
-        // 2. Try to fetch external data
+        // 2. Tenta di scaricare dati esterni solo se non si tratta di un torneo locale del sito
+        if (dbTournament?.discord_channel_id) {
+          setLoading(false);
+          return;
+        }
+
         try {
           if (activeSource === 'challonge') {
             const [tData, dData] = await Promise.all([
@@ -75,49 +89,21 @@ export function TournamentDetail() {
               setTournament({ ...tData, db: dbTournament });
               setSelectedPhase(unifiedPhase);
             }
-          } else {
-            const fullSlug = dbTournament?.slug || (window.location.pathname.includes('/tournament/') ? `tournament/${slug}` : slug);
+          } else if (slug && !dbTournament) {
+            const fullSlug = window.location.pathname.includes('/tournament/') ? `tournament/${slug}` : slug;
             const data = await fetchTournament(fullSlug);
             if (data) {
               setTournament({ ...data, db: dbTournament });
               if (data.events && data.events.length > 0) {
-                // Priorità 1: Parametro ?event= nell'URL
-                let targetEvent = null;
-                if (eventParam) {
-                  targetEvent = data.events.find(e => 
-                    e.slug?.toLowerCase().includes(eventParam.toLowerCase()) || 
-                    e.name.toLowerCase().includes(eventParam.toLowerCase())
-                  );
-                }
-                
-                // Priorità 2: Cerca 1v1 o prendi il primo
-                if (!targetEvent) {
-                  targetEvent = data.events.find(e => e.name.toLowerCase().includes('1v1')) || data.events[0];
-                }
-
-                if (targetEvent.phases && targetEvent.phases.length > 0) {
+                let targetEvent = data.events.find(e => e.name.toLowerCase().includes('1v1')) || data.events[0];
+                if (targetEvent?.phases && targetEvent.phases.length > 0) {
                   setSelectedPhase(targetEvent.phases[0]);
-                  
-                  // Se l'utente non aveva specificato un evento nell'URL, lo aggiungiamo ora
-                  if (!eventParam) {
-                    const newParams = new URLSearchParams(window.location.search);
-                    newParams.set('event', targetEvent.name.toLowerCase().replace(/[^a-z0-9]/g, '-'));
-                    setSearchParams(newParams, { replace: true });
-                  }
                 }
               }
-            } else if (dbTournament) {
-               // Fallback to DB info if Start.gg fails
-               setTournament({ name: dbTournament.name, db: dbTournament, events: [], images: [{ url: dbTournament.banner_url, type: 'banner' }] });
             }
           }
         } catch (fetchErr) {
           console.warn("External fetch failed, falling back to DB info:", fetchErr);
-          if (dbTournament) {
-            setTournament({ name: dbTournament.name, db: dbTournament, events: [], images: [{ url: dbTournament.banner_url, type: 'banner' }] });
-          } else {
-            throw fetchErr;
-          }
         }
 
         // Check for betting markets

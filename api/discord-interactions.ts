@@ -39,6 +39,27 @@ function verifyDiscordSignature(req: VercelRequest): boolean {
 }
 
 /**
+ * Verifica se l'utente Discord ha permessi Staff / Admin (Administrator, Manage Channels, Manage Messages)
+ */
+function isDiscordStaff(member: any): boolean {
+  if (!member) return false;
+  if (member.permissions) {
+    try {
+      const permInt = BigInt(member.permissions);
+      const ADMINISTRATOR = BigInt(0x8);
+      const MANAGE_CHANNELS = BigInt(0x10);
+      const MANAGE_MESSAGES = BigInt(0x2000);
+      if ((permInt & ADMINISTRATOR) !== BigInt(0) || 
+          (permInt & MANAGE_CHANNELS) !== BigInt(0) || 
+          (permInt & MANAGE_MESSAGES) !== BigInt(0)) {
+        return true;
+      }
+    } catch (e) {}
+  }
+  return false;
+}
+
+/**
  * Aggiorna in tempo reale l'Embed del messaggio Discord con il conteggio iscritti aggiornato
  */
 async function updateDiscordMessageCount(tournamentId: string, fallbackChannelId?: string, fallbackMessageId?: string) {
@@ -75,12 +96,12 @@ async function updateDiscordMessageCount(tournamentId: string, fallbackChannelId
     },
     {
       name: '⚔️ Tipologia',
-      value: tournament.type || '1v1',
+      value: tournament?.type || '1v1',
       inline: true
     }
   ];
 
-  if (tournament.map) {
+  if (tournament?.map) {
     fields.push({
       name: '🗺️ Mappe Torneo',
       value: tournament.map,
@@ -88,8 +109,10 @@ async function updateDiscordMessageCount(tournamentId: string, fallbackChannelId
     });
   }
 
-  if (tournament.event_date || tournament.event_time) {
-    const formattedDate = [tournament.event_date, tournament.event_time ? `ore ${tournament.event_time}` : ''].filter(Boolean).join(' - ');
+  if (tournament?.event_date || tournament?.event_time) {
+    const rawDate = tournament.event_date || '';
+    const formattedDatePart = rawDate ? (rawDate.includes('/') ? rawDate : rawDate.split('-').reverse().join('/')) : '';
+    const formattedDate = [formattedDatePart, tournament.event_time ? `ore ${tournament.event_time}` : ''].filter(Boolean).join(' - ');
     fields.push({
       name: '📅 Data & Orario',
       value: formattedDate,
@@ -313,11 +336,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const p1Discord = match.p1?.discord_user_id;
       const p2Discord = match.p2?.discord_user_id;
 
+      const isStaff = isDiscordStaff(interaction.member);
       const isParticipant = discordUserId === p1Discord || discordUserId === p2Discord;
-      if (!isParticipant) {
+      if (!isParticipant && !isStaff) {
         return res.status(200).json({
           type: 4,
-          data: { content: '⛔ Soltanto i due giocatori di questo match o gli Admin possono registrare il risultato.', flags: 64 }
+          data: { content: '⛔ Soltanto i due giocatori di questo match o i membri dello Staff / Admin possono registrare il risultato.', flags: 64 }
         });
       }
 

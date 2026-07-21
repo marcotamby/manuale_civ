@@ -71,7 +71,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (eventDate || eventTime) {
-    const formattedDate = [eventDate, eventTime ? `ore ${eventTime}` : ''].filter(Boolean).join(' - ');
+    const formattedDatePart = eventDate ? (eventDate.includes('/') ? eventDate : eventDate.split('-').reverse().join('/')) : '';
+    const formattedDate = [formattedDatePart, eventTime ? `ore ${eventTime}` : ''].filter(Boolean).join(' - ');
     fields.push({
       name: '📅 Data & Orario',
       value: formattedDate || 'Da definire',
