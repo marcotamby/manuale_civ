@@ -4,20 +4,22 @@ import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
-const DISCORD_PUBLIC_KEY = process.env.DISCORD_PUBLIC_KEY || '';
+const DISCORD_PUBLIC_KEY = (process.env.DISCORD_PUBLIC_KEY || '').trim();
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 /**
- * Verifica la firma Ed25519 proveniente da Discord
+ * Verifica la firma Ed25519 proveniente da Discord in modo conforme agli standard di sicurezza Discord
  */
-function verifySignature(req: VercelRequest, bodyText: string): boolean {
-  if (!DISCORD_PUBLIC_KEY) return true; // Se la chiave non è impostata in dev, ignora la firma (da impostare in prod)
+function verifyDiscordSignature(req: VercelRequest): boolean {
+  if (!DISCORD_PUBLIC_KEY) return true;
 
   const signature = req.headers['x-signature-ed25519'] as string;
   const timestamp = req.headers['x-signature-timestamp'] as string;
 
   if (!signature || !timestamp) return false;
+
+  const bodyText = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
 
   try {
     return crypto.verify(
@@ -40,22 +42,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const interaction = req.body || {};
+  // 1. REQUISITO DI SICUREZZA DISCORD:
+  // La firma Ed25519 DEVE essere verificata PRIMA di processare qualsiasi tipo di interazione (incluso il PING)!
+  const isValid = verifyDiscordSignature(req);
 
-  // 1. Handling PING (Richiesto da Discord per la verifica dell'URL webhook)
+  if (!isValid) {
+    return res.status(401).send('Invalid request signature');
+  }
+
+  const interaction = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+
+  // 2. Risposta al PING di verifica di Discord (type: 1)
   if (interaction.type === 1) {
     return res.status(200).json({ type: 1 });
   }
 
-  // 2. Verifica firma Ed25519 per le altre interazioni
-  const rawBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
-  const isValid = verifySignature(req, rawBody);
-
-  if (!isValid && DISCORD_PUBLIC_KEY) {
-    return res.status(401).send('Invalid request signature');
-  }
-
-  // 2. Handling MESSAGE_COMPONENT (Pressione di Bottoni)
+  // 3. Gestione Pressione di Bottoni (type: 3)
   if (interaction.type === 3) {
     const customId = interaction.data?.custom_id || '';
     const user = interaction.member?.user || interaction.user;
@@ -197,7 +199,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const p2Discord = match.p2?.discord_user_id;
 
       const isParticipant = discordUserId === p1Discord || discordUserId === p2Discord;
-      // In questo contesto consentiamo la registrazione dai due player coinvolti o da admin
       if (!isParticipant) {
         return res.status(200).json({
           type: 4,
