@@ -732,26 +732,26 @@ export function TournamentsPage() {
   const openEditModal = useCallback((t: any) => {
     setEditingTournament(t);
     setEditForm({
-      organizer: t.config?.organizer || '',
-      period: t.config?.period || '',
-      bannerUrl: t.config?.bannerUrl || '',
-      status: t.config?.status || 'Concluso',
+      organizer: t.config?.organizer || t.organizer || '',
+      period: t.config?.period || t.period || '',
+      bannerUrl: t.config?.bannerUrl || t.banner_url || '',
+      status: t.config?.status || t.status || 'Concluso',
       name: t.config?.name || t.name || '',
-      type: t.config?.type || '1v1',
+      type: t.config?.type || t.type || '1v1',
       podium: t.config?.podium || (t.events?.[0]?.standings?.nodes || []),
       hasRegolamento: t.config?.hasRegolamento || false,
       regolamentoContent: t.config?.regolamentoContent || '',
-      externalUrl: t.config?.externalUrl || '',
-      display_order: t.config?.display_order || 0,
-      bannerPositionX: t.config?.bannerPositionX || 50,
-      bannerPositionY: t.config?.bannerPositionY || 50,
+      externalUrl: t.config?.externalUrl || t.direct_link || '',
+      display_order: t.config?.display_order || t.display_order || 0,
+      bannerPositionX: t.config?.bannerPositionX || t.banner_position_x || 50,
+      bannerPositionY: t.config?.bannerPositionY || t.banner_position_y || 50,
       vods: t.config?.vods || [],
-      isArchived: t.config?.isArchived || false,
-      maxParticipants: t.config?.maxParticipants || t.config?.max_participants || 8,
-      discordChannelId: t.config?.discordChannelId || t.config?.discord_channel_id || '',
-      map: t.config?.map || t.map || '',
-      eventDate: t.config?.eventDate || t.event_date || '',
-      eventTime: t.config?.eventTime || t.event_time || ''
+      isArchived: t.config?.isArchived || t.is_archived || false,
+      maxParticipants: t.max_participants || t.maxParticipants || t.config?.maxParticipants || t.config?.max_participants || 8,
+      discordChannelId: t.discord_channel_id || t.discordChannelId || t.config?.discordChannelId || t.config?.discord_channel_id || '',
+      map: t.map || t.config?.map || '',
+      eventDate: t.event_date || t.eventDate || t.config?.eventDate || t.config?.event_date || '',
+      eventTime: t.event_time || t.eventTime || t.config?.eventTime || t.config?.event_time || ''
     });
     setShowEditModal(true);
     const params = new URLSearchParams(window.location.search);
@@ -1054,6 +1054,11 @@ export function TournamentsPage() {
         ...prev,
         name: editForm.name,
         status: editForm.status,
+        max_participants: editForm.maxParticipants,
+        discord_channel_id: editForm.discordChannelId,
+        map: editForm.map,
+        event_date: editForm.eventDate,
+        event_time: editForm.eventTime,
         config: {
           ...prev.config,
           name: editForm.name,
@@ -1069,6 +1074,11 @@ export function TournamentsPage() {
           bannerPositionY: editForm.bannerPositionY,
           vods: editForm.vods,
           isArchived: editForm.isArchived,
+          maxParticipants: editForm.maxParticipants,
+          discordChannelId: editForm.discordChannelId,
+          map: editForm.map,
+          eventDate: editForm.eventDate,
+          eventTime: editForm.eventTime,
           directLink: editForm.externalUrl || undefined,
           externalUrl: editForm.externalUrl || undefined
         }
@@ -1079,6 +1089,11 @@ export function TournamentsPage() {
           return {
             ...t,
             name: editForm.name,
+            max_participants: editForm.maxParticipants,
+            discord_channel_id: editForm.discordChannelId,
+            map: editForm.map,
+            event_date: editForm.eventDate,
+            event_time: editForm.eventTime,
             config: {
               ...t.config,
               name: editForm.name,
@@ -1094,6 +1109,11 @@ export function TournamentsPage() {
               bannerPositionY: editForm.bannerPositionY,
               vods: editForm.vods,
               isArchived: editForm.isArchived,
+              maxParticipants: editForm.maxParticipants,
+              discordChannelId: editForm.discordChannelId,
+              map: editForm.map,
+              eventDate: editForm.eventDate,
+              eventTime: editForm.eventTime,
               directLink: editForm.externalUrl || undefined,
               externalUrl: editForm.externalUrl || undefined
             }
