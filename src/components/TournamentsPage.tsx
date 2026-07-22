@@ -536,7 +536,7 @@ export function TournamentsPage() {
   const [isRegEditorExpanded, setIsRegEditorExpanded] = useState(false);
   const [isPodiumExpanded, setIsPodiumExpanded] = useState(false);
   const [isVodsExpanded, setIsVodsExpanded] = useState(false);
-  const [isDiscordSectionExpanded, setIsDiscordSectionExpanded] = useState(true);
+  const [isDiscordSectionExpanded, setIsDiscordSectionExpanded] = useState(false);
   const [discordLaunchStatus, setDiscordLaunchStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [discordLaunchError, setDiscordLaunchError] = useState<string | null>(null);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
