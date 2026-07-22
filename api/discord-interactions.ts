@@ -1157,11 +1157,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .update({ status: 'annullato' })
         .eq('id', tournamentId);
 
-      // 2. Elimina la Categoria Discord e tutti i canali contenuti (in modo sincrono ed attendibile)
+      // 2. Elimina i canali dei match specifici salvati in Supabase (per sicurezza, anche se non sono figli della categoria)
       const guildId = tournament?.discord_guild_id || interaction.guild_id;
       const categoryId = tournament?.discord_category_id;
 
       if (guildId) {
+        // 2a. Recupera tutti i canali match da Supabase e cancellali esplicitamente
+        const { data: matchRows } = await supabase
+          .from('tournament_matches')
+          .select('id, discord_channel_id')
+          .eq('tournament_id', tournamentId)
+          .not('discord_channel_id', 'is', null);
+
+        if (matchRows && matchRows.length > 0) {
+          for (const m of matchRows) {
+            if (m.discord_channel_id) {
+              try {
+                await discordApi(`/channels/${m.discord_channel_id}`, 'DELETE');
+              } catch (_) {}
+            }
+          }
+          // Pulisce i riferimenti ai canali nel DB
+          await supabase
+            .from('tournament_matches')
+            .update({ discord_channel_id: null, status: 'cancelled' })
+            .eq('tournament_id', tournamentId);
+        }
+
+        // 2b. Elimina la categoria e gli altri canali (brackets, partecipanti, vocale, ecc.)
         await deleteDiscordCategoryAndChannels(guildId, categoryId, tournament?.name);
       }
 
