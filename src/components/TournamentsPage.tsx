@@ -1037,29 +1037,7 @@ export function TournamentsPage() {
           }
         };
 
-        let result = await execute(data);
-        
-        if (result.error) {
-          const errorMsg = result.error.message || '';
-          console.warn("Possibili colonne mancanti nel DB Supabase, tentativo di salvataggio sicuro:", errorMsg);
-          
-          const safeData = { ...data };
-          if (errorMsg.includes('event_date') || errorMsg.includes('event_time') || errorMsg.includes('map') || errorMsg.includes('max_participants') || errorMsg.includes('discord_channel_id') || errorMsg.includes('display_order') || errorMsg.includes('banner_position_x') || errorMsg.includes('banner_position_y') || errorMsg.includes('is_archived')) {
-            // Rimuovi progressivamente solo le colonne mancanti che generano l'errore
-            delete safeData.event_date;
-            delete safeData.event_time;
-            delete safeData.map;
-            delete safeData.max_participants;
-            delete safeData.discord_channel_id;
-            delete safeData.display_order;
-            delete safeData.banner_position_x;
-            delete safeData.banner_position_y;
-            delete safeData.is_archived;
-            
-            result = await execute(safeData);
-          }
-        }
-
+        const result = await execute(data);
         if (result.error) throw result.error;
       };
 

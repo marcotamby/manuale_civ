@@ -350,16 +350,17 @@ async function generateBracketMatchesInDb(tournamentId: string, participants: an
 /**
  * Crea i canali testuali dedicati e PRIVATI per ciascun match di un turno specifico (visibili solo ai 2 sfidanti)
  */
-async function createMatchChannelsForRound(tournamentId: string, roundNum: number) {
+async function createMatchChannelsForRound(tournamentId: string, roundNum: number, fallbackGuildId?: string, fallbackCategoryId?: string) {
   const { data: tournament } = await supabase
     .from('tournaments')
     .select('*')
     .eq('id', tournamentId)
     .single();
 
-  if (!tournament || !tournament.discord_guild_id) return;
+  const guildId = tournament?.discord_guild_id || fallbackGuildId;
+  const categoryId = tournament?.discord_category_id || fallbackCategoryId;
 
-  const categoryId = tournament.discord_category_id;
+  if (!guildId) return;
 
   const { data: matches } = await supabase
     .from('tournament_matches')
@@ -394,7 +395,7 @@ async function createMatchChannelsForRound(tournamentId: string, roundNum: numbe
     // Configura i permessi in modo che il canale sia PRIVATO e visibile unicamente ai 2 sfidanti (oltre allo Staff)
     const permission_overwrites: any[] = [
       {
-        id: tournament.discord_guild_id, // @everyone role ID
+        id: guildId, // @everyone role ID
         type: 0, // Role
         deny: '1024' // VIEW_CHANNEL (Nega la visione a tutti gli altri membri)
       }
@@ -416,7 +417,7 @@ async function createMatchChannelsForRound(tournamentId: string, roundNum: numbe
       });
     }
 
-    const newChannel = await discordApi(`/guilds/${tournament.discord_guild_id}/channels`, 'POST', {
+    const newChannel = await discordApi(`/guilds/${guildId}/channels`, 'POST', {
       name: channelName,
       type: 0, // GUILD_TEXT
       parent_id: categoryId || undefined,
@@ -429,7 +430,7 @@ async function createMatchChannelsForRound(tournamentId: string, roundNum: numbe
         .update({ discord_channel_id: newChannel.id, status: 'in_progress' })
         .eq('id', match.id);
 
-      const content = `⚔️ **MATCH ${match.match_number} - TURNO ${roundNum}**\n${p1Tag} vs ${p2Tag}\n🗺️ Mappa: **${tournament.map || 'Dry Arabia'}** | ⚙️ Formato: **BO1 / Eliminazione Diretta**\n\nPotete iniziare il vostro match! Al termine, cliccate sul bottone sottostante per registrare il risultato finale.`;
+      const content = `⚔️ **MATCH ${match.match_number} - TURNO ${roundNum}**\n${p1Tag} vs ${p2Tag}\n🗺️ Mappa: **${tournament?.map || 'Dry Arabia'}** | ⚙️ Formato: **BO1 / Eliminazione Diretta**\n\nPotete iniziare il vostro match! Al termine, cliccate sul bottone sottostante per registrare il risultato finale.`;
 
       await discordApi(`/channels/${newChannel.id}/messages`, 'POST', {
         content,
@@ -1373,8 +1374,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       await generateBracketMatchesInDb(tournamentId, participants);
 
       // 3. Crea o Riusa i canali #brackets e #risultati nella categoria
-      const categoryId = tournament.discord_category_id;
-      const guildId = tournament.discord_guild_id;
+      const guildId = tournament?.discord_guild_id || interaction.guild_id;
+      let categoryId = tournament?.discord_category_id;
 
       if (guildId) {
         const guildChannels = await discordApi(`/guilds/${guildId}/channels`);
@@ -1382,12 +1383,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         let resultsChId: string | null = null;
 
         if (Array.isArray(guildChannels)) {
+          if (!categoryId) {
+            const existingCat = guildChannels.find((c: any) => c.type === 4 && (c.name.toUpperCase().includes((tournament?.name || '').toUpperCase()) || c.name.includes('TORNEO')));
+            if (existingCat) categoryId = existingCat.id;
+          }
+
           const existingBracket = guildChannels.find((c: any) => c.name.includes('brackets'));
           if (existingBracket) bracketChId = existingBracket.id;
 
           const existingResults = guildChannels.find((c: any) => c.name.includes('risultati'));
           if (existingResults) resultsChId = existingResults.id;
         }
+
+        // Salva i riferimenti guildId e categoryId su Supabase
+        await supabase
+          .from('tournaments')
+          .update({
+            discord_guild_id: guildId,
+            discord_category_id: categoryId || null
+          })
+          .eq('id', tournamentId);
 
         if (!bracketChId) {
           const bracketCh = await discordApi(`/guilds/${guildId}/channels`, 'POST', {
@@ -1437,7 +1452,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
 
         // 4. Crea i canali singoli PRIVATI dei match del Turno 1
-        await createMatchChannelsForRound(tournamentId, 1);
+        await createMatchChannelsForRound(tournamentId, 1, guildId, categoryId);
       }
 
       return res.status(200).json({
