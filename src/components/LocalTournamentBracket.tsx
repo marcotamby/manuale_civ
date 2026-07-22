@@ -127,6 +127,15 @@ export function LocalTournamentBracket({ tournamentId }: LocalTournamentBracketP
     return `ROUND ${round}`;
   };
 
+  // Mostra "annullato" solo se non ci sono match/partecipanti (potrebbe essere stato rilanciato)
+  const isCancelled = tournament?.status === 'annullato' && matches.length === 0 && participants.length === 0;
+  const isStartedOrCompleted = tournament?.status === 'in_corso' || tournament?.status === 'In corso' || tournament?.status === 'completato' || tournament?.status === 'Concluso';
+
+  // Se il torneo è stato avviato o annullato, mostra solo i partecipanti effettivi senza slot fittizi "In attesa"
+  const slotsToRender = (isStartedOrCompleted || isCancelled)
+    ? participants
+    : Array.from({ length: maxSlots }).map((_, index) => participants[index] || null);
+
   return (
     <div className="p-4 md:p-8 animate-in fade-in duration-500 max-w-7xl mx-auto space-y-10">
       
@@ -176,27 +185,41 @@ export function LocalTournamentBracket({ tournamentId }: LocalTournamentBracketP
           <div className="bg-black/60 p-5 rounded-2xl border border-white/10 w-full md:w-80 space-y-3 shadow-inner">
             <div className="flex items-center justify-between text-xs font-black uppercase tracking-wider">
               <span className="text-gray-400 flex items-center gap-1.5">
-                <Users size={14} className="text-cyan-400" /> Posti Iscritti
+                <Users size={14} className="text-cyan-400" /> {isStartedOrCompleted ? 'Partecipanti Ufficiali' : 'Posti Iscritti'}
               </span>
               <span className="text-cyan-400 font-mono text-sm">
-                {currentCount} / {maxSlots}
+                {currentCount} {isStartedOrCompleted ? '' : `/ ${maxSlots}`}
               </span>
             </div>
-            <div className="w-full bg-white/5 h-3 rounded-full overflow-hidden p-0.5 border border-white/10">
-              <div 
-                className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full transition-all duration-500 shadow-[0_0_12px_rgba(6,182,212,0.6)]"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
+            {!isStartedOrCompleted && !isCancelled && (
+              <div className="w-full bg-white/5 h-3 rounded-full overflow-hidden p-0.5 border border-white/10">
+                <div 
+                  className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full transition-all duration-500 shadow-[0_0_12px_rgba(6,182,212,0.6)]"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            )}
             <div className="text-[10px] text-gray-500 text-right font-bold uppercase tracking-tight">
-              {currentCount >= maxSlots ? '🔴 Iscrizioni Chiuse' : `🟢 Posti Rimanenti: ${maxSlots - currentCount}`}
+              {isCancelled ? '🔴 TORNEO ANNULLATO' : isStartedOrCompleted ? '🚀 Torneo Avviato' : (currentCount >= maxSlots ? '🔴 Iscrizioni Chiuse' : `🟢 Posti Rimanenti: ${maxSlots - currentCount}`)}
             </div>
           </div>
         </div>
       </div>
 
       {/* SEZIONE 1: TABELLONE MATCH */}
-      {matches.length > 0 ? (
+      {isCancelled ? (
+        <div className="bg-red-950/20 border border-red-500/30 p-8 rounded-3xl text-center space-y-3 backdrop-blur-md">
+          <div className="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto text-red-400">
+            <Trophy size={24} />
+          </div>
+          <h3 className="text-sm font-black text-red-400 uppercase tracking-[0.2em]">
+            Torneo Annullato dallo Staff
+          </h3>
+          <p className="text-xs text-gray-400 max-w-lg mx-auto font-medium leading-relaxed">
+            Questo torneo è stato annullato. Il tabellone ed i canali di scontro dedicati su Discord sono stati rimossi.
+          </p>
+        </div>
+      ) : matches.length > 0 ? (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
@@ -247,15 +270,15 @@ export function LocalTournamentBracket({ tournamentId }: LocalTournamentBracketP
         </div>
       )}
 
-      {/* SEZIONE 2: GRIGLIA PARTECIPANTI ISCRITTI IN TEMPO REALE (Si popola uno per uno) */}
+      {/* SEZIONE 2: GRIGLIA PARTECIPANTI ISCRITTI IN TEMPO REALE */}
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-4">
           <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
-            <UserCheck size={16} className="text-cyan-400" /> Lista Iscritti in Tempo Reale ({currentCount} / {maxSlots})
+            <UserCheck size={16} className="text-cyan-400" /> {isStartedOrCompleted ? 'Partecipanti al Torneo' : 'Lista Iscritti in Tempo Reale'} ({currentCount} {isStartedOrCompleted ? '' : `/ ${maxSlots}`})
           </h3>
           
           <div className="flex items-center gap-3">
-            {matches.length === 0 && participants.length >= 2 && (
+            {matches.length === 0 && participants.length >= 2 && !isCancelled && (
               <button
                 type="button"
                 onClick={async () => {
@@ -282,8 +305,7 @@ export function LocalTournamentBracket({ tournamentId }: LocalTournamentBracketP
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {Array.from({ length: maxSlots }).map((_, index) => {
-            const player = participants[index];
+          {slotsToRender.map((player, index) => {
 
             return (
               <div

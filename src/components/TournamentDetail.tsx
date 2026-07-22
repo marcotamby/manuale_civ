@@ -78,14 +78,20 @@ export function TournamentDetail() {
 
         const activeSource = dbTournament?.source || source;
 
-        // 2. Tenta di scaricare dati esterni solo se non si tratta di un torneo locale del sito
-        if (dbTournament?.discord_channel_id) {
+        const isStartGGOrChallonge = !!(
+          (dbTournament?.direct_link && (dbTournament.direct_link.includes('start.gg') || dbTournament.direct_link.includes('challonge.com'))) ||
+          dbTournament?.source === 'startgg' ||
+          dbTournament?.source === 'challonge'
+        );
+
+        // Se non è un torneo start.gg/challonge ed è gestito dal Bot locale
+        if (!isStartGGOrChallonge && (dbTournament?.discord_channel_id || dbTournament?.auto_bracket)) {
           setLoading(false);
           return;
         }
 
         try {
-          if (activeSource === 'challonge') {
+          if (activeSource === 'challonge' || dbTournament?.direct_link?.includes('challonge.com')) {
             const [tData, dData] = await Promise.all([
               fetchChallongeTournament(slug),
               fetchChallongeData(slug)
@@ -101,8 +107,9 @@ export function TournamentDetail() {
               setTournament({ ...tData, db: dbTournament });
               setSelectedPhase(unifiedPhase);
             }
-          } else if (slug && !dbTournament) {
-            const fullSlug = window.location.pathname.includes('/tournament/') ? `tournament/${slug}` : slug;
+          } else if (isStartGGOrChallonge || (slug && !dbTournament)) {
+            const targetSlug = dbTournament?.direct_link ? dbTournament.direct_link.split('/tournament/')[1] || slug : slug;
+            const fullSlug = (targetSlug && targetSlug.includes('tournament/')) ? targetSlug : `tournament/${targetSlug}`;
             const data = await fetchTournament(fullSlug);
             if (data) {
               setTournament({ ...data, db: dbTournament });
@@ -327,14 +334,14 @@ export function TournamentDetail() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-full">
-        {tournament?.db?.id ? (
-          <LocalTournamentBracket tournamentId={tournament.db.id} />
-        ) : selectedPhase ? (
+        {selectedPhase ? (
           <TournamentBracket 
             phase={selectedPhase} 
             tournamentSlug={tournament?.slug || slug} 
             directLink={tournament?.db?.direct_link} 
           />
+        ) : tournament?.db?.id ? (
+          <LocalTournamentBracket tournamentId={tournament.db.id} />
         ) : (
           <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
             <div className="glass p-12 rounded-[3rem] border border-white/10 max-w-lg w-full shadow-2xl relative overflow-hidden group">
