@@ -665,10 +665,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       }
 
-      // 2. Notifica l'iscrizione UNICAMENTE nel canale #partecipanti
+      // 2. Notifica l'iscrizione UNICAMENTE nel canale #partecipanti con i pulsanti di controllo per lo Staff
       if (partChannelId) {
+        const { data: pRow } = await supabase
+          .from('tournament_participants')
+          .select('id')
+          .eq('tournament_id', tournamentId)
+          .eq('discord_user_id', discordUserId)
+          .single();
+
+        const participantRecordId = pRow?.id || discordUserId;
+
         await discordApi(`/channels/${partChannelId}/messages`, 'POST', {
-          content: `🎉 <@${discordUserId}> (**${displayName}**) si è iscritto al torneo! Seed #${newSeed}`
+          content: `🎉 <@${discordUserId}> (**${displayName}**) si è iscritto al torneo! Seed #${newSeed}`,
+          components: [
+            {
+              type: 1,
+              components: [
+                {
+                  type: 2,
+                  style: 2, // Secondary (Grigio)
+                  label: '🔀 Imposta Seed',
+                  custom_id: `tr_seed_single_${participantRecordId}`
+                },
+                {
+                  type: 2,
+                  style: 4, // Danger (Rosso)
+                  label: '⛔ Kikka Partecipante',
+                  custom_id: `tr_kick_single_${participantRecordId}`
+                }
+              ]
+            }
+          ]
         });
 
         // 3. Aggiorna il pannello controlli Staff
@@ -718,6 +746,206 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({
         type: 4,
         data: { content: '🗑️ La tua iscrizione al torneo è stata cancellata.', flags: 64 } // Ephemeral
+      });
+    }
+
+    // --- AZIONE STAFF: PROMPT SEED SINGOLO PARTECIPANTE ---
+    if (customId.startsWith('tr_seed_single_')) {
+      if (!isDiscordStaff(interaction.member)) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '⛔ Soltanto i membri dello Staff / Admin possono modificare il Seed dei partecipanti.', flags: 64 }
+        });
+      }
+
+      const participantId = customId.replace('tr_seed_single_', '');
+
+      const { data: p } = await supabase
+        .from('tournament_participants')
+        .select('*, tournament:tournament_id(*)')
+        .eq('id', participantId)
+        .single();
+
+      if (!p) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '❌ Partecipante non trovato.', flags: 64 }
+        });
+      }
+
+      const max = p.tournament?.max_participants || 8;
+      const options: any[] = [];
+      for (let i = 1; i <= Math.min(max, 16); i++) {
+        options.push({
+          label: `Seed #${i} ${i === 1 ? '(Testa di Serie #1)' : ''}`,
+          value: `${p.id}___${i}___${p.tournament_id}`,
+          description: `Assegna la posizione di Seed #${i} a ${p.display_name || p.discord_username}`
+        });
+      }
+
+      return res.status(200).json({
+        type: 4,
+        data: {
+          content: `🔀 **Seleziona la nuova Posizione Seed per <@${p.discord_user_id}> (${p.display_name}):**`,
+          flags: 64, // Ephemeral
+          components: [
+            {
+              type: 1,
+              components: [
+                {
+                  type: 3, // String Select Menu
+                  custom_id: 'tr_seed_exec',
+                  placeholder: 'Seleziona Posizione Seed...',
+                  options
+                }
+              ]
+            }
+          ]
+        }
+      });
+    }
+
+    // --- AZIONE STAFF: ESECUZIONE SEED SINGOLO ---
+    if (customId === 'tr_seed_exec') {
+      if (!isDiscordStaff(interaction.member)) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '⛔ Soltanto lo Staff / Admin può modificare i Seed.', flags: 64 }
+        });
+      }
+
+      const selectedValue = interaction.data?.values?.[0] || '';
+      const [participantId, targetSeedStr, tournamentId] = selectedValue.split('___');
+      const targetSeed = parseInt(targetSeedStr || '1');
+
+      const { data: p } = await supabase
+        .from('tournament_participants')
+        .select('*')
+        .eq('id', participantId)
+        .single();
+
+      if (!p) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '❌ Partecipante non trovato.', flags: 64 }
+        });
+      }
+
+      // Aggiorna il Seed nel DB Supabase
+      await supabase
+        .from('tournament_participants')
+        .update({ seed: targetSeed })
+        .eq('id', participantId);
+
+      // Aggiorna il pannello controlli Staff in #partecipanti
+      await updateStaffControlPanel(tournamentId);
+
+      return res.status(200).json({
+        type: 4,
+        data: { content: `✅ Seed di <@${p.discord_user_id}> (**${p.display_name}**) aggiornato a **Seed #${targetSeed}**!`, flags: 64 }
+      });
+    }
+
+    // --- AZIONE STAFF: PROMPT KICK SINGOLO PARTECIPANTE ---
+    if (customId.startsWith('tr_kick_single_')) {
+      if (!isDiscordStaff(interaction.member)) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '⛔ Soltanto i membri dello Staff / Admin possono espellere i partecipanti.', flags: 64 }
+        });
+      }
+
+      const participantId = customId.replace('tr_kick_single_', '');
+
+      const { data: p } = await supabase
+        .from('tournament_participants')
+        .select('*')
+        .eq('id', participantId)
+        .single();
+
+      if (!p) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '❌ Partecipante non trovato.', flags: 64 }
+        });
+      }
+
+      return res.status(200).json({
+        type: 4,
+        data: {
+          content: `⛔ **CONFERMI L'ESPULSIONE DI <@${p.discord_user_id}> (${p.display_name}) DAL TORNEO?**`,
+          flags: 64, // Ephemeral Popup
+          components: [
+            {
+              type: 1,
+              components: [
+                {
+                  type: 2,
+                  style: 4, // Danger Rosso
+                  label: '✅ Sì, Kikka Giocatore',
+                  custom_id: `tr_kick_confirm_${p.id}`
+                },
+                {
+                  type: 2,
+                  style: 2, // Secondary Grigio
+                  label: '❌ No, Annulla',
+                  custom_id: `tr_kick_abort_${p.id}`
+                }
+              ]
+            }
+          ]
+        }
+      });
+    }
+
+    // --- AZIONE STAFF: CONFERMA KICK SINGOLO ---
+    if (customId.startsWith('tr_kick_confirm_')) {
+      if (!isDiscordStaff(interaction.member)) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '⛔ Soltanto lo Staff / Admin può espellere i partecipanti.', flags: 64 }
+        });
+      }
+
+      const participantId = customId.replace('tr_kick_confirm_', '');
+
+      const { data: p } = await supabase
+        .from('tournament_participants')
+        .select('*, tournament:tournament_id(*)')
+        .eq('id', participantId)
+        .single();
+
+      if (p) {
+        await supabase
+          .from('tournament_participants')
+          .delete()
+          .eq('id', participantId);
+
+        const tournamentId = p.tournament_id;
+        const partChannelId = p.tournament?.discord_participants_channel_id;
+
+        // Notifica nel canale #partecipanti
+        if (partChannelId) {
+          await discordApi(`/channels/${partChannelId}/messages`, 'POST', {
+            content: `⛔ <@${p.discord_user_id}> (**${p.display_name}**) è stato rimosso dal torneo dallo Staff.`
+          });
+        }
+
+        await updateDiscordMessageCount(tournamentId);
+        await updateStaffControlPanel(tournamentId);
+      }
+
+      return res.status(200).json({
+        type: 4,
+        data: { content: `✅ Partecipante espulso con successo dal torneo.`, flags: 64 }
+      });
+    }
+
+    // --- AZIONE STAFF: ABORT KICK SINGOLO ---
+    if (customId.startsWith('tr_kick_abort_')) {
+      return res.status(200).json({
+        type: 4,
+        data: { content: 'ℹ️ Operazione annullata.', flags: 64 }
       });
     }
 

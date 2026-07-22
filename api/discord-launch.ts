@@ -235,7 +235,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Creazione automatica della Categoria e dei 3 Canali Testuali Reali su Discord
     const channelsToCreate = [
-      { name: '👥-partecipanti', msg: '👥 **Canale Partecipanti**: Gli iscritti al torneo ed i loro avatar verranno notificati ed aggiornati qui!' },
+      { name: '👥-partecipanti', msg: '👥 **Canale Partecipanti**: Gli iscritti al torneo verranno notificati ed aggiornati qui!' },
       { name: '🏆-risultati', msg: '🏆 **Canale Risultati**: I risultati dei match ed i vincitori del torneo saranno pubblicati qui in tempo reale!' },
       { name: '⚔️-brackets', msg: `⚔️ **Canale Brackets**: Consulta ed incrocia il tabellone live ad eliminazione diretta sul sito web!` }
     ];
