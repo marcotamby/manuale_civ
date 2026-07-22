@@ -1853,7 +1853,8 @@ export function TournamentsPage() {
                                 description: editForm.period ? `Periodo: ${editForm.period}` : undefined,
                                 bannerUrl: editForm.bannerUrl || undefined,
                                 hasRegolamento: editForm.hasRegolamento,
-                                regolamentoContent: editForm.regolamentoContent || undefined
+                                regolamentoContent: editForm.regolamentoContent || undefined,
+                                slug: editingTournament.slug
                               });
                               setDiscordLaunchStatus('success');
                               setTimeout(() => setDiscordLaunchStatus('idle'), 6000);

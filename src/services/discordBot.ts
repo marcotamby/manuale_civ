@@ -14,6 +14,7 @@ export interface LaunchTournamentParams {
   bannerUrl?: string;
   hasRegolamento?: boolean;
   regolamentoContent?: string;
+  slug?: string;
 }
 
 /**

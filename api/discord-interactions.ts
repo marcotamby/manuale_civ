@@ -60,16 +60,42 @@ function isDiscordStaff(member: any): boolean {
 }
 
 /**
- * Rimuove i caratteri speciali Markdown per mostrare un testo pulito e leggibile su Discord
+ * Rimuove i tag HTML, i simboli Markdown e formatta le prime 4-5 righe con il link al regolamento completo del torneo sul sito web
  */
-function cleanMarkdownText(str: string): string {
-  if (!str) return '';
-  return str
-    .replace(/^#+\s+/gm, '')
-    .replace(/[\*_~`]/g, '')
-    .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
-    .replace(/<[^>]*>/g, '')
-    .trim();
+function formatDiscordRegulation(input: string, slug?: string): string {
+  if (!input) return '';
+
+  let clean = input
+    .replace(/<br\s*[\/]?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<\/div>/gi, '\n')
+    .replace(/<\/h[1-6]>/gi, '\n')
+    .replace(/<\/li>/gi, '\n');
+
+  clean = clean.replace(/<[^>]+>/g, '');
+
+  clean = clean
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+
+  clean = clean.replace(/^#+\s+/gm, '').replace(/[\*_~`]/g, '');
+
+  const lines = clean.split('\n').map(l => l.trim()).filter(Boolean);
+  const shortLines = lines.slice(0, 5);
+  let resultText = shortLines.join('\n');
+
+  if (resultText.length > 350) {
+    resultText = resultText.substring(0, 350) + '...';
+  }
+
+  const tournamentSlug = slug ? slug.trim() : '';
+  const siteUrl = tournamentSlug ? `https://aoe4guide.it/tornei/${tournamentSlug}/regolamento` : 'https://aoe4guide.it/tornei';
+
+  return `${resultText}\n\n👉 **[Continua a leggere il regolamento completo sul sito](${siteUrl})**`;
 }
 
 /**
@@ -137,16 +163,15 @@ async function updateDiscordMessageCount(tournamentId: string, fallbackChannelId
   });
 
   if (tournament?.has_regolamento || tournament?.regolamento_content || tournament?.config?.regolamentoContent) {
-    const rawText = cleanMarkdownText(tournament?.regolamento_content || tournament?.config?.regolamentoContent || '');
-    const displayReg = rawText 
-      ? (rawText.length > 800 ? rawText.substring(0, 800) + '...\n*(Regolamento completo sul sito web)*' : rawText)
-      : 'Consulta il regolamento ufficiale sulla pagina del torneo sul sito web.';
-
-    fields.push({
-      name: '📜 Regolamento',
-      value: displayReg,
-      inline: false
-    });
+    const rawText = tournament?.regolamento_content || tournament?.config?.regolamentoContent || '';
+    const displayReg = formatDiscordRegulation(rawText, tournament?.slug);
+    if (displayReg) {
+      fields.push({
+        name: '📜 Regolamento',
+        value: displayReg,
+        inline: false
+      });
+    }
   }
 
   const embed: any = {
@@ -604,19 +629,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
-      // 1. Assicurati che il canale #partecipanti esista ed appartenga al server
+      // 1. Assicurati che il canale #partecipanti esista ed appartenga al server (cerca prima quelli esistenti)
       const guildId = tournament.discord_guild_id || interaction.guild_id;
       let partChannelId = tournament.discord_participants_channel_id;
 
-      if (!partChannelId && guildId) {
-        const newCh = await discordApi(`/guilds/${guildId}/channels`, 'POST', {
-          name: '👥-partecipanti',
-          type: 0,
-          parent_id: tournament.discord_category_id || undefined
-        });
+      if (guildId) {
+        const guildChannels = await discordApi(`/guilds/${guildId}/channels`);
+        if (Array.isArray(guildChannels)) {
+          const existingPartCh = guildChannels.find((c: any) => c.name.includes('partecipanti'));
+          if (existingPartCh) {
+            partChannelId = existingPartCh.id;
+          }
+        }
 
-        if (newCh && newCh.id) {
-          partChannelId = newCh.id;
+        if (!partChannelId) {
+          const newCh = await discordApi(`/guilds/${guildId}/channels`, 'POST', {
+            name: '👥-partecipanti',
+            type: 0,
+            parent_id: tournament.discord_category_id || undefined
+          });
+
+          if (newCh && newCh.id) {
+            partChannelId = newCh.id;
+          }
+        }
+
+        if (partChannelId && partChannelId !== tournament.discord_participants_channel_id) {
           await supabase
             .from('tournaments')
             .update({ 
@@ -627,7 +665,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       }
 
-      // 2. Notifica l'iscrizione in #partecipanti
+      // 2. Notifica l'iscrizione UNICAMENTE nel canale #partecipanti
       if (partChannelId) {
         await discordApi(`/channels/${partChannelId}/messages`, 'POST', {
           content: `🎉 <@${discordUserId}> (**${displayName}**) si è iscritto al torneo! Seed #${newSeed}`
@@ -637,14 +675,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         await updateStaffControlPanel(tournamentId);
       }
 
-      // 4. Aggiorna l'embed principale
+      // 4. Aggiorna l'embed principale in #iscrizioni
       await updateDiscordMessageCount(tournamentId, interaction.channel_id, interaction.message?.id);
 
       return res.status(200).json({
         type: 4,
         data: {
           content: `🎉 **Iscrizione confermata!** Benvenuto nel torneo *${tournament.name || tournament.title}*! Controlla il canale <#${partChannelId}> per gli aggiornamenti!`,
-          flags: 64
+          flags: 64 // Ephemeral (Visibile solo all'utente)
         }
       });
     }
@@ -653,18 +691,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (customId.startsWith('tr_unreg_')) {
       const tournamentId = customId.replace('tr_unreg_', '');
 
+      const { data: tournament } = await supabase
+        .from('tournaments')
+        .select('*')
+        .eq('id', tournamentId)
+        .single();
+
       await supabase
         .from('tournament_participants')
         .delete()
         .eq('tournament_id', tournamentId)
         .eq('discord_user_id', discordUserId);
 
+      const partChannelId = tournament?.discord_participants_channel_id;
+
+      // Notifica la cancellazione UNICAMENTE nel canale #partecipanti
+      if (partChannelId) {
+        await discordApi(`/channels/${partChannelId}/messages`, 'POST', {
+          content: `🚶 <@${discordUserId}> (**${displayName}**) ha cancellato la propria iscrizione dal torneo.`
+        });
+      }
+
       await updateDiscordMessageCount(tournamentId, interaction.channel_id, interaction.message?.id);
       await updateStaffControlPanel(tournamentId);
 
       return res.status(200).json({
         type: 4,
-        data: { content: '🗑️ La tua iscrizione al torneo è stata cancellata.', flags: 64 }
+        data: { content: '🗑️ La tua iscrizione al torneo è stata cancellata.', flags: 64 } // Ephemeral
       });
     }
 

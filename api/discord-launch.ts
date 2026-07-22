@@ -17,6 +17,45 @@ function cleanChannelId(input: string): string {
   return trimmed;
 }
 
+/**
+ * Rimuove i tag HTML, i simboli Markdown e formatta le prime 4-5 righe con il link al regolamento completo del torneo sul sito web
+ */
+function formatDiscordRegulation(input: string, slug?: string): string {
+  if (!input) return '';
+
+  let clean = input
+    .replace(/<br\s*[\/]?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<\/div>/gi, '\n')
+    .replace(/<\/h[1-6]>/gi, '\n')
+    .replace(/<\/li>/gi, '\n');
+
+  clean = clean.replace(/<[^>]+>/g, '');
+
+  clean = clean
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+
+  clean = clean.replace(/^#+\s+/gm, '').replace(/[\*_~`]/g, '');
+
+  const lines = clean.split('\n').map(l => l.trim()).filter(Boolean);
+  const shortLines = lines.slice(0, 5);
+  let resultText = shortLines.join('\n');
+
+  if (resultText.length > 350) {
+    resultText = resultText.substring(0, 350) + '...';
+  }
+
+  const tournamentSlug = slug ? slug.trim() : '';
+  const siteUrl = tournamentSlug ? `https://aoe4guide.it/tornei/${tournamentSlug}/regolamento` : 'https://aoe4guide.it/tornei';
+
+  return `${resultText}\n\n👉 **[Continua a leggere il regolamento completo sul sito](${siteUrl})**`;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -34,7 +73,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     description, 
     bannerUrl,
     hasRegolamento,
-    regolamentoContent
+    regolamentoContent,
+    slug
   } = req.body;
 
   let channelId = cleanChannelId(rawChannelId);
@@ -115,16 +155,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   });
 
   if (hasRegolamento || regolamentoContent) {
-    const rawText = (regolamentoContent || '').trim();
-    const displayReg = rawText 
-      ? (rawText.length > 800 ? rawText.substring(0, 800) + '...\n*(Regolamento completo sul sito web)*' : rawText)
-      : 'Consulta il regolamento ufficiale sulla pagina del torneo sul sito web.';
-
-    fields.push({
-      name: '📜 Regolamento',
-      value: displayReg,
-      inline: false
-    });
+    const displayReg = formatDiscordRegulation(regolamentoContent || '', slug);
+    if (displayReg) {
+      fields.push({
+        name: '📜 Regolamento',
+        value: displayReg,
+        inline: false
+      });
+    }
   }
 
   const embed: any = {
@@ -220,50 +258,67 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         let targetCategoryId = channelInfo.parent_id || null;
 
         if (guildId) {
-          // 2. Crea una Categoria dedicata per il Torneo nel Server Discord
-          const categoryRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}`
-            },
-            body: JSON.stringify({
-              name: `🏆 ${name ? name.toUpperCase() : 'TORNEO'}`,
-              type: 4 // 4 = GUILD_CATEGORY
-            })
+          // Recupera la lista di tutti i canali esistenti nel server per evitare duplicazioni
+          const existingChannelsRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
+            headers: { 'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}` }
           });
+          const existingChannels: any[] = existingChannelsRes.ok ? await existingChannelsRes.json() : [];
 
-          if (categoryRes.ok) {
-            const categoryData = await categoryRes.json();
-            targetCategoryId = categoryData.id;
+          // 2. Trova o Crea la Categoria per il Torneo
+          const existingCategory = existingChannels.find((c: any) => c.type === 4 && (c.name.toUpperCase().includes(name.toUpperCase()) || c.name.includes(name)));
+          if (existingCategory) {
+            targetCategoryId = existingCategory.id;
+          } else {
+            const categoryRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}`
+              },
+              body: JSON.stringify({
+                name: `🏆 ${name ? name.toUpperCase() : 'TORNEO'}`,
+                type: 4 // 4 = GUILD_CATEGORY
+              })
+            });
+
+            if (categoryRes.ok) {
+              const categoryData = await categoryRes.json();
+              targetCategoryId = categoryData.id;
+            }
           }
           savedCategoryId = targetCategoryId || null;
 
-          // 3. Crea i 3 Canali Testuali Reali (GUILD_TEXT type 0) all'interno della Categoria
+          // 3. Crea o Riusa i 3 Canali Testuali Reali all'interno della Categoria
           for (const ch of channelsToCreate) {
             try {
-              const textChannelRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}`
-                },
-                body: JSON.stringify({
-                  name: ch.name,
-                  type: 0, // 0 = GUILD_TEXT (Canale Testuale Reale)
-                  parent_id: targetCategoryId || undefined
-                })
-              });
+              let textChannelData = existingChannels.find((c: any) => c.parent_id === targetCategoryId && (c.name === ch.name || c.name.includes(ch.name.replace('👥-', '').replace('🏆-', '').replace('⚔️-', ''))));
 
-              if (textChannelRes.ok) {
-                const textChannelData = await textChannelRes.json();
+              if (!textChannelData) {
+                const textChannelRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}`
+                  },
+                  body: JSON.stringify({
+                    name: ch.name,
+                    type: 0, // 0 = GUILD_TEXT
+                    parent_id: targetCategoryId || undefined
+                  })
+                });
+
+                if (textChannelRes.ok) {
+                  textChannelData = await textChannelRes.json();
+                }
+              }
+
+              if (textChannelData && textChannelData.id) {
                 createdChannels.push(ch.name);
 
                 if (ch.name.includes('partecipanti')) {
                   savedParticipantsChannelId = textChannelData.id;
                 }
 
-                // Invia il messaggio iniziale di benvenuto nel canale testuale appena creato
                 await fetch(`https://discord.com/api/v10/channels/${textChannelData.id}/messages`, {
                   method: 'POST',
                   headers: {
@@ -272,11 +327,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                   },
                   body: JSON.stringify({ content: ch.msg })
                 });
-              } else {
-                console.warn(`Creazione canale testuale ${ch.name} fallito, fallback su Thread...`);
               }
             } catch (chErr) {
-              console.warn(`Errore creazione canale ${ch.name}:`, chErr);
+              console.warn(`Errore gestione canale ${ch.name}:`, chErr);
             }
           }
         }
