@@ -491,7 +491,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       const newSeed = currentCount + 1;
 
-      const { error: insertErr } = await supabase
+      // Inserimento con fallback se la colonna 'seed' non è ancora stata creata in Supabase PostgREST
+      let insertErr: any = null;
+
+      const { error: errWithSeed } = await supabase
         .from('tournament_participants')
         .insert({
           tournament_id: tournamentId,
@@ -501,6 +504,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           avatar_url: avatarUrl,
           seed: newSeed
         });
+
+      if (errWithSeed) {
+        if (errWithSeed.message?.includes("'seed'") || errWithSeed.message?.includes('schema cache') || errWithSeed.code === 'PGRST204') {
+          // Retry inserimento senza il campo 'seed'
+          const { error: errWithoutSeed } = await supabase
+            .from('tournament_participants')
+            .insert({
+              tournament_id: tournamentId,
+              discord_user_id: discordUserId,
+              discord_username: discordUsername,
+              display_name: displayName,
+              avatar_url: avatarUrl
+            });
+          insertErr = errWithoutSeed;
+        } else {
+          insertErr = errWithSeed;
+        }
+      }
 
       if (insertErr) {
         if (insertErr.code === '23505') {

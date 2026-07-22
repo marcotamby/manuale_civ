@@ -251,14 +251,13 @@ export function BettingPage() {
           const pastoriCount = new Set(tourneyBets.map(u => u.user_email)).size;
           setTotalStats({ count: tourneyBets.length, sheep: totalSheep, pastori: pastoriCount });
 
-          // Calcola vincite del torneo
+          // Calcola vincite del torneo (Totale pecore vinte/ritornate)
           const winningsByEmail: Record<string, number> = {};
           tourneyBets.forEach(bet => {
             if (bet.status === 'won') {
               const winAmount = Number(bet.payout) || 0;
-              const profit = winAmount - (Number(bet.amount) || 0);
-              if (profit > 0) {
-                winningsByEmail[bet.user_email] = (winningsByEmail[bet.user_email] || 0) + profit;
+              if (winAmount > 0) {
+                winningsByEmail[bet.user_email] = (winningsByEmail[bet.user_email] || 0) + winAmount;
               }
             }
           });

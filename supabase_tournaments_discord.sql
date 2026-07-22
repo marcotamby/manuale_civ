@@ -24,6 +24,8 @@ CREATE TABLE IF NOT EXISTS tournament_participants (
   CONSTRAINT unique_tournament_user UNIQUE(tournament_id, discord_user_id)
 );
 
+ALTER TABLE tournament_participants ADD COLUMN IF NOT EXISTS seed INTEGER DEFAULT 1;
+
 -- 3. Tabella Match / Tabellone (Bracket)
 CREATE TABLE IF NOT EXISTS tournament_matches (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
