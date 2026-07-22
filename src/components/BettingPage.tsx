@@ -270,13 +270,13 @@ export function BettingPage() {
           if (sortedEmails.length > 0) {
             const { data: profiles } = await supabase
               .from('profiles')
-              .select('email, nickname')
-              .in('email', sortedEmails.map(e => e[0]));
+              .select('email, nickname');
             
             const newLeaderboard = sortedEmails.map(([email, profit]) => {
-              const prof = profiles?.find(p => p.email === email);
+              const prof = profiles?.find(p => p.email?.toLowerCase() === email.toLowerCase());
+              const name = (prof?.nickname && prof.nickname.trim() !== '') ? prof.nickname : email.split('@')[0];
               return {
-                nickname: prof?.nickname || 'Anonimo',
+                nickname: name,
                 sheep_balance: profit
               };
             });

@@ -708,6 +708,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           });
         }
 
+        // Canale Vocale Generico Torneo (type 2 = GUILD_VOICE)
+        const voiceChannelName = `🔊 ${(tournament.name || 'TORNEO').toUpperCase()}`;
+        await discordApi(`/guilds/${guildId}/channels`, 'POST', {
+          name: voiceChannelName,
+          type: 2, // 2 = GUILD_VOICE (Canale Vocale Generico)
+          parent_id: categoryId || undefined
+        });
+
         // 4. Crea i canali singoli dei match del Turno 1
         await createMatchChannelsForRound(tournamentId, 1);
       }
