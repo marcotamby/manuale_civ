@@ -353,17 +353,27 @@ async function createMatchChannelsForRound(tournamentId: string, roundNum: numbe
 
   const { data: matches } = await supabase
     .from('tournament_matches')
-    .select('*, p1:player1_id(*), p2:player2_id(*)')
+    .select('*')
     .eq('tournament_id', tournamentId)
     .eq('round', roundNum);
 
-  if (!matches) return;
+  if (!matches || matches.length === 0) return;
 
   for (const match of matches) {
     if (!match.player1_id || !match.player2_id) continue;
 
-    const p1 = match.p1;
-    const p2 = match.p2;
+    const { data: p1 } = await supabase
+      .from('tournament_participants')
+      .select('*')
+      .eq('id', match.player1_id)
+      .maybeSingle();
+
+    const { data: p2 } = await supabase
+      .from('tournament_participants')
+      .select('*')
+      .eq('id', match.player2_id)
+      .maybeSingle();
+
     const p1Tag = p1?.discord_user_id ? `<@${p1.discord_user_id}>` : (p1?.display_name || 'Giocatore 1');
     const p2Tag = p2?.discord_user_id ? `<@${p2.discord_user_id}>` : (p2?.display_name || 'Giocatore 2');
 
@@ -1347,47 +1357,71 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // 2. Genera il tabellone ad eliminazione diretta nel DB
       await generateBracketMatchesInDb(tournamentId, participants);
 
-      // 3. Crea i canali #brackets e #risultati nella categoria
+      // 3. Crea o Riusa i canali #brackets e #risultati nella categoria
       const categoryId = tournament.discord_category_id;
       const guildId = tournament.discord_guild_id;
 
       if (guildId) {
-        // Canale #brackets
-        const bracketCh = await discordApi(`/guilds/${guildId}/channels`, 'POST', {
-          name: '⚔️-brackets',
-          type: 0,
-          parent_id: categoryId || undefined
-        });
+        const guildChannels = await discordApi(`/guilds/${guildId}/channels`);
+        let bracketChId: string | null = null;
+        let resultsChId: string | null = null;
 
-        if (bracketCh && bracketCh.id) {
+        if (Array.isArray(guildChannels)) {
+          const existingBracket = guildChannels.find((c: any) => c.name.includes('brackets'));
+          if (existingBracket) bracketChId = existingBracket.id;
+
+          const existingResults = guildChannels.find((c: any) => c.name.includes('risultati'));
+          if (existingResults) resultsChId = existingResults.id;
+        }
+
+        if (!bracketChId) {
+          const bracketCh = await discordApi(`/guilds/${guildId}/channels`, 'POST', {
+            name: '⚔️-brackets',
+            type: 0,
+            parent_id: categoryId || undefined
+          });
+          if (bracketCh && bracketCh.id) bracketChId = bracketCh.id;
+        }
+
+        if (bracketChId) {
           const siteUrl = `https://aoe4guide.it/tornei/${tournament.slug}`;
-          await discordApi(`/channels/${bracketCh.id}/messages`, 'POST', {
+          await discordApi(`/channels/${bracketChId}/messages`, 'POST', {
             content: `⚔️ **TABELLONE TORNEO LIVE**\nConsulta ed incrocia il tabellone ad eliminazione diretta aggiornato in tempo reale sul sito web:\n👉 ${siteUrl}`
           });
         }
 
-        // Canale #risultati
-        const resultsCh = await discordApi(`/guilds/${guildId}/channels`, 'POST', {
-          name: '🏆-risultati',
-          type: 0,
-          parent_id: categoryId || undefined
-        });
+        if (!resultsChId) {
+          const resultsCh = await discordApi(`/guilds/${guildId}/channels`, 'POST', {
+            name: '🏆-risultati',
+            type: 0,
+            parent_id: categoryId || undefined
+          });
+          if (resultsCh && resultsCh.id) resultsChId = resultsCh.id;
+        }
 
-        if (resultsCh && resultsCh.id) {
-          await discordApi(`/channels/${resultsCh.id}/messages`, 'POST', {
+        if (resultsChId) {
+          await discordApi(`/channels/${resultsChId}/messages`, 'POST', {
             content: `🏆 **CANALE RISULTATI**\nI punteggi ufficiali ed i vincitori di ciascun scontro saranno annunciati qui in tempo reale!`
           });
         }
 
-        // Canale Vocale Generico Torneo (type 2 = GUILD_VOICE)
-        const voiceChannelName = `🔊 ${(tournament.name || 'TORNEO').toUpperCase()}`;
-        await discordApi(`/guilds/${guildId}/channels`, 'POST', {
-          name: voiceChannelName,
-          type: 2, // 2 = GUILD_VOICE (Canale Vocale Generico)
-          parent_id: categoryId || undefined
-        });
+        // Canale Vocale Generico (type 2 = GUILD_VOICE)
+        let voiceChId: string | null = null;
+        if (Array.isArray(guildChannels)) {
+          const voiceChName = (tournament.name || 'TORNEO').toUpperCase();
+          const existingVoice = guildChannels.find((c: any) => c.type === 2 && (c.name.toUpperCase().includes(voiceChName) || c.name.includes('TORNEO')));
+          if (existingVoice) voiceChId = existingVoice.id;
+        }
 
-        // 4. Crea i canali singoli dei match del Turno 1
+        if (!voiceChId) {
+          await discordApi(`/guilds/${guildId}/channels`, 'POST', {
+            name: `🔊 ${(tournament.name || 'TORNEO').toUpperCase()}`,
+            type: 2,
+            parent_id: categoryId || undefined
+          });
+        }
+
+        // 4. Crea i canali singoli PRIVATI dei match del Turno 1
         await createMatchChannelsForRound(tournamentId, 1);
       }
 
@@ -1406,7 +1440,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       const { data: match } = await supabase
         .from('tournament_matches')
-        .select('*, p1:player1_id(*), p2:player2_id(*)')
+        .select('*')
         .eq('id', matchId)
         .single();
 
@@ -1417,8 +1451,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
-      const p1 = match.p1;
-      const p2 = match.p2;
+      const { data: p1 } = await supabase
+        .from('tournament_participants')
+        .select('*')
+        .eq('id', match.player1_id)
+        .maybeSingle();
+
+      const { data: p2 } = await supabase
+        .from('tournament_participants')
+        .select('*')
+        .eq('id', match.player2_id)
+        .maybeSingle();
 
       const isStaff = isDiscordStaff(interaction.member);
       const isP1 = discordUserId === p1?.discord_user_id;
