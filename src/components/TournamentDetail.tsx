@@ -108,13 +108,31 @@ export function TournamentDetail() {
               setSelectedPhase(unifiedPhase);
             }
           } else if (isStartGGOrChallonge || (slug && !dbTournament)) {
-            const targetSlug = dbTournament?.direct_link ? dbTournament.direct_link.split('/tournament/')[1] || slug : slug;
-            const fullSlug = (targetSlug && targetSlug.includes('tournament/')) ? targetSlug : `tournament/${targetSlug}`;
+            // Priorità 1: slug dall'URL se è già un percorso start.gg (es. "tournament/aoe4-2v2-primavera")
+            // Priorità 2: estrai dal direct_link in modo robusto
+            let sgSlug: string = slug || '';
+
+            if (dbTournament?.direct_link?.includes('start.gg')) {
+              // Rimuovi dominio, query params e trailing slash dal direct_link
+              const cleanLink = dbTournament.direct_link
+                .replace(/https?:\/\/(www\.)?start\.gg\//, '')
+                .split('?')[0]
+                .split('#')[0]
+                .replace(/\/$/, '');
+              // cleanLink ora è es: "tournament/aoe4-1v1-invernale/events" o "tournament/aoe4-2v2-primavera"
+              // Se lo slug URL non è già un path start.gg valido, usa quello estratto
+              if (!sgSlug.includes('tournament/')) {
+                sgSlug = cleanLink;
+              }
+            }
+
+            // Assicura il prefisso "tournament/" se mancante
+            const fullSlug = sgSlug.startsWith('tournament/') ? sgSlug : `tournament/${sgSlug}`;
             const data = await fetchTournament(fullSlug);
             if (data) {
               setTournament({ ...data, db: dbTournament });
               if (data.events && data.events.length > 0) {
-                let targetEvent = data.events.find(e => e.name.toLowerCase().includes('1v1')) || data.events[0];
+                const targetEvent = data.events.find((e: any) => e.name.toLowerCase().includes('1v1')) || data.events[0];
                 if (targetEvent?.phases && targetEvent.phases.length > 0) {
                   setSelectedPhase(targetEvent.phases[0]);
                 }
