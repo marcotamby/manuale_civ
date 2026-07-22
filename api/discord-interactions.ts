@@ -444,19 +444,24 @@ async function createMatchChannelsForRound(tournamentId: string, roundNum: numbe
 /**
  * Elimina l'intera Categoria Discord e tutti i canali testuali/vocali contenuti in essa
  */
-async function deleteDiscordCategoryAndChannels(guildId: string, categoryId: string) {
-  if (!DISCORD_BOT_TOKEN || !guildId || !categoryId) return;
+async function deleteDiscordCategoryAndChannels(guildId: string, categoryId?: string | null, tournamentName?: string) {
+  if (!DISCORD_BOT_TOKEN || !guildId) return;
   try {
     const channels = await discordApi(`/guilds/${guildId}/channels`);
     if (Array.isArray(channels)) {
-      const categoryChannels = channels.filter((c: any) => c.parent_id === categoryId || c.id === categoryId);
-      for (const ch of categoryChannels) {
-        if (ch.id !== categoryId) {
+      let targetCatId = categoryId;
+      if (!targetCatId && tournamentName) {
+        const cat = channels.find((c: any) => c.type === 4 && (c.name.toUpperCase().includes(tournamentName.toUpperCase()) || c.name.includes('TORNEO')));
+        if (cat) targetCatId = cat.id;
+      }
+      if (targetCatId) {
+        const categoryChannels = channels.filter((c: any) => c.parent_id === targetCatId);
+        for (const ch of categoryChannels) {
           await discordApi(`/channels/${ch.id}`, 'DELETE');
         }
+        await discordApi(`/channels/${targetCatId}`, 'DELETE');
       }
     }
-    await discordApi(`/channels/${categoryId}`, 'DELETE');
   } catch (err) {
     console.error('Errore eliminazione categoria e canali Discord:', err);
   }
@@ -898,8 +903,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       await updateStaffControlPanel(tournamentId);
 
       return res.status(200).json({
-        type: 4,
-        data: { content: `✅ Seed di <@${p.discord_user_id}> (**${p.display_name}**) aggiornato a **Seed #${targetSeed}**!`, flags: 64 }
+        type: 7, // UPDATE_MESSAGE: Aggiorna ed azzera i bottoni del prompt in-place!
+        data: { content: `✅ Seed di <@${p.discord_user_id}> (**${p.display_name}**) aggiornato a **Seed #${targetSeed}**!`, components: [] }
       });
     }
 
@@ -993,16 +998,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       return res.status(200).json({
-        type: 4,
-        data: { content: `✅ Partecipante espulso con successo dal torneo.`, flags: 64 }
+        type: 7, // UPDATE_MESSAGE: Rimuove i pulsanti di conferma in-place!
+        data: { content: `✅ Partecipante espulso con successo dal torneo.`, components: [] }
       });
     }
 
     // --- AZIONE STAFF: ABORT KICK SINGOLO ---
     if (customId.startsWith('tr_kick_abort_')) {
       return res.status(200).json({
-        type: 4,
-        data: { content: 'ℹ️ Operazione annullata.', flags: 64 }
+        type: 7,
+        data: { content: 'ℹ️ Operazione annullata.', components: [] }
       });
     }
 
@@ -1071,8 +1076,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       await updateStaffControlPanel(tournamentId);
 
       return res.status(200).json({
-        type: 4,
-        data: { content: `✅ Partecipante <@${kickUserId}> rimosso dal torneo dallo Staff.`, flags: 64 }
+        type: 7,
+        data: { content: `✅ Partecipante <@${kickUserId}> rimosso dal torneo dallo Staff.`, components: [] }
       });
     }
 
@@ -1138,19 +1143,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .update({ status: 'annullato' })
         .eq('id', tournamentId);
 
-      // 2. Elimina la Categoria Discord e tutti i canali contenuti
+      // 2. Elimina la Categoria Discord e tutti i canali contenuti (in modo sincrono ed attendibile)
       const guildId = tournament?.discord_guild_id || interaction.guild_id;
       const categoryId = tournament?.discord_category_id;
 
-      if (guildId && categoryId) {
-        deleteDiscordCategoryAndChannels(guildId, categoryId);
+      if (guildId) {
+        await deleteDiscordCategoryAndChannels(guildId, categoryId, tournament?.name);
       }
 
       return res.status(200).json({
-        type: 4,
+        type: 7,
         data: {
           content: `🗑️ **Torneo annullato con successo!** La Categoria Discord ed i canali dedicati sono stati eliminati ed il torneo è stato annullato.`,
-          flags: 64
+          components: []
         }
       });
     }
@@ -1158,8 +1163,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // --- AZIONE STAFF: ABORT ANNULLA TORNEO ---
     if (customId.startsWith('tr_cancel_abort_')) {
       return res.status(200).json({
-        type: 4,
-        data: { content: 'ℹ️ Operazione annullata. Il torneo rimane attivo.', flags: 64 }
+        type: 7,
+        data: { content: 'ℹ️ Operazione annullata. Il torneo rimane attivo.', components: [] }
       });
     }
 
@@ -1243,15 +1248,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const guildId = tournament?.discord_guild_id || interaction.guild_id;
       const categoryId = tournament?.discord_category_id;
 
-      if (guildId && categoryId) {
-        deleteDiscordCategoryAndChannels(guildId, categoryId);
+      if (guildId) {
+        await deleteDiscordCategoryAndChannels(guildId, categoryId, tournament?.name);
       }
 
       return res.status(200).json({
-        type: 4,
+        type: 7,
         data: {
           content: `🏆 **Torneo chiuso ed archiviato con successo!** La Categoria ed i canali Discord sono stati rimossi.`,
-          flags: 64
+          components: []
         }
       });
     }
@@ -1259,8 +1264,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // --- AZIONE STAFF: ABORT CHIUDI TORNEO ---
     if (customId.startsWith('tr_close_abort_')) {
       return res.status(200).json({
-        type: 4,
-        data: { content: 'ℹ️ Operazione annullata. Il torneo rimane visibile.', flags: 64 }
+        type: 7,
+        data: { content: 'ℹ️ Operazione annullata. Il torneo rimane visibile.', components: [] }
       });
     }
 
