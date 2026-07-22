@@ -260,62 +260,61 @@ async function discordApi(endpoint: string, method = 'GET', body?: any) {
  * Genera l'albero di match ad Eliminazione Diretta nel DB Supabase basato sull'ordine dei Seed
  */
 async function generateBracketMatchesInDb(tournamentId: string, participants: any[]) {
-  // Cancella eventuali match precedenti per questo torneo prima di generarne di nuovi
-  await supabase
-    .from('tournament_matches')
-    .delete()
-    .eq('tournament_id', tournamentId);
+  try {
+    // Cancella eventuali match precedenti per questo torneo prima di generarne di nuovi
+    await supabase
+      .from('tournament_matches')
+      .delete()
+      .eq('tournament_id', tournamentId);
 
-  // Ordina per seed (1, 2, 3...)
-  const sorted = [...participants].sort((a, b) => (a.seed || 99) - (b.seed || 99));
-  const n = sorted.length;
-  
-  // Calcola dimensione potenza di 2 (es. 2, 4, 8, 16)
-  let bracketSize = 2;
-  while (bracketSize < n) bracketSize *= 2;
-  
-  const totalRounds = Math.log2(bracketSize);
-  const round1MatchesCount = bracketSize / 2;
+    // Ordina per seed (1, 2, 3...)
+    const sorted = [...participants].sort((a, b) => (a.seed || 99) - (b.seed || 99));
+    const n = sorted.length;
+    
+    // Calcola dimensione potenza di 2 (es. 2, 4, 8, 16)
+    let bracketSize = 2;
+    while (bracketSize < n) bracketSize *= 2;
+    
+    const totalRounds = Math.log2(bracketSize);
+    const round1MatchesCount = bracketSize / 2;
 
-  // Accoppiamenti Seeding: Seed 1 vs Seed N, Seed 2 vs Seed N-1...
-  const pairings: { p1: any | null; p2: any | null }[] = [];
-  for (let i = 0; i < round1MatchesCount; i++) {
-    const p1 = sorted[i] || null;
-    const p2 = sorted[bracketSize - 1 - i] || null;
-    pairings.push({ p1, p2 });
-  }
+    // Accoppiamenti Seeding: Seed 1 vs Seed N, Seed 2 vs Seed N-1...
+    const pairings: { p1: any | null; p2: any | null }[] = [];
+    for (let i = 0; i < round1MatchesCount; i++) {
+      const p1 = sorted[i] || null;
+      const p2 = sorted[bracketSize - 1 - i] || null;
+      pairings.push({ p1, p2 });
+    }
 
-  // Inserisci i match dal Turno Finale scendendo fino al Turno 1 per collegare next_match_id
-  let prevRoundMatches: any[] = [];
+    // Inserisci i match dal Turno Finale scendendo fino al Turno 1 per collegare next_match_id
+    let prevRoundMatches: any[] = [];
 
-  for (let r = totalRounds; r >= 1; r--) {
-    const matchesInRoundCount = Math.pow(2, totalRounds - r);
-    const currentRoundInserted: any[] = [];
+    for (let r = totalRounds; r >= 1; r--) {
+      const matchesInRoundCount = Math.pow(2, totalRounds - r);
+      const currentRoundInserted: any[] = [];
 
-    for (let m = 1; m <= matchesInRoundCount; m++) {
-      let nextMatchId: string | null = null;
-      let nextMatchSlot: number | null = null;
+      for (let m = 1; m <= matchesInRoundCount; m++) {
+        let nextMatchId: string | null = null;
+        let nextMatchSlot: number | null = null;
 
-      if (r < totalRounds) {
-        const parentMatchIndex = Math.floor((m - 1) / 2);
-        nextMatchId = prevRoundMatches[parentMatchIndex]?.id || null;
-        nextMatchSlot = ((m - 1) % 2) + 1;
-      }
+        if (r < totalRounds) {
+          const parentMatchIndex = Math.floor((m - 1) / 2);
+          nextMatchId = prevRoundMatches[parentMatchIndex]?.id || null;
+          nextMatchSlot = ((m - 1) % 2) + 1;
+        }
 
-      let p1 = null;
-      let p2 = null;
-      let status = 'pending';
+        let p1 = null;
+        let p2 = null;
+        let status = 'pending';
 
-      if (r === 1) {
-        const pair = pairings[m - 1];
-        p1 = pair?.p1?.id || null;
-        p2 = pair?.p2?.id || null;
-        status = (p1 && p2) ? 'in_progress' : (p1 || p2) ? 'completed' : 'pending';
-      }
+        if (r === 1) {
+          const pair = pairings[m - 1];
+          p1 = pair?.p1?.id || null;
+          p2 = pair?.p2?.id || null;
+          status = (p1 && p2) ? 'in_progress' : (p1 || p2) ? 'completed' : 'pending';
+        }
 
-      const { data: insertedMatch } = await supabase
-        .from('tournament_matches')
-        .insert({
+        const matchPayload: any = {
           tournament_id: tournamentId,
           round: r,
           match_number: m,
@@ -325,15 +324,26 @@ async function generateBracketMatchesInDb(tournamentId: string, participants: an
           next_match_id: nextMatchId,
           next_match_slot: nextMatchSlot,
           status
-        })
-        .select()
-        .single();
+        };
 
-      if (insertedMatch) {
-        currentRoundInserted.push(insertedMatch);
+        const { data: insertedMatch, error: mInsertErr } = await supabase
+          .from('tournament_matches')
+          .insert(matchPayload)
+          .select()
+          .single();
+
+        if (mInsertErr) {
+          console.error(`Errore inserimento match R${r}M${m}:`, mInsertErr);
+        }
+
+        if (insertedMatch) {
+          currentRoundInserted.push(insertedMatch);
+        }
       }
+      prevRoundMatches = currentRoundInserted;
     }
-    prevRoundMatches = currentRoundInserted;
+  } catch (err) {
+    console.error('Eccezione durante la generazione dei match:', err);
   }
 }
 
