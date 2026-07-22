@@ -244,6 +244,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let savedGuildId: string | null = null;
     let savedCategoryId: string | null = null;
     let savedParticipantsChannelId: string | null = null;
+    let savedControlMessageId: string | null = null;
 
     try {
       // 1. Recupera il Server ID (guild_id) e la Categoria attuale dal canale d'invio
@@ -317,6 +318,73 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
                 if (ch.name.includes('partecipanti')) {
                   savedParticipantsChannelId = textChannelData.id;
+
+                  // Pubblica immediatamente il Pannello Controlli Staff nel canale #partecipanti
+                  const controlContent = `⚙️ **PANNELLO DI CONTROLLO STAFF - TORNEO: ${(name || 'TORNEO').toUpperCase()}**\n` +
+                    `Stato Attuale: **⏳ IN CORSO / REGISTRAZIONE**\n` +
+                    `Iscritti Attuali: **0 / ${maxParticipants || 8}**\n\n` +
+                    `**LISTA PARTECIPANTE & SEEDING:**\n*Nessun partecipante ancora iscritto.*\n\n` +
+                    `*Gli Staff possono gestire il torneo tramite i pulsanti sottostanti.*`;
+
+                  const controlComponents = [
+                    {
+                      type: 1,
+                      components: [
+                        {
+                          type: 2,
+                          style: 1, // Primary Blu
+                          label: '🚀 Avvia Torneo Ora',
+                          custom_id: `tr_start_${tournamentId}`
+                        },
+                        {
+                          type: 2,
+                          style: 3, // Success Verde
+                          label: '📈 Aumenta Tetto (+4)',
+                          custom_id: `tr_max_inc_${tournamentId}`
+                        },
+                        {
+                          type: 2,
+                          style: 2,
+                          label: '🔀 Gestisci Seeding',
+                          custom_id: `tr_seed_menu_${tournamentId}`
+                        },
+                        {
+                          type: 2,
+                          style: 4,
+                          label: '⛔ Rimuovi Partecipante',
+                          custom_id: `tr_kick_menu_${tournamentId}`
+                        }
+                      ]
+                    },
+                    {
+                      type: 1,
+                      components: [
+                        {
+                          type: 2,
+                          style: 4, // Danger Rosso
+                          label: '⚠️ Annulla Torneo',
+                          custom_id: `tr_cancel_prompt_${tournamentId}`
+                        }
+                      ]
+                    }
+                  ];
+
+                  const controlMsgRes = await fetch(`https://discord.com/api/v10/channels/${textChannelData.id}/messages`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}`
+                    },
+                    body: JSON.stringify({
+                      content: controlContent,
+                      components: controlComponents
+                    })
+                  });
+
+                  if (controlMsgRes.ok) {
+                    const controlMsgData = await controlMsgRes.json();
+                    savedControlMessageId = controlMsgData.id;
+                  }
                 }
 
                 await fetch(`https://discord.com/api/v10/channels/${textChannelData.id}/messages`, {
@@ -393,6 +461,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           discord_guild_id: savedGuildId,
           discord_category_id: savedCategoryId,
           discord_participants_channel_id: savedParticipantsChannelId,
+          discord_control_message_id: savedControlMessageId,
           max_participants: maxParticipants || 8,
           map: map || null,
           event_date: eventDate || null,
