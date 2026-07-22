@@ -388,6 +388,12 @@ async function updateStaffControlPanel(tournamentId: string) {
         },
         {
           type: 2,
+          style: 3, // Success (Verde)
+          label: '📈 Aumenta Tetto (+4)',
+          custom_id: `tr_max_inc_${tournamentId}`
+        },
+        {
+          type: 2,
           style: 2,
           label: '🔀 Gestisci Seeding',
           custom_id: `tr_seed_menu_${tournamentId}`
@@ -635,6 +641,61 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({
         type: 4,
         data: { content: `✅ Partecipante <@${kickUserId}> rimosso dal torneo dallo Staff.`, flags: 64 }
+      });
+    }
+
+    // --- AZIONE STAFF: AUMENTA TETTO MASSIMO PARTECIPANTI (+4) ---
+    if (customId.startsWith('tr_max_inc_')) {
+      if (!isDiscordStaff(interaction.member)) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '⛔ Soltanto gli Staff / Admin possono aumentare il tetto massimo del torneo.', flags: 64 }
+        });
+      }
+
+      const tournamentId = customId.replace('tr_max_inc_', '');
+
+      const { data: tournament } = await supabase
+        .from('tournaments')
+        .select('*')
+        .eq('id', tournamentId)
+        .single();
+
+      if (!tournament) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '❌ Torneo non trovato.', flags: 64 }
+        });
+      }
+
+      const currentMax = tournament.max_participants || 8;
+      const newMax = currentMax + 4;
+
+      // 1. Aggiorna DB Supabase
+      await supabase
+        .from('tournaments')
+        .update({ max_participants: newMax })
+        .eq('id', tournamentId);
+
+      // 2. Aggiorna l'embed principale in #iscrizioni (riapre i bottoni se era pieno!)
+      await updateDiscordMessageCount(tournamentId);
+
+      // 3. Aggiorna il pannello controlli Staff in #partecipanti
+      await updateStaffControlPanel(tournamentId);
+
+      // 4. Notifica nel canale #partecipanti
+      if (tournament.discord_participants_channel_id) {
+        await discordApi(`/channels/${tournament.discord_participants_channel_id}/messages`, 'POST', {
+          content: `📈 **TETTO MASSIMO AUMENTATO DA <@${discordUserId}>!** Il tetto partecipanti è stato ampliato da **${currentMax}** a **${newMax}**! Le iscrizioni sono riaperte!`
+        });
+      }
+
+      return res.status(200).json({
+        type: 4,
+        data: {
+          content: `✅ **Tetto massimo aumentato con successo!** Nuovo limite: **${newMax} posti**. Le iscrizioni sono state riaperte sia su Discord che sul sito web!`,
+          flags: 64
+        }
       });
     }
 
