@@ -88,7 +88,7 @@ function SortableTournamentCard({
   activeDivisions,
   setActiveDivisions,
   bracketErrorId,
-  setBracketErrorId,
+  setBracketErrorId: _setBracketErrorId,
   setEditingTournament,
   setEditForm,
   setShowEditModal,
@@ -447,21 +447,9 @@ function SortableTournamentCard({
                   );
                 } else {
                   return (
-                    <button 
-                      onClick={() => {
-                        setBracketErrorId(t.id);
-                        setTimeout(() => setBracketErrorId(null), 3000);
-                      }} 
-                      className={commonClasses}
-                    >
-                      {bracketErrorId === t.id ? (
-                        <span className="text-red-400 font-black animate-pulse text-[10px] tracking-tight">
-                          NON DISPONIBILE
-                        </span>
-                      ) : (
-                        <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
-                      )}
-                    </button>
+                    <Link to={`/tornei/${t.slug}`} className={commonClasses}>
+                      <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
+                    </Link>
                   );
                 }
               })()}
