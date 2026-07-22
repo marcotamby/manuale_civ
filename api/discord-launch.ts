@@ -33,7 +33,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     channelId: rawChannelId, 
     description, 
     bannerUrl,
-    hasRegolamento
+    hasRegolamento,
+    regolamentoContent
   } = req.body;
 
   let channelId = cleanChannelId(rawChannelId);
@@ -113,10 +114,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     inline: true
   });
 
-  if (hasRegolamento) {
+  if (hasRegolamento || regolamentoContent) {
+    const rawText = (regolamentoContent || '').trim();
+    const displayReg = rawText 
+      ? (rawText.length > 800 ? rawText.substring(0, 800) + '...\n*(Regolamento completo sul sito web)*' : rawText)
+      : 'Consulta il regolamento ufficiale sulla pagina del torneo sul sito web.';
+
     fields.push({
       name: '📜 Regolamento',
-      value: 'Consulta il regolamento ufficiale sulla pagina del torneo sul sito web.',
+      value: displayReg,
       inline: false
     });
   }

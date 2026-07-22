@@ -13,6 +13,7 @@ export interface LaunchTournamentParams {
   description?: string;
   bannerUrl?: string;
   hasRegolamento?: boolean;
+  regolamentoContent?: string;
 }
 
 /**

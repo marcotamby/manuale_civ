@@ -1852,7 +1852,8 @@ export function TournamentsPage() {
                                 channelId: editForm.discordChannelId,
                                 description: editForm.period ? `Periodo: ${editForm.period}` : undefined,
                                 bannerUrl: editForm.bannerUrl || undefined,
-                                hasRegolamento: editForm.hasRegolamento
+                                hasRegolamento: editForm.hasRegolamento,
+                                regolamentoContent: editForm.regolamentoContent || undefined
                               });
                               setDiscordLaunchStatus('success');
                               setTimeout(() => setDiscordLaunchStatus('idle'), 6000);
