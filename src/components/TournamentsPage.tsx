@@ -50,6 +50,15 @@ interface TournamentConfig {
   id?: string;
   vods?: any[];
   isArchived?: boolean;
+  maxParticipants?: number;
+  discordChannelId?: string;
+  map?: string;
+  eventDate?: string;
+  eventTime?: string;
+  max_participants?: number;
+  discord_channel_id?: string;
+  event_date?: string;
+  event_time?: string;
 }
 
 const TOURNAMENTS: TournamentConfig[] = [];
@@ -611,7 +620,16 @@ export function TournamentsPage() {
             created_at: db.created_at,
             id: db.id,
             isArchived: db.is_archived || false,
-            vods: db.vods || []
+            vods: db.vods || [],
+            maxParticipants: db.max_participants || 8,
+            discordChannelId: db.discord_channel_id || '',
+            map: db.map || '',
+            eventDate: db.event_date || '',
+            eventTime: db.event_time || '',
+            max_participants: db.max_participants || 8,
+            discord_channel_id: db.discord_channel_id || '',
+            event_date: db.event_date || '',
+            event_time: db.event_time || ''
           };
           dbConfigs.push(configObj);
         });
@@ -986,29 +1004,6 @@ export function TournamentsPage() {
         event_date: editForm.eventDate || null,
         event_time: editForm.eventTime || null,
         discord_channel_id: editForm.discordChannelId || null,
-        config: {
-          ...(editingTournament?.config || {}),
-          name: editForm.name,
-          organizer: editForm.organizer,
-          period: editForm.period,
-          bannerUrl: editForm.bannerUrl,
-          status: editForm.status,
-          type: editForm.type,
-          podium: editForm.podium,
-          hasRegolamento: editForm.hasRegolamento,
-          regolamentoContent: editForm.regolamentoContent,
-          bannerPositionX: editForm.bannerPositionX,
-          bannerPositionY: editForm.bannerPositionY,
-          vods: editForm.vods,
-          isArchived: editForm.isArchived,
-          maxParticipants: editForm.maxParticipants || 8,
-          discordChannelId: editForm.discordChannelId || '',
-          map: editForm.map || '',
-          eventDate: editForm.eventDate || '',
-          eventTime: editForm.eventTime || '',
-          directLink: editForm.externalUrl || undefined,
-          externalUrl: editForm.externalUrl || undefined
-        },
         vods: editForm.vods.map(v => ({
           id: v.id || `vod-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           title: (v.title || '').trim(),
