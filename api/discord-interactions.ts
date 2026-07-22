@@ -175,7 +175,7 @@ async function updateDiscordMessageCount(tournamentId: string, fallbackChannelId
   }
 
   const embed: any = {
-    title: `🏆 TORNEO UFFICIALE: ${(tournament?.name || tournament?.title || 'TORNEO').toUpperCase()}`,
+    title: `🏆 ${(tournament?.name || tournament?.title || 'TORNEO').toUpperCase()}`,
     description: isFull 
       ? `🔒 **ISCRIZIONI CHIUSE!**\nIl tetto massimo di ${max} partecipanti è stato raggiunto.`
       : (tournament?.description || `Sono aperte le iscrizioni per il torneo! Clicca sul bottone qui sotto per iscriverti direttamente da Discord.`),

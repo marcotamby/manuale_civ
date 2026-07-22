@@ -166,7 +166,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const embed: any = {
-    title: `🏆 TORNEO UFFICIALE: ${(name || 'TORNEO').toUpperCase()}`,
+    title: `🏆 ${(name || 'TORNEO').toUpperCase()}`,
     description: description || `Sono aperte le iscrizioni per il torneo! Clicca sul bottone qui sotto per iscriverti direttamente da Discord.`,
     color: 0x06b6d4, // Cyan
     fields,
@@ -399,6 +399,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             } catch (chErr) {
               console.warn(`Errore gestione canale ${ch.name}:`, chErr);
             }
+          }
+
+          // 4. Crea il Canale Vocale Generico del Torneo (type 2 = GUILD_VOICE)
+          try {
+            const voiceChannelName = `🔊 ${(name || 'TORNEO').toUpperCase()}`;
+            const existingVoice = existingChannels.find((c: any) => c.parent_id === targetCategoryId && c.type === 2);
+            if (!existingVoice) {
+              await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bot ${DISCORD_BOT_TOKEN.trim()}`
+                },
+                body: JSON.stringify({
+                  name: voiceChannelName,
+                  type: 2, // 2 = GUILD_VOICE (Canale Vocale Generico)
+                  parent_id: targetCategoryId || undefined
+                })
+              });
+            }
+          } catch (vErr) {
+            console.warn('Avviso creazione canale vocale generico:', vErr);
           }
         }
       }
