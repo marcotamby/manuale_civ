@@ -372,6 +372,27 @@ async function createMatchChannelsForRound(tournamentId: string, roundNum: numbe
 }
 
 /**
+ * Elimina l'intera Categoria Discord e tutti i canali testuali/vocali contenuti in essa
+ */
+async function deleteDiscordCategoryAndChannels(guildId: string, categoryId: string) {
+  if (!DISCORD_BOT_TOKEN || !guildId || !categoryId) return;
+  try {
+    const channels = await discordApi(`/guilds/${guildId}/channels`);
+    if (Array.isArray(channels)) {
+      const categoryChannels = channels.filter((c: any) => c.parent_id === categoryId || c.id === categoryId);
+      for (const ch of categoryChannels) {
+        if (ch.id !== categoryId) {
+          await discordApi(`/channels/${ch.id}`, 'DELETE');
+        }
+      }
+    }
+    await discordApi(`/channels/${categoryId}`, 'DELETE');
+  } catch (err) {
+    console.error('Errore eliminazione categoria e canali Discord:', err);
+  }
+}
+
+/**
  * Aggiorna il messaggio del pannello di controllo Staff nel canale #partecipanti
  */
 async function updateStaffControlPanel(tournamentId: string) {
@@ -397,41 +418,62 @@ async function updateStaffControlPanel(tournamentId: string) {
   const max = tournament.max_participants || 8;
   const isFull = count >= max;
 
+  const isCompleted = tournament.status === 'completato' || tournament.status === 'Concluso';
+
   const content = `⚙️ **PANNELLO DI CONTROLLO STAFF - TORNEO: ${(tournament.name || 'TORNEO').toUpperCase()}**\n` +
+    `Stato Attuale: **${isCompleted ? '🏆 COMPLETATO (VINCITORE PROCLAMATO)' : '⏳ IN CORSO / REGISTRAZIONE'}**\n` +
     `Iscritti Attuali: **${count} / ${max}** ${isFull ? '🔴 (TETTO MASSIMO RAGGIUNTO!)' : ''}\n\n` +
-    `**LISTA PARTECIPANTI & SEEDING:**\n${listText}\n\n` +
-    `*Gli Staff possono riordinare i Seed, rimuovere partecipanti o avviare il torneo in qualsiasi momento.*`;
+    `**LISTA PARTECIPANTE & SEEDING:**\n${listText}\n\n` +
+    `*Gli Staff possono gestire il torneo tramite i pulsanti sottostanti.*`;
+
+  const row1Components: any[] = [];
+
+  if (isCompleted) {
+    row1Components.push({
+      type: 2,
+      style: 1, // Primary (Blu)
+      label: '🏆 Chiudi Torneo & Archivia',
+      custom_id: `tr_close_prompt_${tournamentId}`
+    });
+  } else {
+    row1Components.push({
+      type: 2,
+      style: 1,
+      label: '🚀 Avvia Torneo Ora',
+      custom_id: `tr_start_${tournamentId}`
+    });
+    row1Components.push({
+      type: 2,
+      style: 3, // Success (Verde)
+      label: '📈 Aumenta Tetto (+4)',
+      custom_id: `tr_max_inc_${tournamentId}`
+    });
+    row1Components.push({
+      type: 2,
+      style: 2,
+      label: '🔀 Gestisci Seeding',
+      custom_id: `tr_seed_menu_${tournamentId}`
+    });
+    row1Components.push({
+      type: 2,
+      style: 4,
+      label: '⛔ Rimuovi Partecipante',
+      custom_id: `tr_kick_menu_${tournamentId}`
+    });
+  }
+
+  const row2Components = [
+    {
+      type: 2,
+      style: 4, // Danger (Rosso)
+      label: '⚠️ Annulla Torneo',
+      custom_id: `tr_cancel_prompt_${tournamentId}`
+    }
+  ];
 
   const components = [
-    {
-      type: 1,
-      components: [
-        {
-          type: 2,
-          style: 1,
-          label: '🚀 Avvia Torneo Ora',
-          custom_id: `tr_start_${tournamentId}`
-        },
-        {
-          type: 2,
-          style: 3, // Success (Verde)
-          label: '📈 Aumenta Tetto (+4)',
-          custom_id: `tr_max_inc_${tournamentId}`
-        },
-        {
-          type: 2,
-          style: 2,
-          label: '🔀 Gestisci Seeding',
-          custom_id: `tr_seed_menu_${tournamentId}`
-        },
-        {
-          type: 2,
-          style: 4,
-          label: '⛔ Rimuovi Partecipante',
-          custom_id: `tr_kick_menu_${tournamentId}`
-        }
-      ]
-    }
+    { type: 1, components: row1Components },
+    { type: 1, components: row2Components }
   ];
 
   if (tournament.discord_control_message_id) {
@@ -693,6 +735,194 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({
         type: 4,
         data: { content: `✅ Partecipante <@${kickUserId}> rimosso dal torneo dallo Staff.`, flags: 64 }
+      });
+    }
+
+    // --- AZIONE STAFF: PROMPT ANNULLA TORNEO ---
+    if (customId.startsWith('tr_cancel_prompt_')) {
+      if (!isDiscordStaff(interaction.member)) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '⛔ Soltanto gli Staff / Admin possono annullare il torneo.', flags: 64 }
+        });
+      }
+
+      const tournamentId = customId.replace('tr_cancel_prompt_', '');
+
+      return res.status(200).json({
+        type: 4,
+        data: {
+          content: `⚠️ **SEI SICURO DI VOLER ANNULLARE IL TORNEO?**\n\nQuesta azione eliminerà **immediatamente l'intera Categoria Discord**, tutti i canali testuali e vocali creati, ed annullerà il torneo sul sito web. L'operazione non può essere annullata.`,
+          flags: 64, // Ephemeral (Popup visibile solo allo Staff)
+          components: [
+            {
+              type: 1,
+              components: [
+                {
+                  type: 2,
+                  style: 4, // Danger (Rosso)
+                  label: '✅ Sì, Annulla Torneo ed Elimina Canali',
+                  custom_id: `tr_cancel_confirm_${tournamentId}`
+                },
+                {
+                  type: 2,
+                  style: 2, // Secondary (Grigio)
+                  label: '❌ No, Annulla Operazione',
+                  custom_id: `tr_cancel_abort_${tournamentId}`
+                }
+              ]
+            }
+          ]
+        }
+      });
+    }
+
+    // --- AZIONE STAFF: CONFERMA ANNULLA TORNEO ---
+    if (customId.startsWith('tr_cancel_confirm_')) {
+      if (!isDiscordStaff(interaction.member)) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '⛔ Soltanto gli Staff / Admin possono annullare il torneo.', flags: 64 }
+        });
+      }
+
+      const tournamentId = customId.replace('tr_cancel_confirm_', '');
+
+      const { data: tournament } = await supabase
+        .from('tournaments')
+        .select('*')
+        .eq('id', tournamentId)
+        .single();
+
+      // 1. Aggiorna lo stato del torneo a 'annullato' nel DB Supabase
+      await supabase
+        .from('tournaments')
+        .update({ status: 'annullato' })
+        .eq('id', tournamentId);
+
+      // 2. Elimina la Categoria Discord e tutti i canali contenuti
+      const guildId = tournament?.discord_guild_id || interaction.guild_id;
+      const categoryId = tournament?.discord_category_id;
+
+      if (guildId && categoryId) {
+        deleteDiscordCategoryAndChannels(guildId, categoryId);
+      }
+
+      return res.status(200).json({
+        type: 4,
+        data: {
+          content: `🗑️ **Torneo annullato con successo!** La Categoria Discord ed i canali dedicati sono stati eliminati ed il torneo è stato annullato.`,
+          flags: 64
+        }
+      });
+    }
+
+    // --- AZIONE STAFF: ABORT ANNULLA TORNEO ---
+    if (customId.startsWith('tr_cancel_abort_')) {
+      return res.status(200).json({
+        type: 4,
+        data: { content: 'ℹ️ Operazione annullata. Il torneo rimane attivo.', flags: 64 }
+      });
+    }
+
+    // --- AZIONE STAFF: PROMPT CHIUDI TORNEO (SOLO A TORNEO COMPLETATO) ---
+    if (customId.startsWith('tr_close_prompt_')) {
+      if (!isDiscordStaff(interaction.member)) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '⛔ Soltanto gli Staff / Admin possono chiudere ed archiviare il torneo.', flags: 64 }
+        });
+      }
+
+      const tournamentId = customId.replace('tr_close_prompt_', '');
+
+      const { data: tournament } = await supabase
+        .from('tournaments')
+        .select('*')
+        .eq('id', tournamentId)
+        .single();
+
+      const isCompleted = tournament?.status === 'completato' || tournament?.status === 'Concluso';
+      if (!isCompleted) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '⚠️ Il torneo può essere chiuso solo una volta che il vincitore finale è stato proclamato!', flags: 64 }
+        });
+      }
+
+      return res.status(200).json({
+        type: 4,
+        data: {
+          content: `🏆 **CONFERMI LA CHIUSURA ED ARCHIVIAZIONE DEL TORNEO COMPLETATO?**\n\nQuesta azione archivierà il torneo sul sito web ed **eliminerà la Categoria Discord ed i canali** del torneo concluso.`,
+          flags: 64, // Ephemeral
+          components: [
+            {
+              type: 1,
+              components: [
+                {
+                  type: 2,
+                  style: 1, // Primary (Blu)
+                  label: '✅ Sì, Chiudi ed Archivia Canali',
+                  custom_id: `tr_close_confirm_${tournamentId}`
+                },
+                {
+                  type: 2,
+                  style: 2, // Secondary (Grigio)
+                  label: '❌ No, Annulla Operazione',
+                  custom_id: `tr_close_abort_${tournamentId}`
+                }
+              ]
+            }
+          ]
+        }
+      });
+    }
+
+    // --- AZIONE STAFF: CONFERMA CHIUDI TORNEO ---
+    if (customId.startsWith('tr_close_confirm_')) {
+      if (!isDiscordStaff(interaction.member)) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '⛔ Soltanto gli Staff / Admin possono chiudere ed archiviare il torneo.', flags: 64 }
+        });
+      }
+
+      const tournamentId = customId.replace('tr_close_confirm_', '');
+
+      const { data: tournament } = await supabase
+        .from('tournaments')
+        .select('*')
+        .eq('id', tournamentId)
+        .single();
+
+      // 1. Aggiorna lo stato a 'concluso' nel DB
+      await supabase
+        .from('tournaments')
+        .update({ status: 'concluso' })
+        .eq('id', tournamentId);
+
+      // 2. Elimina la Categoria Discord e tutti i canali contenuti
+      const guildId = tournament?.discord_guild_id || interaction.guild_id;
+      const categoryId = tournament?.discord_category_id;
+
+      if (guildId && categoryId) {
+        deleteDiscordCategoryAndChannels(guildId, categoryId);
+      }
+
+      return res.status(200).json({
+        type: 4,
+        data: {
+          content: `🏆 **Torneo chiuso ed archiviato con successo!** La Categoria ed i canali Discord sono stati rimossi.`,
+          flags: 64
+        }
+      });
+    }
+
+    // --- AZIONE STAFF: ABORT CHIUDI TORNEO ---
+    if (customId.startsWith('tr_close_abort_')) {
+      return res.status(200).json({
+        type: 4,
+        data: { content: 'ℹ️ Operazione annullata. Il torneo rimane visibile.', flags: 64 }
       });
     }
 
