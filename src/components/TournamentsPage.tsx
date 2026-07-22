@@ -426,16 +426,7 @@ function SortableTournamentCard({
                   t.config.hasRegolamento ? "text-[10px]" : "text-xs"
                 );
 
-                const isLocalBotTournament = !!(
-                  t.config?.autoBracket ||
-                  t.auto_bracket ||
-                  t.config?.discordChannelId ||
-                  t.discord_channel_id ||
-                  t.status === 'in_corso' ||
-                  t.status === 'In corso' ||
-                  t.status === 'completato' ||
-                  t.status === 'Concluso'
-                );
+                const isLocalTournament = !!(t.slug || t.id || t.config?.autoBracket || t.auto_bracket || t.discord_channel_id);
 
                 if (isStartGGWithEvents) {
                   return (
@@ -450,7 +441,7 @@ function SortableTournamentCard({
                       <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
                     </a>
                   );
-                } else if (isLocalBotTournament) {
+                } else if (isLocalTournament) {
                   return (
                     <Link to={`/tornei/${t.slug}`} className={commonClasses}>
                       <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
