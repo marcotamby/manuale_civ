@@ -426,16 +426,21 @@ function SortableTournamentCard({
                   t.config.hasRegolamento ? "text-[10px]" : "text-xs"
                 );
 
+                const isLocalBotTournament = !!(
+                  t.config?.autoBracket ||
+                  t.auto_bracket ||
+                  t.config?.discordChannelId ||
+                  t.discord_channel_id ||
+                  t.status === 'in_corso' ||
+                  t.status === 'In corso' ||
+                  t.status === 'completato' ||
+                  t.status === 'Concluso'
+                );
+
                 if (isStartGGWithEvents) {
                   return (
                     <Link to={`/tornei/${t.slug}`} className={commonClasses}>
-                      {bracketErrorId === t.id ? (
-                        <span className="text-red-400 font-black animate-pulse text-[10px] tracking-tight">
-                          NON DISPONIBILE
-                        </span>
-                      ) : (
-                        <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
-                      )}
+                      <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
                     </Link>
                   );
                 } else if (t.config.directLink) {
@@ -445,11 +450,29 @@ function SortableTournamentCard({
                       <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
                     </a>
                   );
-                } else {
+                } else if (isLocalBotTournament) {
                   return (
                     <Link to={`/tornei/${t.slug}`} className={commonClasses}>
                       <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
                     </Link>
+                  );
+                } else {
+                  return (
+                    <button 
+                      onClick={() => {
+                        _setBracketErrorId(t.id);
+                        setTimeout(() => _setBracketErrorId(null), 3000);
+                      }} 
+                      className={clsx(commonClasses, "cursor-not-allowed opacity-60")}
+                    >
+                      {bracketErrorId === t.id ? (
+                        <span className="text-red-400 font-black animate-pulse text-[10px] tracking-tight">
+                          NON DISPONIBILE
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">NON DISPONIBILE</span>
+                      )}
+                    </button>
                   );
                 }
               })()}
