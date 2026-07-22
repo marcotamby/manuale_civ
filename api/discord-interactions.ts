@@ -256,7 +256,16 @@ async function discordApi(endpoint: string, method = 'GET', body?: any) {
 /**
  * Genera l'albero di match ad Eliminazione Diretta nel DB Supabase basato sull'ordine dei Seed
  */
+/**
+ * Genera l'albero di match ad Eliminazione Diretta nel DB Supabase basato sull'ordine dei Seed
+ */
 async function generateBracketMatchesInDb(tournamentId: string, participants: any[]) {
+  // Cancella eventuali match precedenti per questo torneo prima di generarne di nuovi
+  await supabase
+    .from('tournament_matches')
+    .delete()
+    .eq('tournament_id', tournamentId);
+
   // Ordina per seed (1, 2, 3...)
   const sorted = [...participants].sort((a, b) => (a.seed || 99) - (b.seed || 99));
   const n = sorted.length;
@@ -329,7 +338,7 @@ async function generateBracketMatchesInDb(tournamentId: string, participants: an
 }
 
 /**
- * Crea i canali testuali dedicati per ciascun match di un turno specifico
+ * Crea i canali testuali dedicati e PRIVATI per ciascun match di un turno specifico (visibili solo ai 2 sfidanti)
  */
 async function createMatchChannelsForRound(tournamentId: string, roundNum: number) {
   const { data: tournament } = await supabase
@@ -362,10 +371,36 @@ async function createMatchChannelsForRound(tournamentId: string, roundNum: numbe
     const cleanP2 = (p2?.display_name || 'p2').toLowerCase().replace(/[^a-z0-9]/g, '');
     const channelName = `⚔️-match-${match.match_number}-${cleanP1}-vs-${cleanP2}`;
 
+    // Configura i permessi in modo che il canale sia PRIVATO e visibile unicamente ai 2 sfidanti (oltre allo Staff)
+    const permission_overwrites: any[] = [
+      {
+        id: tournament.discord_guild_id, // @everyone role ID
+        type: 0, // Role
+        deny: '1024' // VIEW_CHANNEL (Nega la visione a tutti gli altri membri)
+      }
+    ];
+
+    if (p1?.discord_user_id) {
+      permission_overwrites.push({
+        id: p1.discord_user_id,
+        type: 1, // Member
+        allow: '1024' // VIEW_CHANNEL (Consenti visione al Giocatore 1)
+      });
+    }
+
+    if (p2?.discord_user_id) {
+      permission_overwrites.push({
+        id: p2.discord_user_id,
+        type: 1, // Member
+        allow: '1024' // VIEW_CHANNEL (Consenti visione al Giocatore 2)
+      });
+    }
+
     const newChannel = await discordApi(`/guilds/${tournament.discord_guild_id}/channels`, 'POST', {
       name: channelName,
       type: 0, // GUILD_TEXT
-      parent_id: categoryId || undefined
+      parent_id: categoryId || undefined,
+      permission_overwrites
     });
 
     if (newChannel && newChannel.id) {
