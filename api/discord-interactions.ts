@@ -60,7 +60,7 @@ function isDiscordStaff(member: any): boolean {
 }
 
 /**
- * Aggiorna in tempo reale l'Embed del messaggio Discord con il conteggio iscritti aggiornato
+ * Aggiorna in tempo reale l'Embed del messaggio Discord principale con il conteggio iscritti aggiornato
  */
 async function updateDiscordMessageCount(tournamentId: string, fallbackChannelId?: string, fallbackMessageId?: string) {
   if (!DISCORD_BOT_TOKEN) return;
@@ -74,10 +74,7 @@ async function updateDiscordMessageCount(tournamentId: string, fallbackChannelId
   const channelId = tournament?.discord_channel_id || fallbackChannelId;
   const messageId = tournament?.discord_message_id || fallbackMessageId;
 
-  if (!channelId || !messageId) {
-    console.error('Channel ID o Message ID mancante per l\'aggiornamento dell\'embed Discord', { channelId, messageId });
-    return;
-  }
+  if (!channelId || !messageId) return;
 
   const { count } = await supabase
     .from('tournament_participants')
@@ -127,11 +124,11 @@ async function updateDiscordMessageCount(tournamentId: string, fallbackChannelId
   });
 
   const embed: any = {
-    title: `🏆 TORNEO UFFICIALE: ${(tournament.name || tournament.title || 'TORNEO').toUpperCase()}`,
+    title: `🏆 TORNEO UFFICIALE: ${(tournament?.name || tournament?.title || 'TORNEO').toUpperCase()}`,
     description: isFull 
-      ? `🔒 **ISCRIZIONI CHIUSE!**\nIl tetto massimo di ${max} partecipanti è stato raggiunto. Il tabellone è popolato ed attivo sul sito web!`
-      : (tournament.description || `Sono aperte le iscrizioni per il torneo! Clicca sul bottone qui sotto per iscriverti direttamente da Discord.`),
-    color: isFull ? 0x10b981 : 0x06b6d4, // Verde se completo, Cyan se aperto
+      ? `🔒 **ISCRIZIONI CHIUSE!**\nIl tetto massimo di ${max} partecipanti è stato raggiunto.`
+      : (tournament?.description || `Sono aperte le iscrizioni per il torneo! Clicca sul bottone qui sotto per iscriverti direttamente da Discord.`),
+    color: isFull ? 0x10b981 : 0x06b6d4,
     fields,
     footer: {
       text: 'Manuale Civ • Age of Empires IV',
@@ -140,7 +137,7 @@ async function updateDiscordMessageCount(tournamentId: string, fallbackChannelId
     timestamp: new Date().toISOString()
   };
 
-  if (tournament.banner_url) {
+  if (tournament?.banner_url) {
     embed.image = { url: tournament.banner_url };
   }
 
@@ -165,7 +162,7 @@ async function updateDiscordMessageCount(tournamentId: string, fallbackChannelId
   ];
 
   try {
-    await fetch(`https://discord.com/api/v10/channels/${tournament.discord_channel_id}/messages/${tournament.discord_message_id}`, {
+    await fetch(`https://discord.com/api/v10/channels/${channelId}/messages/${messageId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -181,43 +178,278 @@ async function updateDiscordMessageCount(tournamentId: string, fallbackChannelId
   }
 }
 
+/**
+ * Helper per chiamate API Discord REST
+ */
+async function discordApi(endpoint: string, method = 'GET', body?: any) {
+  if (!DISCORD_BOT_TOKEN) return null;
+  try {
+    const res = await fetch(`https://discord.com/api/v10${endpoint}`, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bot ${DISCORD_BOT_TOKEN}`
+      },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if (res.ok && res.status !== 204) {
+      return await res.json();
+    }
+    return null;
+  } catch (err) {
+    console.error(`Errore API Discord (${endpoint}):`, err);
+    return null;
+  }
+}
+
+/**
+ * Genera l'albero di match ad Eliminazione Diretta nel DB Supabase basato sull'ordine dei Seed
+ */
+async function generateBracketMatchesInDb(tournamentId: string, participants: any[]) {
+  // Ordina per seed (1, 2, 3...)
+  const sorted = [...participants].sort((a, b) => (a.seed || 99) - (b.seed || 99));
+  const n = sorted.length;
+  
+  // Calcola dimensione potenza di 2 (es. 2, 4, 8, 16)
+  let bracketSize = 2;
+  while (bracketSize < n) bracketSize *= 2;
+  
+  const totalRounds = Math.log2(bracketSize);
+  const round1MatchesCount = bracketSize / 2;
+
+  // Accoppiamenti Seeding: Seed 1 vs Seed N, Seed 2 vs Seed N-1...
+  const pairings: { p1: any | null; p2: any | null }[] = [];
+  for (let i = 0; i < round1MatchesCount; i++) {
+    const p1 = sorted[i] || null;
+    const p2 = sorted[bracketSize - 1 - i] || null;
+    pairings.push({ p1, p2 });
+  }
+
+  // Inserisci i match dal Turno Finale scendendo fino al Turno 1 per collegare next_match_id
+  let prevRoundMatches: any[] = [];
+
+  for (let r = totalRounds; r >= 1; r--) {
+    const matchesInRoundCount = Math.pow(2, totalRounds - r);
+    const currentRoundInserted: any[] = [];
+
+    for (let m = 1; m <= matchesInRoundCount; m++) {
+      let nextMatchId: string | null = null;
+      let nextMatchSlot: number | null = null;
+
+      if (r < totalRounds) {
+        const parentMatchIndex = Math.floor((m - 1) / 2);
+        nextMatchId = prevRoundMatches[parentMatchIndex]?.id || null;
+        nextMatchSlot = ((m - 1) % 2) + 1;
+      }
+
+      let p1 = null;
+      let p2 = null;
+      let status = 'pending';
+
+      if (r === 1) {
+        const pair = pairings[m - 1];
+        p1 = pair?.p1?.id || null;
+        p2 = pair?.p2?.id || null;
+        status = (p1 && p2) ? 'in_progress' : (p1 || p2) ? 'completed' : 'pending';
+      }
+
+      const { data: insertedMatch } = await supabase
+        .from('tournament_matches')
+        .insert({
+          tournament_id: tournamentId,
+          round: r,
+          match_number: m,
+          player1_id: p1,
+          player2_id: p2,
+          winner_id: (r === 1 && p1 && !p2) ? p1 : (r === 1 && !p1 && p2) ? p2 : null,
+          next_match_id: nextMatchId,
+          next_match_slot: nextMatchSlot,
+          status
+        })
+        .select()
+        .single();
+
+      if (insertedMatch) {
+        currentRoundInserted.push(insertedMatch);
+      }
+    }
+    prevRoundMatches = currentRoundInserted;
+  }
+}
+
+/**
+ * Crea i canali testuali dedicati per ciascun match di un turno specifico
+ */
+async function createMatchChannelsForRound(tournamentId: string, roundNum: number) {
+  const { data: tournament } = await supabase
+    .from('tournaments')
+    .select('*')
+    .eq('id', tournamentId)
+    .single();
+
+  if (!tournament || !tournament.discord_guild_id) return;
+
+  const categoryId = tournament.discord_category_id;
+
+  const { data: matches } = await supabase
+    .from('tournament_matches')
+    .select('*, p1:player1_id(*), p2:player2_id(*)')
+    .eq('tournament_id', tournamentId)
+    .eq('round', roundNum);
+
+  if (!matches) return;
+
+  for (const match of matches) {
+    if (!match.player1_id || !match.player2_id) continue;
+
+    const p1 = match.p1;
+    const p2 = match.p2;
+    const p1Tag = p1?.discord_user_id ? `<@${p1.discord_user_id}>` : (p1?.display_name || 'Giocatore 1');
+    const p2Tag = p2?.discord_user_id ? `<@${p2.discord_user_id}>` : (p2?.display_name || 'Giocatore 2');
+
+    const cleanP1 = (p1?.display_name || 'p1').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const cleanP2 = (p2?.display_name || 'p2').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const channelName = `⚔️-match-${match.match_number}-${cleanP1}-vs-${cleanP2}`;
+
+    const newChannel = await discordApi(`/guilds/${tournament.discord_guild_id}/channels`, 'POST', {
+      name: channelName,
+      type: 0, // GUILD_TEXT
+      parent_id: categoryId || undefined
+    });
+
+    if (newChannel && newChannel.id) {
+      await supabase
+        .from('tournament_matches')
+        .update({ discord_channel_id: newChannel.id, status: 'in_progress' })
+        .eq('id', match.id);
+
+      const content = `⚔️ **MATCH ${match.match_number} - TURNO ${roundNum}**\n${p1Tag} vs ${p2Tag}\n🗺️ Mappa: **${tournament.map || 'Dry Arabia'}** | ⚙️ Formato: **BO1 / Eliminazione Diretta**\n\nPotete iniziare il vostro match! Al termine, cliccate sul bottone sottostante per registrare il risultato finale.`;
+
+      await discordApi(`/channels/${newChannel.id}/messages`, 'POST', {
+        content,
+        components: [
+          {
+            type: 1,
+            components: [
+              {
+                type: 2,
+                style: 1,
+                label: '🏆 Registra Risultato Match',
+                custom_id: `tm_win_prompt_${match.id}`
+              }
+            ]
+          }
+        ]
+      });
+    }
+  }
+}
+
+/**
+ * Aggiorna il messaggio del pannello di controllo Staff nel canale #partecipanti
+ */
+async function updateStaffControlPanel(tournamentId: string) {
+  const { data: tournament } = await supabase
+    .from('tournaments')
+    .select('*')
+    .eq('id', tournamentId)
+    .single();
+
+  if (!tournament || !tournament.discord_participants_channel_id) return;
+
+  const { data: participants } = await supabase
+    .from('tournament_participants')
+    .select('*')
+    .eq('tournament_id', tournamentId)
+    .order('seed', { ascending: true, nullsFirst: false });
+
+  const listText = participants && participants.length > 0
+    ? participants.map((p, idx) => `\`#${p.seed || idx + 1}\` <@${p.discord_user_id}> (**${p.display_name}**)`).join('\n')
+    : '*Nessun partecipante ancora iscritto.*';
+
+  const count = participants ? participants.length : 0;
+  const max = tournament.max_participants || 8;
+  const isFull = count >= max;
+
+  const content = `⚙️ **PANNELLO DI CONTROLLO STAFF - TORNEO: ${(tournament.name || 'TORNEO').toUpperCase()}**\n` +
+    `Iscritti Attuali: **${count} / ${max}** ${isFull ? '🔴 (TETTO MASSIMO RAGGIUNTO!)' : ''}\n\n` +
+    `**LISTA PARTECIPANTI & SEEDING:**\n${listText}\n\n` +
+    `*Gli Staff possono riordinare i Seed, rimuovere partecipanti o avviare il torneo in qualsiasi momento.*`;
+
+  const components = [
+    {
+      type: 1,
+      components: [
+        {
+          type: 2,
+          style: 1,
+          label: '🚀 Avvia Torneo Ora',
+          custom_id: `tr_start_${tournamentId}`
+        },
+        {
+          type: 2,
+          style: 2,
+          label: '🔀 Gestisci Seeding',
+          custom_id: `tr_seed_menu_${tournamentId}`
+        },
+        {
+          type: 2,
+          style: 4,
+          label: '⛔ Rimuovi Partecipante',
+          custom_id: `tr_kick_menu_${tournamentId}`
+        }
+      ]
+    }
+  ];
+
+  if (tournament.discord_control_message_id) {
+    await discordApi(`/channels/${tournament.discord_participants_channel_id}/messages/${tournament.discord_control_message_id}`, 'PATCH', {
+      content,
+      components
+    });
+  } else {
+    const msg = await discordApi(`/channels/${tournament.discord_participants_channel_id}/messages`, 'POST', {
+      content,
+      components
+    });
+
+    if (msg && msg.id) {
+      await supabase
+        .from('tournaments')
+        .update({ discord_control_message_id: msg.id })
+        .eq('id', tournamentId);
+    }
+  }
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // 1. REQUISITO DI SICUREZZA DISCORD:
   const isValid = verifyDiscordSignature(req);
-
   if (!isValid) {
     return res.status(401).send('Invalid request signature');
   }
 
   const interaction = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
 
-  // 2. Risposta al PING (type: 1)
+  // 1. PING (type 1)
   if (interaction.type === 1) {
     return res.status(200).json({ type: 1 });
   }
 
-  // 3. Gestione Pressione di Bottoni (type: 3)
+  const user = interaction.member?.user || interaction.user;
+  const discordUserId = user?.id;
+  const discordUsername = user?.username;
+  const displayName = user?.global_name || user?.username;
+  const avatarUrl = user?.avatar 
+    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` 
+    : `https://cdn.discordapp.com/embed/avatars/${parseInt(user?.discriminator || '0') % 5}.png`;
+
+  // 2. COMPONENT INTERACTION (type 3 - Bottone o Select Menu)
   if (interaction.type === 3) {
     const customId = interaction.data?.custom_id || '';
-    const user = interaction.member?.user || interaction.user;
-
-    if (!user) {
-      return res.status(200).json({
-        type: 4,
-        data: { content: '❌ Impossibile identificare l\'utente Discord.', flags: 64 }
-      });
-    }
-
-    const discordUserId = user.id;
-    const discordUsername = user.username;
-    const displayName = user.global_name || user.username;
-    const avatarUrl = user.avatar 
-      ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` 
-      : `https://cdn.discordapp.com/embed/avatars/${parseInt(user.discriminator || '0') % 5}.png`;
 
     // --- AZIONE: ISCRIZIONE AL TORNEO ---
     if (customId.startsWith('tr_reg_')) {
@@ -232,11 +464,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!tournament) {
         return res.status(200).json({
           type: 4,
-          data: { content: '❌ Torneo non trovato nel sistema.', flags: 64 }
+          data: { content: '❌ Torneo non trovato.', flags: 64 }
         });
       }
 
-      // Conteggio iscritti attuali
       const { count } = await supabase
         .from('tournament_participants')
         .select('*', { count: 'exact', head: true })
@@ -252,7 +483,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
-      // Inserisce l'utente
+      const newSeed = currentCount + 1;
+
       const { error: insertErr } = await supabase
         .from('tournament_participants')
         .insert({
@@ -260,11 +492,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           discord_user_id: discordUserId,
           discord_username: discordUsername,
           display_name: displayName,
-          avatar_url: avatarUrl
+          avatar_url: avatarUrl,
+          seed: newSeed
         });
 
       if (insertErr) {
-        if (insertErr.code === '23505') { // Unique constraint violation
+        if (insertErr.code === '23505') {
           return res.status(200).json({
             type: 4,
             data: { content: 'ℹ️ Sei già iscritto a questo torneo!', flags: 64 }
@@ -276,14 +509,42 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
-      // Aggiorna l'embed Discord in tempo reale
+      // 1. Assicurati che il canale #partecipanti esista
+      let partChannelId = tournament.discord_participants_channel_id;
+      if (!partChannelId && tournament.discord_guild_id) {
+        const newCh = await discordApi(`/guilds/${tournament.discord_guild_id}/channels`, 'POST', {
+          name: '👥-partecipanti',
+          type: 0,
+          parent_id: tournament.discord_category_id || undefined
+        });
+
+        if (newCh && newCh.id) {
+          partChannelId = newCh.id;
+          await supabase
+            .from('tournaments')
+            .update({ discord_participants_channel_id: partChannelId })
+            .eq('id', tournamentId);
+        }
+      }
+
+      // 2. Notifica l'iscrizione in #partecipanti
+      if (partChannelId) {
+        await discordApi(`/channels/${partChannelId}/messages`, 'POST', {
+          content: `🎉 <@${discordUserId}> (**${displayName}**) si è iscritto al torneo! Seed #${newSeed}`
+        });
+
+        // 3. Aggiorna il pannello controlli Staff
+        await updateStaffControlPanel(tournamentId);
+      }
+
+      // 4. Aggiorna l'embed principale
       await updateDiscordMessageCount(tournamentId, interaction.channel_id, interaction.message?.id);
 
       return res.status(200).json({
         type: 4,
         data: {
-          content: `🎉 **Iscrizione confermata!** Benvenuto nel torneo *${tournament.name || tournament.title}*!`,
-          flags: 64 // Ephemeral
+          content: `🎉 **Iscrizione confermata!** Benvenuto nel torneo *${tournament.name || tournament.title}*! Controlla il canale <#${partChannelId}> per gli aggiornamenti!`,
+          flags: 64
         }
       });
     }
@@ -292,21 +553,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (customId.startsWith('tr_unreg_')) {
       const tournamentId = customId.replace('tr_unreg_', '');
 
-      const { error: deleteErr } = await supabase
+      await supabase
         .from('tournament_participants')
         .delete()
         .eq('tournament_id', tournamentId)
         .eq('discord_user_id', discordUserId);
 
-      if (deleteErr) {
-        return res.status(200).json({
-          type: 4,
-          data: { content: `❌ Errore durante la cancellazione: ${deleteErr.message}`, flags: 64 }
-        });
-      }
-
-      // Aggiorna l'embed Discord in tempo reale
       await updateDiscordMessageCount(tournamentId, interaction.channel_id, interaction.message?.id);
+      await updateStaffControlPanel(tournamentId);
 
       return res.status(200).json({
         type: 4,
@@ -314,11 +568,162 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // --- AZIONE: REGISTRAZIONE RISULTATO MATCH ---
-    if (customId.startsWith('tm_win_')) {
-      const parts = customId.replace('tm_win_', '').split('_');
-      const matchId = parts[0];
-      const winnerParticipantId = parts[1];
+    // --- AZIONE STAFF: MENU KICK ---
+    if (customId.startsWith('tr_kick_menu_')) {
+      if (!isDiscordStaff(interaction.member)) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '⛔ Soltanto gli Staff / Admin possono espellere partecipanti.', flags: 64 }
+        });
+      }
+
+      const tournamentId = customId.replace('tr_kick_menu_', '');
+      const { data: participants } = await supabase
+        .from('tournament_participants')
+        .select('*')
+        .eq('tournament_id', tournamentId);
+
+      if (!participants || participants.length === 0) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: 'ℹ️ Nessun partecipante da rimuovere.', flags: 64 }
+        });
+      }
+
+      const options = participants.map(p => ({
+        label: p.display_name || p.discord_username,
+        value: `${tournamentId}___${p.discord_user_id}`,
+        description: `Seed #${p.seed || 1} - ${p.discord_username}`
+      }));
+
+      return res.status(200).json({
+        type: 4,
+        data: {
+          content: '⛔ **Seleziona il partecipante da rimuovere dal torneo:**',
+          flags: 64,
+          components: [
+            {
+              type: 1,
+              components: [
+                {
+                  type: 3, // String Select Menu
+                  custom_id: 'tr_kick_exec',
+                  placeholder: 'Seleziona Giocatore...',
+                  options
+                }
+              ]
+            }
+          ]
+        }
+      });
+    }
+
+    // --- AZIONE STAFF: ESECUZIONE KICK ---
+    if (customId === 'tr_kick_exec') {
+      const selectedValue = interaction.data?.values?.[0] || '';
+      const [tournamentId, kickUserId] = selectedValue.split('___');
+
+      await supabase
+        .from('tournament_participants')
+        .delete()
+        .eq('tournament_id', tournamentId)
+        .eq('discord_user_id', kickUserId);
+
+      await updateDiscordMessageCount(tournamentId);
+      await updateStaffControlPanel(tournamentId);
+
+      return res.status(200).json({
+        type: 4,
+        data: { content: `✅ Partecipante <@${kickUserId}> rimosso dal torneo dallo Staff.`, flags: 64 }
+      });
+    }
+
+    // --- AZIONE STAFF: AVVIO TORNEO ORA ---
+    if (customId.startsWith('tr_start_')) {
+      if (!isDiscordStaff(interaction.member)) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '⛔ Soltanto gli Staff / Admin possono lanciare ed avviare il torneo.', flags: 64 }
+        });
+      }
+
+      const tournamentId = customId.replace('tr_start_', '');
+
+      const { data: tournament } = await supabase
+        .from('tournaments')
+        .select('*')
+        .eq('id', tournamentId)
+        .single();
+
+      const { data: participants } = await supabase
+        .from('tournament_participants')
+        .select('*')
+        .eq('tournament_id', tournamentId);
+
+      if (!participants || participants.length < 2) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '⚠️ Occorrono almeno 2 partecipanti iscritti per lanciare il torneo!', flags: 64 }
+        });
+      }
+
+      // 1. Aggiorna stato torneo nel DB
+      await supabase
+        .from('tournaments')
+        .update({ status: 'in_corso', current_round: 1 })
+        .eq('id', tournamentId);
+
+      // 2. Genera il tabellone ad eliminazione diretta nel DB
+      await generateBracketMatchesInDb(tournamentId, participants);
+
+      // 3. Crea i canali #brackets e #risultati nella categoria
+      const categoryId = tournament.discord_category_id;
+      const guildId = tournament.discord_guild_id;
+
+      if (guildId) {
+        // Canale #brackets
+        const bracketCh = await discordApi(`/guilds/${guildId}/channels`, 'POST', {
+          name: '⚔️-brackets',
+          type: 0,
+          parent_id: categoryId || undefined
+        });
+
+        if (bracketCh && bracketCh.id) {
+          const siteUrl = `https://aoe4guide.it/tornei/${tournament.slug}`;
+          await discordApi(`/channels/${bracketCh.id}/messages`, 'POST', {
+            content: `⚔️ **TABELLONE TORNEO LIVE**\nConsulta ed incrocia il tabellone ad eliminazione diretta aggiornato in tempo reale sul sito web:\n👉 ${siteUrl}`
+          });
+        }
+
+        // Canale #risultati
+        const resultsCh = await discordApi(`/guilds/${guildId}/channels`, 'POST', {
+          name: '🏆-risultati',
+          type: 0,
+          parent_id: categoryId || undefined
+        });
+
+        if (resultsCh && resultsCh.id) {
+          await discordApi(`/channels/${resultsCh.id}/messages`, 'POST', {
+            content: `🏆 **CANALE RISULTATI**\nI punteggi ufficiali ed i vincitori di ciascun scontro saranno annunciati qui in tempo reale!`
+          });
+        }
+
+        // 4. Crea i canali singoli dei match del Turno 1
+        await createMatchChannelsForRound(tournamentId, 1);
+      }
+
+      return res.status(200).json({
+        type: 4,
+        data: {
+          content: `🚀 **TORNEO AVVIATO CON SUCCESSO!**\nIl tabellone è stato generato ed i canali testuali dei match del Turno 1 sono stati aperti!`,
+          flags: 64
+        }
+      });
+    }
+
+    // --- AZIONE: PROMPT VINCITORE MATCH ---
+    if (customId.startsWith('tm_win_prompt_')) {
+      const matchId = customId.replace('tm_win_prompt_', '');
 
       const { data: match } = await supabase
         .from('tournament_matches')
@@ -333,22 +738,75 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
-      const p1Discord = match.p1?.discord_user_id;
-      const p2Discord = match.p2?.discord_user_id;
+      const p1 = match.p1;
+      const p2 = match.p2;
 
       const isStaff = isDiscordStaff(interaction.member);
-      const isParticipant = discordUserId === p1Discord || discordUserId === p2Discord;
-      if (!isParticipant && !isStaff) {
+      const isP1 = discordUserId === p1?.discord_user_id;
+      const isP2 = discordUserId === p2?.discord_user_id;
+
+      if (!isP1 && !isP2 && !isStaff) {
         return res.status(200).json({
           type: 4,
-          data: { content: '⛔ Soltanto i due giocatori di questo match o i membri dello Staff / Admin possono registrare il risultato.', flags: 64 }
+          data: { content: '⛔ Soltanto i due sfidanti di questo scontro o lo Staff possono registrare il risultato.', flags: 64 }
+        });
+      }
+
+      return res.status(200).json({
+        type: 4,
+        data: {
+          content: '🏆 **Seleziona il Vincitore Ufficiale di questo Match:**',
+          flags: 64,
+          components: [
+            {
+              type: 1,
+              components: [
+                {
+                  type: 3,
+                  custom_id: 'tm_win_exec',
+                  placeholder: 'Seleziona Vincitore...',
+                  options: [
+                    {
+                      label: `Vincitore: ${p1?.display_name || p1?.discord_username}`,
+                      value: `${match.id}___${p1?.id}`
+                    },
+                    {
+                      label: `Vincitore: ${p2?.display_name || p2?.discord_username}`,
+                      value: `${match.id}___${p2?.id}`
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      });
+    }
+
+    // --- AZIONE: ESECUZIONE VINCITORE MATCH & AVANZAMENTO TURNO ---
+    if (customId === 'tm_win_exec') {
+      const selectedValue = interaction.data?.values?.[0] || '';
+      const [matchId, winnerParticipantId] = selectedValue.split('___');
+
+      const { data: match } = await supabase
+        .from('tournament_matches')
+        .select('*, p1:player1_id(*), p2:player2_id(*)')
+        .eq('id', matchId)
+        .single();
+
+      if (!match) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '❌ Match non trovato.', flags: 64 }
         });
       }
 
       const score1 = winnerParticipantId === match.player1_id ? 1 : 0;
       const score2 = winnerParticipantId === match.player2_id ? 1 : 0;
+      const winner = winnerParticipantId === match.player1_id ? match.p1 : match.p2;
 
-      const { error: updateErr } = await supabase
+      // 1. Salva vincitore match nel DB
+      await supabase
         .from('tournament_matches')
         .update({
           player1_score: score1,
@@ -359,13 +817,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         })
         .eq('id', matchId);
 
-      if (updateErr) {
-        return res.status(200).json({
-          type: 4,
-          data: { content: `❌ Errore aggiornamento match: ${updateErr.message}`, flags: 64 }
-        });
-      }
-
+      // 2. Avanza vincitore al match successivo
       if (match.next_match_id) {
         const updatePayload = match.next_match_slot === 1 
           ? { player1_id: winnerParticipantId, status: 'in_progress' } 
@@ -377,13 +829,85 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .eq('id', match.next_match_id);
       }
 
-      const winnerName = winnerParticipantId === match.player1_id ? match.p1?.display_name : match.p2?.display_name;
+      // 3. Invia conferma nel canale del match
+      await discordApi(`/channels/${interaction.channel_id}/messages`, 'POST', {
+        content: `🎉 **MATCH COMPLETATO!** Vincitore proclamato: <@${winner?.discord_user_id}> (**${winner?.display_name}**)!`
+      });
+
+      // 4. Invia notifica nel canale #risultati
+      const { data: tournament } = await supabase
+        .from('tournaments')
+        .select('*')
+        .eq('id', match.tournament_id)
+        .single();
+
+      if (tournament && tournament.discord_guild_id) {
+        const { data: channels } = await fetch(`https://discord.com/api/v10/guilds/${tournament.discord_guild_id}/channels`, {
+          headers: { 'Authorization': `Bot ${DISCORD_BOT_TOKEN}` }
+        }).then(r => r.json());
+
+        const resultsCh = channels?.find((c: any) => c.name.includes('risultati'));
+        if (resultsCh) {
+          await discordApi(`/channels/${resultsCh.id}/messages`, 'POST', {
+            content: `🏆 **RISULTATO MATCH ${match.match_number} (Turno ${match.round})**: <@${winner?.discord_user_id}> ha vinto contro ${winnerParticipantId === match.player1_id ? (match.p2?.display_name || 'SFIDANTE') : (match.p1?.display_name || 'SFIDANTE')}!`
+          });
+        }
+      }
+
+      // 5. Verifica se tutti i match del Turno attuale sono completati per avanzare di turno
+      const currentRoundNum = match.round;
+      const { data: currentRoundMatches } = await supabase
+        .from('tournament_matches')
+        .select('id, status')
+        .eq('tournament_id', match.tournament_id)
+        .eq('round', currentRoundNum);
+
+      const allRoundCompleted = currentRoundMatches && currentRoundMatches.every(m => m.status === 'completed');
+
+      if (allRoundCompleted && tournament) {
+        // Controlla se c'è un turno successivo
+        const nextRoundNum = currentRoundNum + 1;
+        const { data: nextRoundMatches } = await supabase
+          .from('tournament_matches')
+          .select('*')
+          .eq('tournament_id', match.tournament_id)
+          .eq('round', nextRoundNum);
+
+        if (nextRoundMatches && nextRoundMatches.length > 0) {
+          // Avanza di turno e crea i canali match per il turno successivo
+          await supabase
+            .from('tournaments')
+            .update({ current_round: nextRoundNum })
+            .eq('id', match.tournament_id);
+
+          await createMatchChannelsForRound(match.tournament_id, nextRoundNum);
+        } else {
+          // Torneo completato! Incoronazione Vincitore Finale
+          await supabase
+            .from('tournaments')
+            .update({ status: 'completato' })
+            .eq('id', match.tournament_id);
+
+          if (tournament.discord_guild_id) {
+            const { data: channels } = await fetch(`https://discord.com/api/v10/guilds/${tournament.discord_guild_id}/channels`, {
+              headers: { 'Authorization': `Bot ${DISCORD_BOT_TOKEN}` }
+            }).then(r => r.json());
+
+            const resultsCh = channels?.find((c: any) => c.name.includes('risultati'));
+            if (resultsCh) {
+              await discordApi(`/channels/${resultsCh.id}/messages`, 'POST', {
+                content: `👑 **IL TORNEO ${tournament.name.toUpperCase()} È CONCLUSO!**\n\n🎉 **VINCITORE FINALE E CAMPIONE**: <@${winner?.discord_user_id}> (**${winner?.display_name}**)! Congratulazioni!`
+              });
+            }
+          }
+        }
+      }
 
       return res.status(200).json({
         type: 4,
         data: {
-          content: `🏆 **Risultato registrato con successo!** Vincitore: **${winnerName}**! Il tabellone sul sito si è aggiornato in tempo reale!`,
-          flags: 0
+          content: `✅ Risultato registrato con successo! Il tabellone sul sito web è stato aggiornato in tempo reale!`,
+          flags: 64
         }
       });
     }

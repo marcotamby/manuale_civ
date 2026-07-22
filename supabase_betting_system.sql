@@ -145,26 +145,42 @@ BEGIN
     v_winning_pool := v_winning_real_bets + v_winning_initial_weight;
 
     IF v_winning_pool > 0 THEN
-        -- Paga Vincitori
+        -- 1. Aggiorna scommesse vincenti (stato e payout individuale)
+        UPDATE user_bets 
+        SET status = 'won', is_paid = true, payout = FLOOR((amount::NUMERIC * v_total_pool::NUMERIC) / v_winning_pool::NUMERIC)::BIGINT 
+        WHERE market_id = p_market_id AND option_id = p_winner_option_id AND is_paid = false;
+
+        -- 2. Aggiorna scommesse perdenti
+        UPDATE user_bets 
+        SET status = 'lost', is_paid = true, payout = 0 
+        WHERE market_id = p_market_id AND option_id != p_winner_option_id AND is_paid = false;
+
+        -- 3. Paga Vincitori (Aggregato per email utente per evitare il bug dell'UPDATE FROM su righe multiple)
         UPDATE profiles
-        SET sheep_balance = sheep_balance + FLOOR((b.amount::NUMERIC * v_total_pool::NUMERIC) / v_winning_pool::NUMERIC)::BIGINT
-        FROM user_bets b
-        WHERE profiles.email = b.user_email AND b.market_id = p_market_id AND b.option_id = p_winner_option_id AND b.is_paid = false;
+        SET sheep_balance = profiles.sheep_balance + payouts.total_payout
+        FROM (
+            SELECT b.user_email, SUM(FLOOR((b.amount::NUMERIC * v_total_pool::NUMERIC) / v_winning_pool::NUMERIC)::BIGINT) AS total_payout
+            FROM user_bets b
+            WHERE b.market_id = p_market_id AND b.option_id = p_winner_option_id
+            GROUP BY b.user_email
+        ) payouts
+        WHERE LOWER(profiles.email) = LOWER(payouts.user_email);
 
-        -- Notifiche
+        -- 4. Notifiche vincitori
         INSERT INTO betting_notifications (user_email, message, is_read)
-        SELECT b.user_email, 'I tuoi scout sono tornati! Hai vinto ' || FLOOR((b.amount::NUMERIC * v_total_pool::NUMERIC) / v_winning_pool::NUMERIC)::BIGINT || ' 🐑 nel mercato ' || v_market_title || '!', false
-        FROM user_bets b WHERE b.market_id = p_market_id AND b.option_id = p_winner_option_id AND b.is_paid = false;
+        SELECT payouts.user_email, 'I tuoi scout sono tornati! Hai vinto ' || payouts.total_payout || ' 🐑 nel mercato ' || v_market_title || '!', false
+        FROM (
+            SELECT b.user_email, SUM(FLOOR((b.amount::NUMERIC * v_total_pool::NUMERIC) / v_winning_pool::NUMERIC)::BIGINT) AS total_payout
+            FROM user_bets b
+            WHERE b.market_id = p_market_id AND b.option_id = p_winner_option_id
+            GROUP BY b.user_email
+        ) payouts;
 
+        -- 5. Notifiche perdenti
         INSERT INTO betting_notifications (user_email, message, is_read)
-        SELECT b.user_email, 'Il lupo ha decimato il tuo gregge... Hai perso la scommessa nel mercato ' || v_market_title, false
-        FROM user_bets b WHERE b.market_id = p_market_id AND b.option_id != p_winner_option_id AND b.is_paid = false;
+        SELECT DISTINCT b.user_email, 'Il lupo ha decimato il tuo gregge... Hai perso la scommessa nel mercato ' || v_market_title, false
+        FROM user_bets b WHERE b.market_id = p_market_id AND b.option_id != p_winner_option_id;
 
-        -- Aggiorna Scommesse
-        UPDATE user_bets SET status = 'won', is_paid = true, payout = FLOOR((amount::NUMERIC * v_total_pool::NUMERIC) / v_winning_pool::NUMERIC)::BIGINT 
-        WHERE market_id = p_market_id AND option_id = p_winner_option_id;
-        
-        UPDATE user_bets SET status = 'lost', is_paid = true WHERE market_id = p_market_id AND option_id != p_winner_option_id;
     END IF;
 
     UPDATE betting_markets SET status = 'settled', winner_option_id = p_winner_option_id WHERE id = p_market_id;
