@@ -334,15 +334,31 @@ export function TournamentDetail() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-full">
-        {selectedPhase ? (
-          <TournamentBracket 
-            phase={selectedPhase} 
-            tournamentSlug={tournament?.slug || slug} 
-            directLink={tournament?.db?.direct_link} 
-          />
-        ) : tournament?.db?.id ? (
-          <LocalTournamentBracket tournamentId={tournament.db.id} />
-        ) : (
+        {(() => {
+          // Se il torneo ha un link start.gg o challonge, NON mostrare mai il LocalTournamentBracket Discord
+          const isExternalBracket = !!(
+            (tournament?.db?.direct_link && (
+              tournament.db.direct_link.includes('start.gg') ||
+              tournament.db.direct_link.includes('challonge.com')
+            )) ||
+            tournament?.db?.source === 'startgg' ||
+            tournament?.db?.source === 'challonge'
+          );
+
+          if (selectedPhase) {
+            return (
+              <TournamentBracket
+                phase={selectedPhase}
+                tournamentSlug={tournament?.slug || slug}
+                directLink={tournament?.db?.direct_link}
+              />
+            );
+          }
+          // Mostra LocalTournamentBracket SOLO se è un torneo gestito dal bot Discord (senza link esterni)
+          if (!isExternalBracket && tournament?.db?.id) {
+            return <LocalTournamentBracket tournamentId={tournament.db.id} />;
+          }
+          return (
           <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
             <div className="glass p-12 rounded-[3rem] border border-white/10 max-w-lg w-full shadow-2xl relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
@@ -374,7 +390,8 @@ export function TournamentDetail() {
               </div>
             </div>
           </div>
-        )}
+          );
+        })()}
       </main>
     </div>
   );

@@ -631,6 +631,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
+      // Blocca iscrizioni se torneo annullato o già avviato
+      if (tournament.status === 'annullato') {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '🔴 **Torneo annullato.** Non è più possibile iscriversi a questo torneo.', flags: 64 }
+        });
+      }
+      if (tournament.status === 'in_corso' || tournament.status === 'In corso' || tournament.status === 'completato' || tournament.status === 'Concluso') {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '🔒 **Le iscrizioni sono chiuse.** Il torneo è già in corso o concluso.', flags: 64 }
+        });
+      }
+
       const { count } = await supabase
         .from('tournament_participants')
         .select('*', { count: 'exact', head: true })
