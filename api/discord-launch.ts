@@ -203,6 +203,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     ];
 
     const createdChannels: string[] = [];
+    let savedGuildId: string | null = null;
+    let savedCategoryId: string | null = null;
+    let savedParticipantsChannelId: string | null = null;
 
     try {
       // 1. Recupera il Server ID (guild_id) e la Categoria attuale dal canale d'invio
@@ -213,6 +216,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (channelInfoRes.ok) {
         const channelInfo = await channelInfoRes.json();
         const guildId = channelInfo.guild_id;
+        savedGuildId = guildId || null;
         let targetCategoryId = channelInfo.parent_id || null;
 
         if (guildId) {
@@ -233,6 +237,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const categoryData = await categoryRes.json();
             targetCategoryId = categoryData.id;
           }
+          savedCategoryId = targetCategoryId || null;
 
           // 3. Crea i 3 Canali Testuali Reali (GUILD_TEXT type 0) all'interno della Categoria
           for (const ch of channelsToCreate) {
@@ -253,6 +258,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               if (textChannelRes.ok) {
                 const textChannelData = await textChannelRes.json();
                 createdChannels.push(ch.name);
+
+                if (ch.name.includes('partecipanti')) {
+                  savedParticipantsChannelId = textChannelData.id;
+                }
 
                 // Invia il messaggio iniziale di benvenuto nel canale testuale appena creato
                 await fetch(`https://discord.com/api/v10/channels/${textChannelData.id}/messages`, {
@@ -302,6 +311,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
           if (threadRes.ok) {
             const threadData = await threadRes.json();
+            if (threadInfo.name.includes('partecipanti')) {
+              savedParticipantsChannelId = threadData.id;
+            }
+
             await fetch(`https://discord.com/api/v10/channels/${threadData.id}/messages`, {
               method: 'POST',
               headers: {
@@ -317,17 +330,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    // Salva l'ID del messaggio e del canale nel DB Supabase mantenendo lo stato 'Programmato'
+    // Salva l'ID del messaggio e dei canali nel DB Supabase mantenendo lo stato 'Programmato'
     if (tournamentId) {
       await supabase
         .from('tournaments')
         .update({
           discord_channel_id: channelId,
           discord_message_id: messageData.id,
+          discord_guild_id: savedGuildId,
+          discord_category_id: savedCategoryId,
+          discord_participants_channel_id: savedParticipantsChannelId,
           max_participants: maxParticipants || 8,
           map: map || null,
           event_date: eventDate || null,
           event_time: eventTime || null,
+          has_regolamento: hasRegolamento || false,
+          regolamento_content: regolamentoContent || null,
           status: 'Programmato'
         })
         .eq('id', tournamentId);

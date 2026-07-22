@@ -60,6 +60,19 @@ function isDiscordStaff(member: any): boolean {
 }
 
 /**
+ * Rimuove i caratteri speciali Markdown per mostrare un testo pulito e leggibile su Discord
+ */
+function cleanMarkdownText(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/^#+\s+/gm, '')
+    .replace(/[\*_~`]/g, '')
+    .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+    .replace(/<[^>]*>/g, '')
+    .trim();
+}
+
+/**
  * Aggiorna in tempo reale l'Embed del messaggio Discord principale con il conteggio iscritti aggiornato
  */
 async function updateDiscordMessageCount(tournamentId: string, fallbackChannelId?: string, fallbackMessageId?: string) {
@@ -122,6 +135,19 @@ async function updateDiscordMessageCount(tournamentId: string, fallbackChannelId
     value: 'Eliminazione Diretta',
     inline: true
   });
+
+  if (tournament?.has_regolamento || tournament?.regolamento_content || tournament?.config?.regolamentoContent) {
+    const rawText = cleanMarkdownText(tournament?.regolamento_content || tournament?.config?.regolamentoContent || '');
+    const displayReg = rawText 
+      ? (rawText.length > 800 ? rawText.substring(0, 800) + '...\n*(Regolamento completo sul sito web)*' : rawText)
+      : 'Consulta il regolamento ufficiale sulla pagina del torneo sul sito web.';
+
+    fields.push({
+      name: '📜 Regolamento',
+      value: displayReg,
+      inline: false
+    });
+  }
 
   const embed: any = {
     title: `🏆 TORNEO UFFICIALE: ${(tournament?.name || tournament?.title || 'TORNEO').toUpperCase()}`,
@@ -536,10 +562,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
-      // 1. Assicurati che il canale #partecipanti esista
+      // 1. Assicurati che il canale #partecipanti esista ed appartenga al server
+      const guildId = tournament.discord_guild_id || interaction.guild_id;
       let partChannelId = tournament.discord_participants_channel_id;
-      if (!partChannelId && tournament.discord_guild_id) {
-        const newCh = await discordApi(`/guilds/${tournament.discord_guild_id}/channels`, 'POST', {
+
+      if (!partChannelId && guildId) {
+        const newCh = await discordApi(`/guilds/${guildId}/channels`, 'POST', {
           name: '👥-partecipanti',
           type: 0,
           parent_id: tournament.discord_category_id || undefined
@@ -549,7 +577,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           partChannelId = newCh.id;
           await supabase
             .from('tournaments')
-            .update({ discord_participants_channel_id: partChannelId })
+            .update({ 
+              discord_guild_id: guildId,
+              discord_participants_channel_id: partChannelId 
+            })
             .eq('id', tournamentId);
         }
       }
