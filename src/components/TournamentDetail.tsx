@@ -143,18 +143,7 @@ export function TournamentDetail() {
       return;
     }
     
-    // Redirect local tournaments that don't have brackets
-    const hasSyncLink = !!(
-      tournament?.db?.direct_link && 
-      (tournament.db.direct_link.toLowerCase().includes('start.gg') || tournament.db.direct_link.toLowerCase().includes('challonge.com'))
-    );
-    if (!selectedPhase && !hasSyncLink && tournament?.db) {
-      if (tournament.db.has_regolamento) {
-        navigate(`/tornei/${slug}/regolamento`, { replace: true });
-      } else {
-        navigate('/tornei', { replace: true });
-      }
-    }
+    // Per i tornei locali non reindirizzare al regolamento, ma mostrare il tabellone locale
   }, [loading, selectedPhase, tournament, source, slug, navigate]);
 
   if (loading) {

@@ -430,6 +430,9 @@ async function createMatchChannelsForRound(tournamentId: string, roundNum: numbe
         .update({ discord_channel_id: newChannel.id, status: 'in_progress' })
         .eq('id', match.id);
 
+      // Attendi 800ms che i permessi del canale si sincronizzino sul backend di Discord
+      await new Promise(resolve => setTimeout(resolve, 800));
+
       const content = `⚔️ **MATCH ${match.match_number} - TURNO ${roundNum}**\n${p1Tag} vs ${p2Tag}\n🗺️ Mappa: **${tournament?.map || 'Dry Arabia'}** | ⚙️ Formato: **BO1 / Eliminazione Diretta**\n\nPotete iniziare il vostro match! Al termine, cliccate sul bottone sottostante per registrare il risultato finale.`;
 
       await discordApi(`/channels/${newChannel.id}/messages`, 'POST', {
