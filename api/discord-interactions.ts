@@ -731,9 +731,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .eq('tournament_id', tournamentId)
         .eq('discord_user_id', discordUserId);
 
-      const partChannelId = tournament?.discord_participants_channel_id;
+      // Trova il canale #partecipanti in modo robusto nel server
+      const guildId = tournament?.discord_guild_id || interaction.guild_id;
+      let partChannelId = tournament?.discord_participants_channel_id;
 
-      // Notifica la cancellazione UNICAMENTE nel canale #partecipanti
+      if (guildId) {
+        const guildChannels = await discordApi(`/guilds/${guildId}/channels`);
+        if (Array.isArray(guildChannels)) {
+          const existingPartCh = guildChannels.find((c: any) => c.name.includes('partecipanti'));
+          if (existingPartCh) {
+            partChannelId = existingPartCh.id;
+          }
+        }
+      }
+
+      // Notifica pubblica a tutti nel canale #partecipanti
       if (partChannelId) {
         await discordApi(`/channels/${partChannelId}/messages`, 'POST', {
           content: `🚶 <@${discordUserId}> (**${displayName}**) ha cancellato la propria iscrizione dal torneo.`
