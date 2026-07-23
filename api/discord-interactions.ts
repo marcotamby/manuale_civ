@@ -246,6 +246,10 @@ async function discordApi(endpoint: string, method = 'GET', body?: any) {
     if (res.ok && res.status !== 204) {
       return await res.json();
     }
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error(`Errore API Discord (${method} ${endpoint} - Status ${res.status}):`, errText);
+    }
     return null;
   } catch (err) {
     console.error(`Errore API Discord (${endpoint}):`, err);
@@ -405,7 +409,7 @@ async function createMatchChannelsForRound(tournamentId: string, roundNum: numbe
       permission_overwrites.push({
         id: p1.discord_user_id,
         type: 1, // Member
-        allow: '1024' // VIEW_CHANNEL (Consenti visione al Giocatore 1)
+        allow: '66560' // VIEW_CHANNEL (1024) + SEND_MESSAGES (2048) + READ_MESSAGE_HISTORY (65536)
       });
     }
 
@@ -413,7 +417,17 @@ async function createMatchChannelsForRound(tournamentId: string, roundNum: numbe
       permission_overwrites.push({
         id: p2.discord_user_id,
         type: 1, // Member
-        allow: '1024' // VIEW_CHANNEL (Consenti visione al Giocatore 2)
+        allow: '66560' // VIEW_CHANNEL (1024) + SEND_MESSAGES (2048) + READ_MESSAGE_HISTORY (65536)
+      });
+    }
+
+    // Include esplicitamente l'ID del Bot nei permessi per essere sicuri al 100% che il Bot possa accedere e scrivere nel canale
+    const botUser = await discordApi('/users/@me');
+    if (botUser && botUser.id) {
+      permission_overwrites.push({
+        id: botUser.id,
+        type: 1, // Member
+        allow: '66560' // VIEW_CHANNEL (1024) + SEND_MESSAGES (2048) + READ_MESSAGE_HISTORY (65536)
       });
     }
 
@@ -430,28 +444,91 @@ async function createMatchChannelsForRound(tournamentId: string, roundNum: numbe
         .update({ discord_channel_id: newChannel.id, status: 'in_progress' })
         .eq('id', match.id);
 
-      // Attendi 800ms che i permessi del canale si sincronizzino sul backend di Discord
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // Attendi 1000ms che i permessi del canale si sincronizzino sul backend di Discord
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       const content = `⚔️ **MATCH ${match.match_number} - TURNO ${roundNum}**\n${p1Tag} vs ${p2Tag}: **potete iniziare il vostro match!** ⚔️\n\n🗺️ Mappa: **${tournament?.map || 'Dry Arabia'}** | ⚙️ Formato: **BO1 / Eliminazione Diretta**\n\nAl termine del match, cliccate sul bottone sottostante per registrare il risultato finale.`;
 
-      await discordApi(`/channels/${newChannel.id}/messages`, 'POST', {
-        content,
-        components: [
-          {
-            type: 1,
-            components: [
-              {
-                type: 2,
-                style: 1,
-                label: '🏆 Registra Risultato Match',
-                custom_id: `tm_win_prompt_${match.id}`
-              }
-            ]
-          }
-        ]
-      });
+      // Tentativi di invio messaggio con retry (gestione latenza e permessi Discord API)
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const msgRes = await discordApi(`/channels/${newChannel.id}/messages`, 'POST', {
+          content,
+          components: [
+            {
+              type: 1,
+              components: [
+                {
+                  type: 2,
+                  style: 1,
+                  label: '🏆 Registra Risultato Match',
+                  custom_id: `tm_win_prompt_${match.id}`
+                }
+              ]
+            }
+          ]
+        });
+        if (msgRes && msgRes.id) break;
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
     }
+  }
+}
+
+/**
+ * Assicura che in tutti i canali dei match in corso sia presente il messaggio con il bottone "🏆 Registra Risultato Match"
+ */
+async function ensureMatchChannelMessages(tournamentId: string) {
+  const { data: matches } = await supabase
+    .from('tournament_matches')
+    .select('*')
+    .eq('tournament_id', tournamentId)
+    .eq('status', 'in_progress')
+    .not('discord_channel_id', 'is', null);
+
+  if (!matches || matches.length === 0) return;
+
+  const { data: tournament } = await supabase
+    .from('tournaments')
+    .select('*')
+    .eq('id', tournamentId)
+    .maybeSingle();
+
+  for (const match of matches) {
+    if (!match.discord_channel_id || !match.player1_id || !match.player2_id) continue;
+
+    const { data: p1 } = await supabase
+      .from('tournament_participants')
+      .select('*')
+      .eq('id', match.player1_id)
+      .maybeSingle();
+
+    const { data: p2 } = await supabase
+      .from('tournament_participants')
+      .select('*')
+      .eq('id', match.player2_id)
+      .maybeSingle();
+
+    const p1Tag = p1?.discord_user_id ? `<@${p1.discord_user_id}>` : (p1?.display_name || 'Giocatore 1');
+    const p2Tag = p2?.discord_user_id ? `<@${p2.discord_user_id}>` : (p2?.display_name || 'Giocatore 2');
+
+    const content = `⚔️ **MATCH ${match.match_number} - TURNO ${match.round}**\n${p1Tag} vs ${p2Tag}: **potete iniziare il vostro match!** ⚔️\n\n🗺️ Mappa: **${tournament?.map || 'Dry Arabia'}** | ⚙️ Formato: **BO1 / Eliminazione Diretta**\n\nAl termine del match, cliccate sul bottone sottostante per registrare il risultato finale.`;
+
+    await discordApi(`/channels/${match.discord_channel_id}/messages`, 'POST', {
+      content,
+      components: [
+        {
+          type: 1,
+          components: [
+            {
+              type: 2,
+              style: 1,
+              label: '🏆 Registra Risultato Match',
+              custom_id: `tm_win_prompt_${match.id}`
+            }
+          ]
+        }
+      ]
+    });
   }
 }
 
@@ -551,7 +628,7 @@ async function updateStaffControlPanel(tournamentId: string) {
     });
   }
 
-  const row2Components = [
+  const row2Components: any[] = [
     {
       type: 2,
       style: 4, // Danger (Rosso)
@@ -559,6 +636,15 @@ async function updateStaffControlPanel(tournamentId: string) {
       custom_id: `tr_cancel_prompt_${tournamentId}`
     }
   ];
+
+  if (tournament.status === 'in_corso' || tournament.status === 'In corso') {
+    row2Components.unshift({
+      type: 2,
+      style: 1, // Primary (Blu)
+      label: '💬 Ripristina Pulsanti Match',
+      custom_id: `tr_fix_match_msgs_${tournamentId}`
+    });
+  }
 
   const components = [
     { type: 1, components: row1Components },
@@ -1499,6 +1585,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         type: 4,
         data: {
           content: `🚀 **TORNEO AVVIATO CON SUCCESSO!**\nIl tabellone è stato generato ed i canali testuali dei match del Turno 1 sono stati aperti!`,
+          flags: 64
+        }
+      });
+    }
+
+    // --- AZIONE STAFF: RIPRISTINA PULSANTI MATCH ---
+    if (customId.startsWith('tr_fix_match_msgs_')) {
+      if (!isDiscordStaff(interaction.member)) {
+        return res.status(200).json({
+          type: 4,
+          data: { content: '⛔ Soltanto gli Staff possono eseguire questa operazione.', flags: 64 }
+        });
+      }
+
+      const tournamentId = customId.replace('tr_fix_match_msgs_', '');
+      await ensureMatchChannelMessages(tournamentId);
+
+      return res.status(200).json({
+        type: 4,
+        data: {
+          content: '💬 **Pulsanti di registrazione risultati inviati con successo nei canali dei match!**',
           flags: 64
         }
       });
