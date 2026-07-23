@@ -146,8 +146,9 @@ function SortableTournamentCard({
           );
 
           const directLinkStr = String(t.config?.directLink || t.direct_link || t.config?.externalUrl || t.externalUrl || '').toLowerCase();
-          const isChallonge = directLinkStr.includes('challonge.com') || t.config?.source === 'challonge' || t.source === 'challonge';
-          const challongeUrl = t.config?.directLink || t.direct_link || t.config?.externalUrl || t.externalUrl;
+          const isStartGG = directLinkStr.includes('start.gg');
+          const isExternalLink = !!directLinkStr && !isStartGG;
+          const externalUrl = t.config?.directLink || t.direct_link || t.config?.externalUrl || t.externalUrl;
 
           if (isEditingOrder) {
             return (
@@ -157,8 +158,8 @@ function SortableTournamentCard({
             );
           }
 
-          if (isChallonge && challongeUrl) {
-            const formattedHref = challongeUrl.startsWith('http') ? challongeUrl : `https://${challongeUrl}`;
+          if (isExternalLink && externalUrl) {
+            const formattedHref = externalUrl.startsWith('http') ? externalUrl : `https://${externalUrl}`;
             return (
               <a 
                 href={formattedHref}
@@ -442,11 +443,12 @@ function SortableTournamentCard({
                 );
 
                 const directLinkStr = String(t.config?.directLink || t.direct_link || t.config?.externalUrl || t.externalUrl || '').toLowerCase();
-                const isChallonge = directLinkStr.includes('challonge.com') || t.config?.source === 'challonge' || t.source === 'challonge';
-                const challongeUrl = t.config?.directLink || t.direct_link || t.config?.externalUrl || t.externalUrl;
+                const isStartGG = directLinkStr.includes('start.gg');
+                const isExternalLink = !!directLinkStr && !isStartGG;
+                const externalUrl = t.config?.directLink || t.direct_link || t.config?.externalUrl || t.externalUrl;
 
-                if (isChallonge && challongeUrl) {
-                  const formattedHref = challongeUrl.startsWith('http') ? challongeUrl : `https://${challongeUrl}`;
+                if (isExternalLink && externalUrl) {
+                  const formattedHref = externalUrl.startsWith('http') ? externalUrl : `https://${externalUrl}`;
                   return (
                     <a href={formattedHref} target="_blank" rel="noopener noreferrer" className={commonClasses}>
                       <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
@@ -776,7 +778,14 @@ export function TournamentsPage() {
       status: t.config?.status || t.status || 'Concluso',
       name: t.config?.name || t.name || '',
       type: t.config?.type || t.type || '1v1',
-      podium: t.config?.podium || (t.events?.[0]?.standings?.nodes || []),
+      podium: (t.config?.podium || (t.events?.[0]?.standings?.nodes || [])).map((p: any, idx: number) => {
+        const currentPlacement = Number(p.placement ?? p.rank ?? 0);
+        const validPlacement = [1, 2, 3].includes(currentPlacement) ? currentPlacement : (idx % 3 + 1);
+        return {
+          ...p,
+          placement: validPlacement
+        };
+      }),
       hasRegolamento: t.config?.hasRegolamento || false,
       regolamentoContent: t.config?.regolamentoContent || '',
       externalUrl: t.config?.externalUrl || t.direct_link || '',
@@ -1006,10 +1015,17 @@ export function TournamentsPage() {
         period: editForm.period,
         banner_url: editForm.bannerUrl,
         status: editForm.status,
-        podium: editForm.podium.map(p => ({
-          ...p,
-          players: p.players ? p.players.map((name: string) => name.trim()).filter((name: string) => name !== '') : []
-        })),
+        podium: editForm.podium.map((p, idx) => {
+          const currentPlacement = Number(p.placement ?? p.rank ?? 0);
+          const validPlacement = [1, 2, 3].includes(currentPlacement) ? currentPlacement : (idx % 3 + 1);
+          return {
+            ...p,
+            placement: validPlacement,
+            players: Array.isArray(p.players) 
+              ? p.players.map((name: string) => String(name).trim()).filter(Boolean) 
+              : (typeof p.players === 'string' ? (p.players as string).split(',').map(s => s.trim()).filter(Boolean) : [])
+          };
+        }),
         type: editForm.type,
         has_regolamento: editForm.hasRegolamento,
         regolamento_content: editForm.regolamentoContent,
