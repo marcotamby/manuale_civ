@@ -372,6 +372,16 @@ function SortableTournamentCard({
               const divisions = Array.from(new Set(rawDivisions)) as string[];
               const activeDiv = activeDivisions[t.id] || divisions[0];
 
+              const activeDivEntries = podium.filter((s: any) => {
+                return divisions.length > 1 
+                  ? String(s.division || '').trim().toLowerCase() === String(activeDiv || '').trim().toLowerCase()
+                  : true;
+              }).map((s: any, sIdx: number) => {
+                const rawP = Number(s.placement ?? s.rank ?? 0);
+                const normalizedPlacement = [1, 2, 3].includes(rawP) ? rawP : (sIdx === 0 ? 1 : (sIdx === 1 ? 2 : 3));
+                return { ...s, normalizedPlacement };
+              });
+
               return (
                 <>
                   <div className="flex flex-col sm:flex-row justify-between sm:items-center items-start gap-2 mb-3 border-b border-white/5 pb-2 min-h-[28px] overflow-visible">
@@ -409,14 +419,7 @@ function SortableTournamentCard({
 
                   <div className="space-y-2 overflow-visible flex-grow flex flex-col justify-center transition-all duration-300">
                     {[1, 2, 3].map((placement, idx) => {
-                      const entries = podium.filter((s: any) => {
-                        const entryPlacement = Number(s.placement ?? s.rank ?? 0);
-                        const matchesPlacement = entryPlacement === placement;
-                        const matchesDivision = divisions.length > 1 
-                          ? String(s.division || '').trim().toLowerCase() === String(activeDiv || '').trim().toLowerCase()
-                          : true;
-                        return matchesPlacement && matchesDivision;
-                      });
+                      const entries = activeDivEntries.filter((s: any) => s.normalizedPlacement === placement);
                       const hasData = entries.length > 0;
                       return renderStandingRow(entries, idx, hasData);
                     })}
