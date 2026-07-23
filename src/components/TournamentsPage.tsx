@@ -982,7 +982,7 @@ export function TournamentsPage() {
 
       const tournamentData = {
         slug: finalSlug,
-        source: editForm.externalUrl && editForm.externalUrl.includes('challonge') ? 'challonge' : 'startgg',
+        source: editForm.externalUrl ? (editForm.externalUrl.includes('challonge') ? 'challonge' : 'startgg') : 'local',
         name: editForm.name,
         organizer: editForm.organizer,
         period: editForm.period,
