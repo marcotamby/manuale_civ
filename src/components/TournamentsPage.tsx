@@ -145,14 +145,9 @@ function SortableTournamentCard({
             </>
           );
 
-          const isChallonge = !!(
-            (t.config?.directLink && t.config.directLink.includes('challonge.com')) ||
-            (t.direct_link && t.direct_link.includes('challonge.com')) ||
-            t.config?.source === 'challonge' ||
-            t.source === 'challonge' ||
-            (t.config?.externalUrl && t.config.externalUrl.includes('challonge.com'))
-          );
-          const challongeUrl = t.config?.directLink || t.direct_link || t.config?.externalUrl;
+          const directLinkStr = String(t.config?.directLink || t.direct_link || t.config?.externalUrl || t.externalUrl || '').toLowerCase();
+          const isChallonge = directLinkStr.includes('challonge.com') || t.config?.source === 'challonge' || t.source === 'challonge';
+          const challongeUrl = t.config?.directLink || t.direct_link || t.config?.externalUrl || t.externalUrl;
 
           if (isEditingOrder) {
             return (
@@ -446,14 +441,9 @@ function SortableTournamentCard({
                   t.config.hasRegolamento ? "text-[10px]" : "text-xs"
                 );
 
-                const isChallonge = !!(
-                  (t.config?.directLink && t.config.directLink.includes('challonge.com')) ||
-                  (t.direct_link && t.direct_link.includes('challonge.com')) ||
-                  t.config?.source === 'challonge' ||
-                  t.source === 'challonge' ||
-                  (t.config?.externalUrl && t.config.externalUrl.includes('challonge.com'))
-                );
-                const challongeUrl = t.config?.directLink || t.direct_link || t.config?.externalUrl;
+                const directLinkStr = String(t.config?.directLink || t.direct_link || t.config?.externalUrl || t.externalUrl || '').toLowerCase();
+                const isChallonge = directLinkStr.includes('challonge.com') || t.config?.source === 'challonge' || t.source === 'challonge';
+                const challongeUrl = t.config?.directLink || t.direct_link || t.config?.externalUrl || t.externalUrl;
 
                 if (isChallonge && challongeUrl) {
                   const formattedHref = challongeUrl.startsWith('http') ? challongeUrl : `https://${challongeUrl}`;
