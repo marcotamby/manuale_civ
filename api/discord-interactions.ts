@@ -545,12 +545,23 @@ async function deleteDiscordCategoryAndChannels(guildId: string, categoryId?: st
         const cat = channels.find((c: any) => c.type === 4 && (c.name.toUpperCase().includes(tournamentName.toUpperCase()) || c.name.includes('TORNEO')));
         if (cat) targetCatId = cat.id;
       }
-      if (targetCatId) {
-        const categoryChannels = channels.filter((c: any) => c.parent_id === targetCatId);
-        for (const ch of categoryChannels) {
+      
+      // Elimina tutti i canali della categoria ED i canali match specifici (es. match-1-p1-vs-p2)
+      const categoryChannels = channels.filter((c: any) => 
+        (targetCatId && c.parent_id === targetCatId) || 
+        (c.name && (c.name.includes('match-') || c.name.includes('-vs-')))
+      );
+
+      for (const ch of categoryChannels) {
+        try {
           await discordApi(`/channels/${ch.id}`, 'DELETE');
-        }
-        await discordApi(`/channels/${targetCatId}`, 'DELETE');
+        } catch (_) {}
+      }
+
+      if (targetCatId) {
+        try {
+          await discordApi(`/channels/${targetCatId}`, 'DELETE');
+        } catch (_) {}
       }
     }
   } catch (err) {
