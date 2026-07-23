@@ -127,8 +127,7 @@ export function LocalTournamentBracket({ tournamentId }: LocalTournamentBracketP
     return `ROUND ${round}`;
   };
 
-  // Mostra "annullato" solo se non ci sono match/partecipanti (potrebbe essere stato rilanciato)
-  const isCancelled = tournament?.status === 'annullato' && matches.length === 0 && participants.length === 0;
+  const isCancelled = tournament?.status === 'annullato';
   const isStartedOrCompleted = tournament?.status === 'in_corso' || tournament?.status === 'In corso' || tournament?.status === 'completato' || tournament?.status === 'Concluso';
 
   // Se il torneo è stato avviato o annullato, mostra solo i partecipanti effettivi senza slot fittizi "In attesa"
@@ -271,93 +270,96 @@ export function LocalTournamentBracket({ tournamentId }: LocalTournamentBracketP
       )}
 
       {/* SEZIONE 2: GRIGLIA PARTECIPANTI ISCRITTI IN TEMPO REALE */}
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-4">
-          <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
-            <UserCheck size={16} className="text-cyan-400" /> {isStartedOrCompleted ? 'Partecipanti al Torneo' : 'Lista Iscritti in Tempo Reale'} ({currentCount} {isStartedOrCompleted ? '' : `/ ${maxSlots}`})
-          </h3>
-          
-          <div className="flex items-center gap-3">
-            {matches.length === 0 && participants.length >= 2 && !isCancelled && (
-              <button
-                type="button"
-                onClick={async () => {
-                  try {
-                    toast.loading('Generazione tabellone in corso...');
-                    await generateSingleEliminationBracket(tournamentId, participants);
-                    toast.dismiss();
-                    toast.success('🏆 Tabellone generato con successo!');
-                    fetchData();
-                  } catch (err: any) {
-                    toast.dismiss();
-                    toast.error(`Errore generazione: ${err.message}`);
-                  }
-                }}
-                className="px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:brightness-110 text-black font-black uppercase text-[10px] tracking-widest rounded-xl transition-all shadow-lg flex items-center gap-2 active:scale-95"
-              >
-                <Play size={12} fill="black" /> Genera Tabellone Match Ora
-              </button>
-            )}
-            <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold hidden sm:inline-block">
-              Aggiornato da Discord Bot
-            </span>
+      {!isCancelled && (
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-4">
+            <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
+              <UserCheck size={16} className="text-cyan-400" /> {isStartedOrCompleted ? 'Partecipanti al Torneo' : 'Lista Iscritti in Tempo Reale'} ({currentCount} {isStartedOrCompleted ? '' : `/ ${maxSlots}`})
+            </h3>
+            
+            <div className="flex items-center gap-3">
+              {matches.length === 0 && participants.length >= 2 && !isCancelled && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      toast.loading('Generazione tabellone in corso...');
+                      await generateSingleEliminationBracket(tournamentId, participants);
+                      toast.dismiss();
+                      toast.success('🏆 Tabellone generato con successo!');
+                      fetchData();
+                    } catch (err: any) {
+                      toast.dismiss();
+                      toast.error(`Errore generazione: ${err.message}`);
+                    }
+                  }}
+                  className="px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:brightness-110 text-black font-black uppercase text-[10px] tracking-widest rounded-xl transition-all shadow-lg flex items-center gap-2 active:scale-95"
+                >
+                  <Play size={12} fill="black" /> Genera Tabellone Match Ora
+                </button>
+              )}
+              <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold hidden sm:inline-block">
+                Aggiornato da Discord Bot
+              </span>
+            </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {slotsToRender.map((player, index) => {
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {slotsToRender.map((player, index) => {
+              return (
+                <div
+                  key={index}
+                  className={clsx(
+                    "p-4 rounded-2xl border transition-all duration-300 flex items-center gap-3.5 relative overflow-hidden",
+                    player
+                      ? "bg-gradient-to-br from-cyan-500/10 via-black/40 to-black/60 border-cyan-500/40 shadow-lg shadow-cyan-500/5 scale-[1.02]"
+                      : "bg-white/[0.02] border-white/5 opacity-60"
+                  )}
+                >
+                  {/* Slot Number Badge */}
+                  <div className={clsx(
+                    "w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black shrink-0 border shadow-inner",
+                    player 
+                      ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40"
+                      : "bg-white/5 text-gray-600 border-white/10"
+                  )}>
+                    #{index + 1}
+                  </div>
 
-            return (
-              <div
-                key={index}
-                className={clsx(
-                  "p-4 rounded-2xl border transition-all duration-300 flex items-center gap-3.5 relative overflow-hidden",
-                  player
-                    ? "bg-gradient-to-br from-cyan-500/10 via-black/40 to-black/60 border-cyan-500/40 shadow-lg shadow-cyan-500/5 scale-[1.02]"
-                    : "bg-white/[0.02] border-white/5 opacity-60"
-                )}
-              >
-                {/* Slot Number Badge */}
-                <div className={clsx(
-                  "w-7 h-7 rounded-xl font-black text-xs flex items-center justify-center shrink-0 border",
-                  player ? "bg-cyan-500 text-black border-cyan-400" : "bg-white/5 text-gray-600 border-white/10"
-                )}>
-                  #{index + 1}
-                </div>
+                  {player ? (
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      {player.avatar_url ? (
+                        <img 
+                          src={player.avatar_url} 
+                          alt={player.display_name} 
+                          className="w-8 h-8 rounded-full border border-cyan-500/50 object-cover shrink-0" 
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-cyan-950 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold text-xs shrink-0">
+                          {(player.display_name || '?')[0].toUpperCase()}
+                        </div>
+                      )}
 
-                {player ? (
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    {player.avatar_url ? (
-                      <img
-                        src={player.avatar_url}
-                        alt={player.display_name}
-                        className="w-10 h-10 rounded-full border border-cyan-400/50 object-cover shrink-0 shadow-md"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center font-black text-cyan-400 shrink-0 text-sm">
-                        {player.display_name?.substring(0, 2).toUpperCase() || 'P'}
-                      </div>
-                    )}
-
-                    <div className="min-w-0 flex-1">
-                      <div className="text-xs font-black text-white truncate uppercase tracking-wider">
-                        {player.display_name || player.discord_username}
-                      </div>
-                      <div className="text-[10px] font-mono text-cyan-400/80 truncate">
-                        @{player.discord_username}
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-black text-white truncate uppercase tracking-wider">
+                          {player.display_name || player.discord_username}
+                        </div>
+                        <div className="text-[10px] font-mono text-cyan-400/80 truncate">
+                          @{player.discord_username}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 text-gray-600 text-xs italic font-medium">
-                    <span>In attesa di iscrizione...</span>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                  ) : (
+                    <div className="flex items-center gap-2 text-gray-600 text-xs italic font-medium">
+                      <span>In attesa di iscrizione...</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
     </div>
   );

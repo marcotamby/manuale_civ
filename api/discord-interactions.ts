@@ -662,8 +662,24 @@ async function updateStaffControlPanel(tournamentId: string) {
     { type: 1, components: row2Components }
   ];
 
-  if (tournament.discord_control_message_id) {
-    await discordApi(`/channels/${tournament.discord_participants_channel_id}/messages/${tournament.discord_control_message_id}`, 'PATCH', {
+  let controlMsgId = tournament.discord_control_message_id;
+
+  if (!controlMsgId && tournament.discord_participants_channel_id) {
+    const partMsgs = await discordApi(`/channels/${tournament.discord_participants_channel_id}/messages?limit=10`);
+    if (Array.isArray(partMsgs)) {
+      const existingControlMsg = partMsgs.find((m: any) => m.content && m.content.includes('PANNELLO DI CONTROLLO STAFF'));
+      if (existingControlMsg) {
+        controlMsgId = existingControlMsg.id;
+        await supabase
+          .from('tournaments')
+          .update({ discord_control_message_id: existingControlMsg.id })
+          .eq('id', tournamentId);
+      }
+    }
+  }
+
+  if (controlMsgId) {
+    await discordApi(`/channels/${tournament.discord_participants_channel_id}/messages/${controlMsgId}`, 'PATCH', {
       content,
       components
     });
@@ -1262,11 +1278,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .eq('id', tournamentId)
         .single();
 
-      // 1. Aggiorna lo stato del torneo a 'annullato' nel DB Supabase
+      // 1. Aggiorna lo stato del torneo a 'annullato' e pulisci match ed iscritti nel DB Supabase
       await supabase
         .from('tournaments')
         .update({ status: 'annullato' })
         .eq('id', tournamentId);
+
+      await supabase
+        .from('tournament_matches')
+        .delete()
+        .eq('tournament_id', tournamentId);
+
+      await supabase
+        .from('tournament_participants')
+        .delete()
+        .eq('tournament_id', tournamentId);
 
       // 2. Elimina i canali dei match specifici salvati in Supabase (per sicurezza, anche se non sono figli della categoria)
       const guildId = tournament?.discord_guild_id || interaction.guild_id;
