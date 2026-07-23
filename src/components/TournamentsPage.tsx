@@ -133,12 +133,6 @@ function SortableTournamentCard({
         )}
       >
         {(() => {
-          const hasSyncLink = !!(
-            t.config?.directLink && 
-            t.config.directLink.includes('start.gg/')
-          );
-          const isExternal = t.config?.directLink && !hasSyncLink;
-          const canRenderInternal = hasSyncLink && !isExternal && (t.events?.length > 0);
           const bannerContent = (
             <>
               <img 
@@ -159,7 +153,7 @@ function SortableTournamentCard({
             );
           }
 
-          if (canRenderInternal) {
+          if (t.slug) {
             return (
               <Link 
                 to={`/tornei/${t.slug}`}
@@ -168,7 +162,7 @@ function SortableTournamentCard({
                 {bannerContent}
               </Link>
             );
-          } else if (t.config.directLink) {
+          } else if (t.config?.directLink) {
             const formattedHref = t.config.directLink.startsWith('http') ? t.config.directLink : `https://${t.config.directLink}`;
             return (
               <a 
@@ -286,57 +280,66 @@ function SortableTournamentCard({
                     </span>
                     {hasData ? (
                       <div className="flex items-center gap-x-1.5 flex-1 min-w-0 group/players">
-                        {entries.map((s, sIdx) => (
-                          <div key={sIdx} className="relative flex items-center min-w-0 flex-shrink-1 group/name">
-                            <div className="relative min-w-0 flex-shrink-1">
-                              <span 
-                                className={clsx(
-                                  "font-bold transition-colors truncate block",
-                                  idx === 0 ? "text-yellow-100" : "text-gray-400",
-                                  !isEditingOrder && "cursor-help",
-                                  s.players && s.players.length > 0 && "decoration-yellow-500/30 underline underline-offset-8 decoration-dotted"
-                                )}
-                              >
-                                {s.entrant?.name || '---'}
-                              </span>
+                        {entries.map((s, sIdx) => {
+                          const teamPlayers = Array.isArray(s.players)
+                            ? s.players.map((p: any) => String(p).trim()).filter(Boolean)
+                            : (typeof s.players === 'string' && s.players.trim()
+                                ? s.players.split(',').map((p: string) => p.trim()).filter(Boolean)
+                                : []);
+                          const hasPlayers = teamPlayers.length > 0;
 
-                              {!isEditingOrder && (
-                                <div className={clsx(
-                                  "absolute bottom-full mb-3 px-4 py-2.5 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-2xl opacity-0 group-hover/name:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/name:scale-100 z-50",
-                                  sIdx > 0 ? "right-0 origin-bottom-right" : "left-0 origin-bottom-left"
-                                )}>
-                                  <div className="flex flex-col">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 border-b border-white/5 pb-1">
-                                      {idx === 0 ? '🏆 Campione' : idx === 1 ? '🥈 Finalista' : '🥉 3° Classificato'}
-                                    </span>
-                                    <span className={clsx("text-sm font-bold text-white", s.players && s.players.length > 0 ? "mb-2" : "mb-0")}>{s.entrant?.name || '---'}</span>
-                                    
-                                    {s.players && s.players.length > 0 && (
-                                      <div className="mt-1 pt-2 border-t border-white/10">
-                                        <p className="text-[9px] font-black text-yellow-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-                                          <Users size={10} /> Componenti Team
-                                        </p>
-                                        <div className="space-y-1.5">
-                                          {s.players.map((player: string, pIdx: number) => (
-                                            <div key={pIdx} className="flex items-center gap-2 text-[11px] text-white/80 font-bold uppercase tracking-tight">
-                                              <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
-                                              {player}
-                                            </div>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
+                          return (
+                            <div key={sIdx} className="relative flex items-center min-w-0 flex-shrink-1 group/name">
+                              <div className="relative min-w-0 flex-shrink-1">
+                                <span 
+                                  className={clsx(
+                                    "font-bold transition-colors truncate block",
+                                    idx === 0 ? "text-yellow-100" : "text-gray-400",
+                                    !isEditingOrder && "cursor-help",
+                                    hasPlayers && "decoration-yellow-500/50 underline underline-offset-8 decoration-dotted"
+                                  )}
+                                >
+                                  {s.entrant?.name || '---'}
+                                </span>
+
+                                {!isEditingOrder && (
                                   <div className={clsx(
-                                    "absolute top-full -mt-1 border-4 border-transparent border-t-slate-800/95",
-                                    sIdx > 0 ? "right-4" : "left-4 -translate-x-1/2"
-                                  )}></div>
-                                </div>
-                              )}
+                                    "absolute bottom-full mb-3 px-4 py-2.5 bg-slate-800/95 backdrop-blur-md border border-slate-400/30 rounded-2xl opacity-0 group-hover/name:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-2xl scale-90 group-hover/name:scale-100 z-50",
+                                    sIdx > 0 ? "right-0 origin-bottom-right" : "left-0 origin-bottom-left"
+                                  )}>
+                                    <div className="flex flex-col">
+                                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 border-b border-white/5 pb-1">
+                                        {idx === 0 ? '🏆 Campione' : idx === 1 ? '🥈 Finalista' : '🥉 3° Classificato'}
+                                      </span>
+                                      <span className={clsx("text-sm font-bold text-white", hasPlayers ? "mb-2" : "mb-0")}>{s.entrant?.name || '---'}</span>
+                                      
+                                      {hasPlayers && (
+                                        <div className="mt-1 pt-2 border-t border-white/10">
+                                          <p className="text-[9px] font-black text-yellow-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                                            <Users size={10} /> Componenti Team
+                                          </p>
+                                          <div className="space-y-1.5">
+                                            {teamPlayers.map((player: string, pIdx: number) => (
+                                              <div key={pIdx} className="flex items-center gap-2 text-[11px] text-white/80 font-bold uppercase tracking-tight">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
+                                                {player}
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className={clsx(
+                                      "absolute top-full -mt-1 border-4 border-transparent border-t-slate-800/95",
+                                      sIdx > 0 ? "right-4" : "left-4 -translate-x-1/2"
+                                    )}></div>
+                                  </div>
+                                )}
+                              </div>
+                              {sIdx < entries.length - 1 && <span className="text-gray-600 font-black flex-shrink-0 mx-1">&&</span>}
                             </div>
-                            {sIdx < entries.length - 1 && <span className="text-gray-600 font-black flex-shrink-0 mx-1">&&</span>}
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     ) : (
                       <span className="text-gray-600 italic text-[11px] font-medium tracking-tight">In attesa...</span>
@@ -413,39 +416,23 @@ function SortableTournamentCard({
                 </Link>
               )}
               {(() => {
-                const hasSyncLink = !!(
-                  t.config?.directLink && 
-                  t.config.directLink.includes('start.gg/')
-                );
-                const isExternal = t.config?.directLink && !hasSyncLink;
-                const hasEvents = t.events && t.events.length > 0;
-                const isStartGGWithEvents = hasSyncLink && !isExternal && t.config.source === 'startgg' && (hasEvents || (t.slug && t.slug.startsWith('tournament/')));
-                
                 const commonClasses = clsx(
                   "w-full sm:w-auto sm:flex-grow h-12 bg-white/5 hover:bg-white/10 rounded-2xl text-white font-black uppercase transition-all tracking-wider flex items-center justify-center gap-2 group/det shadow-lg active:scale-95",
                   t.config.hasRegolamento ? "text-[10px]" : "text-xs"
                 );
 
-                const isLocalTournament = !!(t.slug || t.id || t.config?.autoBracket || t.auto_bracket || t.discord_channel_id);
-
-                if (isStartGGWithEvents) {
+                if (t.slug) {
                   return (
                     <Link to={`/tornei/${t.slug}`} className={commonClasses}>
                       <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
                     </Link>
                   );
-                } else if (t.config.directLink) {
+                } else if (t.config?.directLink) {
                   const formattedHref = t.config.directLink.startsWith('http') ? t.config.directLink : `https://${t.config.directLink}`;
                   return (
                     <a href={formattedHref} target="_blank" rel="noopener noreferrer" className={commonClasses}>
                       <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
                     </a>
-                  );
-                } else if (isLocalTournament) {
-                  return (
-                    <Link to={`/tornei/${t.slug}`} className={commonClasses}>
-                      <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
-                    </Link>
                   );
                 } else {
                   return (
@@ -2024,31 +2011,29 @@ export function TournamentsPage() {
                             </div>
                           </div>
                           
-                          {/* Sub-players for Team Games */}
-                          {['2v2', '3v3', '4v4', 'Mod'].includes(editForm.type) && (
-                            <div className="space-y-1.5 pt-4 border-t border-white/5">
-                              <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-2">
-                                <Users size={10} /> Componenti Team (per {editForm.type})
-                              </label>
-                              <input 
-                                type="text" 
-                                value={p.players?.join(', ') || ''} 
-                                onChange={e => {
-                                  const playerList = e.target.value.split(',').map((s, idx, arr) => {
-                                    if (idx === arr.length - 1) {
-                                      return s.replace(/^\s+/, '');
-                                    }
-                                    return s.trim();
-                                  });
-                                  const np = [...editForm.podium]; 
-                                  np[i] = { ...p, players: playerList }; 
-                                  setEditForm({ ...editForm, podium: np });
-                                }} 
-                                placeholder="Esempio: Marco, Alessio, Luca (separati da virgola)" 
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white/60 text-[11px] outline-none focus:border-yellow-500/20 transition-all italic" 
-                              />
-                            </div>
-                          )}
+                          {/* Sub-players for Team Games / Multi-players */}
+                          <div className="space-y-1.5 pt-4 border-t border-white/5">
+                            <label className="text-[9px] text-gray-500 font-bold uppercase ml-1 flex items-center gap-2">
+                              <Users size={10} /> Componenti Team / Squadra (Opzionale)
+                            </label>
+                            <input 
+                              type="text" 
+                              value={Array.isArray(p.players) ? p.players.join(', ') : (typeof p.players === 'string' ? p.players : '')} 
+                              onChange={e => {
+                                const playerList = e.target.value.split(',').map((s, idx, arr) => {
+                                  if (idx === arr.length - 1) {
+                                    return s.replace(/^\s+/, '');
+                                  }
+                                  return s.trim();
+                                });
+                                const np = [...editForm.podium]; 
+                                np[i] = { ...p, players: playerList }; 
+                                setEditForm({ ...editForm, podium: np });
+                              }} 
+                              placeholder="Esempio: Marco, Alessio, Luca (separati da virgola)" 
+                              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white/60 text-[11px] outline-none focus:border-yellow-500/20 transition-all italic" 
+                            />
+                          </div>
     
                           {/* Division/Fascia input */}
                           <div className="space-y-1.5 pt-3 border-t border-white/5">

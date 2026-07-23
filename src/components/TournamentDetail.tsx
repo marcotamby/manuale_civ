@@ -9,6 +9,25 @@ import { Loader2, ArrowLeft, Trophy, Users, Shield, ArrowRight } from 'lucide-re
 import { TournamentBracket } from './TournamentBracket';
 import { LocalTournamentBracket } from './LocalTournamentBracket';
 
+function extractStartGGSlug(input: string): string {
+  if (!input) return '';
+  let clean = input.trim();
+  clean = clean.replace(/https?:\/\/(www\.)?start\.gg\//i, '');
+  clean = clean.replace(/^(www\.)?start\.gg\//i, '');
+  clean = clean.split('?')[0].split('#')[0].replace(/\/$/, '');
+
+  const parts = clean.split('/').filter(Boolean);
+  const tIndex = parts.indexOf('tournament');
+  if (tIndex !== -1 && parts.length > tIndex + 1) {
+    return `tournament/${parts[tIndex + 1]}`;
+  }
+  if (parts.length > 0) {
+    const first = parts[0];
+    return first.startsWith('tournament/') ? first : `tournament/${first}`;
+  }
+  return input;
+}
+
 export function TournamentDetail() {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -107,31 +126,26 @@ export function TournamentDetail() {
               setSelectedPhase(unifiedPhase);
             }
           } else if (isStartGGOrChallonge || (slug && !dbTournament)) {
-            // Priorità 1: slug dall'URL se è già un percorso start.gg (es. "tournament/aoe4-2v2-primavera")
-            // Priorità 2: estrai dal direct_link in modo robusto
-            let sgSlug: string = slug || '';
-
+            let fullSlug = '';
             if (dbTournament?.direct_link?.includes('start.gg')) {
-              // Rimuovi dominio, query params e trailing slash dal direct_link
-              const cleanLink = dbTournament.direct_link
-                .replace(/https?:\/\/(www\.)?start\.gg\//, '')
-                .split('?')[0]
-                .split('#')[0]
-                .replace(/\/$/, '');
-              // cleanLink ora è es: "tournament/aoe4-1v1-invernale/events" o "tournament/aoe4-2v2-primavera"
-              // Se lo slug URL non è già un path start.gg valido, usa quello estratto
-              if (!sgSlug.includes('tournament/')) {
-                sgSlug = cleanLink;
-              }
+              fullSlug = extractStartGGSlug(dbTournament.direct_link);
+            } else {
+              fullSlug = extractStartGGSlug(slug);
             }
 
-            // Assicura il prefisso "tournament/" se mancante
-            const fullSlug = sgSlug.startsWith('tournament/') ? sgSlug : `tournament/${sgSlug}`;
             const data = await fetchTournament(fullSlug);
             if (data) {
               setTournament({ ...data, db: dbTournament });
               if (data.events && data.events.length > 0) {
-                const targetEvent = data.events.find((e: any) => e.name.toLowerCase().includes('1v1')) || data.events[0];
+                const eventParam = searchParams.get('event');
+                let targetEvent = data.events[0];
+                if (eventParam) {
+                  const match = data.events.find((e: any) => 
+                    e.name.toLowerCase().replace(/[^a-z0-9]/g, '-').includes(eventParam.toLowerCase()) ||
+                    eventParam.toLowerCase().includes(e.name.toLowerCase().replace(/[^a-z0-9]/g, '-'))
+                  );
+                  if (match) targetEvent = match;
+                }
                 if (targetEvent?.phases && targetEvent.phases.length > 0) {
                   setSelectedPhase(targetEvent.phases[0]);
                 }
