@@ -145,6 +145,15 @@ function SortableTournamentCard({
             </>
           );
 
+          const isChallonge = !!(
+            (t.config?.directLink && t.config.directLink.includes('challonge.com')) ||
+            (t.direct_link && t.direct_link.includes('challonge.com')) ||
+            t.config?.source === 'challonge' ||
+            t.source === 'challonge' ||
+            (t.config?.externalUrl && t.config.externalUrl.includes('challonge.com'))
+          );
+          const challongeUrl = t.config?.directLink || t.direct_link || t.config?.externalUrl;
+
           if (isEditingOrder) {
             return (
               <div className="h-48 relative overflow-hidden rounded-t-3xl">
@@ -153,7 +162,19 @@ function SortableTournamentCard({
             );
           }
 
-          if (t.slug) {
+          if (isChallonge && challongeUrl) {
+            const formattedHref = challongeUrl.startsWith('http') ? challongeUrl : `https://${challongeUrl}`;
+            return (
+              <a 
+                href={formattedHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-48 relative overflow-hidden cursor-pointer block rounded-t-3xl"
+              >
+                {bannerContent}
+              </a>
+            );
+          } else if (t.slug) {
             return (
               <Link 
                 to={`/tornei/${t.slug}`}
@@ -351,7 +372,8 @@ function SortableTournamentCard({
                 </div>
               );
 
-              const divisions = Array.from(new Set(podium.map((s: any) => s.division || '').filter(Boolean))) as string[];
+              const rawDivisions = podium.map((s: any) => String(s.division || '').trim()).filter(Boolean);
+              const divisions = Array.from(new Set(rawDivisions)) as string[];
               const activeDiv = activeDivisions[t.id] || divisions[0];
 
               return (
@@ -362,7 +384,7 @@ function SortableTournamentCard({
                     {divisions.length > 1 && (
                       <div className="flex gap-1 bg-white/[0.02] p-0.5 rounded-lg border border-white/5 shadow-inner max-w-full overflow-x-auto scrollbar-none shrink-0">
                         {divisions.map((divName) => {
-                          const isActive = activeDiv === divName;
+                          const isActive = String(activeDiv || '').trim().toLowerCase() === divName.toLowerCase();
                           return (
                             <button
                               key={divName}
@@ -392,8 +414,11 @@ function SortableTournamentCard({
                   <div className="space-y-2 overflow-visible flex-grow flex flex-col justify-center transition-all duration-300">
                     {[1, 2, 3].map((placement, idx) => {
                       const entries = podium.filter((s: any) => {
-                        const matchesPlacement = s.placement === placement || s.rank === placement;
-                        const matchesDivision = divisions.length > 1 ? s.division === activeDiv : true;
+                        const entryPlacement = Number(s.placement ?? s.rank ?? 0);
+                        const matchesPlacement = entryPlacement === placement;
+                        const matchesDivision = divisions.length > 1 
+                          ? String(s.division || '').trim().toLowerCase() === String(activeDiv || '').trim().toLowerCase()
+                          : true;
                         return matchesPlacement && matchesDivision;
                       });
                       const hasData = entries.length > 0;
@@ -421,7 +446,23 @@ function SortableTournamentCard({
                   t.config.hasRegolamento ? "text-[10px]" : "text-xs"
                 );
 
-                if (t.slug) {
+                const isChallonge = !!(
+                  (t.config?.directLink && t.config.directLink.includes('challonge.com')) ||
+                  (t.direct_link && t.direct_link.includes('challonge.com')) ||
+                  t.config?.source === 'challonge' ||
+                  t.source === 'challonge' ||
+                  (t.config?.externalUrl && t.config.externalUrl.includes('challonge.com'))
+                );
+                const challongeUrl = t.config?.directLink || t.direct_link || t.config?.externalUrl;
+
+                if (isChallonge && challongeUrl) {
+                  const formattedHref = challongeUrl.startsWith('http') ? challongeUrl : `https://${challongeUrl}`;
+                  return (
+                    <a href={formattedHref} target="_blank" rel="noopener noreferrer" className={commonClasses}>
+                      <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>
+                    </a>
+                  );
+                } else if (t.slug) {
                   return (
                     <Link to={`/tornei/${t.slug}`} className={commonClasses}>
                       <>Tabellone <ArrowRight size={14} className="group-hover/det:translate-x-1 transition-transform" /></>

@@ -412,7 +412,7 @@ export function TournamentDetail() {
                     }}
                     className="flex items-center justify-center gap-3 w-full py-5 bg-white/5 hover:bg-white/10 rounded-2xl text-white font-black uppercase text-xs tracking-wider transition-all border border-white/10 shadow-lg active:scale-95 group/btn"
                   >
-                    {(source === 'challonge' || tournament?.db?.source === 'challonge') ? 'Tabellone' : 'Tabellone su startgg'} <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
+                    {(source === 'challonge' || tournament?.db?.source === 'challonge' || tournament?.db?.direct_link?.includes('challonge.com')) ? 'Tabellone su Challonge' : 'Tabellone su startgg'} <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
                   </button>
                 ) : (
                   <p className="text-yellow-500/50 text-[10px] font-black uppercase tracking-widest">Tabellone non ancora disponibile</p>
