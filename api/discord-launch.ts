@@ -473,7 +473,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    // Salva l'ID del messaggio e dei canali nel DB Supabase mantenendo lo stato 'Programmato'
+    // Salva l'ID del messaggio e dei canali nel DB Supabase ripristinando lo stato 'Programmato'
     if (tournamentId) {
       await supabase
         .from('tournaments')
@@ -492,7 +492,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           regolamento_content: regolamentoContent || null,
           status: 'Programmato'
         })
-        .eq('id', tournamentId);
+        .or(`id.eq.${tournamentId},slug.eq.${tournamentId}`);
     }
 
     return res.status(200).json({ success: true, messageId: messageData.id });

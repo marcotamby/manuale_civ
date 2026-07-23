@@ -476,7 +476,7 @@ function SortableTournamentCard({
                       organizer: t.config?.organizer || '',
                       period: t.config?.period || '',
                       bannerUrl: t.config?.bannerUrl || '',
-                      status: t.config?.status || 'Concluso',
+                      status: t.status || t.config?.status || 'Programmato',
                       name: t.config?.name || t.name || '',
                       type: t.config?.type || '1v1',
                       podium: t.config?.podium || (t.events?.[0]?.standings?.nodes || []),
@@ -1588,15 +1588,17 @@ export function TournamentsPage() {
                 <div className="space-y-2">
                   <label className="text-[10px] text-gray-500 font-bold uppercase ml-1">Stato Torneo</label>
                   <div className="flex gap-2 text-center">
-                    {['Programmato', 'In corso', 'Concluso'].map(s => (
+                    {['Programmato', 'In corso', 'Concluso', 'annullato'].map(s => (
                       <button 
                         key={s} 
+                        type="button"
                         onClick={() => setEditForm({...editForm, status: s})} 
                         className={clsx(
                           "flex-grow py-3 rounded-xl border text-[10px] font-black uppercase transition-all tracking-wider", 
                           editForm.status === s 
                             ? s === 'In corso' ? "bg-green-500/10 border-green-500 text-green-400" :
                               s === 'Programmato' ? "bg-blue-500/10 border-blue-500 text-blue-400" :
+                              s === 'annullato' ? "bg-red-950/40 border-red-500 text-red-400" :
                               "bg-red-500/10 border-red-500 text-red-400"
                             : "bg-white/5 border-white/10 text-gray-500 hover:border-white/20"
                         )}
