@@ -80,12 +80,11 @@ export function TournamentDetail() {
 
         const isStartGGOrChallonge = !!(
           (dbTournament?.direct_link && (dbTournament.direct_link.includes('start.gg') || dbTournament.direct_link.includes('challonge.com'))) ||
-          dbTournament?.source === 'startgg' ||
-          dbTournament?.source === 'challonge'
+          ((dbTournament?.source === 'startgg' || dbTournament?.source === 'challonge') && dbTournament?.direct_link)
         );
 
-        // Se non è un torneo start.gg/challonge ed è gestito dal Bot locale
-        if (!isStartGGOrChallonge && (dbTournament?.discord_channel_id || dbTournament?.auto_bracket)) {
+        // Se non è un torneo start.gg/challonge ed è un torneo locale (dbTournament presente)
+        if (!isStartGGOrChallonge && dbTournament) {
           setLoading(false);
           return;
         }
@@ -353,14 +352,13 @@ export function TournamentDetail() {
       {/* Main Content Area */}
       <main className="flex-1 max-w-full">
         {(() => {
-          // Se il torneo ha un link start.gg o challonge, NON mostrare mai il LocalTournamentBracket Discord
+          // Se il torneo ha un link start.gg o challonge con direct_link valido
           const isExternalBracket = !!(
             (tournament?.db?.direct_link && (
               tournament.db.direct_link.includes('start.gg') ||
               tournament.db.direct_link.includes('challonge.com')
             )) ||
-            tournament?.db?.source === 'startgg' ||
-            tournament?.db?.source === 'challonge'
+            ((tournament?.db?.source === 'startgg' || tournament?.db?.source === 'challonge') && tournament?.db?.direct_link)
           );
 
           if (selectedPhase) {
