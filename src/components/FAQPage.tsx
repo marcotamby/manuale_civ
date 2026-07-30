@@ -150,16 +150,16 @@ function SortableFAQItem({ item, sIdx, iIdx, isEditing, isExpanded, onToggle, on
       ref={setNodeRef}
       style={style}
       {...(isEditing ? { ...attributes, ...listeners } : {})}
-      className={`bg-black/50 backdrop-blur-md p-5 rounded-2xl border border-white/10 hover:border-blue-500/40 transition-all group relative ${!isEditing ? 'cursor-pointer md:cursor-default' : ''} ${!isEditing && isExpanded ? 'border-blue-500/40 bg-black/70' : ''} ${isDragging ? 'shadow-[0_0_25px_rgba(59,130,246,0.4)] z-50' : ''}`}
+      className={`bg-black/50 backdrop-blur-md p-5 rounded-2xl border border-white/10 hover:border-sky-500/40 transition-all group relative ${!isEditing ? 'cursor-pointer md:cursor-default' : ''} ${!isEditing && isExpanded ? 'border-sky-500/40 bg-black/70' : ''} ${isDragging ? 'shadow-[0_0_25px_rgba(56,189,248,0.4)] z-50' : ''}`}
       onClick={() => !isEditing && onToggle()}
     >
       {isEditing && (
         <>
           <div 
-            className="absolute left-3 top-3 p-1 text-blue-400/50 group-hover:text-blue-400 cursor-grab active:cursor-grabbing z-20 transition-colors"
+            className="absolute left-3 top-3 p-1 text-sky-400/50 group-hover:text-sky-400 cursor-grab active:cursor-grabbing z-20 transition-colors"
             title="Trascina qualsiasi punto del box per spostare"
           >
-            <GripVertical size={18} className="drop-shadow-[0_0_5px_rgba(96,165,250,0.5)]" />
+            <GripVertical size={18} className="drop-shadow-[0_0_5px_rgba(56,189,248,0.5)]" />
           </div>
           <button 
             onClick={(e) => {
@@ -180,25 +180,25 @@ function SortableFAQItem({ item, sIdx, iIdx, isEditing, isExpanded, onToggle, on
               <select 
                 value={item.icon_name}
                 onChange={(e) => onUpdate('icon_name', e.target.value)}
-                className="w-full appearance-none bg-black/50 border border-white/10 rounded-lg pl-3 pr-10 py-2 text-sm text-blue-400 focus:border-blue-400 focus:outline-none transition-all cursor-pointer"
+                className="w-full appearance-none bg-black/50 border border-white/10 rounded-lg pl-3 pr-10 py-2 text-sm text-sky-400 focus:border-sky-400 focus:outline-none transition-all cursor-pointer"
               >
                 {['Layers', 'Zap', 'Heart', 'GitPullRequest', 'Users', 'Shield', 'PlayCircle', 'BookOpen', 'Sword', 'Info', 'HelpCircle'].map(icon => (
                   <option key={icon} value={icon} className="bg-[#0d1424] text-white">{icon}</option>
                 ))}
               </select>
-              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-400 pointer-events-none" />
+              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-sky-400 pointer-events-none" />
             </div>
             <input 
               value={item.label}
               onChange={(e) => onUpdate('label', e.target.value)}
-              className="flex-1 bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-base font-bold text-white focus:border-blue-400 focus:outline-none transition-all"
+              className="flex-1 bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-base font-bold text-white focus:border-sky-400 focus:outline-none transition-all"
               placeholder="Titolo elemento"
             />
           </div>
           <textarea 
             value={item.description}
             onChange={(e) => onUpdate('description', e.target.value)}
-            className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-sm text-gray-300 h-32 resize-none focus:border-blue-400 focus:outline-none transition-all leading-relaxed"
+            className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-sm text-gray-300 h-32 resize-none focus:border-sky-400 focus:outline-none transition-all leading-relaxed"
             placeholder="Descrizione dell'elemento..."
           />
         </div>
@@ -206,18 +206,18 @@ function SortableFAQItem({ item, sIdx, iIdx, isEditing, isExpanded, onToggle, on
         <>
           <div className="flex items-center justify-between gap-3 mb-3">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/5 rounded-lg group-hover:bg-blue-500/10 transition-colors text-blue-400 shrink-0">
+              <div className="p-2 bg-white/5 rounded-lg group-hover:bg-sky-500/10 transition-colors text-sky-400 shrink-0">
                  <IconComponent name={item.icon_name} />
               </div>
               <h3 className="font-bold text-white tracking-wide">{item.label}</h3>
             </div>
             <div className="md:hidden">
-              {isExpanded ? <ChevronUp size={16} className="text-blue-400" /> : <ChevronDown size={16} className="text-gray-500" />}
+              {isExpanded ? <ChevronUp size={16} className="text-sky-400" /> : <ChevronDown size={16} className="text-gray-500" />}
             </div>
           </div>
           <div className={`overflow-hidden transition-all duration-300 md:block ${isExpanded ? 'max-h-96 opacity-100 mt-3' : 'max-h-0 opacity-0 md:max-h-96 md:opacity-100'}`}>
             <div 
-              className="text-sm text-gray-400 leading-relaxed border-t border-white/5 pt-3 md:border-0 md:pt-0 prose prose-invert max-w-none [&_a]:text-blue-400 [&_a]:hover:underline [&_a]:transition-colors [&_strong]:text-white [&_b]:text-white"
+              className="text-sm text-gray-400 leading-relaxed border-t border-white/5 pt-3 md:border-0 md:pt-0 prose prose-invert max-w-none [&_a]:text-sky-400 [&_a]:hover:underline [&_a]:transition-colors [&_strong]:text-white [&_b]:text-white"
               dangerouslySetInnerHTML={{ __html: item.description }}
             />
           </div>
@@ -414,7 +414,7 @@ export function FAQPage() {
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center lg:bg-transparent bg-[#0a0a0b]">
-        <Loader2 className="animate-spin text-blue-400" size={40} />
+        <Loader2 className="animate-spin text-sky-400" size={40} />
       </div>
     );
   }
@@ -443,7 +443,7 @@ export function FAQPage() {
         <div className="flex justify-between items-center mb-8">
           <button 
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-blue-400 hover:text-cyan-300 transition-all hover:translate-x-[-4px]"
+            className="flex items-center gap-2 text-sky-400 hover:text-cyan-300 transition-all hover:translate-x-[-4px]"
           >
             <ArrowLeft size={20} />
             <span className="font-sans font-bold uppercase text-xs tracking-widest">Torna alla Home</span>
@@ -465,7 +465,7 @@ export function FAQPage() {
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 text-xs font-bold uppercase tracking-wider shadow-lg disabled:opacity-50 ${
                       isSaveSuccess 
                         ? 'bg-[#00ff9f] text-[#0d1424] shadow-[0_0_25px_rgba(0,255,159,0.8)] scale-110 animate-[pulse_1s_infinite]' 
-                        : 'bg-blue-600 text-white hover:bg-blue-500 shadow-blue-600/20'
+                        : 'bg-sky-500 text-white hover:bg-sky-400 shadow-sky-500/20'
                     }`}
                   >
                     {saveLoading ? <Loader2 className="animate-spin" size={16} /> : isSaveSuccess ? <CheckCircle size={16} className="animate-in zoom-in" /> : <Save size={16} />}
@@ -475,7 +475,7 @@ export function FAQPage() {
               ) : (
                 <button 
                   onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-lg hover:bg-blue-600/30 transition-all text-xs font-bold uppercase tracking-wider"
+                  className="flex items-center gap-2 px-4 py-2 bg-sky-500/20 text-sky-400 border border-sky-500/30 rounded-lg hover:bg-sky-500/30 transition-all text-xs font-bold uppercase tracking-wider"
                 >
                   <Edit3 size={16} /> Modifica FAQ
                 </button>
@@ -497,12 +497,12 @@ export function FAQPage() {
           </div>
 
           <div className="flex items-center gap-4 p-6 md:p-8">
-            <div className="p-2.5 bg-blue-500/10 rounded-2xl border border-blue-500/20 shrink-0">
-              <HelpCircle size={28} className="text-blue-400" />
+            <div className="p-2.5 bg-sky-500/10 rounded-2xl border border-sky-500/20 shrink-0">
+              <HelpCircle size={28} className="text-sky-400" />
             </div>
             
             <div className="flex-1">
-              <h1 className="text-3xl md:text-4xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-500 tracking-tight drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]">
+              <h1 className="text-3xl md:text-4xl font-sackers font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-200 to-cyan-400 tracking-tight drop-shadow-[0_0_15px_rgba(56,189,248,0.4)]">
                 Domande Frequenti
               </h1>
               <p className="text-gray-400 mt-0.5 font-serif italic text-sm md:text-base">Tutto quello che c'è da sapere sul Manuale delle Civiltà</p>
@@ -514,29 +514,29 @@ export function FAQPage() {
           {isEditing ? (
             <div className="space-y-4 relative z-10">
               <div className="relative">
-                <Info size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-400 pointer-events-none" />
+                <Info size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-sky-400 pointer-events-none" />
                 <input 
                   value={intro.title}
                   onChange={(e) => setIntro({ ...intro, title: e.target.value })}
-                  className="w-full bg-black/50 border border-blue-500/30 rounded-lg pl-12 pr-4 py-3 text-2xl font-bold text-white transition-all focus:border-blue-400 focus:outline-none"
+                  className="w-full bg-black/50 border border-sky-500/30 rounded-lg pl-12 pr-4 py-3 text-2xl font-bold text-white transition-all focus:border-sky-400 focus:outline-none"
                   placeholder="Titolo Intro"
                 />
               </div>
               <textarea 
                 value={intro.content}
                 onChange={(e) => setIntro({ ...intro, content: e.target.value })}
-                className="w-full bg-black/50 border border-blue-500/30 rounded-lg px-4 py-3 text-lg leading-relaxed text-gray-300 h-40 resize-none transition-all focus:border-blue-400 focus:outline-none"
+                className="w-full bg-black/50 border border-sky-500/30 rounded-lg px-4 py-3 text-lg leading-relaxed text-gray-300 h-40 resize-none transition-all focus:border-sky-400 focus:outline-none"
                 placeholder="Contenuto Intro"
               />
             </div>
           ) : (
             <>
               <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <Info className="text-blue-400" />
+                <Info className="text-sky-400" />
                 {intro.title}
               </h2>
               <div 
-                className="text-lg leading-relaxed text-gray-300 prose prose-invert max-w-none [&_a]:text-blue-400 [&_a]:hover:underline [&_a]:transition-colors [&_strong]:text-white [&_b]:text-white"
+                className="text-lg leading-relaxed text-gray-300 prose prose-invert max-w-none [&_a]:text-sky-400 [&_a]:hover:underline [&_a]:transition-colors [&_strong]:text-white [&_b]:text-white"
                 dangerouslySetInnerHTML={{ __html: intro.content }}
               />
             </>
@@ -572,7 +572,7 @@ export function FAQPage() {
                       next[sIdx].title = e.target.value;
                       setSections(next);
                     }}
-                    className="flex-1 bg-black/50 border border-blue-500/30 rounded-lg px-4 py-2 text-xl font-bold text-white focus:border-blue-400 focus:outline-none"
+                    className="flex-1 bg-black/50 border border-sky-500/30 rounded-lg px-4 py-2 text-xl font-bold text-white focus:border-sky-400 focus:outline-none"
                   />
                   <div className="relative min-w-[150px]">
                     <select 
@@ -582,18 +582,18 @@ export function FAQPage() {
                         next[sIdx].icon_name = e.target.value;
                         setSections(next);
                       }}
-                      className="w-full appearance-none bg-black/50 border border-blue-500/30 rounded-lg pl-4 pr-10 py-2 text-blue-400 focus:border-blue-400 focus:outline-none transition-all cursor-pointer"
+                      className="w-full appearance-none bg-black/50 border border-sky-500/30 rounded-lg pl-4 pr-10 py-2 text-sky-400 focus:border-sky-400 focus:outline-none transition-all cursor-pointer"
                     >
                       {['Layers', 'Zap', 'Heart', 'GitPullRequest', 'Users', 'Shield', 'PlayCircle', 'BookOpen', 'Sword', 'Info', 'HelpCircle'].map(icon => (
                         <option key={icon} value={icon} className="bg-[#0d1424] text-white">{icon}</option>
                       ))}
                     </select>
-                    <ChevronDown size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-400 pointer-events-none" />
+                    <ChevronDown size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-sky-400 pointer-events-none" />
                   </div>
                 </div>
               ) : (
-                <h2 className="text-xl font-sackers font-bold text-blue-400/80 tracking-widest flex items-center gap-3 border-b border-white/5 pb-2">
-                  <IconComponent name={section.icon_name} className="text-blue-400" />
+                <h2 className="text-xl font-sackers font-bold text-sky-400 tracking-widest flex items-center gap-3 border-b border-white/5 pb-2">
+                  <IconComponent name={section.icon_name} className="text-sky-400" />
                   {section.title}
                 </h2>
               )}
@@ -631,10 +631,10 @@ export function FAQPage() {
                   {isEditing && (
                     <button 
                       onClick={() => handleAddField(sIdx)}
-                      className="flex flex-col items-center justify-center p-5 rounded-2xl border-2 border-dashed border-white/10 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group"
+                      className="flex flex-col items-center justify-center p-5 rounded-2xl border-2 border-dashed border-white/10 hover:border-sky-500/50 hover:bg-sky-500/5 transition-all group"
                     >
-                      <Plus className="text-gray-500 group-hover:text-blue-400 transition-colors mb-2" />
-                      <span className="text-xs font-bold text-gray-500 group-hover:text-blue-400 uppercase">Aggiungi Elemento</span>
+                      <Plus className="text-gray-500 group-hover:text-sky-400 transition-colors mb-2" />
+                      <span className="text-xs font-bold text-gray-500 group-hover:text-sky-400 uppercase">Aggiungi Elemento</span>
                     </button>
                   )}
                 </div>
@@ -645,10 +645,10 @@ export function FAQPage() {
           {isEditing && (
             <button 
               onClick={handleAddSection}
-              className="w-full flex items-center justify-center gap-3 p-6 rounded-3xl border-2 border-dashed border-blue-500/20 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group"
+              className="w-full flex items-center justify-center gap-3 p-6 rounded-3xl border-2 border-dashed border-sky-500/20 hover:border-sky-500/50 hover:bg-sky-500/5 transition-all group"
             >
-              <Plus className="text-blue-400 group-hover:scale-125 transition-transform" />
-              <span className="font-sackers font-bold text-blue-400/80 tracking-widest uppercase">Aggiungi Sezione</span>
+              <Plus className="text-sky-400 group-hover:scale-125 transition-transform" />
+              <span className="font-sackers font-bold text-sky-400 tracking-widest uppercase">Aggiungi Sezione</span>
             </button>
           )}
         </div>
@@ -660,7 +660,7 @@ export function FAQPage() {
           <div className="flex justify-center gap-4">
             <button 
               onClick={() => navigate('/privacy')}
-              className="text-xs text-gray-600 hover:text-blue-400 transition-colors font-medium uppercase tracking-widest"
+              className="text-xs text-gray-600 hover:text-sky-400 transition-colors font-medium uppercase tracking-widest"
             >
               Privacy & Cookie Policy
             </button>

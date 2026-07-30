@@ -141,7 +141,7 @@ export function PrivacyPage() {
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center lg:bg-transparent bg-[#0a0a0b]">
-        <Loader2 className="animate-spin text-blue-400" size={40} />
+        <Loader2 className="animate-spin text-sky-400" size={40} />
       </div>
     );
   }
@@ -157,7 +157,7 @@ export function PrivacyPage() {
         <div className="flex justify-between items-center mb-8">
           <button 
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-blue-400 hover:text-cyan-300 transition-all hover:translate-x-[-4px]"
+            className="flex items-center gap-2 text-sky-400 hover:text-cyan-300 transition-all hover:translate-x-[-4px]"
           >
             <ArrowLeft size={20} />
             <span className="font-sans font-bold uppercase text-xs tracking-widest">Torna alla Home</span>
@@ -166,7 +166,7 @@ export function PrivacyPage() {
           {isSuperAdmin && (
             <button 
               onClick={openModal}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-lg hover:bg-blue-600/30 transition-all text-xs font-bold uppercase tracking-wider animate-pulse hover:animate-none"
+              className="flex items-center gap-2 px-4 py-2 bg-sky-500/20 text-sky-400 border border-sky-500/30 rounded-lg hover:bg-sky-500/30 transition-all text-xs font-bold uppercase tracking-wider animate-pulse hover:animate-none"
             >
               <Edit3 size={16} /> Modifica Privacy
             </button>
@@ -174,31 +174,31 @@ export function PrivacyPage() {
         </div>
 
         {/* Main Content Card */}
-        <div className="bg-[#0f0f0f]/95 backdrop-blur-2xl p-8 rounded-2xl border border-blue-500/30 shadow-2xl shadow-black/50">
-          <h1 className="text-3xl font-bold text-white mb-6 italic font-serif border-b border-blue-500/20 pb-4 flex items-center gap-3">
-            <Shield className="text-blue-400" size={28} />
+        <div className="bg-[#0f0f0f]/95 backdrop-blur-2xl p-8 rounded-2xl border border-sky-500/30 shadow-2xl shadow-black/50">
+          <h1 className="text-3xl font-bold text-white mb-6 italic font-serif border-b border-sky-500/20 pb-4 flex items-center gap-3">
+            <Shield className="text-sky-400" size={28} />
             {title}
           </h1>
           
           <div 
             className="prose prose-invert max-w-none text-sm leading-relaxed space-y-6 text-gray-300
-              [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-blue-400 [&_h2]:mt-8 [&_h2]:mb-4 [&_h2]:border-b [&_h2]:border-white/5 [&_h2]:pb-2
+              [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-sky-400 [&_h2]:mt-8 [&_h2]:mb-4 [&_h2]:border-b [&_h2]:border-white/5 [&_h2]:pb-2
               [&_p]:mb-4
               [&_ul]:list-disc [&_ul]:ml-6 [&_ul]:mt-2 [&_ul]:space-y-2
               [&_li]:mb-1
-              [&_a]:text-blue-400 [&_a]:hover:underline [&_a]:transition-colors
+              [&_a]:text-sky-400 [&_a]:hover:underline [&_a]:transition-colors
               [&_strong]:text-white
-              [&_p.highlight]:mt-4 [&_p.highlight]:p-4 [&_p.highlight]:bg-blue-500/5 [&_p.highlight]:border-l-4 [&_p.highlight]:border-blue-500 [&_p.highlight]:text-white [&_p.highlight]:italic [&_p.highlight]:font-medium [&_p.highlight]:rounded-r-lg"
+              [&_p.highlight]:mt-4 [&_p.highlight]:p-4 [&_p.highlight]:bg-sky-500/10 [&_p.highlight]:border-l-4 [&_p.highlight]:border-sky-400 [&_p.highlight]:text-white [&_p.highlight]:italic [&_p.highlight]:font-medium [&_p.highlight]:rounded-r-lg"
             dangerouslySetInnerHTML={{ __html: content }} 
           />
 
-          <section className="pt-8 border-t border-blue-500/20 mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <section className="pt-8 border-t border-sky-500/20 mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <p className="text-xs text-gray-500 italic flex-1">
               Ultimo aggiornamento effettuato. ManualeCiv è un progetto amatoriale dedicato alla community di Age of Empires IV.
             </p>
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('open-cookie-settings'))}
-              className="text-xs font-bold uppercase tracking-wider text-blue-400 hover:text-cyan-300 transition-colors bg-blue-500/5 hover:bg-blue-500/10 px-4 py-2 rounded-lg border border-blue-500/20 shrink-0 cursor-pointer self-start sm:self-auto"
+              className="text-xs font-bold uppercase tracking-wider text-sky-400 hover:text-cyan-300 transition-colors bg-sky-500/10 hover:bg-sky-500/20 px-4 py-2 rounded-lg border border-sky-500/30 shrink-0 cursor-pointer self-start sm:self-auto"
             >
               Gestisci Cookie
             </button>
@@ -213,13 +213,13 @@ export function PrivacyPage() {
           onClick={() => setIsModalOpen(false)}
         >
           <div 
-            className="bg-[#0f0f0f] border border-blue-500/30 rounded-2xl max-w-4xl w-full max-h-[95vh] flex flex-col shadow-2xl shadow-blue-500/20 animate-in zoom-in-95 duration-200"
+            className="bg-[#0f0f0f] border border-sky-500/30 rounded-2xl max-w-4xl w-full max-h-[95vh] flex flex-col shadow-2xl shadow-sky-500/20 animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/5">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Edit3 className="text-blue-400" size={20} />
+                <Edit3 className="text-sky-400" size={20} />
                 Modifica Privacy & Cookie Policy
               </h2>
               <button 
@@ -239,18 +239,18 @@ export function PrivacyPage() {
               )}
               
               <div className="space-y-1">
-                <label className="text-xs font-bold text-blue-400 uppercase tracking-wider">Titolo Pagina</label>
+                <label className="text-xs font-bold text-sky-400 uppercase tracking-wider">Titolo Pagina</label>
                 <input 
                   type="text"
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
-                  className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-blue-400 focus:outline-none transition-all text-sm font-medium"
+                  className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-sky-400 focus:outline-none transition-all text-sm font-medium"
                   placeholder="Es. Privacy & Cookie Policy"
                 />
               </div>
 
               <div className="space-y-1 flex-1 flex flex-col">
-                <label className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">Contenuto Pagina</label>
+                <label className="text-xs font-bold text-sky-400 uppercase tracking-wider mb-2">Contenuto Pagina</label>
                 <WYSIWYGEditor 
                   initialValue={editContent} 
                   onChange={setEditContent} 
@@ -275,7 +275,7 @@ export function PrivacyPage() {
                 className={`flex items-center justify-center gap-2 px-5 py-2 rounded-lg transition-all duration-300 text-xs font-bold uppercase tracking-wider shadow-lg disabled:opacity-50 min-w-[120px] ${
                   isSaveSuccess 
                     ? 'bg-[#00ff9f] text-[#0d1424] shadow-[0_0_20px_rgba(0,255,159,0.6)] scale-105' 
-                    : 'bg-blue-600 text-white hover:bg-blue-500 shadow-blue-600/20'
+                    : 'bg-sky-500 text-white hover:bg-sky-400 shadow-sky-500/20'
                 }`}
               >
                 {saveLoading ? (
