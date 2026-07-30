@@ -415,7 +415,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
       </div>
 
       {/* 2. Main Header (Title Row) */}
-      <div className={`w-full ${isSpecialPage ? 'lg:bg-transparent lg:border-b-0 lg:shadow-none' : 'bg-[#000000]/80 backdrop-blur-md border-b border-yellow-500/20 shadow-[0_4px_20px_rgba(0,0,0,0.5)]'} flex flex-col items-center px-4 py-3 md:px-14 md:py-4 lg:px-20 lg:pt-6 lg:pb-0 z-[100] shrink-0 gap-3 md:gap-4 relative`}>
+      <div className={`w-full ${isSpecialPage ? 'lg:bg-transparent lg:border-b-0 lg:shadow-none' : 'bg-[#000000]/80 backdrop-blur-md border-b border-yellow-500/20 shadow-[0_4px_20px_rgba(0,0,0,0.5)]'} ${!isHome ? 'hidden md:flex' : 'flex'} flex-col items-center px-4 py-3 md:px-14 md:py-4 lg:px-20 lg:pt-6 lg:pb-0 z-[100] shrink-0 gap-3 md:gap-4 relative`}>
         
         {/* Dynamic Background Layer */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
