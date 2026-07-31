@@ -236,11 +236,9 @@ export function DraftRoomPage() {
         if (player === 'HOST') nextState.hostPicks.push(itemId);
         else nextState.guestPicks.push(itemId);
       } else if (action === 'BAN') {
-        // BAN placed by Host goes under Guest's bans; BAN placed by Guest goes under Host's bans
         if (player === 'HOST') nextState.guestBans.push(itemId);
         else nextState.hostBans.push(itemId);
       } else if (action === 'SNIPE') {
-        // Host SNIPEs one of Guest's picks -> moves from guestPicks to guestSnipes
         if (player === 'HOST') {
           nextState.guestPicks = nextState.guestPicks.filter(id => id !== itemId);
           if (!nextState.guestSnipes.includes(itemId)) nextState.guestSnipes.push(itemId);
@@ -300,17 +298,28 @@ export function DraftRoomPage() {
   }
 
   return (
-    <div className={`min-h-screen ${isOverlayMode ? 'bg-black/95 text-white' : 'bg-transparent text-white'} p-3 sm:p-6 space-y-6 max-w-7xl mx-auto font-sans`}>
+    <div className={`min-h-screen ${isOverlayMode ? 'bg-black/95 text-white' : 'bg-transparent text-white'} p-2.5 sm:p-5 space-y-4 sm:space-y-6 max-w-7xl mx-auto font-sans`}>
       
+      {/* Floating Exit Button for Overlay/Stream Mode */}
+      {isOverlayMode && (
+        <button
+          onClick={() => setIsOverlayMode(false)}
+          className="fixed top-4 right-4 z-[999] flex items-center gap-2 px-4 py-2 bg-purple-950/90 hover:bg-purple-900 text-purple-200 border border-purple-500/50 rounded-2xl text-xs font-extrabold shadow-2xl backdrop-blur-md transition-all"
+        >
+          <X size={16} />
+          <span>Esci da Modalità Stream</span>
+        </button>
+      )}
+
       {/* Role Claim Modal */}
       {!role && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
-          <div className="bg-[#0b101e] border border-slate-700/60 rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-5 shadow-2xl my-auto max-h-[92vh] overflow-y-auto no-scrollbar">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 bg-black/85 backdrop-blur-md overflow-y-auto">
+          <div className="bg-[#0b101e] border border-slate-700/60 rounded-3xl p-5 sm:p-8 max-w-md w-[95%] text-center space-y-5 shadow-2xl my-auto max-h-[92vh] overflow-y-auto no-scrollbar">
             <div className="w-14 h-14 bg-slate-800 border border-slate-700 rounded-2xl flex items-center justify-center mx-auto text-cyan-400">
               <Users size={28} />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white tracking-tight">Scegli il tuo Ruolo in Stanza</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Scegli il tuo Ruolo in Stanza</h2>
               <p className="text-xs text-slate-400 mt-1">Stanza Match: <strong className="text-cyan-400">{room.title}</strong></p>
             </div>
 
@@ -393,22 +402,22 @@ export function DraftRoomPage() {
         </div>
       )}
 
-      {/* Control Top Bar */}
+      {/* Control Top Row - Clean Pill Buttons without Outer Background Box */}
       {!isOverlayMode && (
-        <div className="flex flex-wrap justify-between items-center gap-3 bg-[#0d1222]/80 p-3.5 rounded-2xl border border-slate-700/60 backdrop-blur-xl">
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-extrabold px-3 py-1 rounded-full bg-slate-800 text-cyan-300 border border-slate-700 uppercase tracking-wider">
+        <div className="flex flex-wrap justify-between items-center gap-2 px-1 py-1">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-extrabold px-3 py-1.5 rounded-full bg-[#0b101e] text-cyan-300 border border-slate-700 uppercase tracking-wider">
               {room.title}
             </span>
             <span className="text-xs text-slate-400 hidden sm:inline">
-              Ruolo attuale: <strong className={role === 'HOST' ? 'text-red-400 font-bold' : role === 'GUEST' ? 'text-blue-400 font-bold' : 'text-slate-300'}>{role}</strong>
+              Ruolo: <strong className={role === 'HOST' ? 'text-red-400 font-bold' : role === 'GUEST' ? 'text-blue-400 font-bold' : 'text-slate-300'}>{role}</strong>
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopyShareLink}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold border border-slate-700 transition-all"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0b101e] hover:bg-slate-800 text-slate-200 rounded-xl text-xs font-bold border border-slate-700/80 transition-all shadow-md"
             >
               {copiedLink ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
               <span>{copiedLink ? '✓ Copiato!' : 'Copia Link Stanza'}</span>
@@ -419,14 +428,14 @@ export function DraftRoomPage() {
                 sessionStorage.removeItem(`draft_role_${roomId}`);
                 setRole(null);
               }}
-              className="px-3.5 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold border border-slate-700 transition-all"
+              className="px-3.5 py-1.5 bg-[#0b101e] hover:bg-slate-800 text-slate-300 rounded-xl text-xs font-bold border border-slate-700/80 transition-all shadow-md"
             >
               Cambia Ruolo
             </button>
 
             <button
-              onClick={() => setIsOverlayMode(!isOverlayMode)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-950/60 hover:bg-purple-900/60 text-purple-300 border border-purple-500/40 rounded-xl text-xs font-bold transition-all"
+              onClick={() => setIsOverlayMode(true)}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-purple-950/60 hover:bg-purple-900/60 text-purple-300 border border-purple-500/40 rounded-xl text-xs font-bold transition-all shadow-md"
             >
               <Monitor size={14} />
               <span>Modalità Stream</span>
@@ -435,241 +444,241 @@ export function DraftRoomPage() {
         </div>
       )}
 
-      {/* Main Status Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl p-6 sm:p-7 border border-slate-700/60 bg-[#0b101e] shadow-xl">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+      {/* Main Status Header - No Outer Box Container! Distinct Player Cards Aligned to Sides */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 items-stretch">
 
-          {/* Player 1 Host Header & Larger Flags (BAN / PICK / SNIPE) */}
-          <div className={`md:col-span-4 flex flex-col gap-3 p-4 rounded-2xl border transition-all ${
-            isHostTurn && room.status === 'in_progress' ? 'bg-red-500/10 border-red-500/60 ring-1 ring-red-500/40' : 'bg-slate-950/60 border-slate-800'
-          }`}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-red-600/30 border border-red-500/50 flex items-center justify-center text-red-400 font-extrabold text-sm shrink-0">
-                P1
-              </div>
-              <div className="overflow-hidden">
-                <div className="flex items-center gap-2">
-                  <span className="block text-[10px] font-extrabold text-red-400 uppercase tracking-widest">🔴 Host</span>
-                  {hostReady && <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-emerald-500/20 text-emerald-400 rounded border border-emerald-500/40">READY</span>}
-                </div>
-                <h3 className="text-base font-bold text-white truncate">{room.host_name}</h3>
-              </div>
+        {/* Player 1 Host Card (Distinct Dark Card Aligned Left) */}
+        <div className={`md:col-span-4 flex flex-col justify-between gap-3 p-4 sm:p-5 rounded-3xl border transition-all shadow-xl ${
+          isHostTurn && room.status === 'in_progress' ? 'bg-[#0c1224] border-red-500/80 ring-2 ring-red-500/50' : 'bg-[#090e1a]/95 border-slate-800/90'
+        }`}>
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-red-600/30 border border-red-500/50 flex items-center justify-center text-red-400 font-extrabold text-base shrink-0 shadow-md">
+              P1
             </div>
-
-            {/* Picked / Banned / Sniped Flags Rows under Name (Identical Larger Size w-11 h-11) */}
-            <div className="space-y-2 pt-2 border-t border-slate-800/80">
+            <div className="overflow-hidden">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-extrabold text-red-400 uppercase w-12 shrink-0">BAN</span>
-                <div className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
-                  {state.hostBans && state.hostBans.length > 0 ? (
-                    state.hostBans.map(id => {
-                      const c = getCivObj(id);
-                      return (
-                        <img key={`hban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-11 h-11 object-cover rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md" />
-                      );
-                    })
-                  ) : (
-                    <span className="text-[11px] text-slate-600 italic">-</span>
-                  )}
-                </div>
+                <span className="block text-[10px] font-extrabold text-red-400 uppercase tracking-widest">🔴 Host</span>
+                {hostReady && <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-emerald-500/20 text-emerald-400 rounded border border-emerald-500/40">READY</span>}
               </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-extrabold text-emerald-400 uppercase w-12 shrink-0">PICK</span>
-                <div className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
-                  {state.hostPicks && state.hostPicks.length > 0 ? (
-                    state.hostPicks.map(id => {
-                      const c = getCivObj(id);
-                      return (
-                        <img key={`hpick-${id}`} src={c.flag} alt={c.name} title={`PICK: ${c.name}`} className="w-11 h-11 object-cover rounded-xl border-2 border-emerald-500 shadow-md shadow-emerald-950/40" />
-                      );
-                    })
-                  ) : (
-                    <span className="text-[11px] text-slate-600 italic">-</span>
-                  )}
-                </div>
-              </div>
-
-              {state.hostSnipes && state.hostSnipes.length > 0 && (
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-extrabold text-purple-400 uppercase w-12 shrink-0">SNIPE</span>
-                  <div className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
-                    {state.hostSnipes.map(id => {
-                      const c = getCivObj(id);
-                      return (
-                        <img key={`hsnipe-${id}`} src={c.flag} alt={c.name} title={`SNIPE: ${c.name}`} className="w-11 h-11 object-cover rounded-xl border-2 border-purple-500/80 opacity-85 shadow-md" />
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+              {/* Larger Player Name Font */}
+              <h3 className="text-xl sm:text-2xl font-extrabold text-white truncate tracking-tight">{room.host_name}</h3>
             </div>
           </div>
 
-          {/* Center Status / Timer */}
-          <div className="md:col-span-4 text-center space-y-3">
-            {room.status === 'waiting' && (
-              <div className="space-y-3">
-                <span className="inline-block px-3 py-1 bg-slate-800 text-slate-300 border border-slate-700 rounded-full text-xs font-bold uppercase tracking-wider">
-                  In Attesa dei Giocatori
-                </span>
-                
-                <div className="flex justify-center gap-3 py-1 text-xs font-bold">
-                  <span className={hostReady ? 'text-emerald-400' : 'text-red-400'}>
-                    🔴 Host: {hostReady ? 'PRONTO ✓' : 'NON PRONTO'}
-                  </span>
-                  <span className={guestReady ? 'text-emerald-400' : 'text-blue-400'}>
-                    🔵 Guest: {guestReady ? 'PRONTO ✓' : 'NON PRONTO'}
-                  </span>
-                </div>
-
-                {(role === 'HOST' || role === 'GUEST') && (
-                  <button
-                    onClick={handleToggleReady}
-                    className={`px-6 py-2.5 rounded-xl font-bold text-xs tracking-wider uppercase transition-all shadow-md ${
-                      (role === 'HOST' && hostReady) || (role === 'GUEST' && guestReady)
-                        ? 'bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700'
-                        : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-900/30'
-                    }`}
-                  >
-                    {(role === 'HOST' && hostReady) || (role === 'GUEST' && guestReady)
-                      ? 'ANNULLA PRONTO'
-                      : 'SONO PRONTO (Ready)'}
-                  </button>
+          {/* Picked / Banned / Sniped Flags Rows */}
+          <div className="space-y-2.5 pt-2.5 border-t border-slate-800/80">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-extrabold text-red-400 uppercase w-12 shrink-0">BAN</span>
+              <div className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
+                {state.hostBans && state.hostBans.length > 0 ? (
+                  state.hostBans.map(id => {
+                    const c = getCivObj(id);
+                    return (
+                      <img key={`hban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md" />
+                    );
+                  })
+                ) : (
+                  <span className="text-xs text-slate-600 italic">-</span>
                 )}
               </div>
-            )}
+            </div>
 
-            {room.status === 'in_progress' && currentTurn && (
-              <div className="space-y-3">
-                <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  Step {room.current_step + 1} di {turns.length} • Turno {currentTurn.player === 'HOST' ? 'Host' : 'Guest'}
-                </div>
-
-                <div className={`px-4 py-2 rounded-xl border text-sm font-bold tracking-tight inline-block ${
-                  isMyTurn
-                    ? 'bg-slate-800 text-cyan-300 border-cyan-500/50'
-                    : 'bg-slate-900 text-slate-300 border-slate-800'
-                }`}>
-                  {isMyTurn ? (
-                    `Il tuo Turno: ${
-                      currentTurn.action === 'BAN'
-                        ? 'Banna 1 civiltà all\'avversario'
-                        : currentTurn.action === 'SNIPE'
-                        ? 'Snippa 1 civiltà tra i pick dell\'avversario'
-                        : 'Seleziona 1 civiltà per te'
-                    }`
-                  ) : (
-                    `Turno di ${currentTurn.player === 'HOST' ? room.host_name : room.guest_name} (${currentTurn.action})`
-                  )}
-                </div>
-
-                {/* Timer Bar */}
-                <div className="w-full max-w-xs mx-auto space-y-1">
-                  <div className="flex justify-between items-center text-xs font-bold text-slate-400">
-                    <span className="flex items-center gap-1"><Clock size={13} className="text-cyan-400" /> Tempo</span>
-                    <span className={timeLeft <= 5 ? 'text-red-400 font-bold' : 'text-cyan-400'}>{timeLeft}s</span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
-                    <div
-                      className={`h-full transition-all duration-1000 ${
-                        timeLeft <= 5 ? 'bg-red-500' : timeLeft <= 10 ? 'bg-amber-400' : 'bg-cyan-400'
-                      }`}
-                      style={{ width: `${(timeLeft / 30) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {room.status === 'completed' && (
-              <div className="space-y-1.5">
-                <Trophy className="mx-auto text-cyan-400" size={32} />
-                <h2 className="text-xl font-bold text-white tracking-tight">DRAFT COMPLETATO</h2>
-                <p className="text-xs text-slate-400">Tutti i turni del match sono stati effettuati.</p>
-              </div>
-            )}
-          </div>
-
-          {/* Player 2 Guest Header & Larger Flags (BAN / PICK / SNIPE) */}
-          <div className={`md:col-span-4 flex flex-col gap-3 p-4 rounded-2xl border transition-all ${
-            isGuestTurn && room.status === 'in_progress' ? 'bg-blue-500/10 border-blue-500/60 ring-1 ring-blue-500/40' : 'bg-slate-950/60 border-slate-800'
-          }`}>
-            <div className="flex items-center justify-end gap-3 text-right">
-              <div className="overflow-hidden">
-                <div className="flex items-center justify-end gap-2">
-                  {guestReady && <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-emerald-500/20 text-emerald-400 rounded border border-emerald-500/40">READY</span>}
-                  <span className="block text-[10px] font-extrabold text-blue-400 uppercase tracking-widest">🔵 Guest</span>
-                </div>
-                <h3 className="text-base font-bold text-white truncate">{room.guest_name}</h3>
-              </div>
-              <div className="w-10 h-10 rounded-xl bg-blue-600/30 border border-blue-500/50 flex items-center justify-center text-blue-400 font-extrabold text-sm shrink-0">
-                P2
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-extrabold text-emerald-400 uppercase w-12 shrink-0">PICK</span>
+              <div className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
+                {state.hostPicks && state.hostPicks.length > 0 ? (
+                  state.hostPicks.map(id => {
+                    const c = getCivObj(id);
+                    return (
+                      <img key={`hpick-${id}`} src={c.flag} alt={c.name} title={`PICK: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-emerald-500 shadow-md shadow-emerald-950/40" />
+                    );
+                  })
+                ) : (
+                  <span className="text-xs text-slate-600 italic">-</span>
+                )}
               </div>
             </div>
 
-            {/* Picked / Banned / Sniped Flags Rows under Name (Identical Larger Size w-11 h-11) */}
-            <div className="space-y-2 pt-2 border-t border-slate-800/80">
-              <div className="flex items-center justify-end gap-2">
-                <div className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
-                  {state.guestBans && state.guestBans.length > 0 ? (
-                    state.guestBans.map(id => {
-                      const c = getCivObj(id);
-                      return (
-                        <img key={`gban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-11 h-11 object-cover rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md" />
-                      );
-                    })
-                  ) : (
-                    <span className="text-[11px] text-slate-600 italic">-</span>
-                  )}
+            {state.hostSnipes && state.hostSnipes.length > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-extrabold text-purple-400 uppercase w-12 shrink-0">SNIPE</span>
+                <div className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
+                  {state.hostSnipes.map(id => {
+                    const c = getCivObj(id);
+                    return (
+                      <img key={`hsnipe-${id}`} src={c.flag} alt={c.name} title={`SNIPE: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-purple-500/80 opacity-85 shadow-md" />
+                    );
+                  })}
                 </div>
-                <span className="text-[10px] font-extrabold text-red-400 uppercase w-12 shrink-0 text-right">BAN</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Center Status / Timer Column (No Background Box!) */}
+        <div className="md:col-span-4 flex flex-col items-center justify-center text-center p-2 space-y-3">
+          {room.status === 'waiting' && (
+            <div className="space-y-3">
+              <span className="inline-block px-3 py-1 bg-[#0b101e] text-slate-300 border border-slate-700/80 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
+                In Attesa dei Giocatori
+              </span>
+              
+              <div className="flex justify-center gap-3 py-1 text-xs font-bold">
+                <span className={hostReady ? 'text-emerald-400' : 'text-red-400'}>
+                  🔴 Host: {hostReady ? 'PRONTO ✓' : 'NON PRONTO'}
+                </span>
+                <span className={guestReady ? 'text-emerald-400' : 'text-blue-400'}>
+                  🔵 Guest: {guestReady ? 'PRONTO ✓' : 'NON PRONTO'}
+                </span>
               </div>
 
-              <div className="flex items-center justify-end gap-2">
-                <div className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
-                  {state.guestPicks && state.guestPicks.length > 0 ? (
-                    state.guestPicks.map(id => {
-                      const c = getCivObj(id);
-                      return (
-                        <img key={`gpick-${id}`} src={c.flag} alt={c.name} title={`PICK: ${c.name}`} className="w-11 h-11 object-cover rounded-xl border-2 border-emerald-500 shadow-md shadow-emerald-950/40" />
-                      );
-                    })
-                  ) : (
-                    <span className="text-[11px] text-slate-600 italic">-</span>
-                  )}
-                </div>
-                <span className="text-[10px] font-extrabold text-emerald-400 uppercase w-12 shrink-0 text-right">PICK</span>
-              </div>
-
-              {state.guestSnipes && state.guestSnipes.length > 0 && (
-                <div className="flex items-center justify-end gap-2">
-                  <div className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
-                    {state.guestSnipes.map(id => {
-                      const c = getCivObj(id);
-                      return (
-                        <img key={`gsnipe-${id}`} src={c.flag} alt={c.name} title={`SNIPE: ${c.name}`} className="w-11 h-11 object-cover rounded-xl border-2 border-purple-500/80 opacity-85 shadow-md" />
-                      );
-                    })}
-                  </div>
-                  <span className="text-[10px] font-extrabold text-purple-400 uppercase w-12 shrink-0 text-right">SNIPE</span>
-                </div>
+              {(role === 'HOST' || role === 'GUEST') && (
+                <button
+                  onClick={handleToggleReady}
+                  className={`px-7 py-3 rounded-2xl font-extrabold text-xs tracking-wider uppercase transition-all shadow-lg ${
+                    (role === 'HOST' && hostReady) || (role === 'GUEST' && guestReady)
+                      ? 'bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700'
+                      : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-900/30'
+                  }`}
+                >
+                  {(role === 'HOST' && hostReady) || (role === 'GUEST' && guestReady)
+                    ? 'ANNULLA PRONTO'
+                    : 'SONO PRONTO (Ready)'}
+                </button>
               )}
             </div>
+          )}
+
+          {room.status === 'in_progress' && currentTurn && (
+            <div className="space-y-3 w-full">
+              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                Step {room.current_step + 1} di {turns.length} • Turno {currentTurn.player === 'HOST' ? 'Host' : 'Guest'}
+              </div>
+
+              <div className={`px-4 py-2 rounded-2xl border text-sm font-bold tracking-tight inline-block shadow-md ${
+                isMyTurn
+                  ? 'bg-slate-800 text-cyan-300 border-cyan-500/50'
+                  : 'bg-[#090e1a] text-slate-300 border-slate-800'
+              }`}>
+                {isMyTurn ? (
+                  `Il tuo Turno: ${
+                    currentTurn.action === 'BAN'
+                      ? 'Banna 1 civiltà all\'avversario'
+                      : currentTurn.action === 'SNIPE'
+                      ? 'Snippa 1 civiltà tra i pick dell\'avversario'
+                      : 'Seleziona 1 civiltà per te'
+                  }`
+                ) : (
+                  `Turno di ${currentTurn.player === 'HOST' ? room.host_name : room.guest_name} (${currentTurn.action})`
+                )}
+              </div>
+
+              {/* Timer Bar */}
+              <div className="w-full max-w-xs mx-auto space-y-1">
+                <div className="flex justify-between items-center text-xs font-bold text-slate-400">
+                  <span className="flex items-center gap-1"><Clock size={13} className="text-cyan-400" /> Tempo</span>
+                  <span className={timeLeft <= 5 ? 'text-red-400 font-bold' : 'text-cyan-400'}>{timeLeft}s</span>
+                </div>
+                <div className="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                  <div
+                    className={`h-full transition-all duration-1000 ${
+                      timeLeft <= 5 ? 'bg-red-500' : timeLeft <= 10 ? 'bg-amber-400' : 'bg-cyan-400'
+                    }`}
+                    style={{ width: `${(timeLeft / 30) * 100}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {room.status === 'completed' && (
+            <div className="space-y-1.5">
+              <Trophy className="mx-auto text-cyan-400" size={32} />
+              <h2 className="text-xl font-extrabold text-white tracking-tight">DRAFT COMPLETATO</h2>
+              <p className="text-xs text-slate-400">Tutti i turni del match sono stati effettuati.</p>
+            </div>
+          )}
+        </div>
+
+        {/* Player 2 Guest Card (Distinct Dark Card Aligned Right) */}
+        <div className={`md:col-span-4 flex flex-col justify-between gap-3 p-4 sm:p-5 rounded-3xl border transition-all shadow-xl ${
+          isGuestTurn && room.status === 'in_progress' ? 'bg-[#0c1224] border-blue-500/80 ring-2 ring-blue-500/50' : 'bg-[#090e1a]/95 border-slate-800/90'
+        }`}>
+          <div className="flex items-center justify-end gap-3 text-right">
+            <div className="overflow-hidden">
+              <div className="flex items-center justify-end gap-2">
+                {guestReady && <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-emerald-500/20 text-emerald-400 rounded border border-emerald-500/40">READY</span>}
+                <span className="block text-[10px] font-extrabold text-blue-400 uppercase tracking-widest">🔵 Guest</span>
+              </div>
+              {/* Larger Player Name Font */}
+              <h3 className="text-xl sm:text-2xl font-extrabold text-white truncate tracking-tight">{room.guest_name}</h3>
+            </div>
+            <div className="w-11 h-11 rounded-2xl bg-blue-600/30 border border-blue-500/50 flex items-center justify-center text-blue-400 font-extrabold text-base shrink-0 shadow-md">
+              P2
+            </div>
           </div>
 
+          {/* Picked / Banned / Sniped Flags Rows */}
+          <div className="space-y-2.5 pt-2.5 border-t border-slate-800/80">
+            <div className="flex items-center justify-end gap-2">
+              <div className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
+                {state.guestBans && state.guestBans.length > 0 ? (
+                  state.guestBans.map(id => {
+                    const c = getCivObj(id);
+                    return (
+                      <img key={`gban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md" />
+                    );
+                  })
+                ) : (
+                  <span className="text-xs text-slate-600 italic">-</span>
+                )}
+              </div>
+              <span className="text-[10px] font-extrabold text-red-400 uppercase w-12 shrink-0 text-right">BAN</span>
+            </div>
+
+            <div className="flex items-center justify-end gap-2">
+              <div className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
+                {state.guestPicks && state.guestPicks.length > 0 ? (
+                  state.guestPicks.map(id => {
+                    const c = getCivObj(id);
+                    return (
+                      <img key={`gpick-${id}`} src={c.flag} alt={c.name} title={`PICK: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-emerald-500 shadow-md shadow-emerald-950/40" />
+                    );
+                  })
+                ) : (
+                  <span className="text-xs text-slate-600 italic">-</span>
+                )}
+              </div>
+              <span className="text-[10px] font-extrabold text-emerald-400 uppercase w-12 shrink-0 text-right">PICK</span>
+            </div>
+
+            {state.guestSnipes && state.guestSnipes.length > 0 && (
+              <div className="flex items-center justify-end gap-2">
+                <div className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
+                  {state.guestSnipes.map(id => {
+                    const c = getCivObj(id);
+                    return (
+                      <img key={`gsnipe-${id}`} src={c.flag} alt={c.name} title={`SNIPE: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-purple-500/80 opacity-85 shadow-md" />
+                    );
+                  })}
+                </div>
+                <span className="text-[10px] font-extrabold text-purple-400 uppercase w-12 shrink-0 text-right">SNIPE</span>
+              </div>
+            )}
+          </div>
         </div>
+
       </div>
 
-      {/* Main Pick/Ban/Snipe Grid for Civilizations */}
+      {/* Main Pick/Ban/Snipe Grid for Civilizations - 100% Mobile Optimized */}
       {(!currentTurn || currentTurn.target === 'CIV') && (
-        <div className="space-y-3">
-          <div className="flex justify-between items-center">
+        <div className="space-y-3 pt-2">
+          <div className="flex justify-between items-center px-1">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
               <Swords size={16} className="text-cyan-400" /> Civiltà Disponibili
             </h3>
             {isMyTurn && room.status === 'in_progress' && (
-              <span className="text-xs font-bold text-cyan-400">
+              <span className="text-xs font-bold text-cyan-400 hidden sm:inline">
                 {currentTurn?.action === 'SNIPE'
                   ? 'Clicca su una civiltà dell\'avversario per effettuare lo SNIPE'
                   : 'Clicca su una civiltà per selezionarla'}
@@ -677,7 +686,7 @@ export function DraftRoomPage() {
             )}
           </div>
 
-          <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-11 gap-2.5">
+          <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-11 gap-2 sm:gap-2.5">
             {civilizationsData.map((civ) => {
               const isHostPick = state.hostPicks?.includes(civ.id);
               const isGuestPick = state.guestPicks?.includes(civ.id);
@@ -693,7 +702,6 @@ export function DraftRoomPage() {
               let isClickable = false;
               if (isMyTurn && room.status === 'in_progress') {
                 if (isSnipeTurn) {
-                  // Host snipes guest's picks; Guest snipes host's picks
                   isClickable = currentTurn.player === 'HOST' ? isGuestPick : isHostPick;
                 } else {
                   isClickable = !isUsed;
@@ -748,13 +756,13 @@ export function DraftRoomPage() {
                   )}
                   {(isHostSnipe || isGuestSnipe) && (
                     <div className="absolute inset-0 bg-purple-950/75 flex flex-col items-center justify-center gap-0.5 text-purple-200 backdrop-blur-[1px]">
-                      <Target size={26} className="stroke-[2.5]" />
+                      <Target size={24} className="stroke-[2.5]" />
                       <span className="text-[9px] font-extrabold uppercase tracking-wider">SNIPED</span>
                     </div>
                   )}
                   {(isHostBan || isGuestBan) && (
                     <div className="absolute inset-0 bg-black/65 flex flex-col items-center justify-center gap-0.5 text-red-400 backdrop-blur-[1px]">
-                      <X size={28} className="stroke-[3]" />
+                      <X size={26} className="stroke-[3]" />
                       <span className="text-[9px] font-extrabold uppercase tracking-wider">BANNED</span>
                     </div>
                   )}
@@ -767,19 +775,19 @@ export function DraftRoomPage() {
 
       {/* Main Pick/Ban Grid for Maps */}
       {currentTurn && currentTurn.target === 'MAP' && (
-        <div className="space-y-3">
-          <div className="flex justify-between items-center">
+        <div className="space-y-3 pt-2">
+          <div className="flex justify-between items-center px-1">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
               <Monitor size={16} className="text-cyan-400" /> Mappe Disponibili
             </h3>
             {isMyTurn && room.status === 'in_progress' && (
-              <span className="text-xs font-bold text-cyan-400">
+              <span className="text-xs font-bold text-cyan-400 hidden sm:inline">
                 Clicca su una mappa per selezionare
               </span>
             )}
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
             {AOE4_MAPS.slice(0, 24).map((mapName) => {
               const isMapPicked = state.mapPicks?.includes(mapName);
               const isMapBanned = state.mapBans?.includes(mapName);
