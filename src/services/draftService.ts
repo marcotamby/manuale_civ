@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabaseClient';
 
 export type TurnPlayer = 'HOST' | 'GUEST';
-export type TurnAction = 'BAN' | 'PICK';
+export type TurnAction = 'BAN' | 'PICK' | 'SNIPE';
 export type TurnTarget = 'CIV' | 'MAP';
 
 export interface DraftTurn {
@@ -29,6 +29,10 @@ export interface DraftState {
   guestPicks: string[];
   hostBans: string[];
   guestBans: string[];
+  hostSnipes: string[];
+  guestSnipes: string[];
+  hostReady?: boolean;
+  guestReady?: boolean;
   mapPicks: string[];
   mapBans: string[];
 }
@@ -59,7 +63,6 @@ export function generateDraftId(length = 7): string {
 }
 
 export const draftService = {
-  // Preset management
   async getPresets(): Promise<DraftPreset[]> {
     const { data, error } = await supabase
       .from('draft_presets')
@@ -67,7 +70,7 @@ export const draftService = {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.warn('Error fetching draft presets from Supabase, using local fallback if needed:', error);
+      console.warn('Error fetching draft presets from Supabase:', error);
       return [];
     }
     return data || [];
@@ -122,7 +125,6 @@ export const draftService = {
     return true;
   },
 
-  // Room management
   async createRoom(preset: DraftPreset, hostName = 'Giocatore 1', guestName = 'Giocatore 2'): Promise<DraftRoom> {
     const roomId = generateDraftId(7);
     const roomPayload: Partial<DraftRoom> = {
@@ -138,6 +140,10 @@ export const draftService = {
         guestPicks: [],
         hostBans: [],
         guestBans: [],
+        hostSnipes: [],
+        guestSnipes: [],
+        hostReady: false,
+        guestReady: false,
         mapPicks: [],
         mapBans: []
       },
@@ -152,7 +158,6 @@ export const draftService = {
 
     if (error) {
       console.error('Error creating draft room in Supabase:', error);
-      // Fallback local session if table not present yet
       return { ...roomPayload, preset } as DraftRoom;
     }
 

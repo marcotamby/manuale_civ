@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Swords, Users, Shield, Clock, Eye, Check, X, RefreshCcw, Copy, Monitor, Trophy } from 'lucide-react';
+import { Swords, Users, Shield, Clock, Eye, Check, X, RefreshCcw, Copy, Monitor, Trophy, Target, Zap } from 'lucide-react';
 import { draftService } from '../services/draftService';
 import type { DraftRoom, DraftTurn } from '../services/draftService';
 import { civilizationsData } from '../data/aoe4Data';
@@ -62,27 +62,63 @@ export function DraftRoomPage() {
     }
   };
 
-  // Get current turn info
+  // Turn details
   const turns: DraftTurn[] = room?.preset?.turns || [];
-  const currentTurn: DraftTurn | undefined = turns[room?.current_step || 0];
+  const currentStep = room?.current_step || 0;
+  const currentTurn: DraftTurn | undefined = turns[currentStep];
 
   const isHostTurn = currentTurn?.player === 'HOST';
   const isGuestTurn = currentTurn?.player === 'GUEST';
   const isMyTurn = (role === 'HOST' && isHostTurn) || (role === 'GUEST' && isGuestTurn);
 
-  // List of already picked/banned civs and maps
-  const state = room?.state || { hostPicks: [], guestPicks: [], hostBans: [], guestBans: [], mapPicks: [], mapBans: [] };
+  // State arrays
+  const state = room?.state || {
+    hostPicks: [],
+    guestPicks: [],
+    hostBans: [],
+    guestBans: [],
+    hostSnipes: [],
+    guestSnipes: [],
+    hostReady: false,
+    guestReady: false,
+    mapPicks: [],
+    mapBans: []
+  };
+
+  const hostReady = !!state.hostReady;
+  const guestReady = !!state.guestReady;
+
   const allUsedCivs = useMemo(() => [
-    ...state.hostPicks,
-    ...state.guestPicks,
-    ...state.hostBans,
-    ...state.guestBans
+    ...(state.hostPicks || []),
+    ...(state.guestPicks || []),
+    ...(state.hostBans || []),
+    ...(state.guestBans || []),
+    ...(state.hostSnipes || []),
+    ...(state.guestSnipes || [])
   ], [state]);
 
   const allUsedMaps = useMemo(() => [
-    ...state.mapPicks,
-    ...state.mapBans
+    ...(state.mapPicks || []),
+    ...(state.mapBans || [])
   ], [state]);
+
+  // Handle Ready Toggle
+  const handleToggleReady = async () => {
+    if (!room) return;
+    const nextState = { ...state };
+    if (role === 'HOST') nextState.hostReady = !hostReady;
+    if (role === 'GUEST') nextState.guestReady = !guestReady;
+
+    const bothReady = nextState.hostReady && nextState.guestReady;
+
+    const updated = await draftService.updateRoom(room.id, {
+      state: nextState,
+      status: bothReady ? 'in_progress' : room.status,
+      current_step: bothReady ? 0 : room.current_step
+    });
+
+    if (updated) setRoom(updated);
+  };
 
   // Timer Countdown logic (30 seconds per turn)
   useEffect(() => {
@@ -110,7 +146,7 @@ export function DraftRoomPage() {
     };
   }, [room?.current_step, room?.status, isMyTurn]);
 
-  // Handle random action on timeout
+  // Random action on timeout
   const handleAutoRandomAction = () => {
     if (!currentTurn || !room) return;
 
@@ -129,21 +165,22 @@ export function DraftRoomPage() {
     }
   };
 
-  // Start Draft (Move status from waiting to in_progress)
-  const handleStartDraft = async () => {
-    if (!room) return;
-    const updated = await draftService.updateRoom(room.id, {
-      status: 'in_progress',
-      current_step: 0
-    });
-    if (updated) setRoom(updated);
-  };
-
-  // Execute Pick or Ban action
+  // Execute Pick, Ban, or Snipe action
   const executeAction = async (itemId: string) => {
     if (!room || !currentTurn) return;
 
-    const nextState = { ...room.state };
+    const nextState = {
+      ...state,
+      hostPicks: [...(state.hostPicks || [])],
+      guestPicks: [...(state.guestPicks || [])],
+      hostBans: [...(state.hostBans || [])],
+      guestBans: [...(state.guestBans || [])],
+      hostSnipes: [...(state.hostSnipes || [])],
+      guestSnipes: [...(state.guestSnipes || [])],
+      mapPicks: [...(state.mapPicks || [])],
+      mapBans: [...(state.mapBans || [])]
+    };
+
     const player = currentTurn.player;
     const action = currentTurn.action;
     const target = currentTurn.target;
@@ -155,6 +192,9 @@ export function DraftRoomPage() {
       } else if (action === 'BAN') {
         if (player === 'HOST') nextState.hostBans.push(itemId);
         else nextState.guestBans.push(itemId);
+      } else if (action === 'SNIPE') {
+        if (player === 'HOST') nextState.hostSnipes.push(itemId);
+        else nextState.guestSnipes.push(itemId);
       }
     } else if (target === 'MAP') {
       if (action === 'PICK') {
@@ -188,8 +228,8 @@ export function DraftRoomPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[80vh] flex flex-col items-center justify-center text-gray-300 gap-3">
-        <RefreshCcw className="animate-spin text-yellow-500" size={36} />
+      <div className="min-h-[80vh] flex flex-col items-center justify-center text-slate-300 gap-3">
+        <RefreshCcw className="animate-spin text-cyan-400" size={36} />
         <p className="font-semibold text-lg">Caricamento Stanza Draft...</p>
       </div>
     );
@@ -199,8 +239,8 @@ export function DraftRoomPage() {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center text-center p-6">
         <h2 className="text-2xl font-bold text-red-400 mb-2">Stanza Non Trovata</h2>
-        <p className="text-gray-400 mb-6">La stanza draft non esiste o è scaduta.</p>
-        <button onClick={() => navigate('/')} className="px-6 py-2 bg-yellow-500 text-black font-bold rounded-xl">
+        <p className="text-slate-400 mb-6">La stanza draft non esiste o è scaduta.</p>
+        <button onClick={() => navigate('/')} className="px-6 py-2 bg-slate-200 text-black font-bold rounded-xl">
           Torna alla Home
         </button>
       </div>
@@ -218,16 +258,16 @@ export function DraftRoomPage() {
         />
       )}
 
-      {/* Role Selection Modal (No PIN, simple choice) */}
+      {/* Role Selection Modal */}
       {!role && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 border border-yellow-500/40 rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-6 shadow-2xl">
-            <div className="w-16 h-16 bg-yellow-500/10 border border-yellow-500/30 rounded-2xl flex items-center justify-center mx-auto text-yellow-400">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#0b101e] border border-slate-700/60 rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-6 shadow-2xl">
+            <div className="w-16 h-16 bg-slate-800 border border-slate-700 rounded-2xl flex items-center justify-center mx-auto text-cyan-400">
               <Users size={32} />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-white">Scegli il tuo Ruolo</h2>
-              <p className="text-sm text-gray-400 mt-1">Stanza Match: <strong className="text-yellow-400">{room.title}</strong></p>
+              <p className="text-sm text-slate-400 mt-1">Stanza Match: <strong className="text-cyan-400">{room.title}</strong></p>
             </div>
 
             <div className="space-y-3">
@@ -249,7 +289,7 @@ export function DraftRoomPage() {
 
               <button
                 onClick={() => handleSelectRole('SPECTATOR')}
-                className="w-full py-3.5 px-4 bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 font-bold rounded-2xl flex items-center justify-between transition-all"
+                className="w-full py-3.5 px-4 bg-slate-800/80 hover:bg-slate-800 text-slate-300 border border-slate-700 font-bold rounded-2xl flex items-center justify-between transition-all"
               >
                 <span>👁️ Entra come Spettatore / Streamer</span>
                 <Eye size={18} />
@@ -261,20 +301,20 @@ export function DraftRoomPage() {
 
       {/* Control Top Bar */}
       {!isOverlayMode && (
-        <div className="flex flex-wrap justify-between items-center gap-3 bg-gray-900/60 p-3.5 rounded-2xl border border-white/10 backdrop-blur-md">
+        <div className="flex flex-wrap justify-between items-center gap-3 bg-[#0d1222]/80 p-3.5 rounded-2xl border border-slate-700/60 backdrop-blur-xl">
           <div className="flex items-center gap-3">
-            <span className="text-xs font-bold px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 uppercase tracking-wider">
+            <span className="text-xs font-extrabold px-3 py-1 rounded-full bg-slate-800 text-cyan-300 border border-slate-700 uppercase tracking-wider">
               {room.title}
             </span>
-            <span className="text-xs text-gray-400 hidden sm:inline">
-              Ruolo attuale: <strong className={role === 'HOST' ? 'text-red-400' : role === 'GUEST' ? 'text-blue-400' : 'text-gray-300'}>{role}</strong>
+            <span className="text-xs text-slate-400 hidden sm:inline">
+              Ruolo attuale: <strong className={role === 'HOST' ? 'text-red-400 font-bold' : role === 'GUEST' ? 'text-blue-400 font-bold' : 'text-slate-300'}>{role}</strong>
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopyShareLink}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-gray-200 rounded-xl text-xs font-bold border border-white/10 transition-all"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold border border-slate-700 transition-all"
             >
               {copiedLink ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
               <span>{copiedLink ? 'Copiato!' : 'Copia Link Stanza'}</span>
@@ -282,14 +322,14 @@ export function DraftRoomPage() {
 
             <button
               onClick={() => handleSelectRole(role === 'HOST' ? 'GUEST' : role === 'GUEST' ? 'SPECTATOR' : 'HOST')}
-              className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-gray-300 rounded-xl text-xs font-bold border border-white/10 transition-all"
+              className="px-3.5 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold border border-slate-700 transition-all"
             >
               Cambia Ruolo
             </button>
 
             <button
               onClick={() => setIsOverlayMode(!isOverlayMode)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 rounded-xl text-xs font-bold transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-950/60 hover:bg-purple-900/60 text-purple-300 border border-purple-500/40 rounded-xl text-xs font-bold transition-all"
             >
               <Monitor size={14} />
               <span>Modalità Stream</span>
@@ -298,28 +338,31 @@ export function DraftRoomPage() {
         </div>
       )}
 
-      {/* Main Status Header Banner */}
+      {/* Main Status Header Banner - Silver Metallic Theme */}
       <div className={`relative overflow-hidden rounded-3xl p-6 sm:p-8 border shadow-2xl transition-all ${
         room.status === 'completed'
-          ? 'bg-gradient-to-r from-emerald-950/80 via-gray-900 to-emerald-950/80 border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.2)]'
+          ? 'bg-gradient-to-r from-emerald-950/80 via-slate-900 to-emerald-950/80 border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.2)]'
           : isMyTurn
-          ? 'bg-gradient-to-r from-amber-950/90 via-gray-900 to-amber-950/90 border-yellow-500/80 shadow-[0_0_50px_rgba(212,175,55,0.4)] animate-pulse'
-          : 'bg-gradient-to-r from-gray-900 via-gray-950 to-gray-900 border-white/10'
+          ? 'bg-gradient-to-r from-cyan-950/90 via-slate-900 to-cyan-950/90 border-cyan-400/80 shadow-[0_0_50px_rgba(34,211,238,0.3)] animate-pulse'
+          : 'bg-gradient-to-r from-[#0b101e] via-[#0f172a] to-[#0b101e] border-slate-700/60'
       }`}>
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
 
           {/* Player 1 Host Badge */}
           <div className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${
-            isHostTurn && room.status === 'in_progress' ? 'bg-red-500/20 border-red-500 ring-2 ring-red-500/50' : 'bg-black/40 border-white/5'
+            isHostTurn && room.status === 'in_progress' ? 'bg-red-500/20 border-red-500 ring-2 ring-red-500/50' : 'bg-slate-950/60 border-slate-800'
           }`}>
             <div className="w-12 h-12 rounded-xl bg-red-600/30 border border-red-500/50 flex items-center justify-center text-red-400 font-extrabold text-lg shrink-0">
               P1
             </div>
             <div>
-              <span className="block text-[10px] font-bold text-red-400 uppercase tracking-widest">🔴 Host</span>
+              <div className="flex items-center gap-2">
+                <span className="block text-[10px] font-bold text-red-400 uppercase tracking-widest">🔴 Host</span>
+                {hostReady && <span className="text-[9px] font-extrabold px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400 rounded border border-emerald-500/40">READY</span>}
+              </div>
               <h3 className="text-lg font-bold text-white">{room.host_name}</h3>
-              <div className="flex gap-1 mt-1">
-                {state.hostPicks.map(id => (
+              <div className="flex flex-wrap gap-1 mt-1">
+                {state.hostPicks?.map(id => (
                   <span key={id} className="text-[10px] px-1.5 py-0.5 bg-red-500/20 text-red-300 rounded border border-red-500/30 uppercase font-bold">
                     {id}
                   </span>
@@ -328,38 +371,66 @@ export function DraftRoomPage() {
             </div>
           </div>
 
-          {/* Center Status / Timer */}
+          {/* Center Status / Double Ready System */}
           <div className="text-center space-y-2 max-w-md">
             {room.status === 'waiting' && (
-              <div className="space-y-3">
-                <span className="inline-block px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-bold uppercase tracking-wider">
-                  Stanza Pronta
+              <div className="space-y-4">
+                <span className="inline-block px-3 py-1 bg-slate-800 text-slate-300 border border-slate-700 rounded-full text-xs font-bold uppercase tracking-wider">
+                  In Attesa che entrambi i Giocatori siano PRONTI
                 </span>
-                <h2 className="text-2xl font-bold text-white">In Attesa di Iniziare</h2>
-                <button
-                  onClick={handleStartDraft}
-                  className="px-8 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-extrabold rounded-2xl shadow-lg transition-all"
-                >
-                  AVVIA DRAFT MATCH
-                </button>
+                
+                {/* Ready Status Cards */}
+                <div className="flex justify-center gap-4 py-1">
+                  <span className={`px-3 py-1 rounded-xl text-xs font-extrabold border ${
+                    hostReady ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300' : 'bg-red-500/10 border-red-500/30 text-red-400'
+                  }`}>
+                    🔴 {room.host_name}: {hostReady ? 'PRONTO ✓' : 'NON PRONTO'}
+                  </span>
+                  <span className={`px-3 py-1 rounded-xl text-xs font-extrabold border ${
+                    guestReady ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300' : 'bg-blue-500/10 border-blue-500/30 text-blue-400'
+                  }`}>
+                    🔵 {room.guest_name}: {guestReady ? 'PRONTO ✓' : 'NON PRONTO'}
+                  </span>
+                </div>
+
+                {/* Ready Action Button */}
+                {(role === 'HOST' || role === 'GUEST') && (
+                  <button
+                    onClick={handleToggleReady}
+                    className={`px-8 py-3 rounded-2xl font-extrabold shadow-lg transition-all flex items-center justify-center gap-2 mx-auto ${
+                      (role === 'HOST' && hostReady) || (role === 'GUEST' && guestReady)
+                        ? 'bg-slate-700 text-slate-300 border border-slate-600 hover:bg-slate-600'
+                        : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)]'
+                    }`}
+                  >
+                    <Zap size={20} />
+                    <span>
+                      {(role === 'HOST' && hostReady) || (role === 'GUEST' && guestReady)
+                        ? 'ANNULLA PRONTO'
+                        : 'SONO PRONTO (Ready)'}
+                    </span>
+                  </button>
+                )}
               </div>
             )}
 
             {room.status === 'in_progress' && currentTurn && (
               <div className="space-y-3">
-                <div className="flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-400">
+                <div className="flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
                   <span>Step {room.current_step + 1} di {turns.length}</span>
                   <span>•</span>
-                  <span className={currentTurn.player === 'HOST' ? 'text-red-400' : 'text-blue-400'}>
+                  <span className={currentTurn.player === 'HOST' ? 'text-red-400 font-extrabold' : 'text-blue-400 font-extrabold'}>
                     {currentTurn.player}
                   </span>
                 </div>
 
                 <h2 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${
-                  isMyTurn ? 'text-yellow-400 animate-bounce' : 'text-white'
+                  isMyTurn ? 'text-cyan-400 animate-bounce' : 'text-white'
                 }`}>
                   {isMyTurn ? (
-                    `⚡ É IL TUO TURNO! ${currentTurn.action === 'BAN' ? 'BANNA 1' : 'PICCA 1'} ${currentTurn.target}`
+                    `⚡ É IL TUO TURNO! ${
+                      currentTurn.action === 'BAN' ? 'BANNA 1' : currentTurn.action === 'SNIPE' ? 'SNIPPA 1' : 'PICCA 1'
+                    } ${currentTurn.target}`
                   ) : (
                     `⏳ Turno di ${currentTurn.player === 'HOST' ? room.host_name : room.guest_name} (${currentTurn.action})`
                   )}
@@ -367,14 +438,14 @@ export function DraftRoomPage() {
 
                 {/* Timer Bar */}
                 <div className="w-full max-w-xs mx-auto space-y-1">
-                  <div className="flex justify-between items-center text-xs font-bold text-gray-300">
-                    <span className="flex items-center gap-1"><Clock size={14} className="text-yellow-500" /> Timer</span>
-                    <span className={timeLeft <= 5 ? 'text-red-400 font-extrabold text-sm' : 'text-yellow-400'}>{timeLeft}s</span>
+                  <div className="flex justify-between items-center text-xs font-bold text-slate-300">
+                    <span className="flex items-center gap-1"><Clock size={14} className="text-cyan-400" /> Timer</span>
+                    <span className={timeLeft <= 5 ? 'text-red-400 font-extrabold text-sm' : 'text-cyan-400'}>{timeLeft}s</span>
                   </div>
-                  <div className="w-full h-2.5 bg-black/60 rounded-full overflow-hidden border border-white/10">
+                  <div className="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
                     <div
                       className={`h-full transition-all duration-1000 ${
-                        timeLeft <= 5 ? 'bg-red-500' : timeLeft <= 10 ? 'bg-amber-400' : 'bg-emerald-400'
+                        timeLeft <= 5 ? 'bg-red-500' : timeLeft <= 10 ? 'bg-amber-400' : 'bg-cyan-400'
                       }`}
                       style={{ width: `${(timeLeft / 30) * 100}%` }}
                     />
@@ -385,22 +456,25 @@ export function DraftRoomPage() {
 
             {room.status === 'completed' && (
               <div className="space-y-2">
-                <Trophy className="mx-auto text-yellow-400" size={36} />
+                <Trophy className="mx-auto text-cyan-400" size={36} />
                 <h2 className="text-2xl font-extrabold text-white">DRAFT COMPLETATO!</h2>
-                <p className="text-xs text-gray-400">Tutti i turni sono stati effettuati con successo.</p>
+                <p className="text-xs text-slate-400">Tutti i turni del match sono stati effettuati.</p>
               </div>
             )}
           </div>
 
           {/* Player 2 Guest Badge */}
           <div className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${
-            isGuestTurn && room.status === 'in_progress' ? 'bg-blue-500/20 border-blue-500 ring-2 ring-blue-500/50' : 'bg-black/40 border-white/5'
+            isGuestTurn && room.status === 'in_progress' ? 'bg-blue-500/20 border-blue-500 ring-2 ring-blue-500/50' : 'bg-slate-950/60 border-slate-800'
           }`}>
             <div>
-              <span className="block text-[10px] font-bold text-blue-400 uppercase tracking-widest text-right">🔵 Guest</span>
+              <div className="flex items-center justify-end gap-2">
+                {guestReady && <span className="text-[9px] font-extrabold px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400 rounded border border-emerald-500/40">READY</span>}
+                <span className="block text-[10px] font-bold text-blue-400 uppercase tracking-widest text-right">🔵 Guest</span>
+              </div>
               <h3 className="text-lg font-bold text-white text-right">{room.guest_name}</h3>
-              <div className="flex gap-1 mt-1 justify-end">
-                {state.guestPicks.map(id => (
+              <div className="flex flex-wrap gap-1 mt-1 justify-end">
+                {state.guestPicks?.map(id => (
                   <span key={id} className="text-[10px] px-1.5 py-0.5 bg-blue-500/20 text-blue-300 rounded border border-blue-500/30 uppercase font-bold">
                     {id}
                   </span>
@@ -415,75 +489,85 @@ export function DraftRoomPage() {
         </div>
       </div>
 
-      {/* Main Pick/Ban Grid for Civilizations */}
+      {/* Main Pick/Ban/Snipe Grid for Civilizations - Sleek Max 2 Rows Layout */}
       {(!currentTurn || currentTurn.target === 'CIV') && (
         <div className="space-y-3">
           <div className="flex justify-between items-center">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-gray-300 flex items-center gap-2">
-              <Swords size={18} className="text-yellow-500" /> Civiltà di Age of Empires IV
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+              <Swords size={18} className="text-cyan-400" /> Civiltà di Age of Empires IV
             </h3>
-            {isMyTurn && (
-              <span className="text-xs font-bold text-yellow-400 animate-pulse">
+            {isMyTurn && room.status === 'in_progress' && (
+              <span className="text-xs font-bold text-cyan-400 animate-pulse">
                 Clicca su una civiltà per confermare la tua scelta
               </span>
             )}
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          {/* Grid Layout: Max 2 Rows on Desktop (e.g. 10 to 12 civs per row) */}
+          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-11 gap-2.5">
             {civilizationsData.map((civ) => {
-              const isHostPick = state.hostPicks.includes(civ.id);
-              const isGuestPick = state.guestPicks.includes(civ.id);
-              const isHostBan = state.hostBans.includes(civ.id);
-              const isGuestBan = state.guestBans.includes(civ.id);
-              const isUsed = isHostPick || isGuestPick || isHostBan || isGuestBan;
+              const isHostPick = state.hostPicks?.includes(civ.id);
+              const isGuestPick = state.guestPicks?.includes(civ.id);
+              const isHostBan = state.hostBans?.includes(civ.id);
+              const isGuestBan = state.guestBans?.includes(civ.id);
+              const isHostSnipe = state.hostSnipes?.includes(civ.id);
+              const isGuestSnipe = state.guestSnipes?.includes(civ.id);
+
+              const isUsed = isHostPick || isGuestPick || isHostBan || isGuestBan || isHostSnipe || isGuestSnipe;
 
               const isClickable = isMyTurn && !isUsed && room.status === 'in_progress';
 
               return (
                 <button
                   key={civ.id}
+                  type="button"
                   disabled={!isClickable}
                   onClick={() => executeAction(civ.id)}
-                  className={`group relative overflow-hidden rounded-2xl border p-3 flex flex-col items-center justify-center gap-2 transition-all duration-300 aspect-square ${
+                  className={`group relative overflow-hidden rounded-2xl border p-2 flex flex-col items-center justify-center gap-1.5 transition-all duration-300 ${
                     isHostPick
-                      ? 'bg-red-950/80 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.4)]'
+                      ? 'bg-red-950/80 border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]'
                       : isGuestPick
-                      ? 'bg-blue-950/80 border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.4)]'
-                      : isHostBan
-                      ? 'bg-red-950/40 border-red-500/40 opacity-50 grayscale'
-                      : isGuestBan
-                      ? 'bg-blue-950/40 border-blue-500/40 opacity-50 grayscale'
+                      ? 'bg-blue-950/80 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.4)]'
+                      : isHostSnipe || isGuestSnipe
+                      ? 'bg-purple-950/80 border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.4)] opacity-70'
+                      : isHostBan || isGuestBan
+                      ? 'bg-slate-950/60 border-red-500/30 opacity-40 grayscale'
                       : isClickable
-                      ? 'bg-gray-900/80 border-white/20 hover:border-yellow-400 hover:scale-105 shadow-md cursor-pointer'
-                      : 'bg-gray-900/40 border-white/5 opacity-60'
+                      ? 'bg-slate-900/90 border-slate-700/80 hover:border-cyan-400 hover:scale-110 shadow-lg cursor-pointer'
+                      : 'bg-slate-950/40 border-slate-800/60 opacity-60'
                   }`}
                 >
+                  {/* Civ Flag Graphic - Large & Prominent */}
                   <img
                     src={civ.flag}
                     alt={civ.name}
-                    className="w-14 h-14 object-cover rounded-xl shadow-md group-hover:scale-110 transition-transform"
+                    className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-xl shadow-md group-hover:scale-105 transition-transform"
                   />
-                  <span className="text-xs font-bold text-white text-center line-clamp-1">
+                  <span className="text-[10px] sm:text-xs font-bold text-slate-100 text-center line-clamp-1">
                     {civ.name}
                   </span>
 
                   {/* Overlays */}
                   {isHostPick && (
-                    <div className="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded shadow">
-                      PICK (P1)
+                    <div className="absolute top-1 right-1 bg-red-600 text-white text-[9px] font-extrabold px-1 rounded shadow">
+                      P1
                     </div>
                   )}
                   {isGuestPick && (
-                    <div className="absolute top-2 right-2 bg-blue-600 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded shadow">
-                      PICK (P2)
+                    <div className="absolute top-1 right-1 bg-blue-600 text-white text-[9px] font-extrabold px-1 rounded shadow">
+                      P2
+                    </div>
+                  )}
+                  {(isHostSnipe || isGuestSnipe) && (
+                    <div className="absolute inset-0 bg-purple-950/70 flex flex-col items-center justify-center gap-0.5 text-purple-300">
+                      <Target size={28} className="stroke-[2.5]" />
+                      <span className="text-[9px] font-extrabold uppercase">SNIPED</span>
                     </div>
                   )}
                   {(isHostBan || isGuestBan) && (
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] flex flex-col items-center justify-center gap-1 text-red-400">
-                      <X size={36} className="stroke-[3]" />
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-red-300">
-                        BAN ({isHostBan ? 'P1' : 'P2'})
-                      </span>
+                    <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-0.5 text-red-400">
+                      <X size={28} className="stroke-[3]" />
+                      <span className="text-[9px] font-extrabold uppercase">BAN</span>
                     </div>
                   )}
                 </button>
@@ -497,11 +581,11 @@ export function DraftRoomPage() {
       {currentTurn && currentTurn.target === 'MAP' && (
         <div className="space-y-3">
           <div className="flex justify-between items-center">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-gray-300 flex items-center gap-2">
-              <Monitor size={18} className="text-yellow-500" /> Mappe di Age of Empires IV
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+              <Monitor size={18} className="text-cyan-400" /> Mappe di Age of Empires IV
             </h3>
-            {isMyTurn && (
-              <span className="text-xs font-bold text-yellow-400 animate-pulse">
+            {isMyTurn && room.status === 'in_progress' && (
+              <span className="text-xs font-bold text-cyan-400 animate-pulse">
                 Clicca su una mappa per confermare la tua scelta
               </span>
             )}
@@ -509,14 +593,15 @@ export function DraftRoomPage() {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {AOE4_MAPS.slice(0, 24).map((mapName) => {
-              const isMapPicked = state.mapPicks.includes(mapName);
-              const isMapBanned = state.mapBans.includes(mapName);
+              const isMapPicked = state.mapPicks?.includes(mapName);
+              const isMapBanned = state.mapBans?.includes(mapName);
               const isUsed = isMapPicked || isMapBanned;
               const isClickable = isMyTurn && !isUsed && room.status === 'in_progress';
 
               return (
                 <button
                   key={mapName}
+                  type="button"
                   disabled={!isClickable}
                   onClick={() => executeAction(mapName)}
                   className={`group relative overflow-hidden rounded-2xl border p-3 flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
@@ -525,8 +610,8 @@ export function DraftRoomPage() {
                       : isMapBanned
                       ? 'bg-red-950/40 border-red-500/40 opacity-50 grayscale'
                       : isClickable
-                      ? 'bg-gray-900/80 border-white/20 hover:border-yellow-400 hover:scale-105 cursor-pointer'
-                      : 'bg-gray-900/40 border-white/5 opacity-60'
+                      ? 'bg-slate-900/90 border-slate-700 hover:border-cyan-400 hover:scale-105 cursor-pointer'
+                      : 'bg-slate-950/40 border-slate-800 opacity-60'
                   }`}
                 >
                   <img
@@ -535,7 +620,7 @@ export function DraftRoomPage() {
                     alt={mapName}
                     className="w-full h-24 object-cover rounded-xl shadow-md"
                   />
-                  <span className="text-xs font-bold text-white text-center">
+                  <span className="text-xs font-bold text-slate-100 text-center">
                     {mapName}
                   </span>
 

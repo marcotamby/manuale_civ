@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Sparkles, Swords, Users, ArrowRight, Loader2 } from 'lucide-react';
+import { Swords, Users, Shield, ArrowRight, Loader2, Eye } from 'lucide-react';
 import { draftService } from '../services/draftService';
 import type { DraftPreset } from '../services/draftService';
 import { Toast } from './Toast';
+
+type UserRole = 'HOST' | 'GUEST' | 'SPECTATOR';
 
 export function DraftPresetPage() {
   const { presetId } = useParams<{ presetId: string }>();
@@ -12,6 +14,7 @@ export function DraftPresetPage() {
   const [preset, setPreset] = useState<DraftPreset | null>(null);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<UserRole>('HOST');
   const [hostName, setHostName] = useState('Giocatore 1');
   const [guestName, setGuestName] = useState('Giocatore 2');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -29,7 +32,6 @@ export function DraftPresetPage() {
       if (data) {
         setPreset(data);
       } else {
-        // Fallback default preset if id not found
         setPreset({
           id: id,
           title: 'Draft Match BO3',
@@ -58,6 +60,7 @@ export function DraftPresetPage() {
     setCreating(true);
     try {
       const room = await draftService.createRoom(preset, hostName, guestName);
+      sessionStorage.setItem(`draft_role_${room.id}`, selectedRole);
       navigate(`/draft/room/${room.id}`);
     } catch (err) {
       console.error('Error creating draft room:', err);
@@ -68,8 +71,8 @@ export function DraftPresetPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[80vh] flex flex-col items-center justify-center text-gray-300 gap-3">
-        <Loader2 className="animate-spin text-yellow-500" size={36} />
+      <div className="min-h-[80vh] flex flex-col items-center justify-center text-slate-300 gap-3">
+        <Loader2 className="animate-spin text-cyan-400" size={36} />
         <p className="font-semibold text-lg">Caricamento preset del draft...</p>
       </div>
     );
@@ -79,10 +82,10 @@ export function DraftPresetPage() {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center text-center p-6">
         <h2 className="text-2xl font-bold text-red-400 mb-2">Preset Non Trovato</h2>
-        <p className="text-gray-400 mb-6">Il preset richiesto non esiste o è stato rimosso.</p>
+        <p className="text-slate-400 mb-6">Il preset richiesto non esiste o è stato rimosso.</p>
         <button
           onClick={() => navigate('/')}
-          className="px-6 py-2 bg-yellow-500 text-black font-bold rounded-xl"
+          className="px-6 py-2 bg-slate-200 text-black font-bold rounded-xl"
         >
           Torna alla Home
         </button>
@@ -101,54 +104,102 @@ export function DraftPresetPage() {
         />
       )}
 
-      {/* Card Wrapper */}
-      <div className="w-full bg-gray-900/90 border border-yellow-500/30 rounded-3xl p-6 sm:p-10 shadow-[0_0_50px_rgba(0,0,0,0.8)] backdrop-blur-2xl space-y-8">
+      {/* Card Wrapper - Metallic Silver Theme */}
+      <div className="w-full bg-[#0a0f1d]/90 border border-slate-700/60 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-2xl space-y-8">
         
         {/* Header */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-yellow-500/10 border border-yellow-500/30 rounded-full text-yellow-400 text-xs font-bold uppercase tracking-widest">
-            <Sparkles size={14} /> Captain's Mode Draft
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-slate-800 border border-slate-700 rounded-full text-slate-200 text-xs font-bold uppercase tracking-widest">
+            <Swords size={14} className="text-cyan-400" /> Captain's Mode Draft
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
             {preset.title}
           </h1>
           {preset.description && (
-            <p className="text-gray-400 text-sm max-w-xl mx-auto">
+            <p className="text-slate-400 text-sm max-w-xl mx-auto">
               {preset.description}
             </p>
           )}
         </div>
 
         {/* Info Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-black/40 p-4 rounded-2xl border border-white/5 text-center">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-slate-950/60 p-4 rounded-2xl border border-slate-800 text-center">
           <div className="p-3">
-            <span className="block text-[10px] text-gray-400 font-bold uppercase">Formato</span>
-            <span className="text-base font-extrabold text-yellow-400">
+            <span className="block text-[10px] text-slate-400 font-bold uppercase">Formato</span>
+            <span className="text-base font-extrabold text-slate-200">
               {preset.scope === 'civs' ? '⚔️ Solo Civiltà' : preset.scope === 'maps' ? '🗺️ Solo Mappe' : '⚔️🗺️ Civs & Mappe'}
             </span>
           </div>
           <div className="p-3">
-            <span className="block text-[10px] text-gray-400 font-bold uppercase">Turni Totali</span>
-            <span className="text-base font-extrabold text-white">
+            <span className="block text-[10px] text-slate-400 font-bold uppercase">Turni Totali</span>
+            <span className="text-base font-extrabold text-cyan-400">
               {preset.turns?.length || 0} Step
             </span>
           </div>
           <div className="p-3 col-span-2 sm:col-span-1">
-            <span className="block text-[10px] text-gray-400 font-bold uppercase">Timer per Turno</span>
-            <span className="text-base font-extrabold text-emerald-400">
+            <span className="block text-[10px] text-slate-400 font-bold uppercase">Timer per Turno</span>
+            <span className="text-base font-extrabold text-slate-200">
               30 Secondi
             </span>
           </div>
         </div>
 
+        {/* Role Selection on Entry */}
+        <div className="space-y-4 pt-2">
+          <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+            <Users size={18} className="text-cyan-400" /> 1. Scegli come entrare in Stanza
+          </h3>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <button
+              type="button"
+              onClick={() => setSelectedRole('HOST')}
+              className={`p-4 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${
+                selectedRole === 'HOST'
+                  ? 'bg-red-950/60 border-red-500 text-white ring-2 ring-red-500/50 shadow-lg'
+                  : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'
+              }`}
+            >
+              <Shield size={24} className={selectedRole === 'HOST' ? 'text-red-400' : 'text-slate-500'} />
+              <span className="font-bold text-sm">🔴 Host (Giocatore 1)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSelectedRole('GUEST')}
+              className={`p-4 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${
+                selectedRole === 'GUEST'
+                  ? 'bg-blue-950/60 border-blue-500 text-white ring-2 ring-blue-500/50 shadow-lg'
+                  : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'
+              }`}
+            >
+              <Shield size={24} className={selectedRole === 'GUEST' ? 'text-blue-400' : 'text-slate-500'} />
+              <span className="font-bold text-sm">🔵 Guest (Giocatore 2)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSelectedRole('SPECTATOR')}
+              className={`p-4 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${
+                selectedRole === 'SPECTATOR'
+                  ? 'bg-purple-950/60 border-purple-500 text-white ring-2 ring-purple-500/50 shadow-lg'
+                  : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'
+              }`}
+            >
+              <Eye size={24} className={selectedRole === 'SPECTATOR' ? 'text-purple-400' : 'text-slate-500'} />
+              <span className="font-bold text-sm">👁️ Spettatore / Streamer</span>
+            </button>
+          </div>
+        </div>
+
         {/* Players Name Setup */}
         <div className="space-y-4 pt-2">
-          <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
-            <Users size={18} className="text-yellow-500" /> Nomi dei Partecipanti (Opzionale)
+          <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+            <Swords size={18} className="text-cyan-400" /> 2. Nomi dei Partecipanti (Opzionale)
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-black/50 p-4 rounded-2xl border border-red-500/30 space-y-2">
+            <div className="bg-slate-950/60 p-4 rounded-2xl border border-red-500/30 space-y-2">
               <label className="block text-xs font-bold text-red-400 uppercase tracking-wider">
                 🔴 Host (Giocatore 1)
               </label>
@@ -157,11 +208,11 @@ export function DraftPresetPage() {
                 value={hostName}
                 onChange={(e) => setHostName(e.target.value)}
                 placeholder="Es. Player 1"
-                className="w-full bg-black/70 border border-white/20 rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:border-red-500 focus:outline-none"
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:border-red-500 focus:outline-none"
               />
             </div>
 
-            <div className="bg-black/50 p-4 rounded-2xl border border-blue-500/30 space-y-2">
+            <div className="bg-slate-950/60 p-4 rounded-2xl border border-blue-500/30 space-y-2">
               <label className="block text-xs font-bold text-blue-400 uppercase tracking-wider">
                 🔵 Guest (Giocatore 2)
               </label>
@@ -170,7 +221,7 @@ export function DraftPresetPage() {
                 value={guestName}
                 onChange={(e) => setGuestName(e.target.value)}
                 placeholder="Es. Player 2"
-                className="w-full bg-black/70 border border-white/20 rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:border-blue-500 focus:outline-none"
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:border-blue-500 focus:outline-none"
               />
             </div>
           </div>
@@ -181,11 +232,11 @@ export function DraftPresetPage() {
           <button
             onClick={handleStartDraft}
             disabled={creating}
-            className="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-yellow-500 via-amber-400 to-yellow-500 hover:from-yellow-400 hover:to-yellow-400 text-black font-extrabold text-lg rounded-2xl shadow-[0_0_30px_rgba(212,175,55,0.4)] hover:shadow-[0_0_40px_rgba(212,175,55,0.6)] transition-all flex items-center justify-center gap-3 mx-auto disabled:opacity-50"
+            className="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-300 hover:from-white hover:to-slate-200 text-black font-extrabold text-lg rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-all flex items-center justify-center gap-3 mx-auto disabled:opacity-50"
           >
             {creating ? (
               <>
-                <Loader2 className="animate-spin" size={24} />
+                <Loader2 className="animate-spin text-black" size={24} />
                 <span>Generazione Stanza...</span>
               </>
             ) : (
@@ -197,8 +248,8 @@ export function DraftPresetPage() {
             )}
           </button>
 
-          <p className="text-xs text-gray-400 mt-4">
-            Dopo aver cliccato, verrà creata la stanza con link unico da condividere con l'avversario e con lo streamer.
+          <p className="text-xs text-slate-400 mt-4">
+            Verrà creata la stanza con un link unico da condividere con l'avversario e con lo streamer.
           </p>
         </div>
 

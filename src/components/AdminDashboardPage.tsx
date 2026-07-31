@@ -5,7 +5,7 @@ import {
   AlertTriangle, X, ShieldCheck, Radio, Search, UserPlus, 
   Trophy, BookOpen, Zap, Edit2, Check, Trash2, Plus, Minus, ArrowLeft, LayoutDashboard,
   Save, Sparkles, ChevronDown, ChevronUp, Users, Youtube, Menu, History, Database, Activity, Download,
-  Megaphone, TrendingUp, Coins, Lock, Unlock, ChevronRight, Link2, HelpCircle, Shield, Monitor, Archive
+  Megaphone, TrendingUp, Coins, Lock, Unlock, ChevronRight, Link2, HelpCircle, Shield, Monitor, Archive, Swords
 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
@@ -2756,8 +2756,8 @@ export default function AdminDashboardPage() {
               onClick={() => selectTab('drafts')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'drafts' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
             >
-              <Sparkles size={18} className="text-yellow-400" />
-              <span>Gestione Draft & Preset</span>
+              <Swords size={18} />
+              <span>Gestione Draft</span>
             </button>
           )}
 

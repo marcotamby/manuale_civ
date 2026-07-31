@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Copy, Check, Sparkles, Clock, Layers, ChevronUp, ChevronDown } from 'lucide-react';
+import { Plus, Trash2, Edit2, Copy, Check, Clock, Layers, ChevronUp, ChevronDown, Swords } from 'lucide-react';
 import { draftService } from '../services/draftService';
 import type { DraftPreset, DraftTurn, TurnPlayer, TurnAction, TurnTarget } from '../services/draftService';
 import { Toast } from './Toast';
@@ -140,37 +140,37 @@ export function AdminDraftPresetTab() {
         />
       )}
 
-      {/* Header section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-900/60 p-4 rounded-xl border border-white/10 backdrop-blur-md">
+      {/* Header section - Metallic Silver Styling */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#0d1222]/80 p-5 rounded-2xl border border-slate-700/50 backdrop-blur-xl shadow-xl">
         <div>
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <Sparkles className="text-yellow-500" size={22} />
-            Gestione Preset Draft (Captain's Mode)
+          <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2 tracking-wide">
+            <Swords className="text-slate-300" size={22} />
+            Gestione Draft
           </h2>
-          <p className="text-sm text-gray-400">
-            Crea e personalizza i flussi di Pick & Ban. Una volta creati, copia il link del preset ed incollalo nel regolamento o nei post per far avviare le stanze ai player!
+          <p className="text-sm text-slate-400 mt-0.5">
+            Crea e personalizza i flussi di Pick, Ban e Snipe. Una volta salvato, copia il link del preset ed incollalo nei regolamenti o nei post per i giocatori!
           </p>
         </div>
         <button
           onClick={handleCreateNew}
-          className="flex items-center gap-2 px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg transition-all shadow-[0_0_15px_rgba(212,175,55,0.3)] shrink-0"
+          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-slate-200 via-slate-300 to-slate-100 hover:from-white hover:to-slate-200 text-black font-extrabold rounded-xl transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)] shrink-0"
         >
           <Plus size={18} />
           Crea Nuovo Preset
         </button>
       </div>
 
-      {/* Editor Modal / Panel */}
+      {/* Editor Panel */}
       {editingPreset && (
-        <div className="bg-gray-900/90 border border-yellow-500/40 p-6 rounded-2xl shadow-2xl space-y-6 backdrop-blur-xl">
-          <div className="flex justify-between items-center pb-4 border-b border-white/10">
-            <h3 className="text-lg font-bold text-yellow-400 flex items-center gap-2">
-              <Edit2 size={18} />
+        <div className="bg-[#090d1a]/95 border border-slate-600/50 p-6 rounded-3xl shadow-2xl space-y-6 backdrop-blur-2xl">
+          <div className="flex justify-between items-center pb-4 border-b border-slate-800">
+            <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+              <Edit2 size={18} className="text-cyan-400" />
               {editingPreset.id ? 'Modifica Preset' : 'Crea Nuovo Preset'}
             </h3>
             <button
               onClick={() => setEditingPreset(null)}
-              className="text-gray-400 hover:text-white px-3 py-1 bg-white/5 rounded-lg text-sm"
+              className="text-slate-400 hover:text-white px-3.5 py-1.5 bg-slate-800/60 hover:bg-slate-800 rounded-xl text-sm font-semibold transition-colors"
             >
               Annulla
             </button>
@@ -178,7 +178,7 @@ export function AdminDraftPresetTab() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-gray-300 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
                 Titolo Preset (es. BO3 Finale Torneo)
               </label>
               <input
@@ -186,18 +186,18 @@ export function AdminDraftPresetTab() {
                 value={editingPreset.title || ''}
                 onChange={(e) => setEditingPreset({ ...editingPreset, title: e.target.value })}
                 placeholder="Es. BO3 Tornei Italia"
-                className="w-full bg-black/60 border border-white/20 rounded-lg px-3 py-2 text-white font-medium focus:border-yellow-500 focus:outline-none"
+                className="w-full bg-slate-950/80 border border-slate-700/60 rounded-xl px-4 py-2.5 text-white font-medium focus:border-cyan-400 focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-300 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
                 Ambito del Draft
               </label>
               <select
                 value={editingPreset.scope || 'civs'}
                 onChange={(e) => setEditingPreset({ ...editingPreset, scope: e.target.value as any })}
-                className="w-full bg-black/60 border border-white/20 rounded-lg px-3 py-2 text-white font-medium focus:border-yellow-500 focus:outline-none"
+                className="w-full bg-slate-950/80 border border-slate-700/60 rounded-xl px-4 py-2.5 text-white font-medium focus:border-cyan-400 focus:outline-none"
               >
                 <option value="civs">⚔️ Solo Civiltà</option>
                 <option value="maps">🗺️ Solo Mappe</option>
@@ -207,7 +207,7 @@ export function AdminDraftPresetTab() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-300 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
               Descrizione o Note (Opzionale)
             </label>
             <input
@@ -215,32 +215,32 @@ export function AdminDraftPresetTab() {
               value={editingPreset.description || ''}
               onChange={(e) => setEditingPreset({ ...editingPreset, description: e.target.value })}
               placeholder="Es. 1 Ban per parte, poi 3 Pick alternati per BO3"
-              className="w-full bg-black/60 border border-white/20 rounded-lg px-3 py-2 text-gray-300 text-sm focus:border-yellow-500 focus:outline-none"
+              className="w-full bg-slate-950/80 border border-slate-700/60 rounded-xl px-4 py-2.5 text-slate-300 text-sm focus:border-cyan-400 focus:outline-none"
             />
           </div>
 
           {/* Turn Sequence Builder */}
           <div className="space-y-4 pt-2">
             <div className="flex justify-between items-center">
-              <h4 className="text-sm font-bold text-gray-200 uppercase tracking-wider flex items-center gap-2">
-                <Layers size={16} className="text-yellow-500" />
+              <h4 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                <Layers size={16} className="text-cyan-400" />
                 Sequenza Turni (Totale: {editingPreset.turns?.length || 0} turni)
               </h4>
               <button
                 onClick={addTurn}
-                className="px-3 py-1.5 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border border-yellow-500/40 rounded-lg text-xs font-bold flex items-center gap-1 transition-all"
+                className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow"
               >
                 <Plus size={14} /> Aggiungi Turno
               </button>
             </div>
 
-            <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+            <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1 no-scrollbar">
               {editingPreset.turns?.map((turn, idx) => (
                 <div
                   key={idx}
-                  className="flex flex-wrap sm:flex-nowrap items-center gap-2 bg-black/40 p-3 rounded-xl border border-white/10 hover:border-white/20 transition-all"
+                  className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 bg-slate-950/60 p-3 rounded-2xl border border-slate-800 hover:border-slate-700 transition-all"
                 >
-                  <span className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center font-bold text-sm text-yellow-400 shrink-0">
+                  <span className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-extrabold text-sm text-cyan-400 shrink-0">
                     #{turn.step}
                   </span>
 
@@ -248,7 +248,7 @@ export function AdminDraftPresetTab() {
                   <select
                     value={turn.player}
                     onChange={(e) => updateTurn(idx, { player: e.target.value as TurnPlayer })}
-                    className={`bg-black/60 border rounded-lg px-2.5 py-1.5 text-xs font-bold ${
+                    className={`bg-slate-900 border rounded-xl px-3 py-1.5 text-xs font-bold ${
                       turn.player === 'HOST'
                         ? 'text-red-400 border-red-500/40'
                         : 'text-blue-400 border-blue-500/40'
@@ -258,34 +258,37 @@ export function AdminDraftPresetTab() {
                     <option value="GUEST">🔵 Guest (Player 2)</option>
                   </select>
 
-                  {/* Action select */}
+                  {/* Action select (BAN / PICK / SNIPE) */}
                   <select
                     value={turn.action}
                     onChange={(e) => updateTurn(idx, { action: e.target.value as TurnAction })}
-                    className={`bg-black/60 border rounded-lg px-2.5 py-1.5 text-xs font-bold ${
+                    className={`bg-slate-900 border rounded-xl px-3 py-1.5 text-xs font-bold ${
                       turn.action === 'BAN'
                         ? 'text-red-400 border-red-500/40'
+                        : turn.action === 'SNIPE'
+                        ? 'text-purple-400 border-purple-500/40'
                         : 'text-emerald-400 border-emerald-500/40'
                     }`}
                   >
                     <option value="BAN">🚫 BANNA</option>
                     <option value="PICK">✅ PICCA</option>
+                    <option value="SNIPE">🎯 SNIPPA</option>
                   </select>
 
                   {/* Target select */}
                   <select
                     value={turn.target}
                     onChange={(e) => updateTurn(idx, { target: e.target.value as TurnTarget })}
-                    className="bg-black/60 border border-white/20 rounded-lg px-2.5 py-1.5 text-xs font-bold text-gray-200"
+                    className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-200"
                   >
                     <option value="CIV">⚔️ Civiltà</option>
                     <option value="MAP">🗺️ Mappa</option>
                   </select>
 
-                  {/* Timer select */}
-                  <div className="flex items-center gap-1 bg-black/60 px-2 py-1 rounded-lg border border-white/10 text-xs text-gray-300">
-                    <Clock size={12} className="text-yellow-500" />
-                    <span>30 sec</span>
+                  {/* Timer info */}
+                  <div className="flex items-center gap-1 bg-slate-900 px-2.5 py-1 rounded-xl border border-slate-800 text-xs text-slate-300">
+                    <Clock size={12} className="text-cyan-400" />
+                    <span>30s</span>
                   </div>
 
                   {/* Ordering & Delete */}
@@ -293,20 +296,20 @@ export function AdminDraftPresetTab() {
                     <button
                       disabled={idx === 0}
                       onClick={() => moveTurn(idx, 'up')}
-                      className="p-1 hover:bg-white/10 text-gray-400 disabled:opacity-30 rounded"
+                      className="p-1 hover:bg-slate-800 text-slate-400 disabled:opacity-20 rounded-lg"
                     >
                       <ChevronUp size={16} />
                     </button>
                     <button
                       disabled={idx === (editingPreset.turns?.length || 1) - 1}
                       onClick={() => moveTurn(idx, 'down')}
-                      className="p-1 hover:bg-white/10 text-gray-400 disabled:opacity-30 rounded"
+                      className="p-1 hover:bg-slate-800 text-slate-400 disabled:opacity-20 rounded-lg"
                     >
                       <ChevronDown size={16} />
                     </button>
                     <button
                       onClick={() => removeTurn(idx)}
-                      className="p-1 hover:bg-red-500/20 text-red-400 rounded"
+                      className="p-1.5 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors"
                       title="Rimuovi turno"
                     >
                       <Trash2 size={16} />
@@ -317,16 +320,16 @@ export function AdminDraftPresetTab() {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
             <button
               onClick={() => setEditingPreset(null)}
-              className="px-4 py-2 bg-white/5 hover:bg-white/10 text-gray-300 rounded-lg font-bold text-sm"
+              className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold text-sm"
             >
               Annulla
             </button>
             <button
               onClick={handleSavePreset}
-              className="px-6 py-2 bg-yellow-500 hover:bg-yellow-400 text-black rounded-lg font-bold text-sm shadow-lg transition-all"
+              className="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-xl font-extrabold text-sm shadow-lg transition-all"
             >
               Salva Preset
             </button>
@@ -337,40 +340,40 @@ export function AdminDraftPresetTab() {
       {/* List of presets */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {loading ? (
-          <div className="col-span-full py-12 text-center text-gray-400">
+          <div className="col-span-full py-12 text-center text-slate-400 font-medium">
             Caricamento preset...
           </div>
         ) : presets.length === 0 ? (
-          <div className="col-span-full py-12 text-center text-gray-400 bg-gray-900/40 rounded-xl border border-white/10">
+          <div className="col-span-full py-12 text-center text-slate-400 bg-slate-900/40 rounded-2xl border border-slate-800">
             Nessun preset di draft creato finora. Clicca su <strong>"Crea Nuovo Preset"</strong> per iniziare!
           </div>
         ) : (
           presets.map((preset) => (
             <div
               key={preset.id}
-              className="bg-gray-900/70 border border-white/10 hover:border-yellow-500/40 p-5 rounded-2xl flex flex-col justify-between transition-all group backdrop-blur-md"
+              className="bg-[#0b101d]/80 border border-slate-800 hover:border-slate-600 p-5 rounded-2xl flex flex-col justify-between transition-all group backdrop-blur-md shadow-lg"
             >
               <div>
                 <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-bold text-white text-lg group-hover:text-yellow-400 transition-colors">
+                  <h3 className="font-bold text-slate-100 text-lg group-hover:text-cyan-400 transition-colors">
                     {preset.title}
                   </h3>
-                  <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                  <span className="text-[10px] uppercase font-extrabold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
                     {preset.scope === 'civs' ? '⚔️ Civs' : preset.scope === 'maps' ? '🗺️ Maps' : '⚔️🗺️ Both'}
                   </span>
                 </div>
                 {preset.description && (
-                  <p className="text-xs text-gray-400 mb-3 line-clamp-2">
+                  <p className="text-xs text-slate-400 mb-3 line-clamp-2">
                     {preset.description}
                   </p>
                 )}
 
-                <div className="flex items-center gap-4 text-xs text-gray-400 py-2 border-y border-white/5 my-3">
+                <div className="flex items-center gap-4 text-xs text-slate-400 py-2 border-y border-slate-800/80 my-3">
                   <div>
-                    <span className="text-white font-bold">{preset.turns?.length || 0}</span> Turni
+                    <span className="text-slate-200 font-bold">{preset.turns?.length || 0}</span> Turni
                   </div>
                   <div>
-                    <span className="text-white font-bold">30s</span> Timer / turno
+                    <span className="text-slate-200 font-bold">30s</span> Timer / turno
                   </div>
                 </div>
               </div>
@@ -378,7 +381,7 @@ export function AdminDraftPresetTab() {
               <div className="flex items-center gap-2 pt-2">
                 <button
                   onClick={() => handleCopyLink(preset.id)}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 rounded-xl text-xs font-bold transition-all"
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold transition-all shadow"
                   title="Copia link preset per regolamento"
                 >
                   {copiedId === preset.id ? (
@@ -396,7 +399,7 @@ export function AdminDraftPresetTab() {
 
                 <button
                   onClick={() => setEditingPreset(preset)}
-                  className="p-2 bg-white/5 hover:bg-white/10 text-gray-300 rounded-xl transition-all"
+                  className="p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors"
                   title="Modifica preset"
                 >
                   <Edit2 size={16} />
@@ -404,7 +407,7 @@ export function AdminDraftPresetTab() {
 
                 <button
                   onClick={() => handleDeletePreset(preset.id)}
-                  className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl transition-all"
+                  className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl transition-colors"
                   title="Elimina preset"
                 >
                   <Trash2 size={16} />
