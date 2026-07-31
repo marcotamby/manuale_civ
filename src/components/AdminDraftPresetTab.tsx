@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Copy, Check, Clock, Layers, ChevronUp, ChevronDown, Swords, History, ExternalLink, X } from 'lucide-react';
+import { Plus, Trash2, Edit2, Copy, Check, Clock, Layers, ChevronUp, ChevronDown, Swords, History, ExternalLink, X, Archive, RotateCcw } from 'lucide-react';
 import { draftService } from '../services/draftService';
 import type { DraftPreset, DraftTurn, TurnPlayer, TurnAction, TurnTarget, DraftRoom } from '../services/draftService';
 import { Toast } from './Toast';
@@ -15,6 +15,7 @@ export function AdminDraftPresetTab() {
   const [historyPreset, setHistoryPreset] = useState<DraftPreset | null>(null);
   const [historyRooms, setHistoryRooms] = useState<DraftRoom[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [showArchivedFilter, setShowArchivedFilter] = useState(false);
 
   useEffect(() => {
     loadPresets();
@@ -42,6 +43,25 @@ export function AdminDraftPresetTab() {
       console.error('Error loading history:', err);
     } finally {
       setLoadingHistory(false);
+    }
+  };
+
+  const handleToggleArchiveRoom = async (roomId: string, currentArchivedState: boolean) => {
+    const success = await draftService.archiveRoom(roomId, !currentArchivedState);
+    if (success && historyPreset) {
+      const rooms = await draftService.getRoomsByPresetId(historyPreset.id);
+      setHistoryRooms(rooms);
+      setToastMessage(!currentArchivedState ? 'Stanza archiviata con successo.' : 'Stanza ripristinata dall\'archivio.');
+    }
+  };
+
+  const handleDeleteRoom = async (roomId: string) => {
+    if (!window.confirm('Sei sicuro di voler eliminare definitivamente questo draft dallo storico?')) return;
+    const success = await draftService.deleteRoom(roomId);
+    if (success && historyPreset) {
+      const rooms = await draftService.getRoomsByPresetId(historyPreset.id);
+      setHistoryRooms(rooms);
+      setToastMessage('Draft eliminato dallo storico.');
     }
   };
 
@@ -147,6 +167,9 @@ export function AdminDraftPresetTab() {
     setEditingPreset({ ...editingPreset, turns: reindexed });
   };
 
+  // Filter rooms by archived state
+  const filteredRooms = historyRooms.filter(r => showArchivedFilter ? !!r.is_archived : !r.is_archived);
+
   return (
     <div className="space-y-6">
       {toastMessage && (
@@ -182,20 +205,35 @@ export function AdminDraftPresetTab() {
       {historyPreset && (
         <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="bg-[#0b101e] border border-slate-700/60 rounded-3xl p-6 sm:p-8 max-w-4xl w-full space-y-6 shadow-2xl max-h-[90vh] flex flex-col">
-            <div className="flex justify-between items-center pb-4 border-b border-slate-800 shrink-0">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-800 shrink-0">
               <div>
                 <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
                   <History className="text-cyan-400" size={22} />
                   Storico Draft: {historyPreset.title}
                 </h3>
-                <p className="text-xs text-slate-400">Tutte le stanze create da questo preset</p>
+                <p className="text-xs text-slate-400">Gestisci e archivia lo storico dei draft creati da questo preset</p>
               </div>
-              <button
-                onClick={() => setHistoryPreset(null)}
-                className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors"
-              >
-                <X size={20} />
-              </button>
+
+              {/* Filter & Close */}
+              <div className="flex items-center gap-2 self-end sm:self-auto">
+                <button
+                  onClick={() => setShowArchivedFilter(!showArchivedFilter)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${
+                    showArchivedFilter
+                      ? 'bg-purple-950/60 border-purple-500 text-purple-300'
+                      : 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white'
+                  }`}
+                >
+                  <Archive size={14} />
+                  <span>{showArchivedFilter ? 'Mostra Attivi' : 'Mostra Archivio'}</span>
+                </button>
+                <button
+                  onClick={() => setHistoryPreset(null)}
+                  className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto space-y-3 pr-1">
@@ -203,17 +241,22 @@ export function AdminDraftPresetTab() {
                 <div className="py-12 text-center text-slate-400">
                   Caricamento storico...
                 </div>
-              ) : historyRooms.length === 0 ? (
+              ) : filteredRooms.length === 0 ? (
                 <div className="py-12 text-center text-slate-400 bg-slate-950/40 rounded-2xl border border-slate-800">
-                  Nessuna stanza draft ancora giocata per questo preset.
+                  {showArchivedFilter
+                    ? 'Nessun draft archiviato per questo preset.'
+                    : 'Nessun draft attivo presente nello storico per questo preset.'}
                 </div>
               ) : (
-                historyRooms.map((room) => {
+                filteredRooms.map((room) => {
                   const state = room.state || { hostPicks: [], guestPicks: [] };
+                  const isArchived = !!room.is_archived;
                   return (
                     <div
                       key={room.id}
-                      className="bg-slate-950/60 border border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-slate-700 transition-all"
+                      className={`p-4 rounded-2xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all ${
+                        isArchived ? 'bg-slate-950/30 border-slate-800/60 opacity-70' : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                      }`}
                     >
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
@@ -229,6 +272,11 @@ export function AdminDraftPresetTab() {
                           }`}>
                             {room.status}
                           </span>
+                          {isArchived && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 bg-purple-500/20 text-purple-300 rounded border border-purple-500/40">
+                              ARCHIVIATO
+                            </span>
+                          )}
                         </div>
                         <p className="text-xs text-slate-400">
                           Data: {new Date(room.created_at || Date.now()).toLocaleString('it-IT')} • ID Stanza: <strong className="text-slate-200">{room.id}</strong>
@@ -240,15 +288,33 @@ export function AdminDraftPresetTab() {
                         </div>
                       </div>
 
-                      <a
-                        href={`/draft/room/${room.id}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center gap-1.5 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold transition-all shrink-0"
-                      >
-                        <ExternalLink size={14} />
-                        <span>Apri Stanza</span>
-                      </a>
+                      <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                        <a
+                          href={`/draft/room/${room.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold transition-all"
+                        >
+                          <ExternalLink size={14} />
+                          <span>Apri Stanza</span>
+                        </a>
+
+                        <button
+                          onClick={() => handleToggleArchiveRoom(room.id, isArchived)}
+                          className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors"
+                          title={isArchived ? 'Ripristina dall\'archivio' : 'Archivia questo draft'}
+                        >
+                          {isArchived ? <RotateCcw size={16} /> : <Archive size={16} />}
+                        </button>
+
+                        <button
+                          onClick={() => handleDeleteRoom(room.id)}
+                          className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl transition-colors"
+                          title="Elimina dal database"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </div>
                   );
                 })

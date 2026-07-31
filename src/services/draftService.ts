@@ -49,6 +49,7 @@ export interface DraftRoom {
   timer_ends_at: string | null;
   state: DraftState;
   status: 'waiting' | 'in_progress' | 'completed';
+  is_archived?: boolean;
   created_at?: string;
   updated_at?: string;
   preset?: DraftPreset;
@@ -152,7 +153,8 @@ export const draftService = {
         mapPicks: [],
         mapBans: []
       },
-      status: 'waiting'
+      status: 'waiting',
+      is_archived: false
     };
 
     const { data, error } = await supabase
@@ -197,6 +199,32 @@ export const draftService = {
       return [];
     }
     return data || [];
+  },
+
+  async archiveRoom(roomId: string, isArchived: boolean): Promise<boolean> {
+    const { error } = await supabase
+      .from('draft_rooms')
+      .update({ is_archived: isArchived })
+      .eq('id', roomId);
+
+    if (error) {
+      console.error('Error archiving draft room:', error);
+      return false;
+    }
+    return true;
+  },
+
+  async deleteRoom(roomId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('draft_rooms')
+      .delete()
+      .eq('id', roomId);
+
+    if (error) {
+      console.error('Error deleting draft room:', error);
+      return false;
+    }
+    return true;
   },
 
   async updateRoom(roomId: string, updates: Partial<DraftRoom>): Promise<DraftRoom | null> {
