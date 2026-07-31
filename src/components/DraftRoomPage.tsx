@@ -444,12 +444,12 @@ export function DraftRoomPage() {
         </div>
       )}
 
-      {/* Main Status Header - No Outer Box Container! Distinct Player Cards Aligned to Sides */}
+      {/* Main Status Header - No Background Boxes Behind Player Headers */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 items-stretch">
 
-        {/* Player 1 Host Card (Distinct Dark Card Aligned Left) */}
-        <div className={`md:col-span-4 flex flex-col justify-between gap-3 p-4 sm:p-5 rounded-3xl border transition-all shadow-xl ${
-          isHostTurn && room.status === 'in_progress' ? 'bg-[#0c1224] border-red-500/80 ring-2 ring-red-500/50' : 'bg-[#090e1a]/95 border-slate-800/90'
+        {/* Player 1 Host Header (Clean Floating Layout) */}
+        <div className={`md:col-span-4 flex flex-col justify-between gap-3 p-1 sm:p-2 transition-all ${
+          isHostTurn && room.status === 'in_progress' ? 'border-l-4 border-red-500 pl-3' : ''
         }`}>
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-2xl bg-red-600/30 border border-red-500/50 flex items-center justify-center text-red-400 font-extrabold text-base shrink-0 shadow-md">
@@ -461,7 +461,7 @@ export function DraftRoomPage() {
                 {hostReady && <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-emerald-500/20 text-emerald-400 rounded border border-emerald-500/40">READY</span>}
               </div>
               {/* Larger Player Name Font */}
-              <h3 className="text-xl sm:text-2xl font-extrabold text-white truncate tracking-tight">{room.host_name}</h3>
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-white truncate tracking-tight">{room.host_name}</h3>
             </div>
           </div>
 
@@ -515,7 +515,7 @@ export function DraftRoomPage() {
           </div>
         </div>
 
-        {/* Center Status / Timer Column (No Background Box!) */}
+        {/* Center Status / Timer Column (No Background Box) */}
         <div className="md:col-span-4 flex flex-col items-center justify-center text-center p-2 space-y-3">
           {room.status === 'waiting' && (
             <div className="space-y-3">
@@ -600,9 +600,9 @@ export function DraftRoomPage() {
           )}
         </div>
 
-        {/* Player 2 Guest Card (Distinct Dark Card Aligned Right) */}
-        <div className={`md:col-span-4 flex flex-col justify-between gap-3 p-4 sm:p-5 rounded-3xl border transition-all shadow-xl ${
-          isGuestTurn && room.status === 'in_progress' ? 'bg-[#0c1224] border-blue-500/80 ring-2 ring-blue-500/50' : 'bg-[#090e1a]/95 border-slate-800/90'
+        {/* Player 2 Guest Header (Clean Floating Layout) */}
+        <div className={`md:col-span-4 flex flex-col justify-between gap-3 p-1 sm:p-2 transition-all ${
+          isGuestTurn && room.status === 'in_progress' ? 'border-r-4 border-blue-500 pr-3' : ''
         }`}>
           <div className="flex items-center justify-end gap-3 text-right">
             <div className="overflow-hidden">
@@ -611,7 +611,7 @@ export function DraftRoomPage() {
                 <span className="block text-[10px] font-extrabold text-blue-400 uppercase tracking-widest">🔵 Guest</span>
               </div>
               {/* Larger Player Name Font */}
-              <h3 className="text-xl sm:text-2xl font-extrabold text-white truncate tracking-tight">{room.guest_name}</h3>
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-white truncate tracking-tight">{room.guest_name}</h3>
             </div>
             <div className="w-11 h-11 rounded-2xl bg-blue-600/30 border border-blue-500/50 flex items-center justify-center text-blue-400 font-extrabold text-base shrink-0 shadow-md">
               P2
@@ -788,7 +788,10 @@ export function DraftRoomPage() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
-            {AOE4_MAPS.slice(0, 24).map((mapName) => {
+            {(room?.preset?.map_pool && room.preset.map_pool.length > 0
+              ? room.preset.map_pool
+              : AOE4_MAPS.slice(0, 9)
+            ).map((mapName) => {
               const isMapPicked = state.mapPicks?.includes(mapName);
               const isMapBanned = state.mapBans?.includes(mapName);
               const isUsed = isMapPicked || isMapBanned;

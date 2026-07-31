@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Trash2, Edit2, Copy, Check, Clock, Layers, ChevronUp, ChevronDown, Swords, History, ExternalLink, X, Archive, RotateCcw, AlertTriangle, Loader2 } from 'lucide-react';
 import { draftService } from '../services/draftService';
 import type { DraftPreset, DraftTurn, TurnPlayer, TurnAction, TurnTarget, DraftRoom } from '../services/draftService';
+import { AOE4_MAPS } from '../data/aoe4Maps';
 
 export function AdminDraftPresetTab() {
   const [presets, setPresets] = useState<DraftPreset[]>([]);
@@ -424,6 +425,66 @@ export function AdminDraftPresetTab() {
               className="w-full bg-slate-950/80 border border-slate-700/60 rounded-xl px-4 py-2.5 text-slate-300 text-sm focus:border-cyan-400 focus:outline-none"
             />
           </div>
+
+          {/* Map Pool Selector (When scope is maps or both) */}
+          {(editingPreset.scope === 'maps' || editingPreset.scope === 'both') && (
+            <div className="space-y-3 pt-2">
+              <div className="flex justify-between items-center">
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                  🗺️ Pool Mappe del Draft ({editingPreset.map_pool?.length || 0} mappe selezionate)
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingPreset({ ...editingPreset, map_pool: [...AOE4_MAPS] })}
+                    className="text-[11px] font-bold text-cyan-400 hover:underline"
+                  >
+                    Seleziona Tutte
+                  </button>
+                  <span className="text-slate-600">•</span>
+                  <button
+                    type="button"
+                    onClick={() => setEditingPreset({ ...editingPreset, map_pool: [] })}
+                    className="text-[11px] font-bold text-slate-400 hover:underline"
+                  >
+                    Deseleziona Tutte
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 max-h-60 overflow-y-auto p-2 bg-slate-950/60 rounded-2xl border border-slate-800 no-scrollbar">
+                {AOE4_MAPS.map((mapName) => {
+                  const isSelected = editingPreset.map_pool?.includes(mapName);
+                  return (
+                    <button
+                      key={mapName}
+                      type="button"
+                      onClick={() => {
+                        const current = editingPreset.map_pool || [];
+                        const next = isSelected
+                          ? current.filter(m => m !== mapName)
+                          : [...current, mapName];
+                        setEditingPreset({ ...editingPreset, map_pool: next });
+                      }}
+                      className={`p-2 rounded-xl border flex flex-col items-center gap-1.5 transition-all text-center ${
+                        isSelected
+                          ? 'bg-cyan-950/60 border-cyan-400 text-cyan-200 shadow-md ring-1 ring-cyan-400/40'
+                          : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700'
+                      }`}
+                    >
+                      <img
+                        src={`/maps/${mapName}.png`}
+                        onError={(e) => { (e.target as any).src = '/header-bg.png'; }}
+                        alt={mapName}
+                        className="w-full h-12 object-cover rounded-lg"
+                      />
+                      <span className="text-[11px] font-bold line-clamp-1">{mapName}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Turn Sequence Builder */}
           <div className="space-y-4 pt-2">

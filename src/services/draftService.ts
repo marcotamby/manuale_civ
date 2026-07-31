@@ -20,6 +20,7 @@ export interface DraftPreset {
   scope: 'civs' | 'maps' | 'both';
   is_active: boolean;
   turns: DraftTurn[];
+  map_pool?: string[];
   created_at?: string;
   updated_at?: string;
 }
@@ -117,6 +118,7 @@ export const draftService = {
       scope: preset.scope || 'civs',
       is_active: preset.is_active ?? true,
       turns: preset.turns || [],
+      map_pool: preset.map_pool || [],
       updated_at: new Date().toISOString()
     };
 
