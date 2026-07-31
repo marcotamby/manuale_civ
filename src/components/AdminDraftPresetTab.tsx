@@ -1,15 +1,24 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Copy, Check, Clock, Layers, ChevronUp, ChevronDown, Swords, History, ExternalLink, X, Archive, RotateCcw } from 'lucide-react';
+import { Plus, Trash2, Edit2, Copy, Check, Clock, Layers, ChevronUp, ChevronDown, Swords, History, ExternalLink, X, Archive, RotateCcw, AlertTriangle, Loader2 } from 'lucide-react';
 import { draftService } from '../services/draftService';
 import type { DraftPreset, DraftTurn, TurnPlayer, TurnAction, TurnTarget, DraftRoom } from '../services/draftService';
-import { Toast } from './Toast';
 
 export function AdminDraftPresetTab() {
   const [presets, setPresets] = useState<DraftPreset[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingPreset, setEditingPreset] = useState<Partial<DraftPreset> | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // In-button saving state
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Custom Premium Delete Confirmation Modal State
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    type: 'preset' | 'room';
+    id: string;
+    title: string;
+  } | null>(null);
 
   // Draft History State
   const [historyPreset, setHistoryPreset] = useState<DraftPreset | null>(null);
@@ -51,17 +60,27 @@ export function AdminDraftPresetTab() {
     if (success && historyPreset) {
       const rooms = await draftService.getRoomsByPresetId(historyPreset.id);
       setHistoryRooms(rooms);
-      setToastMessage(!currentArchivedState ? 'Stanza archiviata con successo.' : 'Stanza ripristinata dall\'archivio.');
     }
   };
 
-  const handleDeleteRoom = async (roomId: string) => {
-    if (!window.confirm('Sei sicuro di voler eliminare definitivamente questo draft dallo storico?')) return;
-    const success = await draftService.deleteRoom(roomId);
-    if (success && historyPreset) {
-      const rooms = await draftService.getRoomsByPresetId(historyPreset.id);
-      setHistoryRooms(rooms);
-      setToastMessage('Draft eliminato dallo storico.');
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirm) return;
+
+    if (deleteConfirm.type === 'preset') {
+      try {
+        await draftService.deletePreset(deleteConfirm.id);
+        setDeleteConfirm(null);
+        loadPresets();
+      } catch (err) {
+        console.error('Failed to delete preset:', err);
+      }
+    } else if (deleteConfirm.type === 'room') {
+      const success = await draftService.deleteRoom(deleteConfirm.id);
+      if (success && historyPreset) {
+        const rooms = await draftService.getRoomsByPresetId(historyPreset.id);
+        setHistoryRooms(rooms);
+        setDeleteConfirm(null);
+      }
     }
   };
 
@@ -85,25 +104,19 @@ export function AdminDraftPresetTab() {
 
   const handleSavePreset = async () => {
     if (!editingPreset || !editingPreset.title) return;
+    setIsSaving(true);
     try {
       await draftService.savePreset(editingPreset);
-      setToastMessage('Preset salvato con successo!');
-      setEditingPreset(null);
-      loadPresets();
+      setIsSaving(false);
+      setSaveSuccess(true);
+      setTimeout(() => {
+        setSaveSuccess(false);
+        setEditingPreset(null);
+        loadPresets();
+      }, 1500);
     } catch (err) {
       console.error('Failed to save preset:', err);
-      setToastMessage('Errore durante il salvataggio del preset.');
-    }
-  };
-
-  const handleDeletePreset = async (id: string) => {
-    if (!window.confirm('Sei sicuro di voler eliminare questo preset?')) return;
-    try {
-      await draftService.deletePreset(id);
-      setToastMessage('Preset eliminato.');
-      loadPresets();
-    } catch (err) {
-      console.error('Failed to delete preset:', err);
+      setIsSaving(false);
     }
   };
 
@@ -111,7 +124,6 @@ export function AdminDraftPresetTab() {
     const url = `${window.location.origin}/draft/preset/${presetId}`;
     navigator.clipboard.writeText(url);
     setCopiedId(presetId);
-    setToastMessage('Link del Preset copiato! Incollalo nel regolamento o nei post.');
     setTimeout(() => setCopiedId(null), 3000);
   };
 
@@ -171,14 +183,44 @@ export function AdminDraftPresetTab() {
   const filteredRooms = historyRooms.filter(r => showArchivedFilter ? !!r.is_archived : !r.is_archived);
 
   return (
-    <div className="space-y-6">
-      {toastMessage && (
-        <Toast
-          message={toastMessage}
-          type="success"
-          isVisible={!!toastMessage}
-          onClose={() => setToastMessage(null)}
-        />
+    <div className="space-y-6 font-sans">
+      
+      {/* Premium Custom Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
+          <div className="bg-[#0b101e] border border-red-500/50 rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-5 shadow-[0_0_50px_rgba(239,68,68,0.25)] my-auto animate-in fade-in zoom-in-95">
+            <div className="w-16 h-16 bg-red-950/60 border border-red-500/50 rounded-2xl flex items-center justify-center mx-auto text-red-400">
+              <AlertTriangle size={32} />
+            </div>
+            <div>
+              <h3 className="text-xl font-extrabold text-white tracking-tight">
+                {deleteConfirm.type === 'preset' ? 'Eliminare il Preset?' : 'Eliminare Stanza dallo Storico?'}
+              </h3>
+              <p className="text-sm text-slate-300 mt-2">
+                Sei sicuro di voler eliminare definitivamente <strong className="text-white">"{deleteConfirm.title}"</strong>?
+              </p>
+              <p className="text-xs text-red-400 mt-1 font-semibold">
+                Questa azione è irreversibile.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-2xl font-bold text-sm transition-all border border-slate-700"
+              >
+                Annulla
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="py-3 px-4 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white rounded-2xl font-extrabold text-sm shadow-lg shadow-red-950/50 transition-all flex items-center justify-center gap-2"
+              >
+                <Trash2 size={16} />
+                <span>CONFERMA</span>
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Header section - Metallic Silver Styling */}
@@ -308,7 +350,7 @@ export function AdminDraftPresetTab() {
                         </button>
 
                         <button
-                          onClick={() => handleDeleteRoom(room.id)}
+                          onClick={() => setDeleteConfirm({ type: 'room', id: room.id, title: `${room.host_name} vs ${room.guest_name}` })}
                           className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl transition-colors"
                           title="Elimina dal database"
                         >
@@ -493,9 +535,26 @@ export function AdminDraftPresetTab() {
             </button>
             <button
               onClick={handleSavePreset}
-              className="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-xl font-extrabold text-sm shadow-lg transition-all"
+              disabled={isSaving}
+              className={`px-6 py-2.5 rounded-xl font-extrabold text-sm shadow-lg transition-all flex items-center gap-2 ${
+                saveSuccess
+                  ? 'bg-emerald-600 text-white shadow-emerald-900/40'
+                  : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white'
+              }`}
             >
-              Salva Preset
+              {isSaving ? (
+                <>
+                  <Loader2 className="animate-spin" size={16} />
+                  <span>Salvataggio...</span>
+                </>
+              ) : saveSuccess ? (
+                <>
+                  <Check size={16} />
+                  <span>✓ Salvato con Successo!</span>
+                </>
+              ) : (
+                <span>Salva Preset</span>
+              )}
             </button>
           </div>
         </div>
@@ -552,7 +611,7 @@ export function AdminDraftPresetTab() {
                     {copiedId === preset.id ? (
                       <>
                         <Check size={14} className="text-emerald-400" />
-                        <span>Copiato!</span>
+                        <span>✓ Copiato!</span>
                       </>
                     ) : (
                       <>
@@ -582,7 +641,7 @@ export function AdminDraftPresetTab() {
                   </button>
 
                   <button
-                    onClick={() => handleDeletePreset(preset.id)}
+                    onClick={() => setDeleteConfirm({ type: 'preset', id: preset.id, title: preset.title })}
                     className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-xs font-semibold transition-colors"
                   >
                     <Trash2 size={14} />

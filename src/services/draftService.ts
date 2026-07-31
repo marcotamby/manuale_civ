@@ -65,6 +65,24 @@ export function generateDraftId(length = 7): string {
   return result;
 }
 
+// Helper to save/read fallback room in local storage
+function setLocalRoom(room: DraftRoom) {
+  try {
+    localStorage.setItem(`fallback_draft_room_${room.id}`, JSON.stringify(room));
+  } catch (e) {
+    console.warn('Could not save local room fallback:', e);
+  }
+}
+
+function getLocalRoom(roomId: string): DraftRoom | null {
+  try {
+    const raw = localStorage.getItem(`fallback_draft_room_${roomId}`);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
 export const draftService = {
   async getPresets(): Promise<DraftPreset[]> {
     const { data, error } = await supabase
@@ -131,7 +149,7 @@ export const draftService = {
   // Room Management
   async createRoom(preset: DraftPreset, playerName: string, role: TurnPlayer): Promise<DraftRoom> {
     const roomId = generateDraftId(7);
-    const roomPayload: Partial<DraftRoom> = {
+    const roomPayload: any = {
       id: roomId,
       preset_id: preset.id,
       title: preset.title,
@@ -153,8 +171,7 @@ export const draftService = {
         mapPicks: [],
         mapBans: []
       },
-      status: 'waiting',
-      is_archived: false
+      status: 'waiting'
     };
 
     const { data, error } = await supabase
@@ -163,28 +180,42 @@ export const draftService = {
       .select()
       .single();
 
+    const createdRoom: DraftRoom = data ? { ...data, preset } : { ...roomPayload, preset };
+    setLocalRoom(createdRoom);
+
     if (error) {
-      console.error('Error creating draft room in Supabase:', error);
-      return { ...roomPayload, preset } as DraftRoom;
+      console.warn('Draft room created in local fallback due to Supabase notice:', error);
     }
 
-    return { ...data, preset };
+    return createdRoom;
   },
 
   async getRoom(roomId: string): Promise<DraftRoom | null> {
     const { data, error } = await supabase
       .from('draft_rooms')
-      .select('*, draft_presets(*)')
+      .select('*')
       .eq('id', roomId)
       .single();
 
-    if (error || !data) return null;
+    if (error || !data) {
+      // Check local fallback
+      const local = getLocalRoom(roomId);
+      if (local) return local;
+      return null;
+    }
 
-    const presetData = (data as any).draft_presets || null;
-    return {
+    let preset: DraftPreset | null = null;
+    if (data.preset_id) {
+      preset = await draftService.getPresetById(data.preset_id);
+    }
+
+    const roomObj: DraftRoom = {
       ...data,
-      preset: presetData
+      preset: preset || undefined
     };
+
+    setLocalRoom(roomObj);
+    return roomObj;
   },
 
   async getRoomsByPresetId(presetId: string): Promise<DraftRoom[]> {
@@ -209,6 +240,13 @@ export const draftService = {
 
     if (error) {
       console.error('Error archiving draft room:', error);
+      // Fallback update
+      const local = getLocalRoom(roomId);
+      if (local) {
+        local.is_archived = isArchived;
+        setLocalRoom(local);
+        return true;
+      }
       return false;
     }
     return true;
@@ -228,26 +266,41 @@ export const draftService = {
   },
 
   async updateRoom(roomId: string, updates: Partial<DraftRoom>): Promise<DraftRoom | null> {
+    // Exclude preset object from DB payload
+    const { preset, ...dbPayload } = updates as any;
+
     const { data, error } = await supabase
       .from('draft_rooms')
       .update({
-        ...updates,
+        ...dbPayload,
         updated_at: new Date().toISOString()
       })
       .eq('id', roomId)
-      .select('*, draft_presets(*)')
+      .select('*')
       .single();
 
-    if (error) {
-      console.error('Error updating draft room:', error);
-      return null;
+    let roomObj: DraftRoom | null = null;
+
+    if (error || !data) {
+      console.warn('Updating room in local fallback:', error);
+      const local = getLocalRoom(roomId);
+      if (local) {
+        roomObj = { ...local, ...updates };
+        setLocalRoom(roomObj);
+      }
+    } else {
+      let presetData: DraftPreset | null = null;
+      if (data.preset_id) {
+        presetData = await draftService.getPresetById(data.preset_id);
+      }
+      roomObj = {
+        ...data,
+        preset: presetData || undefined
+      };
+      if (roomObj) setLocalRoom(roomObj);
     }
 
-    const presetData = (data as any).draft_presets || null;
-    return {
-      ...data,
-      preset: presetData
-    };
+    return roomObj;
   },
 
   subscribeToRoom(roomId: string, onUpdate: (room: DraftRoom) => void) {
@@ -263,7 +316,7 @@ export const draftService = {
         },
         async () => {
           const fresh = await draftService.getRoom(roomId);
-          if (fresh) onUpdate(fresh);
+          if (fresh !== null) onUpdate(fresh);
         }
       )
       .subscribe();
