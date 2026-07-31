@@ -19,6 +19,7 @@ import { sendNewBuildOrderWebhook } from '../utils/discordWebhook';
 import { WYSIWYGEditor } from './TournamentsPage';
 import { WYSIWYGEditor as SharedWYSIWYGEditor } from './WYSIWYGEditor';
 import { renderTextWithLinks } from '../lib/linkParser';
+import { AdminDraftPresetTab } from './AdminDraftPresetTab';
 
 export interface Suggestion {
   id: string;
@@ -56,7 +57,7 @@ export default function AdminDashboardPage() {
   }, [isAuthenticated, isAdmin, navigate]);
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeTab = (searchParams.get('tab') as 'overview' | 'proposte' | 'qa' | 'users' | 'pecore' | 'tornei' | 'civilta' | 'audit' | 'diagnostics' | 'utenti' | 'comunicazioni' | 'analytics' | 'faq' | 'privacy') || 'overview';
+  const activeTab = (searchParams.get('tab') as 'overview' | 'proposte' | 'qa' | 'users' | 'pecore' | 'tornei' | 'civilta' | 'audit' | 'diagnostics' | 'utenti' | 'comunicazioni' | 'analytics' | 'faq' | 'privacy' | 'drafts') || 'overview';
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // CRM States (Tab 2)
@@ -2750,6 +2751,16 @@ export default function AdminDashboardPage() {
             </button>
           )}
 
+          {(isAdmin || canManageTournaments) && (
+            <button
+              onClick={() => selectTab('drafts')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'drafts' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/15' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            >
+              <Sparkles size={18} className="text-yellow-400" />
+              <span>Gestione Draft & Preset</span>
+            </button>
+          )}
+
           {(isAdmin || canManageCivs || canManageBuildorders) && (
             <button
               onClick={() => selectTab('civilta')}
@@ -2853,6 +2864,7 @@ export default function AdminDashboardPage() {
                 {activeTab === 'users' && 'Staff & Permessi'}
                 {activeTab === 'pecore' && 'Bilancio Pecore'}
                 {activeTab === 'tornei' && 'Gestione Tornei'}
+                {activeTab === 'drafts' && 'Gestione Draft & Preset'}
                 {activeTab === 'civilta' && 'Gestione Civiltà & BO'}
                 {activeTab === 'audit' && 'Registro Attività (Audit)'}
                 {activeTab === 'diagnostics' && 'Backup & Diagnostica'}
@@ -2869,6 +2881,7 @@ export default function AdminDashboardPage() {
                 {activeTab === 'users' && 'Gestisci i permessi operativi ed i ruoli dello staff.'}
                 {activeTab === 'pecore' && 'Gestisci e ricarica i saldi di pecore dei pastori.'}
                 {activeTab === 'tornei' && 'Pianifica tornei, gestisci podi e video dei match.'}
+                {activeTab === 'drafts' && 'Crea preset per i draft di Pick & Ban e genera link per regolamenti e social.'}
                 {activeTab === 'civilta' && 'Modifica dettagli civiltà e crea/edita i build orders.'}
                 {activeTab === 'audit' && 'Registro di controllo e sicurezza di tutte le azioni dello staff.'}
                 {activeTab === 'diagnostics' && 'Monitoraggio del database, test di integrazione ed esportazione backup.'}
@@ -3880,6 +3893,13 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* TAB DRAFTS */}
+          {activeTab === 'drafts' && (isAdmin || canManageTournaments) && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+              <AdminDraftPresetTab />
             </div>
           )}
 

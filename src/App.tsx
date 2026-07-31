@@ -33,6 +33,8 @@ import { Toaster } from 'react-hot-toast';
 import { usePresence } from './components/PresenceContext';
 import { ClassificaPage } from './components/ClassificaPage';
 import { renderTextWithLinks } from './lib/linkParser';
+import { DraftPresetPage } from './components/DraftPresetPage';
+import { DraftRoomPage } from './components/DraftRoomPage';
 
 function App() {
   const navigate = useNavigate();
@@ -529,6 +531,9 @@ function App() {
                 <Route path="/admin/overlays" element={<Home onSelectCiv={handleSelectCiv} onCompareCivs={handleCompare} />} />
                 <Route path="/admin/overlays/:overlayId" element={<Home onSelectCiv={handleSelectCiv} onCompareCivs={handleCompare} />} />
                 <Route path="/admin/overlays/:overlayId/:tab" element={<Home onSelectCiv={handleSelectCiv} onCompareCivs={handleCompare} />} />
+                <Route path="/draft/preset/:presetId" element={<DraftPresetPage />} />
+                <Route path="/draft/room/:roomId" element={<DraftRoomPage />} />
+                <Route path="/draft/:roomId" element={<DraftRoomPage />} />
               </Routes>
             </div>
           </div>
