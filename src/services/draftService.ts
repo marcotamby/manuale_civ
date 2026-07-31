@@ -33,6 +33,8 @@ export interface DraftState {
   guestSnipes: string[];
   hostReady?: boolean;
   guestReady?: boolean;
+  hostClaimed?: boolean;
+  guestClaimed?: boolean;
   mapPicks: string[];
   mapBans: string[];
 }
@@ -125,14 +127,15 @@ export const draftService = {
     return true;
   },
 
-  async createRoom(preset: DraftPreset, hostName = 'Giocatore 1', guestName = 'Giocatore 2'): Promise<DraftRoom> {
+  // Room Management
+  async createRoom(preset: DraftPreset, playerName: string, role: TurnPlayer): Promise<DraftRoom> {
     const roomId = generateDraftId(7);
     const roomPayload: Partial<DraftRoom> = {
       id: roomId,
       preset_id: preset.id,
       title: preset.title,
-      host_name: hostName || 'Giocatore 1',
-      guest_name: guestName || 'Giocatore 2',
+      host_name: role === 'HOST' ? (playerName || 'Giocatore 1') : 'Giocatore 1',
+      guest_name: role === 'GUEST' ? (playerName || 'Giocatore 2') : 'Giocatore 2',
       current_step: 0,
       timer_ends_at: null,
       state: {
@@ -144,6 +147,8 @@ export const draftService = {
         guestSnipes: [],
         hostReady: false,
         guestReady: false,
+        hostClaimed: role === 'HOST',
+        guestClaimed: role === 'GUEST',
         mapPicks: [],
         mapBans: []
       },
@@ -178,6 +183,20 @@ export const draftService = {
       ...data,
       preset: presetData
     };
+  },
+
+  async getRoomsByPresetId(presetId: string): Promise<DraftRoom[]> {
+    const { data, error } = await supabase
+      .from('draft_rooms')
+      .select('*')
+      .eq('preset_id', presetId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.warn('Error fetching rooms by preset:', error);
+      return [];
+    }
+    return data || [];
   },
 
   async updateRoom(roomId: string, updates: Partial<DraftRoom>): Promise<DraftRoom | null> {

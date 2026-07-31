@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Swords, Users, Shield, ArrowRight, Loader2, Eye } from 'lucide-react';
 import { draftService } from '../services/draftService';
-import type { DraftPreset } from '../services/draftService';
+import type { DraftPreset, TurnPlayer } from '../services/draftService';
 import { Toast } from './Toast';
 
 type UserRole = 'HOST' | 'GUEST' | 'SPECTATOR';
@@ -15,8 +15,7 @@ export function DraftPresetPage() {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [selectedRole, setSelectedRole] = useState<UserRole>('HOST');
-  const [hostName, setHostName] = useState('Giocatore 1');
-  const [guestName, setGuestName] = useState('Giocatore 2');
+  const [playerName, setPlayerName] = useState('Giocatore 1');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -59,7 +58,8 @@ export function DraftPresetPage() {
     if (!preset) return;
     setCreating(true);
     try {
-      const room = await draftService.createRoom(preset, hostName, guestName);
+      const roleForRoom: TurnPlayer = selectedRole === 'GUEST' ? 'GUEST' : 'HOST';
+      const room = await draftService.createRoom(preset, playerName, roleForRoom);
       sessionStorage.setItem(`draft_role_${room.id}`, selectedRole);
       navigate(`/draft/room/${room.id}`);
     } catch (err) {
@@ -147,13 +147,16 @@ export function DraftPresetPage() {
         {/* Role Selection on Entry */}
         <div className="space-y-4 pt-2">
           <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-            <Users size={18} className="text-cyan-400" /> 1. Scegli come entrare in Stanza
+            <Users size={18} className="text-cyan-400" /> 1. Scegli il tuo Ruolo
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <button
               type="button"
-              onClick={() => setSelectedRole('HOST')}
+              onClick={() => {
+                setSelectedRole('HOST');
+                if (playerName === 'Giocatore 2') setPlayerName('Giocatore 1');
+              }}
               className={`p-4 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${
                 selectedRole === 'HOST'
                   ? 'bg-red-950/60 border-red-500 text-white ring-2 ring-red-500/50 shadow-lg'
@@ -166,7 +169,10 @@ export function DraftPresetPage() {
 
             <button
               type="button"
-              onClick={() => setSelectedRole('GUEST')}
+              onClick={() => {
+                setSelectedRole('GUEST');
+                if (playerName === 'Giocatore 1') setPlayerName('Giocatore 2');
+              }}
               className={`p-4 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${
                 selectedRole === 'GUEST'
                   ? 'bg-blue-950/60 border-blue-500 text-white ring-2 ring-blue-500/50 shadow-lg'
@@ -192,40 +198,27 @@ export function DraftPresetPage() {
           </div>
         </div>
 
-        {/* Players Name Setup */}
-        <div className="space-y-4 pt-2">
-          <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-            <Swords size={18} className="text-cyan-400" /> 2. Nomi dei Partecipanti (Opzionale)
-          </h3>
+        {/* Player Name Input (Only the user's own name) */}
+        {selectedRole !== 'SPECTATOR' && (
+          <div className="space-y-4 pt-2">
+            <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+              <Swords size={18} className="text-cyan-400" /> 2. Inserisci il TUO Nome
+            </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-slate-950/60 p-4 rounded-2xl border border-red-500/30 space-y-2">
-              <label className="block text-xs font-bold text-red-400 uppercase tracking-wider">
-                🔴 Host (Giocatore 1)
+            <div className="bg-slate-950/60 p-4 rounded-2xl border border-slate-700/60 space-y-2">
+              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                Il tuo Nickname in-game
               </label>
               <input
                 type="text"
-                value={hostName}
-                onChange={(e) => setHostName(e.target.value)}
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
                 placeholder="Es. Player 1"
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:border-red-500 focus:outline-none"
-              />
-            </div>
-
-            <div className="bg-slate-950/60 p-4 rounded-2xl border border-blue-500/30 space-y-2">
-              <label className="block text-xs font-bold text-blue-400 uppercase tracking-wider">
-                🔵 Guest (Giocatore 2)
-              </label>
-              <input
-                type="text"
-                value={guestName}
-                onChange={(e) => setGuestName(e.target.value)}
-                placeholder="Es. Player 2"
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:border-blue-500 focus:outline-none"
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:border-cyan-400 focus:outline-none"
               />
             </div>
           </div>
-        </div>
+        )}
 
         {/* Action Button */}
         <div className="pt-4 text-center">
@@ -242,14 +235,14 @@ export function DraftPresetPage() {
             ) : (
               <>
                 <Swords size={24} />
-                <span>AVVIA STANZA DRAFT MATCH</span>
+                <span>CREA E ENTRA IN STANZA DRAFT</span>
                 <ArrowRight size={20} />
               </>
             )}
           </button>
 
           <p className="text-xs text-slate-400 mt-4">
-            Verrà creata la stanza con un link unico da condividere con l'avversario e con lo streamer.
+            Verrà creata la stanza con il link unico da condividere con l'avversario.
           </p>
         </div>
 

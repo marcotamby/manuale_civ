@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Copy, Check, Clock, Layers, ChevronUp, ChevronDown, Swords } from 'lucide-react';
+import { Plus, Trash2, Edit2, Copy, Check, Clock, Layers, ChevronUp, ChevronDown, Swords, History, ExternalLink, X } from 'lucide-react';
 import { draftService } from '../services/draftService';
-import type { DraftPreset, DraftTurn, TurnPlayer, TurnAction, TurnTarget } from '../services/draftService';
+import type { DraftPreset, DraftTurn, TurnPlayer, TurnAction, TurnTarget, DraftRoom } from '../services/draftService';
 import { Toast } from './Toast';
 
 export function AdminDraftPresetTab() {
@@ -10,6 +10,11 @@ export function AdminDraftPresetTab() {
   const [editingPreset, setEditingPreset] = useState<Partial<DraftPreset> | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Draft History State
+  const [historyPreset, setHistoryPreset] = useState<DraftPreset | null>(null);
+  const [historyRooms, setHistoryRooms] = useState<DraftRoom[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
   useEffect(() => {
     loadPresets();
@@ -24,6 +29,19 @@ export function AdminDraftPresetTab() {
       console.error('Error loading presets:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOpenHistory = async (preset: DraftPreset) => {
+    setHistoryPreset(preset);
+    setLoadingHistory(true);
+    try {
+      const rooms = await draftService.getRoomsByPresetId(preset.id);
+      setHistoryRooms(rooms);
+    } catch (err) {
+      console.error('Error loading history:', err);
+    } finally {
+      setLoadingHistory(false);
     }
   };
 
@@ -159,6 +177,86 @@ export function AdminDraftPresetTab() {
           Crea Nuovo Preset
         </button>
       </div>
+
+      {/* Draft History Modal */}
+      {historyPreset && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#0b101e] border border-slate-700/60 rounded-3xl p-6 sm:p-8 max-w-4xl w-full space-y-6 shadow-2xl max-h-[90vh] flex flex-col">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-800 shrink-0">
+              <div>
+                <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
+                  <History className="text-cyan-400" size={22} />
+                  Storico Draft: {historyPreset.title}
+                </h3>
+                <p className="text-xs text-slate-400">Tutte le stanze create da questo preset</p>
+              </div>
+              <button
+                onClick={() => setHistoryPreset(null)}
+                className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+              {loadingHistory ? (
+                <div className="py-12 text-center text-slate-400">
+                  Caricamento storico...
+                </div>
+              ) : historyRooms.length === 0 ? (
+                <div className="py-12 text-center text-slate-400 bg-slate-950/40 rounded-2xl border border-slate-800">
+                  Nessuna stanza draft ancora giocata per questo preset.
+                </div>
+              ) : (
+                historyRooms.map((room) => {
+                  const state = room.state || { hostPicks: [], guestPicks: [] };
+                  return (
+                    <div
+                      key={room.id}
+                      className="bg-slate-950/60 border border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-slate-700 transition-all"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-extrabold text-white text-base">
+                            🔴 {room.host_name} <span className="text-slate-500 font-normal">vs</span> 🔵 {room.guest_name}
+                          </span>
+                          <span className={`text-[10px] uppercase font-black px-2 py-0.5 rounded-md border ${
+                            room.status === 'completed'
+                              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                              : room.status === 'in_progress'
+                              ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
+                              : 'bg-slate-800 text-slate-400 border-slate-700'
+                          }`}>
+                            {room.status}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-400">
+                          Data: {new Date(room.created_at || Date.now()).toLocaleString('it-IT')} • ID Stanza: <strong className="text-slate-200">{room.id}</strong>
+                        </p>
+                        <div className="flex flex-wrap gap-1 text-[11px] pt-1">
+                          <span className="text-red-400 font-bold">P1:</span> {state.hostPicks?.join(', ') || 'Nessun pick'}
+                          <span className="text-slate-600 px-1">•</span>
+                          <span className="text-blue-400 font-bold">P2:</span> {state.guestPicks?.join(', ') || 'Nessun pick'}
+                        </div>
+                      </div>
+
+                      <a
+                        href={`/draft/room/${room.id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-1.5 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold transition-all shrink-0"
+                      >
+                        <ExternalLink size={14} />
+                        <span>Apri Stanza</span>
+                      </a>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Editor Panel */}
       {editingPreset && (
@@ -378,40 +476,53 @@ export function AdminDraftPresetTab() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 pt-2">
-                <button
-                  onClick={() => handleCopyLink(preset.id)}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold transition-all shadow"
-                  title="Copia link preset per regolamento"
-                >
-                  {copiedId === preset.id ? (
-                    <>
-                      <Check size={14} className="text-emerald-400" />
-                      <span>Copiato!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy size={14} />
-                      <span>Copia Link Preset</span>
-                    </>
-                  )}
-                </button>
+              <div className="space-y-2 pt-2">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleCopyLink(preset.id)}
+                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold transition-all shadow"
+                    title="Copia link preset per regolamento"
+                  >
+                    {copiedId === preset.id ? (
+                      <>
+                        <Check size={14} className="text-emerald-400" />
+                        <span>Copiato!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={14} />
+                        <span>Copia Link Preset</span>
+                      </>
+                    )}
+                  </button>
 
-                <button
-                  onClick={() => setEditingPreset(preset)}
-                  className="p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors"
-                  title="Modifica preset"
-                >
-                  <Edit2 size={16} />
-                </button>
+                  <button
+                    onClick={() => handleOpenHistory(preset)}
+                    className="flex items-center gap-1 px-3 py-2 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 rounded-xl text-xs font-bold transition-all"
+                    title="Storico delle stanze giocate"
+                  >
+                    <History size={14} />
+                    <span>Storico</span>
+                  </button>
+                </div>
 
-                <button
-                  onClick={() => handleDeletePreset(preset.id)}
-                  className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl transition-colors"
-                  title="Elimina preset"
-                >
-                  <Trash2 size={16} />
-                </button>
+                <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-800/60">
+                  <button
+                    onClick={() => setEditingPreset(preset)}
+                    className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-slate-800/40 hover:bg-slate-800 text-slate-300 rounded-lg text-xs font-semibold transition-colors"
+                  >
+                    <Edit2 size={14} />
+                    <span>Modifica</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleDeletePreset(preset.id)}
+                    className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-xs font-semibold transition-colors"
+                  >
+                    <Trash2 size={14} />
+                    <span>Elimina</span>
+                  </button>
+                </div>
               </div>
             </div>
           ))

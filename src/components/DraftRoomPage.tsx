@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Swords, Users, Shield, Clock, Eye, Check, X, RefreshCcw, Copy, Monitor, Trophy, Target, Zap } from 'lucide-react';
+import { Swords, Users, Shield, Clock, Eye, Check, X, RefreshCcw, Copy, Monitor, Trophy, Target, Zap, Lock } from 'lucide-react';
 import { draftService } from '../services/draftService';
 import type { DraftRoom, DraftTurn } from '../services/draftService';
 import { civilizationsData } from '../data/aoe4Data';
@@ -15,9 +15,14 @@ export function DraftRoomPage() {
 
   const [room, setRoom] = useState<DraftRoom | null>(null);
   const [loading, setLoading] = useState(true);
-  const [role, setRole] = useState<UserRole>(() => {
-    return (sessionStorage.getItem(`draft_role_${roomId}`) as UserRole) || 'SPECTATOR';
+
+  // Read stored role for this specific room ID
+  const [role, setRole] = useState<UserRole | null>(() => {
+    return (sessionStorage.getItem(`draft_role_${roomId}`) as UserRole) || null;
   });
+
+  const [joiningRole, setJoiningRole] = useState<UserRole>('GUEST');
+  const [joiningName, setJoiningName] = useState('Giocatore 2');
 
   const [timeLeft, setTimeLeft] = useState(30);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -47,6 +52,12 @@ export function DraftRoomPage() {
       const data = await draftService.getRoom(id);
       if (data) {
         setRoom(data);
+        // Default joining role to unclaimed role
+        if (data.state?.hostClaimed && !data.state?.guestClaimed) {
+          setJoiningRole('GUEST');
+        } else if (!data.state?.hostClaimed && data.state?.guestClaimed) {
+          setJoiningRole('HOST');
+        }
       }
     } catch (err) {
       console.error('Error loading room:', err);
@@ -55,10 +66,52 @@ export function DraftRoomPage() {
     }
   };
 
-  const handleSelectRole = (chosenRole: UserRole) => {
-    setRole(chosenRole);
-    if (roomId) {
-      sessionStorage.setItem(`draft_role_${roomId}`, chosenRole);
+  const state = room?.state || {
+    hostPicks: [],
+    guestPicks: [],
+    hostBans: [],
+    guestBans: [],
+    hostSnipes: [],
+    guestSnipes: [],
+    hostReady: false,
+    guestReady: false,
+    hostClaimed: false,
+    guestClaimed: false,
+    mapPicks: [],
+    mapBans: []
+  };
+
+  const hostClaimed = !!state.hostClaimed;
+  const guestClaimed = !!state.guestClaimed;
+  const hostReady = !!state.hostReady;
+  const guestReady = !!state.guestReady;
+
+  // Claim Role & join room
+  const handleConfirmRole = async () => {
+    if (!room || !joiningRole) return;
+
+    if (joiningRole === 'SPECTATOR') {
+      setRole('SPECTATOR');
+      if (roomId) sessionStorage.setItem(`draft_role_${roomId}`, 'SPECTATOR');
+      return;
+    }
+
+    const nextState = { ...state };
+    const updates: Partial<DraftRoom> = { state: nextState };
+
+    if (joiningRole === 'HOST') {
+      nextState.hostClaimed = true;
+      updates.host_name = joiningName || room.host_name || 'Giocatore 1';
+    } else if (joiningRole === 'GUEST') {
+      nextState.guestClaimed = true;
+      updates.guest_name = joiningName || room.guest_name || 'Giocatore 2';
+    }
+
+    const updated = await draftService.updateRoom(room.id, updates);
+    if (updated) {
+      setRoom(updated);
+      setRole(joiningRole);
+      if (roomId) sessionStorage.setItem(`draft_role_${roomId}`, joiningRole);
     }
   };
 
@@ -70,23 +123,6 @@ export function DraftRoomPage() {
   const isHostTurn = currentTurn?.player === 'HOST';
   const isGuestTurn = currentTurn?.player === 'GUEST';
   const isMyTurn = (role === 'HOST' && isHostTurn) || (role === 'GUEST' && isGuestTurn);
-
-  // State arrays
-  const state = room?.state || {
-    hostPicks: [],
-    guestPicks: [],
-    hostBans: [],
-    guestBans: [],
-    hostSnipes: [],
-    guestSnipes: [],
-    hostReady: false,
-    guestReady: false,
-    mapPicks: [],
-    mapBans: []
-  };
-
-  const hostReady = !!state.hostReady;
-  const guestReady = !!state.guestReady;
 
   const allUsedCivs = useMemo(() => [
     ...(state.hostPicks || []),
@@ -104,7 +140,7 @@ export function DraftRoomPage() {
 
   // Handle Ready Toggle
   const handleToggleReady = async () => {
-    if (!room) return;
+    if (!room || !role) return;
     const nextState = { ...state };
     if (role === 'HOST') nextState.hostReady = !hostReady;
     if (role === 'GUEST') nextState.guestReady = !guestReady;
@@ -258,7 +294,7 @@ export function DraftRoomPage() {
         />
       )}
 
-      {/* Role Selection Modal */}
+      {/* Role Claim Modal (Enforces Role Locking & Single Name Entry) */}
       {!role && (
         <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="bg-[#0b101e] border border-slate-700/60 rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-6 shadow-2xl">
@@ -266,35 +302,85 @@ export function DraftRoomPage() {
               <Users size={32} />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white">Scegli il tuo Ruolo</h2>
+              <h2 className="text-2xl font-bold text-white">Scegli il tuo Ruolo in Stanza</h2>
               <p className="text-sm text-slate-400 mt-1">Stanza Match: <strong className="text-cyan-400">{room.title}</strong></p>
             </div>
 
             <div className="space-y-3">
+              {/* Host option */}
               <button
-                onClick={() => handleSelectRole('HOST')}
-                className="w-full py-3.5 px-4 bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/40 font-bold rounded-2xl flex items-center justify-between transition-all"
+                disabled={hostClaimed}
+                onClick={() => {
+                  setJoiningRole('HOST');
+                  setJoiningName(room.host_name || 'Giocatore 1');
+                }}
+                className={`w-full py-3.5 px-4 rounded-2xl border font-bold flex items-center justify-between transition-all ${
+                  hostClaimed
+                    ? 'bg-slate-900/50 border-slate-800 text-slate-500 opacity-60 cursor-not-allowed'
+                    : joiningRole === 'HOST'
+                    ? 'bg-red-600/30 border-red-500 text-white ring-2 ring-red-500/50'
+                    : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300 border-slate-700'
+                }`}
               >
-                <span>🔴 Gioca come {room.host_name || 'Host (Player 1)'}</span>
-                <Shield size={18} />
+                <span>🔴 Host: {hostClaimed ? `${room.host_name} (Occupato)` : 'Giocatore 1'}</span>
+                {hostClaimed ? <Lock size={16} /> : <Shield size={18} className="text-red-400" />}
               </button>
 
+              {/* Guest option */}
               <button
-                onClick={() => handleSelectRole('GUEST')}
-                className="w-full py-3.5 px-4 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/40 font-bold rounded-2xl flex items-center justify-between transition-all"
+                disabled={guestClaimed}
+                onClick={() => {
+                  setJoiningRole('GUEST');
+                  setJoiningName(room.guest_name || 'Giocatore 2');
+                }}
+                className={`w-full py-3.5 px-4 rounded-2xl border font-bold flex items-center justify-between transition-all ${
+                  guestClaimed
+                    ? 'bg-slate-900/50 border-slate-800 text-slate-500 opacity-60 cursor-not-allowed'
+                    : joiningRole === 'GUEST'
+                    ? 'bg-blue-600/30 border-blue-500 text-white ring-2 ring-blue-500/50'
+                    : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300 border-slate-700'
+                }`}
               >
-                <span>🔵 Gioca come {room.guest_name || 'Guest (Player 2)'}</span>
-                <Shield size={18} />
+                <span>🔵 Guest: {guestClaimed ? `${room.guest_name} (Occupato)` : 'Giocatore 2'}</span>
+                {guestClaimed ? <Lock size={16} /> : <Shield size={18} className="text-blue-400" />}
               </button>
 
+              {/* Spectator option */}
               <button
-                onClick={() => handleSelectRole('SPECTATOR')}
-                className="w-full py-3.5 px-4 bg-slate-800/80 hover:bg-slate-800 text-slate-300 border border-slate-700 font-bold rounded-2xl flex items-center justify-between transition-all"
+                onClick={() => setJoiningRole('SPECTATOR')}
+                className={`w-full py-3.5 px-4 rounded-2xl border font-bold flex items-center justify-between transition-all ${
+                  joiningRole === 'SPECTATOR'
+                    ? 'bg-purple-600/30 border-purple-500 text-white ring-2 ring-purple-500/50'
+                    : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300 border-slate-700'
+                }`}
               >
                 <span>👁️ Entra come Spettatore / Streamer</span>
-                <Eye size={18} />
+                <Eye size={18} className="text-purple-400" />
               </button>
             </div>
+
+            {/* Input name for joining player */}
+            {joiningRole !== 'SPECTATOR' && (
+              <div className="text-left space-y-1.5 pt-2">
+                <label className="block text-xs font-bold text-slate-300 uppercase">
+                  Il tuo Nome in-game
+                </label>
+                <input
+                  type="text"
+                  value={joiningName}
+                  onChange={(e) => setJoiningName(e.target.value)}
+                  placeholder="Inserisci il tuo Nickname"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-white font-bold text-sm focus:border-cyan-400 focus:outline-none"
+                />
+              </div>
+            )}
+
+            <button
+              onClick={handleConfirmRole}
+              className="w-full py-3.5 bg-gradient-to-r from-slate-200 to-slate-100 hover:from-white hover:to-slate-200 text-black font-extrabold rounded-2xl shadow-lg transition-all"
+            >
+              CONFERMA ED ENTRA IN STANZA
+            </button>
           </div>
         </div>
       )}
@@ -321,7 +407,10 @@ export function DraftRoomPage() {
             </button>
 
             <button
-              onClick={() => handleSelectRole(role === 'HOST' ? 'GUEST' : role === 'GUEST' ? 'SPECTATOR' : 'HOST')}
+              onClick={() => {
+                sessionStorage.removeItem(`draft_role_${roomId}`);
+                setRole(null);
+              }}
               className="px-3.5 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold border border-slate-700 transition-all"
             >
               Cambia Ruolo
@@ -338,7 +427,7 @@ export function DraftRoomPage() {
         </div>
       )}
 
-      {/* Main Status Header Banner - Silver Metallic Theme */}
+      {/* Main Status Header Banner */}
       <div className={`relative overflow-hidden rounded-3xl p-6 sm:p-8 border shadow-2xl transition-all ${
         room.status === 'completed'
           ? 'bg-gradient-to-r from-emerald-950/80 via-slate-900 to-emerald-950/80 border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.2)]'
@@ -503,7 +592,6 @@ export function DraftRoomPage() {
             )}
           </div>
 
-          {/* Grid Layout: Max 2 Rows on Desktop (e.g. 10 to 12 civs per row) */}
           <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-11 gap-2.5">
             {civilizationsData.map((civ) => {
               const isHostPick = state.hostPicks?.includes(civ.id);
@@ -537,7 +625,6 @@ export function DraftRoomPage() {
                       : 'bg-slate-950/40 border-slate-800/60 opacity-60'
                   }`}
                 >
-                  {/* Civ Flag Graphic - Large & Prominent */}
                   <img
                     src={civ.flag}
                     alt={civ.name}
