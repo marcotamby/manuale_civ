@@ -667,35 +667,43 @@ export function DraftRoomPage() {
                   disabled={!isClickable}
                   onClick={() => executeAction(civ.id)}
                   className={`group relative overflow-hidden rounded-2xl border aspect-[4/3] w-full flex items-end justify-center transition-all duration-300 shadow-md ${
-                    isHostPick
-                      ? 'border-red-500 ring-2 ring-red-500/50'
-                      : isGuestPick
-                      ? 'border-blue-500 ring-2 ring-blue-500/50'
-                      : isHostSnipe || isGuestSnipe
-                      ? 'border-purple-500 ring-2 ring-purple-500/50 opacity-70'
-                      : isHostBan || isGuestBan
-                      ? 'border-red-500/30 opacity-40 grayscale'
+                    isUsed
+                      ? 'border-slate-800/80 bg-slate-950/90 cursor-not-allowed'
                       : isClickable
                       ? 'border-slate-700/80 hover:border-cyan-400 hover:scale-105 cursor-pointer'
                       : 'border-slate-800/60 opacity-60'
                   }`}
                 >
-                  {/* Flag Image Fills Entire Card Area */}
+                  {/* Flag Image Fills Entire Card Area (Grayscale when used) */}
                   <img
                     src={civ.flag}
                     alt={civ.name}
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
+                      isUsed ? 'grayscale opacity-40' : 'group-hover:scale-110'
+                    }`}
                   />
 
                   {/* Gradient Overlay for Legibility */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
 
                   {/* Civ Name Label Over Flag */}
-                  <span className="relative z-10 text-[10px] sm:text-xs font-bold text-white px-1.5 py-0.5 mb-1 text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] truncate w-full">
+                  <span className={`relative z-10 text-[10px] sm:text-xs font-bold px-1.5 py-0.5 mb-1 text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] truncate w-full ${
+                    isUsed ? 'text-slate-400 line-through' : 'text-white'
+                  }`}>
                     {civ.name}
                   </span>
 
-                  {/* Overlays for Banned or Sniped */}
+                  {/* Overlays for Picked, Banned or Sniped */}
+                  {isHostPick && (
+                    <div className="absolute top-1.5 right-1.5 bg-red-600/90 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded shadow border border-red-400/50">
+                      PICKED (P1)
+                    </div>
+                  )}
+                  {isGuestPick && (
+                    <div className="absolute top-1.5 right-1.5 bg-blue-600/90 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded shadow border border-blue-400/50">
+                      PICKED (P2)
+                    </div>
+                  )}
                   {(isHostSnipe || isGuestSnipe) && (
                     <div className="absolute inset-0 bg-purple-950/75 flex flex-col items-center justify-center gap-0.5 text-purple-200 backdrop-blur-[1px]">
                       <Target size={26} className="stroke-[2.5]" />
