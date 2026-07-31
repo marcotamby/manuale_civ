@@ -189,10 +189,18 @@ export function DraftRoomPage() {
     if (!currentTurn || !room) return;
 
     if (currentTurn.target === 'CIV') {
-      const available = civilizationsData.filter(c => !allUsedCivs.includes(c.id));
-      if (available.length > 0) {
-        const randomCiv = available[Math.floor(Math.random() * available.length)];
-        executeAction(randomCiv.id);
+      if (currentTurn.action === 'SNIPE') {
+        const opponentPicks = currentTurn.player === 'HOST' ? state.guestPicks : state.hostPicks;
+        if (opponentPicks && opponentPicks.length > 0) {
+          const randomCivId = opponentPicks[Math.floor(Math.random() * opponentPicks.length)];
+          executeAction(randomCivId);
+        }
+      } else {
+        const available = civilizationsData.filter(c => !allUsedCivs.includes(c.id));
+        if (available.length > 0) {
+          const randomCiv = available[Math.floor(Math.random() * available.length)];
+          executeAction(randomCiv.id);
+        }
       }
     } else if (currentTurn.target === 'MAP') {
       const available = AOE4_MAPS.filter(m => !allUsedMaps.includes(m));
@@ -228,11 +236,18 @@ export function DraftRoomPage() {
         if (player === 'HOST') nextState.hostPicks.push(itemId);
         else nextState.guestPicks.push(itemId);
       } else if (action === 'BAN') {
-        if (player === 'HOST') nextState.hostBans.push(itemId);
-        else nextState.guestBans.push(itemId);
+        // BAN placed by Host goes under Guest's bans; BAN placed by Guest goes under Host's bans
+        if (player === 'HOST') nextState.guestBans.push(itemId);
+        else nextState.hostBans.push(itemId);
       } else if (action === 'SNIPE') {
-        if (player === 'HOST') nextState.hostSnipes.push(itemId);
-        else nextState.guestSnipes.push(itemId);
+        // Host SNIPEs one of Guest's picks -> moves from guestPicks to guestSnipes
+        if (player === 'HOST') {
+          nextState.guestPicks = nextState.guestPicks.filter(id => id !== itemId);
+          if (!nextState.guestSnipes.includes(itemId)) nextState.guestSnipes.push(itemId);
+        } else {
+          nextState.hostPicks = nextState.hostPicks.filter(id => id !== itemId);
+          if (!nextState.hostSnipes.includes(itemId)) nextState.hostSnipes.push(itemId);
+        }
       }
     } else if (target === 'MAP') {
       if (action === 'PICK') {
@@ -287,7 +302,7 @@ export function DraftRoomPage() {
   return (
     <div className={`min-h-screen ${isOverlayMode ? 'bg-black/95 text-white' : 'bg-transparent text-white'} p-3 sm:p-6 space-y-6 max-w-7xl mx-auto font-sans`}>
       
-      {/* Role Claim Modal (Centered vertically, no top cut-off) */}
+      {/* Role Claim Modal */}
       {!role && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
           <div className="bg-[#0b101e] border border-slate-700/60 rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-5 shadow-2xl my-auto max-h-[92vh] overflow-y-auto no-scrollbar">
@@ -420,11 +435,11 @@ export function DraftRoomPage() {
         </div>
       )}
 
-      {/* Main Status Header Banner - Clean Inter Font, Professional Layout */}
+      {/* Main Status Header Banner */}
       <div className="relative overflow-hidden rounded-3xl p-6 sm:p-7 border border-slate-700/60 bg-[#0b101e] shadow-xl">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
 
-          {/* Player 1 Host Badge & Picked/Banned Flags (Style of aoe2cm.net) */}
+          {/* Player 1 Host Header & Larger Flags (BAN / PICK / SNIPE) */}
           <div className={`md:col-span-4 flex flex-col gap-3 p-4 rounded-2xl border transition-all ${
             isHostTurn && room.status === 'in_progress' ? 'bg-red-500/10 border-red-500/60 ring-1 ring-red-500/40' : 'bg-slate-950/60 border-slate-800'
           }`}>
@@ -441,44 +456,48 @@ export function DraftRoomPage() {
               </div>
             </div>
 
-            {/* Picked / Banned / Sniped Flags Rows under Name */}
-            <div className="space-y-1.5 pt-1 border-t border-slate-800/80">
-              {state.hostBans && state.hostBans.length > 0 && (
-                <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-bold text-red-400 uppercase w-12 shrink-0">BAN</span>
-                  <div className="flex flex-wrap gap-1">
-                    {state.hostBans.map(id => {
+            {/* Picked / Banned / Sniped Flags Rows under Name (Identical Larger Size w-11 h-11) */}
+            <div className="space-y-2 pt-2 border-t border-slate-800/80">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-extrabold text-red-400 uppercase w-12 shrink-0">BAN</span>
+                <div className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
+                  {state.hostBans && state.hostBans.length > 0 ? (
+                    state.hostBans.map(id => {
                       const c = getCivObj(id);
                       return (
-                        <img key={`hban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-7 h-7 object-cover rounded-md border border-red-500/50 opacity-60 grayscale" />
+                        <img key={`hban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-11 h-11 object-cover rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md" />
                       );
-                    })}
-                  </div>
+                    })
+                  ) : (
+                    <span className="text-[11px] text-slate-600 italic">-</span>
+                  )}
                 </div>
-              )}
+              </div>
 
-              {state.hostPicks && state.hostPicks.length > 0 && (
-                <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-bold text-emerald-400 uppercase w-12 shrink-0">PICK</span>
-                  <div className="flex flex-wrap gap-1">
-                    {state.hostPicks.map(id => {
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-extrabold text-emerald-400 uppercase w-12 shrink-0">PICK</span>
+                <div className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
+                  {state.hostPicks && state.hostPicks.length > 0 ? (
+                    state.hostPicks.map(id => {
                       const c = getCivObj(id);
                       return (
-                        <img key={`hpick-${id}`} src={c.flag} alt={c.name} title={`PICK: ${c.name}`} className="w-8 h-8 object-cover rounded-lg border-2 border-emerald-500 shadow-md" />
+                        <img key={`hpick-${id}`} src={c.flag} alt={c.name} title={`PICK: ${c.name}`} className="w-11 h-11 object-cover rounded-xl border-2 border-emerald-500 shadow-md shadow-emerald-950/40" />
                       );
-                    })}
-                  </div>
+                    })
+                  ) : (
+                    <span className="text-[11px] text-slate-600 italic">-</span>
+                  )}
                 </div>
-              )}
+              </div>
 
               {state.hostSnipes && state.hostSnipes.length > 0 && (
                 <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-bold text-purple-400 uppercase w-12 shrink-0">SNIPE</span>
-                  <div className="flex flex-wrap gap-1">
+                  <span className="text-[10px] font-extrabold text-purple-400 uppercase w-12 shrink-0">SNIPE</span>
+                  <div className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
                     {state.hostSnipes.map(id => {
                       const c = getCivObj(id);
                       return (
-                        <img key={`hsnipe-${id}`} src={c.flag} alt={c.name} title={`SNIPE: ${c.name}`} className="w-7 h-7 object-cover rounded-md border border-purple-500/50 opacity-70" />
+                        <img key={`hsnipe-${id}`} src={c.flag} alt={c.name} title={`SNIPE: ${c.name}`} className="w-11 h-11 object-cover rounded-xl border-2 border-purple-500/80 opacity-85 shadow-md" />
                       );
                     })}
                   </div>
@@ -487,7 +506,7 @@ export function DraftRoomPage() {
             </div>
           </div>
 
-          {/* Center Status / Timer (Sleek Professional Typography) */}
+          {/* Center Status / Timer */}
           <div className="md:col-span-4 text-center space-y-3">
             {room.status === 'waiting' && (
               <div className="space-y-3">
@@ -533,7 +552,13 @@ export function DraftRoomPage() {
                     : 'bg-slate-900 text-slate-300 border-slate-800'
                 }`}>
                   {isMyTurn ? (
-                    `Il tuo Turno: ${currentTurn.action === 'BAN' ? 'Banna 1 civiltà' : currentTurn.action === 'SNIPE' ? 'Snippa 1 civiltà' : 'Seleziona 1 civiltà'}`
+                    `Il tuo Turno: ${
+                      currentTurn.action === 'BAN'
+                        ? 'Banna 1 civiltà all\'avversario'
+                        : currentTurn.action === 'SNIPE'
+                        ? 'Snippa 1 civiltà tra i pick dell\'avversario'
+                        : 'Seleziona 1 civiltà per te'
+                    }`
                   ) : (
                     `Turno di ${currentTurn.player === 'HOST' ? room.host_name : room.guest_name} (${currentTurn.action})`
                   )}
@@ -566,7 +591,7 @@ export function DraftRoomPage() {
             )}
           </div>
 
-          {/* Player 2 Guest Badge & Picked/Banned Flags */}
+          {/* Player 2 Guest Header & Larger Flags (BAN / PICK / SNIPE) */}
           <div className={`md:col-span-4 flex flex-col gap-3 p-4 rounded-2xl border transition-all ${
             isGuestTurn && room.status === 'in_progress' ? 'bg-blue-500/10 border-blue-500/60 ring-1 ring-blue-500/40' : 'bg-slate-950/60 border-slate-800'
           }`}>
@@ -583,47 +608,51 @@ export function DraftRoomPage() {
               </div>
             </div>
 
-            {/* Picked / Banned / Sniped Flags Rows under Name */}
-            <div className="space-y-1.5 pt-1 border-t border-slate-800/80">
-              {state.guestBans && state.guestBans.length > 0 && (
-                <div className="flex items-center justify-end gap-2">
-                  <div className="flex flex-wrap gap-1 justify-end">
-                    {state.guestBans.map(id => {
+            {/* Picked / Banned / Sniped Flags Rows under Name (Identical Larger Size w-11 h-11) */}
+            <div className="space-y-2 pt-2 border-t border-slate-800/80">
+              <div className="flex items-center justify-end gap-2">
+                <div className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
+                  {state.guestBans && state.guestBans.length > 0 ? (
+                    state.guestBans.map(id => {
                       const c = getCivObj(id);
                       return (
-                        <img key={`gban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-7 h-7 object-cover rounded-md border border-red-500/50 opacity-60 grayscale" />
+                        <img key={`gban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-11 h-11 object-cover rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md" />
                       );
-                    })}
-                  </div>
-                  <span className="text-[9px] font-bold text-red-400 uppercase w-12 shrink-0 text-right">BAN</span>
+                    })
+                  ) : (
+                    <span className="text-[11px] text-slate-600 italic">-</span>
+                  )}
                 </div>
-              )}
+                <span className="text-[10px] font-extrabold text-red-400 uppercase w-12 shrink-0 text-right">BAN</span>
+              </div>
 
-              {state.guestPicks && state.guestPicks.length > 0 && (
-                <div className="flex items-center justify-end gap-2">
-                  <div className="flex flex-wrap gap-1 justify-end">
-                    {state.guestPicks.map(id => {
+              <div className="flex items-center justify-end gap-2">
+                <div className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
+                  {state.guestPicks && state.guestPicks.length > 0 ? (
+                    state.guestPicks.map(id => {
                       const c = getCivObj(id);
                       return (
-                        <img key={`gpick-${id}`} src={c.flag} alt={c.name} title={`PICK: ${c.name}`} className="w-8 h-8 object-cover rounded-lg border-2 border-emerald-500 shadow-md" />
+                        <img key={`gpick-${id}`} src={c.flag} alt={c.name} title={`PICK: ${c.name}`} className="w-11 h-11 object-cover rounded-xl border-2 border-emerald-500 shadow-md shadow-emerald-950/40" />
                       );
-                    })}
-                  </div>
-                  <span className="text-[9px] font-bold text-emerald-400 uppercase w-12 shrink-0 text-right">PICK</span>
+                    })
+                  ) : (
+                    <span className="text-[11px] text-slate-600 italic">-</span>
+                  )}
                 </div>
-              )}
+                <span className="text-[10px] font-extrabold text-emerald-400 uppercase w-12 shrink-0 text-right">PICK</span>
+              </div>
 
               {state.guestSnipes && state.guestSnipes.length > 0 && (
                 <div className="flex items-center justify-end gap-2">
-                  <div className="flex flex-wrap gap-1 justify-end">
+                  <div className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
                     {state.guestSnipes.map(id => {
                       const c = getCivObj(id);
                       return (
-                        <img key={`gsnipe-${id}`} src={c.flag} alt={c.name} title={`SNIPE: ${c.name}`} className="w-7 h-7 object-cover rounded-md border border-purple-500/50 opacity-70" />
+                        <img key={`gsnipe-${id}`} src={c.flag} alt={c.name} title={`SNIPE: ${c.name}`} className="w-11 h-11 object-cover rounded-xl border-2 border-purple-500/80 opacity-85 shadow-md" />
                       );
                     })}
                   </div>
-                  <span className="text-[9px] font-bold text-purple-400 uppercase w-12 shrink-0 text-right">SNIPE</span>
+                  <span className="text-[10px] font-extrabold text-purple-400 uppercase w-12 shrink-0 text-right">SNIPE</span>
                 </div>
               )}
             </div>
@@ -632,7 +661,7 @@ export function DraftRoomPage() {
         </div>
       </div>
 
-      {/* Main Pick/Ban/Snipe Grid for Civilizations - Full-Bleed Flag Cards (Max 2 Rows) */}
+      {/* Main Pick/Ban/Snipe Grid for Civilizations */}
       {(!currentTurn || currentTurn.target === 'CIV') && (
         <div className="space-y-3">
           <div className="flex justify-between items-center">
@@ -641,12 +670,13 @@ export function DraftRoomPage() {
             </h3>
             {isMyTurn && room.status === 'in_progress' && (
               <span className="text-xs font-bold text-cyan-400">
-                Clicca su una civiltà per selezionare
+                {currentTurn?.action === 'SNIPE'
+                  ? 'Clicca su una civiltà dell\'avversario per effettuare lo SNIPE'
+                  : 'Clicca su una civiltà per selezionarla'}
               </span>
             )}
           </div>
 
-          {/* Grid Layout: Max 2 Rows on Desktop (e.g. 10 to 12 civs per row) */}
           <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-11 gap-2.5">
             {civilizationsData.map((civ) => {
               const isHostPick = state.hostPicks?.includes(civ.id);
@@ -658,7 +688,17 @@ export function DraftRoomPage() {
 
               const isUsed = isHostPick || isGuestPick || isHostBan || isGuestBan || isHostSnipe || isGuestSnipe;
 
-              const isClickable = isMyTurn && !isUsed && room.status === 'in_progress';
+              const isSnipeTurn = currentTurn?.action === 'SNIPE';
+
+              let isClickable = false;
+              if (isMyTurn && room.status === 'in_progress') {
+                if (isSnipeTurn) {
+                  // Host snipes guest's picks; Guest snipes host's picks
+                  isClickable = currentTurn.player === 'HOST' ? isGuestPick : isHostPick;
+                } else {
+                  isClickable = !isUsed;
+                }
+              }
 
               return (
                 <button
@@ -667,19 +707,21 @@ export function DraftRoomPage() {
                   disabled={!isClickable}
                   onClick={() => executeAction(civ.id)}
                   className={`group relative overflow-hidden rounded-2xl border aspect-[4/3] w-full flex items-end justify-center transition-all duration-300 shadow-md ${
-                    isUsed
+                    isSnipeTurn && isClickable
+                      ? 'border-purple-500 ring-2 ring-purple-500/70 hover:scale-110 cursor-pointer animate-pulse'
+                      : isUsed
                       ? 'border-slate-800/80 bg-slate-950/90 cursor-not-allowed'
                       : isClickable
                       ? 'border-slate-700/80 hover:border-cyan-400 hover:scale-105 cursor-pointer'
                       : 'border-slate-800/60 opacity-60'
                   }`}
                 >
-                  {/* Flag Image Fills Entire Card Area (Grayscale when used) */}
+                  {/* Flag Image Fills Entire Card Area */}
                   <img
                     src={civ.flag}
                     alt={civ.name}
                     className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
-                      isUsed ? 'grayscale opacity-40' : 'group-hover:scale-110'
+                      isUsed && !(isSnipeTurn && isClickable) ? 'grayscale opacity-40' : 'group-hover:scale-110'
                     }`}
                   />
 
@@ -688,18 +730,18 @@ export function DraftRoomPage() {
 
                   {/* Civ Name Label Over Flag */}
                   <span className={`relative z-10 text-[10px] sm:text-xs font-bold px-1.5 py-0.5 mb-1 text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] truncate w-full ${
-                    isUsed ? 'text-slate-400 line-through' : 'text-white'
+                    isUsed && !(isSnipeTurn && isClickable) ? 'text-slate-400 line-through' : 'text-white'
                   }`}>
                     {civ.name}
                   </span>
 
                   {/* Overlays for Picked, Banned or Sniped */}
-                  {isHostPick && (
+                  {!isSnipeTurn && isHostPick && (
                     <div className="absolute top-1.5 right-1.5 bg-red-600/90 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded shadow border border-red-400/50">
                       PICKED (P1)
                     </div>
                   )}
-                  {isGuestPick && (
+                  {!isSnipeTurn && isGuestPick && (
                     <div className="absolute top-1.5 right-1.5 bg-blue-600/90 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded shadow border border-blue-400/50">
                       PICKED (P2)
                     </div>
