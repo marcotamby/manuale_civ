@@ -84,6 +84,26 @@ function getLocalRoom(roomId: string): DraftRoom | null {
   }
 }
 
+function markLocalRoomDeleted(roomId: string) {
+  try {
+    const raw = localStorage.getItem('deleted_draft_room_ids');
+    const ids: string[] = raw ? JSON.parse(raw) : [];
+    if (!ids.includes(roomId)) {
+      localStorage.setItem('deleted_draft_room_ids', JSON.stringify([...ids, roomId]));
+    }
+  } catch (e) {}
+}
+
+function getDeletedRoomIds(): Set<string> {
+  try {
+    const raw = localStorage.getItem('deleted_draft_room_ids');
+    const ids: string[] = raw ? JSON.parse(raw) : [];
+    return new Set(ids);
+  } catch (e) {
+    return new Set();
+  }
+}
+
 function setLocalPreset(preset: DraftPreset) {
   try {
     const raw = localStorage.getItem('fallback_draft_presets');
@@ -287,7 +307,8 @@ export const draftService = {
       console.warn('Error fetching rooms by preset:', error);
       return [];
     }
-    return data || [];
+    const deletedIds = getDeletedRoomIds();
+    return (data || []).filter(r => !deletedIds.has(r.id));
   },
 
   async archiveRoom(roomId: string, isArchived: boolean): Promise<boolean> {
@@ -311,6 +332,7 @@ export const draftService = {
   },
 
   async deleteRoom(roomId: string): Promise<boolean> {
+    markLocalRoomDeleted(roomId);
     try {
       localStorage.removeItem(`fallback_draft_room_${roomId}`);
     } catch (e) {}

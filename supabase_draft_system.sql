@@ -72,5 +72,10 @@ CREATE POLICY "Allow public update draft_rooms"
   FOR UPDATE
   USING (true);
 
+CREATE POLICY "Allow public delete draft_rooms"
+  ON public.draft_rooms
+  FOR DELETE
+  USING (true);
+
 -- Enable Realtime for draft_rooms
 ALTER PUBLICATION supabase_realtime ADD TABLE draft_rooms;
