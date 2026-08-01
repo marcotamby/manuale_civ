@@ -301,15 +301,7 @@ export function DraftRoomPage() {
     <div className={`min-h-screen ${isOverlayMode ? 'bg-black/95 text-white' : 'bg-transparent text-white'} p-2.5 sm:p-5 space-y-4 sm:space-y-6 max-w-7xl mx-auto font-sans`}>
       
       {/* Floating Exit Button for Overlay/Stream Mode */}
-      {isOverlayMode && (
-        <button
-          onClick={() => setIsOverlayMode(false)}
-          className="fixed top-4 right-4 z-[999] flex items-center gap-2 px-4 py-2 bg-purple-950/90 hover:bg-purple-900 text-purple-200 border border-purple-500/50 rounded-2xl text-xs font-extrabold shadow-2xl backdrop-blur-md transition-all"
-        >
-          <X size={16} />
-          <span>Esci da Modalità Stream</span>
-        </button>
-      )}
+
 
       {/* Role Claim Modal */}
       {!role && (
@@ -402,47 +394,49 @@ export function DraftRoomPage() {
         </div>
       )}
 
-      {/* Control Top Row - Clean Pill Buttons without Outer Background Box */}
-      {!isOverlayMode && (
-        <div className="flex flex-wrap justify-between items-center gap-2 px-1 py-1">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-extrabold px-3 py-1.5 rounded-full bg-[#0b101e] text-cyan-300 border border-slate-700 uppercase tracking-wider">
-              {room.title}
-            </span>
-            <span className="text-xs text-slate-400 hidden sm:inline">
-              Ruolo: <strong className={role === 'HOST' ? 'text-red-400 font-bold' : role === 'GUEST' ? 'text-blue-400 font-bold' : 'text-slate-300'}>{role}</strong>
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleCopyShareLink}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0b101e] hover:bg-slate-800 text-slate-200 rounded-xl text-xs font-bold border border-slate-700/80 transition-all shadow-md"
-            >
-              {copiedLink ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
-              <span>{copiedLink ? '✓ Copiato!' : 'Copia Link Stanza'}</span>
-            </button>
-
-            <button
-              onClick={() => {
-                sessionStorage.removeItem(`draft_role_${roomId}`);
-                setRole(null);
-              }}
-              className="px-3.5 py-1.5 bg-[#0b101e] hover:bg-slate-800 text-slate-300 rounded-xl text-xs font-bold border border-slate-700/80 transition-all shadow-md"
-            >
-              Cambia Ruolo
-            </button>
-
-            <button
-              onClick={() => setIsOverlayMode(true)}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-purple-950/60 hover:bg-purple-900/60 text-purple-300 border border-purple-500/40 rounded-xl text-xs font-bold transition-all shadow-md"
-            >
-              <Monitor size={14} />
-              <span>Modalità Stream</span>
-            </button>
-          </div>
+      {/* Control Top Row - Clean Pill Buttons */}
+      <div className="flex flex-wrap justify-between items-center gap-2 px-1 py-1">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-extrabold px-3 py-1.5 rounded-full bg-[#0b101e] text-cyan-300 border border-slate-700 uppercase tracking-wider">
+            {room.title}
+          </span>
+          <span className="text-xs text-slate-400 hidden sm:inline">
+            Ruolo: <strong className={role === 'HOST' ? 'text-red-400 font-bold' : role === 'GUEST' ? 'text-blue-400 font-bold' : 'text-slate-300'}>{role}</strong>
+          </span>
         </div>
-      )}
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleCopyShareLink}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0b101e] hover:bg-slate-800 text-slate-200 rounded-xl text-xs font-bold border border-slate-700/80 transition-all shadow-md"
+          >
+            {copiedLink ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+            <span>{copiedLink ? '✓ Copiato!' : 'Copia Link Stanza'}</span>
+          </button>
+
+          <button
+            onClick={() => {
+              sessionStorage.removeItem(`draft_role_${roomId}`);
+              setRole(null);
+            }}
+            className="px-3.5 py-1.5 bg-[#0b101e] hover:bg-slate-800 text-slate-300 rounded-xl text-xs font-bold border border-slate-700/80 transition-all shadow-md"
+          >
+            Cambia Ruolo
+          </button>
+
+          <button
+            onClick={() => setIsOverlayMode(!isOverlayMode)}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-md border ${
+              isOverlayMode
+                ? 'bg-purple-600 hover:bg-purple-500 text-white border-purple-400'
+                : 'bg-purple-950/60 hover:bg-purple-900/60 text-purple-300 border-purple-500/40'
+            }`}
+          >
+            {isOverlayMode ? <X size={14} /> : <Monitor size={14} />}
+            <span>{isOverlayMode ? 'Esci da Modalità Stream' : 'Modalità Stream'}</span>
+          </button>
+        </div>
+      </div>
 
       {/* Main Status Header - No Background Boxes Behind Player Headers */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 items-stretch">
