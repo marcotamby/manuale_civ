@@ -565,7 +565,7 @@ export function DraftRoomPage() {
                     currentTurn.action === 'BAN'
                       ? 'Banna 1 civiltà all\'avversario'
                       : currentTurn.action === 'SNIPE'
-                      ? 'Snippa 1 civiltà tra i pick dell\'avversario'
+                      ? 'Effettua 1 SNIPE tra i pick dell\'avversario'
                       : 'Seleziona 1 civiltà per te'
                   }`
                 ) : (

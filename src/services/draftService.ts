@@ -66,7 +66,7 @@ export function generateDraftId(length = 7): string {
   return result;
 }
 
-// Helper to save/read fallback room in local storage
+// Helper to save/read fallback room & presets in local storage
 function setLocalRoom(room: DraftRoom) {
   try {
     localStorage.setItem(`fallback_draft_room_${room.id}`, JSON.stringify(room));
@@ -84,34 +84,74 @@ function getLocalRoom(roomId: string): DraftRoom | null {
   }
 }
 
+function setLocalPreset(preset: DraftPreset) {
+  try {
+    const raw = localStorage.getItem('fallback_draft_presets');
+    const existing: DraftPreset[] = raw ? JSON.parse(raw) : [];
+    const filtered = existing.filter(p => p.id !== preset.id);
+    localStorage.setItem('fallback_draft_presets', JSON.stringify([preset, ...filtered]));
+  } catch (e) {
+    console.warn('Could not save local preset fallback:', e);
+  }
+}
+
+function getLocalPresets(): DraftPreset[] {
+  try {
+    const raw = localStorage.getItem('fallback_draft_presets');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function removeLocalPreset(id: string) {
+  try {
+    const raw = localStorage.getItem('fallback_draft_presets');
+    const existing: DraftPreset[] = raw ? JSON.parse(raw) : [];
+    localStorage.setItem('fallback_draft_presets', JSON.stringify(existing.filter(p => p.id !== id)));
+  } catch (e) {}
+}
+
 export const draftService = {
   async getPresets(): Promise<DraftPreset[]> {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('draft_presets')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.warn('Error fetching draft presets from Supabase:', error);
-      return [];
-    }
-    return data || [];
+    const dbPresets = data || [];
+    const localPresets = getLocalPresets();
+
+    // Merge DB presets and local presets (DB takes priority)
+    const map = new Map<string, DraftPreset>();
+    localPresets.forEach(p => map.set(p.id, p));
+    dbPresets.forEach(p => map.set(p.id, p));
+
+    return Array.from(map.values());
   },
 
   async getPresetById(id: string): Promise<DraftPreset | null> {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('draft_presets')
       .select('*')
       .eq('id', id)
       .single();
 
-    if (error || !data) return null;
-    return data;
+    if (data) {
+      setLocalPreset(data);
+      return data;
+    }
+
+    // Check local fallback
+    const local = getLocalPresets().find(p => p.id === id);
+    if (local) return local;
+
+    return null;
   },
 
   async savePreset(preset: Partial<DraftPreset>): Promise<DraftPreset | null> {
     const id = preset.id || `preset-${Date.now()}`;
-    const payload = {
+    const payloadWithMapPool = {
       id,
       title: preset.title || 'Nuovo Preset Draft',
       description: preset.description || '',
@@ -122,28 +162,44 @@ export const draftService = {
       updated_at: new Date().toISOString()
     };
 
-    const { data, error } = await supabase
+    // First try saving with map_pool
+    let { data, error } = await supabase
       .from('draft_presets')
-      .upsert([payload])
+      .upsert([payloadWithMapPool])
       .select()
       .single();
 
+    // If map_pool column doesn't exist on DB yet, try fallback without map_pool column in SQL payload
     if (error) {
-      console.error('Error saving draft preset:', error);
-      throw error;
+      console.warn('Supabase save with map_pool failed, attempting fallback save:', error.message);
+      const { map_pool, ...payloadWithoutMapPool } = payloadWithMapPool;
+      const res = await supabase
+        .from('draft_presets')
+        .upsert([payloadWithoutMapPool])
+        .select()
+        .single();
+      
+      if (res.data) {
+        data = { ...res.data, map_pool: preset.map_pool || [] };
+        error = null;
+      }
     }
-    return data;
+
+    const savedPreset: DraftPreset = data ? { ...data, map_pool: preset.map_pool || data.map_pool || [] } : (payloadWithMapPool as DraftPreset);
+    setLocalPreset(savedPreset);
+
+    return savedPreset;
   },
 
   async deletePreset(id: string): Promise<boolean> {
+    removeLocalPreset(id);
     const { error } = await supabase
       .from('draft_presets')
       .delete()
       .eq('id', id);
 
     if (error) {
-      console.error('Error deleting draft preset:', error);
-      throw error;
+      console.warn('Supabase delete preset warning:', error);
     }
     return true;
   },

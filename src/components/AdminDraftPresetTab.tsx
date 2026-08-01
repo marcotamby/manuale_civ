@@ -539,7 +539,7 @@ export function AdminDraftPresetTab() {
                   >
                     <option value="BAN">🚫 BANNA</option>
                     <option value="PICK">✅ PICCA</option>
-                    <option value="SNIPE">🎯 SNIPPA</option>
+                    <option value="SNIPE">🎯 SNIPE</option>
                   </select>
 
                   {/* Target select */}
