@@ -311,14 +311,17 @@ export const draftService = {
   },
 
   async deleteRoom(roomId: string): Promise<boolean> {
+    try {
+      localStorage.removeItem(`fallback_draft_room_${roomId}`);
+    } catch (e) {}
+
     const { error } = await supabase
       .from('draft_rooms')
       .delete()
       .eq('id', roomId);
 
     if (error) {
-      console.error('Error deleting draft room:', error);
-      return false;
+      console.warn('Error or notice when deleting draft room from Supabase:', error.message);
     }
     return true;
   },

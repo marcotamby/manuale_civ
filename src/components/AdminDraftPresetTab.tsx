@@ -76,11 +76,14 @@ export function AdminDraftPresetTab() {
         console.error('Failed to delete preset:', err);
       }
     } else if (deleteConfirm.type === 'room') {
-      const success = await draftService.deleteRoom(deleteConfirm.id);
-      if (success && historyPreset) {
+      const roomIdToDelete = deleteConfirm.id;
+      setDeleteConfirm(null);
+      setHistoryRooms(prev => prev.filter(r => r.id !== roomIdToDelete));
+      
+      await draftService.deleteRoom(roomIdToDelete);
+      if (historyPreset) {
         const rooms = await draftService.getRoomsByPresetId(historyPreset.id);
-        setHistoryRooms(rooms);
-        setDeleteConfirm(null);
+        setHistoryRooms(rooms.filter(r => r.id !== roomIdToDelete));
       }
     }
   };
