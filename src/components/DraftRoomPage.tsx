@@ -240,11 +240,11 @@ export function DraftRoomPage() {
         else nextState.hostBans.push(itemId);
       } else if (action === 'SNIPE') {
         if (player === 'HOST') {
-          nextState.guestPicks = nextState.guestPicks.filter(id => id !== itemId);
           if (!nextState.guestSnipes.includes(itemId)) nextState.guestSnipes.push(itemId);
+          if (!nextState.guestPicks.includes(itemId)) nextState.guestPicks.push(itemId);
         } else {
-          nextState.hostPicks = nextState.hostPicks.filter(id => id !== itemId);
           if (!nextState.hostSnipes.includes(itemId)) nextState.hostSnipes.push(itemId);
+          if (!nextState.hostPicks.includes(itemId)) nextState.hostPicks.push(itemId);
         }
       }
     } else if (target === 'MAP') {
@@ -489,8 +489,20 @@ export function DraftRoomPage() {
                 {state.hostPicks && state.hostPicks.length > 0 ? (
                   state.hostPicks.map(id => {
                     const c = getCivObj(id);
+                    const isSniped = state.hostSnipes?.includes(id);
                     return (
-                      <img key={`hpick-${id}`} src={c.flag} alt={c.name} title={`PICK: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-emerald-500 shadow-md shadow-emerald-950/40" />
+                      <div key={`hpick-${id}`} className={`relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 shadow-md ${
+                        isSniped ? 'border-red-500/80 shadow-red-950/50' : 'border-emerald-500 shadow-emerald-950/40'
+                      }`}>
+                        <img src={c.flag} alt={c.name} title={isSniped ? `SNIPED: ${c.name}` : `PICK: ${c.name}`} className={`w-full h-full object-cover ${isSniped ? 'grayscale opacity-50' : ''}`} />
+                        {isSniped && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[0.5px]">
+                            <span className="bg-red-600/90 text-white text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rotate-[-25deg] shadow-lg border border-red-400/80 whitespace-nowrap">
+                              SNIPED
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     );
                   })
                 ) : (
@@ -498,20 +510,6 @@ export function DraftRoomPage() {
                 )}
               </div>
             </div>
-
-            {state.hostSnipes && state.hostSnipes.length > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-extrabold text-purple-400 uppercase w-12 shrink-0">SNIPE</span>
-                <div className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
-                  {state.hostSnipes.map(id => {
-                    const c = getCivObj(id);
-                    return (
-                      <img key={`hsnipe-${id}`} src={c.flag} alt={c.name} title={`SNIPE: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-purple-500/80 opacity-85 shadow-md" />
-                    );
-                  })}
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
@@ -641,8 +639,20 @@ export function DraftRoomPage() {
                 {state.guestPicks && state.guestPicks.length > 0 ? (
                   state.guestPicks.map(id => {
                     const c = getCivObj(id);
+                    const isSniped = state.guestSnipes?.includes(id);
                     return (
-                      <img key={`gpick-${id}`} src={c.flag} alt={c.name} title={`PICK: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-emerald-500 shadow-md shadow-emerald-950/40" />
+                      <div key={`gpick-${id}`} className={`relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 shadow-md ${
+                        isSniped ? 'border-red-500/80 shadow-red-950/50' : 'border-emerald-500 shadow-emerald-950/40'
+                      }`}>
+                        <img src={c.flag} alt={c.name} title={isSniped ? `SNIPED: ${c.name}` : `PICK: ${c.name}`} className={`w-full h-full object-cover ${isSniped ? 'grayscale opacity-50' : ''}`} />
+                        {isSniped && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[0.5px]">
+                            <span className="bg-red-600/90 text-white text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rotate-[-25deg] shadow-lg border border-red-400/80 whitespace-nowrap">
+                              SNIPED
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     );
                   })
                 ) : (
@@ -651,20 +661,6 @@ export function DraftRoomPage() {
               </div>
               <span className="text-[10px] font-extrabold text-emerald-400 uppercase w-12 shrink-0 text-right">PICK</span>
             </div>
-
-            {state.guestSnipes && state.guestSnipes.length > 0 && (
-              <div className="flex items-center justify-end gap-2">
-                <div className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
-                  {state.guestSnipes.map(id => {
-                    const c = getCivObj(id);
-                    return (
-                      <img key={`gsnipe-${id}`} src={c.flag} alt={c.name} title={`SNIPE: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-purple-500/80 opacity-85 shadow-md" />
-                    );
-                  })}
-                </div>
-                <span className="text-[10px] font-extrabold text-purple-400 uppercase w-12 shrink-0 text-right">SNIPE</span>
-              </div>
-            )}
           </div>
         </div>
 
