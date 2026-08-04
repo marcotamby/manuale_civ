@@ -408,7 +408,12 @@ export function AdminDraftPresetTab() {
               </label>
               <select
                 value={editingPreset.scope || 'civs'}
-                onChange={(e) => setEditingPreset({ ...editingPreset, scope: e.target.value as any })}
+                onChange={(e) => {
+                  const newScope = e.target.value as any;
+                  const currentPool = editingPreset.map_pool;
+                  const nextPool = (currentPool && currentPool.length > 0) ? currentPool : [...AOE4_MAPS];
+                  setEditingPreset({ ...editingPreset, scope: newScope, map_pool: nextPool });
+                }}
                 className="w-full bg-slate-950/80 border border-slate-700/60 rounded-xl px-4 py-2.5 text-white font-medium focus:border-cyan-400 focus:outline-none"
               >
                 <option value="civs">⚔️ Solo Civiltà</option>
@@ -759,7 +764,10 @@ export function AdminDraftPresetTab() {
 
                 <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-800/60">
                   <button
-                    onClick={() => setEditingPreset(preset)}
+                    onClick={() => setEditingPreset({
+                      ...preset,
+                      map_pool: (preset.map_pool && preset.map_pool.length > 0) ? preset.map_pool : [...AOE4_MAPS]
+                    })}
                     className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-slate-800/40 hover:bg-slate-800 text-slate-300 rounded-lg text-xs font-semibold transition-colors"
                   >
                     <Edit2 size={14} />

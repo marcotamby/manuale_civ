@@ -150,10 +150,18 @@ export const draftService = {
     const dbPresets = data || [];
     const localPresets = getLocalPresets();
 
-    // Merge DB presets and local presets (DB takes priority)
+    // Merge DB presets and local presets (DB takes priority, but preserve map_pool if DB is missing it)
     const map = new Map<string, DraftPreset>();
     localPresets.forEach(p => map.set(p.id, p));
-    dbPresets.forEach(p => map.set(p.id, p));
+    dbPresets.forEach(p => {
+      const local = localPresets.find(lp => lp.id === p.id);
+      const mergedMapPool = (p.map_pool && Array.isArray(p.map_pool) && p.map_pool.length > 0)
+        ? p.map_pool
+        : (local?.map_pool && local.map_pool.length > 0)
+        ? local.map_pool
+        : (p.scope === 'maps' || p.scope === 'both') ? [...AOE4_MAPS] : [];
+      map.set(p.id, { ...p, map_pool: mergedMapPool });
+    });
 
     return Array.from(map.values());
   },
@@ -170,7 +178,9 @@ export const draftService = {
     if (data) {
       const mergedMapPool = (data.map_pool && Array.isArray(data.map_pool) && data.map_pool.length > 0)
         ? data.map_pool
-        : (local?.map_pool || []);
+        : (local?.map_pool && local.map_pool.length > 0)
+        ? local.map_pool
+        : (data.scope === 'maps' || data.scope === 'both') ? [...AOE4_MAPS] : [];
       const presetWithPool = { ...data, map_pool: mergedMapPool };
       setLocalPreset(presetWithPool);
       return presetWithPool;
@@ -184,6 +194,10 @@ export const draftService = {
 
   async savePreset(preset: Partial<DraftPreset>): Promise<DraftPreset | null> {
     const id = preset.id || `preset-${Date.now()}`;
+    const mapPoolToSave = (preset.map_pool && Array.isArray(preset.map_pool) && preset.map_pool.length > 0)
+      ? preset.map_pool
+      : (preset.scope === 'maps' || preset.scope === 'both') ? [...AOE4_MAPS] : [];
+
     const payloadWithMapPool = {
       id,
       title: preset.title || 'Nuovo Preset Draft',
@@ -191,7 +205,7 @@ export const draftService = {
       scope: preset.scope || 'civs',
       is_active: preset.is_active ?? true,
       turns: preset.turns || [],
-      map_pool: preset.map_pool || [],
+      map_pool: mapPoolToSave,
       updated_at: new Date().toISOString()
     };
 
@@ -213,12 +227,12 @@ export const draftService = {
         .single();
       
       if (res.data) {
-        data = { ...res.data, map_pool: preset.map_pool || [] };
+        data = { ...res.data, map_pool: mapPoolToSave };
         error = null;
       }
     }
 
-    const savedPreset: DraftPreset = data ? { ...data, map_pool: preset.map_pool || data.map_pool || [] } : (payloadWithMapPool as DraftPreset);
+    const savedPreset: DraftPreset = data ? { ...data, map_pool: mapPoolToSave } : (payloadWithMapPool as DraftPreset);
     setLocalPreset(savedPreset);
 
     return savedPreset;
