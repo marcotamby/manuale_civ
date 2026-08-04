@@ -151,16 +151,23 @@ export const draftService = {
     const dbPresets = data || [];
     const localPresets = getLocalPresets();
 
-    // Merge DB presets and local presets (DB takes priority, but preserve map_pool if DB is missing it)
+    // Merge DB presets and local presets (DB takes priority, with fallback embedded _map_pool in turns)
     const map = new Map<string, DraftPreset>();
     localPresets.forEach(p => map.set(p.id, p));
     dbPresets.forEach(p => {
       const local = localPresets.find(lp => lp.id === p.id);
+      const turnsPool = (p.turns && Array.isArray(p.turns) && p.turns[0]?._map_pool && Array.isArray(p.turns[0]._map_pool) && p.turns[0]._map_pool.length > 0)
+        ? p.turns[0]._map_pool
+        : undefined;
+
       const mergedMapPool = (p.map_pool && Array.isArray(p.map_pool) && p.map_pool.length > 0)
         ? p.map_pool
+        : turnsPool
+        ? turnsPool
         : (local?.map_pool && local.map_pool.length > 0)
         ? local.map_pool
         : (p.scope === 'maps' || p.scope === 'both') ? [...AOE4_MAPS] : [];
+
       map.set(p.id, { ...p, map_pool: mergedMapPool });
     });
 
@@ -177,11 +184,18 @@ export const draftService = {
     const local = getLocalPresets().find(p => p.id === id);
 
     if (data) {
+      const turnsPool = (data.turns && Array.isArray(data.turns) && data.turns[0]?._map_pool && Array.isArray(data.turns[0]._map_pool) && data.turns[0]._map_pool.length > 0)
+        ? data.turns[0]._map_pool
+        : undefined;
+
       const mergedMapPool = (data.map_pool && Array.isArray(data.map_pool) && data.map_pool.length > 0)
         ? data.map_pool
+        : turnsPool
+        ? turnsPool
         : (local?.map_pool && local.map_pool.length > 0)
         ? local.map_pool
         : (data.scope === 'maps' || data.scope === 'both') ? [...AOE4_MAPS] : [];
+
       const presetWithPool = { ...data, map_pool: mergedMapPool };
       setLocalPreset(presetWithPool);
       return presetWithPool;
@@ -199,25 +213,32 @@ export const draftService = {
       ? preset.map_pool
       : (preset.scope === 'maps' || preset.scope === 'both') ? [...AOE4_MAPS] : [];
 
+    // Embed _map_pool into the turns JSONB payload so it persists in Supabase DB even if map_pool column is missing
+    const turns = (preset.turns && preset.turns.length > 0) ? [...preset.turns] : [
+      { step: 1, player: 'HOST' as TurnPlayer, action: 'BAN' as TurnAction, target: 'MAP' as TurnTarget, amount: 1, timeLimit: 30 }
+    ];
+    const turnsWithMapPool = turns.map((t, idx) => idx === 0 ? { ...t, _map_pool: mapPoolToSave } : t);
+
     const payloadWithMapPool = {
       id,
       title: preset.title || 'Nuovo Preset Draft',
       description: preset.description || '',
       scope: preset.scope || 'civs',
       is_active: preset.is_active ?? true,
-      turns: preset.turns || [],
+      turns: turnsWithMapPool,
       map_pool: mapPoolToSave,
       updated_at: new Date().toISOString()
     };
 
-    // First try saving with map_pool
+    // First try saving with map_pool column
     let { data, error } = await supabase
       .from('draft_presets')
       .upsert([payloadWithMapPool])
       .select()
       .single();
 
-    // If map_pool column doesn't exist on DB yet, try fallback without map_pool column in SQL payload
+    // If map_pool column doesn't exist on DB yet, fallback without map_pool column in SQL payload
+    // turnsWithMapPool already contains _map_pool inside the turns JSONB column!
     if (error) {
       console.warn('Supabase save with map_pool failed, attempting fallback save:', error.message);
       const { map_pool, ...payloadWithoutMapPool } = payloadWithMapPool;
