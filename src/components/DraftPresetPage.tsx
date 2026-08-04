@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Swords, Users, Shield, ArrowRight, Loader2, Eye } from 'lucide-react';
+import { Swords, ArrowRight, Loader2 } from 'lucide-react';
 import { draftService } from '../services/draftService';
-import type { DraftPreset, TurnPlayer } from '../services/draftService';
-
-type UserRole = 'HOST' | 'GUEST' | 'SPECTATOR';
+import type { DraftPreset } from '../services/draftService';
 
 export function DraftPresetPage() {
   const { presetId } = useParams<{ presetId: string }>();
@@ -13,8 +11,6 @@ export function DraftPresetPage() {
   const [preset, setPreset] = useState<DraftPreset | null>(null);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<UserRole>('HOST');
-  const [playerName, setPlayerName] = useState('Giocatore 1');
 
   useEffect(() => {
     if (presetId) {

@@ -253,14 +253,16 @@ export const draftService = {
   },
 
   // Room Management
-  async createRoom(preset: DraftPreset, playerName: string = 'Giocatore 1', role: TurnPlayer = 'SPECTATOR'): Promise<DraftRoom> {
+  async createRoom(preset: DraftPreset, playerName: string = 'Giocatore 1', role?: TurnPlayer): Promise<DraftRoom> {
     const roomId = generateDraftId(7);
+    const isHost = role === 'HOST';
+    const isGuest = role === 'GUEST';
     const roomPayload: any = {
       id: roomId,
       preset_id: preset.id,
       title: preset.title,
-      host_name: 'Giocatore 1',
-      guest_name: 'Giocatore 2',
+      host_name: isHost ? playerName : 'Giocatore 1',
+      guest_name: isGuest ? playerName : 'Giocatore 2',
       current_step: 0,
       timer_ends_at: null,
       state: {
@@ -272,8 +274,8 @@ export const draftService = {
         guestSnipes: [],
         hostReady: false,
         guestReady: false,
-        hostClaimed: false,
-        guestClaimed: false,
+        hostClaimed: isHost,
+        guestClaimed: isGuest,
         mapPicks: [],
         mapBans: [],
         hostMapPicks: [],
