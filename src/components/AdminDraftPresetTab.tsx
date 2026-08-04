@@ -96,6 +96,7 @@ export function AdminDraftPresetTab() {
       description: 'Preset per BO3 con 1 Ban e 3 Pick per giocatore',
       scope: 'civs',
       is_active: true,
+      map_pool: [...AOE4_MAPS],
       turns: [
         { step: 1, player: 'HOST', action: 'BAN', target: 'CIV', amount: 1, timeLimit: 30 },
         { step: 2, player: 'GUEST', action: 'BAN', target: 'CIV', amount: 1, timeLimit: 30 },
@@ -478,7 +479,7 @@ export function AdminDraftPresetTab() {
               </div>
 
               {/* Square Map Cards Grid */}
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2.5 max-h-72 overflow-y-auto p-2 bg-slate-950/60 rounded-2xl border border-slate-800 no-scrollbar">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 max-h-80 overflow-y-auto p-2.5 bg-slate-950/60 rounded-2xl border border-slate-800 no-scrollbar">
                 {AOE4_MAPS.filter(m => m.toLowerCase().includes(mapSearchQuery.toLowerCase())).map((mapName) => {
                   const isSelected = editingPreset.map_pool?.includes(mapName);
                   return (
@@ -492,7 +493,7 @@ export function AdminDraftPresetTab() {
                           : [...current, mapName];
                         setEditingPreset({ ...editingPreset, map_pool: next });
                       }}
-                      className={`group relative aspect-square overflow-hidden rounded-xl border flex flex-col justify-end transition-all duration-200 text-center ${
+                      className={`group relative aspect-[4/3] overflow-hidden rounded-2xl border flex flex-col justify-end transition-all duration-200 text-center ${
                         isSelected
                           ? 'border-cyan-400 ring-2 ring-cyan-400/50 shadow-lg shadow-cyan-950/50 scale-[1.02]'
                           : 'border-slate-800/80 hover:border-slate-600 opacity-60 hover:opacity-100'
@@ -506,15 +507,15 @@ export function AdminDraftPresetTab() {
                           isSelected ? 'group-hover:scale-105' : 'grayscale group-hover:grayscale-0'
                         }`}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
-                      <span className={`relative z-10 text-[10px] font-extrabold px-1 py-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] truncate w-full ${
-                        isSelected ? 'text-white font-black' : 'text-slate-300'
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent pointer-events-none" />
+                      <span className={`relative z-10 text-xs sm:text-sm font-black px-1.5 py-1.5 leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,1)] line-clamp-2 w-full ${
+                        isSelected ? 'text-white' : 'text-slate-200'
                       }`}>
                         {mapName}
                       </span>
                       {isSelected && (
-                        <div className="absolute top-1 right-1 bg-cyan-500 text-black rounded-full p-0.5 shadow">
-                          <Check size={10} className="stroke-[3]" />
+                        <div className="absolute top-1.5 right-1.5 bg-cyan-500 text-black rounded-full p-1 shadow-md">
+                          <Check size={12} className="stroke-[3]" />
                         </div>
                       )}
                     </button>

@@ -42,6 +42,8 @@ export interface DraftState {
   guestMapPicks?: string[];
   hostMapBans?: string[];
   guestMapBans?: string[];
+  adminMapPicks?: string[];
+  mapPool?: string[];
   revealedBans?: boolean;
   revealedPicks?: boolean;
 }
@@ -263,6 +265,8 @@ export const draftService = {
         guestMapPicks: [],
         hostMapBans: [],
         guestMapBans: [],
+        adminMapPicks: [],
+        mapPool: preset.map_pool || [],
         revealedBans: false,
         revealedPicks: false
       },
@@ -302,6 +306,22 @@ export const draftService = {
     let preset: DraftPreset | null = null;
     if (data.preset_id) {
       preset = await draftService.getPresetById(data.preset_id);
+    }
+
+    // Ensure preset map_pool is populated from room state if present
+    if (data.state?.mapPool && Array.isArray(data.state.mapPool) && data.state.mapPool.length > 0) {
+      if (!preset) {
+        preset = {
+          id: data.preset_id || 'unknown',
+          title: data.title || 'Draft Match',
+          scope: 'both',
+          is_active: true,
+          turns: [],
+          map_pool: data.state.mapPool
+        };
+      } else {
+        preset = { ...preset, map_pool: data.state.mapPool };
+      }
     }
 
     const roomObj: DraftRoom = {

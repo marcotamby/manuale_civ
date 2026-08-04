@@ -77,13 +77,33 @@ export function DraftRoomPage() {
     hostClaimed: false,
     guestClaimed: false,
     mapPicks: [],
-    mapBans: []
+    mapBans: [],
+    hostMapPicks: [],
+    guestMapPicks: [],
+    hostMapBans: [],
+    guestMapBans: [],
+    adminMapPicks: [],
+    mapPool: []
   };
 
   const hostClaimed = !!state.hostClaimed;
   const guestClaimed = !!state.guestClaimed;
   const hostReady = !!state.hostReady;
   const guestReady = !!state.guestReady;
+
+  // Turn details
+  const turns: DraftTurn[] = room?.preset?.turns || [];
+  const currentStep = room?.current_step || 0;
+  const currentTurn: DraftTurn | undefined = turns[currentStep];
+
+  const activeMapPool = useMemo(() => {
+    if (state.mapPool && Array.isArray(state.mapPool) && state.mapPool.length > 0) {
+      return state.mapPool;
+    }
+    return (room?.preset?.map_pool && room.preset.map_pool.length > 0)
+      ? room.preset.map_pool
+      : AOE4_MAPS;
+  }, [room?.preset?.map_pool, state.mapPool]);
 
   // Claim Role & join room
   const handleConfirmRole = async () => {
@@ -113,17 +133,6 @@ export function DraftRoomPage() {
       if (roomId) sessionStorage.setItem(`draft_role_${roomId}`, joiningRole);
     }
   };
-
-  // Turn details
-  const turns: DraftTurn[] = room?.preset?.turns || [];
-  const currentStep = room?.current_step || 0;
-  const currentTurn: DraftTurn | undefined = turns[currentStep];
-
-  const activeMapPool = useMemo(() => {
-    return (room?.preset?.map_pool && room.preset.map_pool.length > 0)
-      ? room.preset.map_pool
-      : AOE4_MAPS;
-  }, [room?.preset?.map_pool]);
 
   const hasRevealBans = useMemo(() => turns.some(t => t.action === 'REVEAL_BANS' || t.action === 'REVEAL_ALL'), [turns]);
   const hasRevealPicks = useMemo(() => turns.some(t => t.action === 'REVEAL_PICKS' || t.action === 'REVEAL_ALL'), [turns]);
@@ -211,7 +220,8 @@ export function DraftRoomPage() {
         hostMapPicks: [...(state.hostMapPicks || [])],
         guestMapPicks: [...(state.guestMapPicks || [])],
         hostMapBans: [...(state.hostMapBans || [])],
-        guestMapBans: [...(state.guestMapBans || [])]
+        guestMapBans: [...(state.guestMapBans || [])],
+        adminMapPicks: [...(state.adminMapPicks || [])]
       };
       let shouldUpdate = false;
 
@@ -221,7 +231,7 @@ export function DraftRoomPage() {
         if (remaining.length > 0) {
           const mapToPick = remaining[0];
           nextState.mapPicks.push(mapToPick);
-          nextState.hostMapPicks.push(mapToPick);
+          nextState.adminMapPicks.push(mapToPick);
         }
         shouldUpdate = true;
       } else if (currentTurn.action === 'REVEAL_BANS') {
@@ -295,7 +305,8 @@ export function DraftRoomPage() {
       hostMapPicks: [...(state.hostMapPicks || [])],
       guestMapPicks: [...(state.guestMapPicks || [])],
       hostMapBans: [...(state.hostMapBans || [])],
-      guestMapBans: [...(state.guestMapBans || [])]
+      guestMapBans: [...(state.guestMapBans || [])],
+      adminMapPicks: [...(state.adminMapPicks || [])]
     };
 
     const player = currentTurn.player;
@@ -323,14 +334,16 @@ export function DraftRoomPage() {
         nextState.mapPicks.push(itemId);
         if (player === 'HOST') {
           nextState.hostMapPicks.push(itemId);
-        } else {
+        } else if (player === 'GUEST') {
           nextState.guestMapPicks.push(itemId);
+        } else if (player === 'ADMIN') {
+          nextState.adminMapPicks.push(itemId);
         }
       } else if (action === 'BAN') {
         nextState.mapBans.push(itemId);
         if (player === 'HOST') {
           nextState.hostMapBans.push(itemId);
-        } else {
+        } else if (player === 'GUEST') {
           nextState.guestMapBans.push(itemId);
         }
       }
@@ -708,6 +721,36 @@ export function DraftRoomPage() {
               <p className="text-xs text-slate-400">Tutti i turni del match sono stati effettuati.</p>
             </div>
           )}
+
+          {/* Admin / Decider Picked Map Display (Large Center Card) */}
+          {state.adminMapPicks && state.adminMapPicks.length > 0 && (
+            <div className="w-full pt-3 pb-1 flex flex-col items-center space-y-2 animate-in fade-in zoom-in-95">
+              <span className="text-[11px] font-black uppercase tracking-widest text-amber-400 flex items-center gap-1.5 px-3.5 py-1 bg-amber-950/60 border border-amber-500/50 rounded-full shadow-lg shadow-amber-950/40">
+                👑 MAPPA DECIDER / RIMANENTE (ADMIN)
+              </span>
+              <div className="flex flex-wrap justify-center gap-3">
+                {state.adminMapPicks.map((mapName, idx) => (
+                  <div
+                    key={`admin-map-${idx}`}
+                    className="relative w-52 sm:w-64 aspect-[16/9] overflow-hidden rounded-2xl border-2 border-amber-400 shadow-[0_0_30px_rgba(251,191,36,0.35)] group transition-all"
+                  >
+                    <img
+                      src={`/maps/${mapName}.png`}
+                      onError={(e) => { (e.target as any).src = '/header-bg.png'; }}
+                      alt={mapName}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent pointer-events-none" />
+                    <div className="absolute bottom-2 left-2 right-2 text-center">
+                      <span className="text-sm sm:text-base font-black text-white drop-shadow-[0_2px_6px_rgba(0,0,0,1)] line-clamp-1">
+                        {mapName}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Player 2 Guest Header (Clean Floating Layout) */}
@@ -941,8 +984,8 @@ export function DraftRoomPage() {
             )}
           </div>
 
-          {/* Square Map Grid */}
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5 sm:gap-3">
+          {/* Map Grid with Larger Cards & Map Titles */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-3.5">
             {activeMapPool.filter(m => m.toLowerCase().includes(mapSearchQuery.toLowerCase())).map((mapName) => {
               const isMapPicked = state.mapPicks?.includes(mapName);
               const isMapBanned = state.mapBans?.includes(mapName);
@@ -955,7 +998,7 @@ export function DraftRoomPage() {
                   type="button"
                   disabled={!isClickable}
                   onClick={() => executeAction(mapName)}
-                  className={`group relative aspect-square overflow-hidden rounded-2xl border flex flex-col justify-end transition-all duration-300 ${
+                  className={`group relative aspect-[4/3] overflow-hidden rounded-2xl border flex flex-col justify-end transition-all duration-300 ${
                     isMapPicked
                       ? 'border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)]'
                       : isMapBanned
@@ -973,21 +1016,21 @@ export function DraftRoomPage() {
                       isUsed ? 'grayscale opacity-40' : 'group-hover:scale-105'
                     }`}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent pointer-events-none" />
-                  <span className="relative z-10 text-[10px] sm:text-xs font-bold text-white px-1 py-1 text-center truncate drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] w-full">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent pointer-events-none" />
+                  <span className="relative z-10 text-xs sm:text-sm font-extrabold text-white px-1.5 py-1.5 text-center line-clamp-2 leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,1)] w-full">
                     {mapName}
                   </span>
 
                   {isMapPicked && (
                     <div className="absolute inset-0 bg-emerald-950/75 border-2 border-emerald-500 text-emerald-300 flex flex-col items-center justify-center gap-1 backdrop-blur-[1px]">
-                      <Check size={26} className="stroke-[3]" />
-                      <span className="text-[9px] font-extrabold uppercase tracking-wider">PICKED</span>
+                      <Check size={28} className="stroke-[3]" />
+                      <span className="text-xs font-black uppercase tracking-wider">PICKED</span>
                     </div>
                   )}
                   {isMapBanned && (
                     <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center text-red-400 gap-1 backdrop-blur-[1px]">
-                      <X size={26} className="stroke-[3]" />
-                      <span className="text-[9px] font-extrabold uppercase tracking-wider">BANNED</span>
+                      <X size={28} className="stroke-[3]" />
+                      <span className="text-xs font-black uppercase tracking-wider">BANNED</span>
                     </div>
                   )}
                 </button>
