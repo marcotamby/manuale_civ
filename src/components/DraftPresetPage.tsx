@@ -56,9 +56,8 @@ export function DraftPresetPage() {
     if (!preset) return;
     setCreating(true);
     try {
-      const roleForRoom: TurnPlayer = selectedRole === 'GUEST' ? 'GUEST' : 'HOST';
-      const room = await draftService.createRoom(preset, playerName, roleForRoom);
-      sessionStorage.setItem(`draft_role_${room.id}`, selectedRole);
+      const room = await draftService.createRoom(preset);
+      sessionStorage.removeItem(`draft_role_${room.id}`);
       navigate(`/draft/room/${room.id}`);
     } catch (err) {
       console.error('Error creating draft room:', err);
@@ -133,84 +132,8 @@ export function DraftPresetPage() {
           </div>
         </div>
 
-        {/* Role Selection (Clean Floating Card Buttons) */}
-        <div className="space-y-4 pt-2">
-          <h3 className="text-xs font-extrabold text-slate-300 uppercase tracking-widest flex items-center gap-2">
-            <Users size={16} className="text-cyan-400" /> 1. Scegli il tuo Ruolo
-          </h3>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedRole('HOST');
-                if (playerName === 'Giocatore 2') setPlayerName('Giocatore 1');
-              }}
-              className={`p-5 rounded-2xl border flex flex-col items-center justify-center gap-2.5 transition-all duration-300 ${
-                selectedRole === 'HOST'
-                  ? 'bg-red-950/40 border-red-500 text-white ring-2 ring-red-500/50 shadow-lg shadow-red-950/30'
-                  : 'bg-slate-900/40 border-slate-800/80 text-slate-400 hover:border-slate-700 hover:text-white'
-              }`}
-            >
-              <Shield size={26} className={selectedRole === 'HOST' ? 'text-red-400' : 'text-slate-500'} />
-              <span className="font-extrabold text-sm tracking-wide">🔴 Host (Giocatore 1)</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedRole('GUEST');
-                if (playerName === 'Giocatore 1') setPlayerName('Giocatore 2');
-              }}
-              className={`p-5 rounded-2xl border flex flex-col items-center justify-center gap-2.5 transition-all duration-300 ${
-                selectedRole === 'GUEST'
-                  ? 'bg-blue-950/40 border-blue-500 text-white ring-2 ring-blue-500/50 shadow-lg shadow-blue-950/30'
-                  : 'bg-slate-900/40 border-slate-800/80 text-slate-400 hover:border-slate-700 hover:text-white'
-              }`}
-            >
-              <Shield size={26} className={selectedRole === 'GUEST' ? 'text-blue-400' : 'text-slate-500'} />
-              <span className="font-extrabold text-sm tracking-wide">🔵 Guest (Giocatore 2)</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setSelectedRole('SPECTATOR')}
-              className={`p-5 rounded-2xl border flex flex-col items-center justify-center gap-2.5 transition-all duration-300 ${
-                selectedRole === 'SPECTATOR'
-                  ? 'bg-purple-950/40 border-purple-500 text-white ring-2 ring-purple-500/50 shadow-lg shadow-purple-950/30'
-                  : 'bg-slate-900/40 border-slate-800/80 text-slate-400 hover:border-slate-700 hover:text-white'
-              }`}
-            >
-              <Eye size={26} className={selectedRole === 'SPECTATOR' ? 'text-purple-400' : 'text-slate-500'} />
-              <span className="font-extrabold text-sm tracking-wide">👁️ Spettatore / Streamer</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Player Name Input (Clean Input without Outer Box) */}
-        {selectedRole !== 'SPECTATOR' && (
-          <div className="space-y-3 pt-2">
-            <h3 className="text-xs font-extrabold text-slate-300 uppercase tracking-widest flex items-center gap-2">
-              <Swords size={16} className="text-cyan-400" /> 2. Inserisci il TUO Nome
-            </h3>
-
-            <div className="space-y-1.5">
-              <label className="block text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
-                Il tuo Nickname in-game
-              </label>
-              <input
-                type="text"
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
-                placeholder="Es. Player 1"
-                className="w-full bg-[#0b101e] border border-slate-700/80 rounded-2xl px-5 py-3.5 text-white font-extrabold text-base focus:border-cyan-400 focus:outline-none shadow-md transition-all"
-              />
-            </div>
-          </div>
-        )}
-
         {/* Action Button */}
-        <div className="pt-6 text-center">
+        <div className="pt-4 text-center">
           <button
             onClick={handleStartDraft}
             disabled={creating}
