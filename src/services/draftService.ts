@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabaseClient';
+import { AOE4_MAPS } from '../data/aoe4Maps';
 
 export type TurnPlayer = 'HOST' | 'GUEST' | 'ADMIN';
 export type TurnAction = 'BAN' | 'PICK' | 'SNIPE' | 'AUTO_PICK_LAST_MAP' | 'REVEAL_BANS' | 'REVEAL_PICKS' | 'REVEAL_ALL';
