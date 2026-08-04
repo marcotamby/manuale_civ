@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabaseClient';
 
-export type TurnPlayer = 'HOST' | 'GUEST';
-export type TurnAction = 'BAN' | 'PICK' | 'SNIPE';
+export type TurnPlayer = 'HOST' | 'GUEST' | 'ADMIN';
+export type TurnAction = 'BAN' | 'PICK' | 'SNIPE' | 'AUTO_PICK_LAST_MAP' | 'REVEAL_BANS' | 'REVEAL_PICKS' | 'REVEAL_ALL';
 export type TurnTarget = 'CIV' | 'MAP';
 
 export interface DraftTurn {
@@ -38,6 +38,12 @@ export interface DraftState {
   guestClaimed?: boolean;
   mapPicks: string[];
   mapBans: string[];
+  hostMapPicks?: string[];
+  guestMapPicks?: string[];
+  hostMapBans?: string[];
+  guestMapBans?: string[];
+  revealedBans?: boolean;
+  revealedPicks?: boolean;
 }
 
 export interface DraftRoom {
@@ -157,13 +163,18 @@ export const draftService = {
       .eq('id', id)
       .single();
 
+    const local = getLocalPresets().find(p => p.id === id);
+
     if (data) {
-      setLocalPreset(data);
-      return data;
+      const mergedMapPool = (data.map_pool && Array.isArray(data.map_pool) && data.map_pool.length > 0)
+        ? data.map_pool
+        : (local?.map_pool || []);
+      const presetWithPool = { ...data, map_pool: mergedMapPool };
+      setLocalPreset(presetWithPool);
+      return presetWithPool;
     }
 
     // Check local fallback
-    const local = getLocalPresets().find(p => p.id === id);
     if (local) return local;
 
     return null;
@@ -247,7 +258,13 @@ export const draftService = {
         hostClaimed: role === 'HOST',
         guestClaimed: role === 'GUEST',
         mapPicks: [],
-        mapBans: []
+        mapBans: [],
+        hostMapPicks: [],
+        guestMapPicks: [],
+        hostMapBans: [],
+        guestMapBans: [],
+        revealedBans: false,
+        revealedPicks: false
       },
       status: 'waiting'
     };

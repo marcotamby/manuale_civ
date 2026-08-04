@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Swords, Users, Shield, Clock, Eye, Check, X, RefreshCcw, Copy, Monitor, Trophy, Target, Lock } from 'lucide-react';
+import { Swords, Users, Shield, Clock, Eye, Check, X, RefreshCcw, Copy, Monitor, Trophy, Target, Lock, Search } from 'lucide-react';
 import { draftService } from '../services/draftService';
 import type { DraftRoom, DraftTurn } from '../services/draftService';
 import { civilizationsData } from '../data/aoe4Data';
@@ -14,6 +14,7 @@ export function DraftRoomPage() {
 
   const [room, setRoom] = useState<DraftRoom | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mapSearchQuery, setMapSearchQuery] = useState('');
 
   // Read stored role for this specific room ID
   const [role, setRole] = useState<UserRole | null>(() => {
@@ -28,6 +29,7 @@ export function DraftRoomPage() {
   const [copiedLink, setCopiedLink] = useState(false);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const adminProcessingRef = useRef<number | null>(null);
 
   // Fetch room data & subscribe to Supabase Realtime updates
   useEffect(() => {
@@ -117,8 +119,18 @@ export function DraftRoomPage() {
   const currentStep = room?.current_step || 0;
   const currentTurn: DraftTurn | undefined = turns[currentStep];
 
+  const activeMapPool = useMemo(() => {
+    return (room?.preset?.map_pool && room.preset.map_pool.length > 0)
+      ? room.preset.map_pool
+      : AOE4_MAPS;
+  }, [room?.preset?.map_pool]);
+
+  const hasRevealBans = useMemo(() => turns.some(t => t.action === 'REVEAL_BANS' || t.action === 'REVEAL_ALL'), [turns]);
+  const hasRevealPicks = useMemo(() => turns.some(t => t.action === 'REVEAL_PICKS' || t.action === 'REVEAL_ALL'), [turns]);
+
   const isHostTurn = currentTurn?.player === 'HOST';
   const isGuestTurn = currentTurn?.player === 'GUEST';
+  const isAdminTurn = currentTurn?.player === 'ADMIN';
   const isMyTurn = (role === 'HOST' && isHostTurn) || (role === 'GUEST' && isGuestTurn);
 
   const allUsedCivs = useMemo(() => [
@@ -184,6 +196,61 @@ export function DraftRoomPage() {
     };
   }, [room?.current_step, room?.status, isMyTurn]);
 
+  // Admin Turn Auto Execution Effect
+  useEffect(() => {
+    if (!room || room.status !== 'in_progress' || !currentTurn || currentTurn.player !== 'ADMIN') return;
+    if (adminProcessingRef.current === room.current_step) return;
+
+    adminProcessingRef.current = room.current_step;
+
+    const timer = setTimeout(async () => {
+      const nextState = {
+        ...state,
+        mapPicks: [...(state.mapPicks || [])],
+        mapBans: [...(state.mapBans || [])],
+        hostMapPicks: [...(state.hostMapPicks || [])],
+        guestMapPicks: [...(state.guestMapPicks || [])],
+        hostMapBans: [...(state.hostMapBans || [])],
+        guestMapBans: [...(state.guestMapBans || [])]
+      };
+      let shouldUpdate = false;
+
+      if (currentTurn.action === 'AUTO_PICK_LAST_MAP') {
+        const used = [...(nextState.mapPicks || []), ...(nextState.mapBans || [])];
+        const remaining = activeMapPool.filter(m => !used.includes(m));
+        if (remaining.length > 0) {
+          const mapToPick = remaining[0];
+          nextState.mapPicks.push(mapToPick);
+          nextState.hostMapPicks.push(mapToPick);
+        }
+        shouldUpdate = true;
+      } else if (currentTurn.action === 'REVEAL_BANS') {
+        nextState.revealedBans = true;
+        shouldUpdate = true;
+      } else if (currentTurn.action === 'REVEAL_PICKS') {
+        nextState.revealedPicks = true;
+        shouldUpdate = true;
+      } else if (currentTurn.action === 'REVEAL_ALL') {
+        nextState.revealedBans = true;
+        nextState.revealedPicks = true;
+        shouldUpdate = true;
+      }
+
+      if (shouldUpdate) {
+        const nextStepIndex = room.current_step + 1;
+        const isCompleted = nextStepIndex >= turns.length;
+        const updated = await draftService.updateRoom(room.id, {
+          state: nextState,
+          current_step: isCompleted ? room.current_step : nextStepIndex,
+          status: isCompleted ? 'completed' : 'in_progress'
+        });
+        if (updated) setRoom(updated);
+      }
+    }, 1200);
+
+    return () => clearTimeout(timer);
+  }, [room?.current_step, room?.status, currentTurn, activeMapPool, state, turns]);
+
   // Random action on timeout
   const handleAutoRandomAction = () => {
     if (!currentTurn || !room) return;
@@ -203,7 +270,7 @@ export function DraftRoomPage() {
         }
       }
     } else if (currentTurn.target === 'MAP') {
-      const available = AOE4_MAPS.filter(m => !allUsedMaps.includes(m));
+      const available = activeMapPool.filter(m => !allUsedMaps.includes(m));
       if (available.length > 0) {
         const randomMap = available[Math.floor(Math.random() * available.length)];
         executeAction(randomMap);
@@ -224,7 +291,11 @@ export function DraftRoomPage() {
       hostSnipes: [...(state.hostSnipes || [])],
       guestSnipes: [...(state.guestSnipes || [])],
       mapPicks: [...(state.mapPicks || [])],
-      mapBans: [...(state.mapBans || [])]
+      mapBans: [...(state.mapBans || [])],
+      hostMapPicks: [...(state.hostMapPicks || [])],
+      guestMapPicks: [...(state.guestMapPicks || [])],
+      hostMapBans: [...(state.hostMapBans || [])],
+      guestMapBans: [...(state.guestMapBans || [])]
     };
 
     const player = currentTurn.player;
@@ -250,8 +321,18 @@ export function DraftRoomPage() {
     } else if (target === 'MAP') {
       if (action === 'PICK') {
         nextState.mapPicks.push(itemId);
+        if (player === 'HOST') {
+          nextState.hostMapPicks.push(itemId);
+        } else {
+          nextState.guestMapPicks.push(itemId);
+        }
       } else if (action === 'BAN') {
         nextState.mapBans.push(itemId);
+        if (player === 'HOST') {
+          nextState.hostMapBans.push(itemId);
+        } else {
+          nextState.guestMapBans.push(itemId);
+        }
       }
     }
 
@@ -461,46 +542,71 @@ export function DraftRoomPage() {
 
           {/* Picked / Banned / Sniped Flags Rows */}
           <div className="space-y-2.5 pt-2.5 border-t border-slate-800/80">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-extrabold text-red-400 uppercase w-12 shrink-0">BAN</span>
-              <div className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
-                {state.hostBans && state.hostBans.length > 0 ? (
-                  state.hostBans.map(id => {
-                    const c = getCivObj(id);
-                    return (
-                      <img key={`hban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md" />
-                    );
-                  })
-                ) : (
-                  <span className="text-xs text-slate-600 italic">-</span>
-                )}
+            {room.preset?.scope !== 'maps' && (
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-extrabold text-red-400 uppercase w-12 shrink-0">BAN</span>
+                <div className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
+                  {state.hostBans && state.hostBans.length > 0 ? (
+                    state.hostBans.map(id => {
+                      const isHidden = hasRevealBans && !state.revealedBans && role !== 'HOST';
+                      const c = getCivObj(id);
+                      return isHidden ? (
+                        <div key={`hban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md">
+                          <Lock size={16} />
+                        </div>
+                      ) : (
+                        <img key={`hban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md" />
+                      );
+                    })
+                  ) : (
+                    <span className="text-xs text-slate-600 italic">-</span>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-extrabold text-emerald-400 uppercase w-12 shrink-0">PICK</span>
               <div className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
-                {state.hostPicks && state.hostPicks.length > 0 ? (
-                  state.hostPicks.map(id => {
-                    const c = getCivObj(id);
-                    const isSniped = state.hostSnipes?.includes(id);
-                    return (
-                      <div key={`hpick-${id}`} className={`relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 shadow-md ${
-                        isSniped ? 'border-red-500/80 shadow-red-950/50' : 'border-emerald-500 shadow-emerald-950/40'
-                      }`}>
-                        <img src={c.flag} alt={c.name} title={isSniped ? `SNIPED: ${c.name}` : `PICK: ${c.name}`} className={`w-full h-full object-cover ${isSniped ? 'grayscale opacity-50' : ''}`} />
-                        {isSniped && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[0.5px]">
-                            <span className="bg-red-600/90 text-white text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rotate-[-25deg] shadow-lg border border-red-400/80 whitespace-nowrap">
-                              SNIPED
-                            </span>
-                          </div>
-                        )}
+                {room.preset?.scope === 'maps' ? (
+                  state.hostMapPicks && state.hostMapPicks.length > 0 ? (
+                    state.hostMapPicks.map((mapName, idx) => (
+                      <div key={`hmap-${idx}`} title={`PICK MAPPA: ${mapName}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-emerald-500 shadow-md">
+                        <img src={`/maps/${mapName}.png`} onError={(e) => { (e.target as any).src = '/header-bg.png'; }} alt={mapName} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/30" />
                       </div>
-                    );
-                  })
+                    ))
+                  ) : (
+                    <span className="text-xs text-slate-600 italic">-</span>
+                  )
                 ) : (
-                  <span className="text-xs text-slate-600 italic">-</span>
+                  state.hostPicks && state.hostPicks.length > 0 ? (
+                    state.hostPicks.map(id => {
+                      const isHidden = hasRevealPicks && !state.revealedPicks && role !== 'HOST';
+                      const c = getCivObj(id);
+                      const isSniped = state.hostSnipes?.includes(id);
+                      return isHidden ? (
+                        <div key={`hpick-${id}`} title="Pick Nascosto" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 shadow-md">
+                          <Lock size={16} />
+                        </div>
+                      ) : (
+                        <div key={`hpick-${id}`} className={`relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 shadow-md ${
+                          isSniped ? 'border-red-500/80 shadow-red-950/50' : 'border-emerald-500 shadow-emerald-950/40'
+                        }`}>
+                          <img src={c.flag} alt={c.name} title={isSniped ? `SNIPED: ${c.name}` : `PICK: ${c.name}`} className={`w-full h-full object-cover ${isSniped ? 'grayscale opacity-50' : ''}`} />
+                          {isSniped && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[0.5px]">
+                              <span className="bg-red-600/90 text-white text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rotate-[-25deg] shadow-lg border border-red-400/80 whitespace-nowrap">
+                                SNIPED
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <span className="text-xs text-slate-600 italic">-</span>
+                  )
                 )}
               </div>
             </div>
@@ -544,21 +650,33 @@ export function DraftRoomPage() {
           {room.status === 'in_progress' && currentTurn && (
             <div className="space-y-3 w-full">
               <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                Step {room.current_step + 1} di {turns.length} • Turno {currentTurn.player === 'HOST' ? 'Host' : 'Guest'}
+                Step {room.current_step + 1} di {turns.length} • {currentTurn.player === 'ADMIN' ? '👑 Turno Admin' : currentTurn.player === 'HOST' ? '🔴 Turno Host' : '🔵 Turno Guest'}
               </div>
 
               <div className={`px-4 py-2 rounded-2xl border text-sm font-bold tracking-tight inline-block shadow-md ${
-                isMyTurn
+                isAdminTurn
+                  ? 'bg-amber-950/60 text-amber-300 border-amber-500/50'
+                  : isMyTurn
                   ? 'bg-slate-800 text-cyan-300 border-cyan-500/50'
                   : 'bg-[#090e1a] text-slate-300 border-slate-800'
               }`}>
-                {isMyTurn ? (
+                {isAdminTurn ? (
+                  `Elaborazione Admin: ${
+                    currentTurn.action === 'AUTO_PICK_LAST_MAP'
+                      ? 'Pick automatico dell\'ultima mappa rimasta'
+                      : currentTurn.action === 'REVEAL_BANS'
+                      ? 'Rivelazione di tutti i ban'
+                      : currentTurn.action === 'REVEAL_PICKS'
+                      ? 'Rivelazione di tutti i pick'
+                      : 'Rivelazione completa (Ban & Pick)'
+                  }`
+                ) : isMyTurn ? (
                   `Il tuo Turno: ${
                     currentTurn.action === 'BAN'
-                      ? 'Banna 1 civiltà all\'avversario'
+                      ? 'Banna 1 civiltà/mappa'
                       : currentTurn.action === 'SNIPE'
                       ? 'Effettua 1 SNIPE tra i pick dell\'avversario'
-                      : 'Seleziona 1 civiltà per te'
+                      : 'Seleziona 1 civiltà/mappa per te'
                   }`
                 ) : (
                   `Turno di ${currentTurn.player === 'HOST' ? room.host_name : room.guest_name} (${currentTurn.action})`
@@ -612,45 +730,70 @@ export function DraftRoomPage() {
 
           {/* Picked / Banned / Sniped Flags Rows */}
           <div className="space-y-2.5 pt-2.5 border-t border-slate-800/80">
-            <div className="flex items-center justify-end gap-2">
-              <div className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
-                {state.guestBans && state.guestBans.length > 0 ? (
-                  state.guestBans.map(id => {
-                    const c = getCivObj(id);
-                    return (
-                      <img key={`gban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md" />
-                    );
-                  })
-                ) : (
-                  <span className="text-xs text-slate-600 italic">-</span>
-                )}
+            {room.preset?.scope !== 'maps' && (
+              <div className="flex items-center justify-end gap-2">
+                <div className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
+                  {state.guestBans && state.guestBans.length > 0 ? (
+                    state.guestBans.map(id => {
+                      const isHidden = hasRevealBans && !state.revealedBans && role !== 'GUEST';
+                      const c = getCivObj(id);
+                      return isHidden ? (
+                        <div key={`gban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md">
+                          <Lock size={16} />
+                        </div>
+                      ) : (
+                        <img key={`gban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md" />
+                      );
+                    })
+                  ) : (
+                    <span className="text-xs text-slate-600 italic">-</span>
+                  )}
+                </div>
+                <span className="text-[10px] font-extrabold text-red-400 uppercase w-12 shrink-0 text-right">BAN</span>
               </div>
-              <span className="text-[10px] font-extrabold text-red-400 uppercase w-12 shrink-0 text-right">BAN</span>
-            </div>
+            )}
 
             <div className="flex items-center justify-end gap-2">
               <div className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
-                {state.guestPicks && state.guestPicks.length > 0 ? (
-                  state.guestPicks.map(id => {
-                    const c = getCivObj(id);
-                    const isSniped = state.guestSnipes?.includes(id);
-                    return (
-                      <div key={`gpick-${id}`} className={`relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 shadow-md ${
-                        isSniped ? 'border-red-500/80 shadow-red-950/50' : 'border-emerald-500 shadow-emerald-950/40'
-                      }`}>
-                        <img src={c.flag} alt={c.name} title={isSniped ? `SNIPED: ${c.name}` : `PICK: ${c.name}`} className={`w-full h-full object-cover ${isSniped ? 'grayscale opacity-50' : ''}`} />
-                        {isSniped && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[0.5px]">
-                            <span className="bg-red-600/90 text-white text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rotate-[-25deg] shadow-lg border border-red-400/80 whitespace-nowrap">
-                              SNIPED
-                            </span>
-                          </div>
-                        )}
+                {room.preset?.scope === 'maps' ? (
+                  state.guestMapPicks && state.guestMapPicks.length > 0 ? (
+                    state.guestMapPicks.map((mapName, idx) => (
+                      <div key={`gmap-${idx}`} title={`PICK MAPPA: ${mapName}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-emerald-500 shadow-md">
+                        <img src={`/maps/${mapName}.png`} onError={(e) => { (e.target as any).src = '/header-bg.png'; }} alt={mapName} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/30" />
                       </div>
-                    );
-                  })
+                    ))
+                  ) : (
+                    <span className="text-xs text-slate-600 italic">-</span>
+                  )
                 ) : (
-                  <span className="text-xs text-slate-600 italic">-</span>
+                  state.guestPicks && state.guestPicks.length > 0 ? (
+                    state.guestPicks.map(id => {
+                      const isHidden = hasRevealPicks && !state.revealedPicks && role !== 'GUEST';
+                      const c = getCivObj(id);
+                      const isSniped = state.guestSnipes?.includes(id);
+                      return isHidden ? (
+                        <div key={`gpick-${id}`} title="Pick Nascosto" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 shadow-md">
+                          <Lock size={16} />
+                        </div>
+                      ) : (
+                        <div key={`gpick-${id}`} className={`relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 shadow-md ${
+                          isSniped ? 'border-red-500/80 shadow-red-950/50' : 'border-emerald-500 shadow-emerald-950/40'
+                        }`}>
+                          <img src={c.flag} alt={c.name} title={isSniped ? `SNIPED: ${c.name}` : `PICK: ${c.name}`} className={`w-full h-full object-cover ${isSniped ? 'grayscale opacity-50' : ''}`} />
+                          {isSniped && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[0.5px]">
+                              <span className="bg-red-600/90 text-white text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rotate-[-25deg] shadow-lg border border-red-400/80 whitespace-nowrap">
+                                SNIPED
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <span className="text-xs text-slate-600 italic">-</span>
+                  )
                 )}
               </div>
               <span className="text-[10px] font-extrabold text-emerald-400 uppercase w-12 shrink-0 text-right">PICK</span>
@@ -763,25 +906,44 @@ export function DraftRoomPage() {
         </div>
       )}
 
-      {/* Main Pick/Ban Grid for Maps */}
-      {currentTurn && currentTurn.target === 'MAP' && (
+      {/* Main Pick/Ban Grid for Maps (Square Cards & Search Bar) */}
+      {(!currentTurn || currentTurn.target === 'MAP') && (
         <div className="space-y-3 pt-2">
-          <div className="flex justify-between items-center px-1">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 px-1">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-              <Monitor size={16} className="text-cyan-400" /> Mappe Disponibili
+              <Monitor size={16} className="text-cyan-400" /> Mappe Disponibili ({activeMapPool.length})
             </h3>
             {isMyTurn && room.status === 'in_progress' && (
-              <span className="text-xs font-bold text-cyan-400 hidden sm:inline">
-                Clicca su una mappa per selezionare
+              <span className="text-xs font-bold text-cyan-400">
+                Clicca su una mappa per selezionarla
               </span>
             )}
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
-            {(room?.preset?.map_pool && room.preset.map_pool.length > 0
-              ? room.preset.map_pool
-              : AOE4_MAPS.slice(0, 9)
-            ).map((mapName) => {
+          {/* Premium Map Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-400" size={16} />
+            <input
+              type="text"
+              value={mapSearchQuery}
+              onChange={(e) => setMapSearchQuery(e.target.value)}
+              placeholder="Cerca mappa per nome..."
+              className="w-full bg-[#0b101e] border border-slate-700/80 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder:text-slate-500 font-bold focus:border-cyan-400 focus:outline-none shadow-md"
+            />
+            {mapSearchQuery && (
+              <button
+                type="button"
+                onClick={() => setMapSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          {/* Square Map Grid */}
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5 sm:gap-3">
+            {activeMapPool.filter(m => m.toLowerCase().includes(mapSearchQuery.toLowerCase())).map((mapName) => {
               const isMapPicked = state.mapPicks?.includes(mapName);
               const isMapBanned = state.mapBans?.includes(mapName);
               const isUsed = isMapPicked || isMapBanned;
@@ -793,35 +955,39 @@ export function DraftRoomPage() {
                   type="button"
                   disabled={!isClickable}
                   onClick={() => executeAction(mapName)}
-                  className={`group relative overflow-hidden rounded-2xl border p-3 flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
+                  className={`group relative aspect-square overflow-hidden rounded-2xl border flex flex-col justify-end transition-all duration-300 ${
                     isMapPicked
-                      ? 'bg-emerald-950/80 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.4)]'
+                      ? 'border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)]'
                       : isMapBanned
-                      ? 'bg-red-950/40 border-red-500/40 opacity-50 grayscale'
+                      ? 'border-red-500/40 opacity-50 grayscale'
                       : isClickable
-                      ? 'bg-slate-900/90 border-slate-700 hover:border-cyan-400 hover:scale-105 cursor-pointer'
-                      : 'bg-slate-950/40 border-slate-800 opacity-60'
+                      ? 'border-slate-700/80 hover:border-cyan-400 hover:scale-105 cursor-pointer shadow-md'
+                      : 'border-slate-800/60 opacity-60'
                   }`}
                 >
                   <img
                     src={`/maps/${mapName}.png`}
                     onError={(e) => { (e.target as any).src = '/header-bg.png'; }}
                     alt={mapName}
-                    className="w-full h-24 object-cover rounded-xl shadow-md"
+                    className={`absolute inset-0 w-full h-full object-cover transition-transform duration-300 ${
+                      isUsed ? 'grayscale opacity-40' : 'group-hover:scale-105'
+                    }`}
                   />
-                  <span className="text-xs font-bold text-slate-100 text-center">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent pointer-events-none" />
+                  <span className="relative z-10 text-[10px] sm:text-xs font-bold text-white px-1 py-1 text-center truncate drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] w-full">
                     {mapName}
                   </span>
 
                   {isMapPicked && (
-                    <div className="absolute top-2 right-2 bg-emerald-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded shadow">
-                      PICKED
+                    <div className="absolute inset-0 bg-emerald-950/75 border-2 border-emerald-500 text-emerald-300 flex flex-col items-center justify-center gap-1 backdrop-blur-[1px]">
+                      <Check size={26} className="stroke-[3]" />
+                      <span className="text-[9px] font-extrabold uppercase tracking-wider">PICKED</span>
                     </div>
                   )}
                   {isMapBanned && (
-                    <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-red-400">
-                      <X size={36} className="stroke-[3]" />
-                      <span className="text-[10px] font-extrabold">BANNED</span>
+                    <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center text-red-400 gap-1 backdrop-blur-[1px]">
+                      <X size={26} className="stroke-[3]" />
+                      <span className="text-[9px] font-extrabold uppercase tracking-wider">BANNED</span>
                     </div>
                   )}
                 </button>

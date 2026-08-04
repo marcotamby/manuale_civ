@@ -20,6 +20,8 @@ const CIV_ID_TO_API_KEY: Record<string, string> = {
   hre: 'holy_roman_empire',
   japanese: 'japanese',
   jeannedarc: 'jeanne_darc',
+  jindynasty: 'jin_dynasty',
+  'jin-dynasty': 'jin_dynasty',
   lancaster: 'house_of_lancaster',
   macedonian: 'macedonian_dynasty',
   malians: 'malians',

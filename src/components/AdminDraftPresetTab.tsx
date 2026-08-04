@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Copy, Check, Clock, Layers, ChevronUp, ChevronDown, Swords, History, ExternalLink, X, Archive, RotateCcw, AlertTriangle, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Edit2, Copy, Check, Clock, Layers, ChevronUp, ChevronDown, Swords, History, ExternalLink, X, Archive, RotateCcw, AlertTriangle, Loader2, Search } from 'lucide-react';
 import { draftService } from '../services/draftService';
 import type { DraftPreset, DraftTurn, TurnPlayer, TurnAction, TurnTarget, DraftRoom } from '../services/draftService';
 import { AOE4_MAPS } from '../data/aoe4Maps';
@@ -9,6 +9,7 @@ export function AdminDraftPresetTab() {
   const [loading, setLoading] = useState(true);
   const [editingPreset, setEditingPreset] = useState<Partial<DraftPreset> | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [mapSearchQuery, setMapSearchQuery] = useState('');
 
   // In-button saving state
   const [isSaving, setIsSaving] = useState(false);
@@ -432,11 +433,11 @@ export function AdminDraftPresetTab() {
           {/* Map Pool Selector (When scope is maps or both) */}
           {(editingPreset.scope === 'maps' || editingPreset.scope === 'both') && (
             <div className="space-y-3 pt-2">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
                   🗺️ Pool Mappe del Draft ({editingPreset.map_pool?.length || 0} mappe selezionate)
                 </label>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setEditingPreset({ ...editingPreset, map_pool: [...AOE4_MAPS] })}
@@ -455,8 +456,30 @@ export function AdminDraftPresetTab() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 max-h-60 overflow-y-auto p-2 bg-slate-950/60 rounded-2xl border border-slate-800 no-scrollbar">
-                {AOE4_MAPS.map((mapName) => {
+              {/* Premium Search Bar for Maps */}
+              <div className="relative">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-400" size={16} />
+                <input
+                  type="text"
+                  value={mapSearchQuery}
+                  onChange={(e) => setMapSearchQuery(e.target.value)}
+                  placeholder="Cerca mappa per nome..."
+                  className="w-full bg-slate-950/90 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder:text-slate-500 font-bold focus:border-cyan-400 focus:outline-none shadow-inner"
+                />
+                {mapSearchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setMapSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+
+              {/* Square Map Cards Grid */}
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2.5 max-h-72 overflow-y-auto p-2 bg-slate-950/60 rounded-2xl border border-slate-800 no-scrollbar">
+                {AOE4_MAPS.filter(m => m.toLowerCase().includes(mapSearchQuery.toLowerCase())).map((mapName) => {
                   const isSelected = editingPreset.map_pool?.includes(mapName);
                   return (
                     <button
@@ -469,19 +492,31 @@ export function AdminDraftPresetTab() {
                           : [...current, mapName];
                         setEditingPreset({ ...editingPreset, map_pool: next });
                       }}
-                      className={`p-2 rounded-xl border flex flex-col items-center gap-1.5 transition-all text-center ${
+                      className={`group relative aspect-square overflow-hidden rounded-xl border flex flex-col justify-end transition-all duration-200 text-center ${
                         isSelected
-                          ? 'bg-cyan-950/60 border-cyan-400 text-cyan-200 shadow-md ring-1 ring-cyan-400/40'
-                          : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700'
+                          ? 'border-cyan-400 ring-2 ring-cyan-400/50 shadow-lg shadow-cyan-950/50 scale-[1.02]'
+                          : 'border-slate-800/80 hover:border-slate-600 opacity-60 hover:opacity-100'
                       }`}
                     >
                       <img
                         src={`/maps/${mapName}.png`}
                         onError={(e) => { (e.target as any).src = '/header-bg.png'; }}
                         alt={mapName}
-                        className="w-full h-12 object-cover rounded-lg"
+                        className={`absolute inset-0 w-full h-full object-cover transition-transform duration-300 ${
+                          isSelected ? 'group-hover:scale-105' : 'grayscale group-hover:grayscale-0'
+                        }`}
                       />
-                      <span className="text-[11px] font-bold line-clamp-1">{mapName}</span>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
+                      <span className={`relative z-10 text-[10px] font-extrabold px-1 py-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] truncate w-full ${
+                        isSelected ? 'text-white font-black' : 'text-slate-300'
+                      }`}>
+                        {mapName}
+                      </span>
+                      {isSelected && (
+                        <div className="absolute top-1 right-1 bg-cyan-500 text-black rounded-full p-0.5 shadow">
+                          <Check size={10} className="stroke-[3]" />
+                        </div>
+                      )}
                     </button>
                   );
                 })}
@@ -517,18 +552,31 @@ export function AdminDraftPresetTab() {
                   {/* Player select */}
                   <select
                     value={turn.player}
-                    onChange={(e) => updateTurn(idx, { player: e.target.value as TurnPlayer })}
+                    onChange={(e) => {
+                      const newPlayer = e.target.value as TurnPlayer;
+                      const updates: Partial<DraftTurn> = { player: newPlayer };
+                      if (newPlayer === 'ADMIN') {
+                        updates.action = 'AUTO_PICK_LAST_MAP';
+                        updates.target = 'MAP';
+                      } else if (turn.action === 'AUTO_PICK_LAST_MAP' || turn.action === 'REVEAL_BANS' || turn.action === 'REVEAL_PICKS' || turn.action === 'REVEAL_ALL') {
+                        updates.action = 'PICK';
+                      }
+                      updateTurn(idx, updates);
+                    }}
                     className={`bg-slate-900 border rounded-xl px-3 py-1.5 text-xs font-bold ${
                       turn.player === 'HOST'
                         ? 'text-red-400 border-red-500/40'
-                        : 'text-blue-400 border-blue-500/40'
+                        : turn.player === 'GUEST'
+                        ? 'text-blue-400 border-blue-500/40'
+                        : 'text-amber-400 border-amber-500/40 font-black'
                     }`}
                   >
                     <option value="HOST">🔴 Host (Player 1)</option>
                     <option value="GUEST">🔵 Guest (Player 2)</option>
+                    <option value="ADMIN">👑 Admin / Sistema</option>
                   </select>
 
-                  {/* Action select (BAN / PICK / SNIPE) */}
+                  {/* Action select */}
                   <select
                     value={turn.action}
                     onChange={(e) => updateTurn(idx, { action: e.target.value as TurnAction })}
@@ -537,12 +585,25 @@ export function AdminDraftPresetTab() {
                         ? 'text-red-400 border-red-500/40'
                         : turn.action === 'SNIPE'
                         ? 'text-purple-400 border-purple-500/40'
-                        : 'text-emerald-400 border-emerald-500/40'
+                        : turn.action === 'PICK'
+                        ? 'text-emerald-400 border-emerald-500/40'
+                        : 'text-amber-400 border-amber-500/40 font-black'
                     }`}
                   >
-                    <option value="BAN">🚫 BANNA</option>
-                    <option value="PICK">✅ PICCA</option>
-                    <option value="SNIPE">🎯 SNIPE</option>
+                    {turn.player === 'ADMIN' ? (
+                      <>
+                        <option value="AUTO_PICK_LAST_MAP">🗺️ Auto Pick Ultima Mappa</option>
+                        <option value="REVEAL_BANS">👁️ Rivelare Tutti i Ban</option>
+                        <option value="REVEAL_PICKS">👁️ Rivelare Tutti i Pick</option>
+                        <option value="REVEAL_ALL">👁️ Rivelare Tutto (Ban & Pick)</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="BAN">🚫 BANNA</option>
+                        <option value="PICK">✅ PICCA</option>
+                        <option value="SNIPE">🎯 SNIPE</option>
+                      </>
+                    )}
                   </select>
 
                   {/* Target select */}
