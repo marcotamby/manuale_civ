@@ -273,8 +273,8 @@ export function AdminDraftPresetTab() {
         </div>
       )}
 
-      {/* Header section - Metallic Silver Styling */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#0d1222]/80 p-5 rounded-2xl border border-slate-700/50 backdrop-blur-xl shadow-xl">
+      {/* Header section - Metallic Silver Border */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-950/30 p-5 rounded-2xl border border-slate-400/40 shadow-[0_0_20px_rgba(203,213,225,0.06)]">
         <div>
           <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2 tracking-wide">
             <Swords className="text-slate-300" size={22} />
@@ -418,7 +418,7 @@ export function AdminDraftPresetTab() {
 
       {/* Editor Panel */}
       {editingPreset && (
-        <div className="bg-[#090d1a]/95 border border-slate-600/50 p-6 rounded-3xl shadow-2xl space-y-6 backdrop-blur-2xl">
+        <div className="bg-slate-950/30 border border-slate-400/40 p-6 sm:p-8 rounded-3xl shadow-[0_0_25px_rgba(203,213,225,0.08)] space-y-6">
           <div className="flex justify-between items-center pb-4 border-b border-slate-800">
             <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
               <Edit2 size={18} className="text-cyan-400" />
@@ -807,7 +807,7 @@ export function AdminDraftPresetTab() {
           presets.map((preset) => (
             <div
               key={preset.id}
-              className="bg-[#0b101d]/80 border border-slate-800 hover:border-slate-600 p-5 rounded-2xl flex flex-col justify-between transition-all group backdrop-blur-md shadow-lg"
+              className="bg-slate-950/30 border border-slate-400/40 hover:border-slate-200/80 p-5 rounded-2xl flex flex-col justify-between transition-all duration-300 group shadow-[0_0_15px_rgba(203,213,225,0.05)] hover:shadow-[0_0_25px_rgba(203,213,225,0.12)]"
             >
               <div>
                 <div className="flex justify-between items-start mb-2">
