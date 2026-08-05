@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Swords, Users, Shield, Clock, Eye, Check, X, RefreshCcw, Copy, Monitor, Trophy, Target, Lock, Search } from 'lucide-react';
 import { draftService } from '../services/draftService';
-import type { DraftRoom, DraftTurn } from '../services/draftService';
+import type { DraftRoom, DraftTurn, TurnAction } from '../services/draftService';
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
 
