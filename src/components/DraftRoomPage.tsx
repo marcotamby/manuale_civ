@@ -21,8 +21,8 @@ export function DraftRoomPage() {
     return (sessionStorage.getItem(`draft_role_${roomId}`) as UserRole) || null;
   });
 
-  const [joiningRole, setJoiningRole] = useState<UserRole>('GUEST');
-  const [joiningName, setJoiningName] = useState('Giocatore 2');
+  const [joiningRole, setJoiningRole] = useState<UserRole | null>(null);
+  const [joiningName, setJoiningName] = useState('');
 
   const [timeLeft, setTimeLeft] = useState(30);
   const [isOverlayMode, setIsOverlayMode] = useState(false);
@@ -54,8 +54,13 @@ export function DraftRoomPage() {
         setRoom(data);
         if (data.state?.hostClaimed && !data.state?.guestClaimed) {
           setJoiningRole('GUEST');
+          setJoiningName(data.guest_name && data.guest_name !== 'Giocatore 2' ? data.guest_name : 'Giocatore 2');
         } else if (!data.state?.hostClaimed && data.state?.guestClaimed) {
           setJoiningRole('HOST');
+          setJoiningName(data.host_name && data.host_name !== 'Giocatore 1' ? data.host_name : 'Giocatore 1');
+        } else {
+          setJoiningRole(null);
+          setJoiningName('');
         }
       }
     } catch (err) {
@@ -415,7 +420,9 @@ export function DraftRoomPage() {
                 disabled={hostClaimed}
                 onClick={() => {
                   setJoiningRole('HOST');
-                  setJoiningName(room.host_name || 'Giocatore 1');
+                  if (!joiningName || joiningName === 'Giocatore 2') {
+                    setJoiningName(room.host_name && room.host_name !== 'Giocatore 1' ? room.host_name : 'Giocatore 1');
+                  }
                 }}
                 className={`w-full py-3.5 px-4 rounded-2xl border font-bold text-sm flex items-center justify-between transition-all ${
                   hostClaimed
@@ -434,7 +441,9 @@ export function DraftRoomPage() {
                 disabled={guestClaimed}
                 onClick={() => {
                   setJoiningRole('GUEST');
-                  setJoiningName(room.guest_name || 'Giocatore 2');
+                  if (!joiningName || joiningName === 'Giocatore 1') {
+                    setJoiningName(room.guest_name && room.guest_name !== 'Giocatore 2' ? room.guest_name : 'Giocatore 2');
+                  }
                 }}
                 className={`w-full py-3.5 px-4 rounded-2xl border font-bold text-sm flex items-center justify-between transition-all ${
                   guestClaimed
@@ -463,7 +472,7 @@ export function DraftRoomPage() {
             </div>
 
             {/* Input name for joining player */}
-            {joiningRole !== 'SPECTATOR' && (
+            {joiningRole && joiningRole !== 'SPECTATOR' && (
               <div className="text-left space-y-1.5 pt-2">
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
                   Il tuo Nome in-game
@@ -480,7 +489,12 @@ export function DraftRoomPage() {
 
             <button
               onClick={handleConfirmRole}
-              className="w-full py-3.5 bg-slate-200 hover:bg-white text-black font-extrabold text-sm rounded-2xl shadow-lg transition-all"
+              disabled={!joiningRole}
+              className={`w-full py-3.5 font-extrabold text-sm rounded-2xl transition-all ${
+                joiningRole
+                  ? 'bg-slate-200 hover:bg-white text-black shadow-lg cursor-pointer'
+                  : 'bg-slate-800/80 text-slate-500 border border-slate-700/60 cursor-not-allowed opacity-50'
+              }`}
             >
               CONFERMA ED ENTRA IN STANZA
             </button>
@@ -564,11 +578,11 @@ export function DraftRoomPage() {
                       const isHidden = hasRevealBans && !state.revealedBans && role !== 'HOST';
                       const c = getCivObj(id);
                       return isHidden ? (
-                        <div key={`hban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md">
+                        <div key={`hban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md animate-pop-in">
                           <Lock size={16} />
                         </div>
                       ) : (
-                        <img key={`hban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md" />
+                        <img key={`hban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md animate-pop-in" />
                       );
                     })
                   ) : (
@@ -584,7 +598,7 @@ export function DraftRoomPage() {
                 {room.preset?.scope === 'maps' ? (
                   state.hostMapPicks && state.hostMapPicks.length > 0 ? (
                     state.hostMapPicks.map((mapName, idx) => (
-                      <div key={`hmap-${idx}`} title={`PICK MAPPA: ${mapName}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-emerald-500 shadow-md">
+                      <div key={`hmap-${idx}`} title={`PICK MAPPA: ${mapName}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-emerald-500 shadow-md animate-pop-in">
                         <img src={`/maps/${mapName}.png`} onError={(e) => { (e.target as any).src = '/header-bg.png'; }} alt={mapName} className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-black/30" />
                       </div>
@@ -599,11 +613,11 @@ export function DraftRoomPage() {
                       const c = getCivObj(id);
                       const isSniped = state.hostSnipes?.includes(id);
                       return isHidden ? (
-                        <div key={`hpick-${id}`} title="Pick Nascosto" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 shadow-md">
+                        <div key={`hpick-${id}`} title="Pick Nascosto" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 shadow-md animate-pop-in">
                           <Lock size={16} />
                         </div>
                       ) : (
-                        <div key={`hpick-${id}`} className={`relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 shadow-md ${
+                        <div key={`hpick-${id}`} className={`relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 shadow-md animate-pop-in ${
                           isSniped ? 'border-red-500/80 shadow-red-950/50' : 'border-emerald-500 shadow-emerald-950/40'
                         }`}>
                           <img src={c.flag} alt={c.name} title={isSniped ? `SNIPED: ${c.name}` : `PICK: ${c.name}`} className={`w-full h-full object-cover ${isSniped ? 'grayscale opacity-50' : ''}`} />
@@ -732,7 +746,7 @@ export function DraftRoomPage() {
                 {state.adminMapPicks.map((mapName, idx) => (
                   <div
                     key={`admin-map-${idx}`}
-                    className="relative w-52 sm:w-64 aspect-[16/9] overflow-hidden rounded-2xl border-2 border-amber-400 shadow-[0_0_30px_rgba(251,191,36,0.35)] group transition-all"
+                    className="relative w-52 sm:w-64 aspect-[16/9] overflow-hidden rounded-2xl border-2 border-amber-400 shadow-[0_0_30px_rgba(251,191,36,0.35)] group transition-all animate-pop-in"
                   >
                     <img
                       src={`/maps/${mapName}.png`}
@@ -781,11 +795,11 @@ export function DraftRoomPage() {
                       const isHidden = hasRevealBans && !state.revealedBans && role !== 'GUEST';
                       const c = getCivObj(id);
                       return isHidden ? (
-                        <div key={`gban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md">
+                        <div key={`gban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md animate-pop-in">
                           <Lock size={16} />
                         </div>
                       ) : (
-                        <img key={`gban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md" />
+                        <img key={`gban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md animate-pop-in" />
                       );
                     })
                   ) : (
@@ -801,7 +815,7 @@ export function DraftRoomPage() {
                 {room.preset?.scope === 'maps' ? (
                   state.guestMapPicks && state.guestMapPicks.length > 0 ? (
                     state.guestMapPicks.map((mapName, idx) => (
-                      <div key={`gmap-${idx}`} title={`PICK MAPPA: ${mapName}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-emerald-500 shadow-md">
+                      <div key={`gmap-${idx}`} title={`PICK MAPPA: ${mapName}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-emerald-500 shadow-md animate-pop-in">
                         <img src={`/maps/${mapName}.png`} onError={(e) => { (e.target as any).src = '/header-bg.png'; }} alt={mapName} className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-black/30" />
                       </div>
@@ -816,11 +830,11 @@ export function DraftRoomPage() {
                       const c = getCivObj(id);
                       const isSniped = state.guestSnipes?.includes(id);
                       return isHidden ? (
-                        <div key={`gpick-${id}`} title="Pick Nascosto" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 shadow-md">
+                        <div key={`gpick-${id}`} title="Pick Nascosto" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 shadow-md animate-pop-in">
                           <Lock size={16} />
                         </div>
                       ) : (
-                        <div key={`gpick-${id}`} className={`relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 shadow-md ${
+                        <div key={`gpick-${id}`} className={`relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 shadow-md animate-pop-in ${
                           isSniped ? 'border-red-500/80 shadow-red-950/50' : 'border-emerald-500 shadow-emerald-950/40'
                         }`}>
                           <img src={c.flag} alt={c.name} title={isSniped ? `SNIPED: ${c.name}` : `PICK: ${c.name}`} className={`w-full h-full object-cover ${isSniped ? 'grayscale opacity-50' : ''}`} />
@@ -892,11 +906,11 @@ export function DraftRoomPage() {
                   onClick={() => executeAction(civ.id)}
                   className={`group relative overflow-hidden rounded-2xl border aspect-[4/3] w-full flex items-end justify-center transition-all duration-300 shadow-md ${
                     isSnipeTurn && isClickable
-                      ? 'border-purple-500 ring-2 ring-purple-500/70 hover:scale-110 cursor-pointer animate-pulse'
+                      ? 'border-purple-500 ring-2 ring-purple-500/70 hover-bounce-card cursor-pointer animate-pulse'
                       : isUsed
                       ? 'border-slate-800/80 bg-slate-950/90 cursor-not-allowed'
                       : isClickable
-                      ? 'border-slate-700/80 hover:border-cyan-400 hover:scale-105 cursor-pointer'
+                      ? 'border-slate-700/80 hover:border-cyan-400 hover-bounce-card cursor-pointer'
                       : 'border-slate-800/60 opacity-60'
                   }`}
                 >
@@ -1004,7 +1018,7 @@ export function DraftRoomPage() {
                       : isMapBanned
                       ? 'border-red-500/40 opacity-50 grayscale'
                       : isClickable
-                      ? 'border-slate-700/80 hover:border-cyan-400 hover:scale-105 cursor-pointer shadow-md'
+                      ? 'border-slate-700/80 hover:border-cyan-400 hover-bounce-card cursor-pointer shadow-md'
                       : 'border-slate-800/60 opacity-60'
                   }`}
                 >
