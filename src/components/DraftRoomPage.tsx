@@ -746,16 +746,31 @@ export function DraftRoomPage() {
           isHostTurn && room.status === 'in_progress' ? 'border-l-4 border-red-500 pl-3' : ''
         }`}>
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-red-600/30 border border-red-500/50 flex items-center justify-center text-red-400 font-extrabold text-base shrink-0 shadow-md">
+            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center font-extrabold text-base shrink-0 shadow-md ${
+              hostClaimed
+                ? 'bg-red-600/30 border border-red-500/50 text-red-400'
+                : 'bg-slate-900 border border-slate-700/60 text-slate-500 opacity-60'
+            }`}>
               P1
             </div>
             <div className="overflow-hidden">
               <div className="flex items-center gap-2">
                 <span className="block text-[10px] font-extrabold text-red-400 uppercase tracking-widest">🔴 Host</span>
-                {hostReady && <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-emerald-500/20 text-emerald-400 rounded border border-emerald-500/40">READY</span>}
+                {hostClaimed && hostReady && (
+                  <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-emerald-500/20 text-emerald-400 rounded border border-emerald-500/40">READY</span>
+                )}
+                {!hostClaimed && (
+                  <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-amber-500/20 text-amber-400 rounded border border-amber-500/40 animate-pulse">
+                    ⌛ IN ATTESA
+                  </span>
+                )}
               </div>
-              {/* Larger Player Name Font */}
-              <h3 className="text-2xl sm:text-3xl font-extrabold text-white truncate tracking-tight">{room.host_name}</h3>
+              {/* Player Name Font */}
+              <h3 className={`text-2xl sm:text-3xl font-extrabold truncate tracking-tight ${
+                hostClaimed ? 'text-white' : 'text-slate-500 italic animate-pulse'
+              }`}>
+                {hostClaimed ? room.host_name : 'In attesa...'}
+              </h3>
             </div>
           </div>
 
@@ -1021,13 +1036,28 @@ export function DraftRoomPage() {
           <div className="flex items-center justify-end gap-3 text-right">
             <div className="overflow-hidden">
               <div className="flex items-center justify-end gap-2">
-                {guestReady && <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-emerald-500/20 text-emerald-400 rounded border border-emerald-500/40">READY</span>}
+                {!guestClaimed && (
+                  <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-amber-500/20 text-amber-400 rounded border border-amber-500/40 animate-pulse">
+                    ⌛ IN ATTESA
+                  </span>
+                )}
+                {guestClaimed && guestReady && (
+                  <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-emerald-500/20 text-emerald-400 rounded border border-emerald-500/40">READY</span>
+                )}
                 <span className="block text-[10px] font-extrabold text-blue-400 uppercase tracking-widest">🔵 Guest</span>
               </div>
-              {/* Larger Player Name Font */}
-              <h3 className="text-2xl sm:text-3xl font-extrabold text-white truncate tracking-tight">{room.guest_name}</h3>
+              {/* Player Name Font */}
+              <h3 className={`text-2xl sm:text-3xl font-extrabold truncate tracking-tight ${
+                guestClaimed ? 'text-white' : 'text-slate-500 italic animate-pulse'
+              }`}>
+                {guestClaimed ? room.guest_name : 'In attesa...'}
+              </h3>
             </div>
-            <div className="w-11 h-11 rounded-2xl bg-blue-600/30 border border-blue-500/50 flex items-center justify-center text-blue-400 font-extrabold text-base shrink-0 shadow-md">
+            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center font-extrabold text-base shrink-0 shadow-md ${
+              guestClaimed
+                ? 'bg-blue-600/30 border border-blue-500/50 text-blue-400'
+                : 'bg-slate-900 border border-slate-700/60 text-slate-500 opacity-60'
+            }`}>
               P2
             </div>
           </div>
