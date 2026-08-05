@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Edit2, Copy, Check, Clock, Layers, ChevronUp, ChevronDown, Swords, History, ExternalLink, X, Archive, RotateCcw, AlertTriangle, Loader2, Search } from 'lucide-react';
 import { draftService } from '../services/draftService';
-import type { DraftPreset, DraftTurn, TurnPlayer, TurnAction, TurnTarget, DraftRoom } from '../services/draftService';
+import type { DraftPreset, DraftTurn, TurnPlayer, TurnAction, TurnTarget, BanMode, DraftRoom } from '../services/draftService';
 import { AOE4_MAPS } from '../data/aoe4Maps';
 
 export function AdminDraftPresetTab() {
@@ -621,6 +621,37 @@ export function AdminDraftPresetTab() {
                     <option value="CIV">⚔️ Civiltà</option>
                     <option value="MAP">🗺️ Mappa</option>
                   </select>
+
+                  {/* Ban Mode select (only for BAN action) */}
+                  {turn.action === 'BAN' && (
+                    <select
+                      value={turn.banMode || 'GLOBAL'}
+                      onChange={(e) => updateTurn(idx, { banMode: e.target.value as BanMode })}
+                      className="bg-slate-900 border border-red-500/50 rounded-xl px-2.5 py-1.5 text-xs font-bold text-red-300"
+                      title="Tipo di Ban"
+                    >
+                      <option value="GLOBAL">🌐 Ban Globale (gban)</option>
+                      <option value="EXCLUSIVE">🔒 Esclusivo (eban)</option>
+                      <option value="NONEXCLUSIVE">🔓 Non Esclusivo (nban)</option>
+                    </select>
+                  )}
+
+                  {/* Is Hidden toggle button (for BAN or PICK) */}
+                  {(turn.action === 'BAN' || turn.action === 'PICK') && (
+                    <button
+                      type="button"
+                      onClick={() => updateTurn(idx, { isHidden: !turn.isHidden })}
+                      className={`px-2.5 py-1.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 ${
+                        turn.isHidden
+                          ? 'bg-purple-950/70 border-purple-500 text-purple-300 ring-1 ring-purple-500/50'
+                          : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white'
+                      }`}
+                      title="Se attivo, la scelta rimane nascosta all'avversario fino al turno di Rivelazione (Reveal)"
+                    >
+                      {turn.isHidden ? <Lock size={13} className="text-purple-400" /> : <Eye size={13} />}
+                      <span>{turn.isHidden ? 'Nascosto' : 'Visibile'}</span>
+                    </button>
+                  )}
 
                   {/* Timer info */}
                   <div className="flex items-center gap-1 bg-slate-900 px-2.5 py-1 rounded-xl border border-slate-800 text-xs text-slate-300">

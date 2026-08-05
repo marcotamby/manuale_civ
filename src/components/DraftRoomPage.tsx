@@ -478,6 +478,9 @@ export function DraftRoomPage() {
 
     triggerFlyAnimation(itemId, target, player, action);
 
+    const banMode = currentTurn.banMode || 'GLOBAL';
+    const isHidden = currentTurn.isHidden;
+
     const nextState = {
       ...state,
       hostPicks: [...(state.hostPicks || [])],
@@ -492,16 +495,28 @@ export function DraftRoomPage() {
       guestMapPicks: [...(state.guestMapPicks || [])],
       hostMapBans: [...(state.hostMapBans || [])],
       guestMapBans: [...(state.guestMapBans || [])],
-      adminMapPicks: [...(state.adminMapPicks || [])]
+      adminMapPicks: [...(state.adminMapPicks || [])],
+      banModes: { ...(state.banModes || {}) },
+      hiddenPicks: [...(state.hiddenPicks || [])],
+      hiddenBans: [...(state.hiddenBans || [])]
     };
+
+    if (action === 'BAN') {
+      nextState.banModes[itemId] = banMode;
+      if (isHidden && !nextState.hiddenBans.includes(itemId)) {
+        nextState.hiddenBans.push(itemId);
+      }
+    } else if (action === 'PICK' && isHidden && !nextState.hiddenPicks.includes(itemId)) {
+      nextState.hiddenPicks.push(itemId);
+    }
 
     if (target === 'CIV') {
       if (action === 'PICK') {
         if (player === 'HOST') nextState.hostPicks.push(itemId);
         else nextState.guestPicks.push(itemId);
       } else if (action === 'BAN') {
-        if (player === 'HOST') nextState.guestBans.push(itemId);
-        else nextState.hostBans.push(itemId);
+        if (player === 'HOST') nextState.hostBans.push(itemId);
+        else nextState.guestBans.push(itemId);
       } else if (action === 'SNIPE') {
         if (player === 'HOST') {
           if (!nextState.guestSnipes.includes(itemId)) nextState.guestSnipes.push(itemId);
@@ -752,7 +767,7 @@ export function DraftRoomPage() {
                 <div id="host-ban-container" className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
                   {state.hostBans && state.hostBans.length > 0 ? (
                     state.hostBans.map(id => {
-                      const isHidden = hasRevealBans && !state.revealedBans && role !== 'HOST';
+                      const isHidden = (hasRevealBans || state.hiddenBans?.includes(id)) && !state.revealedBans && role !== 'HOST';
                       const c = getCivObj(id);
                       return isHidden ? (
                         <div key={`hban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md animate-pop-in">
@@ -786,7 +801,7 @@ export function DraftRoomPage() {
                 ) : (
                   state.hostPicks && state.hostPicks.length > 0 ? (
                     state.hostPicks.map(id => {
-                      const isHidden = hasRevealPicks && !state.revealedPicks && role !== 'HOST';
+                      const isHidden = (hasRevealPicks || state.hiddenPicks?.includes(id)) && !state.revealedPicks && role !== 'HOST';
                       const c = getCivObj(id);
                       const isSniped = state.hostSnipes?.includes(id);
                       return isHidden ? (
@@ -908,12 +923,8 @@ export function DraftRoomPage() {
           {room.status === 'completed' && (
             <div className="space-y-4 w-full text-center">
               {isSingleCivMatchup ? (
-                <div className="space-y-3 pt-1">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-emerald-950/80 border border-emerald-500/50 rounded-full text-emerald-400 font-extrabold text-[11px] uppercase tracking-widest shadow-lg">
-                    <Trophy size={14} className="text-amber-400" /> Scontro Finale BO1
-                  </div>
-                  
-                  <div className="flex items-center justify-center gap-3 sm:gap-5 pt-1 pb-1">
+                <div className="pt-2 pb-1">
+                  <div className="flex items-center justify-center gap-3 sm:gap-5">
                     {/* P1 Final Civ Card */}
                     {(() => {
                       const c1 = getCivObj(hostFinalCivs[0]);
@@ -934,13 +945,12 @@ export function DraftRoomPage() {
                     })()}
 
                     {/* Center VS Badge */}
-                    <div className="flex flex-col items-center justify-center shrink-0">
-                      <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-amber-500 via-red-500 to-cyan-500 p-[2px] shadow-[0_0_25px_rgba(251,191,36,0.6)] animate-pulse">
-                        <div className="w-full h-full bg-[#0b101e] rounded-[14px] flex items-center justify-center text-amber-400 font-black text-base sm:text-xl tracking-tighter">
+                    <div className="flex items-center justify-center shrink-0">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-amber-500 via-red-500 to-cyan-500 p-[2px] shadow-[0_0_30px_rgba(251,191,36,0.7)] animate-pulse">
+                        <div className="w-full h-full bg-[#0b101e] rounded-[14px] flex items-center justify-center text-amber-400 font-black text-lg sm:text-2xl tracking-tighter">
                           VS
                         </div>
                       </div>
-                      <span className="text-[10px] font-extrabold text-slate-400 mt-1 uppercase tracking-widest">BO1</span>
                     </div>
 
                     {/* P2 Final Civ Card */}
@@ -1029,7 +1039,7 @@ export function DraftRoomPage() {
                 <div id="guest-ban-container" className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
                   {state.guestBans && state.guestBans.length > 0 ? (
                     state.guestBans.map(id => {
-                      const isHidden = hasRevealBans && !state.revealedBans && role !== 'GUEST';
+                      const isHidden = (hasRevealBans || state.hiddenBans?.includes(id)) && !state.revealedBans && role !== 'GUEST';
                       const c = getCivObj(id);
                       return isHidden ? (
                         <div key={`gban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md animate-pop-in">
@@ -1063,7 +1073,7 @@ export function DraftRoomPage() {
                 ) : (
                   state.guestPicks && state.guestPicks.length > 0 ? (
                     state.guestPicks.map(id => {
-                      const isHidden = hasRevealPicks && !state.revealedPicks && role !== 'GUEST';
+                      const isHidden = (hasRevealPicks || state.hiddenPicks?.includes(id)) && !state.revealedPicks && role !== 'GUEST';
                       const c = getCivObj(id);
                       const isSniped = state.guestSnipes?.includes(id);
                       return isHidden ? (
@@ -1121,17 +1131,52 @@ export function DraftRoomPage() {
               const isGuestBan = state.guestBans?.includes(civ.id);
               const isHostSnipe = state.hostSnipes?.includes(civ.id);
               const isGuestSnipe = state.guestSnipes?.includes(civ.id);
-
-              const isUsed = isHostPick || isGuestPick || isHostBan || isGuestBan || isHostSnipe || isGuestSnipe;
+              const banMode = state.banModes?.[civ.id] || 'GLOBAL';
 
               const isSnipeTurn = currentTurn?.action === 'SNIPE';
+              const action = currentTurn?.action;
+              const activePlayer = currentTurn?.player;
 
               let isClickable = false;
-              if (isMyTurn && room.status === 'in_progress') {
-                if (isSnipeTurn) {
-                  isClickable = currentTurn.player === 'HOST' ? isGuestPick : isHostPick;
-                } else {
-                  isClickable = !isUsed;
+              let isUsed = isHostPick || isGuestPick || isHostBan || isGuestBan || isHostSnipe || isGuestSnipe;
+
+              if (isMyTurn && room.status === 'in_progress' && currentTurn) {
+                if (action === 'SNIPE') {
+                  isClickable = activePlayer === 'HOST' ? !!isGuestPick : !!isHostPick;
+                } else if (action === 'PICK') {
+                  if (isHostPick || isGuestPick || isHostSnipe || isGuestSnipe) {
+                    isClickable = false;
+                    isUsed = true;
+                  } else if ((isHostBan || isGuestBan) && banMode === 'GLOBAL') {
+                    isClickable = false;
+                    isUsed = true;
+                  } else {
+                    const bannedByOpponent = activePlayer === 'HOST' ? isGuestBan : isHostBan;
+                    if (bannedByOpponent) {
+                      isClickable = false;
+                      isUsed = true;
+                    } else {
+                      isClickable = true;
+                      isUsed = false;
+                    }
+                  }
+                } else if (action === 'BAN') {
+                  if (isHostPick || isGuestPick || isHostSnipe || isGuestSnipe) {
+                    isClickable = false;
+                    isUsed = true;
+                  } else if ((isHostBan || isGuestBan) && banMode === 'GLOBAL') {
+                    isClickable = false;
+                    isUsed = true;
+                  } else {
+                    const bannedBySelf = activePlayer === 'HOST' ? isHostBan : isGuestBan;
+                    if (bannedBySelf && (banMode === 'EXCLUSIVE' || banMode === 'GLOBAL')) {
+                      isClickable = false;
+                      isUsed = true;
+                    } else {
+                      isClickable = true;
+                      isUsed = false;
+                    }
+                  }
                 }
               }
 
@@ -1241,8 +1286,54 @@ export function DraftRoomPage() {
             {activeMapPool.filter(m => m.toLowerCase().includes(mapSearchQuery.toLowerCase())).map((mapName) => {
               const isMapPicked = state.mapPicks?.includes(mapName);
               const isMapBanned = state.mapBans?.includes(mapName);
-              const isUsed = isMapPicked || isMapBanned;
-              const isClickable = isMyTurn && !isUsed && room.status === 'in_progress';
+              const banMode = state.banModes?.[mapName] || 'GLOBAL';
+              const action = currentTurn?.action;
+              const activePlayer = currentTurn?.player;
+
+              let isUsed = isMapPicked || isMapBanned;
+              let isClickable = false;
+
+              if (isMyTurn && room.status === 'in_progress' && currentTurn) {
+                if (action === 'PICK') {
+                  if (isMapPicked) {
+                    isClickable = false;
+                    isUsed = true;
+                  } else if (isMapBanned && banMode === 'GLOBAL') {
+                    isClickable = false;
+                    isUsed = true;
+                  } else {
+                    const bannedByOpponent = activePlayer === 'HOST'
+                      ? state.guestMapBans?.includes(mapName)
+                      : state.hostMapBans?.includes(mapName);
+                    if (bannedByOpponent) {
+                      isClickable = false;
+                      isUsed = true;
+                    } else {
+                      isClickable = true;
+                      isUsed = false;
+                    }
+                  }
+                } else if (action === 'BAN') {
+                  if (isMapPicked) {
+                    isClickable = false;
+                    isUsed = true;
+                  } else if (isMapBanned && banMode === 'GLOBAL') {
+                    isClickable = false;
+                    isUsed = true;
+                  } else {
+                    const bannedBySelf = activePlayer === 'HOST'
+                      ? state.hostMapBans?.includes(mapName)
+                      : state.guestMapBans?.includes(mapName);
+                    if (bannedBySelf && (banMode === 'EXCLUSIVE' || banMode === 'GLOBAL')) {
+                      isClickable = false;
+                      isUsed = true;
+                    } else {
+                      isClickable = true;
+                      isUsed = false;
+                    }
+                  }
+                }
+              }
 
               return (
                 <button

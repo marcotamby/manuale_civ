@@ -4,6 +4,7 @@ import { AOE4_MAPS } from '../data/aoe4Maps';
 export type TurnPlayer = 'HOST' | 'GUEST' | 'ADMIN';
 export type TurnAction = 'BAN' | 'PICK' | 'SNIPE' | 'AUTO_PICK_LAST_MAP' | 'REVEAL_BANS' | 'REVEAL_PICKS' | 'REVEAL_ALL';
 export type TurnTarget = 'CIV' | 'MAP';
+export type BanMode = 'GLOBAL' | 'EXCLUSIVE' | 'NONEXCLUSIVE';
 
 export interface DraftTurn {
   step: number;
@@ -12,6 +13,8 @@ export interface DraftTurn {
   target: TurnTarget;
   amount: number;
   timeLimit: number; // default 30
+  banMode?: BanMode;
+  isHidden?: boolean;
 }
 
 export interface DraftPreset {
@@ -47,6 +50,9 @@ export interface DraftState {
   mapPool?: string[];
   revealedBans?: boolean;
   revealedPicks?: boolean;
+  banModes?: Record<string, BanMode>;
+  hiddenPicks?: string[];
+  hiddenBans?: string[];
 }
 
 export interface DraftRoom {
