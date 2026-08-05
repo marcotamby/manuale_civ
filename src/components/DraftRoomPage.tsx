@@ -334,7 +334,7 @@ export function DraftRoomPage() {
       flyer.style.borderRadius = '1rem';
       flyer.style.overflow = 'hidden';
       flyer.style.pointerEvents = 'none';
-      flyer.style.transition = 'all 0.65s cubic-bezier(0.16, 1, 0.3, 1)';
+      flyer.style.transition = 'all 0.85s cubic-bezier(0.16, 1, 0.3, 1)';
       flyer.style.boxShadow = action === 'BAN'
         ? '0 0 30px rgba(239, 68, 68, 0.95), 0 0 12px rgba(239, 68, 68, 0.7)'
         : '0 0 30px rgba(16, 185, 129, 0.95), 0 0 12px rgba(16, 185, 129, 0.7)';
@@ -373,7 +373,7 @@ export function DraftRoomPage() {
         if (flyer.parentNode) {
           flyer.parentNode.removeChild(flyer);
         }
-      }, 680);
+      }, 880);
     } catch (e) {
       console.error('Fly animation error:', e);
     }
