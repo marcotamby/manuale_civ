@@ -110,6 +110,95 @@ export function DraftRoomPage() {
       : AOE4_MAPS;
   }, [room?.preset?.map_pool, state.mapPool]);
 
+  // Compute final remaining active (non-sniped) civs for each player
+  const hostFinalCivs = useMemo(() => {
+    return (state.hostPicks || []).filter(id => !(state.hostSnipes || []).includes(id));
+  }, [state.hostPicks, state.hostSnipes]);
+
+  const guestFinalCivs = useMemo(() => {
+    return (state.guestPicks || []).filter(id => !(state.guestSnipes || []).includes(id));
+  }, [state.guestPicks, state.guestSnipes]);
+
+  const isSingleCivMatchup = room?.status === 'completed' && hostFinalCivs.length === 1 && guestFinalCivs.length === 1;
+
+  const hasAnimatedFinalVSRef = useRef(false);
+
+  useEffect(() => {
+    if (isSingleCivMatchup && !hasAnimatedFinalVSRef.current) {
+      hasAnimatedFinalVSRef.current = true;
+      const timer = setTimeout(() => {
+        triggerFinalVSFlight(hostFinalCivs[0], guestFinalCivs[0]);
+      }, 350);
+      return () => clearTimeout(timer);
+    }
+  }, [isSingleCivMatchup, hostFinalCivs, guestFinalCivs]);
+
+  const triggerFinalVSFlight = (hostCivId: string, guestCivId: string) => {
+    try {
+      const hostStart = document.getElementById(`hpick-${hostCivId}`) || document.getElementById('host-pick-container');
+      const guestStart = document.getElementById(`gpick-${guestCivId}`) || document.getElementById('guest-pick-container');
+      const hostEnd = document.getElementById('final-matchup-p1');
+      const guestEnd = document.getElementById('final-matchup-p2');
+
+      const c1 = getCivObj(hostCivId);
+      const c2 = getCivObj(guestCivId);
+
+      if (hostStart && hostEnd && c1) {
+        animateFlightBetween(hostStart, hostEnd, c1.flag, '#ef4444');
+      }
+      if (guestStart && guestEnd && c2) {
+        animateFlightBetween(guestStart, guestEnd, c2.flag, '#3b82f6');
+      }
+    } catch (e) {
+      console.error('Final VS Flight Error:', e);
+    }
+  };
+
+  const animateFlightBetween = (startEl: HTMLElement, endEl: HTMLElement, imgSrc: string, borderColor: string) => {
+    const startRect = startEl.getBoundingClientRect();
+    const endRect = endEl.getBoundingClientRect();
+
+    const flyer = document.createElement('div');
+    flyer.style.position = 'fixed';
+    flyer.style.zIndex = '999999';
+    flyer.style.left = `${startRect.left}px`;
+    flyer.style.top = `${startRect.top}px`;
+    flyer.style.width = `${startRect.width}px`;
+    flyer.style.height = `${startRect.height}px`;
+    flyer.style.borderRadius = '1rem';
+    flyer.style.overflow = 'hidden';
+    flyer.style.pointerEvents = 'none';
+    flyer.style.transition = 'all 0.9s cubic-bezier(0.16, 1, 0.3, 1)';
+    flyer.style.boxShadow = `0 0 35px ${borderColor}, 0 0 15px ${borderColor}`;
+    flyer.style.border = `3px solid ${borderColor}`;
+
+    const img = document.createElement('img');
+    img.src = imgSrc;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
+
+    flyer.appendChild(img);
+    document.body.appendChild(flyer);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        flyer.style.left = `${endRect.left}px`;
+        flyer.style.top = `${endRect.top}px`;
+        flyer.style.width = `${endRect.width}px`;
+        flyer.style.height = `${endRect.height}px`;
+        flyer.style.transform = 'scale(1.05)';
+        flyer.style.opacity = '0.95';
+      });
+    });
+
+    setTimeout(() => {
+      if (flyer.parentNode) {
+        flyer.parentNode.removeChild(flyer);
+      }
+    }, 920);
+  };
+
   // Claim Role & join room
   const handleConfirmRole = async () => {
     if (!room || !joiningRole) return;
@@ -817,10 +906,70 @@ export function DraftRoomPage() {
           )}
 
           {room.status === 'completed' && (
-            <div className="space-y-1.5">
-              <Trophy className="mx-auto text-cyan-400" size={32} />
-              <h2 className="text-xl font-extrabold text-white tracking-tight">DRAFT COMPLETATO</h2>
-              <p className="text-xs text-slate-400">Tutti i turni del match sono stati effettuati.</p>
+            <div className="space-y-4 w-full text-center">
+              {isSingleCivMatchup ? (
+                <div className="space-y-3 pt-1">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-emerald-950/80 border border-emerald-500/50 rounded-full text-emerald-400 font-extrabold text-[11px] uppercase tracking-widest shadow-lg">
+                    <Trophy size={14} className="text-amber-400" /> Scontro Finale BO1
+                  </div>
+                  
+                  <div className="flex items-center justify-center gap-3 sm:gap-5 pt-1 pb-1">
+                    {/* P1 Final Civ Card */}
+                    {(() => {
+                      const c1 = getCivObj(hostFinalCivs[0]);
+                      return (
+                        <div id="final-matchup-p1" className="relative w-36 sm:w-48 aspect-[4/3] rounded-2xl overflow-hidden border-2 border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.45)] group transition-all animate-in fade-in zoom-in-75 duration-700">
+                          <img src={c1.flag} alt={c1.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent pointer-events-none" />
+                          <div className="absolute top-2 left-2 bg-red-600/90 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded shadow border border-red-400/50">
+                            🔴 {room.host_name}
+                          </div>
+                          <div className="absolute bottom-2 left-2 right-2 text-center">
+                            <span className="text-xs sm:text-sm font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,1)] truncate block">
+                              {c1.name}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Center VS Badge */}
+                    <div className="flex flex-col items-center justify-center shrink-0">
+                      <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-amber-500 via-red-500 to-cyan-500 p-[2px] shadow-[0_0_25px_rgba(251,191,36,0.6)] animate-pulse">
+                        <div className="w-full h-full bg-[#0b101e] rounded-[14px] flex items-center justify-center text-amber-400 font-black text-base sm:text-xl tracking-tighter">
+                          VS
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-extrabold text-slate-400 mt-1 uppercase tracking-widest">BO1</span>
+                    </div>
+
+                    {/* P2 Final Civ Card */}
+                    {(() => {
+                      const c2 = getCivObj(guestFinalCivs[0]);
+                      return (
+                        <div id="final-matchup-p2" className="relative w-36 sm:w-48 aspect-[4/3] rounded-2xl overflow-hidden border-2 border-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.45)] group transition-all animate-in fade-in zoom-in-75 duration-700">
+                          <img src={c2.flag} alt={c2.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent pointer-events-none" />
+                          <div className="absolute top-2 right-2 bg-blue-600/90 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded shadow border border-blue-400/50">
+                            🔵 {room.guest_name}
+                          </div>
+                          <div className="absolute bottom-2 left-2 right-2 text-center">
+                            <span className="text-xs sm:text-sm font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,1)] truncate block">
+                              {c2.name}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  <Trophy className="mx-auto text-cyan-400" size={32} />
+                  <h2 className="text-xl font-extrabold text-white tracking-tight">DRAFT COMPLETATO</h2>
+                  <p className="text-xs text-slate-400">Tutti i turni del match sono stati effettuati.</p>
+                </div>
+              )}
             </div>
           )}
 
