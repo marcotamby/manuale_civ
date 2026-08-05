@@ -414,11 +414,11 @@ export function AdminDraftPresetTab() {
                   const nextPool = (currentPool && currentPool.length > 0) ? currentPool : [...AOE4_MAPS];
                   setEditingPreset({ ...editingPreset, scope: newScope, map_pool: nextPool });
                 }}
-                className="w-full bg-slate-950/80 border border-slate-700/60 rounded-xl px-4 py-2.5 text-white font-medium focus:border-cyan-400 focus:outline-none"
+                className="w-full bg-[#090d16] border border-slate-700/80 rounded-xl pl-4 pr-10 py-2.5 text-white font-medium focus:border-cyan-400 focus:outline-none cursor-pointer"
               >
-                <option value="civs">⚔️ Solo Civiltà</option>
-                <option value="maps">🗺️ Solo Mappe</option>
-                <option value="both">⚔️🗺️ Civiltà e Mappe</option>
+                <option value="civs" className="bg-[#090d16] text-white py-1.5">⚔️ Solo Civiltà</option>
+                <option value="maps" className="bg-[#090d16] text-white py-1.5">🗺️ Solo Mappe</option>
+                <option value="both" className="bg-[#090d16] text-white py-1.5">⚔️🗺️ Civiltà e Mappe</option>
               </select>
             </div>
           </div>
@@ -569,7 +569,7 @@ export function AdminDraftPresetTab() {
                       }
                       updateTurn(idx, updates);
                     }}
-                    className={`bg-slate-900 border rounded-xl px-3 py-1.5 text-xs font-bold ${
+                    className={`bg-[#090d16] border rounded-xl pl-3 pr-8 py-1.5 text-xs font-bold cursor-pointer ${
                       turn.player === 'HOST'
                         ? 'text-red-400 border-red-500/40'
                         : turn.player === 'GUEST'
@@ -577,16 +577,16 @@ export function AdminDraftPresetTab() {
                         : 'text-amber-400 border-amber-500/40 font-black'
                     }`}
                   >
-                    <option value="HOST">🔴 Host (Player 1)</option>
-                    <option value="GUEST">🔵 Guest (Player 2)</option>
-                    <option value="ADMIN">👑 Admin / Sistema</option>
+                    <option value="HOST" className="bg-[#090d16] text-red-400 py-1">🔴 Host (Player 1)</option>
+                    <option value="GUEST" className="bg-[#090d16] text-blue-400 py-1">🔵 Guest (Player 2)</option>
+                    <option value="ADMIN" className="bg-[#090d16] text-amber-400 py-1">👑 Admin / Sistema</option>
                   </select>
 
                   {/* Action select */}
                   <select
                     value={turn.action}
                     onChange={(e) => updateTurn(idx, { action: e.target.value as TurnAction })}
-                    className={`bg-slate-900 border rounded-xl px-3 py-1.5 text-xs font-bold ${
+                    className={`bg-[#090d16] border rounded-xl pl-3 pr-8 py-1.5 text-xs font-bold cursor-pointer ${
                       turn.action === 'BAN'
                         ? 'text-red-400 border-red-500/40'
                         : turn.action === 'SNIPE'
@@ -598,16 +598,16 @@ export function AdminDraftPresetTab() {
                   >
                     {turn.player === 'ADMIN' ? (
                       <>
-                        <option value="AUTO_PICK_LAST_MAP">🗺️ Auto Pick Ultima Mappa</option>
-                        <option value="REVEAL_BANS">👁️ Rivelare Tutti i Ban</option>
-                        <option value="REVEAL_PICKS">👁️ Rivelare Tutti i Pick</option>
-                        <option value="REVEAL_ALL">👁️ Rivelare Tutto (Ban & Pick)</option>
+                        <option value="AUTO_PICK_LAST_MAP" className="bg-[#090d16] text-amber-400 py-1">🗺️ Auto Pick Ultima Mappa</option>
+                        <option value="REVEAL_BANS" className="bg-[#090d16] text-cyan-400 py-1">👁️ Rivelare Tutti i Ban</option>
+                        <option value="REVEAL_PICKS" className="bg-[#090d16] text-emerald-400 py-1">👁️ Rivelare Tutti i Pick</option>
+                        <option value="REVEAL_ALL" className="bg-[#090d16] text-purple-400 py-1">👁️ Rivelare Tutto (Ban & Pick)</option>
                       </>
                     ) : (
                       <>
-                        <option value="BAN">🚫 BANNA</option>
-                        <option value="PICK">✅ PICCA</option>
-                        <option value="SNIPE">🎯 SNIPE</option>
+                        <option value="BAN" className="bg-[#090d16] text-red-400 py-1">🚫 BANNA</option>
+                        <option value="PICK" className="bg-[#090d16] text-emerald-400 py-1">✅ PICCA</option>
+                        <option value="SNIPE" className="bg-[#090d16] text-purple-400 py-1">🎯 SNIPE</option>
                       </>
                     )}
                   </select>
@@ -616,10 +616,10 @@ export function AdminDraftPresetTab() {
                   <select
                     value={turn.target}
                     onChange={(e) => updateTurn(idx, { target: e.target.value as TurnTarget })}
-                    className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-200"
+                    className="bg-[#090d16] border border-slate-700/80 rounded-xl pl-3 pr-8 py-1.5 text-xs font-bold text-slate-200 cursor-pointer"
                   >
-                    <option value="CIV">⚔️ Civiltà</option>
-                    <option value="MAP">🗺️ Mappa</option>
+                    <option value="CIV" className="bg-[#090d16] text-slate-200 py-1">⚔️ Civiltà</option>
+                    <option value="MAP" className="bg-[#090d16] text-slate-200 py-1">🗺️ Mappa</option>
                   </select>
 
                   {/* Ban Mode select (only for BAN action) */}
@@ -627,12 +627,12 @@ export function AdminDraftPresetTab() {
                     <select
                       value={turn.banMode || 'GLOBAL'}
                       onChange={(e) => updateTurn(idx, { banMode: e.target.value as BanMode })}
-                      className="bg-slate-900 border border-red-500/50 rounded-xl px-2.5 py-1.5 text-xs font-bold text-red-300"
+                      className="bg-[#090d16] border border-red-500/50 rounded-xl pl-2.5 pr-8 py-1.5 text-xs font-bold text-red-300 cursor-pointer"
                       title="Tipo di Ban"
                     >
-                      <option value="GLOBAL">🌐 Ban Globale (gban)</option>
-                      <option value="EXCLUSIVE">🔒 Esclusivo (eban)</option>
-                      <option value="NONEXCLUSIVE">🔓 Non Esclusivo (nban)</option>
+                      <option value="GLOBAL" className="bg-[#090d16] text-red-300 py-1">🌐 Ban Globale (gban)</option>
+                      <option value="EXCLUSIVE" className="bg-[#090d16] text-red-300 py-1">🔒 Esclusivo (eban)</option>
+                      <option value="NONEXCLUSIVE" className="bg-[#090d16] text-red-300 py-1">🔓 Non Esclusivo (nban)</option>
                     </select>
                   )}
 

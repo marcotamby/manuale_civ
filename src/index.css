@@ -50,6 +50,20 @@ input, textarea, select, button {
   font-family: inherit;
 }
 
+/* Custom Select Styling for Dark Mode */
+select {
+  padding-right: 2.25rem !important;
+  background-color: #090d16 !important;
+  color: #f8fafc !important;
+  cursor: pointer;
+}
+
+select option {
+  background-color: #090d16 !important;
+  color: #f8fafc !important;
+  padding: 8px 12px;
+}
+
 /* Ensure headings/paragraphs inside buttons or interactive elements keep the pointer cursor */
 button *, a *, [role="button"] *, .cursor-pointer * {
   cursor: inherit;
