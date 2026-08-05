@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Copy, Check, Clock, Layers, ChevronUp, ChevronDown, Swords, History, ExternalLink, X, Archive, RotateCcw, AlertTriangle, Loader2, Search, Lock, Eye } from 'lucide-react';
+import { GripVertical, Plus, Trash2, Edit2, Copy, Check, Clock, Layers, ChevronUp, ChevronDown, Swords, History, ExternalLink, X, Archive, RotateCcw, AlertTriangle, Loader2, Search, Lock, Eye } from 'lucide-react';
 import { draftService } from '../services/draftService';
 import type { DraftPreset, DraftTurn, TurnPlayer, TurnAction, TurnTarget, BanMode, DraftRoom } from '../services/draftService';
 import { AOE4_MAPS } from '../data/aoe4Maps';
@@ -133,12 +133,56 @@ export function AdminDraftPresetTab() {
     setTimeout(() => setCopiedId(null), 3000);
   };
 
+  // Drag and drop reordering state
+  const [draggedTurnIndex, setDraggedTurnIndex] = useState<number | null>(null);
+  const [dragOverTurnIndex, setDragOverTurnIndex] = useState<number | null>(null);
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedTurnIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index.toString());
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (dragOverTurnIndex !== index) {
+      setDragOverTurnIndex(index);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault();
+    if (draggedTurnIndex === null || !editingPreset) return;
+    if (draggedTurnIndex === targetIndex) {
+      setDraggedTurnIndex(null);
+      setDragOverTurnIndex(null);
+      return;
+    }
+
+    const turns = [...(editingPreset.turns || [])];
+    const [movedTurn] = turns.splice(draggedTurnIndex, 1);
+    turns.splice(targetIndex, 0, movedTurn);
+
+    const reindexed = turns.map((t, i) => ({ ...t, step: i + 1 }));
+    setEditingPreset({ ...editingPreset, turns: reindexed });
+
+    setDraggedTurnIndex(null);
+    setDragOverTurnIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedTurnIndex(null);
+    setDragOverTurnIndex(null);
+  };
+
   const addTurn = () => {
     if (!editingPreset) return;
     const turns = editingPreset.turns || [];
     const nextStep = turns.length + 1;
     const lastPlayer = turns.length > 0 ? turns[turns.length - 1].player : 'GUEST';
     const nextPlayer: TurnPlayer = lastPlayer === 'HOST' ? 'GUEST' : 'HOST';
+    const defaultTarget: TurnTarget = editingPreset.scope === 'maps' ? 'MAP' : 'CIV';
 
     setEditingPreset({
       ...editingPreset,
@@ -148,7 +192,7 @@ export function AdminDraftPresetTab() {
           step: nextStep,
           player: nextPlayer,
           action: 'PICK',
-          target: editingPreset.scope === 'maps' ? 'MAP' : 'CIV',
+          target: defaultTarget,
           amount: 1,
           timeLimit: 30
         }
@@ -436,8 +480,8 @@ export function AdminDraftPresetTab() {
             />
           </div>
 
-          {/* Map Pool Selector (When scope is maps or both) */}
-          {(editingPreset.scope === 'maps' || editingPreset.scope === 'both') && (
+          {/* Map Pool Selector (When scope is maps) */}
+          {editingPreset.scope === 'maps' && (
             <div className="space-y-3 pt-2">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
@@ -549,8 +593,27 @@ export function AdminDraftPresetTab() {
               {editingPreset.turns?.map((turn, idx) => (
                 <div
                   key={idx}
-                  className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 bg-slate-950/60 p-3 rounded-2xl border border-slate-800 hover:border-slate-700 transition-all"
+                  draggable={true}
+                  onDragStart={(e) => handleDragStart(e, idx)}
+                  onDragOver={(e) => handleDragOver(e, idx)}
+                  onDrop={(e) => handleDrop(e, idx)}
+                  onDragEnd={handleDragEnd}
+                  className={`flex flex-wrap sm:flex-nowrap items-center gap-2.5 bg-slate-950/60 p-3 rounded-2xl border transition-all ${
+                    draggedTurnIndex === idx
+                      ? 'opacity-40 border-dashed border-cyan-400 scale-[0.99]'
+                      : dragOverTurnIndex === idx
+                      ? 'border-cyan-400 bg-cyan-950/30 scale-[1.01] shadow-lg shadow-cyan-950/50'
+                      : 'border-slate-800 hover:border-slate-700'
+                  }`}
                 >
+                  {/* Drag Grip Handle */}
+                  <div
+                    className="cursor-grab active:cursor-grabbing p-1 hover:bg-slate-800 text-slate-500 hover:text-cyan-400 rounded-lg transition-colors shrink-0"
+                    title="Trascina per riordinare il turno"
+                  >
+                    <GripVertical size={18} />
+                  </div>
+
                   <span className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-extrabold text-sm text-cyan-400 shrink-0">
                     #{turn.step}
                   </span>

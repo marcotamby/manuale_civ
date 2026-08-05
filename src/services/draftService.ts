@@ -21,7 +21,7 @@ export interface DraftPreset {
   id: string;
   title: string;
   description?: string;
-  scope: 'civs' | 'maps' | 'both';
+  scope: 'civs' | 'maps';
   is_active: boolean;
   turns: DraftTurn[];
   map_pool?: string[];
@@ -172,7 +172,7 @@ export const draftService = {
         ? turnsPool
         : (local?.map_pool && local.map_pool.length > 0)
         ? local.map_pool
-        : (p.scope === 'maps' || p.scope === 'both') ? [...AOE4_MAPS] : [];
+        : p.scope === 'maps' ? [...AOE4_MAPS] : [];
 
       map.set(p.id, { ...p, map_pool: mergedMapPool });
     });
@@ -200,7 +200,7 @@ export const draftService = {
         ? turnsPool
         : (local?.map_pool && local.map_pool.length > 0)
         ? local.map_pool
-        : (data.scope === 'maps' || data.scope === 'both') ? [...AOE4_MAPS] : [];
+        : data.scope === 'maps' ? [...AOE4_MAPS] : [];
 
       const presetWithPool = { ...data, map_pool: mergedMapPool };
       setLocalPreset(presetWithPool);
@@ -217,7 +217,7 @@ export const draftService = {
     const id = preset.id || `preset-${Date.now()}`;
     const mapPoolToSave = (preset.map_pool && Array.isArray(preset.map_pool) && preset.map_pool.length > 0)
       ? preset.map_pool
-      : (preset.scope === 'maps' || preset.scope === 'both') ? [...AOE4_MAPS] : [];
+      : preset.scope === 'maps' ? [...AOE4_MAPS] : [];
 
     // Embed _map_pool into the turns JSONB payload so it persists in Supabase DB even if map_pool column is missing
     const turns = (preset.turns && preset.turns.length > 0) ? [...preset.turns] : [
