@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Swords, Users, Shield, Clock, Eye, Check, X, RefreshCcw, Copy, Monitor, Trophy, Target, Lock, Search } from 'lucide-react';
+import { Swords, Users, Shield, Clock, Eye, Check, X, RefreshCcw, Copy, Monitor, Trophy, Target, Lock, Search, Loader2 } from 'lucide-react';
 import { draftService } from '../services/draftService';
 import type { DraftRoom, DraftTurn, TurnAction } from '../services/draftService';
 import { civilizationsData } from '../data/aoe4Data';
