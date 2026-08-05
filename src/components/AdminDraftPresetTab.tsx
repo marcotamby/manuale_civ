@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Copy, Check, Clock, Layers, ChevronUp, ChevronDown, Swords, History, ExternalLink, X, Archive, RotateCcw, AlertTriangle, Loader2, Search } from 'lucide-react';
+import { Plus, Trash2, Edit2, Copy, Check, Clock, Layers, ChevronUp, ChevronDown, Swords, History, ExternalLink, X, Archive, RotateCcw, AlertTriangle, Loader2, Search, Lock, Eye } from 'lucide-react';
 import { draftService } from '../services/draftService';
 import type { DraftPreset, DraftTurn, TurnPlayer, TurnAction, TurnTarget, BanMode, DraftRoom } from '../services/draftService';
 import { AOE4_MAPS } from '../data/aoe4Maps';
