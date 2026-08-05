@@ -605,8 +605,8 @@ export function AdminDraftPresetTab() {
                       </>
                     ) : (
                       <>
-                        <option value="BAN" className="bg-[#090d16] text-red-400 py-1">🚫 BANNA</option>
-                        <option value="PICK" className="bg-[#090d16] text-emerald-400 py-1">✅ PICCA</option>
+                        <option value="BAN" className="bg-[#090d16] text-red-400 py-1">🚫 BAN</option>
+                        <option value="PICK" className="bg-[#090d16] text-emerald-400 py-1">✅ PICK</option>
                         <option value="SNIPE" className="bg-[#090d16] text-purple-400 py-1">🎯 SNIPE</option>
                       </>
                     )}
