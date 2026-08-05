@@ -453,16 +453,24 @@ export function AdminDraftPresetTab() {
               <select
                 value={editingPreset.scope || 'civs'}
                 onChange={(e) => {
-                  const newScope = e.target.value as any;
+                  const newScope = e.target.value as 'civs' | 'maps';
                   const currentPool = editingPreset.map_pool;
                   const nextPool = (currentPool && currentPool.length > 0) ? currentPool : [...AOE4_MAPS];
-                  setEditingPreset({ ...editingPreset, scope: newScope, map_pool: nextPool });
+                  const updatedTurns = (editingPreset.turns || []).map(turn => ({
+                    ...turn,
+                    target: newScope === 'maps' ? ('MAP' as TurnTarget) : ('CIV' as TurnTarget)
+                  }));
+                  setEditingPreset({
+                    ...editingPreset,
+                    scope: newScope,
+                    map_pool: nextPool,
+                    turns: updatedTurns
+                  });
                 }}
                 className="w-full bg-[#090d16] border border-slate-700/80 rounded-xl pl-4 pr-10 py-2.5 text-white font-medium focus:border-cyan-400 focus:outline-none cursor-pointer"
               >
-                <option value="civs" className="bg-[#090d16] text-white py-1.5">⚔️ Solo Civiltà</option>
-                <option value="maps" className="bg-[#090d16] text-white py-1.5">🗺️ Solo Mappe</option>
-                <option value="both" className="bg-[#090d16] text-white py-1.5">⚔️🗺️ Civiltà e Mappe</option>
+                <option value="civs" className="bg-[#090d16] text-white py-1.5">⚔️ Civiltà</option>
+                <option value="maps" className="bg-[#090d16] text-white py-1.5">🗺️ Mappe</option>
               </select>
             </div>
           </div>
