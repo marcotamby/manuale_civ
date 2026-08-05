@@ -293,9 +293,101 @@ export function DraftRoomPage() {
     }
   };
 
+  // Helper function to animate flying card/flag to target header slot
+  const triggerFlyAnimation = (itemId: string, target: 'CIV' | 'MAP', player: 'HOST' | 'GUEST' | 'ADMIN', action: 'PICK' | 'BAN' | 'SNIPE') => {
+    try {
+      const cardId = target === 'CIV' ? `civ-card-${itemId}` : `map-card-${itemId}`;
+      const startEl = document.getElementById(cardId);
+      if (!startEl) return;
+
+      let targetContainerId = '';
+      if (player === 'HOST') {
+        targetContainerId = action === 'BAN' ? 'guest-ban-container' : 'host-pick-container';
+      } else if (player === 'GUEST') {
+        targetContainerId = action === 'BAN' ? 'host-ban-container' : 'guest-pick-container';
+      } else if (player === 'ADMIN') {
+        targetContainerId = 'admin-map-container';
+      }
+
+      const targetEl = document.getElementById(targetContainerId);
+      if (!targetEl) return;
+
+      const startRect = startEl.getBoundingClientRect();
+      const targetRect = targetEl.getBoundingClientRect();
+
+      let imgSrc = '';
+      if (target === 'CIV') {
+        const c = civilizationsData.find(item => item.id === itemId);
+        imgSrc = c ? c.flag : '';
+      } else {
+        imgSrc = `/maps/${itemId}.png`;
+      }
+      if (!imgSrc) return;
+
+      const flyer = document.createElement('div');
+      flyer.style.position = 'fixed';
+      flyer.style.zIndex = '999999';
+      flyer.style.left = `${startRect.left}px`;
+      flyer.style.top = `${startRect.top}px`;
+      flyer.style.width = `${startRect.width}px`;
+      flyer.style.height = `${startRect.height}px`;
+      flyer.style.borderRadius = '1rem';
+      flyer.style.overflow = 'hidden';
+      flyer.style.pointerEvents = 'none';
+      flyer.style.transition = 'all 0.65s cubic-bezier(0.16, 1, 0.3, 1)';
+      flyer.style.boxShadow = action === 'BAN'
+        ? '0 0 30px rgba(239, 68, 68, 0.95), 0 0 12px rgba(239, 68, 68, 0.7)'
+        : '0 0 30px rgba(16, 185, 129, 0.95), 0 0 12px rgba(16, 185, 129, 0.7)';
+      flyer.style.border = action === 'BAN' ? '3px solid #ef4444' : '3px solid #10b981';
+
+      const img = document.createElement('img');
+      img.src = imgSrc;
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'cover';
+      if (action === 'BAN') {
+        img.style.filter = 'grayscale(0.6)';
+      }
+
+      flyer.appendChild(img);
+      document.body.appendChild(flyer);
+
+      const isRightAligned = player === 'GUEST';
+      const endX = isRightAligned
+        ? Math.max(targetRect.left, targetRect.right - 50)
+        : targetRect.left + Math.max(0, targetRect.width - 50);
+      const endY = targetRect.top + Math.max(0, (targetRect.height - 44) / 2);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          flyer.style.left = `${endX}px`;
+          flyer.style.top = `${endY}px`;
+          flyer.style.width = '44px';
+          flyer.style.height = '44px';
+          flyer.style.transform = action === 'BAN' ? 'scale(0.85) rotate(-12deg)' : 'scale(1) rotate(6deg)';
+          flyer.style.opacity = '0.9';
+        });
+      });
+
+      setTimeout(() => {
+        if (flyer.parentNode) {
+          flyer.parentNode.removeChild(flyer);
+        }
+      }, 680);
+    } catch (e) {
+      console.error('Fly animation error:', e);
+    }
+  };
+
   // Execute Pick, Ban, or Snipe action
   const executeAction = async (itemId: string) => {
     if (!room || !currentTurn) return;
+
+    const player = currentTurn.player;
+    const action = currentTurn.action;
+    const target = currentTurn.target;
+
+    triggerFlyAnimation(itemId, target, player, action);
 
     const nextState = {
       ...state,
@@ -572,7 +664,7 @@ export function DraftRoomPage() {
             {room.preset?.scope !== 'maps' && (
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-extrabold text-red-400 uppercase w-12 shrink-0">BAN</span>
-                <div className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
+                <div id="host-ban-container" className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
                   {state.hostBans && state.hostBans.length > 0 ? (
                     state.hostBans.map(id => {
                       const isHidden = hasRevealBans && !state.revealedBans && role !== 'HOST';
@@ -594,7 +686,7 @@ export function DraftRoomPage() {
 
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-extrabold text-emerald-400 uppercase w-12 shrink-0">PICK</span>
-              <div className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
+              <div id="host-pick-container" className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
                 {room.preset?.scope === 'maps' ? (
                   state.hostMapPicks && state.hostMapPicks.length > 0 ? (
                     state.hostMapPicks.map((mapName, idx) => (
@@ -742,7 +834,7 @@ export function DraftRoomPage() {
               <span className="text-[11px] font-black uppercase tracking-widest text-amber-400 flex items-center gap-1.5 px-3.5 py-1 bg-amber-950/60 border border-amber-500/50 rounded-full shadow-lg shadow-amber-950/40">
                 👑 MAPPA DECIDER / RIMANENTE (ADMIN)
               </span>
-              <div className="flex flex-wrap justify-center gap-3">
+              <div id="admin-map-container" className="flex flex-wrap justify-center gap-3">
                 {state.adminMapPicks.map((mapName, idx) => (
                   <div
                     key={`admin-map-${idx}`}
@@ -789,7 +881,7 @@ export function DraftRoomPage() {
           <div className="space-y-2.5 pt-2.5 border-t border-slate-800/80">
             {room.preset?.scope !== 'maps' && (
               <div className="flex items-center justify-end gap-2">
-                <div className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
+                <div id="guest-ban-container" className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
                   {state.guestBans && state.guestBans.length > 0 ? (
                     state.guestBans.map(id => {
                       const isHidden = hasRevealBans && !state.revealedBans && role !== 'GUEST';
@@ -811,7 +903,7 @@ export function DraftRoomPage() {
             )}
 
             <div className="flex items-center justify-end gap-2">
-              <div className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
+              <div id="guest-pick-container" className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
                 {room.preset?.scope === 'maps' ? (
                   state.guestMapPicks && state.guestMapPicks.length > 0 ? (
                     state.guestMapPicks.map((mapName, idx) => (
@@ -901,6 +993,7 @@ export function DraftRoomPage() {
               return (
                 <button
                   key={civ.id}
+                  id={`civ-card-${civ.id}`}
                   type="button"
                   disabled={!isClickable}
                   onClick={() => executeAction(civ.id)}
@@ -1009,6 +1102,7 @@ export function DraftRoomPage() {
               return (
                 <button
                   key={mapName}
+                  id={`map-card-${mapName}`}
                   type="button"
                   disabled={!isClickable}
                   onClick={() => executeAction(mapName)}
