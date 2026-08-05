@@ -815,7 +815,7 @@ export function AdminDraftPresetTab() {
                     {preset.title}
                   </h3>
                   <span className="text-[10px] uppercase font-extrabold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
-                    {preset.scope === 'civs' ? '⚔️ Civs' : preset.scope === 'maps' ? '🗺️ Maps' : '⚔️🗺️ Both'}
+                    {preset.scope === 'civs' ? '⚔️ Civiltà' : '🗺️ Mappe'}
                   </span>
                 </div>
                 {preset.description && (

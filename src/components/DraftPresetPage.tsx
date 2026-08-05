@@ -111,7 +111,7 @@ export function DraftPresetPage() {
           <div className="p-2">
             <span className="block text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Formato</span>
             <span className="text-base font-extrabold text-slate-200">
-              {preset.scope === 'civs' ? '⚔️ Solo Civiltà' : preset.scope === 'maps' ? '🗺️ Solo Mappe' : '⚔️🗺️ Civs & Mappe'}
+              {preset.scope === 'civs' ? '⚔️ Civiltà' : '🗺️ Mappe'}
             </span>
           </div>
           <div className="p-2">
