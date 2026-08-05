@@ -294,7 +294,7 @@ export function DraftRoomPage() {
   };
 
   // Helper function to animate flying card/flag to target header slot
-  const triggerFlyAnimation = (itemId: string, target: 'CIV' | 'MAP', player: 'HOST' | 'GUEST' | 'ADMIN', action: 'PICK' | 'BAN' | 'SNIPE') => {
+  const triggerFlyAnimation = (itemId: string, target: 'CIV' | 'MAP', player: 'HOST' | 'GUEST' | 'ADMIN', action: TurnAction) => {
     try {
       const cardId = target === 'CIV' ? `civ-card-${itemId}` : `map-card-${itemId}`;
       const startEl = document.getElementById(cardId);
@@ -405,10 +405,6 @@ export function DraftRoomPage() {
       guestMapBans: [...(state.guestMapBans || [])],
       adminMapPicks: [...(state.adminMapPicks || [])]
     };
-
-    const player = currentTurn.player;
-    const action = currentTurn.action;
-    const target = currentTurn.target;
 
     if (target === 'CIV') {
       if (action === 'PICK') {
