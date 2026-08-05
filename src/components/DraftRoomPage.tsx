@@ -603,6 +603,20 @@ export function DraftRoomPage() {
     }
   };
 
+  // Auto-execute Admin turns (REVEAL_BANS, REVEAL_PICKS, REVEAL_ALL, AUTO_PICK_LAST_MAP) after 2.5s delay
+  useEffect(() => {
+    if (!isAdminTurn || room?.status !== 'in_progress' || !currentTurn) return;
+
+    const isPrimaryClient = role === 'HOST' || (!state.hostClaimed && role === 'GUEST') || role === 'SPECTATOR';
+    if (!isPrimaryClient) return;
+
+    const timer = setTimeout(() => {
+      executeAdminAction(currentTurn.action);
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, [isAdminTurn, room?.status, currentTurn, currentStep, role, state.hostClaimed]);
+
   const handleCopyShareLink = () => {
     const url = window.location.href;
     navigator.clipboard.writeText(url);
@@ -949,15 +963,18 @@ export function DraftRoomPage() {
                   : 'bg-[#090e1a] text-slate-300 border-slate-800'
               }`}>
                 {isAdminTurn ? (
-                  `Elaborazione Admin: ${
-                    currentTurn.action === 'AUTO_PICK_LAST_MAP'
-                      ? 'Pick automatico dell\'ultima mappa rimasta'
-                      : currentTurn.action === 'REVEAL_BANS'
-                      ? 'Rivelazione di tutti i ban'
-                      : currentTurn.action === 'REVEAL_PICKS'
-                      ? 'Rivelazione di tutti i pick'
-                      : 'Rivelazione completa (Ban & Pick)'
-                  }`
+                  <span className="flex items-center gap-2 text-amber-300 font-extrabold animate-pulse">
+                    <Loader2 size={16} className="animate-spin text-amber-400 shrink-0" />
+                    <span>
+                      {currentTurn.action === 'AUTO_PICK_LAST_MAP'
+                        ? '🗺️ Selezione ultima mappa in corso...'
+                        : currentTurn.action === 'REVEAL_BANS'
+                        ? '🔮 Rivelazione ban in corso...'
+                        : currentTurn.action === 'REVEAL_PICKS'
+                        ? '🔮 Rivelazione pick in corso...'
+                        : '🔮 Rivelazione ban e pick in corso...'}
+                    </span>
+                  </span>
                 ) : isMyTurn ? (
                   `Il tuo Turno: ${
                     currentTurn.action === 'BAN'
@@ -970,18 +987,6 @@ export function DraftRoomPage() {
                   `Turno di ${currentTurn.player === 'HOST' ? room.host_name : room.guest_name} (${currentTurn.action})${currentTurn.isHidden ? ' (🔒 Scelta Segreta)' : ''}`
                 )}
               </div>
-
-              {/* Admin Action Execute Button */}
-              {isAdminTurn && (
-                <div className="pt-1">
-                  <button
-                    onClick={() => executeAdminAction(currentTurn.action)}
-                    className="px-5 py-2 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-black font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-amber-950/50 cursor-pointer animate-bounce"
-                  >
-                    👁️ ESEGUI RIVELAZIONE ORA
-                  </button>
-                </div>
-              )}
 
               {/* Timer Bar */}
               <div className="w-full max-w-xs mx-auto space-y-1">
