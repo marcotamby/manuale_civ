@@ -358,7 +358,7 @@ export const draftService = {
         preset = {
           id: data.preset_id || 'unknown',
           title: data.title || 'Draft Match',
-          scope: 'both',
+          scope: 'civs',
           is_active: true,
           turns: [],
           map_pool: data.state.mapPool
