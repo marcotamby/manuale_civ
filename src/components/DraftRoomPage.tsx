@@ -515,8 +515,8 @@ export function DraftRoomPage() {
         if (player === 'HOST') nextState.hostPicks.push(itemId);
         else nextState.guestPicks.push(itemId);
       } else if (action === 'BAN') {
-        if (player === 'HOST') nextState.hostBans.push(itemId);
-        else nextState.guestBans.push(itemId);
+        if (player === 'HOST') nextState.guestBans.push(itemId);
+        else nextState.hostBans.push(itemId);
       } else if (action === 'SNIPE') {
         if (player === 'HOST') {
           if (!nextState.guestSnipes.includes(itemId)) nextState.guestSnipes.push(itemId);
@@ -543,6 +543,49 @@ export function DraftRoomPage() {
         } else if (player === 'GUEST') {
           nextState.guestMapBans.push(itemId);
         }
+      }
+    }
+
+    const nextStepIndex = room.current_step + 1;
+    const isCompleted = nextStepIndex >= turns.length;
+
+    const updated = await draftService.updateRoom(room.id, {
+      state: nextState,
+      current_step: isCompleted ? room.current_step : nextStepIndex,
+      status: isCompleted ? 'completed' : 'in_progress'
+    });
+
+    if (updated) {
+      setRoom(updated);
+    }
+  };
+
+  const executeAdminAction = async (action: TurnAction) => {
+    if (!room || !currentTurn) return;
+
+    const nextState = {
+      ...state,
+      hostPicks: [...(state.hostPicks || [])],
+      guestPicks: [...(state.guestPicks || [])],
+      hostBans: [...(state.hostBans || [])],
+      guestBans: [...(state.guestBans || [])],
+      mapPicks: [...(state.mapPicks || [])],
+      mapBans: [...(state.mapBans || [])],
+      adminMapPicks: [...(state.adminMapPicks || [])]
+    };
+
+    if (action === 'REVEAL_BANS') {
+      nextState.revealedBans = true;
+    } else if (action === 'REVEAL_PICKS') {
+      nextState.revealedPicks = true;
+    } else if (action === 'REVEAL_ALL') {
+      nextState.revealedBans = true;
+      nextState.revealedPicks = true;
+    } else if (action === 'AUTO_PICK_LAST_MAP') {
+      const remainingMaps = activeMapPool.filter(m => !nextState.mapPicks.includes(m) && !nextState.mapBans.includes(m));
+      if (remainingMaps.length > 0) {
+        nextState.mapPicks.push(remainingMaps[0]);
+        nextState.adminMapPicks.push(remainingMaps[0]);
       }
     }
 
@@ -817,10 +860,11 @@ export function DraftRoomPage() {
                   state.hostPicks && state.hostPicks.length > 0 ? (
                     state.hostPicks.map(id => {
                       const isHidden = (hasRevealPicks || state.hiddenPicks?.includes(id)) && !state.revealedPicks && role !== 'HOST';
+                      const isSelfHidden = (hasRevealPicks || state.hiddenPicks?.includes(id)) && !state.revealedPicks && role === 'HOST';
                       const c = getCivObj(id);
                       const isSniped = state.hostSnipes?.includes(id);
                       return isHidden ? (
-                        <div key={`hpick-${id}`} title="Pick Nascosto" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 shadow-md animate-pop-in">
+                        <div key={`hpick-${id}`} title="Pick Nascosto (In attesa della rivelazione)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-purple-950/80 border border-purple-500/60 flex items-center justify-center text-purple-400 shadow-md animate-pop-in">
                           <Lock size={16} />
                         </div>
                       ) : (
@@ -828,6 +872,11 @@ export function DraftRoomPage() {
                           isSniped ? 'border-red-500/80 shadow-red-950/50' : 'border-emerald-500 shadow-emerald-950/40'
                         }`}>
                           <img src={c.flag} alt={c.name} title={isSniped ? `SNIPED: ${c.name}` : `PICK: ${c.name}`} className={`w-full h-full object-cover ${isSniped ? 'grayscale opacity-50' : ''}`} />
+                          {isSelfHidden && (
+                            <div className="absolute top-0.5 right-0.5 bg-purple-900/90 text-purple-200 p-0.5 rounded-full shadow border border-purple-400/80 z-10" title="Scelta Segreta (Nascosta all'avversario)">
+                              <Lock size={10} />
+                            </div>
+                          )}
                           {isSniped && (
                             <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[0.5px]">
                               <span className="bg-red-600/90 text-white text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rotate-[-25deg] shadow-lg border border-red-400/80 whitespace-nowrap">
@@ -883,8 +932,13 @@ export function DraftRoomPage() {
 
           {room.status === 'in_progress' && currentTurn && (
             <div className="space-y-3 w-full">
-              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                Step {room.current_step + 1} di {turns.length} • {currentTurn.player === 'ADMIN' ? '👑 Turno Admin' : currentTurn.player === 'HOST' ? '🔴 Turno Host' : '🔵 Turno Guest'}
+              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center justify-center gap-2">
+                <span>Step {room.current_step + 1} di {turns.length} • {currentTurn.player === 'ADMIN' ? '👑 Turno Admin' : currentTurn.player === 'HOST' ? '🔴 Turno Host' : '🔵 Turno Guest'}</span>
+                {currentTurn.isHidden && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-purple-950/80 border border-purple-500/60 rounded-full text-purple-300 font-extrabold text-[10px] uppercase tracking-wider animate-pulse">
+                    <Lock size={11} className="text-purple-400" /> Nascosto
+                  </span>
+                )}
               </div>
 
               <div className={`px-4 py-2 rounded-2xl border text-sm font-bold tracking-tight inline-block shadow-md ${
@@ -911,11 +965,23 @@ export function DraftRoomPage() {
                       : currentTurn.action === 'SNIPE'
                       ? 'Effettua 1 SNIPE tra i pick dell\'avversario'
                       : 'Seleziona 1 civiltà/mappa per te'
-                  }`
+                  }${currentTurn.isHidden ? ' (🔒 Scelta Segreta)' : ''}`
                 ) : (
-                  `Turno di ${currentTurn.player === 'HOST' ? room.host_name : room.guest_name} (${currentTurn.action})`
+                  `Turno di ${currentTurn.player === 'HOST' ? room.host_name : room.guest_name} (${currentTurn.action})${currentTurn.isHidden ? ' (🔒 Scelta Segreta)' : ''}`
                 )}
               </div>
+
+              {/* Admin Action Execute Button */}
+              {isAdminTurn && (
+                <div className="pt-1">
+                  <button
+                    onClick={() => executeAdminAction(currentTurn.action)}
+                    className="px-5 py-2 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-black font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-amber-950/50 cursor-pointer animate-bounce"
+                  >
+                    👁️ ESEGUI RIVELAZIONE ORA
+                  </button>
+                </div>
+              )}
 
               {/* Timer Bar */}
               <div className="w-full max-w-xs mx-auto space-y-1">
@@ -945,16 +1011,7 @@ export function DraftRoomPage() {
                       const c1 = getCivObj(hostFinalCivs[0]);
                       return (
                         <div id="final-matchup-p1" className="relative w-36 sm:w-48 aspect-[4/3] rounded-2xl overflow-hidden border-2 border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.45)] group transition-all animate-in fade-in zoom-in-75 duration-700">
-                          <img src={c1.flag} alt={c1.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent pointer-events-none" />
-                          <div className="absolute top-2 left-2 bg-red-600/90 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded shadow border border-red-400/50">
-                            🔴 {room.host_name}
-                          </div>
-                          <div className="absolute bottom-2 left-2 right-2 text-center">
-                            <span className="text-xs sm:text-sm font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,1)] truncate block">
-                              {c1.name}
-                            </span>
-                          </div>
+                          <img src={c1.flag} alt={c1.name} title={c1.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                         </div>
                       );
                     })()}
@@ -973,16 +1030,7 @@ export function DraftRoomPage() {
                       const c2 = getCivObj(guestFinalCivs[0]);
                       return (
                         <div id="final-matchup-p2" className="relative w-36 sm:w-48 aspect-[4/3] rounded-2xl overflow-hidden border-2 border-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.45)] group transition-all animate-in fade-in zoom-in-75 duration-700">
-                          <img src={c2.flag} alt={c2.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent pointer-events-none" />
-                          <div className="absolute top-2 right-2 bg-blue-600/90 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded shadow border border-blue-400/50">
-                            🔵 {room.guest_name}
-                          </div>
-                          <div className="absolute bottom-2 left-2 right-2 text-center">
-                            <span className="text-xs sm:text-sm font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,1)] truncate block">
-                              {c2.name}
-                            </span>
-                          </div>
+                          <img src={c2.flag} alt={c2.name} title={c2.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                         </div>
                       );
                     })()}
@@ -1104,10 +1152,11 @@ export function DraftRoomPage() {
                   state.guestPicks && state.guestPicks.length > 0 ? (
                     state.guestPicks.map(id => {
                       const isHidden = (hasRevealPicks || state.hiddenPicks?.includes(id)) && !state.revealedPicks && role !== 'GUEST';
+                      const isSelfHidden = (hasRevealPicks || state.hiddenPicks?.includes(id)) && !state.revealedPicks && role === 'GUEST';
                       const c = getCivObj(id);
                       const isSniped = state.guestSnipes?.includes(id);
                       return isHidden ? (
-                        <div key={`gpick-${id}`} title="Pick Nascosto" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 shadow-md animate-pop-in">
+                        <div key={`gpick-${id}`} title="Pick Nascosto (In attesa della rivelazione)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-purple-950/80 border border-purple-500/60 flex items-center justify-center text-purple-400 shadow-md animate-pop-in">
                           <Lock size={16} />
                         </div>
                       ) : (
@@ -1115,6 +1164,11 @@ export function DraftRoomPage() {
                           isSniped ? 'border-red-500/80 shadow-red-950/50' : 'border-emerald-500 shadow-emerald-950/40'
                         }`}>
                           <img src={c.flag} alt={c.name} title={isSniped ? `SNIPED: ${c.name}` : `PICK: ${c.name}`} className={`w-full h-full object-cover ${isSniped ? 'grayscale opacity-50' : ''}`} />
+                          {isSelfHidden && (
+                            <div className="absolute top-0.5 right-0.5 bg-purple-900/90 text-purple-200 p-0.5 rounded-full shadow border border-purple-400/80 z-10" title="Scelta Segreta (Nascosta all'avversario)">
+                              <Lock size={10} />
+                            </div>
+                          )}
                           {isSniped && (
                             <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[0.5px]">
                               <span className="bg-red-600/90 text-white text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rotate-[-25deg] shadow-lg border border-red-400/80 whitespace-nowrap">
