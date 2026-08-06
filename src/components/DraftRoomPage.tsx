@@ -1045,7 +1045,6 @@ export function DraftRoomPage() {
                 <div className="space-y-1.5">
                   <Trophy className="mx-auto text-cyan-400" size={32} />
                   <h2 className="text-xl font-extrabold text-white tracking-tight">DRAFT COMPLETATO</h2>
-                  <p className="text-xs text-slate-400">Tutti i turni del match sono stati effettuati.</p>
                 </div>
               )}
             </div>
