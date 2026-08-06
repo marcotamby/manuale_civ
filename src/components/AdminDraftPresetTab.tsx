@@ -488,8 +488,8 @@ export function AdminDraftPresetTab() {
             />
           </div>
 
-          {/* Map Pool Selector (When scope is maps or turns contain map target) */}
-          {(editingPreset.scope === 'maps' || editingPreset.turns?.some(t => t.target === 'MAP')) && (
+          {/* Map Pool Selector (Exclusively when scope is maps) */}
+          {editingPreset.scope === 'maps' && (
             <div className="space-y-3 pt-2">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
@@ -633,10 +633,16 @@ export function AdminDraftPresetTab() {
                       const newPlayer = e.target.value as TurnPlayer;
                       const updates: Partial<DraftTurn> = { player: newPlayer };
                       if (newPlayer === 'ADMIN') {
-                        updates.action = 'AUTO_PICK_LAST_MAP';
-                        updates.target = 'MAP';
+                        if (editingPreset.scope === 'civs') {
+                          updates.action = 'REVEAL_BANS';
+                          updates.target = 'CIV';
+                        } else {
+                          updates.action = 'AUTO_PICK_LAST_MAP';
+                          updates.target = 'MAP';
+                        }
                       } else if (turn.action === 'AUTO_PICK_LAST_MAP' || turn.action === 'REVEAL_BANS' || turn.action === 'REVEAL_PICKS' || turn.action === 'REVEAL_ALL') {
                         updates.action = 'PICK';
+                        if (editingPreset.scope === 'civs') updates.target = 'CIV';
                       }
                       updateTurn(idx, updates);
                     }}
@@ -669,7 +675,9 @@ export function AdminDraftPresetTab() {
                   >
                     {turn.player === 'ADMIN' ? (
                       <>
-                        <option value="AUTO_PICK_LAST_MAP" className="bg-[#090d16] text-amber-400 py-1">🗺️ Auto Pick Ultima Mappa</option>
+                        {editingPreset.scope === 'maps' && (
+                          <option value="AUTO_PICK_LAST_MAP" className="bg-[#090d16] text-amber-400 py-1">🗺️ Auto Pick Ultima Mappa</option>
+                        )}
                         <option value="REVEAL_BANS" className="bg-[#090d16] text-cyan-400 py-1">👁️ Rivelare Tutti i Ban</option>
                         <option value="REVEAL_PICKS" className="bg-[#090d16] text-emerald-400 py-1">👁️ Rivelare Tutti i Pick</option>
                         <option value="REVEAL_ALL" className="bg-[#090d16] text-purple-400 py-1">👁️ Rivelare Tutto (Ban & Pick)</option>
