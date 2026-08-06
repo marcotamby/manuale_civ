@@ -835,7 +835,7 @@ export function DraftRoomPage() {
           <div className="space-y-2.5 pt-2.5 border-t border-slate-800/80">
             {room.preset?.scope !== 'maps' && (
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-extrabold text-red-400 uppercase w-12 shrink-0">BAN</span>
+                <span className="text-xs font-black text-red-400 uppercase w-14 shrink-0 tracking-wider">BAN</span>
                 <div id="host-ban-container" className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
                   {state.hostBans && state.hostBans.length > 0 ? (
                     state.hostBans.map(id => {
@@ -857,7 +857,7 @@ export function DraftRoomPage() {
             )}
 
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-extrabold text-emerald-400 uppercase w-12 shrink-0">PICK</span>
+              <span className="text-xs font-black text-emerald-400 uppercase w-14 shrink-0 tracking-wider">PICK</span>
               <div id="host-pick-container" className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
                 {room.preset?.scope === 'maps' ? (
                   state.hostMapPicks && state.hostMapPicks.length > 0 ? (
@@ -1136,7 +1136,7 @@ export function DraftRoomPage() {
                     <span className="text-xs text-slate-600 italic">-</span>
                   )}
                 </div>
-                <span className="text-[10px] font-extrabold text-red-400 uppercase w-12 shrink-0 text-right">BAN</span>
+                <span className="text-xs font-black text-red-400 uppercase w-14 shrink-0 text-right tracking-wider">BAN</span>
               </div>
             )}
 
@@ -1189,7 +1189,7 @@ export function DraftRoomPage() {
                   )
                 )}
               </div>
-              <span className="text-[10px] font-extrabold text-emerald-400 uppercase w-12 shrink-0 text-right">PICK</span>
+              <span className="text-xs font-black text-emerald-400 uppercase w-14 shrink-0 text-right tracking-wider">PICK</span>
             </div>
           </div>
         </div>
