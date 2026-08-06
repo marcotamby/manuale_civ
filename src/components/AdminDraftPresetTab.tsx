@@ -58,8 +58,10 @@ export function AdminDraftPresetTab() {
   };
 
   const handleToggleArchiveRoom = async (roomId: string, currentArchivedState: boolean) => {
-    const success = await draftService.archiveRoom(roomId, !currentArchivedState);
-    if (success && historyPreset) {
+    const nextArchived = !currentArchivedState;
+    setHistoryRooms(prev => prev.map(r => r.id === roomId ? { ...r, is_archived: nextArchived, state: { ...r.state, is_archived: nextArchived } } : r));
+    await draftService.archiveRoom(roomId, nextArchived);
+    if (historyPreset) {
       const rooms = await draftService.getRoomsByPresetId(historyPreset.id);
       setHistoryRooms(rooms);
     }

@@ -53,6 +53,7 @@ export interface DraftState {
   banModes?: Record<string, BanMode>;
   hiddenPicks?: string[];
   hiddenBans?: string[];
+  is_archived?: boolean;
 }
 
 export interface DraftRoom {
@@ -116,6 +117,28 @@ function getDeletedRoomIds(): Set<string> {
     return new Set(ids);
   } catch (e) {
     return new Set();
+  }
+}
+
+function markLocalRoomArchived(roomId: string, isArchived: boolean) {
+  try {
+    const raw = localStorage.getItem('archived_draft_room_ids');
+    const ids: Record<string, boolean> = raw ? JSON.parse(raw) : {};
+    if (isArchived) {
+      ids[roomId] = true;
+    } else {
+      delete ids[roomId];
+    }
+    localStorage.setItem('archived_draft_room_ids', JSON.stringify(ids));
+  } catch (e) {}
+}
+
+function getArchivedRoomIds(): Record<string, boolean> {
+  try {
+    const raw = localStorage.getItem('archived_draft_room_ids');
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
   }
 }
 
@@ -400,25 +423,50 @@ export const draftService = {
       return [];
     }
     const deletedIds = getDeletedRoomIds();
-    return (data || []).filter(r => !deletedIds.has(r.id));
+    const archivedMap = getArchivedRoomIds();
+
+    return (data || [])
+      .filter(r => !deletedIds.has(r.id))
+      .map(r => ({
+        ...r,
+        is_archived: r.is_archived ?? r.state?.is_archived ?? !!archivedMap[r.id]
+      }));
   },
 
   async archiveRoom(roomId: string, isArchived: boolean): Promise<boolean> {
-    const { error } = await supabase
+    markLocalRoomArchived(roomId, isArchived);
+
+    const local = getLocalRoom(roomId);
+    if (local) {
+      local.is_archived = isArchived;
+      if (local.state) local.state.is_archived = isArchived;
+      setLocalRoom(local);
+    }
+
+    const { data: currentRoom } = await supabase
       .from('draft_rooms')
-      .update({ is_archived: isArchived })
+      .select('state')
+      .eq('id', roomId)
+      .single();
+
+    const currentState = currentRoom?.state || {};
+    const nextState = { ...currentState, is_archived: isArchived };
+
+    let { error } = await supabase
+      .from('draft_rooms')
+      .update({ is_archived: isArchived, state: nextState })
       .eq('id', roomId);
 
+    if (error && error.message.includes('is_archived')) {
+      const res = await supabase
+        .from('draft_rooms')
+        .update({ state: nextState })
+        .eq('id', roomId);
+      error = res.error;
+    }
+
     if (error) {
-      console.error('Error archiving draft room:', error);
-      // Fallback update
-      const local = getLocalRoom(roomId);
-      if (local) {
-        local.is_archived = isArchived;
-        setLocalRoom(local);
-        return true;
-      }
-      return false;
+      console.warn('Supabase archive room notice:', error.message);
     }
     return true;
   },
