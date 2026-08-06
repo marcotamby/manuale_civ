@@ -162,17 +162,19 @@ export const draftService = {
     localPresets.forEach(p => map.set(p.id, p));
     dbPresets.forEach(p => {
       const local = localPresets.find(lp => lp.id === p.id);
-      const turnsPool = (p.turns && Array.isArray(p.turns) && p.turns[0]?._map_pool && Array.isArray(p.turns[0]._map_pool) && p.turns[0]._map_pool.length > 0)
-        ? p.turns[0]._map_pool
+      const turnsPool = (p.turns && Array.isArray(p.turns))
+        ? (p.turns.find((t: any) => Array.isArray(t?._map_pool) && t._map_pool.length > 0) as any)?._map_pool
         : undefined;
 
       const mergedMapPool = (p.map_pool && Array.isArray(p.map_pool) && p.map_pool.length > 0)
         ? p.map_pool
         : turnsPool
         ? turnsPool
-        : (local?.map_pool && local.map_pool.length > 0)
+        : (local?.map_pool && Array.isArray(local.map_pool) && local.map_pool.length > 0)
         ? local.map_pool
-        : p.scope === 'maps' ? [...AOE4_MAPS] : [];
+        : (p.scope === 'maps' || (p.turns && Array.isArray(p.turns) && p.turns.some((t: any) => t.target === 'MAP')))
+        ? [...AOE4_MAPS]
+        : [];
 
       map.set(p.id, { ...p, map_pool: mergedMapPool });
     });
@@ -190,17 +192,19 @@ export const draftService = {
     const local = getLocalPresets().find(p => p.id === id);
 
     if (data) {
-      const turnsPool = (data.turns && Array.isArray(data.turns) && data.turns[0]?._map_pool && Array.isArray(data.turns[0]._map_pool) && data.turns[0]._map_pool.length > 0)
-        ? data.turns[0]._map_pool
+      const turnsPool = (data.turns && Array.isArray(data.turns))
+        ? (data.turns.find((t: any) => Array.isArray(t?._map_pool) && t._map_pool.length > 0) as any)?._map_pool
         : undefined;
 
       const mergedMapPool = (data.map_pool && Array.isArray(data.map_pool) && data.map_pool.length > 0)
         ? data.map_pool
         : turnsPool
         ? turnsPool
-        : (local?.map_pool && local.map_pool.length > 0)
+        : (local?.map_pool && Array.isArray(local.map_pool) && local.map_pool.length > 0)
         ? local.map_pool
-        : data.scope === 'maps' ? [...AOE4_MAPS] : [];
+        : (data.scope === 'maps' || (data.turns && Array.isArray(data.turns) && data.turns.some((t: any) => t.target === 'MAP')))
+        ? [...AOE4_MAPS]
+        : [];
 
       const presetWithPool = { ...data, map_pool: mergedMapPool };
       setLocalPreset(presetWithPool);
@@ -215,15 +219,15 @@ export const draftService = {
 
   async savePreset(preset: Partial<DraftPreset>): Promise<DraftPreset | null> {
     const id = preset.id || `preset-${Date.now()}`;
-    const mapPoolToSave = (preset.map_pool && Array.isArray(preset.map_pool) && preset.map_pool.length > 0)
+    const mapPoolToSave = (preset.map_pool && Array.isArray(preset.map_pool))
       ? preset.map_pool
-      : preset.scope === 'maps' ? [...AOE4_MAPS] : [];
+      : (preset.scope === 'maps' || preset.turns?.some(t => t.target === 'MAP')) ? [...AOE4_MAPS] : [];
 
-    // Embed _map_pool into the turns JSONB payload so it persists in Supabase DB even if map_pool column is missing
+    // Embed _map_pool into ALL turns JSONB payload so it persists in Supabase DB even if map_pool column is missing
     const turns = (preset.turns && preset.turns.length > 0) ? [...preset.turns] : [
       { step: 1, player: 'HOST' as TurnPlayer, action: 'BAN' as TurnAction, target: 'MAP' as TurnTarget, amount: 1, timeLimit: 30 }
     ];
-    const turnsWithMapPool = turns.map((t, idx) => idx === 0 ? { ...t, _map_pool: mapPoolToSave } : t);
+    const turnsWithMapPool = turns.map(t => ({ ...t, _map_pool: mapPoolToSave }));
 
     const payloadWithMapPool = {
       id,
@@ -284,6 +288,13 @@ export const draftService = {
     const roomId = generateDraftId(7);
     const isHost = role === 'HOST';
     const isGuest = role === 'GUEST';
+
+    const mapPoolToUse = (preset.map_pool && Array.isArray(preset.map_pool) && preset.map_pool.length > 0)
+      ? preset.map_pool
+      : (preset.turns && Array.isArray(preset.turns))
+      ? (preset.turns.find((t: any) => Array.isArray(t._map_pool) && t._map_pool.length > 0) as any)?._map_pool || []
+      : [];
+
     const roomPayload: any = {
       id: roomId,
       preset_id: preset.id,
@@ -310,7 +321,7 @@ export const draftService = {
         hostMapBans: [],
         guestMapBans: [],
         adminMapPicks: [],
-        mapPool: preset.map_pool || [],
+        mapPool: mapPoolToUse,
         revealedBans: false,
         revealedPicks: false
       },

@@ -488,8 +488,8 @@ export function AdminDraftPresetTab() {
             />
           </div>
 
-          {/* Map Pool Selector (When scope is maps) */}
-          {editingPreset.scope === 'maps' && (
+          {/* Map Pool Selector (When scope is maps or turns contain map target) */}
+          {(editingPreset.scope === 'maps' || editingPreset.turns?.some(t => t.target === 'MAP')) && (
             <div className="space-y-3 pt-2">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
@@ -868,7 +868,7 @@ export function AdminDraftPresetTab() {
                   <button
                     onClick={() => setEditingPreset({
                       ...preset,
-                      map_pool: (preset.map_pool && preset.map_pool.length > 0) ? preset.map_pool : [...AOE4_MAPS]
+                      map_pool: (preset.map_pool && Array.isArray(preset.map_pool)) ? preset.map_pool : (preset.turns && Array.isArray(preset.turns)) ? (preset.turns.find((t: any) => Array.isArray(t._map_pool)) as any)?._map_pool || [...AOE4_MAPS] : [...AOE4_MAPS]
                     })}
                     className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-slate-800/40 hover:bg-slate-800 text-slate-300 rounded-lg text-xs font-semibold transition-colors"
                   >
