@@ -238,9 +238,6 @@ export function DraftRoomPage() {
     }
   };
 
-  const hasRevealBans = useMemo(() => turns.some(t => t.action === 'REVEAL_BANS' || t.action === 'REVEAL_ALL'), [turns]);
-  const hasRevealPicks = useMemo(() => turns.some(t => t.action === 'REVEAL_PICKS' || t.action === 'REVEAL_ALL'), [turns]);
-
   const isBanHiddenForRole = (id: string, performingPlayer: 'HOST' | 'GUEST') => {
     if (room?.status === 'completed' || state.revealedBans) return false;
     if (!state.hiddenBans?.includes(id)) return false;
