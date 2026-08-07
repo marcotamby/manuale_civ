@@ -5,10 +5,12 @@ import { draftService } from '../services/draftService';
 import type { DraftRoom, DraftTurn, TurnAction } from '../services/draftService';
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
+import { useAuth } from './AuthContext';
 
 type UserRole = 'HOST' | 'GUEST' | 'SPECTATOR';
 
 export function DraftRoomPage() {
+  const { user } = useAuth();
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
 
@@ -46,21 +48,29 @@ export function DraftRoomPage() {
     };
   }, [roomId]);
 
+  useEffect(() => {
+    const userAutoName = user?.nickname?.trim() || user?.email?.trim();
+    if (userAutoName && (!joiningName || joiningName === 'Giocatore 1' || joiningName === 'Giocatore 2')) {
+      setJoiningName(userAutoName);
+    }
+  }, [user]);
+
   const loadRoom = async (id: string) => {
     setLoading(true);
     try {
       const data = await draftService.getRoom(id);
+      const userAutoName = user?.nickname?.trim() || user?.email?.trim();
       if (data) {
         setRoom(data);
         if (data.state?.hostClaimed && !data.state?.guestClaimed) {
           setJoiningRole('GUEST');
-          setJoiningName(data.guest_name && data.guest_name !== 'Giocatore 2' ? data.guest_name : 'Giocatore 2');
+          setJoiningName(userAutoName || (data.guest_name && data.guest_name !== 'Giocatore 2' ? data.guest_name : 'Giocatore 2'));
         } else if (!data.state?.hostClaimed && data.state?.guestClaimed) {
           setJoiningRole('HOST');
-          setJoiningName(data.host_name && data.host_name !== 'Giocatore 1' ? data.host_name : 'Giocatore 1');
+          setJoiningName(userAutoName || (data.host_name && data.host_name !== 'Giocatore 1' ? data.host_name : 'Giocatore 1'));
         } else {
           setJoiningRole(null);
-          setJoiningName('');
+          setJoiningName(userAutoName || '');
         }
       }
     } catch (err) {
@@ -230,6 +240,18 @@ export function DraftRoomPage() {
 
   const hasRevealBans = useMemo(() => turns.some(t => t.action === 'REVEAL_BANS' || t.action === 'REVEAL_ALL'), [turns]);
   const hasRevealPicks = useMemo(() => turns.some(t => t.action === 'REVEAL_PICKS' || t.action === 'REVEAL_ALL'), [turns]);
+
+  const isBanHiddenForRole = (id: string, performingPlayer: 'HOST' | 'GUEST') => {
+    if (room?.status === 'completed' || state.revealedBans) return false;
+    if (!state.hiddenBans?.includes(id)) return false;
+    return role !== performingPlayer;
+  };
+
+  const isPickHiddenForRole = (id: string, performingPlayer: 'HOST' | 'GUEST') => {
+    if (room?.status === 'completed' || state.revealedPicks) return false;
+    if (!state.hiddenPicks?.includes(id)) return false;
+    return role !== performingPlayer;
+  };
 
   const isHostTurn = currentTurn?.player === 'HOST';
   const isGuestTurn = currentTurn?.player === 'GUEST';
@@ -669,7 +691,10 @@ export function DraftRoomPage() {
                 disabled={hostClaimed}
                 onClick={() => {
                   setJoiningRole('HOST');
-                  if (!joiningName || joiningName === 'Giocatore 2') {
+                  const userAutoName = user?.nickname?.trim() || user?.email?.trim();
+                  if (userAutoName) {
+                    setJoiningName(userAutoName);
+                  } else if (!joiningName || joiningName === 'Giocatore 2') {
                     setJoiningName(room.host_name && room.host_name !== 'Giocatore 1' ? room.host_name : 'Giocatore 1');
                   }
                 }}
@@ -690,7 +715,10 @@ export function DraftRoomPage() {
                 disabled={guestClaimed}
                 onClick={() => {
                   setJoiningRole('GUEST');
-                  if (!joiningName || joiningName === 'Giocatore 1') {
+                  const userAutoName = user?.nickname?.trim() || user?.email?.trim();
+                  if (userAutoName) {
+                    setJoiningName(userAutoName);
+                  } else if (!joiningName || joiningName === 'Giocatore 1') {
                     setJoiningName(room.guest_name && room.guest_name !== 'Giocatore 2' ? room.guest_name : 'Giocatore 2');
                   }
                 }}
@@ -839,7 +867,7 @@ export function DraftRoomPage() {
                 <div id="host-ban-container" className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
                   {state.hostBans && state.hostBans.length > 0 ? (
                     state.hostBans.map(id => {
-                      const isHidden = (hasRevealBans || state.hiddenBans?.includes(id)) && !state.revealedBans && role !== 'HOST';
+                      const isHidden = isBanHiddenForRole(id, 'HOST');
                       const c = getCivObj(id);
                       return isHidden ? (
                         <div key={`hban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md animate-pop-in">
@@ -856,25 +884,58 @@ export function DraftRoomPage() {
               </div>
             )}
 
+            {room.preset?.scope === 'maps' && state.hostMapBans && state.hostMapBans.length > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black text-red-400 uppercase w-14 shrink-0 tracking-wider">BAN</span>
+                <div id="host-map-ban-container" className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
+                  {state.hostMapBans.map((mapName, idx) => {
+                    const isHidden = isBanHiddenForRole(mapName, 'HOST');
+                    return isHidden ? (
+                      <div key={`hmapban-${idx}`} title="Ban Mappa Nascosto (In attesa della rivelazione)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 shadow-md animate-pop-in">
+                        <Lock size={16} />
+                      </div>
+                    ) : (
+                      <div key={`hmapban-${idx}`} title={`BAN MAPPA: ${mapName}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md animate-pop-in">
+                        <img src={`/maps/${mapName}.png`} onError={(e) => { (e.target as any).src = '/header-bg.png'; }} alt={mapName} className="w-full h-full object-cover" />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center gap-2">
               <span className="text-xs font-black text-emerald-400 uppercase w-14 shrink-0 tracking-wider">PICK</span>
               <div id="host-pick-container" className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
                 {room.preset?.scope === 'maps' ? (
                   state.hostMapPicks && state.hostMapPicks.length > 0 ? (
-                    state.hostMapPicks.map((mapName, idx) => (
-                      <div key={`hmap-${idx}`} title={`PICK MAPPA: ${mapName}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-emerald-500 shadow-md animate-pop-in">
-                        <img src={`/maps/${mapName}.png`} onError={(e) => { (e.target as any).src = '/header-bg.png'; }} alt={mapName} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-black/30" />
-                      </div>
-                    ))
+                    state.hostMapPicks.map((mapName, idx) => {
+                      const isHidden = isPickHiddenForRole(mapName, 'HOST');
+                      const isSelfHidden = !state.revealedPicks && room?.status !== 'completed' && state.hiddenPicks?.includes(mapName) && role === 'HOST';
+                      return isHidden ? (
+                        <div key={`hmap-${idx}`} title="Pick Mappa Nascosto (In attesa della rivelazione)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-purple-950/80 border border-purple-500/60 flex items-center justify-center text-purple-400 shadow-md animate-pop-in">
+                          <Lock size={16} />
+                        </div>
+                      ) : (
+                        <div key={`hmap-${idx}`} title={`PICK MAPPA: ${mapName}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-emerald-500 shadow-md animate-pop-in">
+                          <img src={`/maps/${mapName}.png`} onError={(e) => { (e.target as any).src = '/header-bg.png'; }} alt={mapName} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/30" />
+                          {isSelfHidden && (
+                            <div className="absolute top-0.5 right-0.5 bg-purple-900/90 text-purple-200 p-0.5 rounded-full shadow border border-purple-400/80 z-10" title="Scelta Segreta (Nascosta all'avversario)">
+                              <Lock size={10} />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
                   ) : (
                     <span className="text-xs text-slate-600 italic">-</span>
                   )
                 ) : (
                   state.hostPicks && state.hostPicks.length > 0 ? (
                     state.hostPicks.map(id => {
-                      const isHidden = (hasRevealPicks || state.hiddenPicks?.includes(id)) && !state.revealedPicks && role !== 'HOST';
-                      const isSelfHidden = (hasRevealPicks || state.hiddenPicks?.includes(id)) && !state.revealedPicks && role === 'HOST';
+                      const isHidden = isPickHiddenForRole(id, 'HOST');
+                      const isSelfHidden = !state.revealedPicks && room?.status !== 'completed' && state.hiddenPicks?.includes(id) && role === 'HOST';
                       const c = getCivObj(id);
                       const isSniped = state.hostSnipes?.includes(id);
                       return isHidden ? (
@@ -1121,7 +1182,7 @@ export function DraftRoomPage() {
                 <div id="guest-ban-container" className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
                   {state.guestBans && state.guestBans.length > 0 ? (
                     state.guestBans.map(id => {
-                      const isHidden = (hasRevealBans || state.hiddenBans?.includes(id)) && !state.revealedBans && role !== 'GUEST';
+                      const isHidden = isBanHiddenForRole(id, 'GUEST');
                       const c = getCivObj(id);
                       return isHidden ? (
                         <div key={`gban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md animate-pop-in">
@@ -1139,24 +1200,57 @@ export function DraftRoomPage() {
               </div>
             )}
 
+            {room.preset?.scope === 'maps' && state.guestMapBans && state.guestMapBans.length > 0 && (
+              <div className="flex items-center justify-end gap-2">
+                <div id="guest-map-ban-container" className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
+                  {state.guestMapBans.map((mapName, idx) => {
+                    const isHidden = isBanHiddenForRole(mapName, 'GUEST');
+                    return isHidden ? (
+                      <div key={`gmapban-${idx}`} title="Ban Mappa Nascosto (In attesa della rivelazione)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 shadow-md animate-pop-in">
+                        <Lock size={16} />
+                      </div>
+                    ) : (
+                      <div key={`gmapban-${idx}`} title={`BAN MAPPA: ${mapName}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md animate-pop-in">
+                        <img src={`/maps/${mapName}.png`} onError={(e) => { (e.target as any).src = '/header-bg.png'; }} alt={mapName} className="w-full h-full object-cover" />
+                      </div>
+                    );
+                  })}
+                </div>
+                <span className="text-xs font-black text-red-400 uppercase w-14 shrink-0 text-right tracking-wider">BAN</span>
+              </div>
+            )}
+
             <div className="flex items-center justify-end gap-2">
               <div id="guest-pick-container" className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
                 {room.preset?.scope === 'maps' ? (
                   state.guestMapPicks && state.guestMapPicks.length > 0 ? (
-                    state.guestMapPicks.map((mapName, idx) => (
-                      <div key={`gmap-${idx}`} title={`PICK MAPPA: ${mapName}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-emerald-500 shadow-md animate-pop-in">
-                        <img src={`/maps/${mapName}.png`} onError={(e) => { (e.target as any).src = '/header-bg.png'; }} alt={mapName} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-black/30" />
-                      </div>
-                    ))
+                    state.guestMapPicks.map((mapName, idx) => {
+                      const isHidden = isPickHiddenForRole(mapName, 'GUEST');
+                      const isSelfHidden = !state.revealedPicks && room?.status !== 'completed' && state.hiddenPicks?.includes(mapName) && role === 'GUEST';
+                      return isHidden ? (
+                        <div key={`gmap-${idx}`} title="Pick Mappa Nascosto (In attesa della rivelazione)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-purple-950/80 border border-purple-500/60 flex items-center justify-center text-purple-400 shadow-md animate-pop-in">
+                          <Lock size={16} />
+                        </div>
+                      ) : (
+                        <div key={`gmap-${idx}`} title={`PICK MAPPA: ${mapName}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-emerald-500 shadow-md animate-pop-in">
+                          <img src={`/maps/${mapName}.png`} onError={(e) => { (e.target as any).src = '/header-bg.png'; }} alt={mapName} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/30" />
+                          {isSelfHidden && (
+                            <div className="absolute top-0.5 right-0.5 bg-purple-900/90 text-purple-200 p-0.5 rounded-full shadow border border-purple-400/80 z-10" title="Scelta Segreta (Nascosta all'avversario)">
+                              <Lock size={10} />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
                   ) : (
                     <span className="text-xs text-slate-600 italic">-</span>
                   )
                 ) : (
                   state.guestPicks && state.guestPicks.length > 0 ? (
                     state.guestPicks.map(id => {
-                      const isHidden = (hasRevealPicks || state.hiddenPicks?.includes(id)) && !state.revealedPicks && role !== 'GUEST';
-                      const isSelfHidden = (hasRevealPicks || state.hiddenPicks?.includes(id)) && !state.revealedPicks && role === 'GUEST';
+                      const isHidden = isPickHiddenForRole(id, 'GUEST');
+                      const isSelfHidden = !state.revealedPicks && room?.status !== 'completed' && state.hiddenPicks?.includes(id) && role === 'GUEST';
                       const c = getCivObj(id);
                       const isSniped = state.guestSnipes?.includes(id);
                       return isHidden ? (
@@ -1213,10 +1307,10 @@ export function DraftRoomPage() {
 
           <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-11 gap-2 sm:gap-2.5">
             {civilizationsData.map((civ) => {
-              const isHostPick = state.hostPicks?.includes(civ.id);
-              const isGuestPick = state.guestPicks?.includes(civ.id);
-              const isHostBan = state.hostBans?.includes(civ.id);
-              const isGuestBan = state.guestBans?.includes(civ.id);
+              const isHostPick = state.hostPicks?.includes(civ.id) && !isPickHiddenForRole(civ.id, 'HOST');
+              const isGuestPick = state.guestPicks?.includes(civ.id) && !isPickHiddenForRole(civ.id, 'GUEST');
+              const isHostBan = state.hostBans?.includes(civ.id) && !isBanHiddenForRole(civ.id, 'HOST');
+              const isGuestBan = state.guestBans?.includes(civ.id) && !isBanHiddenForRole(civ.id, 'GUEST');
               const isHostSnipe = state.hostSnipes?.includes(civ.id);
               const isGuestSnipe = state.guestSnipes?.includes(civ.id);
               const banMode = state.banModes?.[civ.id] || 'GLOBAL';
@@ -1372,8 +1466,13 @@ export function DraftRoomPage() {
           {/* Map Grid with Larger Cards & Map Titles */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-3.5">
             {activeMapPool.filter(m => m.toLowerCase().includes(mapSearchQuery.toLowerCase())).map((mapName) => {
-              const isMapPicked = state.mapPicks?.includes(mapName);
-              const isMapBanned = state.mapBans?.includes(mapName);
+              const isHostMapPick = state.hostMapPicks?.includes(mapName) && !isPickHiddenForRole(mapName, 'HOST');
+              const isGuestMapPick = state.guestMapPicks?.includes(mapName) && !isPickHiddenForRole(mapName, 'GUEST');
+              const isHostMapBan = state.hostMapBans?.includes(mapName) && !isBanHiddenForRole(mapName, 'HOST');
+              const isGuestMapBan = state.guestMapBans?.includes(mapName) && !isBanHiddenForRole(mapName, 'GUEST');
+
+              const isMapPicked = isHostMapPick || isGuestMapPick || state.adminMapPicks?.includes(mapName);
+              const isMapBanned = isHostMapBan || isGuestMapBan;
               const banMode = state.banModes?.[mapName] || 'GLOBAL';
               const action = currentTurn?.action;
               const activePlayer = currentTurn?.player;
@@ -1391,8 +1490,8 @@ export function DraftRoomPage() {
                     isUsed = true;
                   } else {
                     const bannedByOpponent = activePlayer === 'HOST'
-                      ? state.guestMapBans?.includes(mapName)
-                      : state.hostMapBans?.includes(mapName);
+                      ? isGuestMapBan
+                      : isHostMapBan;
                     if (bannedByOpponent) {
                       isClickable = false;
                       isUsed = true;
@@ -1410,8 +1509,8 @@ export function DraftRoomPage() {
                     isUsed = true;
                   } else {
                     const bannedBySelf = activePlayer === 'HOST'
-                      ? state.hostMapBans?.includes(mapName)
-                      : state.guestMapBans?.includes(mapName);
+                      ? isHostMapBan
+                      : isGuestMapBan;
                     if (bannedBySelf && (banMode === 'EXCLUSIVE' || banMode === 'GLOBAL')) {
                       isClickable = false;
                       isUsed = true;
