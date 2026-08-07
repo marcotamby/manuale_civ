@@ -864,14 +864,22 @@ export function DraftRoomPage() {
                 <div id="host-ban-container" className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
                   {state.hostBans && state.hostBans.length > 0 ? (
                     state.hostBans.map(id => {
-                      const isHidden = isBanHiddenForRole(id, 'HOST');
+                      const isHidden = isBanHiddenForRole(id, 'GUEST');
+                      const isSelfHidden = !state.revealedBans && room?.status !== 'completed' && state.hiddenBans?.includes(id) && role === 'GUEST';
                       const c = getCivObj(id);
                       return isHidden ? (
                         <div key={`hban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md animate-pop-in">
                           <Lock size={16} />
                         </div>
                       ) : (
-                        <img key={`hban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md animate-pop-in" />
+                        <div key={`hban-${id}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-red-500/60 shadow-md animate-pop-in">
+                          <img src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-full h-full object-cover opacity-70 grayscale" />
+                          {isSelfHidden && (
+                            <div className="absolute top-0.5 right-0.5 bg-purple-900/90 text-purple-200 p-0.5 rounded-full shadow border border-purple-400/80 z-10" title="Ban Segreto (Nascosto all'avversario)">
+                              <Lock size={10} />
+                            </div>
+                          )}
+                        </div>
                       );
                     })
                   ) : (
@@ -1179,14 +1187,22 @@ export function DraftRoomPage() {
                 <div id="guest-ban-container" className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
                   {state.guestBans && state.guestBans.length > 0 ? (
                     state.guestBans.map(id => {
-                      const isHidden = isBanHiddenForRole(id, 'GUEST');
+                      const isHidden = isBanHiddenForRole(id, 'HOST');
+                      const isSelfHidden = !state.revealedBans && room?.status !== 'completed' && state.hiddenBans?.includes(id) && role === 'HOST';
                       const c = getCivObj(id);
                       return isHidden ? (
                         <div key={`gban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md animate-pop-in">
                           <Lock size={16} />
                         </div>
                       ) : (
-                        <img key={`gban-${id}`} src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md animate-pop-in" />
+                        <div key={`gban-${id}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-red-500/60 shadow-md animate-pop-in">
+                          <img src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-full h-full object-cover opacity-70 grayscale" />
+                          {isSelfHidden && (
+                            <div className="absolute top-0.5 right-0.5 bg-purple-900/90 text-purple-200 p-0.5 rounded-full shadow border border-purple-400/80 z-10" title="Ban Segreto (Nascosto all'avversario)">
+                              <Lock size={10} />
+                            </div>
+                          )}
+                        </div>
                       );
                     })
                   ) : (
