@@ -250,6 +250,16 @@ export function DraftRoomPage() {
     return role !== performingPlayer;
   };
 
+  const isBanRevealed = (id: string) => {
+    if (room?.status === 'completed' || state.revealedBans) return true;
+    return !state.hiddenBans?.includes(id);
+  };
+
+  const isPickRevealed = (id: string) => {
+    if (room?.status === 'completed' || state.revealedPicks) return true;
+    return !state.hiddenPicks?.includes(id);
+  };
+
   const isHostTurn = currentTurn?.player === 'HOST';
   const isGuestTurn = currentTurn?.player === 'GUEST';
   const isAdminTurn = currentTurn?.player === 'ADMIN';
@@ -1044,13 +1054,19 @@ export function DraftRoomPage() {
                 ) : isMyTurn ? (
                   `Il tuo Turno: ${
                     currentTurn.action === 'BAN'
-                      ? 'Banna 1 civiltà/mappa'
+                      ? (currentTurn.target === 'MAP' || room.preset?.scope === 'maps' ? 'Banna 1 mappa' : 'Banna 1 civiltà')
                       : currentTurn.action === 'SNIPE'
                       ? 'Effettua 1 SNIPE tra i pick dell\'avversario'
-                      : 'Seleziona 1 civiltà/mappa per te'
+                      : (currentTurn.target === 'MAP' || room.preset?.scope === 'maps' ? 'Picka 1 mappa' : 'Picka 1 civiltà')
                   }${currentTurn.isHidden ? ' (🔒 Scelta Segreta)' : ''}`
                 ) : (
-                  `Turno di ${currentTurn.player === 'HOST' ? room.host_name : room.guest_name} (${currentTurn.action})${currentTurn.isHidden ? ' (🔒 Scelta Segreta)' : ''}`
+                  `Turno di ${currentTurn.player === 'HOST' ? room.host_name : room.guest_name} (${
+                    currentTurn.action === 'BAN'
+                      ? (currentTurn.target === 'MAP' || room.preset?.scope === 'maps' ? 'BAN MAPPA' : 'BAN CIV')
+                      : currentTurn.action === 'PICK'
+                      ? (currentTurn.target === 'MAP' || room.preset?.scope === 'maps' ? 'PICK MAPPA' : 'PICK CIV')
+                      : currentTurn.action
+                  })${currentTurn.isHidden ? ' (🔒 Scelta Segreta)' : ''}`
                 )}
               </div>
 
@@ -1320,10 +1336,10 @@ export function DraftRoomPage() {
 
           <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-11 gap-2 sm:gap-2.5">
             {civilizationsData.map((civ) => {
-              const isHostPick = state.hostPicks?.includes(civ.id) && !isPickHiddenForRole(civ.id, 'HOST');
-              const isGuestPick = state.guestPicks?.includes(civ.id) && !isPickHiddenForRole(civ.id, 'GUEST');
-              const isHostBan = state.hostBans?.includes(civ.id) && !isBanHiddenForRole(civ.id, 'HOST');
-              const isGuestBan = state.guestBans?.includes(civ.id) && !isBanHiddenForRole(civ.id, 'GUEST');
+              const isHostPick = state.hostPicks?.includes(civ.id) && isPickRevealed(civ.id);
+              const isGuestPick = state.guestPicks?.includes(civ.id) && isPickRevealed(civ.id);
+              const isHostBan = state.hostBans?.includes(civ.id) && isBanRevealed(civ.id);
+              const isGuestBan = state.guestBans?.includes(civ.id) && isBanRevealed(civ.id);
               const isHostSnipe = state.hostSnipes?.includes(civ.id);
               const isGuestSnipe = state.guestSnipes?.includes(civ.id);
               const banMode = state.banModes?.[civ.id] || 'GLOBAL';
@@ -1479,10 +1495,10 @@ export function DraftRoomPage() {
           {/* Map Grid with Larger Cards & Map Titles */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-3.5">
             {activeMapPool.filter(m => m.toLowerCase().includes(mapSearchQuery.toLowerCase())).map((mapName) => {
-              const isHostMapPick = state.hostMapPicks?.includes(mapName) && !isPickHiddenForRole(mapName, 'HOST');
-              const isGuestMapPick = state.guestMapPicks?.includes(mapName) && !isPickHiddenForRole(mapName, 'GUEST');
-              const isHostMapBan = state.hostMapBans?.includes(mapName) && !isBanHiddenForRole(mapName, 'HOST');
-              const isGuestMapBan = state.guestMapBans?.includes(mapName) && !isBanHiddenForRole(mapName, 'GUEST');
+              const isHostMapPick = state.hostMapPicks?.includes(mapName) && isPickRevealed(mapName);
+              const isGuestMapPick = state.guestMapPicks?.includes(mapName) && isPickRevealed(mapName);
+              const isHostMapBan = state.hostMapBans?.includes(mapName) && isBanRevealed(mapName);
+              const isGuestMapBan = state.guestMapBans?.includes(mapName) && isBanRevealed(mapName);
 
               const isMapPicked = isHostMapPick || isGuestMapPick || state.adminMapPicks?.includes(mapName);
               const isMapBanned = isHostMapBan || isGuestMapBan;
