@@ -64,7 +64,7 @@ export async function sendNewBuildOrderWebhook(params: BuildOrderWebhookParams) 
     fields,
     footer: {
       text: 'Manuale Civ • Age of Empires IV',
-      icon_url: 'https://aoe4guide.it/favicon.ico'
+      icon_url: 'https://aoe4guide.it/favicon.png'
     },
     timestamp: new Date().toISOString()
   };

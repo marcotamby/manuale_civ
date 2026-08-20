@@ -147,7 +147,7 @@ export function CivView({ civId, onSelectUnit }: CivViewProps) {
           "name": "Manuale Civ",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://manualeciv.it/favicon.png"
+            "url": "https://aoe4guide.it/favicon.png"
           }
         }
       })

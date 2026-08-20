@@ -11,7 +11,7 @@ export default async function handler(req: Request) {
     // ?title=<title>
     const title = searchParams.get('title') || 'Manuale Civ';
     const description = searchParams.has('description') ? searchParams.get('description') : 'Age of Empires 4 Guides';
-    const image = searchParams.get('image') || 'https://manualeciv.it/header-bg.png';
+    const image = searchParams.get('image') || 'https://aoe4guide.it/header-bg.png';
     const subtitle = searchParams.has('subtitle') ? searchParams.get('subtitle') : '';
 
     return new ImageResponse(

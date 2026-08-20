@@ -26,7 +26,7 @@ export default async function handler(req: Request) {
 
     let title = 'Manuale Civ - AoE4 Guides';
     let description = 'Build order, civiltà e strategie per Age of Empires 4.';
-    let image = 'https://manualeciv.it/header-bg.png';
+    let image = 'https://aoe4guide.it/header-bg.png';
     let subtitle = '';
 
     let ogTitle = '';

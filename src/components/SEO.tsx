@@ -14,8 +14,8 @@ interface SEOProps {
 export const SEO = memo(({ 
   title = 'Manuale Civ - Age of Empires 4 Guides', 
   description = 'Il manuale definitivo per Age of Empires 4. Build order, civiltà, strategie e molto altro.',
-  image = 'https://manualeciv.it/header-bg.png', 
-  url = 'https://manualeciv.it',
+  image = 'https://aoe4guide.it/header-bg.png', 
+  url = 'https://aoe4guide.it',
   type = 'website',
   jsonLd,
   subtitle
@@ -23,14 +23,14 @@ export const SEO = memo(({
   // Ensure we have fallbacks even if parameters are explicitly passed as null/undefined
   const safeTitle = title || 'Manuale Civ - Age of Empires 4 Guides';
   const safeDescription = description || 'Il manuale definitivo per Age of Empires 4. Build order, civiltà, strategie e molto altro.';
-  const safeImage = image || 'https://manualeciv.it/header-bg.png';
+  const safeImage = image || 'https://aoe4guide.it/header-bg.png';
 
   const siteTitle = safeTitle.includes('Manuale Civ') ? safeTitle : `${safeTitle} | Manuale Civ`;
 
   // Dynamic OG image URL - Memoized for performance
   const finalImageUrl = useMemo(() => {
     try {
-      const base = typeof window !== 'undefined' ? window.location.origin : 'https://manualeciv.it';
+      const base = typeof window !== 'undefined' ? window.location.origin : 'https://aoe4guide.it';
       const ogImageUrl = new URL(`${base}/api/og`);
       ogImageUrl.searchParams.set('title', safeTitle.replace(' | Manuale Civ', ''));
       ogImageUrl.searchParams.set('description', safeDescription.length > 100 ? safeDescription.substring(0, 97) + '...' : safeDescription);
@@ -38,7 +38,7 @@ export const SEO = memo(({
       if (subtitle) ogImageUrl.searchParams.set('subtitle', subtitle);
       return ogImageUrl.toString();
     } catch (e) {
-      return safeImage.startsWith('http') ? safeImage : `https://manualeciv.it${safeImage}`;
+      return safeImage.startsWith('http') ? safeImage : `https://aoe4guide.it${safeImage}`;
     }
   }, [safeTitle, safeDescription, safeImage, subtitle]);
 
