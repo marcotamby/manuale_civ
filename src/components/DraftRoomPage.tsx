@@ -134,14 +134,14 @@ export function DraftRoomPage() {
   const hasAnimatedFinalVSRef = useRef(false);
 
   useEffect(() => {
-    if (isSingleCivMatchup && !hasAnimatedFinalVSRef.current) {
+    if (role && isSingleCivMatchup && !hasAnimatedFinalVSRef.current) {
       hasAnimatedFinalVSRef.current = true;
       const timer = setTimeout(() => {
         triggerFinalVSFlight(hostFinalCivs[0], guestFinalCivs[0]);
       }, 350);
       return () => clearTimeout(timer);
     }
-  }, [isSingleCivMatchup, hostFinalCivs, guestFinalCivs]);
+  }, [role, isSingleCivMatchup, hostFinalCivs, guestFinalCivs]);
 
   const triggerFinalVSFlight = (hostCivId: string, guestCivId: string) => {
     try {
