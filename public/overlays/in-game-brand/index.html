@@ -73,13 +73,13 @@
         }
 
         /* =========================================================================
-           2. MINIMAP UNIFIED FRAME & PANELS (384x444 Corner Wrapper)
+           2. MINIMAP UNIFIED FRAME & PANELS (EGC Style Full Wrapper)
            ========================================================================= */
         #minimap-brand-wrapper {
             position: absolute;
             right: 0;
             bottom: 0;
-            width: 384px;
+            width: 444px;
             height: 444px;
             z-index: 100;
             pointer-events: none;
@@ -97,10 +97,10 @@
         /* Logo AoE Italia Top-Right Content */
         .minimap-logo-content {
             position: absolute;
-            top: 60px;
-            right: 14px;
-            width: 140px;
-            height: 120px;
+            top: 75px;
+            right: 20px;
+            width: 135px;
+            height: 110px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -109,7 +109,7 @@
 
         .minimap-logo-img {
             max-height: 72px;
-            max-width: 120px;
+            max-width: 115px;
             object-fit: contain;
             filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 10px rgba(212, 175, 55, 0.35));
         }
@@ -117,8 +117,8 @@
         /* Map Name & Day Bottom-Right Content */
         .minimap-bottom-content {
             position: absolute;
-            bottom: 12px;
-            right: 18px;
+            bottom: 14px;
+            right: 20px;
             display: flex;
             flex-direction: column;
             align-items: flex-end;
@@ -160,9 +160,9 @@
         <div class="top-tournament-title" id="top-title-text">Ends of Summer Champions</div>
     </div>
 
-    <!-- 2. MINIMAP COMPLETE BRAND WRAPPER (Frame + Logo + Mappa & Giornata) -->
+    <!-- 2. MINIMAP COMPLETE BRAND WRAPPER (EGC Style: Cornice Scallop + Logo + Info Mappa) -->
     <div id="minimap-brand-wrapper">
-        <svg class="minimap-wrapper-svg" viewBox="0 0 384 444" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg class="minimap-wrapper-svg" viewBox="0 0 444 444" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <linearGradient id="panelBg" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stop-color="#0b1224" stop-opacity="0.98"/>
@@ -175,20 +175,26 @@
                 </linearGradient>
             </defs>
 
-            <!-- 1. Top-Right Panel (covers game toggles from Y=0 to Y=72, diagonal down to Y=264) -->
+            <!-- 1. Top-Right Panel (covers toggles at Y=0..72, diagonal 45° to Y=254) -->
             <g id="svg-minimap-top-group">
-                <polygon points="192,0 384,0 384,264 192,72" fill="url(#panelBg)"/>
-                <line x1="192" y1="72" x2="384" y2="264" stroke="url(#goldStroke)" stroke-width="3" stroke-linecap="round"/>
+                <polygon points="252,0 444,0 444,264 434,254 252,72" fill="url(#panelBg)"/>
+                <line x1="252" y1="72" x2="434" y2="254" stroke="url(#goldStroke)" stroke-width="3" stroke-linecap="round"/>
             </g>
 
-            <!-- 2. Bottom-Right Panel (from right vertex at 384,260 down-left to bottom vertex at 192,438, down to screen bottom) -->
+            <!-- 2. Bottom-Right Panel (diagonal 45° from 434,254 to 252,436, fills screen corner) -->
             <g id="svg-minimap-bottom-group">
-                <polygon points="384,260 384,444 192,444 192,438" fill="url(#panelBg)"/>
-                <line x1="384" y1="260" x2="192" y2="438" stroke="url(#goldStroke)" stroke-width="3" stroke-linecap="round"/>
+                <polygon points="434,254 444,244 444,444 252,444 252,436" fill="url(#panelBg)"/>
+                <line x1="434" y1="254" x2="252" y2="436" stroke="url(#goldStroke)" stroke-width="3" stroke-linecap="round"/>
             </g>
 
-            <!-- 3. Outer Left Diamond Wrapper Frame (wrapping top-left and bottom-left facets) -->
-            <polyline points="192,72 0,264 192,438" stroke="url(#goldStroke)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- 3. Outer Scalloped / Starburst Dark Frame (Left Side) with Gold Trim -->
+            <g id="svg-minimap-frame-group">
+                <polygon points="247.8,67.8 222.7,73.0 217.4,98.1 192.4,103.4 187.1,128.4 162.0,133.7 156.8,158.8 131.7,164.0 126.4,189.1 101.4,194.4 96.1,219.4 71.0,224.7 65.8,249.8 71.0,283.3 96.1,288.6 101.4,313.6 126.4,318.9 131.7,344.0 156.8,349.2 162.0,374.3 187.1,379.6 192.4,404.6 217.4,409.9 222.7,435.0 247.8,440.2 252,436 70,254 252,72" fill="url(#panelBg)"/>
+                <!-- Outer Jagged Gold Line -->
+                <polyline points="247.8,67.8 222.7,73.0 217.4,98.1 192.4,103.4 187.1,128.4 162.0,133.7 156.8,158.8 131.7,164.0 126.4,189.1 101.4,194.4 96.1,219.4 71.0,224.7 65.8,249.8 71.0,283.3 96.1,288.6 101.4,313.6 126.4,318.9 131.7,344.0 156.8,349.2 162.0,374.3 187.1,379.6 192.4,404.6 217.4,409.9 222.7,435.0 247.8,440.2" stroke="url(#goldStroke)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- Inner Diamond Left Gold Line -->
+                <polyline points="252,436 70,254 252,72" stroke="url(#goldStroke)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
         </svg>
 
         <!-- AoE Italia Logo (Top-Right) -->
