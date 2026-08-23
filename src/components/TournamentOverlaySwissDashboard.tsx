@@ -214,6 +214,21 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
     }
   }, [activeTab, onActivePathChange]);
 
+  const handleTabSwitch = (newTab: 'standings' | 'rounds' | 'startgg') => {
+    setActiveTab(newTab);
+    if (newTab === 'rounds') {
+      const updated = { ...state, activeView: 'rounds' as const };
+      setState(updated);
+      handleSave(updated);
+      onActivePathChange?.('/overlays/tournament-swiss/index.html?view=rounds');
+    } else if (newTab === 'standings') {
+      const updated = { ...state, activeView: 'standings' as const };
+      setState(updated);
+      handleSave(updated);
+      onActivePathChange?.('/overlays/tournament-swiss/index.html?view=standings');
+    }
+  };
+
   // Start.gg states
   const [startggSlugInput, setStartggSlugInput] = useState('');
   const [startggLoading, setStartggLoading] = useState(false);
@@ -692,7 +707,7 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
       {/* Tabs Navigation */}
       <div className="flex items-center px-6 border-b border-white/10 bg-[#060910] gap-2 overflow-x-auto">
         <button
-          onClick={() => setActiveTab('standings')}
+          onClick={() => handleTabSwitch('standings')}
           className={`flex items-center gap-2 px-5 py-3.5 border-b-2 text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${
             activeTab === 'standings'
               ? 'border-cyan-400 text-cyan-300 bg-cyan-500/5'
@@ -704,7 +719,7 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
         </button>
 
         <button
-          onClick={() => setActiveTab('rounds')}
+          onClick={() => handleTabSwitch('rounds')}
           className={`flex items-center gap-2 px-5 py-3.5 border-b-2 text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${
             activeTab === 'rounds'
               ? 'border-cyan-400 text-cyan-300 bg-cyan-500/5'
@@ -716,7 +731,7 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
         </button>
 
         <button
-          onClick={() => setActiveTab('startgg')}
+          onClick={() => handleTabSwitch('startgg')}
           className={`flex items-center gap-2 px-5 py-3.5 border-b-2 text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${
             activeTab === 'startgg'
               ? 'border-cyan-400 text-cyan-300 bg-cyan-500/5'

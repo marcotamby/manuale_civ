@@ -642,14 +642,18 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                     >
                       <Copy size={18} /> Copia URL
                     </button>
-                    <a
-                      href={effectiveOverlayPath}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2.5 px-6 py-3 bg-sky-600 text-white font-black rounded-xl hover:bg-sky-500 transition-all text-[11px] uppercase border border-sky-400/30 shadow-xl shadow-sky-900/20 whitespace-nowrap"
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const urlToOpen = effectiveOverlayPath.startsWith('http') 
+                          ? effectiveOverlayPath 
+                          : `${window.location.origin}${effectiveOverlayPath.startsWith('/') ? '' : '/'}${effectiveOverlayPath}`;
+                        window.open(urlToOpen, '_blank');
+                      }}
+                      className="flex items-center gap-2.5 px-6 py-3 bg-sky-600 text-white font-black rounded-xl hover:bg-sky-500 transition-all text-[11px] uppercase border border-sky-400/30 shadow-xl shadow-sky-900/20 whitespace-nowrap cursor-pointer"
                     >
                       <ExternalLink size={18} /> Apri Overlay
-                    </a>
+                    </button>
                   </div>
                 </div>
 

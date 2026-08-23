@@ -757,6 +757,29 @@
         const urlParams = new URLSearchParams(window.location.search);
         const forcedView = urlParams.get('view');
 
+        function applyView(viewName) {
+            const v = (viewName || '').toLowerCase();
+            const viewStandings = document.getElementById('view-standings');
+            const viewRounds = document.getElementById('view-rounds');
+            const viewText = document.getElementById('view-text');
+            if (!viewStandings || !viewRounds) return;
+
+            if (v === 'rounds') {
+                viewStandings.style.setProperty('display', 'none', 'important');
+                viewRounds.style.setProperty('display', 'flex', 'important');
+                if (viewText) viewText.innerText = 'TABELLONE TURNI';
+            } else {
+                viewStandings.style.setProperty('display', 'flex', 'important');
+                viewRounds.style.setProperty('display', 'none', 'important');
+                if (viewText) viewText.innerText = 'CLASSIFICA LIVE';
+            }
+        }
+
+        // Apply immediately on parse
+        if (forcedView) {
+            applyView(forcedView);
+        }
+
         function getCivFlagUrl(id) {
             if (!id || typeof id !== 'string') return '';
             if (id.startsWith('/civs/') || id.endsWith('.webp') || id.endsWith('.png')) {
@@ -785,19 +808,7 @@
 
             // 2. Determine Active View (Prioritize URL param ?view=...)
             const activeView = forcedView ? forcedView.toLowerCase() : (state?.activeView || 'standings');
-            const viewStandings = document.getElementById('view-standings');
-            const viewRounds = document.getElementById('view-rounds');
-            const viewText = document.getElementById('view-text');
-
-            if (activeView === 'rounds') {
-                viewStandings.style.display = 'none';
-                viewRounds.style.display = 'flex';
-                viewText.innerText = 'TABELLONE TURNI';
-            } else {
-                viewStandings.style.display = 'flex';
-                viewRounds.style.display = 'none';
-                viewText.innerText = 'CLASSIFICA LIVE';
-            }
+            applyView(activeView);
 
             // 3. Render Standings (View A)
             if (state) renderStandings(state);
