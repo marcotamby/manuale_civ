@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   ShieldCheck, 
   Save, 
@@ -6,11 +6,13 @@ import {
   Loader2, 
   Eye, 
   EyeOff, 
-  Layers, 
   Sliders, 
   MapPin, 
-  Copy,
-  ExternalLink
+  Search, 
+  X, 
+  Copy, 
+  ExternalLink, 
+  Radio 
 } from 'lucide-react';
 import { overlayService } from '../services/overlayService';
 import type { OverlayState } from '../services/overlayService';
@@ -22,47 +24,113 @@ interface InGameBrandDashboardProps {
   onActivePathChange?: (path: string) => void;
 }
 
-const DEFAULT_STATE: OverlayState = {
-  tournamentTitle: 'Ends of Summer Champions',
-  stageSubtitle: 'QUALIFICAZIONI SVIZZERA',
-  matchFormat: 'BO1',
-  dayNumber: 1,
-  dayText: 'Qualificazioni • Giornata 1/4',
-  mapName: 'Dry Arabia',
-  minimapBrandTitle: 'AOE ITALIA',
-  minimapBrandSub: 'MASTERS',
-  showTopBanner: true,
-  showMinimapCrest: true,
-  showMinimapInfo: true,
-  theme: 'gold',
-  topBannerOffsetY: 0,
-  minimapCrestOffsetY: 0,
-  minimapInfoOffsetY: 0
-};
-
-const COMMON_AOE4_MAPS = [
+const ALL_AOE4_MAPS = [
+  'African Waters',
+  'Alopecia',
+  'Altai',
+  'Anatolian Hills',
+  'Ancient Spires',
+  'Archipelago',
+  'Atacama',
+  'Baltic',
+  'Basin',
+  'Black Forest',
+  'Bohemia',
+  'Boulder Bay',
+  'Canal',
+  'Carmel',
+  'Cauldron',
+  'Cliffside',
+  'Coastal',
+  'Coastal Cliffs',
+  'Confluence',
+  'Continental',
+  'Danube River',
   'Dry Arabia',
-  'Gorge',
-  'Himeyama',
-  'Golden Heights',
-  'Lipany',
-  'Rocky River',
+  'Dry River',
+  'Enlightened Horizon',
+  'Flankwoods',
+  'Floodplain',
+  'Forest Ponds',
+  'Forts',
   'Fortress',
   'Four Lakes',
-  'Prairie',
-  'Cliffside',
+  'French Pass',
+  'Frisian Marshes',
   'Glade',
-  'Baltic'
+  'Golden Heights',
+  'Golden Pit',
+  'Golden Swamp',
+  'Gorge',
+  'Hallowed Spring',
+  'Haywire',
+  'Hidden Valley',
+  'Hideout',
+  'High View',
+  'Hill and Dale',
+  'Himeyama',
+  'Holy Island',
+  'Jousting Fields',
+  'Kawasan',
+  'King of the Hill',
+  'Lake Side',
+  'Lipany',
+  'Marshland',
+  'MegaRandom',
+  'Migration',
+  'Mongolian Heights',
+  'Mountain Clearing',
+  'Mountain Pass',
+  'Nagari',
+  'Oasis',
+  'Prairie',
+  'Relic River',
+  'Rocky Canyon',
+  'Rocky River',
+  'Scandinavia',
+  'Shadow Lake',
+  'Socotra',
+  'Sunkenlands',
+  'The Pit',
+  'Thickets',
+  'Transhumance',
+  'Tundra',
+  'Turtle Ridge',
+  'Volcanic Island',
+  'Warring Islands',
+  'Waterholes',
+  'Waterlanes',
+  'Wetlands',
+  'Wilderness'
 ];
+
+const DEFAULT_STATE: OverlayState = {
+  tournamentTitle: 'Ends of Summer Champions',
+  dayNumber: 1,
+  dayText: 'GIORNATA 1',
+  mapName: 'Dry Arabia',
+  showTopBanner: true,
+  showMinimapBrand: true,
+  showMinimapLogo: true,
+  showMinimapDay: true,
+  showMinimapMapName: true,
+  topBannerOffsetY: 0,
+  minimapSidebarOffsetY: 0,
+  minimapSidebarOffsetX: 0
+};
 
 export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBrandDashboardProps) {
   const [state, setState] = useState<OverlayState>(DEFAULT_STATE);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLiveSyncing, setIsLiveSyncing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [mapSearchQuery, setMapSearchQuery] = useState('');
+
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    onActivePathChange?.('/overlays/in-game-brand/index.html');
+    onActivePathChange?.('/overlays/in-game-brand/index.html?preview=true');
   }, [onActivePathChange]);
 
   // Load state
@@ -82,36 +150,49 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
       });
   }, [onError]);
 
-  const handleSave = async (customState?: OverlayState) => {
-    const toSave = customState || state;
-    setIsSaving(true);
-    try {
-      await overlayService.updateOverlayState(OVERLAY_ID, toSave);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 2500);
-    } catch (err) {
-      console.error('Errore salvataggio in-game-brand:', err);
-      onError?.('Errore durante il salvataggio.');
-    } finally {
-      setIsSaving(false);
+  // Instant Live Sync to Supabase
+  const pushLiveState = (newState: OverlayState, immediate = false) => {
+    setState(newState);
+    setIsLiveSyncing(true);
+
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    const executePush = async () => {
+      setIsSaving(true);
+      try {
+        await overlayService.updateOverlayState(OVERLAY_ID, newState);
+        setIsLiveSyncing(false);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 1500);
+      } catch (err) {
+        console.error('Errore sync realtime:', err);
+        setIsLiveSyncing(false);
+      } finally {
+        setIsSaving(false);
+      }
+    };
+
+    if (immediate) {
+      executePush();
+    } else {
+      debounceTimerRef.current = setTimeout(executePush, 200);
     }
   };
 
-  const handleDayChange = (day: number) => {
-    const newDayText = `Qualificazioni • Giornata ${day}/4`;
-    const newState = {
+  const handleDaySelect = (day: number) => {
+    const updated = {
       ...state,
       dayNumber: day,
-      dayText: newDayText
+      dayText: `GIORNATA ${day}`
     };
-    setState(newState);
-    handleSave(newState);
+    pushLiveState(updated, true);
   };
 
   const handleMapSelect = (map: string) => {
-    const newState = { ...state, mapName: map };
-    setState(newState);
-    handleSave(newState);
+    const updated = { ...state, mapName: map };
+    pushLiveState(updated, true);
   };
 
   const copyLink = (path: string) => {
@@ -120,6 +201,10 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
     setShowSuccess(true);
     setTimeout(() => setShowSuccess(false), 2000);
   };
+
+  const filteredMaps = ALL_AOE4_MAPS.filter((m) =>
+    m.toLowerCase().includes(mapSearchQuery.toLowerCase().trim())
+  );
 
   if (isLoading) {
     return (
@@ -140,218 +225,220 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
           </div>
           <div>
             <h2 className="text-sm font-black uppercase tracking-wider text-white flex items-center gap-2">
-              In-Game Brand 1v1
-              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-400/30 text-cyan-300">
-                Overlay OBS Trasparente
+              In-Game Brand (1V1)
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 flex items-center gap-1">
+                <Radio size={12} className="animate-pulse text-emerald-400" />
+                Live Sync Istantaneo Attivo
               </span>
             </h2>
-            <p className="text-xs text-slate-400">Personalizza il logo AoEItalia, titolo torneo, minimappa e giornata di gioco in diretta.</p>
+            <p className="text-xs text-slate-400">Le modifiche vanno in diretta streaming in tempo reale senza dover salvare.</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          {showSuccess && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-bold animate-in fade-in">
-              <CheckCircle2 size={15} /> Sincronizzato!
+          {isLiveSyncing ? (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 text-xs font-bold animate-pulse">
+              <Loader2 size={13} className="animate-spin" /> Inviando a OBS...
             </div>
-          )}
+          ) : showSuccess ? (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-bold animate-in fade-in">
+              <CheckCircle2 size={14} /> Aggiornato Live
+            </div>
+          ) : null}
 
           <button
-            onClick={() => handleSave()}
+            onClick={() => pushLiveState(state, true)}
             disabled={isSaving}
             className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-600 hover:from-yellow-400 hover:to-orange-500 text-black font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-yellow-500/20 active:scale-95 disabled:opacity-50"
           >
             {isSaving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
-            Salva Modifiche
+            Salva Stato
           </button>
         </div>
       </div>
 
-      {/* Main Form Content */}
+      {/* Main Content */}
       <div className="flex-1 p-6 overflow-y-auto custom-scrollbar space-y-6">
         
-        {/* Row 1: Torneo, Fase, Giornata */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Row 1: Titolo Torneo (In Alto) & Giornata (Di Fianco alla Mappa) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           
-          {/* Titolo Torneo */}
-          <div className="bg-black/40 border border-white/10 rounded-xl p-4 flex flex-col gap-2">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-              Titolo Torneo
-              <span className="text-[10px] text-yellow-400">In alto & Minimappa</span>
-            </label>
+          {/* Titolo Torneo (Elemento Superiore) */}
+          <div className="bg-black/40 border border-white/10 rounded-xl p-5 flex flex-col gap-2.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+                1. Nome Torneo (Banner In Alto)
+              </label>
+              <button
+                type="button"
+                onClick={() => pushLiveState({ ...state, showTopBanner: state.showTopBanner === false ? true : false }, true)}
+                className={`text-xs font-bold flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-all ${
+                  state.showTopBanner !== false 
+                    ? 'bg-yellow-500/15 border-yellow-500/40 text-yellow-300' 
+                    : 'bg-white/5 border-white/10 text-slate-500'
+                }`}
+              >
+                {state.showTopBanner !== false ? <Eye size={13} /> : <EyeOff size={13} />}
+                {state.showTopBanner !== false ? 'Visibile' : 'Nascosto'}
+              </button>
+            </div>
             <input
               type="text"
               value={state.tournamentTitle || ''}
-              onChange={(e) => setState({ ...state, tournamentTitle: e.target.value })}
+              onChange={(e) => pushLiveState({ ...state, tournamentTitle: e.target.value })}
               placeholder="Ends of Summer Champions"
-              className="bg-[#0e1424] border border-white/10 focus:border-yellow-400/60 rounded-lg px-3 py-2 text-sm font-bold text-white focus:outline-none"
+              className="bg-[#0e1424] border border-white/10 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-sm font-bold text-white focus:outline-none"
             />
+            <p className="text-[11px] text-slate-400">Posizionato sotto l'HUD centrale dello spettatore in font medievale sfumato.</p>
           </div>
 
-          {/* Sottotitolo / Fase */}
-          <div className="bg-black/40 border border-white/10 rounded-xl p-4 flex flex-col gap-2">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-              Sottotitolo / Fase
-              <span className="text-[10px] text-cyan-300">Banner Alto</span>
-            </label>
-            <input
-              type="text"
-              value={state.stageSubtitle || ''}
-              onChange={(e) => setState({ ...state, stageSubtitle: e.target.value })}
-              placeholder="QUALIFICAZIONI SVIZZERA"
-              className="bg-[#0e1424] border border-white/10 focus:border-cyan-400/60 rounded-lg px-3 py-2 text-sm font-bold text-white focus:outline-none"
-            />
-          </div>
-
-          {/* Giornata & Formato */}
-          <div className="bg-black/40 border border-white/10 rounded-xl p-4 flex flex-col gap-2">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-              Giornata & Formato
-              <span className="text-[10px] text-slate-400">Rapido</span>
-            </label>
-            <div className="flex gap-2">
-              <select
-                value={state.dayNumber || 1}
-                onChange={(e) => handleDayChange(parseInt(e.target.value) || 1)}
-                className="flex-1 bg-[#0e1424] border border-white/10 focus:border-cyan-400/60 rounded-lg px-3 py-2 text-sm font-bold text-cyan-300 focus:outline-none cursor-pointer"
+          {/* Selettore Giornata (Di Fianco alla Mappa) */}
+          <div className="bg-black/40 border border-white/10 rounded-xl p-5 flex flex-col gap-2.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+                2. Giornata (Di Fianco alla Mappa)
+              </label>
+              <button
+                type="button"
+                onClick={() => pushLiveState({ ...state, showMinimapBrand: state.showMinimapBrand === false ? true : false }, true)}
+                className={`text-xs font-bold flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-all ${
+                  state.showMinimapBrand !== false 
+                    ? 'bg-cyan-500/15 border-cyan-400/40 text-cyan-300' 
+                    : 'bg-white/5 border-white/10 text-slate-500'
+                }`}
               >
-                <option value={1}>Giornata 1/4</option>
-                <option value={2}>Giornata 2/4</option>
-                <option value={3}>Giornata 3/4</option>
-                <option value={4}>Giornata 4/4</option>
-              </select>
+                {state.showMinimapBrand !== false ? <Eye size={13} /> : <EyeOff size={13} />}
+                {state.showMinimapBrand !== false ? 'Visibile' : 'Nascosto'}
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-4 gap-2">
+              {[1, 2, 3, 4].map((d) => (
+                <button
+                  key={d}
+                  onClick={() => handleDaySelect(d)}
+                  className={`py-2 px-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all border ${
+                    (state.dayNumber || 1) === d
+                      ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-md shadow-cyan-500/20 scale-[1.02]'
+                      : 'bg-[#0e1424] border-white/10 text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  Giorno {d}
+                </button>
+              ))}
+            </div>
 
-              <select
-                value={state.matchFormat || 'BO1'}
-                onChange={(e) => setState({ ...state, matchFormat: e.target.value })}
-                className="w-24 bg-[#0e1424] border border-white/10 focus:border-cyan-400/60 rounded-lg px-3 py-2 text-sm font-bold text-yellow-400 focus:outline-none cursor-pointer"
-              >
-                <option value="BO1">Bo1</option>
-                <option value="BO3">Bo3</option>
-                <option value="BO5">Bo5</option>
-                <option value="FINAL">Finale</option>
-              </select>
+            <div className="flex items-center gap-2 pt-1">
+              <span className="text-[11px] text-slate-400">Testo personalizzato:</span>
+              <input
+                type="text"
+                value={state.dayText || ''}
+                onChange={(e) => pushLiveState({ ...state, dayText: e.target.value })}
+                placeholder="GIORNATA 1"
+                className="flex-1 bg-[#0e1424] border border-white/10 focus:border-cyan-400/60 rounded-lg px-3 py-1 text-xs font-bold text-cyan-300 focus:outline-none"
+              />
             </div>
           </div>
 
         </div>
 
-        {/* Row 2: Mappa Corrente */}
-        <div className="bg-black/40 border border-white/10 rounded-xl p-5 space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-              <MapPin size={16} className="text-cyan-400" />
-              Mappa Attuale in Partita
-            </label>
+        {/* Row 2: Ricerca e Selezione Mappa */}
+        <div className="bg-black/40 border border-white/10 rounded-xl p-5 space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+              <label className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <MapPin size={16} className="text-cyan-400" />
+                3. Mappa In Corso (Di Fianco alla Mappa)
+              </label>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                Mappa attuale selezionata: <span className="font-black text-yellow-400 text-xs uppercase">{state.mapName || 'Nessuna'}</span>
+              </p>
+            </div>
+
+            {/* Search Input Bar */}
+            <div className="relative w-full md:w-80">
+              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={mapSearchQuery}
+                onChange={(e) => setMapSearchQuery(e.target.value)}
+                placeholder="Cerca tra tutte le 77 mappe..."
+                className="w-full bg-[#0e1424] border border-white/15 focus:border-cyan-400/70 rounded-xl pl-9 pr-8 py-2 text-xs font-bold text-white focus:outline-none placeholder-slate-500 shadow-inner"
+              />
+              {mapSearchQuery && (
+                <button
+                  onClick={() => setMapSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Maps Grid with Thumbnails */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 max-h-64 overflow-y-auto custom-scrollbar p-1 bg-[#060912] rounded-xl border border-white/5">
+            {filteredMaps.length > 0 ? (
+              filteredMaps.map((map) => {
+                const isSelected = state.mapName?.toLowerCase() === map.toLowerCase();
+                return (
+                  <button
+                    key={map}
+                    onClick={() => handleMapSelect(map)}
+                    className={`flex items-center gap-2 p-2 rounded-xl text-left transition-all border relative overflow-hidden group ${
+                      isSelected
+                        ? 'bg-gradient-to-r from-cyan-500/25 to-blue-500/25 border-cyan-400 text-cyan-200 shadow-md shadow-cyan-500/20 ring-1 ring-cyan-400/50'
+                        : 'bg-[#0d1322] border-white/5 text-slate-300 hover:border-white/20 hover:bg-white/5'
+                    }`}
+                  >
+                    <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 bg-black/50 border border-white/10">
+                      <img
+                        src={`/maps/${map}.png`}
+                        alt={map}
+                        onError={(e) => { (e.target as HTMLImageElement).src = '/aoeitalia-logo.png'; }}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
+                      />
+                    </div>
+                    <span className="text-[11px] font-bold truncate flex-1">{map}</span>
+                    {isSelected && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400 animate-pulse"></span>
+                    )}
+                  </button>
+                );
+              })
+            ) : (
+              <div className="col-span-full py-8 text-center text-slate-500 text-xs">
+                Nessuna mappa trovata con "{mapSearchQuery}". Puoi inserire un nome personalizzato nel campo sotto.
+              </div>
+            )}
+          </div>
+
+          {/* Custom Map Input fallback */}
+          <div className="flex items-center gap-3 pt-1">
+            <span className="text-[11px] font-bold text-slate-400">Inserisci mappa manuale:</span>
             <input
               type="text"
               value={state.mapName || ''}
-              onChange={(e) => setState({ ...state, mapName: e.target.value })}
-              placeholder="Nome della Mappa..."
-              className="bg-[#0e1424] border border-white/10 focus:border-cyan-400/60 rounded-lg px-3 py-1.5 text-xs font-bold text-white focus:outline-none w-56 text-right"
+              onChange={(e) => pushLiveState({ ...state, mapName: e.target.value })}
+              placeholder="Es. Dry Arabia personalizzata"
+              className="bg-[#0e1424] border border-white/10 focus:border-cyan-400/60 rounded-lg px-3 py-1.5 text-xs font-bold text-white focus:outline-none w-72"
             />
           </div>
-
-          <div className="flex flex-wrap gap-2 pt-1">
-            {COMMON_AOE4_MAPS.map((map) => (
-              <button
-                key={map}
-                onClick={() => handleMapSelect(map)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
-                  state.mapName?.toLowerCase() === map.toLowerCase()
-                    ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-md shadow-cyan-500/10'
-                    : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                {map}
-              </button>
-            ))}
-          </div>
         </div>
 
-        {/* Row 3: Visibilità Elementi Grafici (Toggles) */}
+        {/* Row 3: Regolazioni Fine Tuning Pixel (Offsets) */}
         <div className="bg-black/40 border border-white/10 rounded-xl p-5 space-y-4">
           <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-            <Layers size={16} className="text-yellow-400" />
-            Visibilità Elementi Overlay
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            
-            {/* Banner Superiore */}
-            <div 
-              onClick={() => {
-                const updated = { ...state, showTopBanner: state.showTopBanner === false ? true : false };
-                setState(updated);
-                handleSave(updated);
-              }}
-              className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${
-                state.showTopBanner !== false 
-                  ? 'bg-yellow-500/10 border-yellow-500/40 text-white' 
-                  : 'bg-white/5 border-white/10 text-slate-500'
-              }`}
-            >
-              <div>
-                <div className="text-xs font-black uppercase">1. Banner Alto (Sotto HUD)</div>
-                <div className="text-[11px] text-slate-400 mt-0.5">Logo AoEItalia + Titolo Torneo</div>
-              </div>
-              {state.showTopBanner !== false ? <Eye size={18} className="text-yellow-400" /> : <EyeOff size={18} />}
-            </div>
-
-            {/* Badge Minimappa */}
-            <div 
-              onClick={() => {
-                const updated = { ...state, showMinimapCrest: state.showMinimapCrest === false ? true : false };
-                setState(updated);
-                handleSave(updated);
-              }}
-              className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${
-                state.showMinimapCrest !== false 
-                  ? 'bg-cyan-500/10 border-cyan-500/40 text-white' 
-                  : 'bg-white/5 border-white/10 text-slate-500'
-              }`}
-            >
-              <div>
-                <div className="text-xs font-black uppercase">2. Crest Angolare Mappa</div>
-                <div className="text-[11px] text-slate-400 mt-0.5">Logo AoEItalia + Badge Mappa</div>
-              </div>
-              {state.showMinimapCrest !== false ? <Eye size={18} className="text-cyan-400" /> : <EyeOff size={18} />}
-            </div>
-
-            {/* Info Mappa e Giornata */}
-            <div 
-              onClick={() => {
-                const updated = { ...state, showMinimapInfo: state.showMinimapInfo === false ? true : false };
-                setState(updated);
-                handleSave(updated);
-              }}
-              className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${
-                state.showMinimapInfo !== false 
-                  ? 'bg-emerald-500/10 border-emerald-500/40 text-white' 
-                  : 'bg-white/5 border-white/10 text-slate-500'
-              }`}
-            >
-              <div>
-                <div className="text-xs font-black uppercase">3. Testo Mappa & Giornata</div>
-                <div className="text-[11px] text-slate-400 mt-0.5">In basso a destra sotto la mappa</div>
-              </div>
-              {state.showMinimapInfo !== false ? <Eye size={18} className="text-emerald-400" /> : <EyeOff size={18} />}
-            </div>
-
-          </div>
-        </div>
-
-        {/* Row 4: Regolazioni di Posizione / Offset (Fine Tuning) */}
-        <div className="bg-black/40 border border-white/10 rounded-xl p-5 space-y-4">
-          <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-            <Sliders size={16} className="text-cyan-400" />
-            Regolazione Fine Altezza (Offset Verticale Pixel)
+            <Sliders size={16} className="text-yellow-400" />
+            Calibrazione Fine Posizione (Offset Pixel)
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
-                <span className="text-slate-400">Offset Banner Superiore:</span>
+                <span className="text-slate-400">Altezza Banner Alto (Y):</span>
                 <span className="font-bold text-yellow-400">{state.topBannerOffsetY || 0}px</span>
               </div>
               <input
@@ -359,48 +446,48 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
                 min="-30"
                 max="50"
                 value={state.topBannerOffsetY || 0}
-                onChange={(e) => setState({ ...state, topBannerOffsetY: parseInt(e.target.value) || 0 })}
+                onChange={(e) => pushLiveState({ ...state, topBannerOffsetY: parseInt(e.target.value) || 0 })}
                 className="w-full accent-yellow-400"
               />
             </div>
 
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
-                <span className="text-slate-400">Offset Crest Minimappa:</span>
-                <span className="font-bold text-cyan-400">{state.minimapCrestOffsetY || 0}px</span>
+                <span className="text-slate-400">Altezza Info Minimappa (Y):</span>
+                <span className="font-bold text-cyan-400">{state.minimapSidebarOffsetY || 0}px</span>
               </div>
               <input
                 type="range"
-                min="-50"
-                max="50"
-                value={state.minimapCrestOffsetY || 0}
-                onChange={(e) => setState({ ...state, minimapCrestOffsetY: parseInt(e.target.value) || 0 })}
+                min="-40"
+                max="60"
+                value={state.minimapSidebarOffsetY || 0}
+                onChange={(e) => pushLiveState({ ...state, minimapSidebarOffsetY: parseInt(e.target.value) || 0 })}
                 className="w-full accent-cyan-400"
               />
             </div>
 
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
-                <span className="text-slate-400">Offset Info Basso Mappa:</span>
-                <span className="font-bold text-emerald-400">{state.minimapInfoOffsetY || 0}px</span>
+                <span className="text-slate-400">Distanza Destra Minimappa (X):</span>
+                <span className="font-bold text-emerald-400">{state.minimapSidebarOffsetX || 0}px</span>
               </div>
               <input
                 type="range"
                 min="-40"
-                max="40"
-                value={state.minimapInfoOffsetY || 0}
-                onChange={(e) => setState({ ...state, minimapInfoOffsetY: parseInt(e.target.value) || 0 })}
+                max="60"
+                value={state.minimapSidebarOffsetX || 0}
+                onChange={(e) => pushLiveState({ ...state, minimapSidebarOffsetX: parseInt(e.target.value) || 0 })}
                 className="w-full accent-emerald-400"
               />
             </div>
           </div>
         </div>
 
-        {/* Row 5: Link OBS */}
+        {/* Row 4: Link OBS */}
         <div className="bg-black/40 border border-white/10 rounded-xl p-5 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Link Sorgente Browser per OBS</h4>
-            <p className="text-xs text-slate-400 mt-0.5">Aggiungi questo link come Browser Source in OBS (1920x1080, sfondo trasparente).</p>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Link OBS Browser Source</h4>
+            <p className="text-xs text-slate-400 mt-0.5">Risoluzione 1920x1080, sfondo 100% trasparente.</p>
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto">

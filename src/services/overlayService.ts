@@ -41,12 +41,18 @@ export interface OverlayState {
   minimapBrandTitle?: string;
   minimapBrandSub?: string;
   showTopBanner?: boolean;
+  showMinimapBrand?: boolean;
+  showMinimapLogo?: boolean;
+  showMinimapDay?: boolean;
+  showMinimapMapName?: boolean;
   showMinimapCrest?: boolean;
   showMinimapInfo?: boolean;
   theme?: string;
   topBannerOffsetY?: number;
   minimapCrestOffsetY?: number;
   minimapInfoOffsetY?: number;
+  minimapSidebarOffsetY?: number;
+  minimapSidebarOffsetX?: number;
 }
 
 export const overlayService = {
