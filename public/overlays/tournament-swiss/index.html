@@ -449,20 +449,18 @@
             flex: 1;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
+            gap: 20px;
             height: 100%;
             overflow: hidden;
         }
 
         .round-column {
-            background: rgba(10, 15, 26, 0.75);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 18px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
             display: flex;
             flex-direction: column;
-            padding: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            padding: 0;
             min-width: 0;
         }
 
@@ -470,14 +468,18 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding-bottom: 12px;
+            background: rgba(8, 13, 24, 0.85);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 9px 16px;
             margin-bottom: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
         }
 
         .round-title {
             font-family: 'Cinzel', serif;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 900;
             letter-spacing: 1.5px;
             color: #ffffff;
@@ -489,25 +491,25 @@
             font-weight: 900;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            padding: 4px 10px;
+            padding: 3px 8px;
             border-radius: 6px;
-            background: rgba(0, 210, 255, 0.15);
-            color: var(--cyan-bright);
-            border: 1px solid rgba(0, 210, 255, 0.35);
+            background: rgba(212, 175, 55, 0.15);
+            color: var(--gold-bright);
+            border: 1px solid rgba(212, 175, 55, 0.35);
         }
 
         .round-matches-list {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             overflow: hidden;
         }
 
         /* Match Card in Bo1 */
         .match-card {
-            background: rgba(13, 18, 30, 0.9);
-            backdrop-filter: blur(12px);
+            background: rgba(8, 13, 24, 0.88);
+            backdrop-filter: blur(14px);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 14px;
             padding: 5px;
@@ -516,7 +518,7 @@
             gap: 4px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
             transition: all 0.2s ease;
         }
 
@@ -610,14 +612,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100%;
-            color: #475569;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
+            height: 72px;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
             text-transform: uppercase;
             text-align: center;
-            padding: 20px;
+            padding: 16px;
+            background: rgba(8, 13, 24, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px dashed rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
         }
     </style>
 </head>
