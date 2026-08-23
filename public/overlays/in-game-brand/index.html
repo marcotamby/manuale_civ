@@ -73,7 +73,7 @@
         }
 
         /* =========================================================================
-           2. MINIMAP UNIFIED FRAME & PANELS (Pure 1:1 45° Diamond Geometry - Raised)
+           2. MINIMAP UNIFIED FRAME & PANELS (Pure 1:1 45° Diamond - Calibrato)
            ========================================================================= */
         #minimap-brand-wrapper {
             position: absolute;
@@ -160,7 +160,7 @@
         <div class="top-tournament-title" id="top-title-text">Ends of Summer Champions</div>
     </div>
 
-    <!-- 2. MINIMAP COMPLETE BRAND WRAPPER (1:1 45° Diamond Alzato per Eliminare Gap) -->
+    <!-- 2. MINIMAP COMPLETE BRAND WRAPPER (1:1 45° Diamond Alzato di 5px e Spostato a Destra di 4px) -->
     <div id="minimap-brand-wrapper">
         <svg class="minimap-wrapper-svg" viewBox="0 0 444 444" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -175,25 +175,25 @@
                 </linearGradient>
             </defs>
 
-            <!-- 1. Top-Right Panel (copre toggle Y=0..66 e diagonale 45° a 428,242) -->
+            <!-- 1. Top-Right Panel (copre toggle Y=0..61 e diagonale 45° a 432,237) -->
             <g id="svg-minimap-top-group">
-                <polygon points="252,0 444,0 444,252 428,242 252,66" fill="url(#panelBg)"/>
-                <line x1="252" y1="66" x2="428" y2="242" stroke="url(#goldStroke)" stroke-width="3" stroke-linecap="round"/>
+                <polygon points="256,0 444,0 444,247 432,237 256,61" fill="url(#panelBg)"/>
+                <line x1="256" y1="61" x2="432" y2="237" stroke="url(#goldStroke)" stroke-width="3" stroke-linecap="round"/>
             </g>
 
-            <!-- 2. Bottom-Right Panel (diagonale 45° rialzata da 428,242 a 252,418) -->
+            <!-- 2. Bottom-Right Panel (diagonale 45° rialzata e traslata da 432,237 a 256,413) -->
             <g id="svg-minimap-bottom-group">
-                <polygon points="428,242 444,232 444,444 252,444 252,418" fill="url(#panelBg)"/>
-                <line x1="428" y1="242" x2="252" y2="418" stroke="url(#goldStroke)" stroke-width="3" stroke-linecap="round"/>
+                <polygon points="432,237 444,227 444,444 256,444 256,413" fill="url(#panelBg)"/>
+                <line x1="432" y1="237" x2="256" y2="413" stroke="url(#goldStroke)" stroke-width="3" stroke-linecap="round"/>
             </g>
 
-            <!-- 3. Outer Scalloped / Starburst Dark Frame (Lato Sinistro 1:1 45° Alzato) -->
+            <!-- 3. Outer Scalloped / Starburst Dark Frame (Lato Sinistro 1:1 45° Traslato) -->
             <g id="svg-minimap-frame-group">
-                <polygon points="248.5,62.5 224.6,67.9 219.1,91.8 195.3,97.3 189.8,121.1 165.9,126.6 160.5,150.5 136.6,155.9 131.1,179.8 107.3,185.3 101.8,209.1 77.9,214.6 72.5,238.5 77.9,269.4 101.8,274.9 107.3,298.7 131.1,304.2 136.6,328.1 160.5,333.5 165.9,357.4 189.8,362.9 195.3,386.7 219.1,392.2 224.6,416.1 248.5,421.5 252,418 76,242 252,66" fill="url(#panelBg)"/>
+                <polygon points="252.5,57.5 228.6,62.9 223.1,86.8 199.3,92.3 193.8,116.1 169.9,121.6 164.5,145.5 140.6,150.9 135.1,174.8 111.3,180.3 105.8,204.1 81.9,209.6 76.5,233.5 81.9,264.4 105.8,269.9 111.3,293.7 135.1,299.2 140.6,323.1 164.5,328.5 169.9,352.4 193.8,357.9 199.3,381.7 223.1,387.2 228.6,411.1 252.5,416.5 256,413 80,237 256,61" fill="url(#panelBg)"/>
                 <!-- Outer Jagged Gold Line -->
-                <polyline points="248.5,62.5 224.6,67.9 219.1,91.8 195.3,97.3 189.8,121.1 165.9,126.6 160.5,150.5 136.6,155.9 131.1,179.8 107.3,185.3 101.8,209.1 77.9,214.6 72.5,238.5 77.9,269.4 101.8,274.9 107.3,298.7 131.1,304.2 136.6,328.1 160.5,333.5 165.9,357.4 189.8,362.9 195.3,386.7 219.1,392.2 224.6,416.1 248.5,421.5" stroke="url(#goldStroke)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <polyline points="252.5,57.5 228.6,62.9 223.1,86.8 199.3,92.3 193.8,116.1 169.9,121.6 164.5,145.5 140.6,150.9 135.1,174.8 111.3,180.3 105.8,204.1 81.9,209.6 76.5,233.5 81.9,264.4 105.8,269.9 111.3,293.7 135.1,299.2 140.6,323.1 164.5,328.5 169.9,352.4 193.8,357.9 199.3,381.7 223.1,387.2 228.6,411.1 252.5,416.5" stroke="url(#goldStroke)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
                 <!-- Inner Diamond Left Gold Line -->
-                <polyline points="252,418 76,242 252,66" stroke="url(#goldStroke)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <polyline points="256,413 80,237 256,61" stroke="url(#goldStroke)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
             </g>
         </svg>
 
