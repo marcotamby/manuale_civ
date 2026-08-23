@@ -718,11 +718,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                                 top: '50%',
                                 transform: `translate(-50%, -50%) scale(${previewScale})`,
                                 transformOrigin: 'center center',
-                                ...(overlayDisplayBackground
-                                  ? { backgroundImage: `url(${overlayDisplayBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-                                  : selectedOverlay.id === 'in-game-brand'
-                                    ? { backgroundImage: `url('/overlays/in-game-brand/reference_ingame.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center' }
-                                    : {})
+                                ...(overlayDisplayBackground && { backgroundImage: `url(${overlayDisplayBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' })
                               }} 
                               title="Overlay Preview" 
                             />

@@ -107,16 +107,14 @@ const ALL_AOE4_MAPS = [
 const DEFAULT_STATE: OverlayState = {
   tournamentTitle: 'Ends of Summer Champions',
   dayNumber: 1,
-  dayText: 'GIORNATA 1',
+  dayText: 'Giornata 1',
   mapName: 'Dry Arabia',
   showTopBanner: true,
-  showMinimapBrand: true,
-  showMinimapLogo: true,
-  showMinimapDay: true,
-  showMinimapMapName: true,
+  showMinimapCrest: true,
+  showMinimapInfo: true,
   topBannerOffsetY: 0,
-  minimapSidebarOffsetY: 0,
-  minimapSidebarOffsetX: 0
+  minimapCrestOffsetY: 0,
+  minimapBottomOffsetY: 0
 };
 
 export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBrandDashboardProps) {
@@ -130,7 +128,7 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    onActivePathChange?.('/overlays/in-game-brand/index.html?preview=true');
+    onActivePathChange?.('/overlays/in-game-brand/index.html');
   }, [onActivePathChange]);
 
   // Load state
@@ -185,7 +183,7 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
     const updated = {
       ...state,
       dayNumber: day,
-      dayText: `GIORNATA ${day}`
+      dayText: `Giornata ${day}`
     };
     pushLiveState(updated, true);
   };
@@ -228,10 +226,10 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
               In-Game Brand (1V1)
               <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 flex items-center gap-1">
                 <Radio size={12} className="animate-pulse text-emerald-400" />
-                Live Sync Istantaneo Attivo
+                Live Sync Istantaneo
               </span>
             </h2>
-            <p className="text-xs text-slate-400">Le modifiche vanno in diretta streaming in tempo reale senza dover salvare.</p>
+            <p className="text-xs text-slate-400">Tutte le modifiche si sincronizzano in diretta streaming su OBS in tempo reale.</p>
           </div>
         </div>
 
@@ -252,7 +250,7 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
             className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-600 hover:from-yellow-400 hover:to-orange-500 text-black font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-yellow-500/20 active:scale-95 disabled:opacity-50"
           >
             {isSaving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
-            Salva Stato
+            Salva
           </button>
         </div>
       </div>
@@ -260,7 +258,7 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
       {/* Main Content */}
       <div className="flex-1 p-6 overflow-y-auto custom-scrollbar space-y-6">
         
-        {/* Row 1: Titolo Torneo (In Alto) & Giornata (Di Fianco alla Mappa) */}
+        {/* Row 1: Titolo Torneo (In Alto) & Giornata (Sotto alla Mappa) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           
           {/* Titolo Torneo (Elemento Superiore) */}
@@ -290,27 +288,27 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
               placeholder="Ends of Summer Champions"
               className="bg-[#0e1424] border border-white/10 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-sm font-bold text-white focus:outline-none"
             />
-            <p className="text-[11px] text-slate-400">Posizionato sotto l'HUD centrale dello spettatore in font medievale sfumato.</p>
+            <p className="text-[11px] text-slate-400">Posizionato al centro sotto l'HUD spettatore.</p>
           </div>
 
-          {/* Selettore Giornata (Di Fianco alla Mappa) */}
+          {/* Selettore Giornata (Area Scura Minimappa) */}
           <div className="bg-black/40 border border-white/10 rounded-xl p-5 flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
-                2. Giornata (Di Fianco alla Mappa)
+                2. Giornata (Sotto la Mappa)
               </label>
               <button
                 type="button"
-                onClick={() => pushLiveState({ ...state, showMinimapBrand: state.showMinimapBrand === false ? true : false }, true)}
+                onClick={() => pushLiveState({ ...state, showMinimapInfo: state.showMinimapInfo === false ? true : false }, true)}
                 className={`text-xs font-bold flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-all ${
-                  state.showMinimapBrand !== false 
+                  state.showMinimapInfo !== false 
                     ? 'bg-cyan-500/15 border-cyan-400/40 text-cyan-300' 
                     : 'bg-white/5 border-white/10 text-slate-500'
                 }`}
               >
-                {state.showMinimapBrand !== false ? <Eye size={13} /> : <EyeOff size={13} />}
-                {state.showMinimapBrand !== false ? 'Visibile' : 'Nascosto'}
+                {state.showMinimapInfo !== false ? <Eye size={13} /> : <EyeOff size={13} />}
+                {state.showMinimapInfo !== false ? 'Visibile' : 'Nascosto'}
               </button>
             </div>
             
@@ -336,7 +334,7 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
                 type="text"
                 value={state.dayText || ''}
                 onChange={(e) => pushLiveState({ ...state, dayText: e.target.value })}
-                placeholder="GIORNATA 1"
+                placeholder="Giornata 1"
                 className="flex-1 bg-[#0e1424] border border-white/10 focus:border-cyan-400/60 rounded-lg px-3 py-1 text-xs font-bold text-cyan-300 focus:outline-none"
               />
             </div>
@@ -350,7 +348,7 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
             <div>
               <label className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
                 <MapPin size={16} className="text-cyan-400" />
-                3. Mappa In Corso (Di Fianco alla Mappa)
+                3. Mappa In Corso (Area Scura Minimappa)
               </label>
               <p className="text-[11px] text-slate-400 mt-0.5">
                 Mappa attuale selezionata: <span className="font-black text-yellow-400 text-xs uppercase">{state.mapName || 'Nessuna'}</span>
@@ -410,7 +408,7 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
               })
             ) : (
               <div className="col-span-full py-8 text-center text-slate-500 text-xs">
-                Nessuna mappa trovata con "{mapSearchQuery}". Puoi inserire un nome personalizzato nel campo sotto.
+                Nessuna mappa trovata con "{mapSearchQuery}".
               </div>
             )}
           </div>
@@ -428,14 +426,29 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
           </div>
         </div>
 
-        {/* Row 3: Regolazioni Fine Tuning Pixel (Offsets) */}
+        {/* Row 3: Logo Crest Minimappa Toggle & Regolazioni Posizione */}
         <div className="bg-black/40 border border-white/10 rounded-xl p-5 space-y-4">
-          <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-            <Sliders size={16} className="text-yellow-400" />
-            Calibrazione Fine Posizione (Offset Pixel)
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+              <Sliders size={16} className="text-yellow-400" />
+              Calibrazione Posizione & Badge AoEItalia
+            </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <button
+              type="button"
+              onClick={() => pushLiveState({ ...state, showMinimapCrest: state.showMinimapCrest === false ? true : false }, true)}
+              className={`text-xs font-bold flex items-center gap-1.5 px-3 py-1 rounded-lg border transition-all ${
+                state.showMinimapCrest !== false 
+                  ? 'bg-yellow-500/15 border-yellow-500/40 text-yellow-300' 
+                  : 'bg-white/5 border-white/10 text-slate-500'
+              }`}
+            >
+              {state.showMinimapCrest !== false ? <Eye size={13} /> : <EyeOff size={13} />}
+              Badge Logo Minimappa: {state.showMinimapCrest !== false ? 'Visibile' : 'Nascosto'}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
                 <span className="text-slate-400">Altezza Banner Alto (Y):</span>
@@ -453,30 +466,30 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
 
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
-                <span className="text-slate-400">Altezza Info Minimappa (Y):</span>
-                <span className="font-bold text-cyan-400">{state.minimapSidebarOffsetY || 0}px</span>
+                <span className="text-slate-400">Altezza Logo Minimappa (Y):</span>
+                <span className="font-bold text-cyan-400">{state.minimapCrestOffsetY || 0}px</span>
               </div>
               <input
                 type="range"
-                min="-40"
-                max="60"
-                value={state.minimapSidebarOffsetY || 0}
-                onChange={(e) => pushLiveState({ ...state, minimapSidebarOffsetY: parseInt(e.target.value) || 0 })}
+                min="-50"
+                max="50"
+                value={state.minimapCrestOffsetY || 0}
+                onChange={(e) => pushLiveState({ ...state, minimapCrestOffsetY: parseInt(e.target.value) || 0 })}
                 className="w-full accent-cyan-400"
               />
             </div>
 
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
-                <span className="text-slate-400">Distanza Destra Minimappa (X):</span>
-                <span className="font-bold text-emerald-400">{state.minimapSidebarOffsetX || 0}px</span>
+                <span className="text-slate-400">Altezza Area Scura Mappa (Y):</span>
+                <span className="font-bold text-emerald-400">{state.minimapBottomOffsetY || 0}px</span>
               </div>
               <input
                 type="range"
                 min="-40"
-                max="60"
-                value={state.minimapSidebarOffsetX || 0}
-                onChange={(e) => pushLiveState({ ...state, minimapSidebarOffsetX: parseInt(e.target.value) || 0 })}
+                max="40"
+                value={state.minimapBottomOffsetY || 0}
+                onChange={(e) => pushLiveState({ ...state, minimapBottomOffsetY: parseInt(e.target.value) || 0 })}
                 className="w-full accent-emerald-400"
               />
             </div>

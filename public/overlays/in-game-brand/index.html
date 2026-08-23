@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -16,8 +16,8 @@
             --cyan-main: #00d2ff;
             --cyan-bright: #38bdf8;
             --cyan-glow: rgba(0, 210, 255, 0.45);
-            --bg-glass: rgba(7, 12, 22, 0.92);
-            --border-glass: rgba(212, 175, 55, 0.45);
+            --bg-glass: rgba(7, 12, 22, 0.94);
+            --border-glass: rgba(212, 175, 55, 0.5);
         }
 
         * {
@@ -30,62 +30,39 @@
             width: 1920px;
             height: 1080px;
             overflow: hidden;
-            background: transparent;
+            background: transparent !important;
             font-family: 'Inter', sans-serif;
             color: #ffffff;
             position: relative;
             user-select: none;
         }
 
-        body.with-reference-bg {
-            background: url('reference_ingame.jpg') no-repeat center center / cover !important;
-        }
-
         /* =========================================================================
-           1. TOP BANNER (SOLO NOME DEL TORNEO)
+           1. TOP BANNER (SOLO NOME DEL TORNEO - Continuazione HUD di Gioco)
            ========================================================================= */
         #top-brand-banner {
             position: absolute;
             top: 124px;
             left: 50%;
             transform: translateX(-50%);
+            width: 310px;
+            height: 38px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--bg-glass);
-            backdrop-filter: blur(12px);
-            border: 1.5px solid var(--border-glass);
+            background: linear-gradient(180deg, rgba(10, 15, 28, 0.98) 0%, rgba(5, 8, 16, 0.98) 100%);
+            border: 2px solid var(--gold-main);
             border-top: none;
-            border-radius: 0 0 14px 14px;
-            padding: 5px 26px 7px 26px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.85), 0 0 20px rgba(0, 0, 0, 0.6);
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.1);
             z-index: 100;
+            padding: 0 12px;
             transition: all 0.25s ease;
-        }
-
-        #top-brand-banner::before,
-        #top-brand-banner::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            width: 10px;
-            height: 10px;
-            border-top: 2px solid var(--gold-bright);
-        }
-        #top-brand-banner::before {
-            left: -10px;
-            border-right: 2px solid var(--gold-bright);
-            border-top-right-radius: 6px;
-        }
-        #top-brand-banner::after {
-            right: -10px;
-            border-left: 2px solid var(--gold-bright);
-            border-top-left-radius: 6px;
         }
 
         .top-tournament-title {
             font-family: 'Fondamento', 'Eagle Lake', 'Cinzel', serif;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             letter-spacing: 1.5px;
             background: linear-gradient(180deg, #ffffff 0%, #fff176 30%, #ffa726 65%, #ff5722 95%);
@@ -94,70 +71,85 @@
             filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 18px rgba(255, 167, 38, 0.4));
             white-space: nowrap;
             text-align: center;
+            line-height: 1;
         }
 
         /* =========================================================================
-           2. DI FIANCO ALLA MINIMAPPA (LOGO + GIORNATA + NOME MAPPA)
+           2. CREST LOGO AOE ITALIA (Top-Right of Minimap Diamond)
            ========================================================================= */
-        #minimap-brand-sidebar {
+        #minimap-crest-badge {
             position: absolute;
-            right: 14px;
-            bottom: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            text-align: right;
-            z-index: 100;
-            pointer-events: none;
-            gap: 6px;
-            transition: all 0.25s ease;
-        }
-
-        .minimap-logo-box {
+            right: 0;
+            top: 625px;
+            width: 148px;
+            height: 96px;
+            background: linear-gradient(135deg, rgba(8, 14, 26, 0.96) 0%, rgba(16, 22, 38, 0.92) 100%);
+            backdrop-filter: blur(12px);
+            border: 2px solid var(--gold-main);
+            border-right: none;
+            clip-path: polygon(35px 0, 100% 0, 100% 100%, 0 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, rgba(8, 14, 26, 0.95) 0%, rgba(18, 24, 40, 0.88) 100%);
-            backdrop-filter: blur(12px);
-            border: 1.5px solid var(--gold-main);
-            border-radius: 12px;
-            padding: 6px 14px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.9), 0 0 15px rgba(212, 175, 55, 0.25);
-            margin-bottom: 2px;
+            padding: 8px 12px 8px 24px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.9), 0 0 18px rgba(212, 175, 55, 0.3);
+            z-index: 100;
+            transition: all 0.25s ease;
         }
 
         .minimap-logo-img {
-            height: 38px;
+            height: 54px;
             width: auto;
             object-fit: contain;
-            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.85));
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.9));
         }
 
-        .minimap-day-badge {
-            display: inline-flex;
-            align-items: center;
-            background: rgba(0, 210, 255, 0.15);
-            border: 1px solid rgba(0, 210, 255, 0.45);
-            color: var(--cyan-bright);
-            font-size: 12px;
-            font-weight: 900;
-            letter-spacing: 1.5px;
-            padding: 3px 10px;
-            border-radius: 6px;
-            text-transform: uppercase;
-            box-shadow: 0 0 12px rgba(0, 210, 255, 0.3), 0 2px 6px rgba(0, 0, 0, 0.9);
-            text-shadow: 0 0 6px var(--cyan-glow);
+        /* =========================================================================
+           3. AREA SCURA SOTTO LA MINIMAPPA (Hugging Minimap Perimeter)
+           ========================================================================= */
+        #minimap-bottom-corner-panel {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 290px;
+            height: 120px;
+            background: linear-gradient(135deg, rgba(7, 12, 22, 0.96) 0%, rgba(12, 18, 32, 0.94) 100%);
+            backdrop-filter: blur(14px);
+            border-top: 2px solid var(--gold-main);
+            border-left: 2px solid var(--gold-main);
+            clip-path: polygon(95px 0, 100% 0, 100% 100%, 0 100%);
+            box-shadow: -4px -4px 25px rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 12px 20px 14px 30px;
+            text-align: right;
+            z-index: 100;
+            pointer-events: none;
+            transition: all 0.25s ease;
         }
 
         .minimap-map-name {
             font-family: 'Inter', sans-serif;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 900;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
             color: #ffffff;
             text-transform: capitalize;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 1), 0 0 10px rgba(0, 0, 0, 0.95), 0 0 18px rgba(0, 0, 0, 0.95);
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 1);
             line-height: 1.15;
+        }
+
+        .minimap-day-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--cyan-bright);
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--cyan-glow), 0 2px 6px rgba(0, 0, 0, 1);
+            margin-top: 3px;
         }
 
         .hidden-element {
@@ -172,13 +164,15 @@
         <div class="top-tournament-title" id="top-title-text">Ends of Summer Champions</div>
     </div>
 
-    <!-- 2. MINIMAP SIDEBAR (Logo + Giornata + Mappa) -->
-    <div id="minimap-brand-sidebar">
-        <div class="minimap-logo-box" id="minimap-logo-container">
-            <img src="/aoeitalia-logo.png" alt="AoE Italia" class="minimap-logo-img">
-        </div>
-        <div class="minimap-day-badge" id="minimap-day-badge">GIORNATA 1</div>
+    <!-- 2. CREST LOGO AOE ITALIA (In alto a destra sulla minimappa) -->
+    <div id="minimap-crest-badge">
+        <img src="/aoeitalia-logo.png" alt="AoE Italia" class="minimap-logo-img">
+    </div>
+
+    <!-- 3. AREA SCURA SOTTO LA MINIMAPPA (Giornata + Nome Mappa) -->
+    <div id="minimap-bottom-corner-panel">
         <div class="minimap-map-name" id="minimap-map-name">Dry Arabia</div>
+        <div class="minimap-day-text" id="minimap-day-text">Giornata 1</div>
     </div>
 
     <script>
@@ -188,11 +182,6 @@
 
         const { createClient } = window.supabase;
         const client = createClient(SUB_URL, SUB_KEY);
-
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('preview') === 'true' || urlParams.get('bg') === 'true') {
-            document.body.classList.add('with-reference-bg');
-        }
 
         function formatTitle(raw) {
             if (!raw) return 'Ends of Summer Champions';
@@ -217,16 +206,16 @@
             const formattedTitle = formatTitle(title);
             const mapName = s.mapName || 'Dry Arabia';
             const dayNum = s.dayNumber !== undefined ? s.dayNumber : 1;
-            const dayText = s.dayText || `GIORNATA ${dayNum}`;
+            const dayText = s.dayText || `Giornata ${dayNum}`;
 
             // Top Banner Element
             const topBanner = document.getElementById('top-brand-banner');
             document.getElementById('top-title-text').innerText = formattedTitle;
 
             // Minimap Elements
-            const minimapSidebar = document.getElementById('minimap-brand-sidebar');
-            const minimapLogo = document.getElementById('minimap-logo-container');
-            const minimapDay = document.getElementById('minimap-day-badge');
+            const minimapCrest = document.getElementById('minimap-crest-badge');
+            const minimapBottom = document.getElementById('minimap-bottom-corner-panel');
+            const minimapDay = document.getElementById('minimap-day-text');
             const minimapMap = document.getElementById('minimap-map-name');
 
             minimapDay.innerText = dayText;
@@ -239,39 +228,27 @@
                 topBanner.classList.remove('hidden-element');
             }
 
-            if (s.showMinimapBrand === false) {
-                minimapSidebar.classList.add('hidden-element');
+            if (s.showMinimapCrest === false) {
+                minimapCrest.classList.add('hidden-element');
             } else {
-                minimapSidebar.classList.remove('hidden-element');
+                minimapCrest.classList.remove('hidden-element');
             }
 
-            if (s.showMinimapLogo === false) {
-                minimapLogo.classList.add('hidden-element');
+            if (s.showMinimapInfo === false) {
+                minimapBottom.classList.add('hidden-element');
             } else {
-                minimapLogo.classList.remove('hidden-element');
-            }
-
-            if (s.showMinimapDay === false) {
-                minimapDay.classList.add('hidden-element');
-            } else {
-                minimapDay.classList.remove('hidden-element');
-            }
-
-            if (s.showMinimapMapName === false) {
-                minimapMap.classList.add('hidden-element');
-            } else {
-                minimapMap.classList.remove('hidden-element');
+                minimapBottom.classList.remove('hidden-element');
             }
 
             // Fine-tune offsets
             if (s.topBannerOffsetY !== undefined) {
                 topBanner.style.top = `${124 + Number(s.topBannerOffsetY)}px`;
             }
-            if (s.minimapSidebarOffsetY !== undefined) {
-                minimapSidebar.style.bottom = `${12 + Number(s.minimapSidebarOffsetY)}px`;
+            if (s.minimapCrestOffsetY !== undefined) {
+                minimapCrest.style.top = `${625 + Number(s.minimapCrestOffsetY)}px`;
             }
-            if (s.minimapSidebarOffsetX !== undefined) {
-                minimapSidebar.style.right = `${14 + Number(s.minimapSidebarOffsetX)}px`;
+            if (s.minimapBottomOffsetY !== undefined) {
+                minimapBottom.style.bottom = `${0 + Number(s.minimapBottomOffsetY)}px`;
             }
         }
 
