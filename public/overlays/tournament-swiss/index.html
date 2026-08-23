@@ -6,7 +6,7 @@
     <title>Swiss Tournament Overlay</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Almendra:ital,wght@0,400;0,700;1,400;1,700&family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@700;900&family=Eagle+Lake&family=Fondamento:ital@0;1&family=MedievalSharp&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Almendra+Display&family=Almendra:ital,wght@0,400;0,700;1,400;1,700&family=Berkshire+Swash&family=Cinzel:wght@700;900&family=Eagle+Lake&family=Fondamento:ital@0;1&family=IM+Fell+DW+Pica:ital@0;1&family=IM+Fell+English:ital@0;1&family=MedievalSharp&family=Quintessential&family=Pirata+One&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -100,20 +100,21 @@
         }
 
         .header-main-title {
-            font-family: 'Eagle Lake', 'MedievalSharp', 'Almendra', cursive, serif;
-            font-size: 42px;
+            font-family: 'Quintessential', 'Berkshire Swash', 'Eagle Lake', 'MedievalSharp', cursive, serif;
+            font-size: 52px;
             font-weight: 700;
-            letter-spacing: 2px;
-            background: linear-gradient(180deg, #ffffff 15%, #ffd700 80%, #d4af37 100%);
+            letter-spacing: 1.5px;
+            background: linear-gradient(180deg, #ffffff 10%, #ffe066 50%, #ffd700 80%, #d4af37 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 25px rgba(212, 175, 55, 0.45));
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.9);
-            max-width: 950px;
+            filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 30px rgba(212, 175, 55, 0.5));
+            text-shadow: 0 4px 22px rgba(0, 0, 0, 0.9);
+            max-width: 1050px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             line-height: 1.15;
+            padding: 2px 10px;
         }
 
         .header-subtitle {
@@ -126,7 +127,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-top: 4px;
+            margin-top: 2px;
             text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
         }
 
@@ -817,6 +818,22 @@
             return `/civs/${id}.webp`;
         }
 
+        function formatMedievalTitle(raw) {
+            if (!raw) return 'Torneo Svizzera AoE4';
+            const lowerWords = ['of', 'dei', 'del', 'della', 'degli', 'delle', 'di', 'da', 'in', 'and', 'the', 'e', 'a', 'su', 'per', 'con', 'tra', 'fra', 'd\'', 'l\''];
+            return raw.trim().split(/\s+/).map((word, index) => {
+                const wLower = word.toLowerCase();
+                if (index > 0 && lowerWords.includes(wLower)) {
+                    return wLower;
+                }
+                // Capitalize first letter, keep rest as lowercase if word was entirely uppercase
+                if (word === word.toUpperCase() && word.length > 2) {
+                    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                }
+                return word.charAt(0).toUpperCase() + word.slice(1);
+            }).join(' ');
+        }
+
         function render(state, backgroundUrl, displayName) {
             if (backgroundUrl) {
                 document.body.style.backgroundImage = `url(${backgroundUrl})`;
@@ -827,8 +844,8 @@
             currentState = state || {};
 
             // 1. Header Information (Sync title from display_name or tournamentTitle or titleText)
-            const title = displayName || state?.tournamentTitle || state?.titleText || 'TORNEO AOE4 SVIZZERA';
-            document.getElementById('main-title').innerText = title;
+            const rawTitle = displayName || state?.tournamentTitle || state?.titleText || 'Ends of Summer Champions';
+            document.getElementById('main-title').innerText = formatMedievalTitle(rawTitle);
             document.getElementById('day-num').innerText = state?.dayNumber || 1;
 
             // 2. Determine Active View (Prioritize URL param ?view=...)
