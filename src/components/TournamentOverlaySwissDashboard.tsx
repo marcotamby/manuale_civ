@@ -919,7 +919,7 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
                             </span>
                           ) : (
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold text-slate-500 bg-white/5">
-                              In Gara
+                              Non Qualificato
                             </span>
                           )}
                         </td>
