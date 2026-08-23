@@ -1,6 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { X, ExternalLink, Copy, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft, Pencil, Check, Upload, Users, Loader2 } from 'lucide-react';
+import { X, ExternalLink, Copy, Monitor, ShieldCheck, Info, Trophy, Settings, ChevronLeft, Pencil, Check, Upload, Users, Loader2, GripVertical } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { AoE4MatchDashboard } from './AoE4MatchDashboard';
 import { TournamentOverlayDashboard } from './TournamentOverlayDashboard';
 import { TournamentOverlay2v2Dashboard } from './TournamentOverlay2v2Dashboard';
@@ -83,7 +98,130 @@ const OVERLAYS: OverlayItem[] = [
   }
 ];
 
+interface SortableOverlayItemProps {
+  ov: OverlayItem;
+  isSelected: boolean;
+  displayName: string;
+  displayIcon: string;
+  displayDesc: string;
+  onSelect: () => void;
+}
+
+function SortableOverlayItem({
+  ov,
+  isSelected,
+  displayName,
+  displayIcon,
+  displayDesc,
+  onSelect
+}: SortableOverlayItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: ov.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : 'auto',
+    opacity: isDragging ? 0.6 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="relative flex items-center group select-none"
+    >
+      <div
+        className={`w-full group p-4 rounded-2xl border transition-all text-left relative flex items-center gap-3.5 ${
+          isSelected 
+            ? 'bg-gradient-to-br from-[#D4AF37]/20 to-black border-[#D4AF37]/50 shadow-xl' 
+            : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'
+        } ${isDragging ? 'shadow-2xl ring-2 ring-[#D4AF37]/60' : ''}`}
+      >
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          className="p-1.5 -ml-1 text-gray-500 hover:text-[#D4AF37] cursor-grab active:cursor-grabbing shrink-0 transition-colors rounded-lg hover:bg-white/5"
+          title="Trascina per riordinare"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <GripVertical size={16} />
+        </button>
+
+        <button
+          type="button"
+          onClick={onSelect}
+          className="flex-1 min-w-0 flex items-center gap-3.5 text-left"
+        >
+          <div className={`w-11 h-11 rounded-xl flex items-center justify-center border shrink-0 overflow-hidden ${
+            isSelected ? 'bg-[#D4AF37]/20 border-[#D4AF37]/30' : 'bg-white/5 border-white/10'
+          }`}>
+            {displayIcon ? (
+              <img src={displayIcon} className="w-full h-full object-cover" />
+            ) : (
+              <ov.icon className={isSelected ? 'text-[#D4AF37]' : 'text-gray-500'} size={18} />
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-black text-xs text-white uppercase tracking-wider truncate">{displayName}</div>
+            <div className="text-[10px] text-gray-500 mt-0.5 line-clamp-1 group-hover:text-gray-400 transition-colors font-medium">
+              {displayDesc}
+            </div>
+          </div>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
+  const [overlaysList, setOverlaysList] = useState<OverlayItem[]>(() => {
+    const savedOrder = localStorage.getItem('admin_overlays_order');
+    if (savedOrder) {
+      try {
+        const ids: string[] = JSON.parse(savedOrder);
+        const ordered = ids
+          .map(id => OVERLAYS.find(o => o.id === id))
+          .filter(Boolean) as OverlayItem[];
+        const missing = OVERLAYS.filter(o => !ids.includes(o.id));
+        return [...ordered, ...missing];
+      } catch {
+        return OVERLAYS;
+      }
+    }
+    return OVERLAYS;
+  });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    setOverlaysList((items) => {
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+      const newOrder = arrayMove(items, oldIndex, newIndex);
+      localStorage.setItem('admin_overlays_order', JSON.stringify(newOrder.map(o => o.id)));
+      return newOrder;
+    });
+
+    setToast({ isVisible: true, message: 'Ordine overlay aggiornato! ↕️', type: 'success' });
+  };
+
   const [selectedOverlay, setSelectedOverlay] = useState<OverlayItem | null>(null);
   const [activeTab, setActiveTab] = useState<'preview' | 'dashboard'>('preview');
   const [previewScale, setPreviewScale] = useState(1);
@@ -138,12 +276,12 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
   useEffect(() => {
     if (isOpen) {
       if (overlayId) {
-        const found = OVERLAYS.find(o => o.id === overlayId);
+        const found = overlaysList.find(o => o.id === overlayId) || OVERLAYS.find(o => o.id === overlayId);
         if (found) setSelectedOverlay(found);
-      } else if (OVERLAYS.length > 0) {
-        setSelectedOverlay(OVERLAYS[0]);
+      } else if (overlaysList.length > 0) {
+        setSelectedOverlay(overlaysList[0]);
         // Se non c'è overlayId nell'URL, lo aggiungiamo per coerenza
-        navigate(`/admin/overlays/${OVERLAYS[0].id}/${tab === 'config' ? 'config' : 'preview'}`, { replace: true, state: location.state });
+        navigate(`/admin/overlays/${overlaysList[0].id}/${tab === 'config' ? 'config' : 'preview'}`, { replace: true, state: location.state });
       }
       
       if (tab === 'config') {
@@ -350,40 +488,42 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
 
         <div className="flex flex-1 overflow-hidden">
           <div className="w-[380px] border-r border-white/5 bg-black/20 flex flex-col overflow-y-auto custom-scrollbar p-6 space-y-6">
-            <h4 className="text-[11px] font-black text-gray-500 uppercase tracking-[0.3em] px-2">Overlay Disponibili</h4>
-              <div className="flex-1 overflow-y-auto elegant-scrollbar pr-2 space-y-3">
-                {OVERLAYS.map((ov) => {
-                  const isSelected = selectedOverlay?.id === ov.id;
-                  const displayName = overlayNames[ov.id] ?? ov.name;
-                  const displayIcon = overlayIcons[ov.id] ?? '';
-                  const displayDesc = overlayDescriptions[ov.id] ?? ov.description;
-                
-                return (
-                  <button
-                    key={ov.id}
-                    onClick={() => handleSelectOverlay(ov)}
-                    className={`w-full group p-5 rounded-2xl border transition-all text-left relative flex items-center gap-4 ${
-                      isSelected 
-                        ? 'bg-gradient-to-br from-[#D4AF37]/20 to-black border-[#D4AF37]/50 shadow-xl' 
-                        : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'
-                    }`}
-                  >
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center border shrink-0 overflow-hidden ${
-                      isSelected ? 'bg-[#D4AF37]/20 border-[#D4AF37]/30' : 'bg-white/5 border-white/10'
-                    }`}>
-                      {displayIcon ? (
-                        <img src={displayIcon} className="w-full h-full object-cover" />
-                      ) : (
-                        <ov.icon className={isSelected ? 'text-[#D4AF37]' : 'text-gray-500'} size={20} />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-black text-sm text-white uppercase tracking-wider truncate">{displayName}</div>
-                      <div className="text-[10px] text-gray-500 mt-1 line-clamp-1 group-hover:text-gray-400 transition-colors font-medium">{displayDesc}</div>
-                    </div>
-                  </button>
-                );
-              })}
+            <div className="flex items-center justify-between px-2">
+              <h4 className="text-[11px] font-black text-gray-500 uppercase tracking-[0.3em]">Overlay Disponibili</h4>
+              <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded">Trascina ↕️</span>
+            </div>
+            <div className="flex-1 overflow-y-auto elegant-scrollbar pr-2">
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={overlaysList.map(o => o.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-3">
+                    {overlaysList.map((ov) => {
+                      const isSelected = selectedOverlay?.id === ov.id;
+                      const displayName = overlayNames[ov.id] ?? ov.name;
+                      const displayIcon = overlayIcons[ov.id] ?? '';
+                      const displayDesc = overlayDescriptions[ov.id] ?? ov.description;
+                    
+                      return (
+                        <SortableOverlayItem
+                          key={ov.id}
+                          ov={ov}
+                          isSelected={isSelected}
+                          displayName={displayName}
+                          displayIcon={displayIcon}
+                          displayDesc={displayDesc}
+                          onSelect={() => handleSelectOverlay(ov)}
+                        />
+                      );
+                    })}
+                  </div>
+                </SortableContext>
+              </DndContext>
             </div>
 
             <div className="mt-auto p-6 bg-blue-500/5 rounded-3xl border border-blue-500/20 space-y-4">
