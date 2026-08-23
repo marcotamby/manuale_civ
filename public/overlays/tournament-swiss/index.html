@@ -10,12 +10,15 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
+            --gold-main: #d4af37;
+            --gold-bright: #ffd700;
+            --gold-glow: rgba(212, 175, 55, 0.45);
+            --silver-main: #cbd5e1;
+            --silver-bright: #f8fafc;
+            --silver-glow: rgba(203, 213, 225, 0.35);
             --cyan-main: #00d2ff;
             --cyan-bright: #38bdf8;
             --cyan-glow: rgba(0, 210, 255, 0.4);
-            --silver-main: #cbd5e1;
-            --silver-bright: #f1f5f9;
-            --silver-glow: rgba(203, 213, 225, 0.35);
             --bg-dark: #050811;
             --card-bg: rgba(10, 15, 26, 0.88);
             --card-border: rgba(255, 255, 255, 0.1);
@@ -41,7 +44,7 @@
         .ambient-overlay {
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at 50% 15%, rgba(0, 210, 255, 0.09) 0%, transparent 65%),
+            background: radial-gradient(circle at 50% 15%, rgba(212, 175, 55, 0.08) 0%, transparent 65%),
                         radial-gradient(circle at 85% 85%, rgba(148, 163, 184, 0.07) 0%, transparent 60%);
             pointer-events: none;
             z-index: 1;
@@ -57,7 +60,7 @@
             background: rgba(8, 13, 24, 0.88);
             backdrop-filter: blur(20px);
             border-radius: 20px;
-            border: 1px solid rgba(0, 210, 255, 0.3);
+            border: 1px solid rgba(212, 175, 55, 0.3);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
@@ -75,14 +78,14 @@
         .header-logo-badge {
             width: 54px;
             height: 54px;
-            background: linear-gradient(135deg, rgba(0, 210, 255, 0.2), rgba(15, 23, 42, 0.8));
-            border: 1.5px solid var(--cyan-main);
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(15, 23, 42, 0.8));
+            border: 1.5px solid var(--gold-main);
             border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
-            box-shadow: 0 0 20px var(--cyan-glow);
+            box-shadow: 0 0 20px var(--gold-glow);
         }
 
         .header-titles {
@@ -97,7 +100,7 @@
             font-weight: 900;
             letter-spacing: 2px;
             text-transform: uppercase;
-            background: linear-gradient(180deg, #ffffff 30%, #93c5fd 100%);
+            background: linear-gradient(180deg, #ffffff 30%, #ffd700 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
@@ -121,7 +124,7 @@
         .header-subtitle .dot {
             width: 5px;
             height: 5px;
-            background: var(--cyan-main);
+            background: var(--gold-main);
             border-radius: 50%;
         }
 
@@ -135,16 +138,16 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            background: rgba(0, 210, 255, 0.1);
-            border: 1px solid rgba(0, 210, 255, 0.35);
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.35);
             padding: 8px 18px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 800;
             letter-spacing: 2px;
             text-transform: uppercase;
-            color: var(--cyan-bright);
-            box-shadow: 0 0 15px var(--cyan-glow);
+            color: var(--gold-bright);
+            box-shadow: 0 0 15px var(--gold-glow);
         }
 
         .day-badge {
@@ -161,7 +164,7 @@
         }
 
         .day-badge span {
-            color: var(--cyan-bright);
+            color: var(--gold-bright);
         }
 
         /* Content Canvas */
@@ -224,15 +227,15 @@
         }
 
         .badge-gold {
-            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-            color: #0f172a;
-            box-shadow: 0 0 12px var(--silver-glow);
+            background: linear-gradient(135deg, #b8860b 0%, #ffd700 100%);
+            color: #000;
+            box-shadow: 0 0 12px var(--gold-glow);
         }
 
         .badge-silver {
-            background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+            background: linear-gradient(135deg, #64748b 0%, #cbd5e1 100%);
             color: #000;
-            box-shadow: 0 0 12px var(--cyan-glow);
+            box-shadow: 0 0 12px var(--silver-glow);
         }
 
         .badge-normal {
@@ -280,31 +283,31 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
         }
 
-        /* Gold Cutoff (#1-#2) */
+        /* Gold Cutoff (#1-#2) - Luxury Gold */
         .standing-card.is-gold {
-            background: linear-gradient(90deg, rgba(203, 213, 225, 0.18) 0%, rgba(13, 18, 30, 0.95) 60%);
-            border: 1.5px solid rgba(226, 232, 240, 0.6);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(203, 213, 225, 0.15);
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.18) 0%, rgba(13, 18, 30, 0.95) 60%);
+            border: 1.5px solid rgba(212, 175, 55, 0.65);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.2);
         }
 
         .standing-card.is-gold .card-rank-badge {
-            background: linear-gradient(135deg, #cbd5e1, #f8fafc);
-            color: #0f172a;
-            box-shadow: 0 0 15px var(--silver-glow);
+            background: linear-gradient(135deg, #d4af37, #ffd700);
+            color: #000;
+            box-shadow: 0 0 15px var(--gold-glow);
             font-weight: 950;
         }
 
-        /* Silver Cutoff (#3-#4) */
+        /* Silver Cutoff (#3-#4) - Metallic Silver */
         .standing-card.is-silver {
-            background: linear-gradient(90deg, rgba(0, 210, 255, 0.16) 0%, rgba(13, 18, 30, 0.95) 60%);
-            border: 1.5px solid rgba(0, 210, 255, 0.55);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 210, 255, 0.18);
+            background: linear-gradient(90deg, rgba(203, 213, 225, 0.16) 0%, rgba(13, 18, 30, 0.95) 60%);
+            border: 1.5px solid rgba(203, 213, 225, 0.55);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(203, 213, 225, 0.18);
         }
 
         .standing-card.is-silver .card-rank-badge {
-            background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+            background: linear-gradient(135deg, #94a3b8, #e2e8f0);
             color: #000;
-            box-shadow: 0 0 15px var(--cyan-glow);
+            box-shadow: 0 0 15px var(--silver-glow);
             font-weight: 950;
         }
 
@@ -365,15 +368,15 @@
         }
 
         .tag-gold {
-            background: rgba(226, 232, 240, 0.2);
-            color: #f1f5f9;
-            border: 1px solid rgba(226, 232, 240, 0.45);
+            background: rgba(212, 175, 55, 0.25);
+            color: var(--gold-bright);
+            border: 1px solid rgba(212, 175, 55, 0.5);
         }
 
         .tag-silver {
-            background: rgba(0, 210, 255, 0.2);
-            color: #38bdf8;
-            border: 1px solid rgba(0, 210, 255, 0.45);
+            background: rgba(203, 213, 225, 0.2);
+            color: #f1f5f9;
+            border: 1px solid rgba(203, 213, 225, 0.45);
         }
 
         .tag-running {
@@ -406,8 +409,8 @@
         }
 
         .stat-box.highlight-pts {
-            background: linear-gradient(180deg, rgba(0, 210, 255, 0.15), rgba(0, 0, 0, 0.5));
-            border-color: rgba(0, 210, 255, 0.4);
+            background: linear-gradient(180deg, rgba(212, 175, 55, 0.15), rgba(0, 0, 0, 0.5));
+            border-color: rgba(212, 175, 55, 0.4);
         }
 
         .stat-value {
@@ -418,7 +421,7 @@
         }
 
         .stat-box.highlight-pts .stat-value {
-            color: var(--cyan-bright);
+            color: var(--gold-bright);
         }
 
         .stat-label {
