@@ -36,15 +36,15 @@
         }
 
         /* =========================================================================
-           1. TOP BANNER (NOME DEL TORNEO - Continuazione Seamless HUD Spettatore)
+           1. TOP BANNER (NOME DEL TORNEO - Sotto al Timer Spettatore)
            ========================================================================= */
         #top-brand-banner {
             position: absolute;
-            top: 118px;
+            top: 136px;
             left: 50%;
             transform: translateX(-50%);
             width: 296px;
-            height: 36px;
+            height: 34px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -73,14 +73,14 @@
         }
 
         /* =========================================================================
-           2. MINIMAP TOP-RIGHT CORNER (AoEItalia Logo - 45° Pixel-Perfect)
+           2. MINIMAP TOP-RIGHT CORNER (AoEItalia Logo - Allineamento Perfetto 45°)
            ========================================================================= */
         #minimap-crest-badge {
             position: absolute;
             right: 0;
-            top: 658px;
-            width: 182px;
-            height: 182px;
+            top: 636px;
+            width: 202px;
+            height: 202px;
             z-index: 100;
             pointer-events: none;
             transition: all 0.2s ease;
@@ -96,10 +96,10 @@
 
         .minimap-crest-content {
             position: absolute;
-            top: 18px;
-            right: 14px;
-            width: 120px;
-            height: 90px;
+            top: 22px;
+            right: 22px;
+            width: 125px;
+            height: 95px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -107,21 +107,21 @@
         }
 
         .minimap-logo-img {
-            max-height: 64px;
-            max-width: 100px;
+            max-height: 68px;
+            max-width: 110px;
             object-fit: contain;
             filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 10px rgba(212, 175, 55, 0.35));
         }
 
         /* =========================================================================
-           3. MINIMAP BOTTOM-RIGHT CORNER (Mappa & Giornata - 45° Pixel-Perfect)
+           3. MINIMAP BOTTOM-RIGHT CORNER (Mappa & Giornata - Allineamento Perfetto 45°)
            ========================================================================= */
         #minimap-bottom-corner-panel {
             position: absolute;
             right: 0;
             bottom: 0;
-            width: 182px;
-            height: 256px;
+            width: 202px;
+            height: 286px;
             z-index: 100;
             pointer-events: none;
             transition: all 0.2s ease;
@@ -138,7 +138,7 @@
         .minimap-bottom-content {
             position: absolute;
             bottom: 14px;
-            right: 16px;
+            right: 18px;
             display: flex;
             flex-direction: column;
             align-items: flex-end;
@@ -182,7 +182,7 @@
 
     <!-- 2. CREST LOGO AOE ITALIA (In alto a destra sulla minimappa) -->
     <div id="minimap-crest-badge">
-        <svg class="minimap-crest-svg" viewBox="0 0 182 182" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg class="minimap-crest-svg" viewBox="0 0 202 202" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <linearGradient id="crestBg" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stop-color="#0b1224" stop-opacity="0.98"/>
@@ -194,10 +194,10 @@
                     <stop offset="100%" stop-color="#aa8c2c"/>
                 </linearGradient>
             </defs>
-            <!-- Triangle: starts (0,0), across top to (182,0), down to (182,182), diagonal back to (0,0) -->
-            <polygon points="0,0 182,0 182,182" fill="url(#crestBg)"/>
+            <!-- Triangle: from (0,0) across top to (202,0), down to (202,202), diagonal back to (0,0) -->
+            <polygon points="0,0 202,0 202,202" fill="url(#crestBg)"/>
             <!-- Golden border line along the minimap diagonal -->
-            <line x1="0" y1="0" x2="182" y2="182" stroke="url(#goldStroke)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="0" y1="0" x2="202" y2="202" stroke="url(#goldStroke)" stroke-width="2.5" stroke-linecap="round"/>
         </svg>
         <div class="minimap-crest-content">
             <img src="/aoeitalia-logo.png" alt="AoE Italia" class="minimap-logo-img">
@@ -206,22 +206,22 @@
 
     <!-- 3. AREA SCURA SOTTO LA MINIMAPPA (Giornata + Nome Mappa) -->
     <div id="minimap-bottom-corner-panel">
-        <svg class="minimap-bottom-svg" viewBox="0 0 182 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg class="minimap-bottom-svg" viewBox="0 0 202 286" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <linearGradient id="bottomBg" x1="100%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" stop-color="#0b1224" stop-opacity="0.98"/>
                     <stop offset="100%" stop-color="#040711" stop-opacity="0.98"/>
                 </linearGradient>
-                <linearGradient id="bottomGold" x1="0%" y1="100%" x2="100%" y2="0%">
+                <linearGradient id="bottomGold" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stop-color="#aa8c2c"/>
                     <stop offset="50%" stop-color="#d4af37"/>
                     <stop offset="100%" stop-color="#ffd700"/>
                 </linearGradient>
             </defs>
-            <!-- Trapezoid: from (182,0) down to (182,256), across to (0,256), up to (0,166), diagonal back to (182,0) -->
-            <polygon points="182,0 182,256 0,256 0,166" fill="url(#bottomBg)"/>
+            <!-- Trapezoid: from (202,0) down to (202,286), across to (0,286), up to (0,202), diagonal back to (202,0) -->
+            <polygon points="202,0 202,286 0,286 0,202" fill="url(#bottomBg)"/>
             <!-- Golden border line along the minimap diagonal -->
-            <line x1="182" y1="0" x2="0" y2="166" stroke="url(#bottomGold)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="202" y1="0" x2="0" y2="202" stroke="url(#bottomGold)" stroke-width="2.5" stroke-linecap="round"/>
         </svg>
         <div class="minimap-bottom-content">
             <div class="minimap-map-name" id="minimap-map-name">Dry Arabia</div>
@@ -296,10 +296,10 @@
 
             // Fine-tune offsets
             if (s.topBannerOffsetY !== undefined) {
-                topBanner.style.top = `${118 + Number(s.topBannerOffsetY)}px`;
+                topBanner.style.top = `${136 + Number(s.topBannerOffsetY)}px`;
             }
             if (s.minimapCrestOffsetY !== undefined) {
-                minimapCrest.style.top = `${658 + Number(s.minimapCrestOffsetY)}px`;
+                minimapCrest.style.top = `${636 + Number(s.minimapCrestOffsetY)}px`;
             }
             if (s.minimapBottomOffsetY !== undefined) {
                 minimapBottom.style.bottom = `${0 + Number(s.minimapBottomOffsetY)}px`;
