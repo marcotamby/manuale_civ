@@ -138,16 +138,16 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            background: rgba(212, 175, 55, 0.1);
-            border: 1px solid rgba(212, 175, 55, 0.35);
+            background: rgba(0, 210, 255, 0.12);
+            border: 1px solid rgba(0, 210, 255, 0.45);
             padding: 8px 18px;
             border-radius: 12px;
             font-size: 12px;
-            font-weight: 800;
+            font-weight: 900;
             letter-spacing: 2px;
             text-transform: uppercase;
-            color: var(--gold-bright);
-            box-shadow: 0 0 15px var(--gold-glow);
+            color: var(--cyan-bright);
+            box-shadow: 0 0 18px var(--cyan-glow);
         }
 
         .day-badge {
@@ -486,16 +486,22 @@
             text-transform: uppercase;
         }
 
+        .round-title span {
+            color: var(--cyan-bright);
+            text-shadow: 0 0 12px var(--cyan-glow);
+        }
+
         .round-badge {
             font-size: 10px;
             font-weight: 900;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            padding: 3px 8px;
+            padding: 3px 9px;
             border-radius: 6px;
-            background: rgba(212, 175, 55, 0.15);
-            color: var(--gold-bright);
-            border: 1px solid rgba(212, 175, 55, 0.35);
+            background: rgba(0, 210, 255, 0.15);
+            color: var(--cyan-bright);
+            border: 1px solid rgba(0, 210, 255, 0.4);
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.25);
         }
 
         .round-matches-list {
@@ -688,7 +694,7 @@
                 <!-- Round 1 -->
                 <div class="round-column">
                     <div class="round-header">
-                        <div class="round-title">TURNO 1</div>
+                        <div class="round-title">TURNO <span>1</span></div>
                         <div class="round-badge">BO1</div>
                     </div>
                     <div class="round-matches-list" id="matches-round-1"></div>
@@ -697,7 +703,7 @@
                 <!-- Round 2 -->
                 <div class="round-column">
                     <div class="round-header">
-                        <div class="round-title">TURNO 2</div>
+                        <div class="round-title">TURNO <span>2</span></div>
                         <div class="round-badge">BO1</div>
                     </div>
                     <div class="round-matches-list" id="matches-round-2"></div>
@@ -706,7 +712,7 @@
                 <!-- Round 3 -->
                 <div class="round-column">
                     <div class="round-header">
-                        <div class="round-title">TURNO 3</div>
+                        <div class="round-title">TURNO <span>3</span></div>
                         <div class="round-badge">BO1</div>
                     </div>
                     <div class="round-matches-list" id="matches-round-3"></div>
@@ -715,7 +721,7 @@
                 <!-- Round 4 -->
                 <div class="round-column">
                     <div class="round-header">
-                        <div class="round-title">TURNO 4</div>
+                        <div class="round-title">TURNO <span>4</span></div>
                         <div class="round-badge">BO1</div>
                     </div>
                     <div class="round-matches-list" id="matches-round-4"></div>
