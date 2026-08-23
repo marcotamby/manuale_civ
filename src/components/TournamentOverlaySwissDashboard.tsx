@@ -634,8 +634,33 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
           </div>
         </div>
 
-        {/* Global Save Button */}
+        {/* Header Title & Day Controls */}
         <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-black/40 border border-white/10 rounded-xl px-3 py-1.5">
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Titolo:</span>
+            <input
+              type="text"
+              value={state.tournamentTitle || ''}
+              onChange={(e) => setState({ ...state, tournamentTitle: e.target.value })}
+              placeholder="TORNEO AOE4 SVIZZERA"
+              className="bg-transparent text-xs font-black text-white focus:outline-none w-52 placeholder-slate-600 truncate"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 bg-black/40 border border-white/10 rounded-xl px-3 py-1.5">
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Giornata:</span>
+            <select
+              value={state.dayNumber || 1}
+              onChange={(e) => setState({ ...state, dayNumber: parseInt(e.target.value) || 1 })}
+              className="bg-transparent text-xs font-black text-cyan-300 focus:outline-none cursor-pointer"
+            >
+              <option value={1} className="bg-[#0b0f19] text-white">Giornata 1</option>
+              <option value={2} className="bg-[#0b0f19] text-white">Giornata 2</option>
+              <option value={3} className="bg-[#0b0f19] text-white">Giornata 3</option>
+              <option value={4} className="bg-[#0b0f19] text-white">Giornata 4</option>
+            </select>
+          </div>
+
           {showSuccess && (
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 text-xs font-bold animate-in fade-in">
               <CheckCircle2 size={15} /> Salvato!
@@ -648,7 +673,7 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
             className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-cyan-500/20 active:scale-95 disabled:opacity-50"
           >
             {isSaving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
-            Salva Modifiche
+            Salva
           </button>
         </div>
       </div>

@@ -751,22 +751,22 @@
             return `/civs/${id}.webp`;
         }
 
-        function render(state, backgroundUrl) {
+        function render(state, backgroundUrl, displayName) {
             if (backgroundUrl) {
                 document.body.style.backgroundImage = `url(${backgroundUrl})`;
             } else {
                 document.body.style.backgroundImage = "url('../background/background.png')";
             }
-            if (!state) return;
-            currentState = state;
+            if (!state && !displayName) return;
+            currentState = state || {};
 
-            // 1. Header Information
-            const title = state.tournamentTitle || 'TORNEO AOE4 SVIZZERA';
+            // 1. Header Information (Sync title from display_name or tournamentTitle or titleText)
+            const title = displayName || state?.tournamentTitle || state?.titleText || 'TORNEO AOE4 SVIZZERA';
             document.getElementById('main-title').innerText = title;
-            document.getElementById('day-num').innerText = state.dayNumber || 1;
+            document.getElementById('day-num').innerText = state?.dayNumber || 1;
 
             // 2. Determine Active View (Prioritize URL param ?view=...)
-            const activeView = forcedView ? forcedView.toLowerCase() : (state.activeView || 'standings');
+            const activeView = forcedView ? forcedView.toLowerCase() : (state?.activeView || 'standings');
             const viewStandings = document.getElementById('view-standings');
             const viewRounds = document.getElementById('view-rounds');
             const viewText = document.getElementById('view-text');
@@ -782,10 +782,10 @@
             }
 
             // 3. Render Standings (View A)
-            renderStandings(state);
+            if (state) renderStandings(state);
 
             // 4. Render Rounds (View B)
-            renderRounds(state);
+            if (state) renderRounds(state);
         }
 
         function renderStandings(state) {
@@ -911,22 +911,22 @@
 
         async function init() {
             try {
-                const { data } = await client.from('stream_overlays').select('state, background_url').eq('id', OVERLAY_ID).single();
-                if (data) render(data.state, data.background_url);
+                const { data } = await client.from('stream_overlays').select('state, background_url, display_name').eq('id', OVERLAY_ID).single();
+                if (data) render(data.state, data.background_url, data.display_name);
             } catch (err) {
                 console.error('Init error:', err);
             }
 
             client.channel(`public:${OVERLAY_ID}`)
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stream_overlays', filter: `id=eq.${OVERLAY_ID}` }, payload => {
-                    render(payload.new.state, payload.new.background_url);
+                    render(payload.new.state, payload.new.background_url, payload.new.display_name);
                 })
                 .subscribe();
 
             setInterval(async () => {
                 try {
-                    const { data } = await client.from('stream_overlays').select('state, background_url').eq('id', OVERLAY_ID).single();
-                    if (data) render(data.state, data.background_url);
+                    const { data } = await client.from('stream_overlays').select('state, background_url, display_name').eq('id', OVERLAY_ID).single();
+                    if (data) render(data.state, data.background_url, data.display_name);
                 } catch (e) {}
             }, 5000);
         }
