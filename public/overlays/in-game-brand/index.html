@@ -73,12 +73,12 @@
         }
 
         /* =========================================================================
-           2. MINIMAP TOP-RIGHT CORNER (AoEItalia Logo - Allineamento Perfetto 45°)
+           2. MINIMAP TOP-RIGHT CORNER (AoEItalia Logo - 45° Allineamento Perfetto)
            ========================================================================= */
         #minimap-crest-badge {
             position: absolute;
             right: 0;
-            top: 636px;
+            top: 708px;
             width: 202px;
             height: 202px;
             z-index: 100;
@@ -114,14 +114,14 @@
         }
 
         /* =========================================================================
-           3. MINIMAP BOTTOM-RIGHT CORNER (Mappa & Giornata - Allineamento Perfetto 45°)
+           3. MINIMAP BOTTOM-RIGHT CORNER (Mappa & Giornata - 45° Allineamento Perfetto)
            ========================================================================= */
         #minimap-bottom-corner-panel {
             position: absolute;
             right: 0;
             bottom: 0;
             width: 202px;
-            height: 286px;
+            height: 214px;
             z-index: 100;
             pointer-events: none;
             transition: all 0.2s ease;
@@ -137,7 +137,7 @@
 
         .minimap-bottom-content {
             position: absolute;
-            bottom: 14px;
+            bottom: 12px;
             right: 18px;
             display: flex;
             flex-direction: column;
@@ -175,7 +175,7 @@
 </head>
 <body>
 
-    <!-- 1. TOP BRAND BANNER (Solo nome torneo - Continuazione HUD) -->
+    <!-- 1. TOP BRAND BANNER (Solo nome torneo - Sotto HUD Timer) -->
     <div id="top-brand-banner">
         <div class="top-tournament-title" id="top-title-text">Ends of Summer Champions</div>
     </div>
@@ -206,7 +206,7 @@
 
     <!-- 3. AREA SCURA SOTTO LA MINIMAPPA (Giornata + Nome Mappa) -->
     <div id="minimap-bottom-corner-panel">
-        <svg class="minimap-bottom-svg" viewBox="0 0 202 286" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg class="minimap-bottom-svg" viewBox="0 0 202 214" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <linearGradient id="bottomBg" x1="100%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" stop-color="#0b1224" stop-opacity="0.98"/>
@@ -218,8 +218,8 @@
                     <stop offset="100%" stop-color="#ffd700"/>
                 </linearGradient>
             </defs>
-            <!-- Trapezoid: from (202,0) down to (202,286), across to (0,286), up to (0,202), diagonal back to (202,0) -->
-            <polygon points="202,0 202,286 0,286 0,202" fill="url(#bottomBg)"/>
+            <!-- Polygon: from (202,0) down to (202,214), across to (0,214), up to (0,202), diagonal back to (202,0) -->
+            <polygon points="202,0 202,214 0,214 0,202" fill="url(#bottomBg)"/>
             <!-- Golden border line along the minimap diagonal -->
             <line x1="202" y1="0" x2="0" y2="202" stroke="url(#bottomGold)" stroke-width="2.5" stroke-linecap="round"/>
         </svg>
@@ -299,7 +299,7 @@
                 topBanner.style.top = `${136 + Number(s.topBannerOffsetY)}px`;
             }
             if (s.minimapCrestOffsetY !== undefined) {
-                minimapCrest.style.top = `${636 + Number(s.minimapCrestOffsetY)}px`;
+                minimapCrest.style.top = `${708 + Number(s.minimapCrestOffsetY)}px`;
             }
             if (s.minimapBottomOffsetY !== undefined) {
                 minimapBottom.style.bottom = `${0 + Number(s.minimapBottomOffsetY)}px`;
