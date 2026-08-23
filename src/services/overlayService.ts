@@ -22,6 +22,16 @@ export interface OverlayState {
   titleColor?: string;
   titleBorderColor?: string;
   titleBorderWidth?: number;
+  // Swiss tournament fields
+  activeView?: 'standings' | 'rounds';
+  currentRound?: number;
+  totalRounds?: number;
+  dayNumber?: number;
+  goldSlotsCount?: number;
+  silverSlotsCount?: number;
+  standings?: any[];
+  rounds?: any;
+  startgg?: any;
 }
 
 export const overlayService = {

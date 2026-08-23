@@ -4,6 +4,7 @@ import { X, ExternalLink, Copy, Monitor, ShieldCheck, Info, Trophy, Settings, Ch
 import { AoE4MatchDashboard } from './AoE4MatchDashboard';
 import { TournamentOverlayDashboard } from './TournamentOverlayDashboard';
 import { TournamentOverlay2v2Dashboard } from './TournamentOverlay2v2Dashboard';
+import { TournamentOverlaySwissDashboard } from './TournamentOverlaySwissDashboard';
 import { DraftMatchingDashboard } from './DraftMatchingDashboard';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
@@ -36,6 +37,13 @@ const OVERLAYS: OverlayItem[] = [
     name: 'Torneo 1V1 (Tabellone)',
     description: 'Overlay 1V1 con tabellone progressivo a 8 partecipanti.',
     path: '/overlays/tournament-1v1-bracket/index.html',
+    icon: Trophy
+  },
+  {
+    id: 'tournament-swiss',
+    name: 'Torneo Svizzera (Classifica & Turni)',
+    description: 'Classifica 4 turni Bo1 (Top 2 Oro, Top 3-4 Argento) con tabellone e sync Start.gg.',
+    path: '/overlays/tournament-swiss/index.html',
     icon: Trophy
   },
   {
@@ -565,6 +573,8 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                         <AoE4MatchDashboard onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} />
                       ) : selectedOverlay.id === 'draft-matching' ? (
                         <DraftMatchingDashboard onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} />
+                      ) : selectedOverlay.id === 'tournament-swiss' ? (
+                        <TournamentOverlaySwissDashboard onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} />
                       ) : selectedOverlay.id.startsWith('tournament-2v2') ? (
                         <TournamentOverlay2v2Dashboard 
                           overlayId={selectedOverlay.id} 

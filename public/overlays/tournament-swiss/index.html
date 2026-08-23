@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
+    <title>Swiss Tournament Overlay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --gold-main: #d4af37;
+            --gold-bright: #ffd700;
+            --gold-glow: rgba(212, 175, 55, 0.45);
+            --silver-main: #c0c8d8;
+            --silver-bright: #e2e8f0;
+            --silver-glow: rgba(192, 200, 216, 0.4);
+            --bg-dark: #07090e;
+            --card-bg: rgba(13, 18, 30, 0.85);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --accent-blue: #00d2ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            background: #000 url('../background/background.png') no-repeat center center / cover;
+            color: #ffffff;
+            position: relative;
+        }
+
+        /* Ambient Glow & Grid Lines */
+        .ambient-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 70%),
+                        radial-gradient(circle at 10% 80%, rgba(0, 150, 255, 0.06) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Header Bar */
+        #header-bar {
+            position: absolute;
+            top: 24px;
+            left: 50px;
+            right: 50px;
+            height: 96px;
+            background: rgba(8, 12, 22, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            z-index: 10;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-logo-badge {
+            width: 54px;
+            height: 54px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(0, 0, 0, 0.6));
+            border: 1.5px solid var(--gold-main);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 0 20px var(--gold-glow);
+        }
+
+        .header-titles {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .header-main-title {
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #ffffff 30%, #e2d192 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+            max-width: 800px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            font-weight: 700;
+            color: #94a3b8;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-subtitle .dot {
+            width: 5px;
+            height: 5px;
+            background: var(--gold-main);
+            border-radius: 50%;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .view-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #f1f5f9;
+        }
+
+        .view-pill.active {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.08));
+            border-color: var(--gold-main);
+            color: var(--gold-bright);
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        .day-badge {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .day-badge span {
+            color: var(--gold-bright);
+        }
+
+        /* Content Canvas */
+        #content-wrapper {
+            position: absolute;
+            top: 136px;
+            left: 50px;
+            right: 50px;
+            bottom: 30px;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ---------------------------------------------
+           VIEW A: STANDINGS (CLASSIFICA SVIZZERA)
+        --------------------------------------------- */
+        #view-standings {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            gap: 16px;
+        }
+
+        /* Legend Top Bar */
+        .standings-legend {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(10, 15, 26, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 14px;
+            padding: 10px 24px;
+        }
+
+        .legend-items {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .legend-badge {
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        .badge-gold {
+            background: linear-gradient(135deg, #b8860b 0%, #ffd700 100%);
+            color: #000;
+            box-shadow: 0 0 12px var(--gold-glow);
+        }
+
+        .badge-silver {
+            background: linear-gradient(135deg, #64748b 0%, #cbd5e1 100%);
+            color: #050505;
+            box-shadow: 0 0 10px var(--silver-glow);
+        }
+
+        .badge-normal {
+            background: rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .legend-info {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Standings Grid / Two-Column Table */
+        .standings-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            overflow: hidden;
+        }
+
+        .standings-column {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Standings Row Card */
+        .standing-card {
+            display: flex;
+            align-items: center;
+            height: 78px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 0 16px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Left flag ambient glow */
+        .card-flag-bg {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 140px;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.18;
+            -webkit-mask-image: linear-gradient(to right, black 30%, transparent 100%);
+            mask-image: linear-gradient(to right, black 30%, transparent 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Gold League Highlighting */
+        .standing-card.is-gold {
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.16) 0%, rgba(13, 18, 30, 0.92) 50%);
+            border: 1.5px solid rgba(212, 175, 55, 0.65);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .standing-card.is-gold .card-rank-badge {
+            background: linear-gradient(135deg, #d4af37, #ffd700);
+            color: #000;
+            box-shadow: 0 0 15px var(--gold-glow);
+            font-weight: 950;
+        }
+
+        /* Silver League Highlighting */
+        .standing-card.is-silver {
+            background: linear-gradient(90deg, rgba(192, 200, 216, 0.14) 0%, rgba(13, 18, 30, 0.92) 50%);
+            border: 1.5px solid rgba(192, 200, 216, 0.55);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 18px rgba(192, 200, 216, 0.15);
+        }
+
+        .standing-card.is-silver .card-rank-badge {
+            background: linear-gradient(135deg, #94a3b8, #e2e8f0);
+            color: #000;
+            box-shadow: 0 0 12px var(--silver-glow);
+            font-weight: 950;
+        }
+
+        /* Rank Badge */
+        .card-rank-badge {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 900;
+            flex-shrink: 0;
+            z-index: 2;
+        }
+
+        /* Player Details */
+        .card-player-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-left: 14px;
+            flex: 1;
+            min-width: 0;
+            z-index: 2;
+        }
+
+        .card-player-name {
+            font-size: 19px;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-transform: uppercase;
+        }
+
+        .card-player-sub {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 3px;
+        }
+
+        .card-qual-tag {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 2px 7px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .tag-gold {
+            background: rgba(212, 175, 55, 0.25);
+            color: var(--gold-bright);
+            border: 1px solid rgba(212, 175, 55, 0.5);
+        }
+
+        .tag-silver {
+            background: rgba(192, 200, 216, 0.2);
+            color: var(--silver-bright);
+            border: 1px solid rgba(192, 200, 216, 0.4);
+        }
+
+        .tag-running {
+            background: rgba(255, 255, 255, 0.06);
+            color: #64748b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-civ-name {
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Stats Blocks */
+        .card-stats {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+            flex-shrink: 0;
+            z-index: 2;
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 62px;
+            height: 52px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 0 8px;
+        }
+
+        .stat-box.highlight-pts {
+            background: linear-gradient(180deg, rgba(212, 175, 55, 0.15), rgba(0, 0, 0, 0.5));
+            border-color: rgba(212, 175, 55, 0.4);
+        }
+
+        .stat-value {
+            font-size: 17px;
+            font-weight: 900;
+            color: #ffffff;
+            line-height: 1;
+        }
+
+        .stat-box.highlight-pts .stat-value {
+            color: var(--gold-bright);
+        }
+
+        .stat-label {
+            font-size: 9px;
+            font-weight: 800;
+            color: #64748b;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 4px;
+            line-height: 1;
+        }
+
+        /* ---------------------------------------------
+           VIEW B: ROUNDS / MATCHUPS (TABELLONE TURNI)
+        --------------------------------------------- */
+        #view-rounds {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .rounds-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .round-column {
+            background: rgba(10, 15, 26, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            min-width: 0;
+        }
+
+        .round-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .round-title {
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            color: #ffffff;
+            text-transform: uppercase;
+        }
+
+        .round-badge {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: rgba(212, 175, 55, 0.15);
+            color: var(--gold-bright);
+            border: 1px solid rgba(212, 175, 55, 0.35);
+        }
+
+        .round-matches-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        /* Match Card in Bo1 */
+        .match-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            min-height: 84px;
+            justify-content: center;
+        }
+
+        .match-participant {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 32px;
+            padding: 0 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .match-participant.is-winner {
+            background: linear-gradient(90deg, rgba(34, 197, 94, 0.2) 0%, rgba(13, 18, 30, 0.8) 100%);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+        }
+
+        .match-participant.is-loser {
+            opacity: 0.55;
+        }
+
+        .participant-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            flex: 1;
+            z-index: 2;
+        }
+
+        .participant-flag {
+            width: 22px;
+            height: 16px;
+            border-radius: 3px;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            flex-shrink: 0;
+        }
+
+        .participant-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .match-participant.is-winner .participant-name {
+            color: #4ade80;
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
+        }
+
+        .participant-score {
+            font-size: 14px;
+            font-weight: 900;
+            color: #ffffff;
+            width: 22px;
+            text-align: center;
+            flex-shrink: 0;
+            z-index: 2;
+        }
+
+        .match-participant.is-winner .participant-score {
+            color: #4ade80;
+        }
+
+        /* Empty State */
+        .empty-matches-msg {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-overlay"></div>
+
+    <!-- Header Bar -->
+    <div id="header-bar">
+        <div class="header-left">
+            <div class="header-logo-badge">⚔️</div>
+            <div class="header-titles">
+                <div id="main-title" class="header-main-title">TORNEO AOE4 SVIZZERA</div>
+                <div class="header-subtitle">
+                    <span id="sub-format">QUALIFICAZIONI SVIZZERA</span>
+                    <span class="dot"></span>
+                    <span id="sub-mode">4 TURNI BO1</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div id="view-indicator" class="view-pill active">
+                <span id="view-text">CLASSIFICA LIVE</span>
+            </div>
+            <div class="day-badge" id="day-badge">
+                GIORNATA <span id="day-num">1</span>/4
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="content-wrapper">
+        <!-- VIEW A: CLASSIFICA (STANDINGS) -->
+        <div id="view-standings">
+            <div class="standings-legend">
+                <div class="legend-items">
+                    <div class="legend-item">
+                        <span class="legend-badge badge-gold">TOP 1 - 2</span>
+                        <span>QUALIFICATI ALLA LEGA ORO</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-badge badge-silver">TOP 3 - 4</span>
+                        <span>QUALIFICATI ALLA LEGA D'ARGENTO</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-badge badge-normal">5°+ POSTO</span>
+                        <span>CLASSIFICA GENERALE</span>
+                    </div>
+                </div>
+                <div class="legend-info">FORMATO: 4 MATCH BO1 • 1 PT PER VITTORIA</div>
+            </div>
+
+            <div class="standings-container">
+                <div class="standings-column" id="col-left"></div>
+                <div class="standings-column" id="col-right"></div>
+            </div>
+        </div>
+
+        <!-- VIEW B: TURNI E MATCHUPS (ROUNDS) -->
+        <div id="view-rounds">
+            <div class="rounds-grid">
+                <!-- Round 1 -->
+                <div class="round-column">
+                    <div class="round-header">
+                        <div class="round-title">TURNO 1</div>
+                        <div class="round-badge">BO1</div>
+                    </div>
+                    <div class="round-matches-list" id="matches-round-1"></div>
+                </div>
+
+                <!-- Round 2 -->
+                <div class="round-column">
+                    <div class="round-header">
+                        <div class="round-title">TURNO 2</div>
+                        <div class="round-badge">BO1</div>
+                    </div>
+                    <div class="round-matches-list" id="matches-round-2"></div>
+                </div>
+
+                <!-- Round 3 -->
+                <div class="round-column">
+                    <div class="round-header">
+                        <div class="round-title">TURNO 3</div>
+                        <div class="round-badge">BO1</div>
+                    </div>
+                    <div class="round-matches-list" id="matches-round-3"></div>
+                </div>
+
+                <!-- Round 4 -->
+                <div class="round-column">
+                    <div class="round-header">
+                        <div class="round-title">TURNO 4</div>
+                        <div class="round-badge">BO1</div>
+                    </div>
+                    <div class="round-matches-list" id="matches-round-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUB_URL = "https://laliiuqjpxanhwhxajlm.supabase.co";
+        const SUB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhbGlpdXFqcHhhbmh3aHhhamxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjQ5MjEsImV4cCI6MjA4ODU0MDkyMX0.1xIE1MXy1JxgGzpP0Hitotz8o3aMwASV8NUr06bQjkA";
+        const OVERLAY_ID = "tournament-swiss";
+
+        const CIV_DATA = {
+            'abbasid': { name: 'Abbaside', flag: 'Abbasid Dynasty.webp' },
+            'ayyubids': { name: 'Ayyubidi', flag: 'Ayyubids.webp' },
+            'byzantines': { name: 'Bisanzio', flag: 'Byzantines.webp' },
+            'chinese': { name: 'Cinesi', flag: 'Chinese.webp' },
+            'delhi': { name: 'Delhi', flag: 'Delhi Sultanate.webp' },
+            'english': { name: 'Inglesi', flag: 'English.webp' },
+            'french': { name: 'Francesi', flag: 'French.webp' },
+            'goldenhorde': { name: 'Orda d\'Oro', flag: 'Golden Horde.webp' },
+            'hre': { name: 'SRI', flag: 'Holy Roman Empire.webp' },
+            'japanese': { name: 'Giapponesi', flag: 'Japanese.webp' },
+            'jeannedarc': { name: 'Jeanne d\'Arc', flag: 'jeannedarc.webp' },
+            'lancaster': { name: 'Lancaster', flag: 'House of Lancaster.webp' },
+            'malians': { name: 'Maliesi', flag: 'Malians.webp' },
+            'mongols': { name: 'Mongoli', flag: 'Mongols.webp' },
+            'orderofthedragon': { name: 'Dragone', flag: 'Order of the Dragon.webp' },
+            'ottomans': { name: 'Ottomani', flag: 'Ottomans.webp' },
+            'rus': { name: 'Rus', flag: 'Rus.webp' },
+            'templar': { name: 'Templari', flag: 'Knights Templar.webp' },
+            'zhuxi': { name: 'Zhu Xi', flag: 'Zhu Xis Legacy.webp' },
+            'tughlaq': { name: 'Tughlaq', flag: 'Tughlaq Dynasty.webp' },
+            'sengoku': { name: 'Sengoku', flag: 'Sengoku Daimyo.webp' },
+            'macedonian': { name: 'Macedoni', flag: 'Macedonian Dynasty.webp' },
+            'jin-dynasty': { name: 'Dinastia Jin', flag: '/civs/Jin Dynasty.png' }
+        };
+
+        const { createClient } = window.supabase;
+        const client = createClient(SUB_URL, SUB_KEY);
+        let currentState = null;
+
+        // Check URL parameter for forced view: ?view=standings or ?view=rounds
+        const urlParams = new URLSearchParams(window.location.search);
+        const forcedView = urlParams.get('view');
+
+        function getCivFlagUrl(id) {
+            if (!id || typeof id !== 'string') return '';
+            if (id.startsWith('/civs/') || id.endsWith('.webp') || id.endsWith('.png')) {
+                return id.startsWith('/') ? id : `/${id}`;
+            }
+            const data = CIV_DATA[id.toLowerCase()];
+            if (data) {
+                return data.flag.startsWith('/') ? data.flag : `/civs/${data.flag}`;
+            }
+            return `/civs/${id}.webp`;
+        }
+
+        function getCivDisplayName(id) {
+            if (!id || typeof id !== 'string') return '';
+            const data = CIV_DATA[id.toLowerCase()];
+            return data ? data.name : id;
+        }
+
+        function render(state, backgroundUrl) {
+            if (backgroundUrl) {
+                document.body.style.backgroundImage = `url(${backgroundUrl})`;
+            } else {
+                document.body.style.backgroundImage = "url('../background/background.png')";
+            }
+            if (!state) return;
+            currentState = state;
+
+            // 1. Header Information
+            const title = state.tournamentTitle || 'TORNEO AOE4 SVIZZERA';
+            document.getElementById('main-title').innerText = title;
+            document.getElementById('day-num').innerText = state.dayNumber || 1;
+
+            // 2. Determine Active View
+            const activeView = forcedView || state.activeView || 'standings';
+            const viewStandings = document.getElementById('view-standings');
+            const viewRounds = document.getElementById('view-rounds');
+            const viewText = document.getElementById('view-text');
+
+            if (activeView === 'rounds') {
+                viewStandings.style.display = 'none';
+                viewRounds.style.display = 'flex';
+                viewText.innerText = 'TABELLONE TURNI';
+            } else {
+                viewStandings.style.display = 'flex';
+                viewRounds.style.display = 'none';
+                viewText.innerText = 'CLASSIFICA LIVE';
+            }
+
+            // 3. Render Standings (View A)
+            renderStandings(state);
+
+            // 4. Render Rounds (View B)
+            renderRounds(state);
+        }
+
+        function renderStandings(state) {
+            const leftCol = document.getElementById('col-left');
+            const rightCol = document.getElementById('col-right');
+            leftCol.innerHTML = '';
+            rightCol.innerHTML = '';
+
+            const standings = state.standings || [];
+            const goldCutoff = state.goldSlotsCount || 2;
+            const silverCutoff = (state.silverSlotsCount || 2) + goldCutoff;
+
+            standings.forEach((player, index) => {
+                const rank = index + 1;
+                const isGold = rank <= goldCutoff;
+                const isSilver = rank > goldCutoff && rank <= silverCutoff;
+
+                const card = document.createElement('div');
+                card.className = `standing-card ${isGold ? 'is-gold' : ''} ${isSilver ? 'is-silver' : ''}`;
+
+                const flagUrl = getCivFlagUrl(player.civId);
+                const flagBgHtml = flagUrl ? `<div class="card-flag-bg" style="background-image: url('${flagUrl}')"></div>` : '';
+
+                let badgeTagHtml = '';
+                if (isGold) {
+                    badgeTagHtml = `<span class="card-qual-tag tag-gold">👑 LEGA ORO</span>`;
+                } else if (isSilver) {
+                    badgeTagHtml = `<span class="card-qual-tag tag-silver">🛡️ LEGA D'ARGENTO</span>`;
+                } else {
+                    badgeTagHtml = `<span class="card-qual-tag tag-running">IN GARA</span>`;
+                }
+
+                const civName = getCivDisplayName(player.civId);
+                const civNameHtml = civName ? `<span class="card-civ-name">• ${civName}</span>` : '';
+
+                card.innerHTML = `
+                    ${flagBgHtml}
+                    <div class="card-rank-badge">#${rank}</div>
+                    <div class="card-player-info">
+                        <div class="card-player-name">${escapeHtml(player.name || 'Player')}</div>
+                        <div class="card-player-sub">
+                            ${badgeTagHtml}
+                            ${civNameHtml}
+                        </div>
+                    </div>
+                    <div class="card-stats">
+                        <div class="stat-box">
+                            <div class="stat-value">${player.wins ?? 0} - ${player.losses ?? 0}</div>
+                            <div class="stat-label">V - P</div>
+                        </div>
+                        <div class="stat-box highlight-pts">
+                            <div class="stat-value">${player.points ?? 0}</div>
+                            <div class="stat-label">PUNTI</div>
+                        </div>
+                        ${player.tieBreak !== undefined ? `
+                        <div class="stat-box">
+                            <div class="stat-value">${player.tieBreak}</div>
+                            <div class="stat-label">TB / DIFF</div>
+                        </div>` : ''}
+                    </div>
+                `;
+
+                // Distribute evenly between 2 columns (up to 12-16 players)
+                if (index < 6 || (standings.length > 12 && index < Math.ceil(standings.length / 2))) {
+                    leftCol.appendChild(card);
+                } else {
+                    rightCol.appendChild(card);
+                }
+            });
+
+            if (standings.length === 0) {
+                leftCol.innerHTML = `<div class="empty-matches-msg">Nessun giocatore in classifica</div>`;
+            }
+        }
+
+        function renderRounds(state) {
+            const roundsData = state.rounds || {};
+
+            for (let r = 1; r <= 4; r++) {
+                const roundContainer = document.getElementById(`matches-round-${r}`);
+                if (!roundContainer) continue;
+                roundContainer.innerHTML = '';
+
+                const matches = roundsData[r] || [];
+
+                if (matches.length === 0) {
+                    roundContainer.innerHTML = `<div class="empty-matches-msg">Turno in attesa</div>`;
+                    continue;
+                }
+
+                matches.forEach(m => {
+                    const matchCard = document.createElement('div');
+                    matchCard.className = 'match-card';
+
+                    const p1Name = m.p1?.name || '--';
+                    const p2Name = m.p2?.name || '--';
+                    const p1Score = m.p1?.score ?? (m.winner === 1 ? 1 : 0);
+                    const p2Score = m.p2?.score ?? (m.winner === 2 ? 1 : 0);
+
+                    const p1Winner = m.winner === 1;
+                    const p2Winner = m.winner === 2;
+                    const isDone = p1Winner || p2Winner;
+
+                    const p1Flag = getCivFlagUrl(m.p1?.civId);
+                    const p2Flag = getCivFlagUrl(m.p2?.civId);
+
+                    matchCard.innerHTML = `
+                        <div class="match-participant ${p1Winner ? 'is-winner' : ''} ${isDone && !p1Winner ? 'is-loser' : ''}">
+                            <div class="participant-left">
+                                ${p1Flag ? `<div class="participant-flag" style="background-image: url('${p1Flag}')"></div>` : ''}
+                                <span class="participant-name">${escapeHtml(p1Name)}</span>
+                            </div>
+                            <span class="participant-score">${isDone ? p1Score : '-'}</span>
+                        </div>
+                        <div class="match-participant ${p2Winner ? 'is-winner' : ''} ${isDone && !p2Winner ? 'is-loser' : ''}">
+                            <div class="participant-left">
+                                ${p2Flag ? `<div class="participant-flag" style="background-image: url('${p2Flag}')"></div>` : ''}
+                                <span class="participant-name">${escapeHtml(p2Name)}</span>
+                            </div>
+                            <span class="participant-score">${isDone ? p2Score : '-'}</span>
+                        </div>
+                    `;
+
+                    roundContainer.appendChild(matchCard);
+                });
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return String(text).replace(/[&<>"']/g, m => map[m]);
+        }
+
+        async function init() {
+            try {
+                const { data } = await client.from('stream_overlays').select('state, background_url').eq('id', OVERLAY_ID).single();
+                if (data) render(data.state, data.background_url);
+            } catch (err) {
+                console.error('Init error:', err);
+            }
+
+            // Realtime postgres changes channel
+            client.channel(`public:${OVERLAY_ID}`)
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stream_overlays', filter: `id=eq.${OVERLAY_ID}` }, payload => {
+                    render(payload.new.state, payload.new.background_url);
+                })
+                .subscribe();
+
+            // Polling fallback every 5 seconds
+            setInterval(async () => {
+                try {
+                    const { data } = await client.from('stream_overlays').select('state, background_url').eq('id', OVERLAY_ID).single();
+                    if (data) render(data.state, data.background_url);
+                } catch (e) {}
+            }, 5000);
+        }
+
+        init();
+    </script>
+</body>
+</html>
