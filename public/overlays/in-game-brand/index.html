@@ -73,20 +73,20 @@
         }
 
         /* =========================================================================
-           2. MINIMAP TOP-RIGHT CORNER (AoEItalia Logo - 45° Allineamento Perfetto)
+           2. MINIMAP UNIFIED FRAME & PANELS (384x444 Corner Wrapper)
            ========================================================================= */
-        #minimap-crest-badge {
+        #minimap-brand-wrapper {
             position: absolute;
             right: 0;
-            top: 708px;
-            width: 202px;
-            height: 202px;
+            bottom: 0;
+            width: 384px;
+            height: 444px;
             z-index: 100;
             pointer-events: none;
             transition: all 0.2s ease;
         }
 
-        .minimap-crest-svg {
+        .minimap-wrapper-svg {
             position: absolute;
             inset: 0;
             width: 100%;
@@ -94,12 +94,13 @@
             filter: drop-shadow(-4px 4px 15px rgba(0, 0, 0, 0.9));
         }
 
-        .minimap-crest-content {
+        /* Logo AoE Italia Top-Right Content */
+        .minimap-logo-content {
             position: absolute;
-            top: 22px;
-            right: 22px;
-            width: 125px;
-            height: 95px;
+            top: 60px;
+            right: 14px;
+            width: 140px;
+            height: 120px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -107,34 +108,13 @@
         }
 
         .minimap-logo-img {
-            max-height: 68px;
-            max-width: 110px;
+            max-height: 72px;
+            max-width: 120px;
             object-fit: contain;
             filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 10px rgba(212, 175, 55, 0.35));
         }
 
-        /* =========================================================================
-           3. MINIMAP BOTTOM-RIGHT CORNER (Mappa & Giornata - 45° Allineamento Perfetto)
-           ========================================================================= */
-        #minimap-bottom-corner-panel {
-            position: absolute;
-            right: 0;
-            bottom: 0;
-            width: 202px;
-            height: 214px;
-            z-index: 100;
-            pointer-events: none;
-            transition: all 0.2s ease;
-        }
-
-        .minimap-bottom-svg {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            filter: drop-shadow(-4px -4px 15px rgba(0, 0, 0, 0.9));
-        }
-
+        /* Map Name & Day Bottom-Right Content */
         .minimap-bottom-content {
             position: absolute;
             bottom: 12px;
@@ -180,11 +160,11 @@
         <div class="top-tournament-title" id="top-title-text">Ends of Summer Champions</div>
     </div>
 
-    <!-- 2. CREST LOGO AOE ITALIA (In alto a destra sulla minimappa) -->
-    <div id="minimap-crest-badge">
-        <svg class="minimap-crest-svg" viewBox="0 0 202 202" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- 2. MINIMAP COMPLETE BRAND WRAPPER (Frame + Logo + Mappa & Giornata) -->
+    <div id="minimap-brand-wrapper">
+        <svg class="minimap-wrapper-svg" viewBox="0 0 384 444" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
-                <linearGradient id="crestBg" x1="0%" y1="0%" x2="100%" y2="100%">
+                <linearGradient id="panelBg" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stop-color="#0b1224" stop-opacity="0.98"/>
                     <stop offset="100%" stop-color="#040711" stop-opacity="0.98"/>
                 </linearGradient>
@@ -194,36 +174,30 @@
                     <stop offset="100%" stop-color="#aa8c2c"/>
                 </linearGradient>
             </defs>
-            <!-- Triangle: from (0,0) across top to (202,0), down to (202,202), diagonal back to (0,0) -->
-            <polygon points="0,0 202,0 202,202" fill="url(#crestBg)"/>
-            <!-- Golden border line along the minimap diagonal -->
-            <line x1="0" y1="0" x2="202" y2="202" stroke="url(#goldStroke)" stroke-width="2.5" stroke-linecap="round"/>
+
+            <!-- 1. Top-Right Panel (covers game toggles from Y=0 to Y=72, diagonal down to Y=264) -->
+            <g id="svg-minimap-top-group">
+                <polygon points="192,0 384,0 384,264 192,72" fill="url(#panelBg)"/>
+                <line x1="192" y1="72" x2="384" y2="264" stroke="url(#goldStroke)" stroke-width="3" stroke-linecap="round"/>
+            </g>
+
+            <!-- 2. Bottom-Right Panel (from right vertex at 384,260 down-left to bottom vertex at 192,438, down to screen bottom) -->
+            <g id="svg-minimap-bottom-group">
+                <polygon points="384,260 384,444 192,444 192,438" fill="url(#panelBg)"/>
+                <line x1="384" y1="260" x2="192" y2="438" stroke="url(#goldStroke)" stroke-width="3" stroke-linecap="round"/>
+            </g>
+
+            <!-- 3. Outer Left Diamond Wrapper Frame (wrapping top-left and bottom-left facets) -->
+            <polyline points="192,72 0,264 192,438" stroke="url(#goldStroke)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <div class="minimap-crest-content">
+
+        <!-- AoE Italia Logo (Top-Right) -->
+        <div class="minimap-logo-content" id="minimap-logo-content">
             <img src="/aoeitalia-logo.png" alt="AoE Italia" class="minimap-logo-img">
         </div>
-    </div>
 
-    <!-- 3. AREA SCURA SOTTO LA MINIMAPPA (Giornata + Nome Mappa) -->
-    <div id="minimap-bottom-corner-panel">
-        <svg class="minimap-bottom-svg" viewBox="0 0 202 214" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <linearGradient id="bottomBg" x1="100%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#0b1224" stop-opacity="0.98"/>
-                    <stop offset="100%" stop-color="#040711" stop-opacity="0.98"/>
-                </linearGradient>
-                <linearGradient id="bottomGold" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#aa8c2c"/>
-                    <stop offset="50%" stop-color="#d4af37"/>
-                    <stop offset="100%" stop-color="#ffd700"/>
-                </linearGradient>
-            </defs>
-            <!-- Polygon: from (202,0) down to (202,214), across to (0,214), up to (0,202), diagonal back to (202,0) -->
-            <polygon points="202,0 202,214 0,214 0,202" fill="url(#bottomBg)"/>
-            <!-- Golden border line along the minimap diagonal -->
-            <line x1="202" y1="0" x2="0" y2="202" stroke="url(#bottomGold)" stroke-width="2.5" stroke-linecap="round"/>
-        </svg>
-        <div class="minimap-bottom-content">
+        <!-- Map & Day Info (Bottom-Right) -->
+        <div class="minimap-bottom-content" id="minimap-info-content">
             <div class="minimap-map-name" id="minimap-map-name">Dry Arabia</div>
             <div class="minimap-day-text" id="minimap-day-text">Giornata 1</div>
         </div>
@@ -267,8 +241,11 @@
             document.getElementById('top-title-text').innerText = formattedTitle;
 
             // Minimap Elements
-            const minimapCrest = document.getElementById('minimap-crest-badge');
-            const minimapBottom = document.getElementById('minimap-bottom-corner-panel');
+            const minimapWrapper = document.getElementById('minimap-brand-wrapper');
+            const minimapTopGroup = document.getElementById('svg-minimap-top-group');
+            const minimapBottomGroup = document.getElementById('svg-minimap-bottom-group');
+            const minimapLogo = document.getElementById('minimap-logo-content');
+            const minimapInfo = document.getElementById('minimap-info-content');
             const minimapDay = document.getElementById('minimap-day-text');
             const minimapMap = document.getElementById('minimap-map-name');
 
@@ -283,26 +260,27 @@
             }
 
             if (s.showMinimapCrest === false) {
-                minimapCrest.classList.add('hidden-element');
+                if (minimapTopGroup) minimapTopGroup.classList.add('hidden-element');
+                if (minimapLogo) minimapLogo.classList.add('hidden-element');
             } else {
-                minimapCrest.classList.remove('hidden-element');
+                if (minimapTopGroup) minimapTopGroup.classList.remove('hidden-element');
+                if (minimapLogo) minimapLogo.classList.remove('hidden-element');
             }
 
             if (s.showMinimapInfo === false) {
-                minimapBottom.classList.add('hidden-element');
+                if (minimapBottomGroup) minimapBottomGroup.classList.add('hidden-element');
+                if (minimapInfo) minimapInfo.classList.add('hidden-element');
             } else {
-                minimapBottom.classList.remove('hidden-element');
+                if (minimapBottomGroup) minimapBottomGroup.classList.remove('hidden-element');
+                if (minimapInfo) minimapInfo.classList.remove('hidden-element');
             }
 
             // Fine-tune offsets
             if (s.topBannerOffsetY !== undefined) {
                 topBanner.style.top = `${136 + Number(s.topBannerOffsetY)}px`;
             }
-            if (s.minimapCrestOffsetY !== undefined) {
-                minimapCrest.style.top = `${708 + Number(s.minimapCrestOffsetY)}px`;
-            }
             if (s.minimapBottomOffsetY !== undefined) {
-                minimapBottom.style.bottom = `${0 + Number(s.minimapBottomOffsetY)}px`;
+                minimapWrapper.style.bottom = `${0 + Number(s.minimapBottomOffsetY)}px`;
             }
         }
 
