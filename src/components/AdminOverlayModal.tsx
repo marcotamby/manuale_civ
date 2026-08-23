@@ -20,6 +20,7 @@ import { AoE4MatchDashboard } from './AoE4MatchDashboard';
 import { TournamentOverlayDashboard } from './TournamentOverlayDashboard';
 import { TournamentOverlay2v2Dashboard } from './TournamentOverlay2v2Dashboard';
 import { TournamentOverlaySwissDashboard } from './TournamentOverlaySwissDashboard';
+import { InGameBrandDashboard } from './InGameBrandDashboard';
 import { DraftMatchingDashboard } from './DraftMatchingDashboard';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
@@ -60,6 +61,13 @@ const OVERLAYS: OverlayItem[] = [
     description: 'Classifica 4 turni Bo1 (Top 2 Oro, Top 3-4 Argento) con tabellone e sync Start.gg.',
     path: '/overlays/tournament-swiss/index.html',
     icon: Trophy
+  },
+  {
+    id: 'in-game-brand',
+    name: 'In-Game Brand (1V1)',
+    description: 'Overlay trasparente in-game: logo AoEItalia e torneo in alto sotto HUD, badge e info minimappa in basso a destra.',
+    path: '/overlays/in-game-brand/index.html',
+    icon: ShieldCheck
   },
   {
     id: 'tournament-2v2-low-match',
@@ -710,7 +718,11 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                                 top: '50%',
                                 transform: `translate(-50%, -50%) scale(${previewScale})`,
                                 transformOrigin: 'center center',
-                                ...(overlayDisplayBackground && { backgroundImage: `url(${overlayDisplayBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' })
+                                ...(overlayDisplayBackground
+                                  ? { backgroundImage: `url(${overlayDisplayBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+                                  : selectedOverlay.id === 'in-game-brand'
+                                    ? { backgroundImage: `url('/overlays/in-game-brand/reference_ingame.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center' }
+                                    : {})
                               }} 
                               title="Overlay Preview" 
                             />
@@ -724,6 +736,11 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                         <AoE4MatchDashboard onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} />
                       ) : selectedOverlay.id === 'draft-matching' ? (
                         <DraftMatchingDashboard onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} />
+                      ) : selectedOverlay.id === 'in-game-brand' ? (
+                        <InGameBrandDashboard 
+                          onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} 
+                          onActivePathChange={(path) => setCurrentOverlayUrl(path)}
+                        />
                       ) : selectedOverlay.id === 'tournament-swiss' ? (
                         <TournamentOverlaySwissDashboard 
                           onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} 

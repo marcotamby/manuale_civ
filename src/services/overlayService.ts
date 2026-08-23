@@ -32,6 +32,21 @@ export interface OverlayState {
   standings?: any[];
   rounds?: any;
   startgg?: any;
+  // In-Game Brand fields
+  tournamentTitle?: string;
+  stageSubtitle?: string;
+  matchFormat?: string;
+  dayText?: string;
+  mapName?: string;
+  minimapBrandTitle?: string;
+  minimapBrandSub?: string;
+  showTopBanner?: boolean;
+  showMinimapCrest?: boolean;
+  showMinimapInfo?: boolean;
+  theme?: string;
+  topBannerOffsetY?: number;
+  minimapCrestOffsetY?: number;
+  minimapInfoOffsetY?: number;
 }
 
 export const overlayService = {
