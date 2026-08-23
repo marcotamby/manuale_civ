@@ -6,7 +6,7 @@
     <title>Swiss Tournament Overlay</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:ital,wght@0,400;0,700;1,400;1,700&family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@700;900&family=Eagle+Lake&family=Fondamento:ital@0;1&family=MedievalSharp&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -44,87 +44,97 @@
         .ambient-overlay {
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at 50% 15%, rgba(212, 175, 55, 0.08) 0%, transparent 65%),
+            background: radial-gradient(circle at 50% 12%, rgba(212, 175, 55, 0.12) 0%, transparent 60%),
                         radial-gradient(circle at 85% 85%, rgba(148, 163, 184, 0.07) 0%, transparent 60%);
             pointer-events: none;
             z-index: 1;
         }
 
-        /* Header Bar */
+        /* Header Bar (Floating, Seamless - No Big Box) */
         #header-bar {
             position: absolute;
-            top: 24px;
+            top: 20px;
             left: 50px;
             right: 50px;
-            height: 96px;
-            background: rgba(8, 13, 24, 0.88);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            height: 100px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 32px;
+            padding: 0;
             z-index: 10;
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
         }
 
         .header-logo-badge {
-            width: 54px;
-            height: 54px;
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(15, 23, 42, 0.8));
+            width: 52px;
+            height: 52px;
+            background: rgba(8, 13, 24, 0.8);
+            backdrop-filter: blur(12px);
             border: 1.5px solid var(--gold-main);
             border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
-            box-shadow: 0 0 20px var(--gold-glow);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px var(--gold-glow);
         }
 
-        .header-titles {
+        .header-center {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            align-items: center;
+            text-align: center;
+            pointer-events: auto;
         }
 
         .header-main-title {
-            font-family: 'Cinzel', serif;
-            font-size: 24px;
-            font-weight: 900;
+            font-family: 'Eagle Lake', 'MedievalSharp', 'Almendra', cursive, serif;
+            font-size: 42px;
+            font-weight: 700;
             letter-spacing: 2px;
-            text-transform: uppercase;
-            background: linear-gradient(180deg, #ffffff 30%, #ffd700 100%);
+            background: linear-gradient(180deg, #ffffff 15%, #ffd700 80%, #d4af37 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
-            max-width: 850px;
+            filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 25px rgba(212, 175, 55, 0.45));
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.9);
+            max-width: 950px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            line-height: 1.15;
         }
 
         .header-subtitle {
+            font-family: 'MedievalSharp', 'Cinzel', serif;
             font-size: 13px;
             font-weight: 700;
-            color: #94a3b8;
-            letter-spacing: 3px;
+            color: #cbd5e1;
+            letter-spacing: 4px;
             text-transform: uppercase;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            margin-top: 4px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
         }
 
         .header-subtitle .dot {
             width: 5px;
             height: 5px;
-            background: var(--gold-main);
+            background: var(--cyan-main);
+            box-shadow: 0 0 8px var(--cyan-glow);
             border-radius: 50%;
         }
 
@@ -138,29 +148,31 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            background: rgba(0, 210, 255, 0.12);
+            background: rgba(8, 13, 24, 0.8);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(0, 210, 255, 0.45);
-            padding: 8px 18px;
-            border-radius: 12px;
+            padding: 9px 20px;
+            border-radius: 14px;
             font-size: 12px;
             font-weight: 900;
             letter-spacing: 2px;
             text-transform: uppercase;
             color: var(--cyan-bright);
-            box-shadow: 0 0 18px var(--cyan-glow);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 20px var(--cyan-glow);
         }
 
         .day-badge {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
+            background: rgba(8, 13, 24, 0.8);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 8px 18px;
-            border-radius: 12px;
+            padding: 9px 20px;
+            border-radius: 14px;
             font-size: 13px;
             font-weight: 900;
             letter-spacing: 1.5px;
             text-transform: uppercase;
             color: #fff;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
         }
 
         .day-badge span {
@@ -636,17 +648,18 @@
 <body>
     <div class="ambient-overlay"></div>
 
-    <!-- Header Bar -->
+    <!-- Floating Seamless Header -->
     <div id="header-bar">
         <div class="header-left">
             <div class="header-logo-badge">⚔️</div>
-            <div class="header-titles">
-                <div id="main-title" class="header-main-title">TORNEO AOE4 SVIZZERA</div>
-                <div class="header-subtitle">
-                    <span id="sub-format">QUALIFICAZIONI SVIZZERA</span>
-                    <span class="dot"></span>
-                    <span id="sub-mode">4 TURNI BO1</span>
-                </div>
+        </div>
+
+        <div class="header-center">
+            <div id="main-title" class="header-main-title">TORNEO AOE4 SVIZZERA</div>
+            <div class="header-subtitle">
+                <span id="sub-format">QUALIFICAZIONI SVIZZERA</span>
+                <span class="dot"></span>
+                <span id="sub-mode">4 TURNI BO1</span>
             </div>
         </div>
 
