@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -16,7 +16,7 @@
             --cyan-main: #00d2ff;
             --cyan-bright: #38bdf8;
             --cyan-glow: rgba(0, 210, 255, 0.45);
-            --bg-glass: rgba(7, 12, 22, 0.94);
+            --bg-glass: rgba(7, 12, 22, 0.96);
             --border-glass: rgba(212, 175, 55, 0.5);
         }
 
@@ -75,55 +75,54 @@
         }
 
         /* =========================================================================
-           2. CREST LOGO AOE ITALIA (Top-Right of Minimap Diamond)
+           2. CREST LOGO AOE ITALIA (Top-Right of Minimap Diamond - Angolo Masters)
            ========================================================================= */
         #minimap-crest-badge {
             position: absolute;
             right: 0;
             top: 625px;
-            width: 148px;
-            height: 96px;
-            background: linear-gradient(135deg, rgba(8, 14, 26, 0.96) 0%, rgba(16, 22, 38, 0.92) 100%);
-            backdrop-filter: blur(12px);
-            border: 2px solid var(--gold-main);
-            border-right: none;
-            clip-path: polygon(35px 0, 100% 0, 100% 100%, 0 100%);
+            width: 192px;
+            height: 185px;
+            background: linear-gradient(135deg, rgba(8, 14, 28, 0.97) 0%, rgba(16, 22, 38, 0.94) 100%);
+            backdrop-filter: blur(14px);
+            border-bottom: 2.5px solid var(--gold-main);
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 12px 8px 24px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.9), 0 0 18px rgba(212, 175, 55, 0.3);
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: flex-start;
+            padding: 16px 24px 0 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.95);
             z-index: 100;
             transition: all 0.25s ease;
         }
 
         .minimap-logo-img {
-            height: 54px;
+            height: 68px;
             width: auto;
             object-fit: contain;
-            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.9));
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.95));
         }
 
         /* =========================================================================
-           3. AREA SCURA SOTTO LA MINIMAPPA (Hugging Minimap Perimeter)
+           3. AREA SCURA SOTTO LA MINIMAPPA (Hugging Bottom-Right Minimap Perimeter)
            ========================================================================= */
         #minimap-bottom-corner-panel {
             position: absolute;
             right: 0;
             bottom: 0;
-            width: 290px;
-            height: 120px;
-            background: linear-gradient(135deg, rgba(7, 12, 22, 0.96) 0%, rgba(12, 18, 32, 0.94) 100%);
+            width: 250px;
+            height: 145px;
+            background: linear-gradient(135deg, rgba(8, 14, 28, 0.97) 0%, rgba(14, 20, 36, 0.94) 100%);
             backdrop-filter: blur(14px);
-            border-top: 2px solid var(--gold-main);
-            border-left: 2px solid var(--gold-main);
-            clip-path: polygon(95px 0, 100% 0, 100% 100%, 0 100%);
+            border-top: 2.5px solid var(--gold-main);
+            clip-path: polygon(100% 0, 100% 100%, 0 100%, 0 65%);
             box-shadow: -4px -4px 25px rgba(0, 0, 0, 0.95);
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            justify-content: center;
-            padding: 12px 20px 14px 30px;
+            justify-content: flex-end;
+            padding: 0 20px 14px 0;
             text-align: right;
             z-index: 100;
             pointer-events: none;
@@ -132,7 +131,7 @@
 
         .minimap-map-name {
             font-family: 'Inter', sans-serif;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 900;
             letter-spacing: 0.8px;
             color: #ffffff;
@@ -149,7 +148,7 @@
             color: var(--cyan-bright);
             text-transform: uppercase;
             text-shadow: 0 0 10px var(--cyan-glow), 0 2px 6px rgba(0, 0, 0, 1);
-            margin-top: 3px;
+            margin-top: 4px;
         }
 
         .hidden-element {
@@ -159,7 +158,7 @@
 </head>
 <body>
 
-    <!-- 1. TOP BRAND BANNER (Solo nome torneo) -->
+    <!-- 1. TOP BRAND BANNER (Solo nome torneo - Continuazione HUD) -->
     <div id="top-brand-banner">
         <div class="top-tournament-title" id="top-title-text">Ends of Summer Champions</div>
     </div>
