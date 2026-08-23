@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   Save, 
   Trophy, 
@@ -11,14 +11,13 @@ import {
   Loader2, 
   CheckCircle2, 
   AlertCircle, 
-  Eye, 
   Layers, 
-  Calendar, 
   ArrowUpDown, 
   Calculator,
-  Copy
+  Copy,
+  Check,
+  X
 } from 'lucide-react';
-import { civilizationsData } from '../data/aoe4Data';
 import { overlayService } from '../services/overlayService';
 import { fetchTournament, fetchPhaseGroups, fetchPhaseGroupSets } from '../services/startgg';
 import type { StartGGTournament } from '../services/startgg';
@@ -30,7 +29,6 @@ interface TournamentOverlaySwissDashboardProps {
 export interface SwissStandingPlayer {
   id: string;
   name: string;
-  civId?: string;
   wins: number;
   losses: number;
   points: number;
@@ -41,7 +39,121 @@ export interface SwissMatchItem {
   id: string;
   p1: { name: string; civId?: string; score: number };
   p2: { name: string; civId?: string; score: number };
-  winner: 0 | 1 | 2; // 0 none/pending, 1 p1, 2 p2
+  winner: 0 | 1 | 2; // 0 none, 1 p1, 2 p2
+}
+
+const CIV_LIST = [
+  { id: 'abbasid', name: 'Abbaside', flag: '/civs/Abbasid Dynasty.webp' },
+  { id: 'ayyubids', name: 'Ayyubidi', flag: '/civs/Ayyubids.webp' },
+  { id: 'byzantines', name: 'Bizantini', flag: '/civs/Byzantines.webp' },
+  { id: 'chinese', name: 'Cinesi', flag: '/civs/Chinese.webp' },
+  { id: 'delhi', name: 'Delhi', flag: '/civs/Delhi Sultanate.webp' },
+  { id: 'english', name: 'Inglesi', flag: '/civs/English.webp' },
+  { id: 'french', name: 'Francesi', flag: '/civs/French.webp' },
+  { id: 'goldenhorde', name: 'Orda d\'Oro', flag: '/civs/Golden Horde.webp' },
+  { id: 'hre', name: 'SRI', flag: '/civs/Holy Roman Empire.webp' },
+  { id: 'japanese', name: 'Giapponesi', flag: '/civs/Japanese.webp' },
+  { id: 'jeannedarc', name: 'Jeanne d\'Arc', flag: '/civs/jeannedarc.webp' },
+  { id: 'jin-dynasty', name: 'Dinastia Jin', flag: '/civs/Jin Dynasty.webp' },
+  { id: 'lancaster', name: 'Lancaster', flag: '/civs/House of Lancaster.webp' },
+  { id: 'macedonian', name: 'Macedoni', flag: '/civs/Macedonian Dynasty.webp' },
+  { id: 'malians', name: 'Maliesi', flag: '/civs/Malians.webp' },
+  { id: 'mongols', name: 'Mongoli', flag: '/civs/Mongols.webp' },
+  { id: 'orderofthedragon', name: 'Dragone', flag: '/civs/Order of the Dragon.webp' },
+  { id: 'ottomans', name: 'Ottomani', flag: '/civs/Ottomans.webp' },
+  { id: 'rus', name: 'Rus', flag: '/civs/Rus.webp' },
+  { id: 'sengoku', name: 'Sengoku', flag: '/civs/Sengoku Daimyo.webp' },
+  { id: 'templar', name: 'Templari', flag: '/civs/Knights Templar.webp' },
+  { id: 'tughlaq', name: 'Tughlaq', flag: '/civs/Tughlaq Dynasty.webp' },
+  { id: 'zhuxi', name: 'Zhu Xi', flag: '/civs/Zhu Xis Legacy.webp' },
+];
+
+function CivDropdown({ value, onChange }: { value: string; onChange: (civId: string) => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const selectedCiv = CIV_LIST.find(c => c.id.toLowerCase() === (value || '').toLowerCase());
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
+
+  return (
+    <div className="relative w-44 shrink-0" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between gap-2 bg-black/60 hover:bg-black/80 border border-white/10 hover:border-cyan-500/40 rounded-xl px-2.5 py-1.5 text-xs text-white transition-all shadow-sm focus:outline-none"
+      >
+        <div className="flex items-center gap-2 min-w-0">
+          {selectedCiv ? (
+            <>
+              <img 
+                src={selectedCiv.flag} 
+                alt={selectedCiv.name} 
+                className="w-5 h-3.5 object-cover rounded-xs border border-white/20 shrink-0" 
+              />
+              <span className="truncate font-semibold text-gray-200">{selectedCiv.name}</span>
+            </>
+          ) : (
+            <span className="text-gray-500 font-medium">Scegli Civ...</span>
+          )}
+        </div>
+        <ChevronDown size={14} className={`text-cyan-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-1.5 w-52 max-h-60 overflow-y-auto bg-[#0d1322] border border-cyan-500/30 rounded-2xl shadow-2xl z-50 p-1.5 space-y-1 custom-scrollbar animate-in fade-in zoom-in-95 duration-150">
+          <button
+            type="button"
+            onClick={() => {
+              onChange('');
+              setIsOpen(false);
+            }}
+            className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              !value ? 'bg-cyan-500/20 text-cyan-300' : 'text-gray-400 hover:bg-white/5 hover:text-white'
+            }`}
+          >
+            <X size={12} className="text-gray-500" />
+            <span>Nessuna Civ</span>
+          </button>
+
+          {CIV_LIST.map((civ) => {
+            const isSelected = civ.id.toLowerCase() === (value || '').toLowerCase();
+            return (
+              <button
+                key={civ.id}
+                type="button"
+                onClick={() => {
+                  onChange(civ.id);
+                  setIsOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  isSelected 
+                    ? 'bg-gradient-to-r from-cyan-500/20 to-transparent border border-cyan-500/40 text-cyan-300' 
+                    : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <img src={civ.flag} alt={civ.name} className="w-5 h-3.5 object-cover rounded-xs border border-white/10 shrink-0" />
+                  <span className="truncate">{civ.name}</span>
+                </div>
+                {isSelected && <Check size={12} className="text-cyan-400 shrink-0" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 }
 
 const DEFAULT_STATE = {
@@ -52,14 +164,14 @@ const DEFAULT_STATE = {
   goldSlotsCount: 2,
   silverSlotsCount: 2,
   standings: [
-    { id: '1', name: 'Giocatore 1', civId: 'french', wins: 0, losses: 0, points: 0, tieBreak: 0 },
-    { id: '2', name: 'Giocatore 2', civId: 'english', wins: 0, losses: 0, points: 0, tieBreak: 0 },
-    { id: '3', name: 'Giocatore 3', civId: 'hre', wins: 0, losses: 0, points: 0, tieBreak: 0 },
-    { id: '4', name: 'Giocatore 4', civId: 'byzantines', wins: 0, losses: 0, points: 0, tieBreak: 0 },
-    { id: '5', name: 'Giocatore 5', civId: 'rus', wins: 0, losses: 0, points: 0, tieBreak: 0 },
-    { id: '6', name: 'Giocatore 6', civId: 'mongols', wins: 0, losses: 0, points: 0, tieBreak: 0 },
-    { id: '7', name: 'Giocatore 7', civId: 'ottomans', wins: 0, losses: 0, points: 0, tieBreak: 0 },
-    { id: '8', name: 'Giocatore 8', civId: 'chinese', wins: 0, losses: 0, points: 0, tieBreak: 0 }
+    { id: '1', name: 'Giocatore 1', wins: 0, losses: 0, points: 0, tieBreak: 0 },
+    { id: '2', name: 'Giocatore 2', wins: 0, losses: 0, points: 0, tieBreak: 0 },
+    { id: '3', name: 'Giocatore 3', wins: 0, losses: 0, points: 0, tieBreak: 0 },
+    { id: '4', name: 'Giocatore 4', wins: 0, losses: 0, points: 0, tieBreak: 0 },
+    { id: '5', name: 'Giocatore 5', wins: 0, losses: 0, points: 0, tieBreak: 0 },
+    { id: '6', name: 'Giocatore 6', wins: 0, losses: 0, points: 0, tieBreak: 0 },
+    { id: '7', name: 'Giocatore 7', wins: 0, losses: 0, points: 0, tieBreak: 0 },
+    { id: '8', name: 'Giocatore 8', wins: 0, losses: 0, points: 0, tieBreak: 0 }
   ] as SwissStandingPlayer[],
   rounds: {
     1: [
@@ -86,12 +198,12 @@ const OVERLAY_ID = 'tournament-swiss';
 
 export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySwissDashboardProps) {
   const [state, setState] = useState(DEFAULT_STATE);
-  const [activeTab, setActiveTab] = useState<'standings' | 'rounds' | 'startgg' | 'settings'>('standings');
+  const [activeTab, setActiveTab] = useState<'standings' | 'rounds' | 'startgg'>('standings');
   const [selectedRound, setSelectedRound] = useState<number>(1);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // Start.gg integration states
+  // Start.gg states
   const [startggSlugInput, setStartggSlugInput] = useState('');
   const [startggLoading, setStartggLoading] = useState(false);
   const [startggTournamentData, setStartggTournamentData] = useState<StartGGTournament | null>(null);
@@ -100,7 +212,7 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
   const [startggStatus, setStartggStatus] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
   const [isAutoSyncing, setIsAutoSyncing] = useState(false);
 
-  // Load initial state from Supabase
+  // Load initial state
   useEffect(() => {
     overlayService.getOverlayState(OVERLAY_ID)
       .then(savedState => {
@@ -133,7 +245,7 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
       });
   }, [onError]);
 
-  // Save State Helper
+  // Save State
   const handleSave = async (customState?: typeof state) => {
     const stateToSave = customState || state;
     setIsSaving(true);
@@ -153,8 +265,7 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
   const handleAddPlayer = () => {
     const newPlayer: SwissStandingPlayer = {
       id: `p_${Date.now()}`,
-      name: `Nuovo Giocatore ${state.standings.length + 1}`,
-      civId: 'english',
+      name: `Giocatore ${state.standings.length + 1}`,
       wins: 0,
       losses: 0,
       points: 0,
@@ -258,17 +369,14 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
     handleSave(newState);
   };
 
-  // Recalculate standings automatically from rounds results
   const handleAutoCalculateStandings = () => {
-    const playerStatsMap: Record<string, { name: string; civId?: string; wins: number; losses: number; points: number }> = {};
+    const playerStatsMap: Record<string, { name: string; wins: number; losses: number; points: number }> = {};
 
-    // Initialize with existing players
     state.standings.forEach(p => {
       const cleanName = p.name.trim().toLowerCase();
       if (cleanName) {
         playerStatsMap[cleanName] = {
           name: p.name.trim(),
-          civId: p.civId,
           wins: 0,
           losses: 0,
           points: 0
@@ -276,7 +384,6 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
       }
     });
 
-    // Scan all 4 rounds
     for (let r = 1; r <= 4; r++) {
       const matches = state.rounds[r] || [];
       matches.forEach(m => {
@@ -286,17 +393,15 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
         if (p1Name) {
           const k1 = p1Name.toLowerCase();
           if (!playerStatsMap[k1]) {
-            playerStatsMap[k1] = { name: p1Name, civId: m.p1.civId, wins: 0, losses: 0, points: 0 };
+            playerStatsMap[k1] = { name: p1Name, wins: 0, losses: 0, points: 0 };
           }
-          if (m.p1.civId) playerStatsMap[k1].civId = m.p1.civId;
         }
 
         if (p2Name) {
           const k2 = p2Name.toLowerCase();
           if (!playerStatsMap[k2]) {
-            playerStatsMap[k2] = { name: p2Name, civId: m.p2.civId, wins: 0, losses: 0, points: 0 };
+            playerStatsMap[k2] = { name: p2Name, wins: 0, losses: 0, points: 0 };
           }
-          if (m.p2.civId) playerStatsMap[k2].civId = m.p2.civId;
         }
 
         if (m.winner === 1 && p1Name && p2Name) {
@@ -315,7 +420,6 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
       .map((p, idx) => ({
         id: `p_${idx + 1}`,
         name: p.name,
-        civId: p.civId || 'english',
         wins: p.wins,
         losses: p.losses,
         points: p.points,
@@ -343,7 +447,6 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
     setStartggStatus(null);
 
     try {
-      // Extract clean slug
       let cleanSlug = startggSlugInput.trim();
       if (cleanSlug.includes('start.gg/')) {
         const parts = cleanSlug.split('start.gg/');
@@ -385,14 +488,12 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
 
     setStartggLoading(true);
     try {
-      // Fetch phase groups
       const groups = await fetchPhaseGroups(selectedPhaseId);
       if (groups.length === 0) {
         setStartggStatus({ type: 'error', message: 'Nessun gruppo o girone trovato in questa fase.' });
         return;
       }
 
-      // Fetch sets for all phase groups
       const allSetsArrays = await Promise.all(
         groups.map(g => fetchPhaseGroupSets(g.id))
       );
@@ -403,12 +504,10 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
         return;
       }
 
-      // Organize sets into 4 rounds
       const parsedRounds: Record<number, SwissMatchItem[]> = { 1: [], 2: [], 3: [], 4: [] };
       const playerStats: Record<string, { name: string; wins: number; losses: number; points: number }> = {};
 
       allSets.forEach(set => {
-        // Round number in start.gg swiss is usually 1, 2, 3, 4
         const roundNum = Math.min(Math.max(Math.abs(set.round || 1), 1), 4);
 
         const slot1 = set.slots?.[0];
@@ -437,7 +536,6 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
           winner
         });
 
-        // Tally player points
         [p1Name, p2Name].forEach(name => {
           if (name && name !== '--' && !playerStats[name.toLowerCase()]) {
             playerStats[name.toLowerCase()] = { name, wins: 0, losses: 0, points: 0 };
@@ -455,12 +553,10 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
         }
       });
 
-      // Build standings
       const syncedStandings: SwissStandingPlayer[] = Object.values(playerStats)
         .map((p, i) => ({
           id: `startgg_${i + 1}`,
           name: p.name,
-          civId: 'english',
           wins: p.wins,
           losses: p.losses,
           points: p.points,
@@ -491,24 +587,22 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
 
       setStartggStatus({
         type: 'success',
-        message: `Sincronizzazione completata! ${allSets.length} match importati e classifica ricalcolata.`
+        message: `Sincronizzazione completata! ${allSets.length} match importati.`
       });
     } catch (err: any) {
       console.error('Error syncing start.gg:', err);
-      setStartggStatus({ type: 'error', message: err.message || 'Errore durante l\'import dei match da Start.gg.' });
+      setStartggStatus({ type: 'error', message: err.message || 'Errore durante l\'import da Start.gg.' });
     } finally {
       setStartggLoading(false);
     }
   };
 
-  // Auto-Sync loop if enabled
+  // Auto-Sync
   useEffect(() => {
     if (!isAutoSyncing || !selectedPhaseId) return;
-
     const interval = setInterval(() => {
       handleSyncStartggNow();
     }, 20000);
-
     return () => clearInterval(interval);
   }, [isAutoSyncing, selectedPhaseId]);
 
@@ -520,68 +614,68 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#0b0f19] text-white rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+    <div className="flex flex-col h-full bg-[#080c14] text-white rounded-2xl overflow-hidden border border-cyan-500/20 shadow-2xl">
       {/* Top Header Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-6 bg-gradient-to-r from-[#121829] to-[#0d121f] border-b border-white/10">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#D4AF37]/30 to-black border border-[#D4AF37]/50 flex items-center justify-center shadow-lg">
-            <Trophy className="w-6 h-6 text-[#D4AF37]" />
+      <div className="flex flex-wrap items-center justify-between gap-4 p-5 bg-gradient-to-r from-[#0d1424] via-[#090d18] to-[#0d1424] border-b border-white/10">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-500/20 to-slate-800 border border-cyan-400/40 flex items-center justify-center shadow-lg shadow-cyan-500/10">
+            <Trophy className="w-5 h-5 text-cyan-400" />
           </div>
           <div>
-            <h2 className="text-xl font-black uppercase tracking-wider text-white flex items-center gap-3">
+            <h2 className="text-lg font-black uppercase tracking-wider text-white flex items-center gap-2.5">
               Dashboard Svizzera 4 Turni
-              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#ffd700]">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-cyan-500/15 border border-cyan-400/30 text-cyan-300">
                 BO1
               </span>
             </h2>
-            <p className="text-xs text-gray-400 font-medium mt-0.5">
-              Gestione Classifica Live (Top 2 Oro, Top 3-4 Argento) & Tabellone Turni
+            <p className="text-[11px] text-slate-400 font-medium">
+              Gestione Classifica (Top 2 Oro, Top 3-4 Argento) & Tabellone Turni Bo1
             </p>
           </div>
         </div>
 
-        {/* Global Action Buttons */}
+        {/* Global Save Button */}
         <div className="flex items-center gap-3">
           {showSuccess && (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-green-500/20 border border-green-500/40 text-green-400 text-xs font-bold animate-in fade-in">
-              <CheckCircle2 size={16} /> Salvato su OBS!
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 text-xs font-bold animate-in fade-in">
+              <CheckCircle2 size={15} /> Salvato!
             </div>
           )}
 
           <button
             onClick={() => handleSave()}
             disabled={isSaving}
-            className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#D4AF37] to-[#b8860b] text-black font-black text-xs uppercase tracking-wider rounded-xl hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-[#D4AF37]/20 disabled:opacity-50"
+            className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-cyan-500/20 active:scale-95 disabled:opacity-50"
           >
-            {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+            {isSaving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
             Salva Modifiche
           </button>
         </div>
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex items-center px-6 border-b border-white/10 bg-[#080b13] gap-2 overflow-x-auto">
+      <div className="flex items-center px-6 border-b border-white/10 bg-[#060910] gap-2 overflow-x-auto">
         <button
           onClick={() => setActiveTab('standings')}
           className={`flex items-center gap-2 px-5 py-3.5 border-b-2 text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${
             activeTab === 'standings'
-              ? 'border-[#D4AF37] text-[#ffd700] bg-white/5'
-              : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'
+              ? 'border-cyan-400 text-cyan-300 bg-cyan-500/5'
+              : 'border-transparent text-slate-400 hover:text-white hover:bg-white/5'
           }`}
         >
-          <Trophy size={16} />
-          1. Classifica Svizzera (Schermata A)
+          <Trophy size={15} />
+          1. Classifica (Schermata A)
         </button>
 
         <button
           onClick={() => setActiveTab('rounds')}
           className={`flex items-center gap-2 px-5 py-3.5 border-b-2 text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${
             activeTab === 'rounds'
-              ? 'border-[#D4AF37] text-[#ffd700] bg-white/5'
-              : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'
+              ? 'border-cyan-400 text-cyan-300 bg-cyan-500/5'
+              : 'border-transparent text-slate-400 hover:text-white hover:bg-white/5'
           }`}
         >
-          <Layers size={16} />
+          <Layers size={15} />
           2. Turni & Match (Schermata B)
         </button>
 
@@ -589,117 +683,120 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
           onClick={() => setActiveTab('startgg')}
           className={`flex items-center gap-2 px-5 py-3.5 border-b-2 text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${
             activeTab === 'startgg'
-              ? 'border-[#00d2ff] text-[#00d2ff] bg-white/5'
-              : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'
+              ? 'border-cyan-400 text-cyan-300 bg-cyan-500/5'
+              : 'border-transparent text-slate-400 hover:text-white hover:bg-white/5'
           }`}
         >
-          <Link2 size={16} />
+          <Link2 size={15} />
           3. Sincronizzazione Start.gg
           {isAutoSyncing && (
             <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
           )}
         </button>
-
-        <button
-          onClick={() => setActiveTab('settings')}
-          className={`flex items-center gap-2 px-5 py-3.5 border-b-2 text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${
-            activeTab === 'settings'
-              ? 'border-purple-400 text-purple-400 bg-white/5'
-              : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'
-          }`}
-        >
-          <Eye size={16} />
-          4. Regia Stream & URL OBS
-        </button>
       </div>
 
       {/* Main Tab Content */}
-      <div className="flex-1 p-6 overflow-y-auto bg-[#070a12]">
+      <div className="flex-1 p-6 overflow-y-auto bg-[#050810] custom-scrollbar">
         {/* =========================================================================
             TAB 1: CLASSIFICA (STANDINGS)
         ========================================================================== */}
         {activeTab === 'standings' && (
-          <div className="space-y-6 max-w-6xl mx-auto">
-            {/* Header info & quick actions */}
-            <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-white/5 border border-white/10">
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Qualificati:</span>
-                  <span className="text-xs font-black text-[#ffd700] px-2.5 py-1 rounded-lg bg-[#D4AF37]/15 border border-[#D4AF37]/30">
-                    Top {state.goldSlotsCount} 👑 LEGA ORO
-                  </span>
-                  <span className="text-xs font-black text-[#cbd5e1] px-2.5 py-1 rounded-lg bg-slate-400/15 border border-slate-400/30">
-                    3° e 4° 🛡️ LEGA ARGENTO
-                  </span>
-                </div>
+          <div className="space-y-5 max-w-6xl mx-auto">
+            {/* Quick OBS Link Banner */}
+            <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-gradient-to-r from-cyan-950/30 via-slate-900/40 to-cyan-950/30 border border-cyan-500/25 shadow-lg">
+              <div className="flex items-center gap-2.5">
+                <span className="px-2 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 text-[10px] font-black uppercase tracking-wider">
+                  Link OBS Schermata A
+                </span>
+                <span className="text-xs text-slate-300 font-mono">
+                  /overlays/tournament-swiss/index.html?view=standings
+                </span>
+              </div>
+              <button
+                onClick={() => copyUrl('/overlays/tournament-swiss/index.html?view=standings')}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/40 text-cyan-300 text-xs font-black rounded-xl transition-all"
+              >
+                <Copy size={13} /> Copia Link Classifica
+              </button>
+            </div>
+
+            {/* Actions Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-slate-900/40 border border-white/10">
+              <div className="flex items-center gap-3">
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">Qualificati:</span>
+                <span className="text-xs font-black text-slate-200 px-3 py-1 rounded-xl bg-slate-700/30 border border-slate-500/40 shadow-sm">
+                  Top 2 👑 LEGA ORO
+                </span>
+                <span className="text-xs font-black text-cyan-300 px-3 py-1 rounded-xl bg-cyan-950/30 border border-cyan-500/40 shadow-sm">
+                  3° e 4° 🛡️ LEGA ARGENTO
+                </span>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5">
                 <button
                   onClick={handleAutoCalculateStandings}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/40 text-blue-400 font-bold text-xs rounded-xl transition-all"
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-400/30 text-cyan-300 font-black text-xs rounded-xl transition-all"
                   title="Calcola vittorie e punti leggendo tutti i match dei 4 turni"
                 >
-                  <Calculator size={14} />
+                  <Calculator size={13} />
                   Calcola da Match
                 </button>
 
                 <button
                   onClick={handleSortStandings}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-xs rounded-xl transition-all"
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-white/5 hover:bg-white/10 border border-white/15 text-slate-200 font-black text-xs rounded-xl transition-all"
                   title="Ordina per Punti e Vittorie"
                 >
-                  <ArrowUpDown size={14} />
-                  Ordina Classifica
+                  <ArrowUpDown size={13} />
+                  Ordina
                 </button>
 
                 <button
                   onClick={handleAddPlayer}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#D4AF37]/20 hover:bg-[#D4AF37]/30 border border-[#D4AF37]/40 text-[#ffd700] font-bold text-xs rounded-xl transition-all"
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-black text-xs rounded-xl transition-all shadow-md"
                 >
-                  <Plus size={14} />
+                  <Plus size={13} />
                   Aggiungi Player
                 </button>
               </div>
             </div>
 
-            {/* Standings Table */}
-            <div className="border border-white/10 rounded-2xl overflow-hidden bg-black/40 shadow-xl">
+            {/* Standings Table (Clean without Civ) */}
+            <div className="border border-white/10 rounded-2xl overflow-hidden bg-black/40 shadow-2xl">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-white/10 bg-white/5 text-[11px] font-black uppercase tracking-wider text-gray-400">
+                  <tr className="border-b border-white/10 bg-white/5 text-[11px] font-black uppercase tracking-wider text-slate-400">
                     <th className="py-3 px-4 w-16 text-center">Pos</th>
                     <th className="py-3 px-4">Nome Giocatore</th>
-                    <th className="py-3 px-4 w-48">Civiltà Preferita</th>
-                    <th className="py-3 px-4 w-24 text-center">Vittorie (W)</th>
-                    <th className="py-3 px-4 w-24 text-center">Sconfitte (L)</th>
-                    <th className="py-3 px-4 w-24 text-center">Punti</th>
-                    <th className="py-3 px-4 w-28 text-center">Tie-Break</th>
-                    <th className="py-3 px-4 w-36 text-center">Stato Qualifica</th>
-                    <th className="py-3 px-4 w-16 text-center">Azioni</th>
+                    <th className="py-3 px-4 w-28 text-center">Vittorie (W)</th>
+                    <th className="py-3 px-4 w-28 text-center">Sconfitte (L)</th>
+                    <th className="py-3 px-4 w-28 text-center">Punti</th>
+                    <th className="py-3 px-4 w-32 text-center">Tie-Break</th>
+                    <th className="py-3 px-4 w-40 text-center">Destinazione</th>
+                    <th className="py-3 px-4 w-16 text-center"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {state.standings.map((player, idx) => {
                     const rank = idx + 1;
-                    const isGold = rank <= (state.goldSlotsCount || 2);
-                    const isSilver = rank > (state.goldSlotsCount || 2) && rank <= ((state.goldSlotsCount || 2) + (state.silverSlotsCount || 2));
+                    const isGold = rank <= 2;
+                    const isSilver = rank > 2 && rank <= 4;
 
                     return (
                       <tr 
                         key={player.id || idx}
                         className={`hover:bg-white/5 transition-colors ${
-                          isGold ? 'bg-[#D4AF37]/5' : isSilver ? 'bg-slate-400/5' : ''
+                          isGold ? 'bg-slate-800/20' : isSilver ? 'bg-cyan-950/15' : ''
                         }`}
                       >
                         {/* Pos */}
                         <td className="py-3 px-4 text-center">
-                          <div className={`w-8 h-8 rounded-lg mx-auto flex items-center justify-center font-black text-xs ${
+                          <div className={`w-8 h-8 rounded-xl mx-auto flex items-center justify-center font-black text-xs ${
                             isGold 
-                              ? 'bg-[#D4AF37] text-black font-black shadow-md shadow-[#D4AF37]/30' 
+                              ? 'bg-gradient-to-br from-slate-200 to-slate-400 text-black font-black shadow-md shadow-slate-400/20' 
                               : isSilver 
-                              ? 'bg-slate-300 text-black font-black shadow-md shadow-slate-400/30' 
-                              : 'bg-white/10 text-gray-300'
+                              ? 'bg-gradient-to-br from-cyan-400 to-blue-500 text-black font-black shadow-md shadow-cyan-500/20' 
+                              : 'bg-white/5 text-slate-400 border border-white/10'
                           }`}>
                             #{rank}
                           </div>
@@ -712,29 +809,8 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
                             value={player.name}
                             onChange={(e) => handleUpdatePlayer(idx, 'name', e.target.value)}
                             placeholder="Nome player"
-                            className="w-full bg-white/5 border border-white/10 focus:border-[#D4AF37] rounded-lg px-3 py-2 text-sm font-bold text-white placeholder-gray-600 focus:outline-none transition-all"
+                            className="w-full bg-black/40 border border-white/10 focus:border-cyan-400 rounded-xl px-3.5 py-2 text-sm font-bold text-white placeholder-slate-600 focus:outline-none transition-all"
                           />
-                        </td>
-
-                        {/* Civ Dropdown */}
-                        <td className="py-3 px-4">
-                          <div className="relative">
-                            <select
-                              value={player.civId || ''}
-                              onChange={(e) => handleUpdatePlayer(idx, 'civId', e.target.value)}
-                              className="w-full appearance-none bg-white/5 border border-white/10 focus:border-[#D4AF37] rounded-lg pl-3 pr-10 py-2 text-xs font-semibold text-white focus:outline-none transition-all cursor-pointer truncate"
-                            >
-                              <option value="" className="bg-[#0b0f19] text-gray-400">Nessuna Civ</option>
-                              {civilizationsData.map(c => (
-                                <option key={c.id} value={c.id} className="bg-[#0b0f19] text-white">
-                                  {c.name}
-                                </option>
-                              ))}
-                            </select>
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                              <ChevronDown size={14} />
-                            </div>
-                          </div>
                         </td>
 
                         {/* Wins */}
@@ -744,7 +820,7 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
                             min="0"
                             value={player.wins}
                             onChange={(e) => handleUpdatePlayer(idx, 'wins', parseInt(e.target.value) || 0)}
-                            className="w-16 mx-auto text-center bg-white/5 border border-white/10 focus:border-green-500 rounded-lg py-1.5 text-sm font-black text-green-400 focus:outline-none"
+                            className="w-20 mx-auto text-center bg-black/40 border border-white/10 focus:border-emerald-400 rounded-xl py-2 text-sm font-black text-emerald-400 focus:outline-none"
                           />
                         </td>
 
@@ -755,7 +831,7 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
                             min="0"
                             value={player.losses}
                             onChange={(e) => handleUpdatePlayer(idx, 'losses', parseInt(e.target.value) || 0)}
-                            className="w-16 mx-auto text-center bg-white/5 border border-white/10 focus:border-red-500 rounded-lg py-1.5 text-sm font-black text-red-400 focus:outline-none"
+                            className="w-20 mx-auto text-center bg-black/40 border border-white/10 focus:border-rose-400 rounded-xl py-2 text-sm font-black text-rose-400 focus:outline-none"
                           />
                         </td>
 
@@ -766,7 +842,7 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
                             min="0"
                             value={player.points}
                             onChange={(e) => handleUpdatePlayer(idx, 'points', parseInt(e.target.value) || 0)}
-                            className="w-16 mx-auto text-center bg-[#D4AF37]/10 border border-[#D4AF37]/30 focus:border-[#ffd700] rounded-lg py-1.5 text-sm font-black text-[#ffd700] focus:outline-none"
+                            className="w-20 mx-auto text-center bg-cyan-950/30 border border-cyan-500/40 focus:border-cyan-400 rounded-xl py-2 text-sm font-black text-cyan-300 focus:outline-none shadow-sm"
                           />
                         </td>
 
@@ -776,22 +852,22 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
                             type="number"
                             value={player.tieBreak ?? 0}
                             onChange={(e) => handleUpdatePlayer(idx, 'tieBreak', parseInt(e.target.value) || 0)}
-                            className="w-20 mx-auto text-center bg-white/5 border border-white/10 focus:border-blue-500 rounded-lg py-1.5 text-sm font-bold text-gray-300 focus:outline-none"
+                            className="w-24 mx-auto text-center bg-black/40 border border-white/10 focus:border-cyan-400 rounded-xl py-2 text-sm font-bold text-slate-300 focus:outline-none"
                           />
                         </td>
 
                         {/* Status Badge */}
                         <td className="py-3 px-4 text-center">
                           {isGold ? (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#D4AF37]/20 border border-[#D4AF37]/50 text-[#ffd700]">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-200/15 border border-slate-300/40 text-slate-200">
                               👑 Lega Oro
                             </span>
                           ) : isSilver ? (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-400/20 border border-slate-400/50 text-slate-200">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-cyan-500/15 border border-cyan-400/40 text-cyan-300">
                               🛡️ Lega Argento
                             </span>
                           ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold text-gray-500 bg-white/5 border border-white/5">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold text-slate-500 bg-white/5">
                               In Gara
                             </span>
                           )}
@@ -801,10 +877,10 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
                         <td className="py-3 px-4 text-center">
                           <button
                             onClick={() => handleRemovePlayer(idx)}
-                            className="p-1.5 text-gray-500 hover:text-red-400 rounded-lg hover:bg-red-500/10 transition-colors"
+                            className="p-1.5 text-slate-500 hover:text-rose-400 rounded-lg hover:bg-rose-500/10 transition-colors"
                             title="Elimina giocatore"
                           >
-                            <Trash2 size={16} />
+                            <Trash2 size={15} />
                           </button>
                         </td>
                       </tr>
@@ -820,48 +896,66 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
             TAB 2: TURNI & MATCH (4 TURNI BO1)
         ========================================================================== */}
         {activeTab === 'rounds' && (
-          <div className="space-y-6 max-w-6xl mx-auto">
-            {/* Round Subtabs */}
-            <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-white/5 border border-white/10">
+          <div className="space-y-5 max-w-6xl mx-auto">
+            {/* Quick OBS Link Banner */}
+            <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-gradient-to-r from-cyan-950/30 via-slate-900/40 to-cyan-950/30 border border-cyan-500/25 shadow-lg">
+              <div className="flex items-center gap-2.5">
+                <span className="px-2 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 text-[10px] font-black uppercase tracking-wider">
+                  Link OBS Schermata B
+                </span>
+                <span className="text-xs text-slate-300 font-mono">
+                  /overlays/tournament-swiss/index.html?view=rounds
+                </span>
+              </div>
+              <button
+                onClick={() => copyUrl('/overlays/tournament-swiss/index.html?view=rounds')}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/40 text-cyan-300 text-xs font-black rounded-xl transition-all"
+              >
+                <Copy size={13} /> Copia Link Turni
+              </button>
+            </div>
+
+            {/* Round Subtabs (Strictly Turno 1, Turno 2, Turno 3, Turno 4) */}
+            <div className="flex items-center justify-between gap-4 p-3.5 rounded-2xl bg-slate-900/40 border border-white/10">
               <div className="flex items-center gap-2">
                 {[1, 2, 3, 4].map(r => (
                   <button
                     key={r}
                     onClick={() => setSelectedRound(r)}
-                    className={`px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all ${
+                    className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all ${
                       selectedRound === r
-                        ? 'bg-[#D4AF37] text-black shadow-lg shadow-[#D4AF37]/20 scale-105'
-                        : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
+                        ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-black shadow-lg shadow-cyan-500/20'
+                        : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
                     }`}
                   >
-                    Turno {r} {state.rounds[r]?.length ? `(${state.rounds[r].length} match)` : ''}
+                    Turno {r}
                   </button>
                 ))}
               </div>
 
               <button
                 onClick={() => handleAddMatch(selectedRound)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-green-600/20 hover:bg-green-600/30 border border-green-500/40 text-green-400 font-bold text-xs rounded-xl transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-400/30 text-cyan-300 font-bold text-xs rounded-xl transition-all"
               >
                 <Plus size={14} />
-                Aggiungi Match a Turno {selectedRound}
+                Aggiungi Match
               </button>
             </div>
 
-            {/* Matches list for selected round */}
+            {/* Matches List */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {(state.rounds[selectedRound] || []).map((match, mIdx) => (
                 <div
                   key={match.id || mIdx}
-                  className="p-4 rounded-2xl bg-black/40 border border-white/10 hover:border-white/20 transition-all space-y-3 relative group"
+                  className="p-4 rounded-2xl bg-slate-900/30 border border-white/10 hover:border-cyan-500/30 transition-all space-y-3 relative group"
                 >
-                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                    <span className="text-[11px] font-black uppercase tracking-wider text-gray-400">
-                      Match #{mIdx + 1} (Turno {selectedRound})
+                  <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+                      Match #{mIdx + 1}
                     </span>
                     <button
                       onClick={() => handleRemoveMatch(selectedRound, mIdx)}
-                      className="text-gray-500 hover:text-red-400 transition-colors p-1"
+                      className="text-slate-500 hover:text-rose-400 transition-colors p-1"
                       title="Elimina match"
                     >
                       <Trash2 size={14} />
@@ -871,8 +965,8 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
                   {/* Player 1 Row */}
                   <div className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${
                     match.winner === 1 
-                      ? 'bg-green-500/10 border-green-500/40' 
-                      : 'bg-white/5 border-white/5'
+                      ? 'bg-emerald-500/15 border-emerald-500/40' 
+                      : 'bg-black/40 border-white/5'
                   }`}>
                     <input
                       type="text"
@@ -881,47 +975,36 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
                         p1: { ...match.p1, name: e.target.value }
                       })}
                       placeholder="Player 1"
-                      className="flex-1 bg-transparent text-sm font-black text-white focus:outline-none placeholder-gray-600 truncate"
+                      className="flex-1 bg-transparent text-sm font-black text-white focus:outline-none placeholder-slate-600 truncate"
                     />
 
-                    {/* Civ Selector */}
-                    <div className="relative w-36">
-                      <select
-                        value={match.p1?.civId || ''}
-                        onChange={(e) => handleUpdateMatch(selectedRound, mIdx, {
-                          p1: { ...match.p1, civId: e.target.value }
-                        })}
-                        className="w-full appearance-none bg-black/40 border border-white/10 rounded-lg pl-2 pr-8 py-1.5 text-xs text-gray-300 focus:outline-none truncate"
-                      >
-                        <option value="" className="bg-[#0b0f19] text-gray-500">Civ...</option>
-                        {civilizationsData.map(c => (
-                          <option key={c.id} value={c.id} className="bg-[#0b0f19] text-white">
-                            {c.name}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" />
-                    </div>
+                    {/* Custom Civ Flag Selector */}
+                    <CivDropdown
+                      value={match.p1?.civId || ''}
+                      onChange={(civId) => handleUpdateMatch(selectedRound, mIdx, {
+                        p1: { ...match.p1, civId }
+                      })}
+                    />
 
                     <button
                       onClick={() => handleSetWinner(selectedRound, mIdx, match.winner === 1 ? 0 : 1)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider shrink-0 transition-all ${
                         match.winner === 1
-                          ? 'bg-green-500 text-black shadow-md shadow-green-500/20'
-                          : 'bg-white/10 text-gray-400 hover:text-white'
+                          ? 'bg-emerald-400 text-black shadow-md shadow-emerald-500/20'
+                          : 'bg-white/10 text-slate-400 hover:text-white'
                       }`}
                     >
-                      {match.winner === 1 ? '🏆 VINTO (1)' : 'VINCE P1'}
+                      {match.winner === 1 ? '🏆 VINTO' : 'VINCE'}
                     </button>
                   </div>
 
-                  <div className="text-center text-[10px] font-black tracking-widest text-gray-500">VS</div>
+                  <div className="text-center text-[10px] font-black tracking-widest text-slate-600">VS</div>
 
                   {/* Player 2 Row */}
                   <div className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${
                     match.winner === 2 
-                      ? 'bg-green-500/10 border-green-500/40' 
-                      : 'bg-white/5 border-white/5'
+                      ? 'bg-emerald-500/15 border-emerald-500/40' 
+                      : 'bg-black/40 border-white/5'
                   }`}>
                     <input
                       type="text"
@@ -930,44 +1013,33 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
                         p2: { ...match.p2, name: e.target.value }
                       })}
                       placeholder="Player 2"
-                      className="flex-1 bg-transparent text-sm font-black text-white focus:outline-none placeholder-gray-600 truncate"
+                      className="flex-1 bg-transparent text-sm font-black text-white focus:outline-none placeholder-slate-600 truncate"
                     />
 
-                    {/* Civ Selector */}
-                    <div className="relative w-36">
-                      <select
-                        value={match.p2?.civId || ''}
-                        onChange={(e) => handleUpdateMatch(selectedRound, mIdx, {
-                          p2: { ...match.p2, civId: e.target.value }
-                        })}
-                        className="w-full appearance-none bg-black/40 border border-white/10 rounded-lg pl-2 pr-8 py-1.5 text-xs text-gray-300 focus:outline-none truncate"
-                      >
-                        <option value="" className="bg-[#0b0f19] text-gray-500">Civ...</option>
-                        {civilizationsData.map(c => (
-                          <option key={c.id} value={c.id} className="bg-[#0b0f19] text-white">
-                            {c.name}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" />
-                    </div>
+                    {/* Custom Civ Flag Selector */}
+                    <CivDropdown
+                      value={match.p2?.civId || ''}
+                      onChange={(civId) => handleUpdateMatch(selectedRound, mIdx, {
+                        p2: { ...match.p2, civId }
+                      })}
+                    />
 
                     <button
                       onClick={() => handleSetWinner(selectedRound, mIdx, match.winner === 2 ? 0 : 2)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider shrink-0 transition-all ${
                         match.winner === 2
-                          ? 'bg-green-500 text-black shadow-md shadow-green-500/20'
-                          : 'bg-white/10 text-gray-400 hover:text-white'
+                          ? 'bg-emerald-400 text-black shadow-md shadow-emerald-500/20'
+                          : 'bg-white/10 text-slate-400 hover:text-white'
                       }`}
                     >
-                      {match.winner === 2 ? '🏆 VINTO (1)' : 'VINCE P2'}
+                      {match.winner === 2 ? '🏆 VINTO' : 'VINCE'}
                     </button>
                   </div>
                 </div>
               ))}
 
               {(!state.rounds[selectedRound] || state.rounds[selectedRound].length === 0) && (
-                <div className="col-span-full py-16 text-center text-gray-500 border border-dashed border-white/10 rounded-2xl">
+                <div className="col-span-full py-16 text-center text-slate-500 border border-dashed border-white/10 rounded-2xl">
                   Nessun match inserito per il Turno {selectedRound}. Clicca "Aggiungi Match" o sincronizza da Start.gg!
                 </div>
               )}
@@ -979,20 +1051,20 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
             TAB 3: START.GG SYNC
         ========================================================================== */}
         {activeTab === 'startgg' && (
-          <div className="space-y-6 max-w-3xl mx-auto bg-black/40 p-8 rounded-3xl border border-white/10">
+          <div className="space-y-5 max-w-3xl mx-auto bg-slate-900/30 p-7 rounded-3xl border border-white/10">
             <div>
-              <h3 className="text-lg font-black uppercase tracking-wider text-white flex items-center gap-2">
-                <Link2 className="text-[#00d2ff]" size={20} />
-                Connessione Diretta Start.gg
+              <h3 className="text-base font-black uppercase tracking-wider text-white flex items-center gap-2">
+                <Link2 className="text-cyan-400" size={18} />
+                Connessione Start.gg
               </h3>
-              <p className="text-xs text-gray-400 mt-1">
-                Collega il torneo inserendo il link o lo slug di Start.gg per importare automaticamente i 4 turni svizzeri e la classifica in tempo reale.
+              <p className="text-xs text-slate-400 mt-1">
+                Collega il torneo inserendo il link o lo slug per importare i 4 turni e la classifica in tempo reale.
               </p>
             </div>
 
             {/* Slug input */}
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-gray-300">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
                 Link del Torneo o Slug Start.gg
               </label>
               <div className="flex gap-3">
@@ -1000,15 +1072,15 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
                   type="text"
                   value={startggSlugInput}
                   onChange={(e) => setStartggSlugInput(e.target.value)}
-                  placeholder="es. https://www.start.gg/tournament/aoe4-swiss-cup/details oppure aoe4-swiss-cup"
-                  className="flex-1 bg-white/5 border border-white/10 focus:border-[#00d2ff] rounded-xl px-4 py-3 text-sm font-semibold text-white focus:outline-none placeholder-gray-600"
+                  placeholder="es. https://www.start.gg/tournament/nome-torneo/details oppure nome-torneo"
+                  className="flex-1 bg-black/40 border border-white/10 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm font-semibold text-white focus:outline-none placeholder-slate-600"
                 />
                 <button
                   onClick={handleFetchStartggTournament}
                   disabled={startggLoading || !startggSlugInput.trim()}
-                  className="px-6 py-3 bg-[#00d2ff] text-black font-black text-xs uppercase tracking-wider rounded-xl hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-2"
+                  className="px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-black font-black text-xs uppercase tracking-wider rounded-xl transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-cyan-500/20"
                 >
-                  {startggLoading ? <Loader2 size={16} className="animate-spin" /> : <RefreshCcw size={16} />}
+                  {startggLoading ? <Loader2 size={15} className="animate-spin" /> : <RefreshCcw size={15} />}
                   Cerca Torneo
                 </button>
               </div>
@@ -1016,14 +1088,14 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
 
             {/* Feedback message */}
             {startggStatus && (
-              <div className={`p-4 rounded-xl flex items-center gap-3 text-xs font-bold border ${
+              <div className={`p-3.5 rounded-xl flex items-center gap-2.5 text-xs font-bold border ${
                 startggStatus.type === 'success' 
-                  ? 'bg-green-500/10 border-green-500/30 text-green-400' 
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
                   : startggStatus.type === 'error'
-                  ? 'bg-red-500/10 border-red-500/30 text-red-400'
-                  : 'bg-blue-500/10 border-blue-500/30 text-blue-400'
+                  ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                  : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-300'
               }`}>
-                {startggStatus.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+                {startggStatus.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
                 {startggStatus.message}
               </div>
             )}
@@ -1034,7 +1106,7 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Event selector */}
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-gray-300">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
                       Seleziona Evento
                     </label>
                     <div className="relative">
@@ -1047,7 +1119,7 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
                             setSelectedPhaseId(ev.phases[0].id);
                           }
                         }}
-                        className="w-full appearance-none bg-white/5 border border-white/10 rounded-xl pl-4 pr-10 py-3 text-sm font-bold text-white focus:outline-none"
+                        className="w-full appearance-none bg-black/40 border border-white/10 rounded-xl pl-4 pr-10 py-2.5 text-sm font-bold text-white focus:outline-none"
                       >
                         {startggTournamentData.events.map(ev => (
                           <option key={ev.id} value={ev.id} className="bg-[#0b0f19] text-white">
@@ -1055,20 +1127,20 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
                           </option>
                         ))}
                       </select>
-                      <ChevronDown size={16} className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" />
+                      <ChevronDown size={15} className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" />
                     </div>
                   </div>
 
                   {/* Phase selector */}
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-gray-300">
-                      Seleziona Fase / Bracket Svizzero
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                      Seleziona Fase Svizzera
                     </label>
                     <div className="relative">
                       <select
                         value={selectedPhaseId}
                         onChange={(e) => setSelectedPhaseId(e.target.value)}
-                        className="w-full appearance-none bg-white/5 border border-white/10 rounded-xl pl-4 pr-10 py-3 text-sm font-bold text-white focus:outline-none"
+                        className="w-full appearance-none bg-black/40 border border-white/10 rounded-xl pl-4 pr-10 py-2.5 text-sm font-bold text-white focus:outline-none"
                       >
                         {startggTournamentData.events
                           .find(ev => ev.id === selectedEventId)
@@ -1078,12 +1150,12 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
                             </option>
                           ))}
                       </select>
-                      <ChevronDown size={16} className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" />
+                      <ChevronDown size={15} className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" />
                     </div>
                   </div>
                 </div>
 
-                {/* Sync Action Buttons */}
+                {/* Action Buttons */}
                 <div className="flex flex-wrap items-center justify-between gap-4 pt-4">
                   <div className="flex items-center gap-3">
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -1093,9 +1165,9 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
                         onChange={(e) => setIsAutoSyncing(e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                      <div className="w-10 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-500"></div>
                     </label>
-                    <span className="text-xs font-bold uppercase tracking-wider text-gray-300">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
                       Auto-Sincronizza ogni 20 secondi
                     </span>
                   </div>
@@ -1103,172 +1175,14 @@ export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySw
                   <button
                     onClick={handleSyncStartggNow}
                     disabled={startggLoading}
-                    className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-green-900/30 flex items-center gap-2"
+                    className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-cyan-500/20 flex items-center gap-2"
                   >
-                    {startggLoading ? <Loader2 size={16} className="animate-spin" /> : <RefreshCcw size={16} />}
+                    {startggLoading ? <Loader2 size={15} className="animate-spin" /> : <RefreshCcw size={15} />}
                     Sincronizza Dati Ora
                   </button>
                 </div>
-
-                {state.startgg?.lastSyncedAt && (
-                  <div className="text-[11px] text-gray-500 text-right">
-                    Ultimo aggiornamento automatico: {state.startgg.lastSyncedAt}
-                  </div>
-                )}
               </div>
             )}
-          </div>
-        )}
-
-        {/* =========================================================================
-            TAB 4: REGIA STREAM & IMPOSTAZIONI
-        ========================================================================== */}
-        {activeTab === 'settings' && (
-          <div className="space-y-6 max-w-4xl mx-auto">
-            {/* Stream Scene Switcher */}
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-purple-950/20 to-black border border-purple-500/30 space-y-4">
-              <h3 className="text-sm font-black uppercase tracking-wider text-purple-400 flex items-center gap-2">
-                <Eye size={18} />
-                Regia Stream: Schermata Visibile su OBS
-              </h3>
-              <p className="text-xs text-gray-400">
-                Scegli quale vista mostrare nella sorgente browser principale su OBS Studio in tempo reale.
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button
-                  onClick={() => {
-                    const newState = { ...state, activeView: 'standings' as const };
-                    setState(newState);
-                    handleSave(newState);
-                  }}
-                  className={`p-5 rounded-2xl border text-left flex items-center gap-4 transition-all ${
-                    state.activeView === 'standings'
-                      ? 'bg-[#D4AF37]/20 border-[#D4AF37] shadow-xl shadow-[#D4AF37]/10'
-                      : 'bg-white/5 border-white/10 hover:bg-white/10'
-                  }`}
-                >
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black ${
-                    state.activeView === 'standings' ? 'bg-[#D4AF37] text-black' : 'bg-white/10 text-gray-400'
-                  }`}>
-                    A
-                  </div>
-                  <div>
-                    <div className="font-black text-sm text-white uppercase tracking-wider">Schermata Classifica</div>
-                    <div className="text-xs text-gray-400 mt-0.5">Top 2 Oro, Top 3-4 Argento, Record W-L</div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => {
-                    const newState = { ...state, activeView: 'rounds' as const };
-                    setState(newState);
-                    handleSave(newState);
-                  }}
-                  className={`p-5 rounded-2xl border text-left flex items-center gap-4 transition-all ${
-                    state.activeView === 'rounds'
-                      ? 'bg-[#00d2ff]/20 border-[#00d2ff] shadow-xl shadow-[#00d2ff]/10'
-                      : 'bg-white/5 border-white/10 hover:bg-white/10'
-                  }`}
-                >
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black ${
-                    state.activeView === 'rounds' ? 'bg-[#00d2ff] text-black' : 'bg-white/10 text-gray-400'
-                  }`}>
-                    B
-                  </div>
-                  <div>
-                    <div className="font-black text-sm text-white uppercase tracking-wider">Schermata Turni</div>
-                    <div className="text-xs text-gray-400 mt-0.5">Tabellone 4 Turni Bo1 con Match e Vincitori</div>
-                  </div>
-                </button>
-              </div>
-            </div>
-
-            {/* General Info */}
-            <div className="p-6 rounded-2xl bg-black/40 border border-white/10 space-y-4">
-              <h3 className="text-sm font-black uppercase tracking-wider text-white flex items-center gap-2">
-                <Calendar size={18} className="text-[#D4AF37]" />
-                Titolo & Giornata Torneo
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="md:col-span-2 space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-gray-400">Titolo Torneo</label>
-                  <input
-                    type="text"
-                    value={state.tournamentTitle}
-                    onChange={(e) => setState({ ...state, tournamentTitle: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm font-bold text-white focus:outline-none focus:border-[#D4AF37]"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-gray-400">Giornata di Qualifica</label>
-                  <div className="relative">
-                    <select
-                      value={state.dayNumber}
-                      onChange={(e) => setState({ ...state, dayNumber: parseInt(e.target.value) || 1 })}
-                      className="w-full appearance-none bg-white/5 border border-white/10 rounded-xl pl-4 pr-10 py-2.5 text-sm font-bold text-white focus:outline-none focus:border-[#D4AF37]"
-                    >
-                      <option value={1} className="bg-[#0b0f19]">Giornata 1</option>
-                      <option value={2} className="bg-[#0b0f19]">Giornata 2</option>
-                      <option value={3} className="bg-[#0b0f19]">Giornata 3</option>
-                      <option value={4} className="bg-[#0b0f19]">Giornata 4</option>
-                    </select>
-                    <ChevronDown size={16} className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* OBS URLs Helper */}
-            <div className="p-6 rounded-2xl bg-black/40 border border-white/10 space-y-4">
-              <h3 className="text-sm font-black uppercase tracking-wider text-white flex items-center gap-2">
-                <Link2 size={18} className="text-[#00d2ff]" />
-                Link Browser Source per OBS Studio
-              </h3>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
-                  <div>
-                    <div className="text-xs font-bold text-white">Sorgente Unica Controllata da Dashboard</div>
-                    <div className="text-[11px] text-gray-400">Cambia automaticamente tra Classifica e Turni quando clicchi sopra</div>
-                  </div>
-                  <button
-                    onClick={() => copyUrl('/overlays/tournament-swiss/index.html')}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-xs font-bold text-white rounded-lg transition-all"
-                  >
-                    <Copy size={12} /> Copia Link
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
-                  <div>
-                    <div className="text-xs font-bold text-yellow-400">Solo Schermata A (Classifica)</div>
-                    <div className="text-[11px] text-gray-400">Resta sempre fissa sulla classifica</div>
-                  </div>
-                  <button
-                    onClick={() => copyUrl('/overlays/tournament-swiss/index.html?view=standings')}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-500/20 hover:bg-yellow-500/30 text-xs font-bold text-yellow-300 rounded-lg transition-all"
-                  >
-                    <Copy size={12} /> Copia Link
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
-                  <div>
-                    <div className="text-xs font-bold text-blue-400">Solo Schermata B (Turni)</div>
-                    <div className="text-[11px] text-gray-400">Resta sempre fissa sul tabellone dei 4 turni</div>
-                  </div>
-                  <button
-                    onClick={() => copyUrl('/overlays/tournament-swiss/index.html?view=rounds')}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-xs font-bold text-blue-300 rounded-lg transition-all"
-                  >
-                    <Copy size={12} /> Copia Link
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
         )}
       </div>
