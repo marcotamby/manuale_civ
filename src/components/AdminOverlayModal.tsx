@@ -247,6 +247,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bgInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingBg, setIsUploadingBg] = useState(false);
+  const [currentOverlayUrl, setCurrentOverlayUrl] = useState<string>('');
 
   const { overlayId, tab } = useParams();
   const navigate = useNavigate();
@@ -277,9 +278,13 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
     if (isOpen) {
       if (overlayId) {
         const found = overlaysList.find(o => o.id === overlayId) || OVERLAYS.find(o => o.id === overlayId);
-        if (found) setSelectedOverlay(found);
+        if (found) {
+          setSelectedOverlay(found);
+          setCurrentOverlayUrl(found.path);
+        }
       } else if (overlaysList.length > 0) {
         setSelectedOverlay(overlaysList[0]);
+        setCurrentOverlayUrl(overlaysList[0].path);
         // Se non c'è overlayId nell'URL, lo aggiungiamo per coerenza
         navigate(`/admin/overlays/${overlaysList[0].id}/${tab === 'config' ? 'config' : 'preview'}`, { replace: true, state: location.state });
       }
@@ -294,6 +299,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
 
   const handleSelectOverlay = (ov: OverlayItem) => {
     setSelectedOverlay(ov);
+    setCurrentOverlayUrl(ov.path);
     navigate(`/admin/overlays/${ov.id}/${activeTab === 'dashboard' ? 'config' : 'preview'}`, { state: location.state });
   };
 
@@ -308,6 +314,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
   const overlayDisplayIcon = (selectedOverlay && overlayIcons[selectedOverlay.id]) ?? '';
   const overlayDisplayBackground = (selectedOverlay && overlayBackgrounds[selectedOverlay.id]) ?? '';
   const overlayDisplayDesc = (selectedOverlay && overlayDescriptions[selectedOverlay.id]) ?? selectedOverlay?.description ?? '';
+  const effectiveOverlayPath = currentOverlayUrl || selectedOverlay?.path || '';
 
   useEffect(() => {
     if (activeTab !== 'preview') return;
@@ -630,13 +637,13 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                       {activeTab === 'preview' ? 'Configura' : 'Indietro'}
                     </button>
                     <button
-                      onClick={() => copyToClipboard(selectedOverlay.path)}
+                      onClick={() => copyToClipboard(effectiveOverlayPath)}
                       className="flex items-center gap-2.5 px-6 py-3 bg-emerald-600 text-white font-black rounded-xl hover:bg-emerald-500 transition-all text-[11px] uppercase shadow-xl shadow-emerald-900/20 border border-emerald-400/30 whitespace-nowrap"
                     >
                       <Copy size={18} /> Copia URL
                     </button>
                     <a
-                      href={selectedOverlay.path}
+                      href={effectiveOverlayPath}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2.5 px-6 py-3 bg-sky-600 text-white font-black rounded-xl hover:bg-sky-500 transition-all text-[11px] uppercase border border-sky-400/30 shadow-xl shadow-sky-900/20 whitespace-nowrap"
@@ -690,7 +697,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                         <div className="absolute inset-0 flex items-center justify-center p-6 overflow-hidden">
                           <div className="w-full h-full relative" ref={containerRef}>
                             <iframe 
-                              src={selectedOverlay.path} 
+                              src={effectiveOverlayPath} 
                               className="absolute border-none bg-transparent" 
                               style={{ 
                                 width: '1920px', 
@@ -714,7 +721,10 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                       ) : selectedOverlay.id === 'draft-matching' ? (
                         <DraftMatchingDashboard onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} />
                       ) : selectedOverlay.id === 'tournament-swiss' ? (
-                        <TournamentOverlaySwissDashboard onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} />
+                        <TournamentOverlaySwissDashboard 
+                          onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} 
+                          onActivePathChange={(path) => setCurrentOverlayUrl(path)}
+                        />
                       ) : selectedOverlay.id.startsWith('tournament-2v2') ? (
                         <TournamentOverlay2v2Dashboard 
                           overlayId={selectedOverlay.id} 

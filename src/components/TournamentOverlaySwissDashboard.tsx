@@ -24,6 +24,7 @@ import type { StartGGTournament } from '../services/startgg';
 
 interface TournamentOverlaySwissDashboardProps {
   onError: (msg: string) => void;
+  onActivePathChange?: (path: string) => void;
 }
 
 export interface SwissStandingPlayer {
@@ -196,12 +197,22 @@ const DEFAULT_STATE = {
 
 const OVERLAY_ID = 'tournament-swiss';
 
-export function TournamentOverlaySwissDashboard({ onError }: TournamentOverlaySwissDashboardProps) {
+export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }: TournamentOverlaySwissDashboardProps) {
   const [state, setState] = useState(DEFAULT_STATE);
   const [activeTab, setActiveTab] = useState<'standings' | 'rounds' | 'startgg'>('standings');
   const [selectedRound, setSelectedRound] = useState<number>(1);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  // Sync active path with parent modal
+  useEffect(() => {
+    if (!onActivePathChange) return;
+    if (activeTab === 'rounds') {
+      onActivePathChange('/overlays/tournament-swiss/index.html?view=rounds');
+    } else {
+      onActivePathChange('/overlays/tournament-swiss/index.html?view=standings');
+    }
+  }, [activeTab, onActivePathChange]);
 
   // Start.gg states
   const [startggSlugInput, setStartggSlugInput] = useState('');
