@@ -51,6 +51,7 @@ export interface OverlayState {
   topBannerOffsetY?: number;
   minimapCrestOffsetY?: number;
   minimapInfoOffsetY?: number;
+  minimapBottomOffsetY?: number;
   minimapSidebarOffsetY?: number;
   minimapSidebarOffsetX?: number;
 }
