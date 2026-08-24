@@ -353,7 +353,7 @@ function SortableTournamentCard({
                                   </div>
                                 )}
                               </div>
-                              {sIdx < entries.length - 1 && <span className="text-gray-600 font-black flex-shrink-0 mx-1">&&</span>}
+                              {sIdx < entries.length - 1 && <span className="text-gray-600 font-black flex-shrink-0 mx-1">&</span>}
                             </div>
                           );
                         })}
@@ -384,11 +384,18 @@ function SortableTournamentCard({
 
               return (
                 <>
-                  <div className="flex flex-col sm:flex-row justify-between sm:items-center items-start gap-2 mb-3 border-b border-white/5 pb-2 min-h-[28px] overflow-visible">
-                    <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Risultati Finali</p>
+                  <div className="flex flex-col gap-2 mb-3 border-b border-white/5 pb-2">
+                    <div className="flex justify-between items-center min-h-[18px]">
+                      <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Risultati Finali</p>
+                      {divisions.length === 1 && (
+                        <span className="text-[9px] font-bold text-yellow-500/80 uppercase tracking-widest flex items-center gap-1">
+                          🏆 {divisions[0]}
+                        </span>
+                      )}
+                    </div>
                     
                     {divisions.length > 1 && (
-                      <div className="flex gap-1 bg-white/[0.02] p-0.5 rounded-lg border border-white/5 shadow-inner max-w-full overflow-x-auto scrollbar-none shrink-0">
+                      <div className="flex gap-1 bg-white/[0.02] p-0.5 rounded-lg border border-white/5 shadow-inner w-full overflow-x-auto scrollbar-none">
                         {divisions.map((divName) => {
                           const isActive = String(activeDiv || '').trim().toLowerCase() === divName.toLowerCase();
                           return (
@@ -397,23 +404,18 @@ function SortableTournamentCard({
                               type="button"
                               onClick={() => setActiveDivisions(prev => ({ ...prev, [t.id]: divName }))}
                               className={clsx(
-                                "py-1 px-3.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all min-w-[70px] text-center",
+                                "flex-1 py-1 px-2.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all min-w-0 text-center truncate",
                                 isActive
-                                  ? "bg-gradient-to-b from-slate-100 via-slate-200 to-blue-200 text-slate-900 shadow-[0_0_10px_rgba(191,219,254,0.25)] scale-[1.02]"
+                                  ? "bg-gradient-to-b from-slate-100 via-slate-200 to-blue-200 text-slate-900 shadow-[0_0_10px_rgba(191,219,254,0.25)] scale-[1.01]"
                                   : "text-slate-400 hover:text-white hover:bg-white/5"
                               )}
+                              title={divName}
                             >
                               {divName}
                             </button>
                           );
                         })}
                       </div>
-                    )}
-
-                    {divisions.length === 1 && (
-                      <span className="text-[9px] font-bold text-yellow-500/80 uppercase tracking-widest flex items-center gap-1">
-                        🏆 {divisions[0]}
-                      </span>
                     )}
                   </div>
 
