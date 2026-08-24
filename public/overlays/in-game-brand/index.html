@@ -36,7 +36,7 @@
         }
 
         /* =========================================================================
-           1. TOP BANNER (NOME DEL TORNEO - Sotto al Timer Spettatore)
+           1. TOP BANNER (NOME DEL TORNEO - Raccordo Seamless con HUD Spettatore)
            ========================================================================= */
         #top-brand-banner {
             position: absolute;
@@ -48,14 +48,41 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(180deg, #090e1c 0%, #040711 100%);
+            background: linear-gradient(180deg, rgba(25, 38, 50, 0.96) 0%, rgba(16, 25, 34, 0.98) 100%);
             border: 2px solid var(--gold-main);
-            border-top: none;
-            border-radius: 0 0 10px 10px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.95), 0 0 15px rgba(212, 175, 55, 0.25);
+            border-top: 1px solid rgba(255, 215, 0, 0.35);
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 215, 0, 0.35), 0 0 12px rgba(212, 175, 55, 0.2);
             z-index: 100;
             padding: 0 8px;
             transition: all 0.2s ease;
+        }
+
+        /* Staffe dorate angolari di raccordo superiore che si agganciano all'HUD fisso del gioco */
+        #top-brand-banner::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -2px;
+            width: 8px;
+            height: 8px;
+            border-left: 2px solid var(--gold-bright);
+            border-top: 2px solid var(--gold-bright);
+            filter: drop-shadow(0 0 4px var(--gold-glow));
+            pointer-events: none;
+        }
+
+        #top-brand-banner::after {
+            content: '';
+            position: absolute;
+            top: -6px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid var(--gold-bright);
+            border-top: 2px solid var(--gold-bright);
+            filter: drop-shadow(0 0 4px var(--gold-glow));
+            pointer-events: none;
         }
 
         .top-tournament-title {
@@ -73,7 +100,7 @@
         }
 
         /* =========================================================================
-           2. MINIMAP UNIFIED FRAME & PANELS (Bordo Spesso Morbido + Dentellato EGC)
+           2. MINIMAP UNIFIED FRAME & PANELS (Pure 1:1 45° Diamond - Calibrato)
            ========================================================================= */
         #minimap-brand-wrapper {
             position: absolute;
@@ -155,12 +182,12 @@
 </head>
 <body>
 
-    <!-- 1. TOP BRAND BANNER (Solo nome torneo - Sotto HUD Timer) -->
+    <!-- 1. TOP BRAND BANNER (Solo nome torneo - Sotto HUD Timer con Raccordo Dorato) -->
     <div id="top-brand-banner">
         <div class="top-tournament-title" id="top-title-text">Ends of Summer Champions</div>
     </div>
 
-    <!-- 2. MINIMAP COMPLETE BRAND WRAPPER (Bordo Scuro Spesso 10px + Dentellatura EGC) -->
+    <!-- 2. MINIMAP COMPLETE BRAND WRAPPER (1:1 45° Diamond + Bordo Morbido + Dentellatura EGC) -->
     <div id="minimap-brand-wrapper">
         <svg class="minimap-wrapper-svg" viewBox="0 0 444 444" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
