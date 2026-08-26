@@ -227,14 +227,14 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
     <div className="w-full flex flex-col shrink-0 z-[100] relative select-none">
       
       {/* 1. Desktop Utility Topbar (PC Only) */}
-      <div className="hidden lg:flex h-12 w-full bg-[#000000] border-b border-white/5 items-center justify-between px-4 lg:px-6 xl:px-10 2xl:px-16 z-[110] relative text-xs">
+      <div className="hidden lg:flex h-12 w-full bg-[#000000] border-b border-white/5 items-center justify-between px-3 lg:px-4 xl:px-6 2xl:px-12 z-[110] relative text-xs">
          {/* Left Side: Navigation & Social */}
-         <div className="flex items-center gap-2 xl:gap-3 2xl:gap-4 shrink-0 min-w-0">
+         <div className="flex items-center gap-1.5 lg:gap-2 xl:gap-2.5 2xl:gap-4 shrink-0 min-w-0">
             <a
               href="https://discord.gg/8Tx2YdXrEu"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 xl:gap-2 text-indigo-400 hover:text-indigo-300 transition-colors text-xs xl:text-[13px] font-bold uppercase tracking-wider whitespace-nowrap shrink-0 group"
+              className="flex items-center gap-1 xl:gap-1.5 2xl:gap-2 text-indigo-400 hover:text-indigo-300 transition-colors text-[11px] xl:text-xs 2xl:text-[13px] font-bold uppercase tracking-wide xl:tracking-wider whitespace-nowrap shrink-0 group"
             >
               <svg className="w-3.5 h-3.5 xl:w-4 xl:h-4 fill-current shrink-0" viewBox="0 0 24 24">
                 <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.874.893.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.078.078 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.419-2.157 2.419z"/>
@@ -242,49 +242,53 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
               Discord
             </a>
             <div className="w-px h-3 bg-white/10 shrink-0"></div>
-            <Link to="/tornei" className="flex items-center gap-1.5 xl:gap-2 text-emerald-400 hover:text-emerald-300 transition-colors text-xs xl:text-[13px] font-bold uppercase tracking-wider whitespace-nowrap shrink-0">
-              <Trophy size={14} className="shrink-0" /> Tornei
+            <Link to="/tornei" className="flex items-center gap-1 xl:gap-1.5 2xl:gap-2 text-emerald-400 hover:text-emerald-300 transition-colors text-[11px] xl:text-xs 2xl:text-[13px] font-bold uppercase tracking-wide xl:tracking-wider whitespace-nowrap shrink-0">
+              <Trophy size={13} className="shrink-0 xl:w-3.5 xl:h-3.5" /> Tornei
             </Link>
             <div className="w-px h-3 bg-white/10 shrink-0"></div>
-            <Link to="/faq" className="flex items-center gap-1.5 xl:gap-2 text-sky-400 hover:text-sky-300 transition-colors text-xs xl:text-[13px] font-bold uppercase tracking-wider whitespace-nowrap shrink-0">
-              <HelpCircle size={14} className="shrink-0" /> FAQ
+            <Link to="/faq" className="flex items-center gap-1 xl:gap-1.5 2xl:gap-2 text-sky-400 hover:text-sky-300 transition-colors text-[11px] xl:text-xs 2xl:text-[13px] font-bold uppercase tracking-wide xl:tracking-wider whitespace-nowrap shrink-0">
+              <HelpCircle size={13} className="shrink-0 xl:w-3.5 xl:h-3.5" /> FAQ
             </Link>
             <div className="w-px h-3 bg-white/10 shrink-0"></div>
-            <a href="https://ko-fi.com/marcotamby" target="_blank" className="flex items-center gap-1.5 xl:gap-2 text-rose-400 hover:text-rose-300 transition-colors text-xs xl:text-[13px] font-bold uppercase tracking-wider whitespace-nowrap shrink-0">
-              <Coffee size={14} className="shrink-0" /> Sostieni
+            <a href="https://ko-fi.com/marcotamby" target="_blank" className="flex items-center gap-1 xl:gap-1.5 2xl:gap-2 text-rose-400 hover:text-rose-300 transition-colors text-[11px] xl:text-xs 2xl:text-[13px] font-bold uppercase tracking-wide xl:tracking-wider whitespace-nowrap shrink-0">
+              <Coffee size={13} className="shrink-0 xl:w-3.5 xl:h-3.5" /> Sostieni
             </a>
             {(isAdmin || isStreamer) && user?.email !== 'alessio.bella97@gmail.com' && (
               <>
                 <div className="w-px h-3 bg-white/10 shrink-0"></div>
-                <button onClick={onOpenAdminOverlay} className="flex items-center gap-1.5 xl:gap-2 text-fuchsia-400 hover:text-fuchsia-300 transition-colors text-xs xl:text-[13px] font-bold uppercase tracking-wider whitespace-nowrap shrink-0">
-                  <Monitor size={14} className="shrink-0" /> Stream
+                <button onClick={onOpenAdminOverlay} className="flex items-center gap-1 xl:gap-1.5 2xl:gap-2 text-fuchsia-400 hover:text-fuchsia-300 transition-colors text-[11px] xl:text-xs 2xl:text-[13px] font-bold uppercase tracking-wide xl:tracking-wider whitespace-nowrap shrink-0">
+                  <Monitor size={13} className="shrink-0 xl:w-3.5 xl:h-3.5" /> Stream
                 </button>
               </>
             )}
             <div className="w-px h-3 bg-white/10 shrink-0"></div>
-            <Link to="/classifica" className="flex items-center gap-1.5 xl:gap-2 text-pink-300 hover:text-pink-200 transition-colors text-xs xl:text-[13px] font-bold uppercase tracking-wider whitespace-nowrap shrink-0">
-              <Award size={14} className="shrink-0" /> Classifica
+            <Link to="/classifica" className="flex items-center gap-1 xl:gap-1.5 2xl:gap-2 text-pink-300 hover:text-pink-200 transition-colors text-[11px] xl:text-xs 2xl:text-[13px] font-bold uppercase tracking-wide xl:tracking-wider whitespace-nowrap shrink-0">
+              <Award size={13} className="shrink-0 xl:w-3.5 xl:h-3.5" /> Classifica
             </Link>
             <div className="w-px h-3 bg-white/10 shrink-0"></div>
             <a 
               href="https://aoefightsimulator.onrender.com/" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="flex items-center gap-1.5 xl:gap-2 text-orange-400 hover:text-orange-300 transition-colors text-xs xl:text-[13px] font-bold uppercase tracking-wider whitespace-nowrap shrink-0"
+              className="flex items-center gap-1 xl:gap-1.5 2xl:gap-2 text-orange-400 hover:text-orange-300 transition-colors text-[11px] xl:text-xs 2xl:text-[13px] font-bold uppercase tracking-wide xl:tracking-wider whitespace-nowrap shrink-0"
             >
-              <Swords size={14} className="shrink-0" /> Fight simulator
+              <Swords size={13} className="shrink-0 xl:w-3.5 xl:h-3.5" /> 
+              <span className="hidden xl:inline">Fight Simulator</span>
+              <span className="xl:hidden">Fight Sim</span>
             </a>
          </div>
 
          {/* Right Side: Auth & Presence */}
-         <div className="flex items-center gap-2 xl:gap-4 2xl:gap-6 shrink-0 min-w-0">
+         <div className="flex items-center gap-1.5 lg:gap-2 xl:gap-3 2xl:gap-5 shrink-0 min-w-0">
             {/* Online Stats */}
-            <div className="flex items-center gap-2 xl:gap-3 shrink-0">
+            <div className="flex items-center gap-1.5 xl:gap-2.5 shrink-0">
               {/* Users Online */}
               <div className="relative group cursor-help py-3 shrink-0">
                 <div className="flex items-center gap-1.5 whitespace-nowrap">
                   <div className="h-1.5 w-1.5 rounded-full bg-slate-500 shadow-[0_0_8px_rgba(148,163,184,0.5)] shrink-0"></div>
-                  <span className="text-[10px] xl:text-[11px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">{onlineUserCount} Online</span>
+                  <span className="text-[10px] xl:text-[11px] font-bold text-slate-400 uppercase tracking-wider xl:tracking-widest whitespace-nowrap">
+                    {onlineUserCount} <span className="hidden lg:inline">Online</span>
+                  </span>
                 </div>
 
                 {/* Tooltip */}
@@ -316,7 +320,9 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
                 <div className="relative group cursor-help py-3 shrink-0">
                   <div className="flex items-center gap-1.5 whitespace-nowrap">
                     <div className="h-1.5 w-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)] animate-pulse shrink-0"></div>
-                    <span className="text-[10px] xl:text-[11px] font-bold text-yellow-500 uppercase tracking-widest whitespace-nowrap">{Object.keys(_activeAdmins).length} Admin Live</span>
+                    <span className="text-[10px] xl:text-[11px] font-bold text-yellow-500 uppercase tracking-wider xl:tracking-widest whitespace-nowrap">
+                      {Object.keys(_activeAdmins).length} <span className="hidden xl:inline">Admin Live</span><span className="xl:hidden">Admin</span>
+                    </span>
                   </div>
 
                   {/* Tooltip */}
@@ -368,7 +374,7 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
 
             {/* Sheep Balance (PC) */}
             {isAuthenticated && (
-              <div className="flex items-center gap-1.5 xl:gap-2 bg-blue-500/10 px-2.5 xl:px-3 py-1 rounded-full border border-blue-500/20 shrink-0 whitespace-nowrap">
+              <div className="flex items-center gap-1 xl:gap-1.5 bg-blue-500/10 px-2 xl:px-2.5 py-0.5 xl:py-1 rounded-full border border-blue-500/20 shrink-0 whitespace-nowrap">
                 <span className="text-[10px] xl:text-[11px] font-black text-white">{user?.sheep_balance ?? 100}</span>
                 <span className="text-xs">🐑</span>
               </div>
@@ -376,38 +382,38 @@ export function Topbar({ onOpenAdminDashboard, onOpenAdminOverlay, isHome }: Top
 
             {/* Profile / Auth */}
             {isAuthenticated ? (
-              <div className="flex items-center gap-2 xl:gap-3 2xl:gap-4 shrink-0">
+              <div className="flex items-center gap-1.5 lg:gap-2 xl:gap-2.5 2xl:gap-3 shrink-0">
                 <button 
                   onClick={() => {
                     (window as any).openProfileModal?.();
                     (window as any).clearNotifications?.();
                   }}
-                  className="relative flex items-center gap-1.5 xl:gap-2 hover:opacity-80 transition-all group shrink-0"
+                  className="relative flex items-center gap-1 xl:gap-1.5 hover:opacity-80 transition-all group shrink-0"
                 >
-                  <div className={`w-7 h-7 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30 overflow-hidden relative shrink-0 ${getAvatarEffectClass(user?.selected_avatar_effect)}`}>
-                    {user?.avatar_url ? <img src={user.avatar_url} alt="" className="w-full h-full object-cover" /> : <User size={14} className="text-yellow-500" />}
+                  <div className={`w-6 h-6 xl:w-7 xl:h-7 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/30 overflow-hidden relative shrink-0 ${getAvatarEffectClass(user?.selected_avatar_effect)}`}>
+                    {user?.avatar_url ? <img src={user.avatar_url} alt="" className="w-full h-full object-cover" /> : <User size={13} className="text-yellow-500" />}
                   </div>
                   {notificationCount > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 z-50 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-red-600 text-[9px] font-bold text-white shadow-[0_0_10px_rgba(220,38,38,0.4)] ring-2 ring-[#0d1424]">
+                    <span className="absolute -top-1.5 -right-1.5 z-50 flex h-4 w-4 xl:h-4.5 xl:w-4.5 items-center justify-center rounded-full bg-red-600 text-[9px] font-bold text-white shadow-[0_0_10px_rgba(220,38,38,0.4)] ring-2 ring-[#0d1424]">
                       {notificationCount}
                     </span>
                   )}
-                  <span className="text-[10px] xl:text-[11px] font-bold text-white uppercase tracking-widest whitespace-nowrap truncate max-w-[70px] lg:max-w-[90px] xl:max-w-[130px] 2xl:max-w-none">{user?.nickname || 'Profilo'}</span>
+                  <span className="text-[10px] xl:text-[11px] font-bold text-white uppercase tracking-wider xl:tracking-widest whitespace-nowrap truncate max-w-[60px] lg:max-w-[70px] xl:max-w-[100px] 2xl:max-w-[140px]">{user?.nickname || 'Profilo'}</span>
                 </button>
 
                 {isAdmin && (
-                  <button onClick={onOpenAdminDashboard} className="relative text-[10px] xl:text-[11px] bg-yellow-500/10 text-yellow-500 border border-yellow-500/30 px-2.5 xl:px-3 py-1 rounded-md font-black uppercase tracking-widest hover:bg-yellow-500 hover:text-black transition-all whitespace-nowrap shrink-0">
+                  <button onClick={onOpenAdminDashboard} className="relative text-[10px] xl:text-[11px] bg-yellow-500/10 text-yellow-500 border border-yellow-500/30 px-2 xl:px-2.5 py-0.5 xl:py-1 rounded-md font-black uppercase tracking-wider xl:tracking-widest hover:bg-yellow-500 hover:text-black transition-all whitespace-nowrap shrink-0">
                     Pannello
                     {(pendingCount + pendingQaCount) > 0 && <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-600 text-[8px] font-black text-white shadow-lg ring-1 ring-black">{pendingCount + pendingQaCount}</span>}
                   </button>
                 )}
 
-                <button onClick={() => setShowLogoutConfirm(true)} className="text-[10px] xl:text-[11px] text-gray-500 hover:text-white transition-colors font-bold uppercase tracking-widest whitespace-nowrap shrink-0">
+                <button onClick={() => setShowLogoutConfirm(true)} className="text-[10px] xl:text-[11px] text-gray-500 hover:text-white transition-colors font-bold uppercase tracking-wider xl:tracking-widest whitespace-nowrap shrink-0">
                   Esci
                 </button>
               </div>
             ) : (
-              <button onClick={() => openLoginModal()} className="text-[10px] xl:text-[11px] bg-yellow-600/10 text-yellow-500 border border-yellow-500/30 px-3 xl:px-4 py-1.5 rounded-lg font-bold uppercase tracking-widest hover:bg-yellow-500 hover:text-black transition-all whitespace-nowrap shrink-0">
+              <button onClick={() => openLoginModal()} className="text-[10px] xl:text-[11px] bg-yellow-600/10 text-yellow-500 border border-yellow-500/30 px-2.5 xl:px-3.5 py-1 xl:py-1.5 rounded-lg font-bold uppercase tracking-wider xl:tracking-widest hover:bg-yellow-500 hover:text-black transition-all whitespace-nowrap shrink-0">
                 Accedi
               </button>
             )}
