@@ -1,22 +1,24 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, RotateCcw, Shield, Swords, Zap, ChevronRight, ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from './AuthContext';
-
-interface TacticalCard {
-  title?: string;
-  age?: string;
-  counterUnits?: Array<{ name: string; icon: string; role: string }>;
-  villi?: { food?: number; wood?: number; gold?: number; stone?: number };
-  villagers?: { food?: number; wood?: number; gold?: number; stone?: number };
-  proTip?: string;
-}
+import { X, Send, Sparkles, RotateCcw, ChevronRight, Swords } from 'lucide-react';
 
 interface Message {
   id: string;
   sender: 'user' | 'coach';
   text: string;
-  tacticalCard?: TacticalCard | null;
+  tacticalCard?: {
+    title?: string;
+    age?: string;
+    counterUnits?: Array<{ name: string; icon?: string; role?: string }>;
+    villi?: { food?: number; wood?: number; gold?: number; stone?: number };
+    proTip?: string;
+  } | null;
   timestamp: string;
+}
+
+interface FunnelOption {
+  label: string;
+  prompt: string;
 }
 
 interface FunnelCategory {
@@ -24,10 +26,7 @@ interface FunnelCategory {
   label: string;
   icon: string;
   description: string;
-  options: Array<{
-    label: string;
-    prompt: string;
-  }>;
+  options: FunnelOption[];
 }
 
 const FUNNEL_CATEGORIES: FunnelCategory[] = [
@@ -37,9 +36,9 @@ const FUNNEL_CATEGORIES: FunnelCategory[] = [
     icon: '💥',
     description: 'Fast Feudal, Rush, All-In, Tower Rush',
     options: [
-      { label: '⚡ Come fare un Rush Feudale veloce ed efficace?', prompt: 'Come faccio un Rush Feudale aggressivo e veloce?' },
-      { label: '🗼 Come si esegue o difende un Tower Rush?', prompt: 'Qual è la migliore tattica per un Tower Rush (attacco e difesa)?' },
-      { label: '🏹 Strategia All-In con 1 Centro Città in Età II', prompt: 'Come si gioca una strategia All-In 1 TC in Feudale?' }
+      { label: '🔥 Come fare un Feudal All-In efficace?', prompt: 'Qual è la migliore strategia per un Feudal All-In aggressivo in AoE4?' },
+      { label: '🏹 Come eseguire la Tower Rush con i Mongoli?', prompt: 'Spiegami passo-passo come fare una Tower Rush efficace con i Mongoli.' },
+      { label: '🛡️ Come difendersi da un Rush Feudale precoce?', prompt: 'Quali sono i consigli chiave per difendersi da un aggressione Feudale nei primi minuti?' }
     ]
   },
   {
@@ -48,20 +47,20 @@ const FUNNEL_CATEGORIES: FunnelCategory[] = [
     icon: '🏰',
     description: '2 TC, Fast Castle, Boom Economico',
     options: [
-      { label: '🏗️ Quando conviene fare il 2° Centro Città (2 TC)?', prompt: 'Quando conviene costruire il 2° Centro Città (2 TC) e con quali civiltà?' },
-      { label: '🏰 Come fare una Fast Castle sicura ed efficace?', prompt: 'Come si esegue una strategia Fast Castle (Età III veloce)?' },
-      { label: '💰 Come gestire l\'economia in Età Imperiale?', prompt: 'Come ottimizzo la produzione di villi e risorse in Età IV?' }
+      { label: '💰 Quando conviene fare il secondo Centro Città (2 TC)?', prompt: 'In quali matchup conviene passare a 2 TC e a quale minutaggio ideale?' },
+      { label: '👑 Come eseguire una Fast Castle in sicurezza?', prompt: 'Quali sono le civiltà migliori per la Fast Castle e come difendersi durante il passaggio di età?' },
+      { label: '📈 Come gestire l\'economia in Età Imperiale (Post-Boom)?', prompt: 'Come ripartire i villi in Età IV per sostenere l\'esercito ed il riaddestramento rapido?' }
     ]
   },
   {
     id: 'matchups',
     label: 'Guida ai Matchup & Civiltà',
     icon: '🛡️',
-    description: 'Consigli contro civiltà specifiche',
+    description: 'Consigli contro civiltà specifiche e percentuali reali',
     options: [
-      { label: '🐎 Come contrasto la Cavalleria Francese?', prompt: 'Come contrasto i Cavalieri Reali Francesi in Età II?' },
-      { label: '🏹 Come affrontare gli Inglesi e gli Arcieri Lunghi?', prompt: 'Come si batte la combinazione Arcieri Lunghi + Picchieri degli Inglesi?' },
-      { label: '⛺ Come difendersi dagli attacchi rapidi dei Mongoli?', prompt: 'Come difendersi dai raid e dalla pressione iniziale dei Mongoli?' }
+      { label: '🇫🇷 Come giocare Inglesi contro Francesi?', prompt: 'Qual è la guida tattica e il win rate per Inglesi contro Francesi?' },
+      { label: '🇩🇪 Come contrastare il Sacro Romano Impero (SRI)?', prompt: 'Come impedire al Sacro Romano Impero di raccogliere tutte le reliquie in Fast Castle?' },
+      { label: '🇨🇳 Dinastia Jin vs Mongoli a livello Conqueror?', prompt: 'Chi vince a livello Conqueror tra Dinastia Jin e Mongoli e quali sono i win rate del sito?' }
     ]
   },
   {
@@ -72,7 +71,7 @@ const FUNNEL_CATEGORIES: FunnelCategory[] = [
     options: [
       { label: '🗡️ Quali sono i counter principali per ogni unità?', prompt: 'Qual è la tabella completa delle contromisure delle unità in AoE4?' },
       { label: '🪵 Come contrastare le armi d\'assedio?', prompt: 'Qual è il modo migliore per distruggere Manganelli e Bombarde nemiche?' },
-      { label: '🐎 Quando produrre la Cavalleria Leggera?', prompt: 'In quali situazioni la Cavalleria Leggera (Stradiotti/Cavalleria) è la scelta migliore?' }
+      { label: '🐎 Quando produrre la Cavalleria Leggera?', prompt: 'In quali situazioni la Cavalleria Leggera è la scelta migliore?' }
     ]
   },
   {
@@ -99,12 +98,23 @@ export const CoachBeastyWidget: React.FC = () => {
   const [selectedFunnelCategory, setSelectedFunnelCategory] = useState<FunnelCategory | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
 
+  // Draggable position state for trigger button
+  const [btnPos, setBtnPos] = useState<{ x: number; y: number } | null>(null);
+  const isDraggingBtnRef = useRef(false);
+  const dragBtnStartRef = useRef({ startX: 0, startY: 0, initX: 0, initY: 0 });
+  const hasBtnMovedRef = useRef(false);
+
+  // Draggable position state for chat modal drawer
+  const [modalPos, setModalPos] = useState<{ x: number; y: number } | null>(null);
+  const isDraggingModalRef = useRef(false);
+  const dragModalStartRef = useRef({ startX: 0, startY: 0, initX: 0, initY: 0 });
+
   useEffect(() => {
     setMessages([
       {
         id: 'welcome',
         sender: 'coach',
-        text: `Ciao **${displayName}**! 👋 Sono **Coach Beasty AI**.\n\nChiedimi consigli su matchup, contromisure delle unità, posizionamento delle strutture o distribuzione dei villi per qualsiasi civiltà!`,
+        text: `Ciao **${displayName}**! 👋 Sono **Coach Beasty AI**.\n\nChiedimi consigli su matchup, win rate reali, contromisure delle unità, posizionamento o distribuzione dei villi!`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
     ]);
@@ -131,14 +141,12 @@ export const CoachBeastyWidget: React.FC = () => {
     setTimeout(applyScrollTop, 120);
   };
 
-  // Scroll to top when opening widget so initial welcome message is shown at top
   useEffect(() => {
     if (isOpen) {
       scrollToTop();
     }
   }, [isOpen]);
 
-  // Scroll to bottom only when new user/coach messages are added (more than initial welcome message)
   useEffect(() => {
     if (isOpen && (messages.length > 1 || loading)) {
       scrollToBottom();
@@ -229,20 +237,155 @@ export const CoachBeastyWidget: React.FC = () => {
     return () => clearInterval(interval);
   }, [isOpen]);
 
+  // --- Trigger Button Drag Handlers ---
+  const handleBtnPointerDown = (e: React.PointerEvent) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    isDraggingBtnRef.current = true;
+    hasBtnMovedRef.current = false;
+
+    const defaultX = window.innerWidth - 76;
+    const defaultY = window.innerHeight - 96;
+    const initX = btnPos ? btnPos.x : defaultX;
+    const initY = btnPos ? btnPos.y : defaultY;
+
+    dragBtnStartRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      initX,
+      initY
+    };
+
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch (err) {}
+  };
+
+  const handleBtnPointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingBtnRef.current) return;
+    const deltaX = e.clientX - dragBtnStartRef.current.startX;
+    const deltaY = e.clientY - dragBtnStartRef.current.startY;
+
+    if (Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4) {
+      hasBtnMovedRef.current = true;
+    }
+
+    const newX = Math.max(10, Math.min(window.innerWidth - 66, dragBtnStartRef.current.initX + deltaX));
+    const newY = Math.max(10, Math.min(window.innerHeight - 66, dragBtnStartRef.current.initY + deltaY));
+
+    setBtnPos({ x: newX, y: newY });
+  };
+
+  const handleBtnPointerUp = (e: React.PointerEvent) => {
+    if (!isDraggingBtnRef.current) return;
+    isDraggingBtnRef.current = false;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch (err) {}
+
+    if (!hasBtnMovedRef.current) {
+      setIsOpen(prev => !prev);
+    }
+  };
+
+  // --- Modal Header Drag Handlers ---
+  const handleHeaderPointerDown = (e: React.PointerEvent) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    if ((e.target as HTMLElement).closest('button')) return;
+
+    isDraggingModalRef.current = true;
+
+    const modalWidth = Math.min(440, window.innerWidth * 0.94);
+    const defaultX = Math.max(10, window.innerWidth - modalWidth - 24);
+    const defaultY = hasActiveBanner ? 112 : 70;
+
+    const initX = modalPos ? modalPos.x : defaultX;
+    const initY = modalPos ? modalPos.y : defaultY;
+
+    dragModalStartRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      initX,
+      initY
+    };
+
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch (err) {}
+  };
+
+  const handleHeaderPointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingModalRef.current) return;
+    const deltaX = e.clientX - dragModalStartRef.current.startX;
+    const deltaY = e.clientY - dragModalStartRef.current.startY;
+
+    const modalWidth = Math.min(440, window.innerWidth * 0.94);
+    const newX = Math.max(10, Math.min(window.innerWidth - modalWidth - 10, dragModalStartRef.current.initX + deltaX));
+    const newY = Math.max(10, Math.min(window.innerHeight - 180, dragModalStartRef.current.initY + deltaY));
+
+    setModalPos({ x: newX, y: newY });
+  };
+
+  const handleHeaderPointerUp = (e: React.PointerEvent) => {
+    if (!isDraggingModalRef.current) return;
+    isDraggingModalRef.current = false;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch (err) {}
+  };
+
+  const renderFormattedText = (text: string) => {
+    const lines = text.split('\n');
+    return lines.map((line, lIdx) => {
+      const parts = line.split(/(\*\*.*?\*\*)/g);
+      return (
+        <React.Fragment key={lIdx}>
+          {parts.map((part, pIdx) => {
+            if (part.startsWith('**') && part.endsWith('**')) {
+              const cleanBold = part.slice(2, -2);
+              const isUserNick = cleanBold.toLowerCase() === displayName.toLowerCase();
+              return (
+                <strong 
+                  key={pIdx} 
+                  className={isUserNick ? "font-bold text-cyan-300 drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]" : "font-bold text-slate-100"}
+                >
+                  {cleanBold}
+                </strong>
+              );
+            }
+            return part;
+          })}
+          {lIdx < lines.length - 1 && <br />}
+        </React.Fragment>
+      );
+    });
+  };
+
   return (
     <>
-      {/* Drawer Dialog Modal - Adaptively positions top-28 when announcement banner is active to prevent cutoff */}
+      {/* Drawer Dialog Modal - Draggable via header */}
       {isOpen && (
-        <div className={`fixed ${hasActiveBanner ? 'top-28 sm:top-28' : 'top-16 sm:top-20'} bottom-20 sm:bottom-24 right-4 sm:right-6 w-[94vw] sm:w-[440px] max-h-[580px] bg-[#0a0c10]/95 backdrop-blur-xl border border-[#D4AF37]/30 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200 z-[9999] font-sans select-none pointer-events-auto`}>
+        <div 
+          style={modalPos ? { left: `${modalPos.x}px`, top: `${modalPos.y}px` } : undefined}
+          className={modalPos 
+            ? "fixed w-[94vw] sm:w-[440px] h-[580px] max-h-[calc(100vh-5rem)] bg-[#0a0c10]/95 backdrop-blur-xl border border-[#D4AF37]/30 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden animate-in fade-in duration-200 z-[9999] font-sans select-none pointer-events-auto"
+            : `fixed ${hasActiveBanner ? 'top-28 sm:top-28' : 'top-16 sm:top-20'} bottom-20 sm:bottom-24 right-4 sm:right-6 w-[94vw] sm:w-[440px] max-h-[580px] bg-[#0a0c10]/95 backdrop-blur-xl border border-[#D4AF37]/30 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200 z-[9999] font-sans select-none pointer-events-auto`
+          }
+        >
           
-          {/* Header */}
-          <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-blue-950/80 p-3.5 border-b border-[#D4AF37]/20 flex items-center justify-between shrink-0 relative z-10">
-            <div className="flex items-center space-x-3">
+          {/* Header - DragHandle */}
+          <div 
+            onPointerDown={handleHeaderPointerDown}
+            onPointerMove={handleHeaderPointerMove}
+            onPointerUp={handleHeaderPointerUp}
+            className="bg-gradient-to-r from-slate-900 via-slate-900 to-blue-950/80 p-3.5 border-b border-[#D4AF37]/20 flex items-center justify-between shrink-0 relative z-10 cursor-grab active:cursor-grabbing"
+            title="Trascina per spostare la chat"
+          >
+            <div className="flex items-center space-x-3 pointer-events-none">
               <div className="relative">
                 <img 
                   src="/beasty_avatar.jpg" 
                   alt="Coach Beasty AI" 
-                  className="w-9 h-9 rounded-xl object-cover border border-[#D4AF37]/50 shadow-md pointer-events-none"
+                  className="w-9 h-9 rounded-xl object-cover border border-[#D4AF37]/50 shadow-md"
                 />
                 <span className="absolute -top-1 -right-1 flex h-3 w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
@@ -250,7 +393,7 @@ export const CoachBeastyWidget: React.FC = () => {
                 </span>
               </div>
               <div>
-                <h3 className="font-bold text-[#D4AF37] text-base tracking-wide">
+                <h3 className="font-bold text-[#D4AF37] text-base tracking-wide flex items-center gap-1.5">
                   Coach Beasty AI
                 </h3>
               </div>
@@ -300,250 +443,188 @@ export const CoachBeastyWidget: React.FC = () => {
             {messages.map((msg) => (
               <div 
                 key={msg.id} 
-                className={`flex items-start space-x-2.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex gap-3 ${msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
               >
-                {msg.sender === 'coach' && (
+                {msg.sender === 'coach' ? (
                   <img 
                     src="/beasty_avatar.jpg" 
-                    alt="Coach Beasty" 
-                    className="w-8 h-8 rounded-lg object-cover border border-[#D4AF37]/40 shrink-0 mt-0.5" 
+                    alt="Beasty" 
+                    className="w-7 h-7 rounded-lg object-cover border border-[#D4AF37]/40 shrink-0 mt-0.5"
                   />
+                ) : (
+                  user?.avatar_url ? (
+                    <img 
+                      src={user.avatar_url} 
+                      alt={displayName} 
+                      className="w-7 h-7 rounded-lg object-cover border border-cyan-500/40 shrink-0 mt-0.5"
+                    />
+                  ) : (
+                    <div className="w-7 h-7 rounded-lg bg-blue-600/80 border border-cyan-400/30 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5">
+                      {displayName.charAt(0).toUpperCase()}
+                    </div>
+                  )
                 )}
 
-                <div className={`max-w-[86%] rounded-2xl p-3.5 shadow-md ${
+                <div className={`max-w-[85%] rounded-2xl p-3 text-sm leading-relaxed ${
                   msg.sender === 'user' 
-                    ? 'bg-blue-600/25 border border-blue-500/40 text-blue-100 rounded-tr-none' 
-                    : 'bg-slate-900/90 border border-slate-800 text-slate-200 rounded-tl-none space-y-3'
+                    ? 'bg-blue-600/90 text-white rounded-tr-none shadow-md shadow-blue-900/30 border border-blue-400/30' 
+                    : 'bg-slate-900/95 text-slate-100 border border-slate-800 rounded-tl-none shadow-lg'
                 }`}>
-                  
-                  {/* Message Text with Larger Font (text-sm / 14px) and formatted Markdown */}
-                  <div className="whitespace-pre-wrap leading-relaxed text-sm sm:text-[15px] select-text">
-                    {(() => {
-                      const cleanedText = msg.text.replace(/^#+\s*/gm, '');
-                      return cleanedText.split('\n\n').map((paragraph, pIdx) => {
-                        const parts = paragraph.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
-                        return (
-                          <p key={pIdx} className={pIdx > 0 ? 'mt-2' : ''}>
-                            {parts.map((part, idx) => {
-                              if (part.startsWith('**') && part.endsWith('**')) {
-                                const content = part.slice(2, -2);
-                                const isUserMention = displayName && displayName !== 'nabbo' && content.toLowerCase().includes(displayName.toLowerCase());
-                                return (
-                                  <strong key={idx} className={`font-bold ${isUserMention ? 'text-cyan-300' : 'text-slate-100'}`}>
-                                    {content}
-                                  </strong>
-                                );
-                              }
-                              if (part.startsWith('*') && part.endsWith('*')) {
-                                return (
-                                  <em key={idx} className="italic text-slate-200">
-                                    {part.slice(1, -1)}
-                                  </em>
-                                );
-                              }
-                              return part;
-                            })}
-                          </p>
-                        );
-                      });
-                    })()}
+                  <div className="text-slate-100 space-y-1">
+                    {renderFormattedText(msg.text)}
                   </div>
 
-                  {/* Tactical Card Render */}
                   {msg.tacticalCard && (
-                    <div className="bg-slate-950/90 border border-[#D4AF37]/30 rounded-xl p-3.5 space-y-3 mt-2">
-                      {(msg.tacticalCard.title || msg.tacticalCard.age) && (
-                        <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                          <span className="font-bold text-[#D4AF37] text-sm flex items-center gap-1.5">
-                            <Swords className="w-4 h-4 text-[#D4AF37]" />
-                            {msg.tacticalCard.title || 'Scheda Tattica'}
+                    <div className="mt-3 p-3 bg-slate-950/90 border border-[#D4AF37]/30 rounded-xl space-y-2.5">
+                      {msg.tacticalCard.title && (
+                        <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                          <span className="font-bold text-[#D4AF37] text-xs uppercase tracking-wider flex items-center gap-1.5">
+                            <Swords className="w-3.5 h-3.5" />
+                            {msg.tacticalCard.title}
                           </span>
                           {msg.tacticalCard.age && (
-                            <span className="text-xs bg-blue-500/10 text-blue-300 px-2.5 py-0.5 rounded border border-blue-500/20 font-medium">
+                            <span className="text-[10px] bg-blue-950 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full font-semibold">
                               {msg.tacticalCard.age}
                             </span>
                           )}
                         </div>
                       )}
 
-                      {/* Counter Units Grid */}
                       {msg.tacticalCard.counterUnits && msg.tacticalCard.counterUnits.length > 0 && (
-                        <div className="space-y-1.5">
-                          <span className="text-xs text-slate-400 font-semibold flex items-center gap-1">
-                            <Shield className="w-3.5 h-3.5 text-emerald-400" /> Unità Consigliate:
-                          </span>
-                          <div className="grid grid-cols-2 gap-2">
-                            {msg.tacticalCard.counterUnits.map((u, i) => (
-                              <div key={i} className="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 flex items-center space-x-2">
-                                <span className="text-lg">{u.icon || '🛡️'}</span>
-                                <div className="min-w-0 flex-1">
-                                  <div className="font-semibold text-emerald-400 text-xs sm:text-sm truncate">{u.name}</div>
-                                  <div className="text-[11px] text-slate-400 truncate">{u.role}</div>
-                                </div>
+                        <div className="space-y-1">
+                          <span className="text-[11px] font-semibold text-slate-400 block">Contromisure consigliate:</span>
+                          <div className="grid grid-cols-1 gap-1">
+                            {msg.tacticalCard.counterUnits.map((unit, idx) => (
+                              <div key={idx} className="flex items-center justify-between text-xs bg-slate-900/80 px-2.5 py-1 rounded border border-slate-800">
+                                <span className="font-medium text-slate-200 flex items-center gap-1.5">
+                                  <span>{unit.icon || '⚔️'}</span>
+                                  <span>{unit.name}</span>
+                                </span>
+                                {unit.role && <span className="text-[10px] text-slate-400">{unit.role}</span>}
                               </div>
                             ))}
                           </div>
                         </div>
                       )}
 
-                      {/* Villi Distribution */}
-                      {(msg.tacticalCard.villi || msg.tacticalCard.villagers) && (
-                        <div className="space-y-1.5">
-                          <span className="text-xs text-slate-400 font-semibold">🌾 Villi consigliati:</span>
-                          <div className="grid grid-cols-4 gap-1.5 text-center">
-                            {(() => {
-                              const v = msg.tacticalCard.villi || msg.tacticalCard.villagers || {};
-                              return (
-                                <>
-                                  <div className="bg-amber-950/30 border border-amber-500/20 p-1.5 rounded-lg">
-                                    <div className="text-slate-400 text-[10px]">Cibo</div>
-                                    <div className="font-bold text-[#D4AF37] text-sm">{v.food ?? 0}</div>
-                                  </div>
-                                  <div className="bg-emerald-950/30 border border-emerald-500/20 p-1.5 rounded-lg">
-                                    <div className="text-slate-400 text-[10px]">Legno</div>
-                                    <div className="font-bold text-emerald-400 text-sm">{v.wood ?? 0}</div>
-                                  </div>
-                                  <div className="bg-yellow-950/30 border border-yellow-500/20 p-1.5 rounded-lg">
-                                    <div className="text-slate-400 text-[10px]">Oro</div>
-                                    <div className="font-bold text-yellow-400 text-sm">{v.gold ?? 0}</div>
-                                  </div>
-                                  <div className="bg-slate-800/40 border border-slate-700/20 p-1.5 rounded-lg">
-                                    <div className="text-slate-400 text-[10px]">Pietra</div>
-                                    <div className="font-bold text-slate-300 text-sm">{v.stone ?? 0}</div>
-                                  </div>
-                                </>
-                              );
-                            })()}
+                      {msg.tacticalCard.villi && (
+                        <div className="space-y-1">
+                          <span className="text-[11px] font-semibold text-slate-400 block">Ripartizione Villi consigliata:</span>
+                          <div className="grid grid-cols-4 gap-1 text-center">
+                            <div className="bg-amber-950/40 border border-amber-500/30 rounded p-1">
+                              <span className="block text-[10px] text-amber-300 font-bold">🌾 Cibo</span>
+                              <span className="text-xs font-black text-amber-200">{msg.tacticalCard.villi.food || 0}</span>
+                            </div>
+                            <div className="bg-emerald-950/40 border border-emerald-500/30 rounded p-1">
+                              <span className="block text-[10px] text-emerald-300 font-bold">🪵 Legna</span>
+                              <span className="text-xs font-black text-emerald-200">{msg.tacticalCard.villi.wood || 0}</span>
+                            </div>
+                            <div className="bg-yellow-950/40 border border-yellow-500/30 rounded p-1">
+                              <span className="block text-[10px] text-yellow-300 font-bold">🪙 Oro</span>
+                              <span className="text-xs font-black text-yellow-200">{msg.tacticalCard.villi.gold || 0}</span>
+                            </div>
+                            <div className="bg-slate-800/60 border border-slate-600/30 rounded p-1">
+                              <span className="block text-[10px] text-slate-300 font-bold">🪨 Pietra</span>
+                              <span className="text-xs font-black text-slate-100">{msg.tacticalCard.villi.stone || 0}</span>
+                            </div>
                           </div>
                         </div>
                       )}
 
-                      {/* Pro Tip */}
                       {msg.tacticalCard.proTip && (
-                        <div className="bg-blue-950/40 border-l-2 border-[#D4AF37] p-2.5 rounded-r-lg text-xs sm:text-sm text-slate-200 flex items-start gap-2">
-                          <Zap className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
-                          <span><strong>Tip Pro:</strong> {msg.tacticalCard.proTip}</span>
+                        <div className="bg-blue-950/40 border border-blue-500/20 p-2 rounded text-xs text-blue-200 flex items-start gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
+                          <span><strong>Pro Tip:</strong> {msg.tacticalCard.proTip}</span>
                         </div>
                       )}
                     </div>
                   )}
 
-                  <div className={`text-[10px] mt-1 text-right ${msg.sender === 'user' ? 'text-blue-300/60' : 'text-slate-500'}`}>
+                  <span className="block text-[10px] opacity-40 text-right mt-1 font-mono">
                     {msg.timestamp}
-                  </div>
+                  </span>
                 </div>
-
-                {msg.sender === 'user' && (
-                  user?.avatar_url ? (
-                    <img 
-                      src={user.avatar_url} 
-                      alt={displayName} 
-                      className="w-8 h-8 rounded-lg object-cover border border-blue-400/50 shrink-0 mt-0.5 shadow-md" 
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-lg bg-blue-600 text-white font-bold flex items-center justify-center shrink-0 mt-0.5 text-xs shadow-md">
-                      {displayName.charAt(0).toUpperCase()}
-                    </div>
-                  )
-                )}
               </div>
             ))}
 
-            {/* INTERACTIVE FUNNEL SYSTEM */}
-            {messages.length <= 2 && !loading && (
-              <div className="pt-2 space-y-2 border-t border-slate-800/80">
-                
-                {/* Funnel Level 1: Main Category Selection */}
-                {!selectedFunnelCategory ? (
-                  <div className="space-y-2">
-                    <span className="text-xs uppercase font-bold text-[#D4AF37] tracking-wider block">
-                      Cosa stai cercando?
-                    </span>
-                    <div className="space-y-1.5">
-                      {FUNNEL_CATEGORIES.map((cat) => (
-                        <button
-                          key={cat.id}
-                          onClick={() => setSelectedFunnelCategory(cat)}
-                          className="w-full text-left bg-slate-900/90 hover:bg-blue-950/40 hover:border-blue-500/50 border border-slate-800 p-2.5 rounded-xl transition flex items-center justify-between group"
-                        >
-                          <div className="flex items-center space-x-2.5 min-w-0">
-                            <span className="text-lg">{cat.icon}</span>
-                            <div className="min-w-0">
-                              <div className="font-semibold text-slate-200 text-xs sm:text-sm group-hover:text-blue-300 transition">
-                                {cat.label}
-                              </div>
-                              <div className="text-[11px] text-slate-400 truncate">
-                                {cat.description}
-                              </div>
-                            </div>
+            {/* Funnel Navigation */}
+            {selectedFunnelCategory ? (
+              <div className="bg-slate-900/90 border border-blue-500/30 rounded-xl p-3 space-y-2.5 animate-in fade-in duration-200">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-base">{selectedFunnelCategory.icon}</span>
+                    <span className="font-bold text-xs text-[#D4AF37] uppercase tracking-wider">{selectedFunnelCategory.label}</span>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedFunnelCategory(null)}
+                    className="text-[11px] text-blue-400 hover:text-blue-300 font-medium hover:underline"
+                  >
+                    ← Torna al menu
+                  </button>
+                </div>
+                <div className="space-y-1.5">
+                  {selectedFunnelCategory.options.map((opt, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleSendMessage(opt.prompt)}
+                      disabled={loading}
+                      className="w-full text-left p-2.5 bg-slate-950 hover:bg-blue-950/60 border border-slate-800 hover:border-blue-500/50 rounded-lg text-xs text-slate-200 hover:text-white transition flex items-center justify-between group disabled:opacity-50"
+                    >
+                      <span>{opt.label}</span>
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-blue-400 transition-transform group-hover:translate-x-0.5 shrink-0 ml-2" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 space-y-2 animate-in fade-in duration-200">
+                <div className="flex items-center space-x-2 pb-1 border-b border-slate-800/80">
+                  <span className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider">Cosa stai cercando?</span>
+                </div>
+                <div className="grid grid-cols-1 gap-1.5">
+                  {FUNNEL_CATEGORIES.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setSelectedFunnelCategory(cat)}
+                      disabled={loading}
+                      className="w-full text-left p-2.5 bg-slate-950/90 hover:bg-slate-800/80 border border-slate-800/80 hover:border-[#D4AF37]/40 rounded-xl transition flex items-center justify-between group disabled:opacity-50"
+                    >
+                      <div className="flex items-center space-x-2.5 min-w-0">
+                        <span className="text-base shrink-0">{cat.icon}</span>
+                        <div className="truncate">
+                          <div className="font-semibold text-xs text-slate-200 group-hover:text-[#D4AF37] transition-colors truncate">
+                            {cat.label}
                           </div>
-                          <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-[#D4AF37] shrink-0 transition" />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  /* Funnel Level 2: Options for selected category */
-                  <div className="space-y-2 animate-in fade-in duration-150">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-bold text-[#D4AF37] flex items-center gap-1.5">
-                        <span>{selectedFunnelCategory.icon}</span>
-                        <span>{selectedFunnelCategory.label}</span>
-                      </span>
-                      <button
-                        onClick={() => setSelectedFunnelCategory(null)}
-                        className="text-[11px] text-slate-400 hover:text-blue-400 flex items-center gap-1 hover:underline transition"
-                      >
-                        <ArrowLeft className="w-3 h-3" />
-                        <span>Torna alle opzioni</span>
-                      </button>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      {selectedFunnelCategory.options.map((opt, i) => (
-                        <button
-                          key={i}
-                          onClick={() => handleSendMessage(opt.prompt)}
-                          className="w-full text-left bg-slate-900/90 hover:bg-blue-950/40 hover:border-blue-500/40 border border-slate-800 text-xs sm:text-sm text-slate-200 p-2.5 rounded-xl transition flex items-center justify-between group"
-                        >
-                          <span className="pr-2 leading-snug">{opt.label}</span>
-                          <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-[#D4AF37] shrink-0 transition" />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
+                          <div className="text-[10px] text-slate-400 truncate">
+                            {cat.description}
+                          </div>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-[#D4AF37] transition-transform group-hover:translate-x-0.5 shrink-0 ml-2" />
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 
-            {/* Loading Indicator */}
             {loading && (
-              <div className="flex items-center space-x-2.5">
-                <img 
-                  src="/beasty_avatar.jpg" 
-                  alt="Coach Beasty" 
-                  className="w-8 h-8 rounded-lg object-cover border border-[#D4AF37]/40 shrink-0 animate-pulse" 
-                />
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-none p-3 text-slate-300 text-xs sm:text-sm flex items-center space-x-2">
-                  <div className="flex space-x-1">
-                    <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                    <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                    <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></span>
-                  </div>
-                  <span>Coach Beasty sta elaborando la tattica per {displayName}...</span>
-                </div>
+              <div className="flex items-center space-x-2 text-slate-400 text-xs p-2 bg-slate-900/60 rounded-xl border border-slate-800/60 w-fit animate-pulse">
+                <img src="/beasty_avatar.jpg" alt="Beasty" className="w-5 h-5 rounded-md object-cover" />
+                <span>Coach Beasty sta elaborando la strategia...</span>
               </div>
             )}
 
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Bar */}
-          <div className="p-3 bg-slate-950 border-t border-slate-800/80 shrink-0">
+          {/* Input Footer */}
+          <div className="p-3 bg-slate-900 border-t border-[#D4AF37]/20 shrink-0">
             <form 
-              onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }}
-              className="flex items-center space-x-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSendMessage();
+              }}
+              className="flex items-center gap-2"
             >
               <input
                 type="text"
@@ -551,12 +632,12 @@ export const CoachBeastyWidget: React.FC = () => {
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder={`Chiedi a Coach Beasty, ${displayName}...`}
                 disabled={loading}
-                className="flex-1 bg-slate-900 border border-slate-700/80 focus:border-blue-500/60 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none transition"
+                className="flex-1 bg-slate-950 border border-slate-800 focus:border-[#D4AF37]/60 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none transition disabled:opacity-50"
               />
               <button
                 type="submit"
-                disabled={loading || !inputMessage.trim()}
-                className="bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold p-2.5 rounded-xl text-xs sm:text-sm flex items-center justify-center transition shadow-md shadow-blue-600/20"
+                disabled={!inputMessage.trim() || loading}
+                className="bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:hover:bg-blue-600 text-white p-2 rounded-xl transition shadow-md shadow-blue-950 cursor-pointer shrink-0"
                 title="Invia messaggio"
               >
                 <Send className="w-4 h-4 text-white" />
@@ -567,13 +648,21 @@ export const CoachBeastyWidget: React.FC = () => {
         </div>
       )}
 
-      {/* Floating Trigger Button */}
-      <div className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-[9990] font-sans select-none">
+      {/* Floating Trigger Button - Draggable */}
+      <div 
+        style={btnPos ? { left: `${btnPos.x}px`, top: `${btnPos.y}px` } : undefined}
+        onPointerDown={handleBtnPointerDown}
+        onPointerMove={handleBtnPointerMove}
+        onPointerUp={handleBtnPointerUp}
+        className={btnPos 
+          ? "fixed z-[9990] font-sans select-none cursor-grab active:cursor-grabbing touch-none" 
+          : "fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-[9990] font-sans select-none cursor-grab active:cursor-grabbing touch-none"
+        }
+        title="Trascina per spostare il bottone"
+      >
         <button
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="group relative flex items-center justify-center w-14 h-14 rounded-full bg-slate-900 border-2 border-[#D4AF37] shadow-xl shadow-blue-900/40 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer overflow-hidden p-0.5"
-          title="Coach Beasty AI"
+          className="group relative flex items-center justify-center w-14 h-14 rounded-full bg-slate-900 border-2 border-[#D4AF37] shadow-xl shadow-blue-900/40 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer overflow-hidden p-0.5 pointer-events-none"
         >
           <div className="relative w-full h-full flex items-center justify-center">
             {isOpen ? (

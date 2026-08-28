@@ -826,7 +826,7 @@ const civilizationsDataRaw: Civilization[] = [
     "name": "Dinastia Jin",
     "flag": "/civs/Jin Dynasty.webp",
     "difficulty": "Difficile",
-    "shortDescription": "Una civiltà nomade e imperiale che domina con la sua cavalleria d'élite e la potenza d'assedio superiore. I Jin eccellono nel controllo della mappa grazie ai villaggi a cavallo e ai tributari che potenziano la loro economia.",
+    "shortDescription": "Una civiltà imperiale che domina con la sua cavalleria d'élite e la potenza d'assedio superiore. I Jin eccellono nel controllo della mappa grazie ai villaggi a cavallo e ai tributari che potenziano la loro economia.",
     "passiveBonuses": [
       "Villaggi a Cavallo: Può addestrare fino a 20 villaggi a cavallo che raccolgono risorse e si muovono più velocemente dei villaggi standard.",
       "Pascoli (Grasslands): Permette di costruire un Pascolo in una posizione strategica al passaggio di epoca per la produzione rapida di cavalleria.",
