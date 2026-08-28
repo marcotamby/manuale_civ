@@ -47,7 +47,7 @@ const FUNNEL_CATEGORIES: FunnelCategory[] = [
     icon: '🏰',
     description: '2 TC, Fast Castle, Boom Economico',
     options: [
-      { label: '💰 Quando conviene fare il secondo Centro Città (2 TC)?', prompt: 'In quali matchup conviene passare a 2 TC e a quale minutaggio ideale?' },
+      { label: '💎 Quando conviene fare il secondo Centro Città (2 TC)?', prompt: 'In quali matchup conviene passare a 2 TC e a quale minutaggio ideale?' },
       { label: '👑 Come eseguire una Fast Castle in sicurezza?', prompt: 'Quali sono le civiltà migliori per la Fast Castle e come difendersi durante il passaggio di età?' },
       { label: '📈 Come gestire l\'economia in Età Imperiale (Post-Boom)?', prompt: 'Come ripartire i villi in Età IV per sostenere l\'esercito ed il riaddestramento rapido?' }
     ]
@@ -90,7 +90,7 @@ const FUNNEL_CATEGORIES: FunnelCategory[] = [
 export const CoachBeastyWidget: React.FC = () => {
   const { user } = useAuth();
   const userNickname = user?.nickname || user?.name || '';
-  const displayName = userNickname || 'nabbo';
+  const displayName = userNickname || 'utente';
 
   const [isOpen, setIsOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
@@ -114,7 +114,9 @@ export const CoachBeastyWidget: React.FC = () => {
       {
         id: 'welcome',
         sender: 'coach',
-        text: `Ciao **${displayName}**! 👋 Sono **Coach Beasty AI**.\n\nChiedimi consigli su matchup, win rate reali, contromisure delle unità, posizionamento o distribuzione dei villi!`,
+        text: displayName !== 'utente' 
+          ? `Ciao **${displayName}**! 👋 Sono **Coach Beasty AI**.\n\nChiedimi consigli su matchup, win rate reali, contromisure delle unità, posizionamento o distribuzione dei villi!`
+          : `Ciao! 👋 Sono **Coach Beasty AI**.\n\nChiedimi consigli su matchup, win rate reali, contromisure delle unità, posizionamento o distribuzione dei villi!`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
     ]);
@@ -217,7 +219,9 @@ export const CoachBeastyWidget: React.FC = () => {
       {
         id: 'welcome-' + Date.now(),
         sender: 'coach',
-        text: `Chat azzerata! 🔄 Come posso aiutarti ora nelle tue battaglie, **${displayName}**?`,
+        text: displayName !== 'utente'
+          ? `Chat azzerata! 🔄 Come posso aiutarti ora nelle tue battaglie, **${displayName}**?`
+          : `Chat azzerata! 🔄 Come posso aiutarti ora nelle tue battaglie?`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
     ]);
@@ -388,7 +392,7 @@ export const CoachBeastyWidget: React.FC = () => {
           {parts.map((part, pIdx) => {
             if (part.startsWith('**') && part.endsWith('**')) {
               const cleanBold = part.slice(2, -2);
-              const isUserNick = cleanBold.toLowerCase() === displayName.toLowerCase();
+              const isUserNick = displayName !== 'utente' && cleanBold.toLowerCase() === displayName.toLowerCase();
               return (
                 <strong 
                   key={pIdx} 
@@ -408,13 +412,13 @@ export const CoachBeastyWidget: React.FC = () => {
 
   return (
     <>
-      {/* Drawer Dialog Modal - Draggable via header */}
+      {/* Drawer Dialog Modal - Cyan / Silver / Electric Blue Theme */}
       {isOpen && (
         <div 
           style={modalPos ? { left: `${modalPos.x}px`, top: `${modalPos.y}px` } : undefined}
           className={modalPos 
-            ? "fixed w-[94vw] sm:w-[440px] h-[580px] max-h-[calc(100vh-5rem)] bg-[#0a0c10]/95 backdrop-blur-xl border border-[#D4AF37]/30 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden animate-in fade-in duration-200 z-[9999] font-sans select-none pointer-events-auto"
-            : `fixed ${hasActiveBanner ? 'top-28 sm:top-28' : 'top-16 sm:top-20'} bottom-20 sm:bottom-24 right-4 sm:right-6 w-[94vw] sm:w-[440px] max-h-[580px] bg-[#0a0c10]/95 backdrop-blur-xl border border-[#D4AF37]/30 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200 z-[9999] font-sans select-none pointer-events-auto`
+            ? "fixed w-[94vw] sm:w-[440px] h-[580px] max-h-[calc(100vh-5rem)] bg-[#0a0c10]/95 backdrop-blur-xl border border-cyan-500/30 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden animate-in fade-in duration-200 z-[9999] font-sans select-none pointer-events-auto"
+            : `fixed ${hasActiveBanner ? 'top-28 sm:top-28' : 'top-16 sm:top-20'} bottom-20 sm:bottom-24 right-4 sm:right-6 w-[94vw] sm:w-[440px] max-h-[580px] bg-[#0a0c10]/95 backdrop-blur-xl border border-cyan-500/30 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200 z-[9999] font-sans select-none pointer-events-auto`
           }
         >
           
@@ -423,7 +427,7 @@ export const CoachBeastyWidget: React.FC = () => {
             onPointerDown={handleHeaderPointerDown}
             onPointerMove={handleHeaderPointerMove}
             onPointerUp={handleHeaderPointerUp}
-            className="bg-gradient-to-r from-slate-900 via-slate-900 to-blue-950/80 p-3.5 border-b border-[#D4AF37]/20 flex items-center justify-between shrink-0 relative z-10 cursor-grab active:cursor-grabbing"
+            className="bg-gradient-to-r from-slate-900 via-slate-900 to-blue-950/80 p-3.5 border-b border-cyan-500/20 flex items-center justify-between shrink-0 relative z-10 cursor-grab active:cursor-grabbing"
             title="Trascina per spostare la chat"
           >
             <div className="flex items-center space-x-3 pointer-events-none">
@@ -431,15 +435,15 @@ export const CoachBeastyWidget: React.FC = () => {
                 <img 
                   src="/beasty_avatar.jpg" 
                   alt="Coach Beasty AI" 
-                  className="w-9 h-9 rounded-xl object-cover border border-[#D4AF37]/50 shadow-md"
+                  className="w-9 h-9 rounded-xl object-cover border border-cyan-500/40 shadow-md"
                 />
                 <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
                 </span>
               </div>
               <div>
-                <h3 className="font-bold text-[#D4AF37] text-base tracking-wide flex items-center gap-1.5">
+                <h3 className="font-bold text-cyan-400 text-base tracking-wide flex items-center gap-1.5">
                   Coach Beasty AI
                 </h3>
               </div>
@@ -454,7 +458,7 @@ export const CoachBeastyWidget: React.FC = () => {
                   handleResetChat();
                 }} 
                 onPointerDown={(e) => e.stopPropagation()}
-                className="text-slate-400 hover:text-[#D4AF37] p-2 rounded-lg hover:bg-slate-800/80 transition cursor-pointer"
+                className="text-slate-400 hover:text-cyan-300 p-2 rounded-lg hover:bg-slate-800/80 transition cursor-pointer"
                 title="Azzera conversazione"
               >
                 <RotateCcw className="w-4.5 h-4.5 pointer-events-none" />
@@ -472,7 +476,7 @@ export const CoachBeastyWidget: React.FC = () => {
             </div>
           </div>
 
-          {/* Messages Area - flex-1 min-h-0 ensures clean internal scrolling */}
+          {/* Messages Area */}
           <div ref={messagesContainerRef} className="flex-1 min-h-0 overflow-y-auto p-3.5 space-y-4 elegant-scrollbar bg-slate-950/80">
             {messages.map((msg) => (
               <div 
@@ -483,7 +487,7 @@ export const CoachBeastyWidget: React.FC = () => {
                   <img 
                     src="/beasty_avatar.jpg" 
                     alt="Beasty" 
-                    className="w-7 h-7 rounded-lg object-cover border border-[#D4AF37]/40 shrink-0 mt-0.5"
+                    className="w-7 h-7 rounded-lg object-cover border border-cyan-500/40 shrink-0 mt-0.5"
                   />
                 ) : (
                   user?.avatar_url ? (
@@ -494,7 +498,7 @@ export const CoachBeastyWidget: React.FC = () => {
                     />
                   ) : (
                     <div className="w-7 h-7 rounded-lg bg-blue-600/80 border border-cyan-400/30 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5">
-                      {displayName.charAt(0).toUpperCase()}
+                      {displayName !== 'utente' ? displayName.charAt(0).toUpperCase() : 'U'}
                     </div>
                   )
                 )}
@@ -509,10 +513,10 @@ export const CoachBeastyWidget: React.FC = () => {
                   </div>
 
                   {msg.tacticalCard && (
-                    <div className="mt-3 p-3 bg-slate-950/90 border border-[#D4AF37]/30 rounded-xl space-y-2.5">
+                    <div className="mt-3 p-3 bg-slate-950/90 border border-cyan-500/30 rounded-xl space-y-2.5">
                       {msg.tacticalCard.title && (
                         <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
-                          <span className="font-bold text-[#D4AF37] text-xs uppercase tracking-wider flex items-center gap-1.5">
+                          <span className="font-bold text-cyan-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
                             <Swords className="w-3.5 h-3.5" />
                             {msg.tacticalCard.title}
                           </span>
@@ -545,17 +549,17 @@ export const CoachBeastyWidget: React.FC = () => {
                         <div className="space-y-1">
                           <span className="text-[11px] font-semibold text-slate-400 block">Ripartizione Villi consigliata:</span>
                           <div className="grid grid-cols-4 gap-1 text-center">
-                            <div className="bg-amber-950/40 border border-amber-500/30 rounded p-1">
-                              <span className="block text-[10px] text-amber-300 font-bold">🌾 Cibo</span>
-                              <span className="text-xs font-black text-amber-200">{msg.tacticalCard.villi.food || 0}</span>
+                            <div className="bg-cyan-950/40 border border-cyan-500/30 rounded p-1">
+                              <span className="block text-[10px] text-cyan-300 font-bold">🌾 Cibo</span>
+                              <span className="text-xs font-black text-cyan-200">{msg.tacticalCard.villi.food || 0}</span>
                             </div>
-                            <div className="bg-emerald-950/40 border border-emerald-500/30 rounded p-1">
-                              <span className="block text-[10px] text-emerald-300 font-bold">🪵 Legna</span>
-                              <span className="text-xs font-black text-emerald-200">{msg.tacticalCard.villi.wood || 0}</span>
+                            <div className="bg-blue-950/40 border border-blue-500/30 rounded p-1">
+                              <span className="block text-[10px] text-blue-300 font-bold">🪵 Legna</span>
+                              <span className="text-xs font-black text-blue-200">{msg.tacticalCard.villi.wood || 0}</span>
                             </div>
-                            <div className="bg-yellow-950/40 border border-yellow-500/30 rounded p-1">
-                              <span className="block text-[10px] text-yellow-300 font-bold">🪙 Oro</span>
-                              <span className="text-xs font-black text-yellow-200">{msg.tacticalCard.villi.gold || 0}</span>
+                            <div className="bg-slate-900 border border-slate-700 rounded p-1">
+                              <span className="block text-[10px] text-slate-300 font-bold">🪙 Oro</span>
+                              <span className="text-xs font-black text-slate-200">{msg.tacticalCard.villi.gold || 0}</span>
                             </div>
                             <div className="bg-slate-800/60 border border-slate-600/30 rounded p-1">
                               <span className="block text-[10px] text-slate-300 font-bold">🪨 Pietra</span>
@@ -567,7 +571,7 @@ export const CoachBeastyWidget: React.FC = () => {
 
                       {msg.tacticalCard.proTip && (
                         <div className="bg-blue-950/40 border border-blue-500/20 p-2 rounded text-xs text-blue-200 flex items-start gap-1.5">
-                          <Sparkles className="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
+                          <Sparkles className="w-3.5 h-3.5 text-cyan-400 shrink-0 mt-0.5" />
                           <span><strong>Pro Tip:</strong> {msg.tacticalCard.proTip}</span>
                         </div>
                       )}
@@ -581,17 +585,17 @@ export const CoachBeastyWidget: React.FC = () => {
               </div>
             ))}
 
-            {/* Funnel Navigation - Clean, Seamless & Borderless Design */}
+            {/* Funnel Navigation - Seamless Cyan/Silver Theme */}
             {selectedFunnelCategory ? (
               <div className="pt-2 pb-1 space-y-2 animate-in fade-in duration-200">
                 <div className="flex items-center justify-between border-b border-slate-800/60 pb-2 px-1">
                   <div className="flex items-center space-x-2">
                     <span className="text-sm">{selectedFunnelCategory.icon}</span>
-                    <span className="font-bold text-xs text-[#D4AF37] uppercase tracking-wider">{selectedFunnelCategory.label}</span>
+                    <span className="font-bold text-xs text-cyan-400 uppercase tracking-wider">{selectedFunnelCategory.label}</span>
                   </div>
                   <button 
                     onClick={() => setSelectedFunnelCategory(null)}
-                    className="text-[11px] text-blue-400 hover:text-blue-300 font-semibold transition"
+                    className="text-[11px] text-cyan-400 hover:text-cyan-300 font-semibold transition"
                   >
                     ← Torna al menu
                   </button>
@@ -602,10 +606,10 @@ export const CoachBeastyWidget: React.FC = () => {
                       key={idx}
                       onClick={() => handleSendMessage(opt.prompt)}
                       disabled={loading}
-                      className="w-full text-left py-2 px-2.5 rounded-lg hover:bg-slate-900/80 text-xs text-slate-300 hover:text-white transition flex items-center justify-between group disabled:opacity-50 border-l-2 border-transparent hover:border-[#D4AF37]"
+                      className="w-full text-left py-2 px-2.5 rounded-lg hover:bg-slate-900/80 text-xs text-slate-300 hover:text-white transition flex items-center justify-between group disabled:opacity-50 border-l-2 border-transparent hover:border-cyan-400"
                     >
                       <span className="font-medium">{opt.label}</span>
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-[#D4AF37] transition-transform group-hover:translate-x-0.5 shrink-0 ml-2" />
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-cyan-400 transition-transform group-hover:translate-x-0.5 shrink-0 ml-2" />
                     </button>
                   ))}
                 </div>
@@ -613,7 +617,7 @@ export const CoachBeastyWidget: React.FC = () => {
             ) : (
               <div className="pt-2 pb-1 space-y-2 animate-in fade-in duration-200">
                 <div className="flex items-center space-x-2 pb-1.5 border-b border-slate-800/60 px-1">
-                  <span className="text-[10px] font-bold text-[#D4AF37] uppercase tracking-widest">Cosa stai cercando?</span>
+                  <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Cosa stai cercando?</span>
                 </div>
                 <div className="space-y-1">
                   {FUNNEL_CATEGORIES.map((cat) => (
@@ -621,12 +625,12 @@ export const CoachBeastyWidget: React.FC = () => {
                       key={cat.id}
                       onClick={() => setSelectedFunnelCategory(cat)}
                       disabled={loading}
-                      className="w-full text-left py-2 px-2.5 rounded-xl hover:bg-slate-900/90 transition flex items-center justify-between group disabled:opacity-50 border-l-2 border-transparent hover:border-[#D4AF37]"
+                      className="w-full text-left py-2 px-2.5 rounded-xl hover:bg-slate-900/90 transition flex items-center justify-between group disabled:opacity-50 border-l-2 border-transparent hover:border-cyan-400"
                     >
                       <div className="flex items-center space-x-3 min-w-0">
                         <span className="text-base shrink-0">{cat.icon}</span>
                         <div className="truncate">
-                          <div className="font-semibold text-xs text-slate-200 group-hover:text-[#D4AF37] transition-colors truncate">
+                          <div className="font-semibold text-xs text-slate-200 group-hover:text-cyan-300 transition-colors truncate">
                             {cat.label}
                           </div>
                           <div className="text-[10px] text-slate-400 truncate">
@@ -634,7 +638,7 @@ export const CoachBeastyWidget: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-[#D4AF37] transition-transform group-hover:translate-x-0.5 shrink-0 ml-2" />
+                      <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-cyan-400 transition-transform group-hover:translate-x-0.5 shrink-0 ml-2" />
                     </button>
                   ))}
                 </div>
@@ -644,7 +648,7 @@ export const CoachBeastyWidget: React.FC = () => {
             {loading && (
               <div className="flex items-center space-x-2 text-slate-400 text-xs p-2 bg-slate-900/60 rounded-xl border border-slate-800/60 w-fit animate-pulse">
                 <img src="/beasty_avatar.jpg" alt="Beasty" className="w-5 h-5 rounded-md object-cover" />
-                <span>Coach Beasty sta elaborando la strategia...</span>
+                <span>Coach Beasty sta elaborando la risposta...</span>
               </div>
             )}
 
@@ -652,7 +656,7 @@ export const CoachBeastyWidget: React.FC = () => {
           </div>
 
           {/* Input Footer */}
-          <div className="p-3 bg-slate-900 border-t border-[#D4AF37]/20 shrink-0">
+          <div className="p-3 bg-slate-900 border-t border-cyan-500/20 shrink-0">
             <form 
               onSubmit={(e) => {
                 e.preventDefault();
@@ -664,9 +668,9 @@ export const CoachBeastyWidget: React.FC = () => {
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder={`Chiedi a Coach Beasty, ${displayName}...`}
+                placeholder={displayName !== 'utente' ? `Chiedi a Coach Beasty, ${displayName}...` : 'Chiedi a Coach Beasty...'}
                 disabled={loading}
-                className="flex-1 bg-slate-950 border border-slate-800 focus:border-[#D4AF37]/60 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none transition disabled:opacity-50"
+                className="flex-1 bg-slate-950 border border-slate-800 focus:border-cyan-400/60 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none transition disabled:opacity-50"
               />
               <button
                 type="submit"
@@ -682,7 +686,7 @@ export const CoachBeastyWidget: React.FC = () => {
         </div>
       )}
 
-      {/* Floating Trigger Button - Hidden when modal is open to avoid orphaned duplicate button */}
+      {/* Floating Trigger Button - Hidden when modal is open */}
       {!isOpen && (
         <div 
           style={btnPos ? { left: `${btnPos.x}px`, top: `${btnPos.y}px` } : undefined}
@@ -697,7 +701,7 @@ export const CoachBeastyWidget: React.FC = () => {
         >
           <button
             type="button"
-            className="group relative flex items-center justify-center w-14 h-14 rounded-full bg-slate-900 border-2 border-[#D4AF37] shadow-xl shadow-blue-900/40 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer overflow-hidden p-0.5 pointer-events-none"
+            className="group relative flex items-center justify-center w-14 h-14 rounded-full bg-slate-900 border-2 border-cyan-400 shadow-xl shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer overflow-hidden p-0.5 pointer-events-none"
           >
             <div className="relative w-full h-full flex items-center justify-center">
               <img 
@@ -706,8 +710,8 @@ export const CoachBeastyWidget: React.FC = () => {
                 className="w-full h-full rounded-full object-cover group-hover:scale-110 transition-transform duration-300"
               />
               <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500 border border-slate-900"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-500 border border-slate-900"></span>
               </span>
             </div>
           </button>
