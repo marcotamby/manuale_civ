@@ -318,6 +318,20 @@ export const CoachBeastyWidget: React.FC = () => {
     }
   };
 
+  const handleCloseModal = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (modalPos) {
+      const modalWidth = Math.min(440, window.innerWidth * 0.94);
+      const bX = Math.max(10, Math.min(window.innerWidth - 66, modalPos.x + modalWidth - 56));
+      const bY = Math.max(10, Math.min(window.innerHeight - 66, modalPos.y + 500));
+      setBtnPos({ x: bX, y: bY });
+    }
+
+    setIsOpen(false);
+  };
+
   // --- Modal Header Drag Handlers ---
   const handleHeaderPointerDown = (e: React.PointerEvent) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
@@ -447,21 +461,9 @@ export const CoachBeastyWidget: React.FC = () => {
               </button>
               <button 
                 type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsOpen(false);
-                }} 
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsOpen(false);
-                }}
-                onTouchEnd={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsOpen(false);
-                }}
+                onClick={handleCloseModal} 
+                onPointerDown={handleCloseModal}
+                onTouchEnd={handleCloseModal}
                 className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800/80 transition cursor-pointer relative z-50"
                 title="Chiudi widget"
               >
@@ -680,41 +682,37 @@ export const CoachBeastyWidget: React.FC = () => {
         </div>
       )}
 
-      {/* Floating Trigger Button - Draggable */}
-      <div 
-        style={btnPos ? { left: `${btnPos.x}px`, top: `${btnPos.y}px` } : undefined}
-        onPointerDown={handleBtnPointerDown}
-        onPointerMove={handleBtnPointerMove}
-        onPointerUp={handleBtnPointerUp}
-        className={btnPos 
-          ? "fixed z-[9990] font-sans select-none cursor-grab active:cursor-grabbing touch-none" 
-          : "fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-[9990] font-sans select-none cursor-grab active:cursor-grabbing touch-none"
-        }
-        title="Trascina per spostare il bottone"
-      >
-        <button
-          type="button"
-          className="group relative flex items-center justify-center w-14 h-14 rounded-full bg-slate-900 border-2 border-[#D4AF37] shadow-xl shadow-blue-900/40 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer overflow-hidden p-0.5 pointer-events-none"
+      {/* Floating Trigger Button - Hidden when modal is open to avoid orphaned duplicate button */}
+      {!isOpen && (
+        <div 
+          style={btnPos ? { left: `${btnPos.x}px`, top: `${btnPos.y}px` } : undefined}
+          onPointerDown={handleBtnPointerDown}
+          onPointerMove={handleBtnPointerMove}
+          onPointerUp={handleBtnPointerUp}
+          className={btnPos 
+            ? "fixed z-[9990] font-sans select-none cursor-grab active:cursor-grabbing touch-none" 
+            : "fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-[9990] font-sans select-none cursor-grab active:cursor-grabbing touch-none"
+          }
+          title="Trascina per spostare il bottone"
         >
-          <div className="relative w-full h-full flex items-center justify-center">
-            {isOpen ? (
-              <X className="w-6 h-6 text-white stroke-[2.5]" />
-            ) : (
-              <>
-                <img 
-                  src="/beasty_avatar.jpg" 
-                  alt="Coach Beasty AI" 
-                  className="w-full h-full rounded-full object-cover group-hover:scale-110 transition-transform duration-300"
-                />
-                <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500 border border-slate-900"></span>
-                </span>
-              </>
-            )}
-          </div>
-        </button>
-      </div>
+          <button
+            type="button"
+            className="group relative flex items-center justify-center w-14 h-14 rounded-full bg-slate-900 border-2 border-[#D4AF37] shadow-xl shadow-blue-900/40 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer overflow-hidden p-0.5 pointer-events-none"
+          >
+            <div className="relative w-full h-full flex items-center justify-center">
+              <img 
+                src="/beasty_avatar.jpg" 
+                alt="Coach Beasty AI" 
+                className="w-full h-full rounded-full object-cover group-hover:scale-110 transition-transform duration-300"
+              />
+              <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500 border border-slate-900"></span>
+              </span>
+            </div>
+          </button>
+        </div>
+      )}
     </>
   );
 };
