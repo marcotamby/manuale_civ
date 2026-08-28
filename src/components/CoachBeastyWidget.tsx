@@ -257,17 +257,27 @@ export const CoachBeastyWidget: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center space-x-1 z-30 pointer-events-auto">
               <button 
-                onClick={handleResetChat} 
-                className="text-slate-400 hover:text-[#D4AF37] p-1.5 rounded-lg hover:bg-slate-800/60 transition"
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleResetChat();
+                }} 
+                className="text-slate-400 hover:text-[#D4AF37] p-1.5 rounded-lg hover:bg-slate-800/60 transition cursor-pointer"
                 title="Azzera conversazione"
               >
                 <RotateCcw className="w-4.5 h-4.5" />
               </button>
               <button 
-                onClick={() => setIsOpen(false)} 
-                className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800/60 transition"
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsOpen(false);
+                }} 
+                className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800/60 transition cursor-pointer"
                 title="Chiudi widget"
               >
                 <X className="w-5 h-5" />

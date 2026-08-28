@@ -14,19 +14,20 @@ const supabase = (SUPABASE_URL && SUPABASE_KEY)
   : null;
 
 const AOE4_GROUND_TRUTH_UNITS = `
-DIZIONARIO DI VERITÀ UFFICIALE CIVILTÀ E UNITÀ AGE OF EMPIRES IV (MANDATORIO - NON INVENTARE MAI NOMI DA AOE2 O DALLA STORIA):
+DIZIONARIO DI VERITÀ UFFICIALE CIVILTÀ E UNITÀ AGE OF EMPIRES IV (MANDATORIO - PRENDI INFO DA QUESTO ELENCO UFFICIALE):
 
-1. INGLESI (English):
-   - Unità uniche: Arcieri Lunghi (Longbowmen) - NOTA: NON usare MAI 'Yeoman' (è di AoE2, in AoE4 NON ESISTONO)!
+1. INGLESI (English - Civiltà Base):
+   - Unità uniche: Arcieri Lunghi (Longbowmen).
    - Meccaniche: Rete dei Castelli, Fattorie Enclosures, Centro Città difensivo.
    - Monumenti: Sala del Consiglio (Council Hall), Abbazia del Re, Torre Bianca (White Tower), Palazzo Berkshire.
 
 2. LA CASATA DI LANCASTER (Lancaster - Civiltà Variante degli Inglesi):
-   - Unità uniche: Lord of Lancaster, Nobili Lancaster.
+   - Unità uniche: **Yeoman** (Arcieri Yeoman con abilità Synchronized Shot / Tiro Sincronizzato), Lord of Lancaster, Nobili Lancaster.
    - Meccaniche: Manieri (Manors), Tassazione dei Manieri.
    - Monumenti: Castello di Lancaster (Lancaster Castle).
+   - NOTA BENE: Gli **Yeoman** ESISTONO e sono l'unità unica degli arcieri di **Lancaster**! Non appartengono agli Inglesi base (che hanno gli Arcieri Lunghi).
 
-3. FRANCESI (French):
+3. FRANCESI (French - Civiltà Base):
    - Unità uniche: Cavalieri Reali (Royal Knights), Arbalétrier, Galea da Guerra Cannoniera.
    - Meccaniche: produzione villi più veloce ad ogni età, centri commerciali scontati.
 
@@ -125,6 +126,53 @@ async function logInteraction(userNickname: string, prompt: string, reply: strin
   } catch (e) { }
 }
 
+const MODELS_TO_TRY = [
+  'gemini-2.5-flash',
+  'gemini-1.5-flash',
+  'gemini-2.5-flash-lite'
+];
+
+async function generateWithModelFallback(apiKey: string, promptText: string) {
+  let lastErrorMsg = '';
+
+  for (const model of MODELS_TO_TRY) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const geminiRes = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: promptText }] }],
+          generationConfig: {
+            temperature: 0.2,
+            topP: 0.8,
+            topK: 30
+          }
+        })
+      });
+
+      const data = await geminiRes.json();
+
+      if (geminiRes.status === 429 || data.error?.code === 429 || data.error?.message?.includes('quota') || data.error?.message?.includes('RESOURCE_EXHAUSTED')) {
+        console.warn(`Modello ${model} in quota limit (429), tento il modello successivo...`);
+        lastErrorMsg = 'Limite richieste momentaneamente raggiunto (Quota API Gemini). Riprova tra 30 secondi!';
+        continue;
+      }
+
+      if (data.error) {
+        throw new Error(`Gemini API Error (${model}): ${data.error.message}`);
+      }
+
+      const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (resultText) return resultText;
+    } catch (err: any) {
+      lastErrorMsg = err.message || 'Errore durante la generazione';
+    }
+  }
+
+  throw new Error(lastErrorMsg || 'Tutti i modelli IA sono momentaneamente occupati. Riprova tra poco!');
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -175,15 +223,17 @@ REGOLA AUREA ED INFLESSIBILE: ZERO ALLUCINAZIONI / ZERO INVENZIONI (MANDATORIO!)
   - Ammetti con totale trasparenza e umiltà da coach di non avere quel dato specifico a portata di mano.
   - Chiedi scusa all'utente (es: "Purtroppo non ho questo dato specifico a portata di mano, mi spiace **${nameToUse}**! Se tu hai l'info o la risposta giusta fammela sapere così la integriamo per la community!").
 
-REGOLE TASSATIVE DI ACCURATEZZA ED ERRORE ZERO:
-1. ACCURATEZZA UNICITÀ UNITÀ (RIGOROSA):
-   - Gli Inglesi in AoE4 hanno ESCLUSIVAMENTE gli **Arcieri Lunghi** (Longbowmen).
-   - NON citare MAI "Arcieri Yeoman" per gli Inglesi (è un errore da AoE2, in AoE4 non esistono!).
-   - Usa SOLO ED ESCLUSIVAMENTE i nomi delle unità riportati nel Dizionario di Verità sopra!
+REGOLE TASSATIVE DI ACCURATEZZA UNICITÀ E VARIANTI:
+1. LANCASTER vs INGLESI:
+   - Gli **Yeoman** (Arcieri Yeoman) ESISTONO in AoE4 e sono l'unità unica degli arcieri della civiltà variante **La Casata di Lancaster**!
+   - Gli **Inglesi** (civiltà base) hanno gli **Arcieri Lunghi** (Longbowmen).
+   - NON NEGARE MAI l'esistenza degli Yeoman per i Lancaster!
 2. DISTINZIONE CIVILTÀ E VARIANTI:
-   - "Inglesi" e "Lancaster" sono DUE CIVILTÀ DISTINTE.
-   - NON attribuire meccaniche o monumenti dei Lancaster agli Inglesi o viceversa!
-   - Mantieni distinte anche Francesi vs Giovanni d'Arco, SRI vs Ordine del Drago, Cinesi vs Zhu Xi, Abbasidi vs Ayubidi.
+   - Inglesi != Lancaster
+   - Francesi != Giovanni d'Arco
+   - SRI != Ordine del Drago
+   - Cinesi != Zhu Xi
+   - Abbasidi != Ayubidi
 
 STILE DI COMUNICAZIONE & GERGO TWITCH/GAMING:
 1. PARLA COME UN VERO STREAMER / GAMER SU TWITCH:
@@ -225,33 +275,8 @@ Se la risposta è generica, puoi impostare "tacticalCard": null.`;
 
     const promptText = `${systemPrompt}\n\n${siteKnowledge ? `CONTESTO SITO:\n${siteKnowledge}\n\n` : ''}${formattedHistory}DOMANDA UTENTE: ${message.trim()}`;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-    
-    const geminiRes = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: promptText }]
-        }],
-        generationConfig: {
-          temperature: 0.1,
-          topP: 0.75,
-          topK: 25
-        }
-      })
-    });
-
-    const data = await geminiRes.json();
-
-    if (data.error) {
-      throw new Error(`Gemini API Error: ${data.error.message}`);
-    }
-
-    const rawResultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!rawResultText) {
-      throw new Error("Nessuna risposta dal Coach.");
-    }
+    // Generate response with model fallback handling 429 quotas gracefully
+    const rawResultText = await generateWithModelFallback(apiKey, promptText);
 
     let parsedResult = { reply: rawResultText, tacticalCard: null };
     try {
