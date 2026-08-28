@@ -35,6 +35,7 @@ import { ClassificaPage } from './components/ClassificaPage';
 import { renderTextWithLinks } from './lib/linkParser';
 import { DraftPresetPage } from './components/DraftPresetPage';
 import { DraftRoomPage } from './components/DraftRoomPage';
+import { CoachBeastyWidget } from './components/CoachBeastyWidget';
 
 function App() {
   const navigate = useNavigate();
@@ -627,6 +628,7 @@ function App() {
           borderRadius: '16px',
         },
       }} />
+      <CoachBeastyWidget />
     </div>
   );
 }
