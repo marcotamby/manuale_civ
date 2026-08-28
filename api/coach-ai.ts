@@ -188,8 +188,9 @@ async function logInteraction(userNickname: string, prompt: string, reply: strin
 
 const MODELS_TO_TRY = [
   'gemini-2.5-flash',
+  'gemini-2.0-flash',
   'gemini-1.5-flash',
-  'gemini-2.5-flash-lite'
+  'gemini-1.5-pro'
 ];
 
 async function generateWithModelFallback(apiKey: string, promptText: string) {
@@ -213,25 +214,23 @@ async function generateWithModelFallback(apiKey: string, promptText: string) {
 
       const data = await geminiRes.json();
 
-      if (geminiRes.status === 429 || data.error?.code === 429 || data.error?.message?.includes('quota') || data.error?.message?.includes('RESOURCE_EXHAUSTED')) {
-        console.warn(`Modello ${model} in quota limit (429), tento il modello successivo...`);
-        lastErrorMsg = 'Limite di richieste dell\'API gratuita raggiunto. Attendi qualche secondo e riprova!';
-        await new Promise(r => setTimeout(r, 400));
-        continue;
-      }
-
       if (data.error) {
-        throw new Error(`Gemini API Error (${model}): ${data.error.message}`);
+        console.warn(`Modello ${model} non disponibile o errore: ${data.error.message}, provo il prossimo...`);
+        lastErrorMsg = data.error.message;
+        await new Promise(r => setTimeout(r, 200));
+        continue;
       }
 
       const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (resultText) return resultText;
     } catch (err: any) {
+      console.warn(`Errore con il modello ${model}:`, err);
       lastErrorMsg = err.message || 'Errore durante la generazione';
+      continue;
     }
   }
 
-  throw new Error(lastErrorMsg || 'Tutti i modelli IA sono momentaneamente occupati. Riprova tra poco!');
+  throw new Error(lastErrorMsg ? `Servizio occupato (${lastErrorMsg}). Riprova tra poco!` : 'Servizio temporaneamente occupato. Riprova tra 15 secondi!');
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
