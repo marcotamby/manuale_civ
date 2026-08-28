@@ -260,13 +260,32 @@ export const CoachBeastyWidget: React.FC = () => {
                     : 'bg-slate-900/90 border border-slate-800 text-slate-200 rounded-tl-none space-y-3'
                 }`}>
                   
-                  {/* Message Text with Larger Font (text-sm / 14px) */}
+                  {/* Message Text with Larger Font (text-sm / 14px) and formatted Markdown */}
                   <div className="whitespace-pre-wrap leading-relaxed text-sm sm:text-[15px] select-text">
-                    {msg.text.split('\n\n').map((paragraph, idx) => (
-                      <p key={idx} className={idx > 0 ? 'mt-2' : ''}>
-                        {paragraph}
-                      </p>
-                    ))}
+                    {msg.text.split('\n\n').map((paragraph, pIdx) => {
+                      const parts = paragraph.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
+                      return (
+                        <p key={pIdx} className={pIdx > 0 ? 'mt-2' : ''}>
+                          {parts.map((part, idx) => {
+                            if (part.startsWith('**') && part.endsWith('**')) {
+                              return (
+                                <strong key={idx} className="font-bold text-[#D4AF37]">
+                                  {part.slice(2, -2)}
+                                </strong>
+                              );
+                            }
+                            if (part.startsWith('*') && part.endsWith('*')) {
+                              return (
+                                <em key={idx} className="italic text-slate-200">
+                                  {part.slice(1, -1)}
+                                </em>
+                              );
+                            }
+                            return part;
+                          })}
+                        </p>
+                      );
+                    })}
                   </div>
 
                   {/* Tactical Card Render */}
