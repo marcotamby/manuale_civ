@@ -536,7 +536,7 @@ export const CoachBeastyWidget: React.FC = () => {
 
                       {msg.tacticalCard.counterUnits && msg.tacticalCard.counterUnits.length > 0 && (
                         <div className="space-y-1">
-                          <span className="text-[11px] font-semibold text-slate-400 block">Contromisure consigliate:</span>
+                          <span className="text-[11px] font-semibold text-slate-400 block">Counter consigliati:</span>
                           <div className="grid grid-cols-1 gap-1">
                             {msg.tacticalCard.counterUnits.map((unit, idx) => (
                               <div key={idx} className="flex items-center justify-between text-xs bg-slate-900/80 px-2.5 py-1 rounded border border-slate-800">
@@ -553,7 +553,7 @@ export const CoachBeastyWidget: React.FC = () => {
 
                       {msg.tacticalCard.villi && (
                         <div className="space-y-1">
-                          <span className="text-[11px] font-semibold text-slate-400 block">Ripartizione Villi consigliata:</span>
+                          <span className="text-[11px] font-semibold text-slate-400 block">Ripartizione Abitanti del Villaggio (Villi):</span>
                           <div className="grid grid-cols-4 gap-1 text-center">
                             <div className="bg-cyan-950/40 border border-cyan-500/30 rounded p-1">
                               <span className="block text-[10px] text-cyan-300 font-bold">🌾 Cibo</span>
