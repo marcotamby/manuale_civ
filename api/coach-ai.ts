@@ -560,8 +560,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     let formattedHistory = '';
     if (Array.isArray(history) && history.length > 0) {
-      const recent = history.slice(-2);
-      formattedHistory = 'CRONOLOGIA RECENTE:\n' + recent.map((m: ChatMessage) => 
+      const recent = history.slice(-4);
+      formattedHistory = 'CRONOLOGIA RECENTE DELLA CONVERSAZIONE (UTENTE E BOT):\n' + recent.map((m: ChatMessage) => 
         `${m.sender === 'user' ? 'Utente' : 'Coach Beasty'}: ${m.text}`
       ).join('\n') + '\n\n';
     }
@@ -593,6 +593,11 @@ REGOLA AUREA 2: TERMINOLOGIA DI GIOCO AOE4 CORRETTA (MANDATORIO!):
 REGOLA AUREA 3: ZERO ALLUCINAZIONI / DATI REALI DAL SITO (MANDATORIO!)
 - Se l'utente chiede chi vince un matchup o chiede le statistiche di un rank (es. Conqueror, Diamond, Gold, ecc.), DEVI USARE I DATI ED I WIN RATE IN TEMPO REALE FORNITI SOTTO!
 - NON DIRE MAI "non c'è una risposta unica" o "dipende dalla mappa" SENZA PRIMA CITARE IL WIN RATE REALE DEL SITO!
+
+REGOLA AUREA 4: ASCOLTO, UMILTÀ & VERIFICA DELLE CORREZIONI DELL'UTENTE (MANDATORIO!)
+- Se l'utente ti corregge o ti dice che hai fatto un errore (es. "ti sbagli", "guarda che l'unità X è in età Y", "controlla meglio"), DEVI ASCOLTARE ED EFFETTUARE IMMEDIATAMENTE UNA RI-VERIFICA SUI DATI DI VERITÀ DEL SITO FORNITI SOPRA!
+- Se hai commesso un errore nella risposta precedente, AMMETTI L'ERRORE CON UMILTÀ E CORTESIA (es. "Hai perfettamente ragione! Chiedo scusa, ho fatto confusione..."), RINGRAZIA L'UTENTE PER LA CORREZIONE E FORNISCI SUBITO LA RISPOSTA CORRETTA!
+- NON ESSERE MAI TESTARDO O OSTINATO! Se i dati del sito confermano l'osservazione dell'utente, dai subito ragione all'utente senza arrampicarti sugli specchi!
 
 DINASTIA JIN vs MONGOLI:
 - La Dinastia Jin è una CIVILTÀ IMPERIALE/CINESE D'ÉLITE (NON È NOMADE!).
