@@ -334,11 +334,10 @@ export const CoachBeastyWidget: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (modalPos) {
-      const safeX = Math.max(10, Math.min(window.innerWidth - 70, modalPos.x));
-      const safeY = Math.max(10, Math.min(window.innerHeight - 70, modalPos.y));
-      setBtnPos({ x: safeX, y: safeY });
-    }
+    // Reset button and modal position back to default initial bottom-right position
+    setBtnPos(null);
+    setModalPos(null);
+    isModalManuallyMovedRef.current = false;
 
     setIsOpen(false);
   };
