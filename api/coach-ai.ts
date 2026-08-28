@@ -186,17 +186,37 @@ async function logInteraction(userNickname: string, prompt: string, reply: strin
   } catch (e) { }
 }
 
-const MODELS_TO_TRY = [
+const GEMINI_MODELS = [
   'gemini-2.5-flash',
   'gemini-2.0-flash',
-  'gemini-1.5-flash',
-  'gemini-1.5-pro'
+  'gemini-1.5-flash'
 ];
 
-async function generateWithModelFallback(apiKey: string, promptText: string) {
-  let lastErrorMsg = '';
+async function fetchGroqResponse(groqApiKey: string, promptText: string) {
+  const url = 'https://api.groq.com/openai/v1/chat/completions';
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${groqApiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'user', content: promptText }],
+      temperature: 0.15,
+      max_tokens: 1000
+    })
+  });
+  const data = await res.json();
+  if (data.choices?.[0]?.message?.content) {
+    return data.choices[0].message.content;
+  }
+  throw new Error(data.error?.message || 'Groq API Error');
+}
 
-  for (const model of MODELS_TO_TRY) {
+async function generateWithModelFallback(apiKey: string, promptText: string) {
+  // 1. Try official Gemini models first
+  for (const model of GEMINI_MODELS) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
       const geminiRes = await fetch(url, {
@@ -214,23 +234,29 @@ async function generateWithModelFallback(apiKey: string, promptText: string) {
 
       const data = await geminiRes.json();
 
-      if (data.error) {
-        console.warn(`Modello ${model} non disponibile o errore: ${data.error.message}, provo il prossimo...`);
-        lastErrorMsg = data.error.message;
-        await new Promise(r => setTimeout(r, 200));
-        continue;
+      if (!data.error && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+        return data.candidates[0].content.parts[0].text;
       }
-
-      const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (resultText) return resultText;
-    } catch (err: any) {
-      console.warn(`Errore con il modello ${model}:`, err);
-      lastErrorMsg = err.message || 'Errore durante la generazione';
-      continue;
+      console.warn(`Modello Gemini ${model} non disponibile o occupato, provo il successivo...`);
+    } catch (err) {
+      console.warn(`Errore con Gemini ${model}:`, err);
     }
   }
 
-  throw new Error(lastErrorMsg ? `Servizio occupato (${lastErrorMsg}). Riprova tra poco!` : 'Servizio temporaneamente occupato. Riprova tra 15 secondi!');
+  // 2. Try Groq Llama 3.3 70B fallback if GROQ_API_KEY is configured
+  const groqApiKey = process.env.GROQ_API_KEY;
+  if (groqApiKey) {
+    try {
+      console.log('Gemini occupato, eseguo il fallback su Groq (Llama 3.3 70B)...');
+      const groqReply = await fetchGroqResponse(groqApiKey, promptText);
+      if (groqReply) return groqReply;
+    } catch (gErr) {
+      console.warn('Errore fallback Groq API:', gErr);
+    }
+  }
+
+  // 3. Clean user-friendly message when all free quotas are temporarily busy
+  throw new Error('I server dell\'IA gratuita sono momentaneamente saturi per l\'alto numero di domande. Attendi 15 secondi e riprova!');
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
