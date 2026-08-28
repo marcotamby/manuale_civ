@@ -111,16 +111,31 @@ export const CoachBeastyWidget: React.FC = () => {
   }, [displayName]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const scrollToTop = () => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = 0;
+    }
+  };
+
+  // Scroll to top when opening widget so initial welcome message is shown at top
   useEffect(() => {
     if (isOpen) {
+      scrollToTop();
+    }
+  }, [isOpen]);
+
+  // Scroll to bottom only when new messages are added during chat
+  useEffect(() => {
+    if (isOpen && (messages.length > 1 || loading)) {
       scrollToBottom();
     }
-  }, [messages, isOpen, loading]);
+  }, [messages.length, loading]);
 
   const handleSendMessage = async (textToSend?: string) => {
     const query = (textToSend || inputMessage).trim();
@@ -240,7 +255,7 @@ export const CoachBeastyWidget: React.FC = () => {
           </div>
 
           {/* Messages Area - flex-1 min-h-0 ensures clean internal scrolling */}
-          <div className="flex-1 min-h-0 overflow-y-auto p-3.5 space-y-4 elegant-scrollbar bg-slate-950/80">
+          <div ref={messagesContainerRef} className="flex-1 min-h-0 overflow-y-auto p-3.5 space-y-4 elegant-scrollbar bg-slate-950/80">
             {messages.map((msg) => (
               <div 
                 key={msg.id} 
