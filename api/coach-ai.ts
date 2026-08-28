@@ -13,92 +13,143 @@ const supabase = (SUPABASE_URL && SUPABASE_KEY)
   ? createClient(SUPABASE_URL, SUPABASE_KEY) 
   : null;
 
+const CIV_NAME_TO_SLUG: Record<string, string> = {
+  'jin': 'jin_dynasty',
+  'dinastia jin': 'jin_dynasty',
+  'jin dynasty': 'jin_dynasty',
+  'mongoli': 'mongols',
+  'mongols': 'mongols',
+  'inglesi': 'english',
+  'english': 'english',
+  'francesi': 'french',
+  'french': 'french',
+  'bisantini': 'byzantines',
+  'byzantines': 'byzantines',
+  'ottomani': 'ottomans',
+  'ottomans': 'ottomans',
+  'rus': 'rus',
+  'maliani': 'malians',
+  'malians': 'malians',
+  'delhi': 'delhi_sultanate',
+  'sultanato di delhi': 'delhi_sultanate',
+  'cinesi': 'chinese',
+  'chinese': 'chinese',
+  'giapponesi': 'japanese',
+  'japanese': 'japanese',
+  'sri': 'holy_roman_empire',
+  'sacro romano impero': 'holy_roman_empire',
+  'hre': 'holy_roman_empire',
+  'ordine del drago': 'order_of_the_dragon',
+  'order of the dragon': 'order_of_the_dragon',
+  'giovanni d\'arco': 'jeanne_darc',
+  'jeanne d\'arco': 'jeanne_darc',
+  'ayubidi': 'ayyubids',
+  'ayyubids': 'ayyubids',
+  'zhu xi': 'zhu_xis_legacy',
+  'eredita di zhu xi': 'zhu_xis_legacy',
+  'lancaster': 'house_of_lancaster',
+  'casata di lancaster': 'house_of_lancaster',
+  'templari': 'knights_templar',
+  'cavalieri templari': 'knights_templar',
+  'sengoku': 'sengoku_daimyo',
+  'macedoni': 'macedonian_dynasty',
+  'dinastia macedone': 'macedonian_dynasty',
+  'orda d\'oro': 'golden_horde',
+  'golden horde': 'golden_horde',
+  'tughlaq': 'tughlaq_dynasty'
+};
+
 const AOE4_GROUND_TRUTH_UNITS = `
-DIZIONARIO DI VERITÀ UFFICIALE CIVILTÀ E UNITÀ DEL PORTALE "MANUALE CIV" (MANDATORIO - TUTTE QUESTE CIVILTÀ ESISTONO SUL SITO):
+DIZIONARIO DI VERITÀ UFFICIALE CIVILTÀ E UNITÀ DEL PORTALE "MANUALE CIV" (MANDATORIO):
 
-1. DINASTIA JIN (Jin Dynasty - PRESENTE SUL SITO!):
-   - Descrizione: Civiltà nomade e imperiale che domina con la sua cavalleria d'élite e la potenza d'assedio superiore. I Jin eccellono nel controllo della mappa grazie ai villaggi a cavallo e ai tributari che potenziano la loro economia.
-   - NON negare MAI l'esistenza della Dinastia Jin! È una civiltà registrata ed attiva sul portale Manuale Civ.
+1. DINASTIA JIN (Jin Dynasty - PRESENTE SUL SITO):
+   - NATURA CIVILTÀ: Civiltà imperiale/cinese d'élite (ATTENZIONE: NON È UNA CIVILTÀ NOMADE! I Mongoli sono nomadi, la Dinastia Jin NO!).
+   - Caratteristiche: Domina con la sua cavalleria pesante d'élite (Pagoda di Ferro / Iron Pagoda), fortificazioni, tributari ed economia avanzata.
+   - VIETATO ASSOLUTAMENTE definire la Dinastia Jin come "civiltà nomade"!
 
-2. DINASTIA MACEDONE (Macedonian Dynasty - PRESENTE SUL SITO!):
-   - Descrizione: Civiltà con potente falange, fanteria d'élite e monumenti di conquista.
+2. MONGOLI (Mongols):
+   - NATURA CIVILTÀ: Civiltà nomade per eccellenza (edifici mobili, Ovoo, Mangudai, Khan).
 
-3. ORDA D'ORO (Golden Horde - PRESENTE SUL SITO!):
-   - Descrizione: Variante nomade dominatrice delle steppe con cavalleria d'attacco rapido e tributi.
-
-4. SENGOKU DAIMYO (PRESENTE SUL SITO!):
-   - Descrizione: Variante giapponese basata sui feudi dei Daimyo e guerrieri provinciali.
-
-5. CAVALIERI TEMPLARI (Knights Templar - PRESENTE SUL SITO!):
-   - Descrizione: Ordine cavalleresco con forte cavalleria pesante, fortezze e bonus di fede.
-
-6. DINASTIA TUGHLAQ (Tughlaq Dynasty - PRESENTE SUL SITO!):
-   - Descrizione: Dinastia indiana d'élite focalizzata su elefanti da guerra, fortificazioni ed economia.
-
-7. INGLESI (English - Civiltà Base):
-   - Unità uniche: Arcieri Lunghi (Longbowmen).
-   - Meccaniche: Rete dei Castelli, Fattorie Enclosures, Centro Città difensivo.
-   - Monumenti: Sala del Consiglio (Council Hall), Abbazia del Re, Torre Bianca (White Tower), Palazzo Berkshire.
-
-8. LA CASATA DI LANCASTER (Lancaster - Civiltà Variante degli Inglesi):
-   - Unità uniche: **Yeoman** (Arcieri Yeoman con abilità Synchronized Shot / Tiro Sincronizzato), Lord of Lancaster, Nobili Lancaster.
-   - Meccaniche: Manieri (Manors), Tassazione dei Manieri.
-   - Monumenti: Castello di Lancaster (Lancaster Castle).
-   - Gli Yeoman ESISTONO e sono gli arcieri unici dei Lancaster!
-
-9. FRANCESI (French - Civiltà Base):
-   - Unità uniche: Cavalieri Reali (Royal Knights), Arbalétrier, Galea da Guerra Cannoniera.
-   - Meccaniche: produzione villi più veloce ad ogni età, centri commerciali scontati.
-
-10. GIOVANNI D'ARCO (Jeanne d'Arc - Civiltà Variante dei Francesi):
-    - Unità uniche: Giovanni d'Arco (Eroe con livelli/abilità), Compagni di Giovanni, Cavalieri Reali.
-
-11. OTTOMANI (Ottomans):
-    - Unità uniche: Giannizzeri (Janissaries), Sipahi, Grande Bombarda (Great Bombard), Mehter (Tamburino).
-    - Meccaniche: Scuole Militari (produzione truppe gratuita), Sistema di Vizir.
-
-12. BISANTINI (Byzantines):
-    - Unità uniche: Catrafatti (Cataphracts), Varangiani (Varangian Guard), Cheirosiphon (Lanciafiamme d'assedio).
-    - Meccaniche: Cisterne d'Acqua & Acquedotti (Oliva/Olio), Mercenari da diverse civiltà.
-
-13. SACRO ROMANO IMPERO (HRE - Holy Roman Empire):
-    - Unità uniche: Landsknecht, Prelato (Ispira villi ed esercito).
-    - Meccaniche: Influenza dei Castelli/Cattedrali, Reliquie negli edifici per difesa e oro.
-
-14. ORDINE DEL DRAGO (Order of the Dragon - Civiltà Variante SRI):
-    - Unità uniche: Unità Gildate (Arcieri Gildati, Picchieri Gildati, Ussari Gildati, Landsknecht Gildato).
-
-15. MONGOLI (Mongols):
-    - Unità uniche: Mangudai, Khan (con frecce di segnalazione).
-    - Meccaniche: Edifici mobili, Ovoo (estrazione pietra doppia), Pascolo, Piattaforme di Segnalazione Yam.
-
-16. CINESI (Chinese):
-    - Unità uniche: Zhuge Nu (Arbalestiere a ripetizione), Guardia di Palazzo, Speziere (Neshuten), Bombarde dei Fuochi d'Artificio.
-    - Meccaniche: Sistema delle Dinastie (Tang, Song, Yuan, Ming), Funzionari Imperiali (riscossione tasse/supervisione).
-
-17. EREDITÀ DI ZHU XI (Zhu Xi's Legacy - Civiltà Variante dei Cinesi):
-    - Unità uniche: Zhuge Nu Gildati, Guardie Imperiali, Medici Shaolin.
-
-18. GIAPPONESI (Japanese):
-    - Unità uniche: Samurai, Shinobi, Yumi Mounted Archers, Onna-Bugeisha, Mounted Samurai.
-    - Meccaniche: Forgia/Fattoria potenziata (Kura Storehouse), Banner di Clan (Katamoto).
-
-19. MALIANI (Malians):
-    - Unità uniche: Donso (Giavellotto anti-cavalleria), Musofadi (Guerriere invisibili con pugnale), Giavellottisti, Sofa (Cavalieri leggeri).
-    - Meccaniche: Miniere d'Oro aperte (Open Pit Mine), Allevamento dei Bovini, Rete di Caccia.
-
-20. SULTANATO DI DELHI (Delhi Sultanate):
-    - Unità uniche: Elefanti da Guerra, Elefanti con Torre, Gazi Raider, Saggio (Scholar).
-    - Meccaniche: Tecnologie GRATUITE (velocizzate dai Saggi nelle Moschee).
-
-21. RUS (Rus):
-    - Unità uniche: Strel'cy (Streltsy - Archibugieri), Monaci Guerrieri (Warrior Monks), Cavallo Boyaro.
-    - Meccaniche: Cabine da Caccia (Bounty System da animali selvatici), Fortini in legno.
-
-22. AYUBIDI (Ayyubids - Civiltà Variante degli Abbasidi):
-    - Unità uniche: Cavalieri su Cammello, Arcieri su Cammello, Derviscio, Atabeg.
-    - Meccaniche: Casa della Sapienza con Ala Militare/Economica/Culturale focalizzata.
+3. DINASTIA MACEDONE (Macedonian Dynasty)
+4. ORDA D'ORO (Golden Horde - Civiltà nomade variante)
+5. SENGOKU DAIMYO (Variante Giapponese)
+6. CAVALIERI TEMPLARI (Knights Templar)
+7. DINASTIA TUGHLAQ (Tughlaq Dynasty)
+8. INGLESI (English): Arcieri Lunghi (Longbowmen), Rete dei Castelli, Fattorie.
+9. LA CASATA DI LANCASTER (Lancaster): Yeoman (Arcieri Yeoman con Tiro Sincronizzato), Lord of Lancaster, Manieri.
+10. FRANCESI (French): Cavalieri Reali, Arbalétrier.
+11. GIOVANNI D'ARCO (Jeanne d'Arc): Eroe Giovanni d'Arco con livelli.
+12. OTTOMANI (Ottomans): Giannizzeri, Sipahi, Grande Bombarda.
+13. BISANTINI (Byzantines): Catrafatti, Varangiani, Cheirosiphon.
+14. SACRO ROMANO IMPERO (HRE): Landsknecht, Prelato.
+15. ORDINE DEL DRAGO (Order of the Dragon): Unità Gildate.
+16. CINESI (Chinese): Zhuge Nu, Dinastie.
+17. EREDITÀ DI ZHU XI (Zhu Xi's Legacy): Zhuge Nu Gildati.
+18. GIAPPONESI (Japanese): Samurai, Shinobi.
+19. MALIANI (Malians): Donso, Musofadi, Giavellottisti.
+20. SULTANATO DI DELHI (Delhi Sultanate): Elefanti da Guerra, Saggi.
+21. RUS (Rus): Strel'cy, Monaci Guerrieri.
+22. AYUBIDI (Ayyubids): Cavalieri e Arcieri su Cammello.
 `;
+
+async function fetchMatchupContext(userMessage: string): Promise<string> {
+  try {
+    const lower = userMessage.toLowerCase();
+    
+    let rank = '';
+    if (lower.includes('conqueror')) rank = 'conqueror';
+    else if (lower.includes('diamond') || lower.includes('diamante')) rank = 'diamond';
+    else if (lower.includes('platinum') || lower.includes('platino')) rank = 'platinum';
+    else if (lower.includes('gold') || lower.includes('oro')) rank = 'gold';
+    else if (lower.includes('silver') || lower.includes('argento')) rank = 'silver';
+    else if (lower.includes('bronze') || lower.includes('bronzo')) rank = 'bronze';
+
+    const detectedSlugs: string[] = [];
+    for (const [key, slug] of Object.entries(CIV_NAME_TO_SLUG)) {
+      if (lower.includes(key) && !detectedSlugs.includes(slug)) {
+        detectedSlugs.push(slug);
+      }
+    }
+
+    if (detectedSlugs.length === 0) return '';
+
+    const url = `https://aoe4world.com/api/v0/stats/rm_solo/matchups${rank ? '?rank_level=' + rank : ''}`;
+    const res = await fetch(url);
+    if (!res.ok) return '';
+    const json = await res.json();
+    const allData: any[] = json.data || [];
+
+    if (detectedSlugs.length >= 2) {
+      const civA = detectedSlugs[0];
+      const civB = detectedSlugs[1];
+      const match = allData.find(m => 
+        (m.civilization === civA && m.other_civilization === civB) ||
+        (m.civilization === civB && m.other_civilization === civA)
+      );
+
+      if (match) {
+        const isCivAFrist = match.civilization === civA;
+        const winRateA = isCivAFrist ? match.win_rate : (100 - match.win_rate);
+        const winRateB = isCivAFrist ? (100 - match.win_rate) : match.win_rate;
+        const nameA = civA.replace('_', ' ').toUpperCase();
+        const nameB = civB.replace('_', ' ').toUpperCase();
+        
+        return `STATISTICHE UFFICIALI E REALI IN TEMPO REALE DAL PORTALE / AOE4WORLD (Rank: ${rank ? rank.toUpperCase() : 'TUTTI I RANK'}):\n- ${nameA}: Win Rate **${winRateA.toFixed(1)}%** (${match.win_count} vittorie su ${match.games_count} partite totali)\n- ${nameB}: Win Rate **${winRateB.toFixed(1)}%**\nCITA OBBLIGATORIAMENTE QUESTI DATI E PERCENTUALI PRECISE NELLA TUA RISPOSTA!`;
+      }
+    } else if (detectedSlugs.length === 1) {
+      const civA = detectedSlugs[0];
+      const matches = allData.filter(m => m.civilization === civA);
+      if (matches.length > 0) {
+        const topList = matches.slice(0, 5).map(m => `- contro ${m.other_civilization.replace('_', ' ')}: Win Rate ${m.win_rate.toFixed(1)}% (${m.games_count} partite)`).join('\n');
+        return `STATISTICHE LIVE DAL SITO PER ${civA.toUpperCase()} (Rank: ${rank ? rank.toUpperCase() : 'TUTTI I RANK'}):\n${topList}\nUSALI NELLA RISPOSTA!`;
+      }
+    }
+
+    return '';
+  } catch (e) {
+    return '';
+  }
+}
 
 async function fetchSiteKnowledge() {
   if (!supabase) return '';
@@ -153,7 +204,7 @@ async function generateWithModelFallback(apiKey: string, promptText: string) {
         body: JSON.stringify({
           contents: [{ parts: [{ text: promptText }] }],
           generationConfig: {
-            temperature: 0.2,
+            temperature: 0.15,
             topP: 0.8,
             topK: 30
           }
@@ -165,7 +216,6 @@ async function generateWithModelFallback(apiKey: string, promptText: string) {
       if (geminiRes.status === 429 || data.error?.code === 429 || data.error?.message?.includes('quota') || data.error?.message?.includes('RESOURCE_EXHAUSTED')) {
         console.warn(`Modello ${model} in quota limit (429), tento il modello successivo...`);
         lastErrorMsg = 'Limite di richieste dell\'API gratuita raggiunto. Attendi qualche secondo e riprova!';
-        // Brief delay before trying fallback model
         await new Promise(r => setTimeout(r, 400));
         continue;
       }
@@ -212,8 +262,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const siteKnowledge = await fetchSiteKnowledge();
+    const matchupLiveStats = await fetchMatchupContext(message);
 
-    // Keep history pruned to ONLY the last 2 turns (4 messages max) to keep payload small & avoid API rate limit freezes
     let formattedHistory = '';
     if (Array.isArray(history) && history.length > 0) {
       const recent = history.slice(-2);
@@ -229,34 +279,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
 ${AOE4_GROUND_TRUTH_UNITS}
 
-REGOLA AUREA ED INFLESSIBILE: ZERO ALLUCINAZIONI / ZERO INVENZIONI (MANDATORIO!)
-- NON inventare MAI notizie, strategie, unità, statistiche o civiltà! Tutte le civiltà elencate sopra (inclusa la **Dinastia Jin**, **Dinastia Macedone**, **Orda d'Oro**, **Sengoku Daimyo**, **Cavalieri Templari**, **Dinastia Tughlaq**) ESISTONO sul portale Manuale Civ!
-- SE NON SAI UNA COSA O NON HAI IL DATO CERTO NEL DIZIONARIO DI VERITÀ:
-  - NON inventare MAI risposte o nomi di fantasia per sembrare sapiente!
-  - Ammetti con totale trasparenza ed umiltà di non avere quel dato specifico a portata di mano.
-  - Chiedi scusa all'utente (es: "Purtroppo non ho questo dato specifico a portata di mano, mi spiace! Se tu hai la risposta o la guida giusta fammela sapere così la integriamo per la community!").
+REGOLA AUREA ED INFLESSIBILE: ZERO ALLUCINAZIONI / DATI REALI DAL SITO (MANDATORIO!)
+- Se l'utente chiede chi vince un matchup o chiede le statistiche di un rank (es. Conqueror, Diamond, Gold, ecc.), DEVI USARE I DATI ED I WIN RATE IN TEMPO REALE FORNITI SOTTO!
+- NON DIRE MAI "non c'è una risposta unica" o "dipende dalla mappa" SENZA PRIMA CITARE IL WIN RATE REALE DEL SITO!
 
-STILE DI COMUNICAZIONE & REGOLAZIONE DEL TONO (FONDAMENTALE):
+DINASTIA JIN vs MONGOLI:
+- La Dinastia Jin è una CIVILTÀ IMPERIALE/CINESE D'ÉLITE (NON È NOMADE!).
+- I Mongoli sono una CIVILTÀ NOMADE.
+- VIETATO chiamare la Dinastia Jin "civiltà nomade"!
+
+STILE DI COMUNICAZIONE:
 1. TONO PULITO, NATURALE E PROFESSIONALE:
-   - Parla come un coach esperto, amichevole e competente.
-   - **LIMITA I TERMINI GAMER/NERD**: NON usare troppi termini da streamer o da gamer in ogni frase! Evita di risultare ridicolo o forzato. Usa un italiano naturale, pulito e chiaro.
-2. NOME UTENTE E GESTIONE TERMINE "NABBO":
-   - ${hasRealNickname ? `Rivolgiti all'utente con il suo nickname (**${nameToUse}**) con naturalezza.` : `Rivolgiti all'utente in modo amichevole e cordiale senza usare etichette.`}
-   - **VIETATO USARE A RIPETIZIONE LA PAROLA "NABBO"!** NON usare mai la parola "nabbo" di continuo o in modo insistente. Tratta tutti gli utenti con amichevolezza e rispetto.
-3. DIVIETO FRASI DA ROBOT / IA:
-   - NON usare MAI frasi robotiche tipo "La mia memoria si sta affinando", "Grazie per la correzione", "Come intelligenza artificiale...".
-   - NON usare MAI simboli di intestazione markdown (#, ##, ###).
+   - Parla come un coach esperto, amichevole e competente. Usa un italiano naturale, pulito e chiaro.
+2. NOME UTENTE & RISPETTO:
+   - ${hasRealNickname ? `Rivolgiti all'utente con il suo nickname (**${nameToUse}**) con naturalezza.` : `Rivolgiti all'utente in modo amichevole e cordiale.`}
+   - VIETATO USARE A RIPETIZIONE LA PAROLA "NABBO"!
 
-4. TERMINOLOGIA FISSA AOE4:
-   - VIETATA la parola "villici"! Usa ESCLUSIVAMENTE "villi" o "abitanti".
-   - Esploratore: si chiama "esploratore".
-   - "cibo", "legna", "oro", "pietra", "centro città", "monumento".
-   - Edifici: "caserma", "stalla" (mai 'stabile'), "poligono di tiro" o "arceria", "officina d'assedio".
-
-5. FORMATO RISPOSTA JSON:
+3. FORMATO RISPOSTA JSON:
    Rispondi ESCLUSIVAMENTE in formato JSON valido con questa struttura:
    {
-     "reply": "spiegazione tattica spigliata, simpatica e chiara in markdown",
+     "reply": "spiegazione tattica spigliata, simpatica e chiara in markdown citando i win rate reali se richiesti",
      "tacticalCard": {
        "title": "Titolo opzionale",
        "age": "Opzionale (es. Età II - Feudale)",
@@ -275,9 +317,8 @@ STILE DI COMUNICAZIONE & REGOLAZIONE DEL TONO (FONDAMENTALE):
 
 Se la risposta è generica, puoi impostare "tacticalCard": null.`;
 
-    const promptText = `${systemPrompt}\n\n${siteKnowledge ? `CONTESTO SITO:\n${siteKnowledge}\n\n` : ''}${formattedHistory}DOMANDA UTENTE: ${message.trim()}`;
+    const promptText = `${systemPrompt}\n\n${matchupLiveStats ? `DATI REALI MATCHUP DAL SITO:\n${matchupLiveStats}\n\n` : ''}${siteKnowledge ? `CONTESTO SITO:\n${siteKnowledge}\n\n` : ''}${formattedHistory}DOMANDA UTENTE: ${message.trim()}`;
 
-    // Generate response with model fallback handling 429 quotas gracefully
     const rawResultText = await generateWithModelFallback(apiKey, promptText);
 
     let parsedResult = { reply: rawResultText, tacticalCard: null };
