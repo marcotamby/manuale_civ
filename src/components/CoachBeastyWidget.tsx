@@ -262,30 +262,35 @@ export const CoachBeastyWidget: React.FC = () => {
                   
                   {/* Message Text with Larger Font (text-sm / 14px) and formatted Markdown */}
                   <div className="whitespace-pre-wrap leading-relaxed text-sm sm:text-[15px] select-text">
-                    {msg.text.split('\n\n').map((paragraph, pIdx) => {
-                      const parts = paragraph.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
-                      return (
-                        <p key={pIdx} className={pIdx > 0 ? 'mt-2' : ''}>
-                          {parts.map((part, idx) => {
-                            if (part.startsWith('**') && part.endsWith('**')) {
-                              return (
-                                <strong key={idx} className="font-bold text-cyan-300">
-                                  {part.slice(2, -2)}
-                                </strong>
-                              );
-                            }
-                            if (part.startsWith('*') && part.endsWith('*')) {
-                              return (
-                                <em key={idx} className="italic text-slate-200">
-                                  {part.slice(1, -1)}
-                                </em>
-                              );
-                            }
-                            return part;
-                          })}
-                        </p>
-                      );
-                    })}
+                    {(() => {
+                      const cleanedText = msg.text.replace(/^#+\s*/gm, '');
+                      return cleanedText.split('\n\n').map((paragraph, pIdx) => {
+                        const parts = paragraph.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
+                        return (
+                          <p key={pIdx} className={pIdx > 0 ? 'mt-2' : ''}>
+                            {parts.map((part, idx) => {
+                              if (part.startsWith('**') && part.endsWith('**')) {
+                                const content = part.slice(2, -2);
+                                const isUserMention = displayName && displayName !== 'nabbo' && content.toLowerCase().includes(displayName.toLowerCase());
+                                return (
+                                  <strong key={idx} className={`font-bold ${isUserMention ? 'text-cyan-300' : 'text-slate-100'}`}>
+                                    {content}
+                                  </strong>
+                                );
+                              }
+                              if (part.startsWith('*') && part.endsWith('*')) {
+                                return (
+                                  <em key={idx} className="italic text-slate-200">
+                                    {part.slice(1, -1)}
+                                  </em>
+                                );
+                              }
+                              return part;
+                            })}
+                          </p>
+                        );
+                      });
+                    })()}
                   </div>
 
                   {/* Tactical Card Render */}
