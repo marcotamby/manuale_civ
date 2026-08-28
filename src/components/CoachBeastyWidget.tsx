@@ -161,7 +161,7 @@ export const CoachBeastyWidget: React.FC = () => {
     setLoading(true);
 
     try {
-      const historyPayload = messages.map(m => ({
+      const historyPayload = messages.slice(-2).map(m => ({
         sender: m.sender,
         text: m.text
       }));
