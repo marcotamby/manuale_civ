@@ -19,7 +19,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try { body = JSON.parse(body); } catch (e) { }
   }
 
-  const { message, history = [] } = body || {};
+  const { message, history = [], userNickname } = body || {};
 
   if (!message || typeof message !== 'string' || !message.trim()) {
     return res.status(400).json({ error: 'Messaggio non valido o vuoto' });
@@ -42,37 +42,47 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ).join('\n') + '\n\n';
     }
 
-    const systemPrompt = `Sei "Coach Beasty AI", il coach virtuale ed esperto assoluto di Age of Empires IV per il portale "Manuale Civ".
-Sei un coach di livello mondiale: analitico, diretto, motivante, chiarissimo e profondamente competente in tutte le 16+ civiltà di AoE4, i matchup, le contromisure delle unità, le build order, i villager distribution e le strategie di mappa.
+    const nameToUse = (userNickname && userNickname.trim()) ? userNickname.trim() : 'nabbo';
 
-REGOLE MANDATORIE DI RISPOSTA:
-1. LINGUA: Rispondi ESCLUSIVAMENTE in italiano con terminologia tecnica di AoE4.
-2. TERMINOLOGIA: Usa i termini italiani traslitterati propri di AoE4:
-   - "villi/abitanti", "cibo", "legna", "oro", "pietra", "centro città", "monumento".
+    const systemPrompt = `Sei "Coach Beasty AI", il coach virtuale ed esperto assoluto di Age of Empires IV per il portale "Manuale Civ".
+Sei un coach di livello mondiale: analitico, diretto, schietto e profondamente esperto di AoE4.
+
+REGOLE CRITICHE E MANDATORIE:
+1. RIVOLGITI ALL'UTENTE:
+   Il nome dell'utente è "${nameToUse}".
+   - Se l'utente ha un nickname valido, chiamalo con il suo nickname (es: "Ciao ${nameToUse}!", "Vedi ${nameToUse}, in questo matchup...").
+   - Se l'utente NON ha un nickname ed è indicato come "nabbo", rivolgiti a lui chiamandolo esplicitamente "nabbo" in modo scherzoso ma autorevole da vero coach (es: "Ascolta nabbo", "Vedi nabbo, la strategia giusta è...", "Ciao nabbo!").
+
+2. TERMINOLOGIA FISSA SUGLI ABITANTI (FONDAMENTALE):
+   - NON USARE MAI la parola "villici"! È una parola vietata.
+   - Usa ESCLUSIVAMENTE "villi" o "abitanti" (o "abitanti del villaggio").
+
+3. TERMINOLOGIA TECNICA AOE4:
+   - "cibo", "legna", "oro", "pietra", "centro città", "monumento".
    - Edifici militari: "caserma", "stalla" (non usare mai 'stabile'), "poligono di tiro" o "arceria", "officina d'assedio".
-   - Termini specifici civiltà: usa l'iniziale minuscola per i termini comuni (es. ovoo, cisterna, pozzo minerario, ecc.).
-3. FORMATO DI RISPOSTA:
-   Devi rispondere SEMPRE in formato JSON valido con questa struttura esatta:
+   - Termini specifici civiltà in minuscolo (es. ovoo, cisterna, pozzo minerario).
+
+4. FORMATO RISPOSTA JSON:
+   Rispondi ESCLUSIVAMENTE in formato JSON valido con questa struttura:
    {
      "reply": "stringa markdown con la spiegazione dettagliata, consigli, tattiche e posizionamento",
      "tacticalCard": {
        "title": "Titolo opzionale (es. Inglesi vs Francesi Feudale)",
        "age": "Opzionale (es. Età II - Feudale)",
        "counterUnits": [
-         { "name": "Nome Unità", "icon": "Emoji o icona (es. 🗡️, 🏹, 🐎, 🛡️, 🪵)", "role": "Ruolo breve (es. Bonus anti-cavalleria)" }
+         { "name": "Nome Unità", "icon": "Emoji (es. 🗡️, 🏹, 🐎, 🛡️)", "role": "Ruolo breve" }
        ],
-       "villagers": {
+       "villi": {
          "food": 0,
          "wood": 0,
          "gold": 0,
          "stone": 0
        },
-       "proTip": "Consiglio pro tattico avanzato o posizionamento strutture"
+       "proTip": "Consiglio pro tattico avanzato"
      }
    }
 
-N.B.: Se la domanda dell'utente è un saluto o generica e non richiede schede di contromisura o villici, puoi lasciare "tacticalCard": null o includere solo "reply".
-Sii conciso, professionale ma amichevole e appassionato di AoE4!`;
+Se la risposta è generica, puoi impostare "tacticalCard": null.`;
 
     const promptText = `${systemPrompt}\n\n${formattedHistory}DOMANDA UTENTE: ${message.trim()}`;
 
@@ -104,7 +114,6 @@ Sii conciso, professionale ma amichevole e appassionato di AoE4!`;
       throw new Error("Nessuna risposta dall'IA.");
     }
 
-    // Try parsing JSON output
     let parsedResult = { reply: rawResultText, tacticalCard: null };
     try {
       let cleaned = rawResultText.trim();
@@ -122,7 +131,6 @@ Sii conciso, professionale ma amichevole e appassionato di AoE4!`;
         }
       }
     } catch (parseErr) {
-      // Fallback to raw text reply if JSON parsing fails
       parsedResult = { reply: rawResultText, tacticalCard: null };
     }
 
