@@ -211,9 +211,9 @@ export const CoachBeastyWidget: React.FC = () => {
   return (
     <div className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-50 font-sans select-none">
       
-      {/* Drawer Dialog Modal - Max Height capped to never overflow 13" laptop screens */}
+      {/* Drawer Dialog Modal - Clamped between top-12 and bottom-20 to never overflow 13" laptop screens */}
       {isOpen && (
-        <div className="fixed bottom-20 sm:bottom-24 right-4 sm:right-6 w-[94vw] sm:w-[440px] h-[580px] max-h-[calc(100vh-7rem)] bg-[#0a0c10]/95 backdrop-blur-xl border border-[#D4AF37]/30 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
+        <div className="fixed top-12 sm:top-16 bottom-20 sm:bottom-24 right-4 sm:right-6 w-[94vw] sm:w-[440px] max-h-[580px] bg-[#0a0c10]/95 backdrop-blur-xl border border-[#D4AF37]/30 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
           
           {/* Header */}
           <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-blue-950/80 p-3.5 border-b border-[#D4AF37]/20 flex items-center justify-between shrink-0">
