@@ -327,10 +327,9 @@ export const CoachBeastyWidget: React.FC = () => {
     e.stopPropagation();
 
     if (modalPos) {
-      const modalWidth = Math.min(440, window.innerWidth * 0.94);
-      const bX = Math.max(10, Math.min(window.innerWidth - 66, modalPos.x + modalWidth - 56));
-      const bY = Math.max(10, Math.min(window.innerHeight - 66, modalPos.y + 500));
-      setBtnPos({ x: bX, y: bY });
+      const safeX = Math.max(10, Math.min(window.innerWidth - 70, modalPos.x));
+      const safeY = Math.max(10, Math.min(window.innerHeight - 70, modalPos.y));
+      setBtnPos({ x: safeX, y: safeY });
     }
 
     setIsOpen(false);
