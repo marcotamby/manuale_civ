@@ -193,25 +193,36 @@ const GEMINI_MODELS = [
 ];
 
 async function fetchGroqResponse(groqApiKey: string, promptText: string) {
-  const url = 'https://api.groq.com/openai/v1/chat/completions';
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${groqApiKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      messages: [{ role: 'user', content: promptText }],
-      temperature: 0.15,
-      max_tokens: 1000
-    })
-  });
-  const data = await res.json();
-  if (data.choices?.[0]?.message?.content) {
-    return data.choices[0].message.content;
+  const GROQ_MODELS = ['groq/compound', 'groq/compound-mini'];
+
+  for (const model of GROQ_MODELS) {
+    try {
+      const url = 'https://api.groq.com/openai/v1/chat/completions';
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${groqApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [{ role: 'user', content: promptText }],
+          temperature: 0.15,
+          max_tokens: 1000
+        })
+      });
+
+      const data = await res.json();
+      if (!data.error && data.choices?.[0]?.message?.content) {
+        return data.choices[0].message.content;
+      }
+      console.warn(`Groq model ${model} error:`, data.error);
+    } catch (err) {
+      console.warn(`Groq fetch error (${model}):`, err);
+    }
   }
-  throw new Error(data.error?.message || 'Groq API Error');
+
+  throw new Error('Groq API Error');
 }
 
 async function generateWithModelFallback(apiKey: string, promptText: string) {
