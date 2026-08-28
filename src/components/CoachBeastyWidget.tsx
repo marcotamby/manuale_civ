@@ -581,49 +581,49 @@ export const CoachBeastyWidget: React.FC = () => {
               </div>
             ))}
 
-            {/* Funnel Navigation */}
+            {/* Funnel Navigation - Clean, Seamless & Borderless Design */}
             {selectedFunnelCategory ? (
-              <div className="bg-slate-900/90 border border-blue-500/30 rounded-xl p-3 space-y-2.5 animate-in fade-in duration-200">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+              <div className="pt-2 pb-1 space-y-2 animate-in fade-in duration-200">
+                <div className="flex items-center justify-between border-b border-slate-800/60 pb-2 px-1">
                   <div className="flex items-center space-x-2">
-                    <span className="text-base">{selectedFunnelCategory.icon}</span>
+                    <span className="text-sm">{selectedFunnelCategory.icon}</span>
                     <span className="font-bold text-xs text-[#D4AF37] uppercase tracking-wider">{selectedFunnelCategory.label}</span>
                   </div>
                   <button 
                     onClick={() => setSelectedFunnelCategory(null)}
-                    className="text-[11px] text-blue-400 hover:text-blue-300 font-medium hover:underline"
+                    className="text-[11px] text-blue-400 hover:text-blue-300 font-semibold transition"
                   >
                     ← Torna al menu
                   </button>
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   {selectedFunnelCategory.options.map((opt, idx) => (
                     <button
                       key={idx}
                       onClick={() => handleSendMessage(opt.prompt)}
                       disabled={loading}
-                      className="w-full text-left p-2.5 bg-slate-950 hover:bg-blue-950/60 border border-slate-800 hover:border-blue-500/50 rounded-lg text-xs text-slate-200 hover:text-white transition flex items-center justify-between group disabled:opacity-50"
+                      className="w-full text-left py-2 px-2.5 rounded-lg hover:bg-slate-900/80 text-xs text-slate-300 hover:text-white transition flex items-center justify-between group disabled:opacity-50 border-l-2 border-transparent hover:border-[#D4AF37]"
                     >
-                      <span>{opt.label}</span>
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-blue-400 transition-transform group-hover:translate-x-0.5 shrink-0 ml-2" />
+                      <span className="font-medium">{opt.label}</span>
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-[#D4AF37] transition-transform group-hover:translate-x-0.5 shrink-0 ml-2" />
                     </button>
                   ))}
                 </div>
               </div>
             ) : (
-              <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 space-y-2 animate-in fade-in duration-200">
-                <div className="flex items-center space-x-2 pb-1 border-b border-slate-800/80">
-                  <span className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider">Cosa stai cercando?</span>
+              <div className="pt-2 pb-1 space-y-2 animate-in fade-in duration-200">
+                <div className="flex items-center space-x-2 pb-1.5 border-b border-slate-800/60 px-1">
+                  <span className="text-[10px] font-bold text-[#D4AF37] uppercase tracking-widest">Cosa stai cercando?</span>
                 </div>
-                <div className="grid grid-cols-1 gap-1.5">
+                <div className="space-y-1">
                   {FUNNEL_CATEGORIES.map((cat) => (
                     <button
                       key={cat.id}
                       onClick={() => setSelectedFunnelCategory(cat)}
                       disabled={loading}
-                      className="w-full text-left p-2.5 bg-slate-950/90 hover:bg-slate-800/80 border border-slate-800/80 hover:border-[#D4AF37]/40 rounded-xl transition flex items-center justify-between group disabled:opacity-50"
+                      className="w-full text-left py-2 px-2.5 rounded-xl hover:bg-slate-900/90 transition flex items-center justify-between group disabled:opacity-50 border-l-2 border-transparent hover:border-[#D4AF37]"
                     >
-                      <div className="flex items-center space-x-2.5 min-w-0">
+                      <div className="flex items-center space-x-3 min-w-0">
                         <span className="text-base shrink-0">{cat.icon}</span>
                         <div className="truncate">
                           <div className="font-semibold text-xs text-slate-200 group-hover:text-[#D4AF37] transition-colors truncate">
