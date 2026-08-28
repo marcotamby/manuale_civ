@@ -230,20 +230,19 @@ export const CoachBeastyWidget: React.FC = () => {
   }, [isOpen]);
 
   return (
-    <div className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-50 font-sans select-none">
-      
+    <>
       {/* Drawer Dialog Modal - Adaptively positions top-28 when announcement banner is active to prevent cutoff */}
       {isOpen && (
-        <div className={`fixed ${hasActiveBanner ? 'top-28 sm:top-28' : 'top-16 sm:top-20'} bottom-20 sm:bottom-24 right-4 sm:right-6 w-[94vw] sm:w-[440px] max-h-[580px] bg-[#0a0c10]/95 backdrop-blur-xl border border-[#D4AF37]/30 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200 z-[60]`}>
+        <div className={`fixed ${hasActiveBanner ? 'top-28 sm:top-28' : 'top-16 sm:top-20'} bottom-20 sm:bottom-24 right-4 sm:right-6 w-[94vw] sm:w-[440px] max-h-[580px] bg-[#0a0c10]/95 backdrop-blur-xl border border-[#D4AF37]/30 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200 z-[9999] font-sans select-none pointer-events-auto`}>
           
           {/* Header */}
-          <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-blue-950/80 p-3.5 border-b border-[#D4AF37]/20 flex items-center justify-between shrink-0">
+          <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-blue-950/80 p-3.5 border-b border-[#D4AF37]/20 flex items-center justify-between shrink-0 relative z-10">
             <div className="flex items-center space-x-3">
               <div className="relative">
                 <img 
                   src="/beasty_avatar.jpg" 
                   alt="Coach Beasty AI" 
-                  className="w-9 h-9 rounded-xl object-cover border border-[#D4AF37]/50 shadow-md"
+                  className="w-9 h-9 rounded-xl object-cover border border-[#D4AF37]/50 shadow-md pointer-events-none"
                 />
                 <span className="absolute -top-1 -right-1 flex h-3 w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
@@ -257,7 +256,7 @@ export const CoachBeastyWidget: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center space-x-1 z-30 pointer-events-auto">
+            <div className="flex items-center space-x-1 relative z-30 pointer-events-auto">
               <button 
                 type="button"
                 onClick={(e) => {
@@ -265,10 +264,11 @@ export const CoachBeastyWidget: React.FC = () => {
                   e.stopPropagation();
                   handleResetChat();
                 }} 
-                className="text-slate-400 hover:text-[#D4AF37] p-1.5 rounded-lg hover:bg-slate-800/60 transition cursor-pointer"
+                onPointerDown={(e) => e.stopPropagation()}
+                className="text-slate-400 hover:text-[#D4AF37] p-2 rounded-lg hover:bg-slate-800/80 transition cursor-pointer"
                 title="Azzera conversazione"
               >
-                <RotateCcw className="w-4.5 h-4.5" />
+                <RotateCcw className="w-4.5 h-4.5 pointer-events-none" />
               </button>
               <button 
                 type="button"
@@ -277,10 +277,20 @@ export const CoachBeastyWidget: React.FC = () => {
                   e.stopPropagation();
                   setIsOpen(false);
                 }} 
-                className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800/60 transition cursor-pointer"
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsOpen(false);
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsOpen(false);
+                }}
+                className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800/80 transition cursor-pointer relative z-50"
                 title="Chiudi widget"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 pointer-events-none" />
               </button>
             </div>
           </div>
@@ -558,30 +568,32 @@ export const CoachBeastyWidget: React.FC = () => {
       )}
 
       {/* Floating Trigger Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="group relative flex items-center justify-center w-14 h-14 rounded-full bg-slate-900 border-2 border-[#D4AF37] shadow-xl shadow-blue-900/40 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer overflow-hidden p-0.5"
-        title="Coach Beasty AI"
-      >
-        <div className="relative w-full h-full flex items-center justify-center">
-          {isOpen ? (
-            <X className="w-6 h-6 text-white stroke-[2.5]" />
-          ) : (
-            <>
-              <img 
-                src="/beasty_avatar.jpg" 
-                alt="Coach Beasty AI" 
-                className="w-full h-full rounded-full object-cover group-hover:scale-110 transition-transform duration-300"
-              />
-              <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500 border border-slate-900"></span>
-              </span>
-            </>
-          )}
-        </div>
-      </button>
-
-    </div>
+      <div className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-[9990] font-sans select-none">
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="group relative flex items-center justify-center w-14 h-14 rounded-full bg-slate-900 border-2 border-[#D4AF37] shadow-xl shadow-blue-900/40 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer overflow-hidden p-0.5"
+          title="Coach Beasty AI"
+        >
+          <div className="relative w-full h-full flex items-center justify-center">
+            {isOpen ? (
+              <X className="w-6 h-6 text-white stroke-[2.5]" />
+            ) : (
+              <>
+                <img 
+                  src="/beasty_avatar.jpg" 
+                  alt="Coach Beasty AI" 
+                  className="w-full h-full rounded-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+                <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500 border border-slate-900"></span>
+                </span>
+              </>
+            )}
+          </div>
+        </button>
+      </div>
+    </>
   );
 };
