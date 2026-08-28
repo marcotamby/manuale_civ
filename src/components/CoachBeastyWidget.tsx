@@ -114,13 +114,21 @@ export const CoachBeastyWidget: React.FC = () => {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 50);
   };
 
   const scrollToTop = () => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop = 0;
-    }
+    const applyScrollTop = () => {
+      if (messagesContainerRef.current) {
+        messagesContainerRef.current.scrollTop = 0;
+      }
+    };
+    applyScrollTop();
+    requestAnimationFrame(applyScrollTop);
+    setTimeout(applyScrollTop, 40);
+    setTimeout(applyScrollTop, 120);
   };
 
   // Scroll to top when opening widget so initial welcome message is shown at top
@@ -130,7 +138,7 @@ export const CoachBeastyWidget: React.FC = () => {
     }
   }, [isOpen]);
 
-  // Scroll to bottom only when new messages are added during chat
+  // Scroll to bottom only when new user/coach messages are added (more than initial welcome message)
   useEffect(() => {
     if (isOpen && (messages.length > 1 || loading)) {
       scrollToBottom();
