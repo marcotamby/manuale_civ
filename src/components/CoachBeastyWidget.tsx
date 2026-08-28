@@ -237,6 +237,27 @@ export const CoachBeastyWidget: React.FC = () => {
     return () => clearInterval(interval);
   }, [isOpen]);
 
+  const isModalManuallyMovedRef = useRef(false);
+
+  const calcModalPosFromBtn = (bX: number, bY: number) => {
+    const modalWidth = Math.min(440, window.innerWidth * 0.94);
+    const modalHeight = Math.min(580, window.innerHeight - 80);
+
+    let mX = bX > window.innerWidth / 2 
+      ? bX - modalWidth + 56 
+      : bX;
+
+    mX = Math.max(10, Math.min(window.innerWidth - modalWidth - 10, mX));
+
+    let mY = bY > window.innerHeight / 2
+      ? bY - modalHeight - 10
+      : bY + 64;
+
+    mY = Math.max(hasActiveBanner ? 112 : 50, Math.min(window.innerHeight - modalHeight - 10, mY));
+
+    return { x: mX, y: mY };
+  };
+
   // --- Trigger Button Drag Handlers ---
   const handleBtnPointerDown = (e: React.PointerEvent) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
@@ -273,6 +294,10 @@ export const CoachBeastyWidget: React.FC = () => {
     const newY = Math.max(10, Math.min(window.innerHeight - 66, dragBtnStartRef.current.initY + deltaY));
 
     setBtnPos({ x: newX, y: newY });
+
+    if (!isModalManuallyMovedRef.current) {
+      setModalPos(calcModalPosFromBtn(newX, newY));
+    }
   };
 
   const handleBtnPointerUp = (e: React.PointerEvent) => {
@@ -283,7 +308,13 @@ export const CoachBeastyWidget: React.FC = () => {
     } catch (err) {}
 
     if (!hasBtnMovedRef.current) {
-      setIsOpen(prev => !prev);
+      setIsOpen(prev => {
+        const nextOpen = !prev;
+        if (nextOpen && btnPos && !isModalManuallyMovedRef.current) {
+          setModalPos(calcModalPosFromBtn(btnPos.x, btnPos.y));
+        }
+        return nextOpen;
+      });
     }
   };
 
@@ -295,8 +326,8 @@ export const CoachBeastyWidget: React.FC = () => {
     isDraggingModalRef.current = true;
 
     const modalWidth = Math.min(440, window.innerWidth * 0.94);
-    const defaultX = Math.max(10, window.innerWidth - modalWidth - 24);
-    const defaultY = hasActiveBanner ? 112 : 70;
+    const defaultX = btnPos ? calcModalPosFromBtn(btnPos.x, btnPos.y).x : Math.max(10, window.innerWidth - modalWidth - 24);
+    const defaultY = btnPos ? calcModalPosFromBtn(btnPos.x, btnPos.y).y : (hasActiveBanner ? 112 : 70);
 
     const initX = modalPos ? modalPos.x : defaultX;
     const initY = modalPos ? modalPos.y : defaultY;
@@ -322,6 +353,7 @@ export const CoachBeastyWidget: React.FC = () => {
     const newX = Math.max(10, Math.min(window.innerWidth - modalWidth - 10, dragModalStartRef.current.initX + deltaX));
     const newY = Math.max(10, Math.min(window.innerHeight - 180, dragModalStartRef.current.initY + deltaY));
 
+    isModalManuallyMovedRef.current = true;
     setModalPos({ x: newX, y: newY });
   };
 
