@@ -111,13 +111,38 @@ async function fetchMatchupContext(userMessage: string): Promise<string> {
       }
     }
 
-    if (detectedSlugs.length === 0) return '';
-
     const url = `https://aoe4world.com/api/v0/stats/rm_solo/matchups${rank ? '?rank_level=' + rank : ''}`;
     const res = await fetch(url);
     if (!res.ok) return '';
     const json = await res.json();
     const allData: any[] = json.data || [];
+
+    if (detectedSlugs.length === 0) {
+      const isGeneralWinrateQuery = lower.includes('win rate') || lower.includes('winrate') || lower.includes('vittori') || lower.includes('miglior') || lower.includes('classifica') || lower.includes('top') || lower.includes('tier') || !!rank;
+      
+      if (isGeneralWinrateQuery && allData.length > 0) {
+        const civStats: Record<string, { totalWins: number; totalGames: number }> = {};
+        for (const m of allData) {
+          if (!civStats[m.civilization]) civStats[m.civilization] = { totalWins: 0, totalGames: 0 };
+          civStats[m.civilization].totalWins += m.win_count || 0;
+          civStats[m.civilization].totalGames += m.games_count || 0;
+        }
+
+        const ranking = Object.entries(civStats)
+          .map(([civ, stats]) => ({
+            civ: civ.replace('_', ' ').toUpperCase(),
+            winRate: stats.totalGames > 0 ? (stats.totalWins / stats.totalGames) * 100 : 0,
+            totalGames: stats.totalGames
+          }))
+          .sort((a, b) => b.winRate - a.winRate);
+
+        if (ranking.length > 0) {
+          const top5 = ranking.slice(0, 5).map((r, idx) => `${idx + 1}. **${r.civ}**: Win Rate **${r.winRate.toFixed(1)}%** (${r.totalGames} partite)`).join('\n');
+          return `CLASSIFICA GENERALE WIN RATE REALE IN TEMPO REALE DAL PORTALE (Rank: ${rank ? rank.toUpperCase() : 'TUTTI I RANK'}):\n${top5}\n\nCITA QUESTA CLASSIFICA E QUESTI NUMERI REALI NELLA TUA RISPOSTA!`;
+        }
+      }
+      return '';
+    }
 
     if (detectedSlugs.length >= 2) {
       const civA = detectedSlugs[0];
