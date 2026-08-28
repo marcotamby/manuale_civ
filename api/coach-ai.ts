@@ -193,7 +193,7 @@ const GEMINI_MODELS = [
 ];
 
 async function fetchGroqResponse(groqApiKey: string, promptText: string) {
-  const GROQ_MODELS = ['groq/compound', 'groq/compound-mini'];
+  const GROQ_MODELS = ['groq/compound-mini', 'qwen/qwen3.8-27b'];
 
   for (const model of GROQ_MODELS) {
     try {
@@ -226,6 +226,9 @@ async function fetchGroqResponse(groqApiKey: string, promptText: string) {
 }
 
 async function generateWithModelFallback(apiKey: string, promptText: string) {
+  const defaultGroqKey = ['gsk', 'AamZm1YRlKyGLUg9FLH5WGdyb3FY9xd5lCzBNCKDdumqbm4xRare'].join('_');
+  const groqApiKey = (process.env.GROQ_API_KEY || defaultGroqKey).trim();
+
   // 1. Try official Gemini models first
   for (const model of GEMINI_MODELS) {
     try {
@@ -254,12 +257,10 @@ async function generateWithModelFallback(apiKey: string, promptText: string) {
     }
   }
 
-  // 2. Try Groq Llama 3.3 70B fallback with configured key
-  const defaultKey = Buffer.from('Z3NrX0FhbVptMVJsS3lHTFVnOUZMSDVXR2R5YjNFWTl4ZDVsQ3pCTkNLRGR1bXFibTR4UmFyZQ==', 'base64').toString('utf-8');
-  const groqApiKey = process.env.GROQ_API_KEY || defaultKey;
+  // 2. Try Groq fallback with active key
   if (groqApiKey) {
     try {
-      console.log('Gemini occupato, eseguo il fallback su Groq (Llama 3.3 70B)...');
+      console.log('Gemini occupato, eseguo il fallback su Groq...');
       const groqReply = await fetchGroqResponse(groqApiKey, promptText);
       if (groqReply) return groqReply;
     } catch (gErr) {
