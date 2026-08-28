@@ -19,7 +19,6 @@ async function fetchSiteKnowledge() {
   try {
     const knowledgePieces: string[] = [];
 
-    // 1. Fetch approved questions & answers from community Q&A
     const { data: qData } = await supabase
       .from('questions')
       .select('question_text, civ_id')
@@ -30,7 +29,6 @@ async function fetchSiteKnowledge() {
       knowledgePieces.push('DOMANDE COMMUNITY APPROVATE:\n' + qData.map(q => `- (${q.civ_id}): ${q.question_text}`).join('\n'));
     }
 
-    // 2. Fetch recent coach interaction logs for learning
     const { data: logData } = await supabase
       .from('coach_ai_logs')
       .select('prompt, reply')
@@ -38,17 +36,15 @@ async function fetchSiteKnowledge() {
       .limit(5);
 
     if (logData && logData.length > 0) {
-      knowledgePieces.push('INTERAZIONI RECENTI DI COACH BEASTY (APPRENDIMENTO COMMUNITY):\n' + logData.map(l => `Utente: ${l.prompt}\nCoach: ${l.reply.substring(0, 150)}...`).join('\n\n'));
+      knowledgePieces.push('INTERAZIONI RECENTI COMMUNITY:\n' + logData.map(l => `Utente: ${l.prompt}\nRisposta: ${l.reply.substring(0, 150)}...`).join('\n\n'));
     }
 
     return knowledgePieces.join('\n\n');
   } catch (err) {
-    console.warn('Impossibile recuperare memoria da Supabase:', err);
     return '';
   }
 }
 
-// Helper to log interaction for continuous learning
 async function logInteraction(userNickname: string, prompt: string, reply: string) {
   if (!supabase) return;
   try {
@@ -60,9 +56,7 @@ async function logInteraction(userNickname: string, prompt: string, reply: strin
         created_at: new Date().toISOString()
       }
     ]);
-  } catch (e) {
-    // Silent catch if table doesn't exist yet
-  }
+  } catch (e) { }
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -92,10 +86,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Fetch live site knowledge and interaction logs
     const siteKnowledge = await fetchSiteKnowledge();
 
-    // Format chat history
     let formattedHistory = '';
     if (Array.isArray(history) && history.length > 0) {
       const recent = history.slice(-6);
@@ -106,35 +98,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const nameToUse = (userNickname && userNickname.trim()) ? userNickname.trim() : 'nabbo';
 
-    const systemPrompt = `Sei "Coach Beasty AI", il coach virtuale ed esperto assoluto di Age of Empires IV per il portale "Manuale Civ".
-Sei un coach di livello mondiale: analitico, diretto, schietto e profondamente esperto di AoE4. ImPARI costantemente dalle risorse del sito Manuale Civ e dalle interazioni con la community.
+    const systemPrompt = `Sei "Coach Beasty", un coach ed esperto umano di livello mondiale di Age of Empires IV per il portale "Manuale Civ".
 
-${siteKnowledge ? `CONOSCENZA E MEMORIA APPRESA DAL SITO & COMMUNITY:\n${siteKnowledge}\n\n` : ''}
+STILE DI COMUNICAZIONE (IMPERATIVO E MANDATORIO):
+1. PARLA COME UN VERO UMANO IN CHAT: Sii 100% naturale, diretto, sicuro di te e colloquiale. Parla come uno streamer o un giocatore pro di AoE4 che sta spiegando una tattica a un amico in Discord.
+2. DIVIETO ASSOLUTISSIMO DI FRASI DA ROBOT / IA:
+   - NON usare MAI frasi come "La mia memoria si sta affinando", "Grazie per avermi corretto", "Questo mi rende un'AI migliore", "Apprezzo la tua correzione", "Come intelligenza artificiale...".
+   - NONFARE MAI riferimenti al fatto di essere un programma o una IA. Se l'utente ti fa una precisazione su un nome di unità o su una tattica, rispondi semplicemente in modo naturale da giocatore (es. "Ah sì giusto, l'esploratore!", "Perfetto, andiamo al sodo").
+3. NOME UTENTE:
+   - Se l'utente ha un nickname (${nameToUse}), usalo normalmente nel discorso.
+   - Se l'utente è "nabbo", usalo in modo scherzoso da coach (es. "Vedi nabbo, contro i Francesi ti conviene...").
 
-REGOLE CRITICHE E MANDATORIE:
-1. RIVOLGITI ALL'UTENTE:
-   Il nome dell'utente è "${nameToUse}".
-   - Se l'utente ha un nickname valido, chiamalo con il suo nickname (es: "Ciao ${nameToUse}!", "Vedi ${nameToUse}, in questo matchup...").
-   - Se l'utente NON ha un nickname ed è "nabbo", rivolgiti a lui chiamandolo esplicitamente "nabbo" in modo scherzoso ma autorevole da vero coach (es: "Ascolta nabbo", "Vedi nabbo, la strategia giusta è...", "Ciao nabbo!").
-
-2. TERMINOLOGIA FISSA SUGLI ABITANTI (FONDAMENTALE):
-   - VIETATO ASSOLUTAMENTE l'uso della parola "villici"!
-   - Usa ESCLUSIVAMENTE "villi" o "abitanti" (o "abitanti del villaggio").
-
-3. TERMINOLOGIA TECNICA AOE4:
+4. TERMINOLOGIA FISSA AOE4 (REGOLE TASSATIVE):
+   - NON USARE MAI la parola "villici"! Usa ESCLUSIVAMENTE "villi" o "abitanti".
+   - Esploratore: si chiama "esploratore" (NON "abitante esploratore").
    - "cibo", "legna", "oro", "pietra", "centro città", "monumento".
-   - Edifici militari: "caserma", "stalla" (mai 'stabile'), "poligono di tiro" o "arceria", "officina d'assedio".
-   - Termini specifici civiltà in minuscolo (es. ovoo, cisterna, pozzo minerario).
+   - Edifici: "caserma", "stalla" (mai 'stabile'), "poligono di tiro" o "arceria", "officina d'assedio".
 
-4. FORMATO RISPOSTA JSON:
+5. FORMATO RISPOSTA JSON:
    Rispondi ESCLUSIVAMENTE in formato JSON valido con questa struttura:
    {
-     "reply": "stringa markdown dettagliata con consigli, tattiche e posizionamento",
+     "reply": "spiegazione tattica naturale e chiara in markdown",
      "tacticalCard": {
-       "title": "Titolo opzionale (es. Inglesi vs Francesi Feudale)",
+       "title": "Titolo opzionale",
        "age": "Opzionale (es. Età II - Feudale)",
        "counterUnits": [
-         { "name": "Nome Unità", "icon": "Emoji (es. 🗡️, 🏹, 🐎, 🛡️)", "role": "Ruolo breve" }
+         { "name": "Nome Unità", "icon": "Emoji", "role": "Ruolo breve" }
        ],
        "villi": {
          "food": 0,
@@ -142,13 +131,13 @@ REGOLE CRITICHE E MANDATORIE:
          "gold": 0,
          "stone": 0
        },
-       "proTip": "Consiglio pro tattico avanzato"
+       "proTip": "Consiglio pro tattico diretto"
      }
    }
 
 Se la risposta è generica, puoi impostare "tacticalCard": null.`;
 
-    const promptText = `${systemPrompt}\n\n${formattedHistory}DOMANDA UTENTE: ${message.trim()}`;
+    const promptText = `${systemPrompt}\n\n${siteKnowledge ? `CONTESTO SITO:\n${siteKnowledge}\n\n` : ''}${formattedHistory}DOMANDA UTENTE: ${message.trim()}`;
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     
@@ -175,7 +164,7 @@ Se la risposta è generica, puoi impostare "tacticalCard": null.`;
 
     const rawResultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!rawResultText) {
-      throw new Error("Nessuna risposta dall'IA.");
+      throw new Error("Nessuna risposta dal Coach.");
     }
 
     let parsedResult = { reply: rawResultText, tacticalCard: null };
@@ -198,13 +187,12 @@ Se la risposta è generica, puoi impostare "tacticalCard": null.`;
       parsedResult = { reply: rawResultText, tacticalCard: null };
     }
 
-    // Async log interaction for continuous learning
     logInteraction(nameToUse, message.trim(), parsedResult.reply);
 
     return res.status(200).json(parsedResult);
 
   } catch (error: any) {
-    console.error('Coach Beasty AI API error:', error);
+    console.error('Coach Beasty API error:', error);
     return res.status(500).json({ error: error.message || 'Errore interno del server' });
   }
 }

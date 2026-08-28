@@ -269,7 +269,7 @@ export const CoachBeastyWidget: React.FC = () => {
                           {parts.map((part, idx) => {
                             if (part.startsWith('**') && part.endsWith('**')) {
                               return (
-                                <strong key={idx} className="font-bold text-[#D4AF37]">
+                                <strong key={idx} className="font-bold text-cyan-300">
                                   {part.slice(2, -2)}
                                 </strong>
                               );
@@ -373,9 +373,17 @@ export const CoachBeastyWidget: React.FC = () => {
                 </div>
 
                 {msg.sender === 'user' && (
-                  <div className="w-8 h-8 rounded-lg bg-blue-600 text-white font-bold flex items-center justify-center shrink-0 mt-0.5 text-xs shadow-md">
-                    {displayName.charAt(0).toUpperCase()}
-                  </div>
+                  user?.avatar_url ? (
+                    <img 
+                      src={user.avatar_url} 
+                      alt={displayName} 
+                      className="w-8 h-8 rounded-lg object-cover border border-blue-400/50 shrink-0 mt-0.5 shadow-md" 
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-lg bg-blue-600 text-white font-bold flex items-center justify-center shrink-0 mt-0.5 text-xs shadow-md">
+                      {displayName.charAt(0).toUpperCase()}
+                    </div>
+                  )
                 )}
               </div>
             ))}
