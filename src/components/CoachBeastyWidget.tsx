@@ -216,12 +216,25 @@ export const CoachBeastyWidget: React.FC = () => {
     setSelectedFunnelCategory(null);
   };
 
+  const [hasActiveBanner, setHasActiveBanner] = useState(false);
+
+  useEffect(() => {
+    const checkBanner = () => {
+      const bannerEl = document.querySelector('[class*="from-cyan-950"]');
+      setHasActiveBanner(!!bannerEl);
+    };
+
+    checkBanner();
+    const interval = setInterval(checkBanner, 500);
+    return () => clearInterval(interval);
+  }, [isOpen]);
+
   return (
     <div className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-50 font-sans select-none">
       
-      {/* Drawer Dialog Modal - Clamped between top-12 and bottom-20 to never overflow 13" laptop screens */}
+      {/* Drawer Dialog Modal - Adaptively positions top-28 when announcement banner is active to prevent cutoff */}
       {isOpen && (
-        <div className="fixed top-12 sm:top-16 bottom-20 sm:bottom-24 right-4 sm:right-6 w-[94vw] sm:w-[440px] max-h-[580px] bg-[#0a0c10]/95 backdrop-blur-xl border border-[#D4AF37]/30 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
+        <div className={`fixed ${hasActiveBanner ? 'top-28 sm:top-28' : 'top-16 sm:top-20'} bottom-20 sm:bottom-24 right-4 sm:right-6 w-[94vw] sm:w-[440px] max-h-[580px] bg-[#0a0c10]/95 backdrop-blur-xl border border-[#D4AF37]/30 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200 z-[60]`}>
           
           {/* Header */}
           <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-blue-950/80 p-3.5 border-b border-[#D4AF37]/20 flex items-center justify-between shrink-0">
