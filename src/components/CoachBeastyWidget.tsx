@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from './AuthContext';
-import { X, Send, Sparkles, RotateCcw, ChevronRight, Swords } from 'lucide-react';
+import { X, Send, Sparkles, RotateCcw, ChevronRight, Swords, Copy, Check } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -91,6 +91,14 @@ export const CoachBeastyWidget: React.FC = () => {
   const { user } = useAuth();
   const userNickname = user?.nickname || user?.name || '';
   const displayName = userNickname || 'utente';
+
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopyText = (id: string, text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const [isOpen, setIsOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
@@ -416,8 +424,8 @@ export const CoachBeastyWidget: React.FC = () => {
         <div 
           style={modalPos ? { left: `${modalPos.x}px`, top: `${modalPos.y}px` } : undefined}
           className={modalPos 
-            ? "fixed w-[94vw] sm:w-[440px] h-[580px] max-h-[calc(100vh-5rem)] bg-[#0a0c10]/95 backdrop-blur-xl border border-cyan-500/30 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden animate-in fade-in duration-200 z-[9999] font-sans select-none pointer-events-auto"
-            : `fixed ${hasActiveBanner ? 'top-28 sm:top-28' : 'top-16 sm:top-20'} bottom-20 sm:bottom-24 right-4 sm:right-6 w-[94vw] sm:w-[440px] max-h-[580px] bg-[#0a0c10]/95 backdrop-blur-xl border border-cyan-500/30 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200 z-[9999] font-sans select-none pointer-events-auto`
+            ? "fixed w-[94vw] sm:w-[440px] h-[580px] max-h-[calc(100vh-5rem)] bg-[#0a0c10]/95 backdrop-blur-xl border border-cyan-500/30 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden animate-in fade-in duration-200 z-[9999] font-sans pointer-events-auto"
+            : `fixed ${hasActiveBanner ? 'top-28 sm:top-28' : 'top-16 sm:top-20'} bottom-20 sm:bottom-24 right-4 sm:right-6 w-[94vw] sm:w-[440px] max-h-[580px] bg-[#0a0c10]/95 backdrop-blur-xl border border-cyan-500/30 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200 z-[9999] font-sans pointer-events-auto`
           }
         >
           
@@ -426,7 +434,7 @@ export const CoachBeastyWidget: React.FC = () => {
             onPointerDown={handleHeaderPointerDown}
             onPointerMove={handleHeaderPointerMove}
             onPointerUp={handleHeaderPointerUp}
-            className="bg-gradient-to-r from-slate-900 via-slate-900 to-blue-950/80 p-3.5 border-b border-cyan-500/20 flex items-center justify-between shrink-0 relative z-10 cursor-grab active:cursor-grabbing"
+            className="bg-gradient-to-r from-slate-900 via-slate-900 to-blue-950/80 p-3.5 border-b border-cyan-500/20 flex items-center justify-between shrink-0 relative z-10 cursor-grab active:cursor-grabbing select-none"
             title="Trascina per spostare la chat"
           >
             <div className="flex items-center space-x-3 pointer-events-none">
@@ -475,8 +483,8 @@ export const CoachBeastyWidget: React.FC = () => {
             </div>
           </div>
 
-          {/* Messages Area */}
-          <div ref={messagesContainerRef} className="flex-1 min-h-0 overflow-y-auto p-3.5 space-y-4 elegant-scrollbar bg-slate-950/80">
+          {/* Messages Area - Full Selectable Text */}
+          <div ref={messagesContainerRef} className="flex-1 min-h-0 overflow-y-auto p-3.5 space-y-4 elegant-scrollbar bg-slate-950/80 select-text">
             {messages.map((msg) => (
               <div 
                 key={msg.id} 
@@ -577,9 +585,29 @@ export const CoachBeastyWidget: React.FC = () => {
                     </div>
                   )}
 
-                  <span className="block text-[10px] opacity-40 text-right mt-1 font-mono">
-                    {msg.timestamp}
-                  </span>
+                  <div className="flex items-center justify-between mt-1 pt-1 border-t border-slate-800/40 text-[10px] select-none">
+                    {msg.sender === 'coach' ? (
+                      <button 
+                        type="button"
+                        onClick={() => handleCopyText(msg.id, msg.text)}
+                        className="text-slate-400 hover:text-cyan-300 flex items-center gap-1 transition cursor-pointer"
+                        title="Copia risposta"
+                      >
+                        {copiedId === msg.id ? (
+                          <>
+                            <Check className="w-3 h-3 text-emerald-400" />
+                            <span className="text-emerald-400 font-semibold">Copiato!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" />
+                            <span>Copia</span>
+                          </>
+                        )}
+                      </button>
+                    ) : <span />}
+                    <span className="opacity-40 font-mono">{msg.timestamp}</span>
+                  </div>
                 </div>
               </div>
             ))}
