@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bot, X, Send, RotateCcw, Sparkles, Shield, Swords, Zap } from 'lucide-react';
+import { X, Send, RotateCcw, Sparkles, Shield, Swords, Zap } from 'lucide-react';
 import { useAuth } from './AuthContext';
 
 interface TacticalCard {
@@ -141,9 +141,11 @@ export const CoachBeastyWidget: React.FC = () => {
           <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-blue-950/80 p-3.5 border-b border-[#D4AF37]/20 flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="relative">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-md shadow-blue-500/20 text-white font-bold border border-blue-400/30">
-                  <Bot className="w-5 h-5 text-white" />
-                </div>
+                <img 
+                  src="/beasty_avatar.jpg" 
+                  alt="Coach Beasty AI" 
+                  className="w-9 h-9 rounded-xl object-cover border border-[#D4AF37]/50 shadow-md"
+                />
                 <span className="absolute -top-1 -right-1 flex h-3 w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
@@ -182,9 +184,11 @@ export const CoachBeastyWidget: React.FC = () => {
                 className={`flex items-start space-x-2.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.sender === 'coach' && (
-                  <div className="w-7 h-7 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                    <Bot className="w-4 h-4 text-blue-400" />
-                  </div>
+                  <img 
+                    src="/beasty_avatar.jpg" 
+                    alt="Coach Beasty" 
+                    className="w-7 h-7 rounded-lg object-cover border border-[#D4AF37]/40 shrink-0 mt-0.5" 
+                  />
                 )}
 
                 <div className={`max-w-[85%] rounded-2xl p-3 shadow-md ${
@@ -318,9 +322,11 @@ export const CoachBeastyWidget: React.FC = () => {
             {/* Loading Indicator */}
             {loading && (
               <div className="flex items-center space-x-2.5">
-                <div className="w-7 h-7 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center shrink-0">
-                  <Bot className="w-4 h-4 text-blue-400 animate-pulse" />
-                </div>
+                <img 
+                  src="/beasty_avatar.jpg" 
+                  alt="Coach Beasty" 
+                  className="w-7 h-7 rounded-lg object-cover border border-[#D4AF37]/40 shrink-0 animate-pulse" 
+                />
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-none p-3 text-slate-400 text-xs flex items-center space-x-2">
                   <div className="flex space-x-1">
                     <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
@@ -366,18 +372,22 @@ export const CoachBeastyWidget: React.FC = () => {
       {/* Floating Trigger Button (Positioned above bottom bar) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="group relative flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 via-blue-700 to-slate-900 text-white shadow-xl shadow-blue-900/50 border-2 border-[#D4AF37]/70 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
+        className="group relative flex items-center justify-center w-14 h-14 rounded-full bg-slate-900 border-2 border-[#D4AF37] shadow-xl shadow-blue-900/40 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer overflow-hidden p-0.5"
         title="Coach Beasty AI"
       >
-        <div className="relative">
+        <div className="relative w-full h-full flex items-center justify-center">
           {isOpen ? (
             <X className="w-6 h-6 text-white stroke-[2.5]" />
           ) : (
             <>
-              <Bot className="w-7 h-7 text-white stroke-[2.2] group-hover:rotate-12 transition-transform duration-300" />
-              <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-300 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-400"></span>
+              <img 
+                src="/beasty_avatar.jpg" 
+                alt="Coach Beasty AI" 
+                className="w-full h-full rounded-full object-cover group-hover:scale-110 transition-transform duration-300"
+              />
+              <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500 border border-slate-900"></span>
               </span>
             </>
           )}
