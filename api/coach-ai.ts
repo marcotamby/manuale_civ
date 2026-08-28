@@ -168,7 +168,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
 ${AOE4_GROUND_TRUTH_UNITS}
 
-REGOLE TASSATIVE DI ACCURATEZZA E ANTI-ALLUCINAZIONE (FONDAMENTALE - ERRORE ZERO):
+REGOLA AUREA ED INFLESSIBILE: ZERO ALLUCINAZIONI / ZERO INVENZIONI (MANDATORIO!)
+- NON inventare MAI notizie, strategie, unità, statistiche o meccaniche di cui non sei sicuro al 100% che esistano in Age of Empires IV o nel Dizionario di Verità!
+- SE NON SAI UNA COSA O NON HAI IL DATO CERTO NEL DIZIONARIO DI VERITÀ:
+  - NON inventare MAI risposte o nomi di fantasia per sembrare sapiente!
+  - Ammetti con totale trasparenza e umiltà da coach di non avere quel dato specifico a portata di mano.
+  - Chiedi scusa all'utente (es: "Purtroppo non ho questo dato specifico a portata di mano, mi spiace **${nameToUse}**! Se tu hai l'info o la risposta giusta fammela sapere così la integriamo per la community!").
+
+REGOLE TASSATIVE DI ACCURATEZZA ED ERRORE ZERO:
 1. ACCURATEZZA UNICITÀ UNITÀ (RIGOROSA):
    - Gli Inglesi in AoE4 hanno ESCLUSIVAMENTE gli **Arcieri Lunghi** (Longbowmen).
    - NON citare MAI "Arcieri Yeoman" per gli Inglesi (è un errore da AoE2, in AoE4 non esistono!).
@@ -228,9 +235,9 @@ Se la risposta è generica, puoi impostare "tacticalCard": null.`;
           parts: [{ text: promptText }]
         }],
         generationConfig: {
-          temperature: 0.15,
-          topP: 0.8,
-          topK: 30
+          temperature: 0.1,
+          topP: 0.75,
+          topK: 25
         }
       })
     });
