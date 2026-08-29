@@ -1,6 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
-import { civilizationsData } from '../src/data/aoe4Data';
 
 interface ChatMessage {
   sender: 'user' | 'coach';
@@ -60,6 +59,103 @@ const CIV_NAME_TO_SLUG: Record<string, string> = {
   'tughlaq': 'tughlaq'
 };
 
+const CIV_SUMMARIES: Record<string, string> = {
+  'english': `[INGLESI - ID: english]
+- Natura: Civiltà difensiva ed economica con arcieri a lungo raggio (Longbowman) e produzione agricola potenziata.
+- Unità Uniche: Longbowman (Età II - Feudale), King (Età II - Feudale), Vanguard Man-at-Arms (Età I - Dark Age), Wynguard Ranger/Footman (Età IV - Imperiale).`,
+
+  'french': `[FRANCESI - ID: french]
+- Natura: Civiltà aggressiva dominata dalla cavalleria pesante e produzione economica accelerata.
+- Unità Uniche: Royal Knight (Cavaliere Reale, Età II - Feudale), Arbalétrier (Età II - Feudale), Royal Cannon (Età IV - Imperiale).`,
+
+  'holy_roman_empire': `[SACRO ROMANO IMPERO (SRI / HRE) - ID: holy_roman_empire]
+- Natura: Fast Castle rapida, raccolta reliquie per la Cattedrale di Ratisbona e prelati che potenziano l'economia.
+- Unità Uniche: Prelate (Età I - Dark Age), Landsknecht (Età III - Castelli), Early Man-at-Arms (Età II - Feudale).`,
+
+  'mongols': `[MONGOLI - ID: mongols]
+- Natura: CIVILTÀ NOMADE per eccellenza. Nessun muro di pietra, mobilità estrema, Ovoo per raddoppiare le produzioni e pascoli per pecore.
+- Unità Uniche: Khan (Età I - Dark Age), Keshik (Età II - Feudale), Mangudai (Età II - Feudale), Traction Trebuchet (Età III - Castelli), Shaman (Età III - Castelli).`,
+
+  'jin-dynasty': `[DINASTIA JIN - ID: jin-dynasty]
+- Natura: CIVILTÀ IMPERIALE/CINESE D'ÉLITE (NON NOMADE!). Cavalleria pesante d'élite, villaggi montati e controllo del territorio.
+- Unità Uniche: Emissary / Mounted Villager / Reindeer Trader (Età I - Dark Age), Mohe Tribesman / Bed Crossbow (Età II - Feudale), Iron Pagoda / Zhanma Swordsman (Età III - Castelli), Eruptor (Età IV - Imperiale).`,
+
+  'malians': `[MALIANI - ID: malians]
+- Natura: Miniere a cielo aperto per l'oro e allevamento MUCCHE.
+- MECCANICA MUCCHE: Le MUCCHE appartengono ESCLUSIVAMENTE ai Maliani! Nessun'altra civiltà ha le mucche!
+- Unità Uniche: Donso / Musofadi Warrior (Età I - Dark Age), Javelin Thrower / Sofa (Età II - Feudale), Cacciatore velenoso (Età III - Castelli).`,
+
+  'lancaster': `[CASATA DI LANCASTER - ID: lancaster]
+- Natura: Variante inglese incentrata su Manieri ed espansione agricola.
+- MECCANICA MUCCHE: NON HANNO MUCCHE! Le mucche appartengono ESCLUSIVAMENTE ai Maliani!
+- Unità Uniche ed Età Reali:
+  * Lord of Lancaster (Età I - Dark Age)
+  * Hobelar (Età I - Dark Age)
+  * Earl's Guard (Guardia del Conte): Sbloccata ESCLUSIVAMENTE in Castle Age (Età III - Castelli). VIETATO dire Dark Age!
+  * Yeoman: Sbloccata ESCLUSIVAMENTE in Feudal Age (Età II - Feudale). VIETATO dire Dark Age!
+  * Demilancer (Età II - Feudale).`,
+
+  'byzantines': `[BIZANTINI - ID: byzantines]
+- Natura: Rete di acquedotti e cisterne, economia basata sull'olio d'oliva e assoldamento mercenari.
+- Unità Uniche: Limitanei (Età I - Dark Age), Varangian Guard / Cataphract / Cheirosiphon (Età III - Castelli).`,
+
+  'macedonian': `[DINASTIA MACEDONE - ID: macedonian]
+- Natura: Variante bizantina che conia argento per armare i Variaghi e la cavalleria dell'Ippodromo.
+- Unità Uniche: Atgeirmaðr / Bogmaðr / Varangian Guard / Hippodrome Scout / Hippodrome Horseman (Età I - Dark Age), Cataphract / Riddari / Cheirosiphon (Età III - Castelli).`,
+
+  'rus': `[RUS - ID: rus]
+- Natura: Caccia alla selvaggina, taglie d'oro, capanni da caccia, mura di tronchi e forti cavalieri.
+- Unità Uniche: Scout Rus (Età I - Dark Age), Early Knight (Età II - Feudale), Streltsy (Età IV - Imperiale), Monaco Guerriero (Età III - Castelli).`,
+
+  'ottomans': `[OTTOMANI - ID: ottomans]
+- Natura: Produzione passiva e gratuita di unità tramite Scuole Militari, tamburi Mehter e grandi cannoni d'assedio.
+- Unità Uniche: Mehter / Sipahi (Età II - Feudale), Giannizzero (Età III - Castelli), Grande Bombarda (Età IV - Imperiale).`,
+
+  'japanese': `[GIAPPONESI - ID: japanese]
+- Natura: Fucina Daimyo, fanteria samurai d'élite, shinobi e banner per potenziare le truppe.
+- Unità Uniche: Samurai / Onna-Bugeisha / Shinobi / Yumi Ashigaru / Bannerman (Età II - Feudale), Mounted Samurai / Onna-Musha / Sacerdote Shinto (Età III - Castelli), Ozutsu (Età IV - Imperiale).`,
+
+  'sengoku': `[SENGOKU DAIMYO - ID: sengoku]
+- Natura: Variante giapponese incentrata su Clan feudali e samurai d'onore.
+- Unità Uniche: Bushi / Ronin / Kunoichi (Età I/II), Hatamoto / Naginata Samurai (Età III - Castelli).`,
+
+  'chinese': `[CINESI - ID: chinese]
+- Natura: Grandi Dinastie, Ufficiali Imperiali per riscuotere tasse, difesa e polvere da sparo.
+- Unità Uniche: Ufficiale Imperiale (Età I - Dark Age), Zhuge Nu (Età II - Feudale), Guardia del Palazzo / Nido delle Api / Lanciere di Fuoco (Età III - Castelli), Granatiere (Età IV - Imperiale).`,
+
+  'zhuxi': `[EREDITÀ DI ZHU XI - ID: zhuxi]
+- Natura: Variante cinese specializzata in rush Zhuge Nu rapidi, tecnologie scontate e monaci Shaolin.
+- Unità Uniche: Funzionario Imperiale (Età I - Dark Age), Zhuge Nu (Età II - Feudale), Monaco Shaolin / Guardia del Palazzo (Età III - Castelli), Granatiere (Età IV - Imperiale).`,
+
+  'ayyubids': `[AYUBIDI - ID: ayyubids]
+- Natura: Variante abbaside flessibile con ali della Casa della Sapienza che sbloccano dervisci e cammelli d'assalto.
+- Unità Uniche: Desert Raider (Età II - Feudale), Derviscio (Età III - Castelli), Cammello Lanciatore (Età III/IV).`,
+
+  'delhi_sultanate': `[SULTANATO DI DELHI - ID: delhi_sultanate]
+- Natura: Tecnologie interamente GRATUITE tramite studiosi nelle moschee ed elefanti da guerra devastanti.
+- Unità Uniche: Scholar (Età I - Dark Age), Ghazi Raider (Età II - Feudale), War Elephant / Tower Elephant (Età III - Castelli).`,
+
+  'orderoftheragon': `[ORDINE DEL DRAGO - ID: orderoftheragon]
+- Natura: Variante del SRI con unità d'élite dorate (Gilded) che costano e valgono il doppio.
+- Unità Uniche: Gilded Spearman (Età I - Dark Age), Gilded Archer / Horseman / Man-at-Arms (Età II - Feudale), Gilded Knight / Landsknecht / Crossbowman (Età III - Castelli), Gilded Handcannoneer (Età IV - Imperiale).`,
+
+  'jeannedarc': `[GIOVANNA D'ARCO - ID: jeannedarc]
+- Natura: Variante francese con l'eroina Giovanna d'Arco che acquisisce esperienza e poteri in battaglia.
+- Unità Uniche: Jeanne d'Arc (Età I - Dark Age), Campioni di Jeanne (Età II/III), Cavaliere Reale (Età II - Feudale).`,
+
+  'templar': `[CAVALIERI TEMPLARI - ID: templar]
+- Natura: Ordine cavalleresco devoto con cavalleria pesante fortificata.
+- Unità Uniche: Scudiere / Cavaliere Templare (Età II/III).`,
+
+  'goldenhorde': `[ORDA D'ORO - ID: goldenhorde]
+- Natura: Variante mongola guidata da Batu Khan con basi fortificate e truppe ausiliarie.
+- Unità Uniche: Kharash / Batu Khan / Torguud (Età I - Dark Age), Keshik / Kipchak Archer (Età II - Feudale), Sciamano (Età III - Castelli).`,
+
+  'tughlaq': `[DINASTIA TUGHLAQ - ID: tughlaq]
+- Natura: Variante indiana con elefanti corazzati e guerrieri d'assalto Tughlaq.
+- Unità Uniche: Elefante corazzato / Guerriero Tughlaq (Età II/III).`
+};
+
 function getRelevantGroundTruth(userMessage: string, history: ChatMessage[] = []): string {
   const combinedText = (userMessage + ' ' + history.map(m => m.text).join(' ')).toLowerCase();
   
@@ -70,40 +166,19 @@ function getRelevantGroundTruth(userMessage: string, history: ChatMessage[] = []
     }
   }
 
-  let relevantCivs = civilizationsData;
+  let selectedEntries: string[] = [];
   if (matchedSlugs.size > 0) {
-    relevantCivs = civilizationsData.filter(c => matchedSlugs.has(c.id));
+    for (const slug of matchedSlugs) {
+      if (CIV_SUMMARIES[slug]) selectedEntries.push(CIV_SUMMARIES[slug]);
+    }
   }
 
-  const ageMap: Record<number, string> = {
-    1: 'Dark Age (Età I)',
-    2: 'Feudal Age (Età II)',
-    3: 'Castle Age / Età dei Castelli (Età III)',
-    4: 'Imperial Age / Età Imperiale (Età IV)'
-  };
-
-  let truthStr = 'DIZIONARIO VERITÀ UFFICIALE DEL PORTALE SULLE CIVILTÀ ED ETÀ DI SBLOCCO UNITÀ (MANDATORIO!):\n\n';
-  
-  for (const civ of relevantCivs) {
-    truthStr += `[${civ.name.toUpperCase()} - ID: ${civ.id}]\n`;
-    truthStr += `  - Natura: ${civ.shortDescription}\n`;
-    if (civ.id === 'malians') {
-      truthStr += `  - MECCANICA MUCCHE: Le MUCCHE appartengono ESCLUSIVAMENTE ai Maliani! Nessun'altra civiltà ha le mucche!\n`;
-    } else if (civ.id === 'lancaster') {
-      truthStr += `  - MECCANICA LANCASTER: Spina dorsale economia: Manieri. NON HANNO MUCCHE! Le mucche sono SOLO dei Maliani!\n`;
-    }
-    
-    if (civ.uniqueUnits && civ.uniqueUnits.length > 0) {
-      truthStr += `  - Unità Uniche ed Età di Sblocco REALI:\n`;
-      for (const u of civ.uniqueUnits) {
-        const ageName = ageMap[u.age] || `Età ${u.age}`;
-        truthStr += `    * ${u.name} (id: ${u.id}): Sbloccata ESCLUSIVAMENTE in ${ageName}. Tipo: ${u.type || 'Unità'}.\n`;
-      }
-    }
-    truthStr += '\n';
+  if (selectedEntries.length === 0) {
+    // Return key civ summaries if no specific civ detected
+    selectedEntries = Object.values(CIV_SUMMARIES).slice(0, 10);
   }
 
-  return truthStr;
+  return 'DIZIONARIO VERITÀ UFFICIALE DEL PORTALE SULLE CIVILTÀ ED ETÀ DI SBLOCCO UNITÀ (MANDATORIO!):\n\n' + selectedEntries.join('\n\n');
 }
 
 async function fetchMatchupContext(userMessage: string): Promise<string> {
