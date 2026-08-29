@@ -194,7 +194,17 @@ export const CoachBeastyWidget: React.FC = () => {
         })
       });
 
-      const data = await res.json();
+      let data: any = {};
+      const rawText = await res.text();
+      try {
+        data = JSON.parse(rawText);
+      } catch (parseErr) {
+        if (!res.ok) {
+          throw new Error('Il server del Coach è momentaneamente occupato. Riprova tra poco!');
+        } else {
+          throw new Error('Risposta non valida ricevuta dal server.');
+        }
+      }
 
       if (!res.ok || data.error) {
         throw new Error(data.error || 'Errore nella comunicazione con Coach Beasty');

@@ -226,13 +226,12 @@ async function logInteraction(userNickname: string, prompt: string, reply: strin
 }
 
 const GEMINI_MODELS = [
-  'gemini-2.5-flash',
   'gemini-2.0-flash',
   'gemini-1.5-flash'
 ];
 
 async function fetchGroqResponse(groqApiKey: string, promptText: string) {
-  const GROQ_MODELS = ['groq/compound-mini', 'qwen/qwen3.8-27b'];
+  const GROQ_MODELS = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'];
 
   for (const model of GROQ_MODELS) {
     try {
@@ -250,6 +249,11 @@ async function fetchGroqResponse(groqApiKey: string, promptText: string) {
           max_tokens: 1000
         })
       });
+
+      if (!res.ok) {
+        console.warn(`Groq model ${model} returned HTTP ${res.status}`);
+        continue;
+      }
 
       const data = await res.json();
       if (!data.error && data.choices?.[0]?.message?.content) {
@@ -284,6 +288,11 @@ async function generateWithModelFallback(apiKey: string, promptText: string) {
           }
         })
       });
+
+      if (!geminiRes.ok) {
+        console.warn(`Gemini model ${model} returned HTTP ${geminiRes.status}`);
+        continue;
+      }
 
       const data = await geminiRes.json();
 

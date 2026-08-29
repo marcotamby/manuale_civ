@@ -193,15 +193,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         : "Impossibile recuperare dati automaticamente. Usa l'inserimento manuale o un link valido.";
       throw new Error(errorMsg);
     }
+    const GEMINI_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+    let resultText = '';
+    let lastGeminiError: any = null;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: `Sei un esperto di Age of Empires 4. Stai analizzando un Build Order per la civiltà: ${civName || 'Generica'}.
+    for (const model of GEMINI_MODELS) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `Sei un esperto di Age of Empires 4. Stai analizzando un Build Order per la civiltà: ${civName || 'Generica'}.
             Analizza il seguente testo (descrizione e trascrizione) ed estrai il Build Order strutturato completo seguendo lo stile del sito "Manuale Civ".
             
             REGOLE DI STILE MANDATORIE:
@@ -224,20 +229,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             
             TESTO DA ANALIZZARE:
             ${textToAnalyze.substring(0, 60000)}`
-          }]
-        }],
-        generationConfig: {
-          temperature: 0.2,
-          topP: 0.8,
-          topK: 40
-        }
-      })
-    });
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.2,
+              topP: 0.8,
+              topK: 40
+            }
+          })
+        });
 
-    const data = await response.json();
-    if (data.error) throw new Error(`Gemini API Error: ${data.error.message}`);
-    const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!resultText) throw new Error("L'IA non ha restituito alcun contenuto.");
+        if (!response.ok) continue;
+
+        const data = await response.json();
+        if (data.error) {
+          lastGeminiError = data.error;
+          continue;
+        }
+
+        const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (candidateText) {
+          resultText = candidateText;
+          break;
+        }
+      } catch (err) {
+        lastGeminiError = err;
+      }
+    }
+
+    if (!resultText) throw new Error(lastGeminiError?.message || "L'IA non ha restituito alcun contenuto.");
 
     try {
       let jsonString = resultText.trim();
