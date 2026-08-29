@@ -682,9 +682,20 @@ export const CoachBeastyWidget: React.FC = () => {
             )}
 
             {loading && (
-              <div className="flex items-center space-x-2 text-slate-400 text-xs p-2 bg-slate-900/60 rounded-xl border border-slate-800/60 w-fit animate-pulse">
-                <img src="/beasty_avatar.jpg" alt="Beasty" className="w-5 h-5 rounded-md object-cover" />
-                <span>Coach Beasty sta elaborando la risposta...</span>
+              <div className="flex items-end gap-2.5 my-2 animate-in fade-in duration-200">
+                <img 
+                  src="/beasty_avatar.jpg" 
+                  alt="Coach Beasty AI" 
+                  className="w-7 h-7 rounded-lg object-cover border border-cyan-500/30 shrink-0 mb-1" 
+                />
+                <div className="bg-slate-900/90 border border-cyan-500/30 rounded-2xl rounded-bl-xs px-4 py-3 text-slate-200 flex items-center gap-2.5 shadow-lg shadow-cyan-950/20">
+                  <span className="text-xs text-cyan-300 font-medium">Coach Beasty sta scrivendo</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
               </div>
             )}
 
@@ -692,13 +703,13 @@ export const CoachBeastyWidget: React.FC = () => {
           </div>
 
           {/* Input Footer */}
-          <div className="p-3 bg-slate-900 border-t border-cyan-500/20 shrink-0">
+          <div className="p-3.5 bg-slate-900/95 border-t border-cyan-500/20 shrink-0">
             <form 
               onSubmit={(e) => {
                 e.preventDefault();
                 handleSendMessage();
               }}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2.5"
             >
               <input
                 type="text"
@@ -706,15 +717,15 @@ export const CoachBeastyWidget: React.FC = () => {
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder={displayName !== 'utente' ? `Chiedi a Coach Beasty, ${displayName}...` : 'Chiedi a Coach Beasty...'}
                 disabled={loading}
-                className="flex-1 bg-slate-950 border border-slate-800 focus:border-cyan-400/60 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none transition disabled:opacity-50"
+                className="flex-1 bg-slate-950 border border-slate-700/80 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/50 transition disabled:opacity-50 shadow-inner"
               />
               <button
                 type="submit"
                 disabled={!inputMessage.trim() || loading}
-                className="bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:hover:bg-blue-600 text-white p-2 rounded-xl transition shadow-md shadow-blue-950 cursor-pointer shrink-0"
+                className="bg-cyan-500 hover:bg-cyan-400 disabled:opacity-40 disabled:hover:bg-cyan-500 text-slate-950 p-3 rounded-xl transition shadow-md shadow-cyan-950 cursor-pointer shrink-0 font-bold flex items-center justify-center"
                 title="Invia messaggio"
               >
-                <Send className="w-4 h-4 text-white" />
+                <Send className="w-5 h-5 text-slate-950 fill-slate-950" />
               </button>
             </form>
           </div>
