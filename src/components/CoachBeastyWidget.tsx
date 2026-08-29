@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
-import { X, Send, Sparkles, RotateCcw, ChevronRight, Swords, Copy, Check } from 'lucide-react';
+import { X, Send, Sparkles, RotateCcw, ChevronRight, Swords } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -93,14 +93,6 @@ export const CoachBeastyWidget: React.FC = () => {
   const { user } = useAuth();
   const userNickname = user?.nickname || user?.name || '';
   const displayName = userNickname || 'utente';
-
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  const handleCopyText = (id: string, text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
 
   const [isOpen, setIsOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
@@ -689,28 +681,10 @@ export const CoachBeastyWidget: React.FC = () => {
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between mt-1 pt-1 border-t border-slate-800/40 text-[10px] select-none">
-                    {msg.sender === 'coach' ? (
-                      <button 
-                        type="button"
-                        onClick={() => handleCopyText(msg.id, msg.text)}
-                        className="text-slate-400 hover:text-cyan-300 flex items-center gap-1 transition cursor-pointer"
-                        title="Copia risposta"
-                      >
-                        {copiedId === msg.id ? (
-                          <>
-                            <Check className="w-3 h-3 text-emerald-400" />
-                            <span className="text-emerald-400 font-semibold">Copiato!</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3 h-3" />
-                            <span>Copia</span>
-                          </>
-                        )}
-                      </button>
-                    ) : <span />}
-                    <span className="opacity-40 font-mono">{msg.timestamp}</span>
+                  <div className="flex justify-end mt-1.5 select-none">
+                    <span className={msg.sender === 'user' ? "text-blue-200/50 font-mono text-[10px]" : "text-slate-400/50 font-mono text-[10px]"}>
+                      {msg.timestamp}
+                    </span>
                   </div>
                 </div>
               </div>
