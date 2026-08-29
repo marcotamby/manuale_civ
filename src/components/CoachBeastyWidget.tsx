@@ -118,7 +118,7 @@ export const CoachBeastyWidget: React.FC = () => {
         sender: 'coach',
         text: displayName !== 'utente' 
           ? `Ciao **${displayName}**! 👋 Sono **Coach Beasty AI**.\n\nChiedimi consigli su matchup, win rate reali, contromisure delle unità, posizionamento o distribuzione dei villi!`
-          : `Ciao! 👋 Sono **Coach Beasty AI**.\n\nChiedimi consigli su matchup, win rate reali, contromisure delle unità, posizionamento o distribuzione dei villi!`,
+          : `Ciao **nabbo**! 👋 Sono **Coach Beasty AI**.\n\nChiedimi consigli su matchup, win rate reali, contromisure delle unità, posizionamento o distribuzione dei villi!`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
     ]);
@@ -269,7 +269,7 @@ export const CoachBeastyWidget: React.FC = () => {
         sender: 'coach',
         text: displayName !== 'utente'
           ? `Chat azzerata! 🔄 Come posso aiutarti ora nelle tue battaglie, **${displayName}**?`
-          : `Chat azzerata! 🔄 Come posso aiutarti ora nelle tue battaglie?`,
+          : `Chat azzerata! 🔄 Pronto a salire di rank, **nabbo**? Di cosa parliamo?`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
     ]);
