@@ -228,8 +228,45 @@ async function logInteraction(userNickname: string, prompt: string, reply: strin
 const DEFAULT_GEMINI_KEY = ['AIzaSyCoOKkHKw23UCUG', 'dXDYv0TxUA6b-6tsh4Y'].join('');
 const DEFAULT_GROQ_KEY = ['gsk', 'AamZm1YRlKyGLUg9FLH5WGdyb3FY9xd5lCzBNCKDdumqbm4xRare'].join('_');
 
+const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-3.5-flash', 'gemini-flash-latest'];
 const GROQ_MODELS = ['groq/compound-mini', 'groq/compound', 'qwen/qwen3.8-27b'];
-const GEMINI_MODELS = ['gemini-3.6-flash', 'gemini-1.5-flash'];
+
+async function fetchGeminiResponse(geminiApiKey: string, promptText: string) {
+  for (const model of GEMINI_MODELS) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`;
+      const geminiRes = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: promptText }] }],
+          generationConfig: {
+            temperature: 0.15,
+            topP: 0.8,
+            topK: 30
+          }
+        }),
+        signal: AbortSignal.timeout(6000)
+      });
+
+      if (!geminiRes.ok) {
+        console.warn(`Gemini model ${model} returned HTTP ${geminiRes.status}`);
+        continue;
+      }
+
+      const data = await geminiRes.json();
+
+      if (!data.error && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+        return data.candidates[0].content.parts[0].text;
+      }
+      console.warn(`Modello Gemini ${model} non disponibile o occupato, provo il successivo...`);
+    } catch (err) {
+      console.warn(`Errore con Gemini ${model}:`, err);
+    }
+  }
+
+  throw new Error('Gemini API Error');
+}
 
 async function fetchGroqResponse(groqApiKey: string, promptText: string) {
   for (const model of GROQ_MODELS) {
@@ -268,64 +305,27 @@ async function fetchGroqResponse(groqApiKey: string, promptText: string) {
   throw new Error('Groq API Error');
 }
 
-async function fetchGeminiResponse(geminiApiKey: string, promptText: string) {
-  for (const model of GEMINI_MODELS) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`;
-      const geminiRes = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: promptText }] }],
-          generationConfig: {
-            temperature: 0.15,
-            topP: 0.8,
-            topK: 30
-          }
-        }),
-        signal: AbortSignal.timeout(5000)
-      });
-
-      if (!geminiRes.ok) {
-        console.warn(`Gemini model ${model} returned HTTP ${geminiRes.status}`);
-        continue;
-      }
-
-      const data = await geminiRes.json();
-
-      if (!data.error && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-        return data.candidates[0].content.parts[0].text;
-      }
-      console.warn(`Modello Gemini ${model} non disponibile o occupato, provo il successivo...`);
-    } catch (err) {
-      console.warn(`Errore con Gemini ${model}:`, err);
-    }
-  }
-
-  throw new Error('Gemini API Error');
-}
-
 async function generateWithModelFallback(promptText: string) {
-  const groqApiKey = (process.env.GROQ_API_KEY || DEFAULT_GROQ_KEY).trim();
   const geminiApiKey = (process.env.GEMINI_API_KEY || DEFAULT_GEMINI_KEY).trim();
+  const groqApiKey = (process.env.GROQ_API_KEY || DEFAULT_GROQ_KEY).trim();
 
-  // 1. Try ultra-fast Groq models first (~1.0s latency)
-  if (groqApiKey) {
-    try {
-      const groqReply = await fetchGroqResponse(groqApiKey, promptText);
-      if (groqReply) return groqReply;
-    } catch (gErr) {
-      console.warn('Groq non disponibile, tento fallback su Gemini...', gErr);
-    }
-  }
-
-  // 2. Fallback to Gemini
+  // 1. Try Gemini models first
   if (geminiApiKey) {
     try {
       const geminiReply = await fetchGeminiResponse(geminiApiKey, promptText);
       if (geminiReply) return geminiReply;
     } catch (err) {
-      console.warn('Errore fallback Gemini API:', err);
+      console.warn('Gemini non disponibile, tento fallback su Groq...', err);
+    }
+  }
+
+  // 2. Fallback to Groq
+  if (groqApiKey) {
+    try {
+      const groqReply = await fetchGroqResponse(groqApiKey, promptText);
+      if (groqReply) return groqReply;
+    } catch (gErr) {
+      console.warn('Errore fallback Groq API:', gErr);
     }
   }
 

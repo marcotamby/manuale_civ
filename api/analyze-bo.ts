@@ -193,7 +193,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         : "Impossibile recuperare dati automaticamente. Usa l'inserimento manuale o un link valido.";
       throw new Error(errorMsg);
     }
-    const GEMINI_MODELS = ['gemini-3.6-flash', 'gemini-1.5-flash'];
+    const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-3.5-flash', 'gemini-flash-latest'];
     let resultText = '';
     let lastGeminiError: any = null;
 
