@@ -203,7 +203,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const response = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          signal: AbortSignal.timeout(8000),
           body: JSON.stringify({
             contents: [{
               parts: [{

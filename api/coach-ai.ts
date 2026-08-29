@@ -6,12 +6,7 @@ interface ChatMessage {
   text: string;
 }
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
 
-const supabase = (SUPABASE_URL && SUPABASE_KEY) 
-  ? createClient(SUPABASE_URL, SUPABASE_KEY) 
-  : null;
 
 const CIV_NAME_TO_SLUG: Record<string, string> = {
   'jin': 'jin-dynasty',
@@ -181,6 +176,26 @@ function getRelevantGroundTruth(userMessage: string, history: ChatMessage[] = []
   return 'DIZIONARIO VERITÀ UFFICIALE DEL PORTALE SULLE CIVILTÀ ED ETÀ DI SBLOCCO UNITÀ (MANDATORIO!):\n\n' + selectedEntries.join('\n\n');
 }
 
+function safeTimeoutSignal(ms: number) {
+  try {
+    if (typeof AbortSignal !== 'undefined' && typeof (AbortSignal as any).timeout === 'function') {
+      return (AbortSignal as any).timeout(ms);
+    }
+  } catch (e) {}
+  return undefined;
+}
+
+function getSupabase() {
+  const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
+  if (!url || !key) return null;
+  try {
+    return createClient(url, key);
+  } catch (e) {
+    return null;
+  }
+}
+
 async function fetchMatchupContext(userMessage: string): Promise<string> {
   try {
     const lower = userMessage.toLowerCase();
@@ -201,7 +216,8 @@ async function fetchMatchupContext(userMessage: string): Promise<string> {
     }
 
     const url = `https://aoe4world.com/api/v0/stats/rm_solo/matchups${rank ? '?rank_level=' + rank : ''}`;
-    const res = await fetch(url, { signal: AbortSignal.timeout(2500) });
+    const signal = safeTimeoutSignal(2500);
+    const res = await fetch(url, signal ? { signal } : {});
     if (!res.ok) return '';
     const json = await res.json();
     const allData: any[] = json.data || [];
@@ -266,11 +282,12 @@ async function fetchMatchupContext(userMessage: string): Promise<string> {
 }
 
 async function fetchSiteKnowledge() {
-  if (!supabase) return '';
+  const sb = getSupabase();
+  if (!sb) return '';
   try {
     const knowledgePieces: string[] = [];
 
-    const { data: qData } = await supabase
+    const { data: qData } = await sb
       .from('questions')
       .select('question_text, civ_id')
       .eq('status', 'approved')
@@ -287,9 +304,10 @@ async function fetchSiteKnowledge() {
 }
 
 async function logInteraction(userNickname: string, prompt: string, reply: string) {
-  if (!supabase) return;
+  const sb = getSupabase();
+  if (!sb) return;
   try {
-    await supabase.from('coach_ai_logs').insert([
+    await sb.from('coach_ai_logs').insert([
       {
         user_nickname: userNickname || 'utente',
         prompt: prompt,
@@ -310,6 +328,7 @@ async function fetchGeminiResponse(geminiApiKey: string, promptText: string) {
   for (const model of GEMINI_MODELS) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`;
+      const signal = safeTimeoutSignal(6000);
       const geminiRes = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -321,7 +340,7 @@ async function fetchGeminiResponse(geminiApiKey: string, promptText: string) {
             topK: 30
           }
         }),
-        signal: AbortSignal.timeout(6000)
+        ...(signal ? { signal } : {})
       });
 
       if (!geminiRes.ok) {
@@ -347,6 +366,7 @@ async function fetchGroqResponse(groqApiKey: string, promptText: string) {
   for (const model of GROQ_MODELS) {
     try {
       const url = 'https://api.groq.com/openai/v1/chat/completions';
+      const signal = safeTimeoutSignal(4500);
       const res = await fetch(url, {
         method: 'POST',
         headers: {
@@ -359,7 +379,7 @@ async function fetchGroqResponse(groqApiKey: string, promptText: string) {
           temperature: 0.15,
           max_tokens: 1000
         }),
-        signal: AbortSignal.timeout(4500)
+        ...(signal ? { signal } : {})
       });
 
       if (!res.ok) {
