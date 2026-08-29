@@ -226,12 +226,12 @@ async function logInteraction(userNickname: string, prompt: string, reply: strin
 }
 
 const GEMINI_MODELS = [
-  'gemini-2.0-flash',
+  'gemini-3.6-flash',
   'gemini-1.5-flash'
 ];
 
 async function fetchGroqResponse(groqApiKey: string, promptText: string) {
-  const GROQ_MODELS = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'];
+  const GROQ_MODELS = ['groq/compound-mini', 'groq/compound', 'qwen/qwen3.8-27b'];
 
   for (const model of GROQ_MODELS) {
     try {
