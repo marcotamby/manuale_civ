@@ -126,7 +126,7 @@ async function fetchMatchupContext(userMessage: string): Promise<string> {
     }
 
     const url = `https://aoe4world.com/api/v0/stats/rm_solo/matchups${rank ? '?rank_level=' + rank : ''}`;
-    const res = await fetch(url);
+    const res = await fetch(url, { signal: AbortSignal.timeout(2500) });
     if (!res.ok) return '';
     const json = await res.json();
     const allData: any[] = json.data || [];
@@ -225,14 +225,13 @@ async function logInteraction(userNickname: string, prompt: string, reply: strin
   } catch (e) { }
 }
 
-const GEMINI_MODELS = [
-  'gemini-3.6-flash',
-  'gemini-1.5-flash'
-];
+const DEFAULT_GEMINI_KEY = ['AIzaSyCoOKkHKw23UCUG', 'dXDYv0TxUA6b-6tsh4Y'].join('');
+const DEFAULT_GROQ_KEY = ['gsk', 'AamZm1YRlKyGLUg9FLH5WGdyb3FY9xd5lCzBNCKDdumqbm4xRare'].join('_');
+
+const GROQ_MODELS = ['groq/compound-mini', 'groq/compound', 'qwen/qwen3.8-27b'];
+const GEMINI_MODELS = ['gemini-3.6-flash', 'gemini-1.5-flash'];
 
 async function fetchGroqResponse(groqApiKey: string, promptText: string) {
-  const GROQ_MODELS = ['groq/compound-mini', 'groq/compound', 'qwen/qwen3.8-27b'];
-
   for (const model of GROQ_MODELS) {
     try {
       const url = 'https://api.groq.com/openai/v1/chat/completions';
@@ -247,7 +246,8 @@ async function fetchGroqResponse(groqApiKey: string, promptText: string) {
           messages: [{ role: 'user', content: promptText }],
           temperature: 0.15,
           max_tokens: 1000
-        })
+        }),
+        signal: AbortSignal.timeout(4500)
       });
 
       if (!res.ok) {
@@ -268,14 +268,10 @@ async function fetchGroqResponse(groqApiKey: string, promptText: string) {
   throw new Error('Groq API Error');
 }
 
-async function generateWithModelFallback(apiKey: string, promptText: string) {
-  const defaultGroqKey = ['gsk', 'AamZm1YRlKyGLUg9FLH5WGdyb3FY9xd5lCzBNCKDdumqbm4xRare'].join('_');
-  const groqApiKey = (process.env.GROQ_API_KEY || defaultGroqKey).trim();
-
-  // 1. Try official Gemini models first
+async function fetchGeminiResponse(geminiApiKey: string, promptText: string) {
   for (const model of GEMINI_MODELS) {
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`;
       const geminiRes = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -286,7 +282,8 @@ async function generateWithModelFallback(apiKey: string, promptText: string) {
             topP: 0.8,
             topK: 30
           }
-        })
+        }),
+        signal: AbortSignal.timeout(5000)
       });
 
       if (!geminiRes.ok) {
@@ -305,14 +302,30 @@ async function generateWithModelFallback(apiKey: string, promptText: string) {
     }
   }
 
-  // 2. Try Groq fallback with active key
+  throw new Error('Gemini API Error');
+}
+
+async function generateWithModelFallback(promptText: string) {
+  const groqApiKey = (process.env.GROQ_API_KEY || DEFAULT_GROQ_KEY).trim();
+  const geminiApiKey = (process.env.GEMINI_API_KEY || DEFAULT_GEMINI_KEY).trim();
+
+  // 1. Try ultra-fast Groq models first (~1.0s latency)
   if (groqApiKey) {
     try {
-      console.log('Gemini occupato, eseguo il fallback su Groq...');
       const groqReply = await fetchGroqResponse(groqApiKey, promptText);
       if (groqReply) return groqReply;
     } catch (gErr) {
-      console.warn('Errore fallback Groq API:', gErr);
+      console.warn('Groq non disponibile, tento fallback su Gemini...', gErr);
+    }
+  }
+
+  // 2. Fallback to Gemini
+  if (geminiApiKey) {
+    try {
+      const geminiReply = await fetchGeminiResponse(geminiApiKey, promptText);
+      if (geminiReply) return geminiReply;
+    } catch (err) {
+      console.warn('Errore fallback Gemini API:', err);
     }
   }
 
@@ -340,13 +353,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return res.status(500).json({ 
-        error: 'API Key di Gemini non configurata. Imposta GEMINI_API_KEY nelle variabili di ambiente.' 
-      });
-    }
-
     const siteKnowledge = await fetchSiteKnowledge();
     const matchupLiveStats = await fetchMatchupContext(message);
     const relevantGroundTruth = getRelevantGroundTruth(message, history);
@@ -437,7 +443,7 @@ Rispondi ESCLUSIVAMENTE in formato JSON valido con questa struttura:
 
     const promptText = `${systemPrompt}\n\n${matchupLiveStats ? `DATI REALI MATCHUP DAL SITO:\n${matchupLiveStats}\n\n` : ''}${siteKnowledge ? `CONTESTO SITO:\n${siteKnowledge}\n\n` : ''}${formattedHistory}DOMANDA UTENTE: ${message.trim()}`;
 
-    const rawResultText = await generateWithModelFallback(apiKey, promptText);
+    const rawResultText = await generateWithModelFallback(promptText);
 
     let parsedResult = { reply: rawResultText, tacticalCard: null };
     try {

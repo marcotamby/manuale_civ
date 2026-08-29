@@ -220,10 +220,16 @@ export const CoachBeastyWidget: React.FC = () => {
 
       setMessages(prev => [...prev, coachMsg]);
     } catch (err: any) {
-      const errorMsgText = err.message || 'Impossibile connettersi al Coach';
-      const cleanError = errorMsgText.startsWith('Si è verificato un errore:') 
-        ? errorMsgText 
-        : `⚠️ Si è verificato un errore: ${errorMsgText}. Riprova tra poco!`;
+      let errorMsgText = (err.message || 'Impossibile connettersi al Coach').trim();
+      if (errorMsgText.startsWith('⚠️')) {
+        errorMsgText = errorMsgText.substring(2).trim();
+      }
+      if (errorMsgText.startsWith('Si è verificato un errore:')) {
+        errorMsgText = errorMsgText.replace('Si è verificato un errore:', '').trim();
+      }
+      errorMsgText = errorMsgText.replace(/\.?\s*Riprova tra poco!?/gi, '').trim();
+
+      const cleanError = `⚠️ Si è verificato un errore: ${errorMsgText}. Riprova tra poco!`;
 
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
