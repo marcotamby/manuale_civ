@@ -141,6 +141,21 @@ export const CoachBeastyWidget: React.FC = () => {
     }, 50);
   };
 
+  const scrollToMessageTop = (msgId: string) => {
+    const applyScroll = () => {
+      const el = document.getElementById(`msg-${msgId}`);
+      if (el && messagesContainerRef.current) {
+        const containerRect = messagesContainerRef.current.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+        const offset = elRect.top - containerRect.top;
+        messagesContainerRef.current.scrollBy({ top: offset - 8, behavior: 'smooth' });
+      }
+    };
+    requestAnimationFrame(applyScroll);
+    setTimeout(applyScroll, 60);
+    setTimeout(applyScroll, 150);
+  };
+
   const scrollToTop = () => {
     const applyScrollTop = () => {
       if (messagesContainerRef.current) {
@@ -160,10 +175,20 @@ export const CoachBeastyWidget: React.FC = () => {
   }, [isOpen]);
 
   useEffect(() => {
-    if (isOpen && (messages.length > 1 || loading)) {
+    if (!isOpen) return;
+    if (loading) {
+      scrollToBottom();
+      return;
+    }
+    const lastMsg = messages[messages.length - 1];
+    if (!lastMsg || lastMsg.id === 'welcome' || lastMsg.id.startsWith('welcome-')) return;
+
+    if (lastMsg.sender === 'coach') {
+      scrollToMessageTop(lastMsg.id);
+    } else {
       scrollToBottom();
     }
-  }, [messages.length, loading]);
+  }, [messages, loading, isOpen]);
 
   const handleSendMessage = async (textToSend?: string) => {
     const query = (textToSend || inputMessage).trim();
@@ -413,10 +438,13 @@ export const CoachBeastyWidget: React.FC = () => {
   };
 
   const renderFormattedText = (text: string) => {
-    const lines = text.split('\n');
+    // 1. Normalize spaces or newlines between ] and ( in markdown links e.g. [Label] (/url) -> [Label](/url)
+    const normalizedText = text.replace(/\]\s+\(/g, '](');
+    const lines = normalizedText.split('\n');
+
     return lines.map((line, lIdx) => {
-      // Regex matches both [markdown link](url) and **bold**
-      const tokenRegex = /(\[[^\]]+\]\([^\s)]+\)|\*\*.*?\*\*)/g;
+      // Regex matches [markdown link](url), plain https/http URLs, and **bold** text
+      const tokenRegex = /(\[[^\]]+\]\([^)]+\)|https?:\/\/[^\s<>]+|\*\*[^*]+\*\*)/g;
       const parts = line.split(tokenRegex);
 
       return (
@@ -425,10 +453,15 @@ export const CoachBeastyWidget: React.FC = () => {
             if (!part) return null;
 
             // Check if it's a markdown link [Label](url)
-            const linkMatch = part.match(/^\[([^\]]+)\]\(([^\s)]+)\)$/);
+            const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
             if (linkMatch) {
-              const [, label, url] = linkMatch;
+              const label = linkMatch[1].trim();
+              let url = linkMatch[2].trim();
               const isInternal = url.startsWith('/');
+              if (!isInternal && !/^https?:\/\//i.test(url)) {
+                url = `https://${url}`;
+              }
+
               return (
                 <a
                   key={pIdx}
@@ -441,11 +474,26 @@ export const CoachBeastyWidget: React.FC = () => {
                   }}
                   target={isInternal ? undefined : "_blank"}
                   rel={isInternal ? undefined : "noopener noreferrer"}
-                  className="inline-flex items-center gap-1 font-bold text-cyan-300 hover:text-cyan-100 bg-cyan-950/60 hover:bg-cyan-900/80 px-2 py-0.5 rounded-md text-[13px] my-0.5 mx-0.5 border border-cyan-500/40 hover:border-cyan-400 cursor-pointer shadow-sm transition-all hover:scale-[1.02] active:scale-95 select-none"
+                  className="inline-flex items-center gap-1 font-bold text-cyan-300 hover:text-cyan-100 bg-cyan-950/70 hover:bg-cyan-900/90 px-2 py-0.5 rounded-md text-[13px] my-0.5 mx-0.5 border border-cyan-500/40 hover:border-cyan-400 cursor-pointer shadow-sm transition-all hover:scale-[1.02] active:scale-95 select-none"
                   title={`Apri ${label} sul sito`}
                 >
                   <span>{label}</span>
                   <span className="text-[10px] text-cyan-400 font-normal opacity-80">↗</span>
+                </a>
+              );
+            }
+
+            // Check if it's a plain URL
+            if (/^https?:\/\/[^\s<>]+$/.test(part)) {
+              return (
+                <a
+                  key={pIdx}
+                  href={part}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-cyan-400 hover:text-cyan-300 transition-colors break-all font-semibold"
+                >
+                  {part}
                 </a>
               );
             }
@@ -543,6 +591,7 @@ export const CoachBeastyWidget: React.FC = () => {
             {messages.map((msg) => (
               <div 
                 key={msg.id} 
+                id={`msg-${msg.id}`}
                 className={`flex gap-3 ${msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
               >
                 {msg.sender === 'coach' ? (
