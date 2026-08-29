@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { X, Send, Sparkles, RotateCcw, ChevronRight, Swords, Copy, Check } from 'lucide-react';
 
@@ -88,6 +89,7 @@ const FUNNEL_CATEGORIES: FunnelCategory[] = [
 ];
 
 export const CoachBeastyWidget: React.FC = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const userNickname = user?.nickname || user?.name || '';
   const displayName = userNickname || 'utente';
@@ -413,10 +415,42 @@ export const CoachBeastyWidget: React.FC = () => {
   const renderFormattedText = (text: string) => {
     const lines = text.split('\n');
     return lines.map((line, lIdx) => {
-      const parts = line.split(/(\*\*.*?\*\*)/g);
+      // Regex matches both [markdown link](url) and **bold**
+      const tokenRegex = /(\[[^\]]+\]\([^\s)]+\)|\*\*.*?\*\*)/g;
+      const parts = line.split(tokenRegex);
+
       return (
         <React.Fragment key={lIdx}>
           {parts.map((part, pIdx) => {
+            if (!part) return null;
+
+            // Check if it's a markdown link [Label](url)
+            const linkMatch = part.match(/^\[([^\]]+)\]\(([^\s)]+)\)$/);
+            if (linkMatch) {
+              const [, label, url] = linkMatch;
+              const isInternal = url.startsWith('/');
+              return (
+                <a
+                  key={pIdx}
+                  href={url}
+                  onClick={(e) => {
+                    if (isInternal) {
+                      e.preventDefault();
+                      navigate(url);
+                    }
+                  }}
+                  target={isInternal ? undefined : "_blank"}
+                  rel={isInternal ? undefined : "noopener noreferrer"}
+                  className="inline-flex items-center gap-1 font-bold text-cyan-300 hover:text-cyan-100 bg-cyan-950/60 hover:bg-cyan-900/80 px-2 py-0.5 rounded-md text-[13px] my-0.5 mx-0.5 border border-cyan-500/40 hover:border-cyan-400 cursor-pointer shadow-sm transition-all hover:scale-[1.02] active:scale-95 select-none"
+                  title={`Apri ${label} sul sito`}
+                >
+                  <span>{label}</span>
+                  <span className="text-[10px] text-cyan-400 font-normal opacity-80">↗</span>
+                </a>
+              );
+            }
+
+            // Check if it's **bold**
             if (part.startsWith('**') && part.endsWith('**')) {
               const cleanBold = part.slice(2, -2);
               const isUserNick = displayName !== 'utente' && cleanBold.toLowerCase() === displayName.toLowerCase();
@@ -429,6 +463,7 @@ export const CoachBeastyWidget: React.FC = () => {
                 </strong>
               );
             }
+
             return part;
           })}
           {lIdx < lines.length - 1 && <br />}
