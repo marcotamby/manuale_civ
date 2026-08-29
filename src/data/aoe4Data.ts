@@ -3014,7 +3014,7 @@ const civilizationsDataRaw: Civilization[] = [
       },
       {
         "id": "earls-guard",
-        "age": 1,
+        "age": 2,
         "name": "Earl's Guard",
         "type": "Infantry",
         "stats": {
@@ -3036,7 +3036,7 @@ const civilizationsDataRaw: Civilization[] = [
       },
       {
         "id": "yeoman",
-        "age": 1,
+        "age": 2,
         "name": "Yeoman",
         "type": "Ranged",
         "stats": {
