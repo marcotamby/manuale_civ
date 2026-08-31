@@ -862,11 +862,20 @@
             rightCol.innerHTML = '';
 
             const standings = state.standings || [];
+            const goldCount = Number.isInteger(state.goldSlotsCount) ? state.goldSlotsCount : 2;
+            const silverCount = Number.isInteger(state.silverSlotsCount) ? state.silverSlotsCount : 2;
+
+            // Check if any match has been played or any points/wins/losses recorded
+            const hasAnyGame = standings.some(p => ((p.wins || 0) + (p.losses || 0)) > 0 || (p.points || 0) > 0);
+            const hasRoundMatchesCompleted = Object.values(state.rounds || {}).some(
+                roundMatches => Array.isArray(roundMatches) && roundMatches.some(m => (m.winner === 1 || m.winner === 2) || ((m.p1?.score || 0) > 0 || (m.p2?.score || 0) > 0))
+            );
+            const hasStarted = hasAnyGame || hasRoundMatchesCompleted;
 
             standings.forEach((player, index) => {
                 const rank = index + 1;
-                const isGold = rank <= 2;
-                const isSilver = rank > 2 && rank <= 4;
+                const isGold = hasStarted && (rank <= goldCount);
+                const isSilver = hasStarted && (rank > goldCount && rank <= (goldCount + silverCount));
 
                 const card = document.createElement('div');
                 card.className = `standing-card ${isGold ? 'is-gold' : ''} ${isSilver ? 'is-silver' : ''}`;
@@ -876,6 +885,8 @@
                     badgeTagHtml = `<span class="card-qual-tag tag-gold">👑 LEGA ORO</span>`;
                 } else if (isSilver) {
                     badgeTagHtml = `<span class="card-qual-tag tag-silver">🛡️ LEGA D'ARGENTO</span>`;
+                } else if (!hasStarted) {
+                    badgeTagHtml = `<span class="card-qual-tag tag-running">IN ATTESA</span>`;
                 } else {
                     badgeTagHtml = `<span class="card-qual-tag tag-running">NON QUALIFICATO</span>`;
                 }

@@ -828,101 +828,112 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {state.standings.map((player, idx) => {
-                    const rank = idx + 1;
-                    const isGold = rank <= 2;
-                    const isSilver = rank > 2 && rank <= 4;
+                  {(() => {
+                    const hasAnyGame = state.standings.some(p => ((p.wins || 0) + (p.losses || 0)) > 0 || (p.points || 0) > 0);
+                    const hasRoundMatchesCompleted = Object.values(state.rounds || {}).some(
+                      roundMatches => Array.isArray(roundMatches) && roundMatches.some(m => (m.winner === 1 || m.winner === 2) || ((m.p1?.score || 0) > 0 || (m.p2?.score || 0) > 0))
+                    );
+                    const hasStarted = hasAnyGame || hasRoundMatchesCompleted;
 
-                    return (
-                      <tr 
-                        key={player.id || idx}
-                        className={`hover:bg-white/5 transition-colors ${
-                          isGold ? 'bg-slate-800/20' : isSilver ? 'bg-cyan-950/15' : ''
-                        }`}
-                      >
-                        {/* Pos */}
-                        <td className="py-3 px-4 text-center">
-                          <div className={`w-8 h-8 rounded-xl mx-auto flex items-center justify-center font-black text-xs ${
-                            isGold 
-                              ? 'bg-gradient-to-br from-slate-200 to-slate-400 text-black font-black shadow-md shadow-slate-400/20' 
-                              : isSilver 
-                              ? 'bg-gradient-to-br from-cyan-400 to-blue-500 text-black font-black shadow-md shadow-cyan-500/20' 
-                              : 'bg-white/5 text-slate-400 border border-white/10'
-                          }`}>
-                            #{rank}
-                          </div>
-                        </td>
+                    return state.standings.map((player, idx) => {
+                      const rank = idx + 1;
+                      const isGold = hasStarted && rank <= 2;
+                      const isSilver = hasStarted && rank > 2 && rank <= 4;
 
-                        {/* Name */}
-                        <td className="py-3 px-4">
-                          <input
-                            type="text"
-                            value={player.name}
-                            onChange={(e) => handleUpdatePlayer(idx, 'name', e.target.value)}
-                            placeholder="Nome player"
-                            className="w-full bg-black/40 border border-white/10 focus:border-cyan-400 rounded-xl px-3.5 py-2 text-sm font-bold text-white placeholder-slate-600 focus:outline-none transition-all"
-                          />
-                        </td>
+                      return (
+                        <tr 
+                          key={player.id || idx}
+                          className={`hover:bg-white/5 transition-colors ${
+                            isGold ? 'bg-slate-800/20' : isSilver ? 'bg-cyan-950/15' : ''
+                          }`}
+                        >
+                          {/* Pos */}
+                          <td className="py-3 px-4 text-center">
+                            <div className={`w-8 h-8 rounded-xl mx-auto flex items-center justify-center font-black text-xs ${
+                              isGold 
+                                ? 'bg-gradient-to-br from-slate-200 to-slate-400 text-black font-black shadow-md shadow-slate-400/20' 
+                                : isSilver 
+                                ? 'bg-gradient-to-br from-cyan-400 to-blue-500 text-black font-black shadow-md shadow-cyan-500/20' 
+                                : 'bg-white/5 text-slate-400 border border-white/10'
+                            }`}>
+                              #{rank}
+                            </div>
+                          </td>
 
-                        {/* Wins */}
-                        <td className="py-3 px-4 text-center">
-                          <input
-                            type="number"
-                            min="0"
-                            value={player.wins}
-                            onChange={(e) => handleUpdatePlayer(idx, 'wins', parseInt(e.target.value) || 0)}
-                            className="w-20 mx-auto text-center bg-black/40 border border-white/10 focus:border-emerald-400 rounded-xl py-2 text-sm font-black text-emerald-400 focus:outline-none"
-                          />
-                        </td>
+                          {/* Name */}
+                          <td className="py-3 px-4">
+                            <input
+                              type="text"
+                              value={player.name}
+                              onChange={(e) => handleUpdatePlayer(idx, 'name', e.target.value)}
+                              placeholder="Nome player"
+                              className="w-full bg-black/40 border border-white/10 focus:border-cyan-400 rounded-xl px-3.5 py-2 text-sm font-bold text-white placeholder-slate-600 focus:outline-none transition-all"
+                            />
+                          </td>
 
-                        {/* Losses */}
-                        <td className="py-3 px-4 text-center">
-                          <input
-                            type="number"
-                            min="0"
-                            value={player.losses}
-                            onChange={(e) => handleUpdatePlayer(idx, 'losses', parseInt(e.target.value) || 0)}
-                            className="w-20 mx-auto text-center bg-black/40 border border-white/10 focus:border-rose-400 rounded-xl py-2 text-sm font-black text-rose-400 focus:outline-none"
-                          />
-                        </td>
+                          {/* Wins */}
+                          <td className="py-3 px-4 text-center">
+                            <input
+                              type="number"
+                              min="0"
+                              value={player.wins}
+                              onChange={(e) => handleUpdatePlayer(idx, 'wins', parseInt(e.target.value) || 0)}
+                              className="w-20 mx-auto text-center bg-black/40 border border-white/10 focus:border-emerald-400 rounded-xl py-2 text-sm font-black text-emerald-400 focus:outline-none"
+                            />
+                          </td>
 
-                        {/* Points */}
-                        <td className="py-3 px-4 text-center">
-                          <input
-                            type="number"
-                            min="0"
-                            value={player.points}
-                            onChange={(e) => handleUpdatePlayer(idx, 'points', parseInt(e.target.value) || 0)}
-                            className="w-20 mx-auto text-center bg-cyan-950/30 border border-cyan-500/40 focus:border-cyan-400 rounded-xl py-2 text-sm font-black text-cyan-300 focus:outline-none shadow-sm"
-                          />
-                        </td>
+                          {/* Losses */}
+                          <td className="py-3 px-4 text-center">
+                            <input
+                              type="number"
+                              min="0"
+                              value={player.losses}
+                              onChange={(e) => handleUpdatePlayer(idx, 'losses', parseInt(e.target.value) || 0)}
+                              className="w-20 mx-auto text-center bg-black/40 border border-white/10 focus:border-rose-400 rounded-xl py-2 text-sm font-black text-rose-400 focus:outline-none"
+                            />
+                          </td>
 
-                        {/* TieBreak */}
-                        <td className="py-3 px-4 text-center">
-                          <input
-                            type="number"
-                            value={player.tieBreak ?? 0}
-                            onChange={(e) => handleUpdatePlayer(idx, 'tieBreak', parseInt(e.target.value) || 0)}
-                            className="w-24 mx-auto text-center bg-black/40 border border-white/10 focus:border-cyan-400 rounded-xl py-2 text-sm font-bold text-slate-300 focus:outline-none"
-                          />
-                        </td>
+                          {/* Points */}
+                          <td className="py-3 px-4 text-center">
+                            <input
+                              type="number"
+                              min="0"
+                              value={player.points}
+                              onChange={(e) => handleUpdatePlayer(idx, 'points', parseInt(e.target.value) || 0)}
+                              className="w-20 mx-auto text-center bg-cyan-950/30 border border-cyan-500/40 focus:border-cyan-400 rounded-xl py-2 text-sm font-black text-cyan-300 focus:outline-none shadow-sm"
+                            />
+                          </td>
 
-                        {/* Status Badge */}
-                        <td className="py-3 px-4 text-center">
-                          {isGold ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-200/15 border border-slate-300/40 text-slate-200">
-                              👑 Lega Oro
-                            </span>
-                          ) : isSilver ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-cyan-500/15 border border-cyan-400/40 text-cyan-300">
-                              🛡️ Lega Argento
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold text-slate-500 bg-white/5">
-                              Non Qualificato
-                            </span>
-                          )}
-                        </td>
+                          {/* TieBreak */}
+                          <td className="py-3 px-4 text-center">
+                            <input
+                              type="number"
+                              value={player.tieBreak ?? 0}
+                              onChange={(e) => handleUpdatePlayer(idx, 'tieBreak', parseInt(e.target.value) || 0)}
+                              className="w-24 mx-auto text-center bg-black/40 border border-white/10 focus:border-cyan-400 rounded-xl py-2 text-sm font-bold text-slate-300 focus:outline-none"
+                            />
+                          </td>
+
+                          {/* Status Badge */}
+                          <td className="py-3 px-4 text-center">
+                            {isGold ? (
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-200/15 border border-slate-300/40 text-slate-200">
+                                👑 Lega Oro
+                              </span>
+                            ) : isSilver ? (
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-cyan-500/15 border border-cyan-400/40 text-cyan-300">
+                                🛡️ Lega Argento
+                              </span>
+                            ) : !hasStarted ? (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold text-slate-500 bg-white/5">
+                                In attesa
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold text-slate-500 bg-white/5">
+                                Non Qualificato
+                              </span>
+                            )}
+                          </td>
 
                         {/* Delete */}
                         <td className="py-3 px-4 text-center">
@@ -936,8 +947,9 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
                         </td>
                       </tr>
                     );
-                  })}
-                </tbody>
+                  });
+                })()}
+              </tbody>
               </table>
             </div>
           </div>
