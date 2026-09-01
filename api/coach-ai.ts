@@ -1,42 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
-import { YOUTUBE_VIDEOS_LIST } from './youtube_data';
 
 interface ChatMessage {
   sender: 'user' | 'coach';
   text: string;
-}
-
-function getRelevantYouTubeVideos(userMessage: string): string {
-  try {
-    const lower = userMessage.toLowerCase();
-    const matched: Array<{ title: string; id: string }> = [];
-    const list = YOUTUBE_VIDEOS_LIST || [];
-
-    const keywords = lower.split(/[^a-zA-Z0-9àèéìòù]+/).filter(w => w.length >= 4);
-    if (keywords.length === 0) return '';
-
-    for (const v of list) {
-      const vTitleLower = v.title.toLowerCase();
-      let score = 0;
-      for (const kw of keywords) {
-        if (vTitleLower.includes(kw)) score++;
-      }
-      if (score > 0) {
-        const cleanTitle = v.title.replace(/►.*/, '').replace(/[☦️🏯🐎⚔️🐘♜🤔🛡️🦸‍♀️🔥❓❗👨🏿]/g, '').trim();
-        matched.push({ title: cleanTitle, id: v.id });
-      }
-      if (matched.length >= 2) break;
-    }
-
-    if (matched.length === 0) return '';
-
-    return 'VIDEO GUIDE / GAMEPLAY DISPONIBILI SUL CANALE YOUTUBE DEL PORTALE:\n' +
-      matched.map(m => `- [Guida Video: ${m.title}](https://www.youtube.com/watch?v=${m.id})`).join('\n') +
-      '\nCONSIGLIA E INSERISCI QUESTO LINK VIDEO SE UTILE ALLA DOMANDA!';
-  } catch (e) {
-    return '';
-  }
 }
 
 const AOE4_MAPS: Record<string, { name: string; type: string; tips: string }> = {
@@ -652,7 +619,7 @@ async function fetchGeminiResponse(geminiApiKey: string, promptText: string) {
   for (const model of GEMINI_MODELS) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`;
-      const signal = safeTimeoutSignal(8000);
+      const signal = safeTimeoutSignal(4000);
       const geminiRes = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -691,7 +658,7 @@ async function fetchGroqResponse(groqApiKey: string, promptText: string) {
   for (const model of GROQ_MODELS) {
     try {
       const url = 'https://api.groq.com/openai/v1/chat/completions';
-      const signal = safeTimeoutSignal(7000);
+      const signal = safeTimeoutSignal(4000);
       const res = await fetch(url, {
         method: 'POST',
         headers: {
@@ -730,13 +697,13 @@ async function generateWithModelFallback(promptText: string) {
   const geminiApiKey = (process.env.GEMINI_API_KEY || DEFAULT_GEMINI_KEY).trim();
   const groqApiKey = (process.env.GROQ_API_KEY || DEFAULT_GROQ_KEY).trim();
 
-  // 1. Try ultra-fast Groq models first (lightning fast ~200-500ms response time)
+  // 1. Try ultra-fast Groq models first (instant ~200ms response time)
   if (groqApiKey) {
     try {
       const groqReply = await fetchGroqResponse(groqApiKey, promptText);
       if (groqReply) return groqReply;
     } catch (gErr) {
-      console.warn('Groq non disponibile, tento fallback su Gemini...', gErr);
+      console.warn('Groq non disponibile, fallback su Gemini...', gErr);
     }
   }
 
@@ -842,22 +809,6 @@ Se la domanda o la risposta riguarda una civiltà o un argomento approfondibile 
 - **Confronto Civiltà**: [Confronta Civiltà](/compare)
 - **Classifiche / Leaderboard**: [Classifica](/classifica)
 
-REGOLA AUREA 8: VIDEO GUIDE YOUTUBE & TUTORIAL (MANDATORIO!):
-- Se nei dati del prompt sono presenti "VIDEO GUIDE / GAMEPLAY DISPONIBILI SUL CANALE YOUTUBE", INSERISCI il relativo link markdown [Guida Video: {Titolo}](https://www.youtube.com/watch?v={id}) nella risposta per far vedere all'utente la guida in azione!
-- Se stai spiegando una civiltà, cita anche il link del portale [Tutte le Video Guide {NomeCiv}](/civ/{civId}/video).
-
-REGOLA AUREA 9: GESTIONE RICHIESTA ANALISI PROFILO SENZA LINK:
-- Se l'utente scrive che vuole analizzare il suo profilo (o clicca la scorciatoia) ma NON ha ancora incollato il link o il suo username:
-  RISPONDI CON ENTUSIASMO invitandolo a incollare qui il link del suo profilo AoE4World (es. https://aoe4world.com/players/...) oppure a scriverti il suo nickname esatto in-game! Spiegagli che analizzerai le sue vittorie, le civiltà più forti e i punti su cui migliorare. In questo caso NON inventare statistiche e imposta "villi": null.
-
-REGOLA AUREA 10: GESTIONE RICHIESTA GUIDA MAPPA SENZA MAPPA INDICATA:
-- Se l'utente chiede una guida per una mappa (o clicca la scorciatoia "Guida Mappa") senza specificare il nome di una mappa:
-  RISPONDI CON ENTUSIASMO chiedendogli su quale mappa vorrebbe giocare (es. Dry Arabia, Four Lakes / Quattro Laghi, Hideout / Nascondiglio, Prairie / Prateria, Baltic / Baltico, Gorge / Gola, Golden Heights, Oasis, Lipany) e con quale civiltà, spiegandogli che la strategia (Fast Castle, Boom 2 TC o Rush Feudale) cambia completamente in base alle risorse e all'apertura della mappa! In questo caso imposta "villi": null.
-
-REGOLA AUREA 11: RIPARTIZIONE VILLICI (MANDATORIO!):
-- Il blocco "villi" va inserito CON NUMERI REALI (> 0) ESCLUSIVAMENTE quando stai spiegando una Build Order o una ripartizione economica!
-- Per analisi profilo, guide mappe generiche, spiegazione counter, risposte teoriche o matchup generali: IMPOSTA SEMPRE "villi": null (VIETATO restituire tutti zeri!).
-
 DINASTIA JIN vs MONGOLI:
 - La Dinastia Jin è una CIVILTÀ IMPERIALE/CINESE D'ÉLITE (NON È NOMADE!).
 - I Mongoli sono una CIVILTÀ NOMADE.
@@ -875,7 +826,7 @@ PERSONALITÀ, TONO & GAMER SLANG DI COACH BEASTY:
 FORMATO RISPOSTA JSON (MANDATORIO!):
 Rispondi ESCLUSIVAMENTE con un JSON valido con questa struttura esatta:
 {
-  "reply": "spiegazione tattica in italiano spigliato e chiaro in markdown citando statistiche/win rate reali, consigli precisi e video correlati se presenti",
+  "reply": "spiegazione tattica in italiano spigliato e chiaro in markdown citando statistiche/win rate reali e consigli precisi",
   "tacticalCard": {
     "title": "Titolo opzionale in italiano (es. Fast Castle HRE / Difesa contro Cavalleria)",
     "age": "Opzionale (es. Dark Age / Feudal Age / Castle Age / Imperial Age)",
@@ -884,14 +835,18 @@ Rispondi ESCLUSIVAMENTE con un JSON valido con questa struttura esatta:
     "counterUnits": [
       { "name": "Nome Unità Counter", "icon": "Emoji", "role": "Ruolo breve" }
     ],
-    "villi": null,
+    "villi": {
+      "food": 0,
+      "wood": 0,
+      "gold": 0,
+      "stone": 0
+    },
     "proTip": "Consiglio tattico pratico",
     "buildOrderLink": "Opzionale link relativo al BO sul sito (es. /civ/english/buildorders)"
   }
 }`;
 
-    const ytVideosContext = getRelevantYouTubeVideos(message);
-    const promptText = `${systemPrompt}\n\n${matchupLiveStats ? `DATI REALI MATCHUP DAL SITO:\n${matchupLiveStats}\n\n` : ''}${mapContext ? `${mapContext}\n\n` : ''}${playerStatsContext ? `${playerStatsContext}\n\n` : ''}${ytVideosContext ? `${ytVideosContext}\n\n` : ''}${siteKnowledge ? `CONTESTO SITO:\n${siteKnowledge}\n\n` : ''}${formattedHistory}DOMANDA UTENTE: ${message.trim()}`;
+    const promptText = `${systemPrompt}\n\n${matchupLiveStats ? `DATI REALI MATCHUP DAL SITO:\n${matchupLiveStats}\n\n` : ''}${mapContext ? `${mapContext}\n\n` : ''}${playerStatsContext ? `${playerStatsContext}\n\n` : ''}${siteKnowledge ? `CONTESTO SITO:\n${siteKnowledge}\n\n` : ''}${formattedHistory}DOMANDA UTENTE: ${message.trim()}`;
 
     const rawResultText = await generateWithModelFallback(promptText);
 
