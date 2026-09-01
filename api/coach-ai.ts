@@ -263,37 +263,97 @@ function getMapContext(userMessage: string): string {
 }
 
 async function fetchPlayerStatsContext(userMessage: string): Promise<string> {
-  const match = userMessage.match(/(?:profilo|player|giocatore|statistiche|analizza|aoe4world\.com\/players\/)\s*[:#@]?\s*([a-zA-Z0-9_\-\.\s]{3,30})/i);
-  if (!match) return '';
+  const cleanMsg = userMessage.trim();
   
-  const query = match[1].trim();
-  const excludedKeywords = ['inglesi', 'francesi', 'mongoli', 'rus', 'partita', 'matchup', 'consiglio', 'come', 'villi', 'build', 'order', 'fast', 'castle', 'feudal', 'imperial', 'dark'];
-  if (excludedKeywords.includes(query.toLowerCase())) {
+  // 1. Direct URL extraction for aoe4world.com/players/<id>
+  const urlMatch = cleanMsg.match(/aoe4world\.com\/players\/(\d+)(?:-([^\s/?#]+))?/i);
+  let profileId = urlMatch ? urlMatch[1] : '';
+  let searchQuery = '';
+
+  if (!profileId) {
+    // 2. Query extraction from common intents (e.g. "il mio username è MarineLorD", "analizza il player Beasty", etc.)
+    const nameMatch = cleanMsg.match(/(?:profilo|player|giocatore|statistiche|analizza|username|account|aoe4world|guarda|chiamo|sono)\s*(?:di|del|dell'utente|su|il|mio|è|e|in-game|in\s*game)?\s*[:#@]?\s*([a-zA-Z0-9_\-\.]{2,30})/i);
+    if (nameMatch) {
+      searchQuery = nameMatch[1].trim();
+    } else if (/^[a-zA-Z0-9_\-\.]{3,25}$/.test(cleanMsg)) {
+      searchQuery = cleanMsg;
+    }
+  }
+
+  const excludedKeywords = ['inglesi', 'francesi', 'mongoli', 'rus', 'partita', 'matchup', 'consiglio', 'come', 'villi', 'build', 'order', 'fast', 'castle', 'feudal', 'imperial', 'dark', 'mucche', 'drago', 'cinesi', 'ottomani', 'maliani', 'delhi', 'giapponesi', 'bisantini', 'ayyubids', 'zhuxi', 'lancaster', 'templar', 'sengoku', 'macedonian', 'goldenhorde', 'tughlaq'];
+  if (searchQuery && excludedKeywords.includes(searchQuery.toLowerCase())) {
     return '';
   }
 
   try {
-    const url = `https://aoe4world.com/api/v0/players/search?query=${encodeURIComponent(query)}`;
-    const signal = safeTimeoutSignal(3000);
-    const res = await fetch(url, signal ? { signal } : {});
-    if (!res.ok) return '';
-    const json = await res.json();
-    const players: any[] = json.players || [];
-    if (players.length === 0) return '';
+    let playerData: any = null;
 
-    const p = players[0];
-    const rmSolo = p.modes?.rm_solo;
-    let text = `DATI PROFILO GIOCATORE AOE4WORLD (Player: "${p.name}", ID: ${p.profile_id}):\n`;
-    if (rmSolo) {
-      text += `- Rank Solo: ${rmSolo.rank_level || 'Non classificato'} (Rating: ${rmSolo.rating || 'N/D'})\n`;
-      text += `- Win Rate Solo: ${rmSolo.win_rate ? Number(rmSolo.win_rate).toFixed(1) : 0}% (${rmSolo.games_count || 0} partite giocate, ${rmSolo.wins_count || 0} vittorie)\n`;
-      if (rmSolo.streak !== undefined) {
-        text += `- Striscia attuale: ${rmSolo.streak > 0 ? `+${rmSolo.streak} vittorie` : rmSolo.streak < 0 ? `${rmSolo.streak} sconfitte` : '0'}\n`;
+    if (profileId) {
+      const url = `https://aoe4world.com/api/v0/players/${profileId}`;
+      const signal = safeTimeoutSignal(3500);
+      const res = await fetch(url, signal ? { signal } : {});
+      if (res.ok) {
+        playerData = await res.json();
       }
-    } else {
-      text += `- Partite totali registrate: ${p.games_count || 0}, Win Rate stimato: ${p.win_rate || 0}%\n`;
+    } else if (searchQuery) {
+      const url = `https://aoe4world.com/api/v0/players/search?query=${encodeURIComponent(searchQuery)}`;
+      const signal = safeTimeoutSignal(3500);
+      const res = await fetch(url, signal ? { signal } : {});
+      if (res.ok) {
+        const json = await res.json();
+        const players: any[] = json.players || [];
+        if (players.length > 0) {
+          const first = players[0];
+          if (first.profile_id) {
+            const detailRes = await fetch(`https://aoe4world.com/api/v0/players/${first.profile_id}`, signal ? { signal } : {});
+            if (detailRes.ok) {
+              playerData = await detailRes.json();
+            } else {
+              playerData = first;
+            }
+          } else {
+            playerData = first;
+          }
+        }
+      }
     }
-    text += `Usa questi dati reali per dare un feedback personalizzato, amichevole ed incoraggiante da vero Coach Beasty!\n`;
+
+    if (!playerData) return '';
+
+    const name = playerData.name || searchQuery || 'Giocatore';
+    const pId = playerData.profile_id || profileId || '';
+    const rmSolo = playerData.modes?.rm_solo;
+    const rm1v1 = playerData.modes?.rm_1v1_elo || playerData.modes?.rm_solo;
+    const prevSeasons = rmSolo?.previous_seasons || [];
+
+    let text = `DATI UFFICIALI E REALI DEL PROFILO AOE4WORLD (Player: "${name}", ID: ${pId}):\n`;
+    
+    if (rmSolo && rmSolo.rank_level && rmSolo.rank_level !== 'unranked') {
+      text += `- Rank Solo Corrente: ${rmSolo.rank_level.toUpperCase()} (Rating Elo: ${rmSolo.rating || 'N/D'})\n`;
+      text += `- Win Rate Stagione Corrente: ${rmSolo.win_rate ? Number(rmSolo.win_rate).toFixed(1) : 0}% (${rmSolo.games_count || 0} partite: ${rmSolo.wins_count || 0} V / ${rmSolo.losses_count || 0} S)\n`;
+      if (rmSolo.streak !== undefined && rmSolo.streak !== 0) {
+        text += `- Striscia: ${rmSolo.streak > 0 ? `+${rmSolo.streak} vittorie consecutive` : `${rmSolo.streak} sconfitte`}\n`;
+      }
+    } else if (prevSeasons.length > 0) {
+      const best = prevSeasons[0];
+      text += `- Stato Corrente: Non ancora classificato nella stagione attiva (oppure inizio season).\n`;
+      text += `- Ultimo/Miglior Rank Solo Registrato (Season ${best.season}): ${best.rank_level ? best.rank_level.toUpperCase() : 'N/D'} (Rating Elo: ${best.rating || 'N/D'})\n`;
+      text += `- Win Rate Registrato: ${best.win_rate ? Number(best.win_rate).toFixed(1) : 0}% su ${best.games_count || 0} partite (${best.wins_count || 0}V / ${best.losses_count || 0}S)\n`;
+    } else if (rm1v1 && rm1v1.games_count > 0) {
+      text += `- Rating Elo 1v1: ${rm1v1.rating || 'N/D'} (Max: ${rm1v1.max_rating || 'N/D'})\n`;
+      text += `- Win Rate 1v1 Globale: ${rm1v1.win_rate ? Number(rm1v1.win_rate).toFixed(1) : 0}% (${rm1v1.games_count || 0} partite: ${rm1v1.wins_count || 0}V / ${rm1v1.losses_count || 0}S)\n`;
+    } else {
+      text += `- Partite totali registrate: ${playerData.games_count || 0}, Win Rate: ${playerData.win_rate || 0}%\n`;
+    }
+
+    const civStats: any[] = rmSolo?.civilizations || [];
+    if (civStats.length > 0) {
+      const topCivs = civStats.slice(0, 4).map((c: any) => `${c.civilization}: ${c.win_rate ? Number(c.win_rate).toFixed(0) : 0}% WR (${c.games_count} partite)`).join(', ');
+      text += `- Civiltà più giocate: ${topCivs}\n`;
+    }
+
+    text += `ISTRUZIONE PER IL COACH: Riconosci esplicitamente il profilo e cita questi dati REALI (nome, rank, rating, win rate, vittorie/sconfitte). Dai consigli mirati e incoraggianti sul livello effettivo del giocatore!\n`;
+
     return text;
   } catch (e) {
     return '';

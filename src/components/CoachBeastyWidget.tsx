@@ -733,63 +733,86 @@ export const CoachBeastyWidget: React.FC = () => {
               </div>
             ))}
 
-            {/* Funnel Navigation - Seamless Cyan/Silver Theme */}
-            {selectedFunnelCategory ? (
-              <div className="pt-2 pb-1 space-y-2 animate-in fade-in duration-200">
-                <div className="flex items-center justify-between border-b border-slate-800/60 pb-2 px-1">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm">{selectedFunnelCategory.icon}</span>
-                    <span className="font-bold text-xs text-cyan-400 uppercase tracking-wider">{selectedFunnelCategory.label}</span>
+            {/* Initial Starter Guide & Funnel Navigation - Only visible before conversation starts */}
+            {messages.length <= 1 && (
+              <div className="pt-2 pb-1 space-y-3 animate-in fade-in duration-200">
+                {/* Quick Starter Chips */}
+                <div className="space-y-1.5 px-1">
+                  <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest block">Scorciatoie Rapide</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {QUICK_PROMPTS.map((qp, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleSendMessage(qp.prompt)}
+                        disabled={loading}
+                        className="bg-slate-900/90 hover:bg-cyan-950/90 border border-slate-700/70 hover:border-cyan-500/50 text-slate-200 hover:text-cyan-300 text-xs font-medium px-2.5 py-1.5 rounded-lg transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-sm"
+                      >
+                        {qp.label}
+                      </button>
+                    ))}
                   </div>
-                  <button 
-                    onClick={() => setSelectedFunnelCategory(null)}
-                    className="text-[11px] text-cyan-400 hover:text-cyan-300 font-semibold transition"
-                  >
-                    ← Torna al menu
-                  </button>
                 </div>
-                <div className="space-y-1">
-                  {selectedFunnelCategory.options.map((opt, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => handleSendMessage(opt.prompt)}
-                      disabled={loading}
-                      className="w-full text-left py-2 px-2.5 rounded-lg hover:bg-slate-900/80 text-xs text-slate-300 hover:text-white transition flex items-center justify-between group disabled:opacity-50 border-l-2 border-transparent hover:border-cyan-400"
-                    >
-                      <span className="font-medium">{opt.label}</span>
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-cyan-400 transition-transform group-hover:translate-x-0.5 shrink-0 ml-2" />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="pt-2 pb-1 space-y-2 animate-in fade-in duration-200">
-                <div className="flex items-center space-x-2 pb-1.5 border-b border-slate-800/60 px-1">
-                  <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Cosa stai cercando?</span>
-                </div>
-                <div className="space-y-1">
-                  {FUNNEL_CATEGORIES.map((cat) => (
-                    <button
-                      key={cat.id}
-                      onClick={() => setSelectedFunnelCategory(cat)}
-                      disabled={loading}
-                      className="w-full text-left py-2 px-2.5 rounded-xl hover:bg-slate-900/90 transition flex items-center justify-between group disabled:opacity-50 border-l-2 border-transparent hover:border-cyan-400"
-                    >
-                      <div className="flex items-center space-x-3 min-w-0">
-                        <span className="text-base shrink-0">{cat.icon}</span>
-                        <div className="truncate">
-                          <div className="font-semibold text-xs text-slate-200 group-hover:text-cyan-300 transition-colors truncate">
-                            {cat.label}
-                          </div>
-                          <div className="text-[10px] text-slate-400 truncate">
-                            {cat.description}
-                          </div>
-                        </div>
+
+                {/* Categorized Funnel Guide */}
+                {selectedFunnelCategory ? (
+                  <div className="space-y-2 pt-1">
+                    <div className="flex items-center justify-between border-b border-slate-800/60 pb-2 px-1">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm">{selectedFunnelCategory.icon}</span>
+                        <span className="font-bold text-xs text-cyan-400 uppercase tracking-wider">{selectedFunnelCategory.label}</span>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-cyan-400 transition-transform group-hover:translate-x-0.5 shrink-0 ml-2" />
-                    </button>
-                  ))}
-                </div>
+                      <button 
+                        onClick={() => setSelectedFunnelCategory(null)}
+                        className="text-[11px] text-cyan-400 hover:text-cyan-300 font-semibold transition"
+                      >
+                        ← Torna al menu
+                      </button>
+                    </div>
+                    <div className="space-y-1">
+                      {selectedFunnelCategory.options.map((opt, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => handleSendMessage(opt.prompt)}
+                          disabled={loading}
+                          className="w-full text-left py-2 px-2.5 rounded-lg hover:bg-slate-900/80 text-xs text-slate-300 hover:text-white transition flex items-center justify-between group disabled:opacity-50 border-l-2 border-transparent hover:border-cyan-400"
+                        >
+                          <span className="font-medium">{opt.label}</span>
+                          <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-cyan-400 transition-transform group-hover:translate-x-0.5 shrink-0 ml-2" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex items-center space-x-2 pb-1.5 border-b border-slate-800/60 px-1">
+                      <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Oppure esplora per argomento</span>
+                    </div>
+                    <div className="space-y-1">
+                      {FUNNEL_CATEGORIES.map((cat) => (
+                        <button
+                          key={cat.id}
+                          onClick={() => setSelectedFunnelCategory(cat)}
+                          disabled={loading}
+                          className="w-full text-left py-2 px-2.5 rounded-xl hover:bg-slate-900/90 transition flex items-center justify-between group disabled:opacity-50 border-l-2 border-transparent hover:border-cyan-400"
+                        >
+                          <div className="flex items-center space-x-3 min-w-0">
+                            <span className="text-base shrink-0">{cat.icon}</span>
+                            <div className="truncate">
+                              <div className="font-semibold text-xs text-slate-200 group-hover:text-cyan-300 transition-colors truncate">
+                                {cat.label}
+                              </div>
+                              <div className="text-[10px] text-slate-400 truncate">
+                                {cat.description}
+                              </div>
+                            </div>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-cyan-400 transition-transform group-hover:translate-x-0.5 shrink-0 ml-2" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -815,23 +838,7 @@ export const CoachBeastyWidget: React.FC = () => {
           </div>
 
           {/* Input Footer */}
-          <div className="p-3.5 bg-slate-900/95 border-t border-cyan-500/20 shrink-0 space-y-2.5">
-            {/* Quick Action Chips */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5 select-none elegant-scrollbar">
-              {QUICK_PROMPTS.map((qp, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleSendMessage(qp.prompt)}
-                  disabled={loading}
-                  className="shrink-0 bg-slate-950/80 hover:bg-cyan-950/80 border border-slate-700/70 hover:border-cyan-500/50 text-slate-300 hover:text-cyan-300 text-[11px] font-semibold px-2.5 py-1 rounded-lg transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-sm"
-                  title={qp.prompt}
-                >
-                  {qp.label}
-                </button>
-              ))}
-            </div>
-
+          <div className="p-3.5 bg-slate-900/95 border-t border-cyan-500/20 shrink-0">
             <form 
               onSubmit={(e) => {
                 e.preventDefault();
