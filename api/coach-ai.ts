@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
-import youtubeVideosRaw from '../src/data/youtube_videos.json';
+import { YOUTUBE_VIDEOS_LIST } from './youtube_data';
 
 interface ChatMessage {
   sender: 'user' | 'coach';
@@ -8,31 +8,35 @@ interface ChatMessage {
 }
 
 function getRelevantYouTubeVideos(userMessage: string): string {
-  const lower = userMessage.toLowerCase();
-  const matched: Array<{ title: string; id: string }> = [];
-  const list = (youtubeVideosRaw as Array<{ title: string; id: string }>) || [];
+  try {
+    const lower = userMessage.toLowerCase();
+    const matched: Array<{ title: string; id: string }> = [];
+    const list = YOUTUBE_VIDEOS_LIST || [];
 
-  const keywords = lower.split(/[^a-zA-Z0-9àèéìòù]+/).filter(w => w.length >= 4);
-  if (keywords.length === 0) return '';
+    const keywords = lower.split(/[^a-zA-Z0-9àèéìòù]+/).filter(w => w.length >= 4);
+    if (keywords.length === 0) return '';
 
-  for (const v of list) {
-    const vTitleLower = v.title.toLowerCase();
-    let score = 0;
-    for (const kw of keywords) {
-      if (vTitleLower.includes(kw)) score++;
+    for (const v of list) {
+      const vTitleLower = v.title.toLowerCase();
+      let score = 0;
+      for (const kw of keywords) {
+        if (vTitleLower.includes(kw)) score++;
+      }
+      if (score > 0) {
+        const cleanTitle = v.title.replace(/►.*/, '').replace(/[☦️🏯🐎⚔️🐘♜🤔🛡️🦸‍♀️🔥❓❗👨🏿]/g, '').trim();
+        matched.push({ title: cleanTitle, id: v.id });
+      }
+      if (matched.length >= 2) break;
     }
-    if (score > 0) {
-      const cleanTitle = v.title.replace(/►.*/, '').replace(/[☦️🏯🐎⚔️🐘♜🤔🛡️🦸‍♀️🔥❓❗👨🏿]/g, '').trim();
-      matched.push({ title: cleanTitle, id: v.id });
-    }
-    if (matched.length >= 2) break;
+
+    if (matched.length === 0) return '';
+
+    return 'VIDEO GUIDE / GAMEPLAY DISPONIBILI SUL CANALE YOUTUBE DEL PORTALE:\n' +
+      matched.map(m => `- [Guida Video: ${m.title}](https://www.youtube.com/watch?v=${m.id})`).join('\n') +
+      '\nCONSIGLIA E INSERISCI QUESTO LINK VIDEO SE UTILE ALLA DOMANDA!';
+  } catch (e) {
+    return '';
   }
-
-  if (matched.length === 0) return '';
-
-  return 'VIDEO GUIDE / GAMEPLAY DISPONIBILI SUL CANALE YOUTUBE DEL PORTALE:\n' +
-    matched.map(m => `- [Guida Video: ${m.title}](https://www.youtube.com/watch?v=${m.id})`).join('\n') +
-    '\nCONSIGLIA E INSERISCI QUESTO LINK VIDEO SE UTILE ALLA DOMANDA!';
 }
 
 const AOE4_MAPS: Record<string, { name: string; type: string; tips: string }> = {
@@ -641,14 +645,14 @@ async function logInteraction(userNickname: string, prompt: string, reply: strin
 const DEFAULT_GEMINI_KEY = ['AIzaSyCoOKkHKw23UCUG', 'dXDYv0TxUA6b-6tsh4Y'].join('');
 const DEFAULT_GROQ_KEY = ['gsk', 'AamZm1YRlKyGLUg9FLH5WGdyb3FY9xd5lCzBNCKDdumqbm4xRare'].join('_');
 
-const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-3.5-flash', 'gemini-flash-latest'];
-const GROQ_MODELS = ['groq/compound-mini', 'groq/compound', 'qwen/qwen3.8-27b'];
+const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-flash-latest'];
+const GROQ_MODELS = ['qwen/qwen3.8-27b', 'qwen/qwen3.6-27b', 'openai/gpt-oss-120b', 'openai/gpt-oss-20b'];
 
 async function fetchGeminiResponse(geminiApiKey: string, promptText: string) {
   for (const model of GEMINI_MODELS) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`;
-      const signal = safeTimeoutSignal(6000);
+      const signal = safeTimeoutSignal(8000);
       const geminiRes = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -687,7 +691,7 @@ async function fetchGroqResponse(groqApiKey: string, promptText: string) {
   for (const model of GROQ_MODELS) {
     try {
       const url = 'https://api.groq.com/openai/v1/chat/completions';
-      const signal = safeTimeoutSignal(4500);
+      const signal = safeTimeoutSignal(7000);
       const res = await fetch(url, {
         method: 'POST',
         headers: {
