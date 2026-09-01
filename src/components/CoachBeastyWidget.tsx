@@ -708,7 +708,7 @@ export const CoachBeastyWidget: React.FC = () => {
                         if (!hasVilli || !v) return null;
                         return (
                           <div className="space-y-1">
-                            <span className="text-[11px] font-semibold text-slate-400 block">Ripartizione Abitanti del Villaggio (Villi):</span>
+                            <span className="text-[11px] font-semibold text-slate-400 block">Ripartizione Villi:</span>
                             <div className="grid grid-cols-4 gap-1 text-center">
                               <div className="bg-cyan-950/40 border border-cyan-500/30 rounded p-1">
                                 <span className="block text-[10px] text-cyan-300 font-bold">🌾 Cibo</span>

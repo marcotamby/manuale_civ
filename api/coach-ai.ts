@@ -256,7 +256,7 @@ function getMapContext(userMessage: string): string {
   const lower = userMessage.toLowerCase();
   for (const [key, mapInfo] of Object.entries(AOE4_MAPS)) {
     if (lower.includes(key)) {
-      return `CONTESTO MAPPA AOE4 INDIVIDUATO: [${mapInfo.name} - Tipologia: ${mapInfo.type}]\nCONSIGLIO SPECIFICO PER QUESTA MAPPA:\n${mapInfo.tips}\nAdatta i tuoi consigli tattici e la ripartizione dei villici al layout di questa mappa!`;
+      return `CONTESTO MAPPA AOE4 INDIVIDUATO: [${mapInfo.name} - Tipologia: ${mapInfo.type}]\nCONSIGLIO SPECIFICO PER QUESTA MAPPA:\n${mapInfo.tips}\nAdatta i tuoi consigli tattici e la ripartizione dei villi al layout di questa mappa!`;
     }
   }
   return '';
@@ -749,8 +749,8 @@ REGOLA AUREA 1: LINGUA 100% ITALIANO (MANDATORIO!)
 - Puoi usare i naturali termini gaming/RTS (micro, macro, harassment, counter, power spike, GG, Fast Castle, All-In, TC, BO), ma spiega le tattiche in ottimo italiano chiaro e piacevole.
 
 REGOLA AUREA 2: TERMINOLOGIA DI GIOCO AOE4 CORRETTA (MANDATORIO!):
-1. "ABITANTI DEL VILLAGGIO" / "VILLICI":
-   - I lavoratori sono "Abitanti del villaggio" o "Villici" o "Villi" (NON usare MAI la parola "villaggi" per indicare i lavoratori!).
+1. "VILLI" (LAVORATORI):
+   - I lavoratori si chiamano SEMPRE **Villi** (singolare **Villo** o all'occorrenza **Abitanti del villaggio**). NON usare mai "villici" e NON usare MAI "villaggi" per indicare i lavoratori!
 2. "DARK AGE":
    - La prima età di gioco si chiama **Dark Age** (oppure Età Oscura / Dark Age). NON usare mai "età antica"!
 3. "HARASSMENT":
@@ -799,7 +799,7 @@ REGOLA AUREA 9: RICHIESTA GUIDA MAPPA SENZA MAPPA SPECIFICATA:
 - Se l'utente chiede una guida mappa generica (o clicca "Guida Mappa") senza aver nominato una mappa specifica:
   RISPONDI CON ENTUSIASMO chiedendogli su quale mappa e con quale civiltà vorrebbe ricevere la guida strategica (citando ad esempio Dry Arabia, Four Lakes, Hideout, Prairie, Baltic, Gorge, Lipany, Oasis), spiegandogli come l'apertura cambia radicalmente in base alla mappa! Imposta "villi": null.
 
-REGOLA AUREA 10: RIPARTIZIONE VILLICI (MANDATORIO!):
+REGOLA AUREA 10: RIPARTIZIONE VILLI (MANDATORIO!):
 - Il blocco "villi" va popolato con numeri (> 0) ESCLUSIVAMENTE quando stai spiegando una Build Order o un'apertura economica!
 - Per analisi profilo, guide mappa generiche, spiegazioni di counter o risposte teoriche: IMPOSTA SEMPRE "villi": null (NON restituire tutti zeri!).
 
