@@ -25,7 +25,7 @@ const QUICK_PROMPTS = [
   { label: '🛡️ Counter Unità', prompt: 'Qual è la tabella completa dei counter delle unità in AoE4?' },
   { label: '📊 Win Rate Live', prompt: 'Qual è la classifica aggiornata dei win rate delle civiltà del sito?' },
   { label: '🗺️ Guida Four Lakes', prompt: 'Come approcciare la mappa Four Lakes (Quattro Laghi) e quando aprire il porto?' },
-  { label: '👤 Analisi Profilo', prompt: 'Come puoi analizzare le mie statistiche o il mio profilo AoE4World?' }
+  { label: '👤 Analizza Profilo', prompt: 'Vorrei che analizzassi il mio profilo AoE4World!' }
 ];
 
 interface FunnelOption {
@@ -446,8 +446,8 @@ export const CoachBeastyWidget: React.FC = () => {
     const lines = normalizedText.split('\n');
 
     return lines.map((line, lIdx) => {
-      // Regex matches [markdown link](url), plain https/http URLs, and **bold** text
-      const tokenRegex = /(\[[^\]]+\]\([^)]+\)|https?:\/\/[^\s<>]+|\*\*[^*]+\*\*)/g;
+      // Regex matches [markdown link](url), plain https/http URLs, ***bold italic***, **bold**, *italic*, _italic_, `code`
+      const tokenRegex = /(\[[^\]]+\]\([^)]+\)|https?:\/\/[^\s<>]+|\*\*\*[^*]+\*\*\*|\*\*[^*]+\*\*|\*[^*\n]+\*|_[^_\n]+_|`[^`]+`)/g;
       const parts = line.split(tokenRegex);
 
       return (
@@ -478,7 +478,7 @@ export const CoachBeastyWidget: React.FC = () => {
                   target={isInternal ? undefined : "_blank"}
                   rel={isInternal ? undefined : "noopener noreferrer"}
                   className="inline-flex items-center gap-1 font-bold text-cyan-300 hover:text-cyan-100 bg-cyan-950/70 hover:bg-cyan-900/90 px-2 py-0.5 rounded-md text-[13px] my-0.5 mx-0.5 border border-cyan-500/40 hover:border-cyan-400 cursor-pointer shadow-sm transition-all hover:scale-[1.02] active:scale-95 select-none"
-                  title={`Apri ${label} sul sito`}
+                  title={`Apri ${label}`}
                 >
                   <span>{label}</span>
                   <span className="text-[10px] text-cyan-400 font-normal opacity-80">↗</span>
@@ -501,8 +501,18 @@ export const CoachBeastyWidget: React.FC = () => {
               );
             }
 
+            // Check if it's ***bold italic***
+            if (part.startsWith('***') && part.endsWith('***') && part.length > 6) {
+              const clean = part.slice(3, -3);
+              return (
+                <strong key={pIdx} className="font-bold italic text-cyan-200">
+                  {clean}
+                </strong>
+              );
+            }
+
             // Check if it's **bold**
-            if (part.startsWith('**') && part.endsWith('**')) {
+            if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
               const cleanBold = part.slice(2, -2);
               const isUserNick = displayName !== 'utente' && cleanBold.toLowerCase() === displayName.toLowerCase();
               return (
@@ -512,6 +522,25 @@ export const CoachBeastyWidget: React.FC = () => {
                 >
                   {cleanBold}
                 </strong>
+              );
+            }
+
+            // Check if it's *italic* or _italic_
+            if (((part.startsWith('*') && part.endsWith('*')) || (part.startsWith('_') && part.endsWith('_'))) && part.length > 2) {
+              const cleanItalic = part.slice(1, -1);
+              return (
+                <em key={pIdx} className="italic text-slate-300">
+                  {cleanItalic}
+                </em>
+              );
+            }
+
+            // Check if it's `code`
+            if (part.startsWith('`') && part.endsWith('`') && part.length > 2) {
+              return (
+                <code key={pIdx} className="bg-slate-900 text-cyan-300 px-1.5 py-0.5 rounded text-xs font-mono border border-slate-700">
+                  {part.slice(1, -1)}
+                </code>
               );
             }
 
@@ -673,29 +702,34 @@ export const CoachBeastyWidget: React.FC = () => {
                         </div>
                       )}
 
-                      {msg.tacticalCard.villi && (
-                        <div className="space-y-1">
-                          <span className="text-[11px] font-semibold text-slate-400 block">Ripartizione Abitanti del Villaggio (Villi):</span>
-                          <div className="grid grid-cols-4 gap-1 text-center">
-                            <div className="bg-cyan-950/40 border border-cyan-500/30 rounded p-1">
-                              <span className="block text-[10px] text-cyan-300 font-bold">🌾 Cibo</span>
-                              <span className="text-xs font-black text-cyan-200">{msg.tacticalCard.villi.food || 0}</span>
-                            </div>
-                            <div className="bg-blue-950/40 border border-blue-500/30 rounded p-1">
-                              <span className="block text-[10px] text-blue-300 font-bold">🪵 Legna</span>
-                              <span className="text-xs font-black text-blue-200">{msg.tacticalCard.villi.wood || 0}</span>
-                            </div>
-                            <div className="bg-slate-900 border border-slate-700 rounded p-1">
-                              <span className="block text-[10px] text-slate-300 font-bold">🪙 Oro</span>
-                              <span className="text-xs font-black text-slate-200">{msg.tacticalCard.villi.gold || 0}</span>
-                            </div>
-                            <div className="bg-slate-800/60 border border-slate-600/30 rounded p-1">
-                              <span className="block text-[10px] text-slate-300 font-bold">🪨 Pietra</span>
-                              <span className="text-xs font-black text-slate-100">{msg.tacticalCard.villi.stone || 0}</span>
+                      {(() => {
+                        const v = msg.tacticalCard.villi;
+                        const hasVilli = v && ((v.food || 0) + (v.wood || 0) + (v.gold || 0) + (v.stone || 0)) > 0;
+                        if (!hasVilli || !v) return null;
+                        return (
+                          <div className="space-y-1">
+                            <span className="text-[11px] font-semibold text-slate-400 block">Ripartizione Abitanti del Villaggio (Villi):</span>
+                            <div className="grid grid-cols-4 gap-1 text-center">
+                              <div className="bg-cyan-950/40 border border-cyan-500/30 rounded p-1">
+                                <span className="block text-[10px] text-cyan-300 font-bold">🌾 Cibo</span>
+                                <span className="text-xs font-black text-cyan-200">{v.food || 0}</span>
+                              </div>
+                              <div className="bg-blue-950/40 border border-blue-500/30 rounded p-1">
+                                <span className="block text-[10px] text-blue-300 font-bold">🪵 Legna</span>
+                                <span className="text-xs font-black text-blue-200">{v.wood || 0}</span>
+                              </div>
+                              <div className="bg-slate-900 border border-slate-700 rounded p-1">
+                                <span className="block text-[10px] text-slate-300 font-bold">🪙 Oro</span>
+                                <span className="text-xs font-black text-slate-200">{v.gold || 0}</span>
+                              </div>
+                              <div className="bg-slate-800/60 border border-slate-600/30 rounded p-1">
+                                <span className="block text-[10px] text-slate-300 font-bold">🪨 Pietra</span>
+                                <span className="text-xs font-black text-slate-100">{v.stone || 0}</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      )}
+                        );
+                      })()}
 
                       {msg.tacticalCard.proTip && (
                         <div className="bg-blue-950/40 border border-blue-500/20 p-2 rounded text-xs text-blue-200 flex items-start gap-1.5">
