@@ -394,19 +394,26 @@ async function getDynamicGroundTruth(userMessage: string, history: ChatMessage[]
     }
   }
 
+  // If no specific civ was mentioned, return concise key rules to save tokens
+  if (matchedSlugs.size === 0) {
+    return `REGOLE VERITÀ BASE PORTALE:
+- DINASTIA JIN: Civiltà Imperiale Cinese (NON NOMADE!).
+- MONGOLI: Civiltà Nomade.
+- MALIANI: Unica civiltà con le MUCCHE.
+- LANCASTER: Casata inglese con manieri (NON ha mucche!).
+- SACRO ROMANO IMPERO: Fast Castle e Ratisbona.`;
+  }
+
   const sb = getSupabase();
   if (sb) {
     try {
-      let query = sb.from('civilizations').select('id, name, short_description, unique_units, build_orders, passive_bonuses, landmarks, videos');
-      if (matchedSlugs.size > 0) {
-        query = query.in('id', Array.from(matchedSlugs));
-      } else {
-        query = query.limit(6);
-      }
+      const { data: dbCivs, error } = await sb
+        .from('civilizations')
+        .select('id, name, short_description, unique_units, build_orders, passive_bonuses')
+        .in('id', Array.from(matchedSlugs));
 
-      const { data: dbCivs, error } = await query;
       if (!error && dbCivs && dbCivs.length > 0) {
-        let truthStr = 'DATI UFFICIALI IN TEMPO REALE DAL DATABASE SUPABASE DEL SITO:\n\n';
+        let truthStr = 'DATI UFFICIALI DAL DATABASE DEL SITO:\n\n';
         for (const civ of dbCivs) {
           truthStr += `[${civ.name.toUpperCase()} - ID: ${civ.id}]\n`;
           if (civ.short_description) truthStr += `  - Descrizione: ${civ.short_description}\n`;
@@ -414,46 +421,20 @@ async function getDynamicGroundTruth(userMessage: string, history: ChatMessage[]
           if (civ.id === 'malians') {
             truthStr += `  - MECCANICA MUCCHE: Le MUCCHE appartengono ESCLUSIVAMENTE ai Maliani!\n`;
           } else if (civ.id === 'lancaster') {
-            truthStr += `  - MECCANICA LANCASTER: Manieri ed espansione agricola. NON HANNO MUCCHE! Le mucche sono SOLO dei Maliani!\n`;
+            truthStr += `  - MECCANICA LANCASTER: Manieri ed espansione agricola. NON HANNO MUCCHE!\n`;
           }
 
           if (civ.unique_units && Array.isArray(civ.unique_units) && civ.unique_units.length > 0) {
-            truthStr += `  - Unità Uniche Ufficiali ed Età:\n`;
+            truthStr += `  - Unità Uniche:\n`;
             for (const u of civ.unique_units) {
-              const ageLabel = u.age === 1 ? 'Dark Age (Età I)' : u.age === 2 ? 'Feudal Age (Età II)' : u.age === 3 ? 'Castle Age (Età III)' : 'Imperial Age (Età IV)';
-              truthStr += `    * ${u.name} (ID: ${u.id}): Sbloccata in ${ageLabel}. Tipo: ${u.type || 'Unità'}.\n`;
+              const ageLabel = u.age === 1 ? 'Dark Age' : u.age === 2 ? 'Feudal Age' : u.age === 3 ? 'Castle Age' : 'Imperial Age';
+              truthStr += `    * ${u.name} (Età: ${ageLabel})\n`;
             }
           }
 
           if (civ.build_orders && Array.isArray(civ.build_orders) && civ.build_orders.length > 0) {
-            truthStr += `  - Build Order Ufficiali presenti sul sito per ${civ.name}:\n`;
-            for (const bo of civ.build_orders) {
-              const boTitle = bo.title || bo.name || 'Build Order';
-              const boAge = bo.age ? ` (Età: ${bo.age})` : '';
-              truthStr += `    * "${boTitle}"${boAge} -> Link sito: [Build Order ${civ.name}](/civ/${civ.id}/buildorders)\n`;
-              if (bo.villi) {
-                truthStr += `      Villi consigliati: Cibo ${bo.villi.food || 0}, Legna ${bo.villi.wood || 0}, Oro ${bo.villi.gold || 0}, Pietra ${bo.villi.stone || 0}\n`;
-              }
-              if (bo.steps && Array.isArray(bo.steps) && bo.steps.length > 0) {
-                const stepSummaries = bo.steps.slice(0, 6).map((s: any, sIdx: number) => {
-                  const time = s.timing || s.time ? `[${s.timing || s.time}] ` : '';
-                  const desc = s.description || s.text || s.title || '';
-                  return `${sIdx + 1}. ${time}${desc}`;
-                }).filter(Boolean);
-                if (stepSummaries.length > 0) {
-                  truthStr += `      Passi BO Dettagliati:\n        ${stepSummaries.join('\n        ')}\n`;
-                }
-              }
-            }
+            truthStr += `  - Build Order Ufficiali: [Build Order ${civ.name}](/civ/${civ.id}/buildorders)\n`;
           }
-
-          if (civ.passive_bonuses && Array.isArray(civ.passive_bonuses) && civ.passive_bonuses.length > 0) {
-            const bonusTitles = civ.passive_bonuses.slice(0, 4).map((b: any) => b.title || b.name || b).filter(Boolean);
-            if (bonusTitles.length > 0) {
-              truthStr += `  - Bonus passivi principali: ${bonusTitles.join(', ')}\n`;
-            }
-          }
-
           truthStr += '\n';
         }
         return truthStr;
@@ -463,32 +444,9 @@ async function getDynamicGroundTruth(userMessage: string, history: ChatMessage[]
     }
   }
 
-  // Fallback to internal dictionary
-  return getRelevantGroundTruth(userMessage, history);
-}
-
-function getRelevantGroundTruth(userMessage: string, history: ChatMessage[] = []): string {
-  const combinedText = (userMessage + ' ' + history.map(m => m.text).join(' ')).toLowerCase();
-  
-  const matchedSlugs = new Set<string>();
-  for (const [key, slug] of Object.entries(CIV_NAME_TO_SLUG)) {
-    if (combinedText.includes(key)) {
-      matchedSlugs.add(slug);
-    }
-  }
-
-  let selectedEntries: string[] = [];
-  if (matchedSlugs.size > 0) {
-    for (const slug of matchedSlugs) {
-      if (CIV_SUMMARIES[slug]) selectedEntries.push(CIV_SUMMARIES[slug]);
-    }
-  }
-
-  if (selectedEntries.length === 0) {
-    selectedEntries = Object.values(CIV_SUMMARIES).slice(0, 8);
-  }
-
-  return 'DIZIONARIO VERITÀ UFFICIALE DEL PORTALE SULLE CIVILTÀ ED ETÀ DI SBLOCCO UNITÀ (MANDATORIO!):\n\n' + selectedEntries.join('\n\n');
+  // Fallback to internal dictionary for matched civs
+  const selectedEntries = Array.from(matchedSlugs).map(s => CIV_SUMMARIES[s]).filter(Boolean);
+  return 'DIZIONARIO VERITÀ DEL PORTALE:\n\n' + selectedEntries.join('\n\n');
 }
 
 function safeTimeoutSignal(ms: number) {
