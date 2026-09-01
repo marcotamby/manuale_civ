@@ -272,7 +272,7 @@ async function fetchPlayerStatsContext(userMessage: string): Promise<string> {
 
   if (!profileId) {
     // 2. Query extraction from common intents (e.g. "il mio username è MarineLorD", "analizza il player Beasty", etc.)
-    const nameMatch = cleanMsg.match(/(?:profilo|player|giocatore|statistiche|analizza|username|account|aoe4world|guarda|chiamo|sono)\s*(?:di|del|dell'utente|su|il|mio|è|e|in-game|in\s*game)?\s*[:#@]?\s*([a-zA-Z0-9_\-\.]{2,30})/i);
+    const nameMatch = cleanMsg.match(/\b(?:profilo|player|giocatore|statistiche|analizza|analizzare|username|account|chiamo|sono)\b(?:\s+(?:di|del|dell'utente|su|il|mio|mia|mie|miei|è|e|in-game|in\s*game|profilo|player|giocatore|statistiche|account|username))+\s*[:#@]?\s*([a-zA-Z0-9_\-\.]{3,30})/i);
     if (nameMatch) {
       searchQuery = nameMatch[1].trim();
     } else if (/^[a-zA-Z0-9_\-\.]{3,25}$/.test(cleanMsg)) {
@@ -280,8 +280,18 @@ async function fetchPlayerStatsContext(userMessage: string): Promise<string> {
     }
   }
 
-  const excludedKeywords = ['inglesi', 'francesi', 'mongoli', 'rus', 'partita', 'matchup', 'consiglio', 'come', 'villi', 'build', 'order', 'fast', 'castle', 'feudal', 'imperial', 'dark', 'mucche', 'drago', 'cinesi', 'ottomani', 'maliani', 'delhi', 'giapponesi', 'bisantini', 'ayyubids', 'zhuxi', 'lancaster', 'templar', 'sengoku', 'macedonian', 'goldenhorde', 'tughlaq'];
+  const excludedKeywords = [
+    'aoe4world', 'aoe4', 'profilo', 'statistiche', 'stats', 'account', 'username', 'giocatore', 'player',
+    'inglesi', 'francesi', 'mongoli', 'rus', 'partita', 'matchup', 'consiglio', 'come', 'villi', 'build',
+    'order', 'fast', 'castle', 'feudal', 'imperial', 'dark', 'mucche', 'drago', 'cinesi', 'ottomani',
+    'maliani', 'delhi', 'giapponesi', 'bisantini', 'ayyubids', 'zhuxi', 'lancaster', 'templar', 'sengoku',
+    'macedonian', 'goldenhorde', 'tughlaq', 'guida', 'mappa'
+  ];
   if (searchQuery && excludedKeywords.includes(searchQuery.toLowerCase())) {
+    searchQuery = '';
+  }
+
+  if (!profileId && !searchQuery) {
     return '';
   }
 
@@ -809,6 +819,18 @@ Se la domanda o la risposta riguarda una civiltà o un argomento approfondibile 
 - **Confronto Civiltà**: [Confronta Civiltà](/compare)
 - **Classifiche / Leaderboard**: [Classifica](/classifica)
 
+REGOLA AUREA 8: RICHIESTA ANALISI PROFILO SENZA LINK O DATI REALI (MANDATORIO!):
+- Se l'utente chiede di analizzare il suo profilo (o clicca la scorciatoia "Analizza Profilo") e sopra NON è presente la sezione "DATI UFFICIALI E REALI DEL PROFILO AOE4WORLD":
+  RISPONDI CON ENTUSIASMO invitando l'utente a incollare qui il link del suo profilo AoE4World (es. https://aoe4world.com/players/...) oppure a scriverti il suo username esatto in gioco, spiegando che analizzerai il suo rank, elo, le sue migliori civiltà e gli errori da correggere! NON inventare dati finti e imposta "villi": null.
+
+REGOLA AUREA 9: RICHIESTA GUIDA MAPPA SENZA MAPPA SPECIFICATA:
+- Se l'utente chiede una guida mappa generica (o clicca "Guida Mappa") senza aver nominato una mappa specifica:
+  RISPONDI CON ENTUSIASMO chiedendogli su quale mappa e con quale civiltà vorrebbe ricevere la guida strategica (citando ad esempio Dry Arabia, Four Lakes, Hideout, Prairie, Baltic, Gorge, Lipany, Oasis), spiegandogli come l'apertura cambia radicalmente in base alla mappa! Imposta "villi": null.
+
+REGOLA AUREA 10: RIPARTIZIONE VILLICI (MANDATORIO!):
+- Il blocco "villi" va popolato con numeri (> 0) ESCLUSIVAMENTE quando stai spiegando una Build Order o un'apertura economica!
+- Per analisi profilo, guide mappa generiche, spiegazioni di counter o risposte teoriche: IMPOSTA SEMPRE "villi": null (NON restituire tutti zeri!).
+
 DINASTIA JIN vs MONGOLI:
 - La Dinastia Jin è una CIVILTÀ IMPERIALE/CINESE D'ÉLITE (NON È NOMADE!).
 - I Mongoli sono una CIVILTÀ NOMADE.
@@ -835,12 +857,7 @@ Rispondi ESCLUSIVAMENTE con un JSON valido con questa struttura esatta:
     "counterUnits": [
       { "name": "Nome Unità Counter", "icon": "Emoji", "role": "Ruolo breve" }
     ],
-    "villi": {
-      "food": 0,
-      "wood": 0,
-      "gold": 0,
-      "stone": 0
-    },
+    "villi": null,
     "proTip": "Consiglio tattico pratico",
     "buildOrderLink": "Opzionale link relativo al BO sul sito (es. /civ/english/buildorders)"
   }
