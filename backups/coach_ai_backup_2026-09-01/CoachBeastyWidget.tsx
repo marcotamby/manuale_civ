@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
-import { X, Send, Sparkles, RotateCcw, ChevronRight, Swords, Compass, Clock } from 'lucide-react';
+import { X, Send, Sparkles, RotateCcw, ChevronRight, Swords } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -10,23 +10,12 @@ interface Message {
   tacticalCard?: {
     title?: string;
     age?: string;
-    mapTip?: string;
-    timingTip?: string;
     counterUnits?: Array<{ name: string; icon?: string; role?: string }>;
     villi?: { food?: number; wood?: number; gold?: number; stone?: number };
     proTip?: string;
-    buildOrderLink?: string;
   } | null;
   timestamp: string;
 }
-
-const QUICK_PROMPTS = [
-  { label: '⚡ Fast Castle', prompt: 'Qual è la strategia migliore per una Fast Castle sicura ed efficace?' },
-  { label: '🛡️ Counter Unità', prompt: 'Qual è la tabella completa dei counter delle unità in AoE4?' },
-  { label: '📊 Win Rate Live', prompt: 'Qual è la classifica aggiornata dei win rate delle civiltà del sito?' },
-  { label: '🗺️ Guida Four Lakes', prompt: 'Come approcciare la mappa Four Lakes (Quattro Laghi) e quando aprire il porto?' },
-  { label: '👤 Analisi Profilo', prompt: 'Come puoi analizzare le mie statistiche o il mio profilo AoE4World?' }
-];
 
 interface FunnelOption {
   label: string;
@@ -642,20 +631,6 @@ export const CoachBeastyWidget: React.FC = () => {
                         </div>
                       )}
 
-                      {msg.tacticalCard.mapTip && (
-                        <div className="bg-emerald-950/40 border border-emerald-500/30 p-2 rounded-lg text-xs text-emerald-200 flex items-start gap-1.5 shadow-sm">
-                          <Compass className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                          <span><strong>Mappa:</strong> {msg.tacticalCard.mapTip}</span>
-                        </div>
-                      )}
-
-                      {msg.tacticalCard.timingTip && (
-                        <div className="bg-amber-950/40 border border-amber-500/30 p-2 rounded-lg text-xs text-amber-200 flex items-start gap-1.5 shadow-sm">
-                          <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
-                          <span><strong>Timing Chiave:</strong> {msg.tacticalCard.timingTip}</span>
-                        </div>
-                      )}
-
                       {msg.tacticalCard.counterUnits && msg.tacticalCard.counterUnits.length > 0 && (
                         <div className="space-y-1">
                           <span className="text-[11px] font-semibold text-slate-400 block">Counter consigliati:</span>
@@ -701,24 +676,6 @@ export const CoachBeastyWidget: React.FC = () => {
                         <div className="bg-blue-950/40 border border-blue-500/20 p-2 rounded text-xs text-blue-200 flex items-start gap-1.5">
                           <Sparkles className="w-3.5 h-3.5 text-cyan-400 shrink-0 mt-0.5" />
                           <span><strong>Pro Tip:</strong> {msg.tacticalCard.proTip}</span>
-                        </div>
-                      )}
-
-                      {msg.tacticalCard.buildOrderLink && (
-                        <div className="pt-1">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              if (msg.tacticalCard?.buildOrderLink) {
-                                navigate(msg.tacticalCard.buildOrderLink);
-                              }
-                            }}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs shadow-md transition-all hover:scale-[1.02] active:scale-95 cursor-pointer"
-                          >
-                            <span>📜 Apri Guida Build Order sul Sito</span>
-                            <ChevronRight className="w-3.5 h-3.5 text-slate-950" />
-                          </button>
                         </div>
                       )}
                     </div>
@@ -815,23 +772,7 @@ export const CoachBeastyWidget: React.FC = () => {
           </div>
 
           {/* Input Footer */}
-          <div className="p-3.5 bg-slate-900/95 border-t border-cyan-500/20 shrink-0 space-y-2.5">
-            {/* Quick Action Chips */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5 select-none elegant-scrollbar">
-              {QUICK_PROMPTS.map((qp, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleSendMessage(qp.prompt)}
-                  disabled={loading}
-                  className="shrink-0 bg-slate-950/80 hover:bg-cyan-950/80 border border-slate-700/70 hover:border-cyan-500/50 text-slate-300 hover:text-cyan-300 text-[11px] font-semibold px-2.5 py-1 rounded-lg transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-sm"
-                  title={qp.prompt}
-                >
-                  {qp.label}
-                </button>
-              ))}
-            </div>
-
+          <div className="p-3.5 bg-slate-900/95 border-t border-cyan-500/20 shrink-0">
             <form 
               onSubmit={(e) => {
                 e.preventDefault();

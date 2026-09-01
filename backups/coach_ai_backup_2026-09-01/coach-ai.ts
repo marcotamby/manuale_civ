@@ -6,108 +6,7 @@ interface ChatMessage {
   text: string;
 }
 
-const AOE4_MAPS: Record<string, { name: string; type: string; tips: string }> = {
-  'dry arabia': {
-    name: 'Arabia Secca (Dry Arabia)',
-    type: 'Terrestre Aperta',
-    tips: 'Mappa molto aperta con risorse esposte. Consigliata aggressività feudale precoce (Feudal Aggression) o difesa con palizzate strette (small walls). Controllo dell\'oro e pecore essenziale.'
-  },
-  'arabia': {
-    name: 'Arabia Secca (Dry Arabia)',
-    type: 'Terrestre Aperta',
-    tips: 'Mappa molto aperta con risorse esposte. Consigliata aggressività feudale precoce (Feudal Aggression) o difesa con palizzate strette (small walls). Controllo dell\'oro e pecore essenziale.'
-  },
-  'prairie': {
-    name: 'Prateria (Prairie)',
-    type: 'Terrestre Iper-Aperta',
-    tips: 'Prateria priva di strozzature e ricca di branchi di cervi. Le civiltà con cavalleria mobile (Rus, Francesi, Mongoli) dominano l\'harassment e la caccia.'
-  },
-  'prateria': {
-    name: 'Prateria (Prairie)',
-    type: 'Terrestre Iper-Aperta',
-    tips: 'Prateria priva di strozzature e ricca di branchi di cervi. Le civiltà con cavalleria mobile (Rus, Francesi, Mongoli) dominano l\'harassment e la caccia.'
-  },
-  'hideout': {
-    name: 'Nascondiglio (Hideout)',
-    type: 'Terrestre Chiusa',
-    tips: 'Basi circondate da fitti boschi e palizzate iniziali. Ideale per strategie di Fast Castle, boom economico su 2 o 3 TC o raccolta indisturbata delle reliquie (HRE, Ayyubidi).'
-  },
-  'nascondiglio': {
-    name: 'Nascondiglio (Hideout)',
-    type: 'Terrestre Chiusa',
-    tips: 'Basi circondate da fitti boschi e palizzate iniziali. Ideale per strategie di Fast Castle, boom economico su 2 o 3 TC o raccolta indisturbata delle reliquie (HRE, Ayyubidi).'
-  },
-  'four lakes': {
-    name: 'Quattro Laghi (Four Lakes)',
-    type: 'Ibrida',
-    tips: 'I 4 laghi d\'angolo contengono banchi di pesci profondi. È tassativo costruire un Porto (Dock) e produrre pescherecci nei primi 2-3 minuti per non restare indietro nel boom economico.'
-  },
-  'quattro laghi': {
-    name: 'Quattro Laghi (Four Lakes)',
-    type: 'Ibrida',
-    tips: 'I 4 laghi d\'angolo contengono banchi di pesci profondi. È tassativo costruire un Porto (Dock) e produrre pescherecci nei primi 2-3 minuti per non restare indietro nel boom economico.'
-  },
-  'baltic': {
-    name: 'Baltico (Baltic)',
-    type: 'Ibrida / Navale',
-    tips: 'Un grande specchio d\'acqua centrale domina la mappa. La superiorità navale e il controllo delle navi da guerra con frecce/baliste decide la partita.'
-  },
-  'baltico': {
-    name: 'Baltico (Baltic)',
-    type: 'Ibrida / Navale',
-    tips: 'Un grande specchio d\'acqua centrale domina la mappa. La superiorità navale e il controllo delle navi da guerra con frecce/baliste decide la partita.'
-  },
-  'gorge': {
-    name: 'Gola (Gorge)',
-    type: 'Terrestre con Strozzature',
-    tips: 'Altopiani e corridoi centrali creano strozzature naturali. Mura di pietra ed edifici difensivi permettono di controllare le alture e proteggere le riserve d\'oro.'
-  },
-  'gola': {
-    name: 'Gola (Gorge)',
-    type: 'Terrestre con Strozzature',
-    tips: 'Altopiani e corridoi centrali creano strozzature naturali. Mura di pietra ed edifici difensivi permettono di controllare le alture e proteggere le riserve d\'oro.'
-  },
-  'golden heights': {
-    name: 'Alture Dorate (Golden Heights)',
-    type: 'Terrestre ad Alture',
-    tips: 'Collina centrale con oro abbondante e siti sacri/reliquie. Chi controlla la collina ha un vantaggio di visione e gittata per le armi da lancio.'
-  },
-  'alture dorate': {
-    name: 'Alture Dorate (Golden Heights)',
-    type: 'Terrestre ad Alture',
-    tips: 'Collina centrale con oro abbondante e siti sacri/reliquie. Chi controlla la collina ha un vantaggio di visione e gittata per le armi da lancio.'
-  },
-  'lipany': {
-    name: 'Lipany',
-    type: 'Terrestre Aperta',
-    tips: 'Mappa classica bilanciata con colline dolci. Permette sia approcci aggressivi a 1 TC sia Fast Castle in base al matchup.'
-  },
-  'oasis': {
-    name: 'Oasi (Oasis)',
-    type: 'Terrestre / Chiusa',
-    tips: 'Fitta foresta di palme che divide le due metà della mappa con uno specchio d\'acqua. Facile da murare per favorire il boom economico.'
-  },
-  'oasi': {
-    name: 'Oasi (Oasis)',
-    type: 'Terrestre / Chiusa',
-    tips: 'Fitta foresta di palme che divide le due metà della mappa con uno specchio d\'acqua. Facile da murare per favorire il boom economico.'
-  },
-  'himeyama': {
-    name: 'Himeyama',
-    type: 'Terrestre Fortificata',
-    tips: 'Collina centrale fortificabile circondata da boschi. Cruciale il controllo della zona centrale per oro e reliquie.'
-  },
-  'boulder bay': {
-    name: 'Baia dei Massi (Boulder Bay)',
-    type: 'Costiera',
-    tips: 'Costa aperta con ricche risorse ittiche. Richiede bilanciamento tra truppe terrestri e flotta da pesca/guerra.'
-  },
-  'baia dei massi': {
-    name: 'Baia dei Massi (Boulder Bay)',
-    type: 'Costiera',
-    tips: 'Costa aperta con ricche risorse ittiche. Richiede bilanciamento tra truppe terrestri e flotta da pesca/guerra.'
-  }
-};
+
 
 const CIV_NAME_TO_SLUG: Record<string, string> = {
   'jin': 'jin-dynasty',
@@ -252,54 +151,6 @@ const CIV_SUMMARIES: Record<string, string> = {
 - Unità Uniche: Elefante corazzato / Guerriero Tughlaq (Età II/III).`
 };
 
-function getMapContext(userMessage: string): string {
-  const lower = userMessage.toLowerCase();
-  for (const [key, mapInfo] of Object.entries(AOE4_MAPS)) {
-    if (lower.includes(key)) {
-      return `CONTESTO MAPPA AOE4 INDIVIDUATO: [${mapInfo.name} - Tipologia: ${mapInfo.type}]\nCONSIGLIO SPECIFICO PER QUESTA MAPPA:\n${mapInfo.tips}\nAdatta i tuoi consigli tattici e la ripartizione dei villici al layout di questa mappa!`;
-    }
-  }
-  return '';
-}
-
-async function fetchPlayerStatsContext(userMessage: string): Promise<string> {
-  const match = userMessage.match(/(?:profilo|player|giocatore|statistiche|analizza|aoe4world\.com\/players\/)\s*[:#@]?\s*([a-zA-Z0-9_\-\.\s]{3,30})/i);
-  if (!match) return '';
-  
-  const query = match[1].trim();
-  const excludedKeywords = ['inglesi', 'francesi', 'mongoli', 'rus', 'partita', 'matchup', 'consiglio', 'come', 'villi', 'build', 'order', 'fast', 'castle', 'feudal', 'imperial', 'dark'];
-  if (excludedKeywords.includes(query.toLowerCase())) {
-    return '';
-  }
-
-  try {
-    const url = `https://aoe4world.com/api/v0/players/search?query=${encodeURIComponent(query)}`;
-    const signal = safeTimeoutSignal(3000);
-    const res = await fetch(url, signal ? { signal } : {});
-    if (!res.ok) return '';
-    const json = await res.json();
-    const players: any[] = json.players || [];
-    if (players.length === 0) return '';
-
-    const p = players[0];
-    const rmSolo = p.modes?.rm_solo;
-    let text = `DATI PROFILO GIOCATORE AOE4WORLD (Player: "${p.name}", ID: ${p.profile_id}):\n`;
-    if (rmSolo) {
-      text += `- Rank Solo: ${rmSolo.rank_level || 'Non classificato'} (Rating: ${rmSolo.rating || 'N/D'})\n`;
-      text += `- Win Rate Solo: ${rmSolo.win_rate ? Number(rmSolo.win_rate).toFixed(1) : 0}% (${rmSolo.games_count || 0} partite giocate, ${rmSolo.wins_count || 0} vittorie)\n`;
-      if (rmSolo.streak !== undefined) {
-        text += `- Striscia attuale: ${rmSolo.streak > 0 ? `+${rmSolo.streak} vittorie` : rmSolo.streak < 0 ? `${rmSolo.streak} sconfitte` : '0'}\n`;
-      }
-    } else {
-      text += `- Partite totali registrate: ${p.games_count || 0}, Win Rate stimato: ${p.win_rate || 0}%\n`;
-    }
-    text += `Usa questi dati reali per dare un feedback personalizzato, amichevole ed incoraggiante da vero Coach Beasty!\n`;
-    return text;
-  } catch (e) {
-    return '';
-  }
-}
-
 async function getDynamicGroundTruth(userMessage: string, history: ChatMessage[] = []): Promise<string> {
   const combinedText = (userMessage + ' ' + history.map(m => m.text).join(' ')).toLowerCase();
   
@@ -351,20 +202,16 @@ async function getDynamicGroundTruth(userMessage: string, history: ChatMessage[]
                 truthStr += `      Villi consigliati: Cibo ${bo.villi.food || 0}, Legna ${bo.villi.wood || 0}, Oro ${bo.villi.gold || 0}, Pietra ${bo.villi.stone || 0}\n`;
               }
               if (bo.steps && Array.isArray(bo.steps) && bo.steps.length > 0) {
-                const stepSummaries = bo.steps.slice(0, 6).map((s: any, sIdx: number) => {
-                  const time = s.timing || s.time ? `[${s.timing || s.time}] ` : '';
-                  const desc = s.description || s.text || s.title || '';
-                  return `${sIdx + 1}. ${time}${desc}`;
-                }).filter(Boolean);
+                const stepSummaries = bo.steps.slice(0, 3).map((s: any) => s.description || s.text || '').filter(Boolean);
                 if (stepSummaries.length > 0) {
-                  truthStr += `      Passi BO Dettagliati:\n        ${stepSummaries.join('\n        ')}\n`;
+                  truthStr += `      Passi BO: ${stepSummaries.join(' | ')}\n`;
                 }
               }
             }
           }
 
           if (civ.passive_bonuses && Array.isArray(civ.passive_bonuses) && civ.passive_bonuses.length > 0) {
-            const bonusTitles = civ.passive_bonuses.slice(0, 4).map((b: any) => b.title || b.name || b).filter(Boolean);
+            const bonusTitles = civ.passive_bonuses.slice(0, 3).map((b: any) => b.title || b.name || b).filter(Boolean);
             if (bonusTitles.length > 0) {
               truthStr += `  - Bonus passivi principali: ${bonusTitles.join(', ')}\n`;
             }
@@ -568,8 +415,7 @@ async function fetchGeminiResponse(geminiApiKey: string, promptText: string) {
           generationConfig: {
             temperature: 0.15,
             topP: 0.8,
-            topK: 30,
-            responseMimeType: "application/json"
+            topK: 30
           }
         }),
         ...(signal ? { signal } : {})
@@ -609,8 +455,7 @@ async function fetchGroqResponse(groqApiKey: string, promptText: string) {
           model: model,
           messages: [{ role: 'user', content: promptText }],
           temperature: 0.15,
-          max_tokens: 1200,
-          response_format: { type: "json_object" }
+          max_tokens: 1000
         }),
         ...(signal ? { signal } : {})
       });
@@ -683,8 +528,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const siteKnowledge = await fetchSiteKnowledge();
     const matchupLiveStats = await fetchMatchupContext(message);
-    const mapContext = getMapContext(message);
-    const playerStatsContext = await fetchPlayerStatsContext(message);
     const relevantGroundTruth = await getDynamicGroundTruth(message, history);
 
     let formattedHistory = '';
@@ -763,15 +606,13 @@ PERSONALITÀ, TONO & GAMER SLANG DI COACH BEASTY:
     : `* L'utente non è loggato: puoi iniziare scherzosamente con un tocco amichevole (es. *"Tranquillo **nabbo**, ti spiego io la giocata giusta!"*), ma usa la parola **nabbo** al massimo UNA SOLA VOLTA all'inizio o alla fine, senza ripeterla continuamente nel corpo della risposta!`}
 - **Chiusura da Coach**: A volte puoi chiudere con una battuta carica (es. *"Esegui questa build e poi è GG!"*, *"Fallo bene e vedrai l'avversario arrendersi prima dell'Età 3!"*).
 
-FORMATO RISPOSTA JSON (MANDATORIO!):
-Rispondi ESCLUSIVAMENTE con un JSON valido con questa struttura esatta:
+FORMATO RISPOSTA JSON:
+Rispondi ESCLUSIVAMENTE in formato JSON valido con questa struttura:
 {
-  "reply": "spiegazione tattica in italiano spigliato e chiaro in markdown citando statistiche/win rate reali e consigli precisi",
+  "reply": "spiegazione tattica in italiano spigliato e chiaro in markdown citando i win rate reali se richiesti",
   "tacticalCard": {
-    "title": "Titolo opzionale in italiano (es. Fast Castle HRE / Difesa contro Cavalleria)",
-    "age": "Opzionale (es. Dark Age / Feudal Age / Castle Age / Imperial Age)",
-    "mapTip": "Consiglio pratico per la mappa individuata (opzionale)",
-    "timingTip": "Minutaggio chiave (es. Feudale al 4:15, Castle Age al 7:30)",
+    "title": "Titolo opzionale in italiano",
+    "age": "Opzionale (es. Feudal Age / Dark Age / Castle Age / Imperial Age)",
     "counterUnits": [
       { "name": "Nome Unità Counter", "icon": "Emoji", "role": "Ruolo breve" }
     ],
@@ -781,12 +622,11 @@ Rispondi ESCLUSIVAMENTE con un JSON valido con questa struttura esatta:
       "gold": 0,
       "stone": 0
     },
-    "proTip": "Consiglio tattico pratico",
-    "buildOrderLink": "Opzionale link relativo al BO sul sito (es. /civ/english/buildorders)"
+    "proTip": "Consiglio tattico pratico"
   }
 }`;
 
-    const promptText = `${systemPrompt}\n\n${matchupLiveStats ? `DATI REALI MATCHUP DAL SITO:\n${matchupLiveStats}\n\n` : ''}${mapContext ? `${mapContext}\n\n` : ''}${playerStatsContext ? `${playerStatsContext}\n\n` : ''}${siteKnowledge ? `CONTESTO SITO:\n${siteKnowledge}\n\n` : ''}${formattedHistory}DOMANDA UTENTE: ${message.trim()}`;
+    const promptText = `${systemPrompt}\n\n${matchupLiveStats ? `DATI REALI MATCHUP DAL SITO:\n${matchupLiveStats}\n\n` : ''}${siteKnowledge ? `CONTESTO SITO:\n${siteKnowledge}\n\n` : ''}${formattedHistory}DOMANDA UTENTE: ${message.trim()}`;
 
     const rawResultText = await generateWithModelFallback(promptText);
 
