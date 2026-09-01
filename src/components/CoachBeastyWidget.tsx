@@ -24,7 +24,7 @@ const QUICK_PROMPTS = [
   { label: '⚡ Fast Castle', prompt: 'Qual è la strategia migliore per una Fast Castle sicura ed efficace?' },
   { label: '🛡️ Counter Unità', prompt: 'Qual è la tabella completa dei counter delle unità in AoE4?' },
   { label: '📊 Win Rate Live', prompt: 'Qual è la classifica aggiornata dei win rate delle civiltà del sito?' },
-  { label: '🗺️ Guida Four Lakes', prompt: 'Come approcciare la mappa Four Lakes (Quattro Laghi) e quando aprire il porto?' },
+  { label: '🗺️ Guida Mappa', prompt: 'Vorrei una guida strategica per una mappa di AoE4!' },
   { label: '👤 Analizza Profilo', prompt: 'Vorrei che analizzassi il mio profilo AoE4World!' }
 ];
 
