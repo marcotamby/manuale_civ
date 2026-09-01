@@ -265,13 +265,14 @@ function getMapContext(userMessage: string): string {
 async function fetchPlayerStatsContext(userMessage: string): Promise<string> {
   const cleanMsg = userMessage.trim();
   
-  // 1. Direct URL extraction for aoe4world.com/players/<id>
+  // 1. Direct URL extraction for aoe4world.com/players/<id> optionally followed by name slug
   const urlMatch = cleanMsg.match(/aoe4world\.com\/players\/(\d+)(?:-([^\s/?#]+))?/i);
   let profileId = urlMatch ? urlMatch[1] : '';
+  let urlSlug = urlMatch && urlMatch[2] ? urlMatch[2].trim() : '';
   let searchQuery = '';
 
   if (!profileId) {
-    // 2. Query extraction from common intents (e.g. "il mio username è MarineLorD", "analizza il player Beasty", etc.)
+    // 2. Query extraction from common intents (e.g. "il mio username è marcotamby", "analizza il player Beasty", etc.)
     const nameMatch = cleanMsg.match(/\b(?:profilo|player|giocatore|statistiche|analizza|analizzare|username|account|chiamo|sono)\b(?:\s+(?:di|del|dell'utente|su|il|mio|mia|mie|miei|è|e|in-game|in\s*game|profilo|player|giocatore|statistiche|account|username))+\s*[:#@]?\s*([a-zA-Z0-9_\-\.]{3,30})/i);
     if (nameMatch) {
       searchQuery = nameMatch[1].trim();
@@ -285,7 +286,7 @@ async function fetchPlayerStatsContext(userMessage: string): Promise<string> {
     'inglesi', 'francesi', 'mongoli', 'rus', 'partita', 'matchup', 'consiglio', 'come', 'villi', 'build',
     'order', 'fast', 'castle', 'feudal', 'imperial', 'dark', 'mucche', 'drago', 'cinesi', 'ottomani',
     'maliani', 'delhi', 'giapponesi', 'bisantini', 'ayyubids', 'zhuxi', 'lancaster', 'templar', 'sengoku',
-    'macedonian', 'goldenhorde', 'tughlaq', 'guida', 'mappa'
+    'macedonian', 'goldenhorde', 'tughlaq', 'guida', 'mappa', 'mie', 'mio', 'miei', 'nostro', 'nostri'
   ];
   if (searchQuery && excludedKeywords.includes(searchQuery.toLowerCase())) {
     searchQuery = '';
@@ -300,14 +301,25 @@ async function fetchPlayerStatsContext(userMessage: string): Promise<string> {
 
     if (profileId) {
       const url = `https://aoe4world.com/api/v0/players/${profileId}`;
-      const signal = safeTimeoutSignal(3500);
+      const signal = safeTimeoutSignal(4000);
       const res = await fetch(url, signal ? { signal } : {});
       if (res.ok) {
         playerData = await res.json();
+      } else if (res.status === 404 && urlSlug) {
+        // Fallback: if numeric ID was invalid but slug exists (e.g. players/123-marcotamby), search by slug
+        const searchRes = await fetch(`https://aoe4world.com/api/v0/players/search?query=${encodeURIComponent(urlSlug)}`, signal ? { signal } : {});
+        if (searchRes.ok) {
+          const sJson = await searchRes.json();
+          const pList = sJson.players || [];
+          if (pList.length > 0 && pList[0].profile_id) {
+            const detailRes = await fetch(`https://aoe4world.com/api/v0/players/${pList[0].profile_id}`, signal ? { signal } : {});
+            if (detailRes.ok) playerData = await detailRes.json();
+          }
+        }
       }
     } else if (searchQuery) {
       const url = `https://aoe4world.com/api/v0/players/search?query=${encodeURIComponent(searchQuery)}`;
-      const signal = safeTimeoutSignal(3500);
+      const signal = safeTimeoutSignal(4000);
       const res = await fetch(url, signal ? { signal } : {});
       if (res.ok) {
         const json = await res.json();
@@ -328,7 +340,9 @@ async function fetchPlayerStatsContext(userMessage: string): Promise<string> {
       }
     }
 
-    if (!playerData) return '';
+    if (!playerData) {
+      return `ESITO RICERCA PROFILO AOE4WORLD: Il link o username "${userMessage}" non è stato trovato nei server pubblici di AoE4World.\nISTRUZIONE PER IL COACH: Spiega gentilmente all'utente che il profilo con questo link/nome non risulta registrato o è privato su AoE4World, e chiedigli di verificare il link o fornirti il suo username esatto in gioco!\n`;
+    }
 
     const name = playerData.name || searchQuery || 'Giocatore';
     const pId = playerData.profile_id || profileId || '';
@@ -358,11 +372,11 @@ async function fetchPlayerStatsContext(userMessage: string): Promise<string> {
 
     const civStats: any[] = rmSolo?.civilizations || [];
     if (civStats.length > 0) {
-      const topCivs = civStats.slice(0, 4).map((c: any) => `${c.civilization}: ${c.win_rate ? Number(c.win_rate).toFixed(0) : 0}% WR (${c.games_count} partite)`).join(', ');
+      const topCivs = civStats.slice(0, 5).map((c: any) => `${c.civilization}: ${c.win_rate ? Number(c.win_rate).toFixed(0) : 0}% WR (${c.games_count} partite)`).join(', ');
       text += `- Civiltà più giocate: ${topCivs}\n`;
     }
 
-    text += `ISTRUZIONE PER IL COACH: Riconosci esplicitamente il profilo e cita questi dati REALI (nome, rank, rating, win rate, vittorie/sconfitte). Dai consigli mirati e incoraggianti sul livello effettivo del giocatore!\n`;
+    text += `ISTRUZIONE PER IL COACH: Riconosci esplicitamente il profilo e cita questi dati REALI (nome, rank, rating, win rate, vittorie/sconfitte, civiltà migliori e peggiori). Dai consigli mirati ed entusiasti sul livello effettivo del giocatore per farlo salire di rank!\n`;
 
     return text;
   } catch (e) {
@@ -629,7 +643,7 @@ async function fetchGeminiResponse(geminiApiKey: string, promptText: string) {
   for (const model of GEMINI_MODELS) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`;
-      const signal = safeTimeoutSignal(4000);
+      const signal = safeTimeoutSignal(9000);
       const geminiRes = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -668,7 +682,7 @@ async function fetchGroqResponse(groqApiKey: string, promptText: string) {
   for (const model of GROQ_MODELS) {
     try {
       const url = 'https://api.groq.com/openai/v1/chat/completions';
-      const signal = safeTimeoutSignal(4000);
+      const signal = safeTimeoutSignal(6000);
       const res = await fetch(url, {
         method: 'POST',
         headers: {
@@ -679,7 +693,7 @@ async function fetchGroqResponse(groqApiKey: string, promptText: string) {
           model: model,
           messages: [{ role: 'user', content: promptText }],
           temperature: 0.15,
-          max_tokens: 1200,
+          max_tokens: 2500,
           response_format: { type: "json_object" }
         }),
         ...(signal ? { signal } : {})
