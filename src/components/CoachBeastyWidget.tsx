@@ -70,7 +70,7 @@ const FUNNEL_CATEGORIES: FunnelCategory[] = [
     icon: '⚔️',
     description: 'Fanteria, Cavalleria, Arcieri, Assedio',
     options: [
-      { label: '🗡️ Quali sono i counter principali per ogni unità?', prompt: 'Qual è la tabella completa delle contromisure delle unità in AoE4?' },
+      { label: '🗡️ Quali sono i counter principali per ogni unità?', prompt: 'Qual è la tabella completa dei counter delle unità in AoE4?' },
       { label: '🪵 Come contrastare le armi d\'assedio?', prompt: 'Qual è il modo migliore per distruggere Manganelli e Bombarde nemiche?' },
       { label: '🐎 Quando produrre la Cavalleria Leggera?', prompt: 'In quali situazioni la Cavalleria Leggera è la scelta migliore?' }
     ]
@@ -117,8 +117,8 @@ export const CoachBeastyWidget: React.FC = () => {
         id: 'welcome',
         sender: 'coach',
         text: displayName !== 'utente' 
-          ? `Ciao **${displayName}**! 👋 Sono **Coach Beasty AI**.\n\nChiedimi consigli su matchup, win rate reali, contromisure delle unità, posizionamento o distribuzione dei villi!`
-          : `Ciao **nabbo**! 👋 Sono **Coach Beasty AI**.\n\nChiedimi consigli su matchup, win rate reali, contromisure delle unità, posizionamento o distribuzione dei villi!`,
+          ? `Ciao **${displayName}**! 👋 Sono **Coach Beasty AI**.\n\nChiedimi consigli su matchup, win rate reali, counter delle unità, posizionamento o distribuzione dei villi!`
+          : `Ciao **nabbo**! 👋 Sono **Coach Beasty AI**.\n\nChiedimi consigli su matchup, win rate reali, counter delle unità, posizionamento o distribuzione dei villi!`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
     ]);
