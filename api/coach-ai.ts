@@ -730,23 +730,23 @@ async function generateWithModelFallback(promptText: string) {
   const geminiApiKey = (process.env.GEMINI_API_KEY || DEFAULT_GEMINI_KEY).trim();
   const groqApiKey = (process.env.GROQ_API_KEY || DEFAULT_GROQ_KEY).trim();
 
-  // 1. Try Gemini models first
-  if (geminiApiKey) {
-    try {
-      const geminiReply = await fetchGeminiResponse(geminiApiKey, promptText);
-      if (geminiReply) return geminiReply;
-    } catch (err) {
-      console.warn('Gemini non disponibile, tento fallback su Groq...', err);
-    }
-  }
-
-  // 2. Fallback to Groq
+  // 1. Try ultra-fast Groq models first (lightning fast ~200-500ms response time)
   if (groqApiKey) {
     try {
       const groqReply = await fetchGroqResponse(groqApiKey, promptText);
       if (groqReply) return groqReply;
     } catch (gErr) {
-      console.warn('Errore fallback Groq API:', gErr);
+      console.warn('Groq non disponibile, tento fallback su Gemini...', gErr);
+    }
+  }
+
+  // 2. Fallback to Gemini models
+  if (geminiApiKey) {
+    try {
+      const geminiReply = await fetchGeminiResponse(geminiApiKey, promptText);
+      if (geminiReply) return geminiReply;
+    } catch (err) {
+      console.warn('Gemini non disponibile:', err);
     }
   }
 
