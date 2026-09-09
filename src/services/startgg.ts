@@ -175,6 +175,7 @@ export async function fetchPhaseGroupSets(phaseGroupId: string): Promise<StartGG
         sets(page: 1, perPage: 100, sortType: STANDARD) {
           nodes {
             id
+            winnerId
             fullRoundText
             round
             displayScore

@@ -687,7 +687,7 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
   };
 
   const handleSyncStartggNow = async (overridePhaseId?: string, overrideDayNumber?: number) => {
-    const phaseToSync = overridePhaseId || selectedPhaseIdRef.current;
+    const phaseToSync = overridePhaseId || selectedPhaseIdRef.current || stateRef.current?.startgg?.phaseId;
     if (!phaseToSync) {
       setStartggStatus({ type: 'error', message: 'Seleziona prima una fase del torneo.' });
       return;
@@ -737,17 +737,77 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
         const p1Name = slot1?.entrant?.name || '--';
         const p2Name = slot2?.entrant?.name || '--';
 
-        const p1Score = slot1?.standing?.stats?.score?.value ?? 0;
-        const p2Score = slot2?.standing?.stats?.score?.value ?? 0;
+        const p1EntrantId = slot1?.entrant?.id;
+        const p2EntrantId = slot2?.entrant?.id;
+
+        let p1Score = slot1?.standing?.stats?.score?.value ?? null;
+        let p2Score = slot2?.standing?.stats?.score?.value ?? null;
+
+        // Parse displayScore if scores are null
+        if ((p1Score === null || p2Score === null) && set.displayScore) {
+          const parts = set.displayScore.split(' - ');
+          if (parts.length === 2) {
+            const m1 = parts[0].match(/(\d+)\s*$/);
+            const m2 = parts[1].match(/(\d+)\s*$/);
+            if (m1 && m2) {
+              const namePart1 = parts[0].slice(0, m1.index).trim().toLowerCase();
+              const s1 = parseInt(m1[1], 10);
+              const s2 = parseInt(m2[1], 10);
+              if (p1Name && namePart1.includes(p1Name.toLowerCase())) {
+                p1Score = s1;
+                p2Score = s2;
+              } else if (p2Name && namePart1.includes(p2Name.toLowerCase())) {
+                p1Score = s2;
+                p2Score = s1;
+              } else {
+                p1Score = s1;
+                p2Score = s2;
+              }
+            } else {
+              const mAlt = set.displayScore.match(/(\d+)\s*-\s*(\d+)/);
+              if (mAlt) {
+                p1Score = parseInt(mAlt[1], 10);
+                p2Score = parseInt(mAlt[2], 10);
+              }
+            }
+          }
+        }
+
+        const finalP1Score = p1Score !== null ? p1Score : 0;
+        const finalP2Score = p2Score !== null ? p2Score : 0;
 
         let winner: 0 | 1 | 2 = 0;
-        if (set.winnerId) {
-          if (String(slot1?.entrant?.id) === String(set.winnerId)) winner = 1;
-          else if (String(slot2?.entrant?.id) === String(set.winnerId)) winner = 2;
-        } else if (p1Score > p2Score) {
-          winner = 1;
-        } else if (p2Score > p1Score) {
-          winner = 2;
+        if (set.winnerId != null) {
+          if (p1EntrantId != null && String(p1EntrantId) === String(set.winnerId)) {
+            winner = 1;
+          } else if (p2EntrantId != null && String(p2EntrantId) === String(set.winnerId)) {
+            winner = 2;
+          }
+        }
+
+        if (winner === 0) {
+          if (finalP1Score > finalP2Score) {
+            winner = 1;
+          } else if (finalP2Score > finalP1Score) {
+            winner = 2;
+          } else if (set.state === 3) {
+            if (set.displayScore) {
+              const lower = set.displayScore.toLowerCase();
+              if (lower.startsWith(p1Name.toLowerCase()) && (lower.includes(' w ') || lower.includes(' def '))) {
+                winner = 1;
+              } else if (lower.startsWith(p2Name.toLowerCase()) && (lower.includes(' w ') || lower.includes(' def '))) {
+                winner = 2;
+              }
+            }
+          }
+        }
+
+        let resolvedP1Score = finalP1Score;
+        let resolvedP2Score = finalP2Score;
+        if (winner === 1 && resolvedP1Score === 0 && resolvedP2Score === 0) {
+          resolvedP1Score = 1;
+        } else if (winner === 2 && resolvedP1Score === 0 && resolvedP2Score === 0) {
+          resolvedP2Score = 1;
         }
 
         // PRESERVE CIVS FROM EXISTING STATE (do not overwrite user-selected civs)
@@ -779,8 +839,8 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
 
         parsedRounds[roundNum].push({
           id: set.id,
-          p1: { name: p1Name, civId: p1CivId, score: p1Score },
-          p2: { name: p2Name, civId: p2CivId, score: p2Score },
+          p1: { name: p1Name, civId: p1CivId, score: resolvedP1Score },
+          p2: { name: p2Name, civId: p2CivId, score: resolvedP2Score },
           winner
         });
 
@@ -828,7 +888,7 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
           eventId: selectedEventIdRef.current,
           phaseId: phaseToSync,
           autoSync: isAutoSyncingRef.current,
-          syncInterval: 20,
+          syncInterval: 12,
           lastSyncedAt: new Date().toLocaleTimeString()
         }
       };
@@ -851,10 +911,11 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
 
   // Auto-Sync
   useEffect(() => {
-    if (!isAutoSyncing || !selectedPhaseId) return;
+    const activePhase = selectedPhaseId || stateRef.current?.startgg?.phaseId;
+    if (!isAutoSyncing || !activePhase) return;
     const interval = setInterval(() => {
       handleSyncStartggNow();
-    }, 20000);
+    }, 12000);
     return () => clearInterval(interval);
   }, [isAutoSyncing, selectedPhaseId]);
 

@@ -960,20 +960,23 @@
                     const p1Flag = getCivFlagUrl(m.p1?.civId);
                     const p2Flag = getCivFlagUrl(m.p2?.civId);
 
+                    const p1ScoreDisplay = isDone ? `${p1Score}${p1Winner ? ' 🏆' : ''}` : '-';
+                    const p2ScoreDisplay = isDone ? `${p2Score}${p2Winner ? ' 🏆' : ''}` : '-';
+
                     matchCard.innerHTML = `
                         <div class="match-participant ${p1Winner ? 'is-winner' : ''} ${isDone && !p1Winner ? 'is-loser' : ''}">
                             ${p1Flag ? `<div class="match-participant-flag" style="background-image: url('${p1Flag}')"></div>` : ''}
                             <div class="participant-left">
                                 <span class="participant-name">${escapeHtml(p1Name)}</span>
                             </div>
-                            <span class="participant-score">${isDone ? (p1Winner ? '🏆' : p1Score) : '-'}</span>
+                            <span class="participant-score">${p1ScoreDisplay}</span>
                         </div>
                         <div class="match-participant ${p2Winner ? 'is-winner' : ''} ${isDone && !p2Winner ? 'is-loser' : ''}">
                             ${p2Flag ? `<div class="match-participant-flag" style="background-image: url('${p2Flag}')"></div>` : ''}
                             <div class="participant-left">
                                 <span class="participant-name">${escapeHtml(p2Name)}</span>
                             </div>
-                            <span class="participant-score">${isDone ? (p2Winner ? '🏆' : p2Score) : '-'}</span>
+                            <span class="participant-score">${p2ScoreDisplay}</span>
                         </div>
                     `;
 
@@ -988,16 +991,229 @@
             return String(text).replace(/[&<>"']/g, m => map[m]);
         }
 
+        let latestState = null;
+        let isSyncingStartgg = false;
+        let lastStartggSyncTime = 0;
+
+        async function checkAndSyncStartgg(state) {
+            if (!state || !state.startgg?.autoSync || !state.startgg?.phaseId) return;
+            const now = Date.now();
+            if (isSyncingStartgg || (now - lastStartggSyncTime < 12000)) return;
+            isSyncingStartgg = true;
+            lastStartggSyncTime = now;
+
+            try {
+                const phaseId = String(state.startgg.phaseId);
+                const groupsRes = await fetch('/api/startgg', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        query: `query PhaseGroups($id: ID!) { phase(id: $id) { phaseGroups { nodes { id } } } }`,
+                        variables: { id: phaseId }
+                    })
+                });
+                if (!groupsRes.ok) return;
+                const groupsData = await groupsRes.json();
+                const groupNodes = groupsData?.data?.phase?.phaseGroups?.nodes || [];
+                if (groupNodes.length === 0) return;
+
+                const allSetsPromises = groupNodes.map(async g => {
+                    const sRes = await fetch('/api/startgg', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            query: `query PhaseGroupSets($id: ID!) {
+                                phaseGroup(id: $id) {
+                                    sets(page: 1, perPage: 100, sortType: STANDARD) {
+                                        nodes {
+                                            id
+                                            winnerId
+                                            round
+                                            state
+                                            displayScore
+                                            slots {
+                                                entrant { id name }
+                                                standing { stats { score { value } } }
+                                            }
+                                        }
+                                    }
+                                }
+                            }`,
+                            variables: { id: g.id }
+                        })
+                    });
+                    if (!sRes.ok) return [];
+                    const sData = await sRes.json();
+                    return sData?.data?.phaseGroup?.sets?.nodes || [];
+                });
+
+                const setsArrays = await Promise.all(allSetsPromises);
+                const allSets = setsArrays.flat();
+                if (allSets.length === 0) return;
+
+                const existingRounds = state.rounds || {};
+                const parsedRounds = { 1: [], 2: [], 3: [], 4: [] };
+                const playerStats = {};
+
+                allSets.forEach(set => {
+                    const roundNum = Math.min(Math.max(Math.abs(set.round || 1), 1), 4);
+                    const slot1 = set.slots?.[0];
+                    const slot2 = set.slots?.[1];
+                    const p1Name = slot1?.entrant?.name || '--';
+                    const p2Name = slot2?.entrant?.name || '--';
+                    const p1EntrantId = slot1?.entrant?.id;
+                    const p2EntrantId = slot2?.entrant?.id;
+
+                    let p1Score = slot1?.standing?.stats?.score?.value ?? null;
+                    let p2Score = slot2?.standing?.stats?.score?.value ?? null;
+
+                    if ((p1Score === null || p2Score === null) && set.displayScore) {
+                        const parts = set.displayScore.split(' - ');
+                        if (parts.length === 2) {
+                            const m1 = parts[0].match(/(\d+)\s*$/);
+                            const m2 = parts[1].match(/(\d+)\s*$/);
+                            if (m1 && m2) {
+                                const namePart1 = parts[0].slice(0, m1.index).trim().toLowerCase();
+                                const s1 = parseInt(m1[1], 10);
+                                const s2 = parseInt(m2[1], 10);
+                                if (p1Name && namePart1.includes(p1Name.toLowerCase())) {
+                                    p1Score = s1; p2Score = s2;
+                                } else if (p2Name && namePart1.includes(p2Name.toLowerCase())) {
+                                    p1Score = s2; p2Score = s1;
+                                } else {
+                                    p1Score = s1; p2Score = s2;
+                                }
+                            } else {
+                                const mAlt = set.displayScore.match(/(\d+)\s*-\s*(\d+)/);
+                                if (mAlt) {
+                                    p1Score = parseInt(mAlt[1], 10);
+                                    p2Score = parseInt(mAlt[2], 10);
+                                }
+                            }
+                        }
+                    }
+
+                    const finalP1Score = p1Score !== null ? p1Score : 0;
+                    const finalP2Score = p2Score !== null ? p2Score : 0;
+
+                    let winner = 0;
+                    if (set.winnerId != null) {
+                        if (p1EntrantId != null && String(p1EntrantId) === String(set.winnerId)) winner = 1;
+                        else if (p2EntrantId != null && String(p2EntrantId) === String(set.winnerId)) winner = 2;
+                    }
+
+                    if (winner === 0) {
+                        if (finalP1Score > finalP2Score) winner = 1;
+                        else if (finalP2Score > finalP1Score) winner = 2;
+                        else if (set.state === 3 && set.displayScore) {
+                            const lower = set.displayScore.toLowerCase();
+                            if (lower.startsWith(p1Name.toLowerCase()) && (lower.includes(' w ') || lower.includes(' def '))) winner = 1;
+                            else if (lower.startsWith(p2Name.toLowerCase()) && (lower.includes(' w ') || lower.includes(' def '))) winner = 2;
+                        }
+                    }
+
+                    let resolvedP1Score = finalP1Score;
+                    let resolvedP2Score = finalP2Score;
+                    if (winner === 1 && resolvedP1Score === 0 && resolvedP2Score === 0) resolvedP1Score = 1;
+                    else if (winner === 2 && resolvedP1Score === 0 && resolvedP2Score === 0) resolvedP2Score = 1;
+
+                    // Preserve civs
+                    const existingMatchesForRound = existingRounds[roundNum] || [];
+                    const existingMatch = existingMatchesForRound.find(m => 
+                        m.id === set.id ||
+                        (m.p1?.name && m.p2?.name && p1Name !== '--' && p2Name !== '--' && (
+                            (m.p1.name.toLowerCase().trim() === p1Name.toLowerCase().trim() && m.p2.name.toLowerCase().trim() === p2Name.toLowerCase().trim()) ||
+                            (m.p1.name.toLowerCase().trim() === p2Name.toLowerCase().trim() && m.p2.name.toLowerCase().trim() === p1Name.toLowerCase().trim())
+                        ))
+                    );
+
+                    let p1CivId = '';
+                    let p2CivId = '';
+                    if (existingMatch) {
+                        if (existingMatch.p1?.name?.toLowerCase().trim() === p1Name.toLowerCase().trim()) p1CivId = existingMatch.p1.civId || '';
+                        else if (existingMatch.p2?.name?.toLowerCase().trim() === p1Name.toLowerCase().trim()) p1CivId = existingMatch.p2.civId || '';
+                        if (existingMatch.p2?.name?.toLowerCase().trim() === p2Name.toLowerCase().trim()) p2CivId = existingMatch.p2.civId || '';
+                        else if (existingMatch.p1?.name?.toLowerCase().trim() === p2Name.toLowerCase().trim()) p2CivId = existingMatch.p1.civId || '';
+                    }
+
+                    parsedRounds[roundNum].push({
+                        id: set.id,
+                        p1: { name: p1Name, civId: p1CivId, score: resolvedP1Score },
+                        p2: { name: p2Name, civId: p2CivId, score: resolvedP2Score },
+                        winner
+                    });
+
+                    [p1Name, p2Name].forEach(name => {
+                        if (name && name !== '--' && !playerStats[name.toLowerCase()]) {
+                            playerStats[name.toLowerCase()] = { name, wins: 0, losses: 0, points: 0 };
+                        }
+                    });
+
+                    if (winner === 1 && p1Name !== '--') {
+                        playerStats[p1Name.toLowerCase()].wins += 1;
+                        playerStats[p1Name.toLowerCase()].points += 1;
+                        if (p2Name !== '--') playerStats[p2Name.toLowerCase()].losses += 1;
+                    } else if (winner === 2 && p2Name !== '--') {
+                        playerStats[p2Name.toLowerCase()].wins += 1;
+                        playerStats[p2Name.toLowerCase()].points += 1;
+                        if (p1Name !== '--') playerStats[p1Name.toLowerCase()].losses += 1;
+                    }
+                });
+
+                const syncedStandings = Object.values(playerStats)
+                    .map((p, i) => ({
+                        id: `startgg_${i + 1}`,
+                        name: p.name,
+                        wins: p.wins,
+                        losses: p.losses,
+                        points: p.points,
+                        tieBreak: 0
+                    }))
+                    .sort((a, b) => {
+                        if (b.points !== a.points) return b.points - a.points;
+                        if (b.wins !== a.wins) return b.wins - a.wins;
+                        return a.losses - b.losses;
+                    });
+
+                const roundsChanged = JSON.stringify(parsedRounds) !== JSON.stringify(state.rounds);
+                const standingsChanged = JSON.stringify(syncedStandings) !== JSON.stringify(state.standings);
+
+                if (roundsChanged || standingsChanged) {
+                    const updatedState = {
+                        ...state,
+                        rounds: parsedRounds,
+                        standings: syncedStandings.length > 0 ? syncedStandings : state.standings,
+                        startgg: {
+                            ...state.startgg,
+                            lastSyncedAt: new Date().toLocaleTimeString()
+                        }
+                    };
+                    latestState = updatedState;
+                    render(updatedState);
+                    await client.from('stream_overlays').update({ state: updatedState }).eq('id', OVERLAY_ID);
+                }
+            } catch (e) {
+                console.warn('Auto-sync startgg error in overlay:', e);
+            } finally {
+                isSyncingStartgg = false;
+            }
+        }
+
         async function init() {
             try {
                 const { data } = await client.from('stream_overlays').select('state, background_url, display_name').eq('id', OVERLAY_ID).single();
-                if (data) render(data.state, data.background_url, data.display_name);
+                if (data) {
+                    latestState = data.state;
+                    render(data.state, data.background_url, data.display_name);
+                    checkAndSyncStartgg(data.state);
+                }
             } catch (err) {
                 console.error('Init error:', err);
             }
 
             client.channel(`public:${OVERLAY_ID}`)
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stream_overlays', filter: `id=eq.${OVERLAY_ID}` }, payload => {
+                    latestState = payload.new.state;
                     render(payload.new.state, payload.new.background_url, payload.new.display_name);
                 })
                 .subscribe();
@@ -1005,7 +1221,11 @@
             setInterval(async () => {
                 try {
                     const { data } = await client.from('stream_overlays').select('state, background_url, display_name').eq('id', OVERLAY_ID).single();
-                    if (data) render(data.state, data.background_url, data.display_name);
+                    if (data) {
+                        latestState = data.state;
+                        render(data.state, data.background_url, data.display_name);
+                        checkAndSyncStartgg(data.state);
+                    }
                 } catch (e) {}
             }, 5000);
         }
