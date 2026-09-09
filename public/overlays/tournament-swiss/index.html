@@ -865,12 +865,13 @@
             const goldCount = Number.isInteger(state.goldSlotsCount) ? state.goldSlotsCount : 2;
             const silverCount = Number.isInteger(state.silverSlotsCount) ? state.silverSlotsCount : 2;
 
-            // Check if any match has been played or any points/wins/losses recorded
+            // Se tutti sono a 0 punti prima di giocare il primo game, nessuna riga colorata d'oro o d'argento sui primi 4!
+            const allAtZero = standings.length > 0 && standings.every(p => (p.points || 0) === 0 && (p.wins || 0) === 0 && (p.losses || 0) === 0);
             const hasAnyGame = standings.some(p => ((p.wins || 0) + (p.losses || 0)) > 0 || (p.points || 0) > 0);
             const hasRoundMatchesCompleted = Object.values(state.rounds || {}).some(
                 roundMatches => Array.isArray(roundMatches) && roundMatches.some(m => (m.winner === 1 || m.winner === 2) || ((m.p1?.score || 0) > 0 || (m.p2?.score || 0) > 0))
             );
-            const hasStarted = hasAnyGame || hasRoundMatchesCompleted;
+            const hasStarted = !allAtZero && (hasAnyGame || hasRoundMatchesCompleted);
 
             standings.forEach((player, index) => {
                 const rank = index + 1;

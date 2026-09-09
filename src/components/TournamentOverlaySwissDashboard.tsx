@@ -705,10 +705,10 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
       });
 
       const parsedRounds: Record<number, SwissMatchItem[]> = {
-        1: roundsWithSets.has(1) ? [] : [...(existingRounds[1] || [])],
-        2: roundsWithSets.has(2) ? [] : [...(existingRounds[2] || [])],
-        3: roundsWithSets.has(3) ? [] : [...(existingRounds[3] || [])],
-        4: roundsWithSets.has(4) ? [] : [...(existingRounds[4] || [])],
+        1: [],
+        2: [],
+        3: [],
+        4: [],
       };
       const playerStats: Record<string, { name: string; wins: number; losses: number; points: number }> = {};
 
