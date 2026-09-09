@@ -443,6 +443,19 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
     handleSave(newState);
   };
 
+  const handleClearRound = (roundNum: number) => {
+    const newState = {
+      ...state,
+      rounds: {
+        ...state.rounds,
+        [roundNum]: []
+      }
+    };
+    setState(newState);
+    stateRef.current = newState;
+    handleSave(newState);
+  };
+
   const handleUpdateMatch = (roundNum: number, matchIndex: number, updatedFields: Partial<SwissMatchItem>, immediateSave = false) => {
     const currentMatches = [...(state.rounds[roundNum] || [])];
     currentMatches[matchIndex] = { ...currentMatches[matchIndex], ...updatedFields };
@@ -594,9 +607,12 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
       }
     }
 
+    const isNewDay = newDay !== stateRef.current.dayNumber;
     const updatedState = {
       ...stateRef.current,
       dayNumber: newDay,
+      rounds: isNewDay ? { 1: [], 2: [], 3: [], 4: [] } : stateRef.current.rounds,
+      ...(isNewDay ? { standings: [] } : {}),
       ...(targetPhaseId ? {
         startgg: {
           ...stateRef.current.startgg,
@@ -1049,11 +1065,12 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {(() => {
+                    const allAtZero = state.standings.length > 0 && state.standings.every(p => (p.points || 0) === 0 && (p.wins || 0) === 0 && (p.losses || 0) === 0);
                     const hasAnyGame = state.standings.some(p => ((p.wins || 0) + (p.losses || 0)) > 0 || (p.points || 0) > 0);
                     const hasRoundMatchesCompleted = Object.values(state.rounds || {}).some(
                       roundMatches => Array.isArray(roundMatches) && roundMatches.some(m => (m.winner === 1 || m.winner === 2) || ((m.p1?.score || 0) > 0 || (m.p2?.score || 0) > 0))
                     );
-                    const hasStarted = hasAnyGame || hasRoundMatchesCompleted;
+                    const hasStarted = !allAtZero && (hasAnyGame || hasRoundMatchesCompleted);
 
                     return state.standings.map((player, idx) => {
                       const rank = idx + 1;
@@ -1216,13 +1233,22 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
                 ))}
               </div>
 
-              <button
-                onClick={() => handleAddMatch(selectedRound)}
-                className="flex items-center gap-2 px-4 py-2 bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-400/30 text-cyan-300 font-bold text-xs rounded-xl transition-all"
-              >
-                <Plus size={14} />
-                Aggiungi Match
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleClearRound(selectedRound)}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 font-bold text-xs rounded-xl transition-all"
+                  title={`Svuota tutti i match del Turno ${selectedRound}`}
+                >
+                  <Trash2 size={13} /> Svuota Turno {selectedRound}
+                </button>
+                <button
+                  onClick={() => handleAddMatch(selectedRound)}
+                  className="flex items-center gap-2 px-4 py-2 bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-400/30 text-cyan-300 font-bold text-xs rounded-xl transition-all"
+                >
+                  <Plus size={14} />
+                  Aggiungi Match
+                </button>
+              </div>
             </div>
 
             {/* Matches List */}
