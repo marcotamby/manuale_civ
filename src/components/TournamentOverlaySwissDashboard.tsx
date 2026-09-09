@@ -199,10 +199,38 @@ const OVERLAY_ID = 'tournament-swiss';
 
 export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }: TournamentOverlaySwissDashboardProps) {
   const [state, setState] = useState(DEFAULT_STATE);
+  const stateRef = useRef(state);
+  const debounceSaveRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+
   const [activeTab, setActiveTab] = useState<'standings' | 'rounds' | 'startgg'>('standings');
   const [selectedRound, setSelectedRound] = useState<number>(1);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  // Start.gg states & refs
+  const [startggSlugInput, setStartggSlugInput] = useState('');
+  const [startggLoading, setStartggLoading] = useState(false);
+  const [startggTournamentData, setStartggTournamentData] = useState<StartGGTournament | null>(null);
+  const [selectedEventId, setSelectedEventId] = useState<string>('');
+  const [selectedPhaseId, setSelectedPhaseId] = useState<string>('');
+  const [startggStatus, setStartggStatus] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
+  const [isAutoSyncing, setIsAutoSyncing] = useState(false);
+
+  const selectedPhaseIdRef = useRef(selectedPhaseId);
+  const selectedEventIdRef = useRef(selectedEventId);
+  const isAutoSyncingRef = useRef(isAutoSyncing);
+  const startggSlugInputRef = useRef(startggSlugInput);
+  const startggTournamentDataRef = useRef(startggTournamentData);
+
+  useEffect(() => { selectedPhaseIdRef.current = selectedPhaseId; }, [selectedPhaseId]);
+  useEffect(() => { selectedEventIdRef.current = selectedEventId; }, [selectedEventId]);
+  useEffect(() => { isAutoSyncingRef.current = isAutoSyncing; }, [isAutoSyncing]);
+  useEffect(() => { startggSlugInputRef.current = startggSlugInput; }, [startggSlugInput]);
+  useEffect(() => { startggTournamentDataRef.current = startggTournamentData; }, [startggTournamentData]);
 
   // Sync active path with parent modal
   useEffect(() => {
@@ -219,49 +247,95 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
     if (newTab === 'rounds') {
       const updated = { ...state, activeView: 'rounds' as const };
       setState(updated);
+      stateRef.current = updated;
       handleSave(updated);
       onActivePathChange?.('/overlays/tournament-swiss/index.html?view=rounds');
     } else if (newTab === 'standings') {
       const updated = { ...state, activeView: 'standings' as const };
       setState(updated);
+      stateRef.current = updated;
       handleSave(updated);
       onActivePathChange?.('/overlays/tournament-swiss/index.html?view=standings');
     }
   };
 
-  // Start.gg states
-  const [startggSlugInput, setStartggSlugInput] = useState('');
-  const [startggLoading, setStartggLoading] = useState(false);
-  const [startggTournamentData, setStartggTournamentData] = useState<StartGGTournament | null>(null);
-  const [selectedEventId, setSelectedEventId] = useState<string>('');
-  const [selectedPhaseId, setSelectedPhaseId] = useState<string>('');
-  const [startggStatus, setStartggStatus] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
-  const [isAutoSyncing, setIsAutoSyncing] = useState(false);
+  const fetchTournamentData = async (slugInput: string, currentEventId?: string, currentPhaseId?: string, currentDay?: number) => {
+    let cleanSlug = slugInput.trim();
+    if (!cleanSlug) return;
+    if (cleanSlug.includes('start.gg/')) {
+      const parts = cleanSlug.split('start.gg/');
+      const sub = parts[1].split('/')[1] ? `${parts[1].split('/')[0]}/${parts[1].split('/')[1]}` : parts[1];
+      cleanSlug = sub.replace(/^tournament\//, '');
+    }
+    try {
+      const tournament = await fetchTournament(cleanSlug);
+      if (tournament) {
+        setStartggTournamentData(tournament);
+        startggTournamentDataRef.current = tournament;
+
+        const eventId = currentEventId || (tournament.events?.[0]?.id ? String(tournament.events[0].id) : '');
+        if (eventId) {
+          setSelectedEventId(eventId);
+          selectedEventIdRef.current = eventId;
+          const ev = tournament.events?.find(e => String(e.id) === String(eventId));
+          if (ev && ev.phases && ev.phases.length > 0) {
+            let targetPhase = currentPhaseId ? ev.phases.find(p => String(p.id) === String(currentPhaseId)) : null;
+            if (!targetPhase && currentDay) {
+              targetPhase = ev.phases.find(p => {
+                const n = p.name.toLowerCase();
+                return n.includes(`day ${currentDay}`) || n.includes(`day${currentDay}`) || n.includes(`giornata ${currentDay}`) || n.includes(`giornata${currentDay}`) || n.includes(`turno ${currentDay}`) || n.includes(`round ${currentDay}`) || n.endsWith(` ${currentDay}`);
+              }) || ev.phases[0];
+            }
+            if (targetPhase) {
+              const pid = String(targetPhase.id);
+              setSelectedPhaseId(pid);
+              selectedPhaseIdRef.current = pid;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Prefetch of startgg tournament info failed:', e);
+    }
+  };
 
   // Load initial state
   useEffect(() => {
     overlayService.getOverlayState(OVERLAY_ID)
       .then(savedState => {
         if (savedState) {
-          setState({
+          const merged = {
             ...DEFAULT_STATE,
             ...savedState,
             startgg: {
               ...DEFAULT_STATE.startgg,
               ...(savedState.startgg || {})
             }
-          });
+          };
+          setState(merged);
+          stateRef.current = merged;
+
           if (savedState.startgg?.slug) {
             setStartggSlugInput(savedState.startgg.slug);
+            startggSlugInputRef.current = savedState.startgg.slug;
+            fetchTournamentData(
+              savedState.startgg.slug, 
+              savedState.startgg.eventId ? String(savedState.startgg.eventId) : undefined, 
+              savedState.startgg.phaseId ? String(savedState.startgg.phaseId) : undefined, 
+              savedState.dayNumber || 1
+            );
           }
           if (savedState.startgg?.eventId) {
-            setSelectedEventId(savedState.startgg.eventId);
+            setSelectedEventId(String(savedState.startgg.eventId));
+            selectedEventIdRef.current = String(savedState.startgg.eventId);
           }
           if (savedState.startgg?.phaseId) {
-            setSelectedPhaseId(savedState.startgg.phaseId);
+            setSelectedPhaseId(String(savedState.startgg.phaseId));
+            selectedPhaseIdRef.current = String(savedState.startgg.phaseId);
           }
           if (savedState.startgg?.autoSync) {
             setIsAutoSyncing(true);
+            isAutoSyncingRef.current = true;
           }
         }
       })
@@ -273,7 +347,7 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
 
   // Save State
   const handleSave = async (customState?: typeof state) => {
-    const stateToSave = customState || state;
+    const stateToSave = customState || stateRef.current;
     setIsSaving(true);
     try {
       await overlayService.updateOverlayState(OVERLAY_ID, stateToSave);
@@ -315,6 +389,12 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
     newStandings[index] = { ...newStandings[index], [field]: value };
     const newState = { ...state, standings: newStandings };
     setState(newState);
+    if (debounceSaveRef.current) {
+      clearTimeout(debounceSaveRef.current);
+    }
+    debounceSaveRef.current = setTimeout(() => {
+      handleSave(newState);
+    }, 600);
   };
 
   const handleSortStandings = () => {
@@ -363,7 +443,7 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
     handleSave(newState);
   };
 
-  const handleUpdateMatch = (roundNum: number, matchIndex: number, updatedFields: Partial<SwissMatchItem>) => {
+  const handleUpdateMatch = (roundNum: number, matchIndex: number, updatedFields: Partial<SwissMatchItem>, immediateSave = false) => {
     const currentMatches = [...(state.rounds[roundNum] || [])];
     currentMatches[matchIndex] = { ...currentMatches[matchIndex], ...updatedFields };
     const newState = {
@@ -374,6 +454,18 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
       }
     };
     setState(newState);
+
+    if (debounceSaveRef.current) {
+      clearTimeout(debounceSaveRef.current);
+    }
+
+    if (immediateSave) {
+      handleSave(newState);
+    } else {
+      debounceSaveRef.current = setTimeout(() => {
+        handleSave(newState);
+      }, 600);
+    }
   };
 
   const handleSetWinner = (roundNum: number, matchIndex: number, winner: 0 | 1 | 2) => {
@@ -462,6 +554,67 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
     handleSave(newState);
   };
 
+  // --- DAY CHANGE & AUTO PHASE DETECTION ---
+  const handleDayChange = async (newDay: number) => {
+    let tourney = startggTournamentDataRef.current;
+
+    // If tournament data isn't loaded yet, try fetching it quickly
+    if (!tourney && startggSlugInputRef.current) {
+      let cleanSlug = startggSlugInputRef.current.trim();
+      if (cleanSlug.includes('start.gg/')) {
+        const parts = cleanSlug.split('start.gg/');
+        const sub = parts[1].split('/')[1] ? `${parts[1].split('/')[0]}/${parts[1].split('/')[1]}` : parts[1];
+        cleanSlug = sub.replace(/^tournament\//, '');
+      }
+      try {
+        tourney = await fetchTournament(cleanSlug);
+        if (tourney) {
+          setStartggTournamentData(tourney);
+          startggTournamentDataRef.current = tourney;
+        }
+      } catch (e) {
+        console.warn('Could not fetch tournament data in handleDayChange:', e);
+      }
+    }
+
+    let targetPhaseId: string | undefined;
+
+    if (tourney && tourney.events) {
+      const ev = tourney.events.find(e => String(e.id) === String(selectedEventIdRef.current)) || tourney.events[0];
+      if (ev && ev.phases) {
+        const match = ev.phases.find(p => {
+          const n = p.name.toLowerCase();
+          return n.includes(`day ${newDay}`) || n.includes(`day${newDay}`) || n.includes(`giornata ${newDay}`) || n.includes(`giornata${newDay}`) || n.includes(`turno ${newDay}`) || n.includes(`round ${newDay}`) || n.endsWith(` ${newDay}`) || n === String(newDay);
+        });
+        if (match) {
+          targetPhaseId = String(match.id);
+          setSelectedPhaseId(targetPhaseId);
+          selectedPhaseIdRef.current = targetPhaseId;
+        }
+      }
+    }
+
+    const updatedState = {
+      ...stateRef.current,
+      dayNumber: newDay,
+      ...(targetPhaseId ? {
+        startgg: {
+          ...stateRef.current.startgg,
+          phaseId: targetPhaseId
+        }
+      } : {})
+    };
+
+    setState(updatedState);
+    stateRef.current = updatedState;
+    await handleSave(updatedState);
+
+    // If we matched a new phase, trigger sync for this phase immediately
+    if (targetPhaseId) {
+      handleSyncStartggNow(targetPhaseId, newDay);
+    }
+  };
+
   // --- TAB 3: START.GG INTEGRATION ---
   const handleFetchStartggTournament = async () => {
     if (!startggSlugInput.trim()) {
@@ -487,15 +640,26 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
       }
 
       setStartggTournamentData(tournament);
+      startggTournamentDataRef.current = tournament;
       setStartggStatus({ 
         type: 'success', 
         message: `Torneo trovato: "${tournament.name}". Seleziona l'evento e la fase qui sotto.` 
       });
 
       if (tournament.events && tournament.events.length > 0) {
-        setSelectedEventId(tournament.events[0].id);
+        const evId = String(tournament.events[0].id);
+        setSelectedEventId(evId);
+        selectedEventIdRef.current = evId;
         if (tournament.events[0].phases && tournament.events[0].phases.length > 0) {
-          setSelectedPhaseId(tournament.events[0].phases[0].id);
+          const curDay = stateRef.current.dayNumber || 1;
+          const matchingPhase = tournament.events[0].phases.find(p => {
+            const n = p.name.toLowerCase();
+            return n.includes(`day ${curDay}`) || n.includes(`day${curDay}`) || n.includes(`giornata ${curDay}`) || n.includes(`giornata${curDay}`) || n.includes(`turno ${curDay}`) || n.includes(`round ${curDay}`) || n.endsWith(` ${curDay}`);
+          }) || tournament.events[0].phases[0];
+
+          const phId = String(matchingPhase.id);
+          setSelectedPhaseId(phId);
+          selectedPhaseIdRef.current = phId;
         }
       }
     } catch (err: any) {
@@ -506,15 +670,16 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
     }
   };
 
-  const handleSyncStartggNow = async () => {
-    if (!selectedPhaseId) {
+  const handleSyncStartggNow = async (overridePhaseId?: string, overrideDayNumber?: number) => {
+    const phaseToSync = overridePhaseId || selectedPhaseIdRef.current;
+    if (!phaseToSync) {
       setStartggStatus({ type: 'error', message: 'Seleziona prima una fase del torneo.' });
       return;
     }
 
     setStartggLoading(true);
     try {
-      const groups = await fetchPhaseGroups(selectedPhaseId);
+      const groups = await fetchPhaseGroups(phaseToSync);
       if (groups.length === 0) {
         setStartggStatus({ type: 'error', message: 'Nessun gruppo o girone trovato in questa fase.' });
         return;
@@ -530,7 +695,21 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
         return;
       }
 
-      const parsedRounds: Record<number, SwissMatchItem[]> = { 1: [], 2: [], 3: [], 4: [] };
+      const existingRounds = stateRef.current?.rounds || {};
+
+      // Determine which rounds have sets in this sync
+      const roundsWithSets = new Set<number>();
+      allSets.forEach(set => {
+        const roundNum = Math.min(Math.max(Math.abs(set.round || 1), 1), 4);
+        roundsWithSets.add(roundNum);
+      });
+
+      const parsedRounds: Record<number, SwissMatchItem[]> = {
+        1: roundsWithSets.has(1) ? [] : [...(existingRounds[1] || [])],
+        2: roundsWithSets.has(2) ? [] : [...(existingRounds[2] || [])],
+        3: roundsWithSets.has(3) ? [] : [...(existingRounds[3] || [])],
+        4: roundsWithSets.has(4) ? [] : [...(existingRounds[4] || [])],
+      };
       const playerStats: Record<string, { name: string; wins: number; losses: number; points: number }> = {};
 
       allSets.forEach(set => {
@@ -555,10 +734,37 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
           winner = 2;
         }
 
+        // PRESERVE CIVS FROM EXISTING STATE (do not overwrite user-selected civs)
+        const existingMatchesForRound = existingRounds[roundNum] || [];
+        const existingMatch = existingMatchesForRound.find((m: SwissMatchItem) => 
+          m.id === set.id ||
+          (m.p1?.name && m.p2?.name && p1Name !== '--' && p2Name !== '--' && (
+            (m.p1.name.toLowerCase().trim() === p1Name.toLowerCase().trim() && m.p2.name.toLowerCase().trim() === p2Name.toLowerCase().trim()) ||
+            (m.p1.name.toLowerCase().trim() === p2Name.toLowerCase().trim() && m.p2.name.toLowerCase().trim() === p1Name.toLowerCase().trim())
+          ))
+        );
+
+        let p1CivId = '';
+        let p2CivId = '';
+
+        if (existingMatch) {
+          if (existingMatch.p1?.name?.toLowerCase().trim() === p1Name.toLowerCase().trim()) {
+            p1CivId = existingMatch.p1.civId || '';
+          } else if (existingMatch.p2?.name?.toLowerCase().trim() === p1Name.toLowerCase().trim()) {
+            p1CivId = existingMatch.p2.civId || '';
+          }
+
+          if (existingMatch.p2?.name?.toLowerCase().trim() === p2Name.toLowerCase().trim()) {
+            p2CivId = existingMatch.p2.civId || '';
+          } else if (existingMatch.p1?.name?.toLowerCase().trim() === p2Name.toLowerCase().trim()) {
+            p2CivId = existingMatch.p1.civId || '';
+          }
+        }
+
         parsedRounds[roundNum].push({
           id: set.id,
-          p1: { name: p1Name, civId: '', score: p1Score },
-          p2: { name: p2Name, civId: '', score: p2Score },
+          p1: { name: p1Name, civId: p1CivId, score: p1Score },
+          p2: { name: p2Name, civId: p2CivId, score: p2Score },
           winner
         });
 
@@ -594,21 +800,25 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
           return a.losses - b.losses;
         });
 
+      const targetDay = overrideDayNumber ?? stateRef.current.dayNumber ?? 1;
+
       const updatedState = {
-        ...state,
-        standings: syncedStandings.length > 0 ? syncedStandings : state.standings,
+        ...stateRef.current,
+        dayNumber: targetDay,
+        standings: syncedStandings.length > 0 ? syncedStandings : stateRef.current.standings,
         rounds: parsedRounds,
         startgg: {
-          slug: startggSlugInput.trim(),
-          eventId: selectedEventId,
-          phaseId: selectedPhaseId,
-          autoSync: isAutoSyncing,
+          slug: startggSlugInputRef.current.trim(),
+          eventId: selectedEventIdRef.current,
+          phaseId: phaseToSync,
+          autoSync: isAutoSyncingRef.current,
           syncInterval: 20,
           lastSyncedAt: new Date().toLocaleTimeString()
         }
       };
 
       setState(updatedState);
+      stateRef.current = updatedState;
       await handleSave(updatedState);
 
       setStartggStatus({
@@ -667,7 +877,14 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
             <input
               type="text"
               value={state.tournamentTitle || ''}
-              onChange={(e) => setState({ ...state, tournamentTitle: e.target.value })}
+              onChange={(e) => {
+                const val = e.target.value;
+                const updated = { ...stateRef.current, tournamentTitle: val };
+                setState(updated);
+                stateRef.current = updated;
+                if (debounceSaveRef.current) clearTimeout(debounceSaveRef.current);
+                debounceSaveRef.current = setTimeout(() => handleSave(updated), 600);
+              }}
               placeholder="TORNEO AOE4 SVIZZERA"
               className="bg-transparent text-xs font-black text-white focus:outline-none w-52 placeholder-slate-600 truncate"
             />
@@ -677,7 +894,10 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
             <span className="text-[10px] font-bold text-slate-400 uppercase">Giornata:</span>
             <select
               value={state.dayNumber || 1}
-              onChange={(e) => setState({ ...state, dayNumber: parseInt(e.target.value) || 1 })}
+              onChange={(e) => {
+                const day = parseInt(e.target.value) || 1;
+                handleDayChange(day);
+              }}
               className="bg-transparent text-xs font-black text-cyan-300 focus:outline-none cursor-pointer"
             >
               <option value={1} className="bg-[#0b0f19] text-white">Giornata 1</option>
@@ -1046,7 +1266,7 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
                       value={match.p1?.civId || ''}
                       onChange={(civId) => handleUpdateMatch(selectedRound, mIdx, {
                         p1: { ...match.p1, civId }
-                      })}
+                      }, true)}
                     />
 
                     <button
@@ -1084,7 +1304,7 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
                       value={match.p2?.civId || ''}
                       onChange={(civId) => handleUpdateMatch(selectedRound, mIdx, {
                         p2: { ...match.p2, civId }
-                      })}
+                      }, true)}
                     />
 
                     <button
@@ -1176,10 +1396,19 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
                       <select
                         value={selectedEventId}
                         onChange={(e) => {
-                          setSelectedEventId(e.target.value);
-                          const ev = startggTournamentData.events.find(ev => ev.id === e.target.value);
+                          const newEvId = e.target.value;
+                          setSelectedEventId(newEvId);
+                          selectedEventIdRef.current = newEvId;
+                          const ev = startggTournamentData.events.find(ev => String(ev.id) === String(newEvId));
                           if (ev && ev.phases && ev.phases.length > 0) {
-                            setSelectedPhaseId(ev.phases[0].id);
+                            const curDay = stateRef.current.dayNumber || 1;
+                            const match = ev.phases.find(p => {
+                              const n = p.name.toLowerCase();
+                              return n.includes(`day ${curDay}`) || n.includes(`day${curDay}`) || n.includes(`giornata ${curDay}`) || n.includes(`giornata${curDay}`) || n.includes(`turno ${curDay}`) || n.includes(`round ${curDay}`) || n.endsWith(` ${curDay}`);
+                            }) || ev.phases[0];
+                            const pid = String(match.id);
+                            setSelectedPhaseId(pid);
+                            selectedPhaseIdRef.current = pid;
                           }
                         }}
                         className="w-full appearance-none bg-black/40 border border-white/10 rounded-xl pl-4 pr-10 py-2.5 text-sm font-bold text-white focus:outline-none"
@@ -1202,11 +1431,37 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
                     <div className="relative">
                       <select
                         value={selectedPhaseId}
-                        onChange={(e) => setSelectedPhaseId(e.target.value)}
+                        onChange={(e) => {
+                          const newPhaseId = e.target.value;
+                          setSelectedPhaseId(newPhaseId);
+                          selectedPhaseIdRef.current = newPhaseId;
+
+                          const ev = startggTournamentData?.events?.find(ev => String(ev.id) === String(selectedEventIdRef.current));
+                          const ph = ev?.phases?.find(p => String(p.id) === String(newPhaseId));
+                          let detectedDay = stateRef.current.dayNumber || 1;
+                          if (ph) {
+                            const match = ph.name.match(/(?:day|giornata|turno|round)\s*(\d+)/i);
+                            if (match && match[1]) {
+                              detectedDay = parseInt(match[1]);
+                            }
+                          }
+                          const updated = {
+                            ...stateRef.current,
+                            dayNumber: detectedDay,
+                            startgg: {
+                              ...stateRef.current.startgg,
+                              phaseId: newPhaseId
+                            }
+                          };
+                          setState(updated);
+                          stateRef.current = updated;
+                          handleSave(updated);
+                          handleSyncStartggNow(newPhaseId, detectedDay);
+                        }}
                         className="w-full appearance-none bg-black/40 border border-white/10 rounded-xl pl-4 pr-10 py-2.5 text-sm font-bold text-white focus:outline-none"
                       >
                         {startggTournamentData.events
-                          .find(ev => ev.id === selectedEventId)
+                          .find(ev => String(ev.id) === String(selectedEventId))
                           ?.phases.map(ph => (
                             <option key={ph.id} value={ph.id} className="bg-[#0b0f19] text-white">
                               {ph.name} ({ph.bracketType || 'Swiss'})
@@ -1225,7 +1480,21 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
                       <input
                         type="checkbox"
                         checked={isAutoSyncing}
-                        onChange={(e) => setIsAutoSyncing(e.target.checked)}
+                        onChange={(e) => {
+                          const val = e.target.checked;
+                          setIsAutoSyncing(val);
+                          isAutoSyncingRef.current = val;
+                          const updated = {
+                            ...stateRef.current,
+                            startgg: {
+                              ...stateRef.current.startgg,
+                              autoSync: val
+                            }
+                          };
+                          setState(updated);
+                          stateRef.current = updated;
+                          handleSave(updated);
+                        }}
                         className="sr-only peer"
                       />
                       <div className="w-10 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-500"></div>
@@ -1236,7 +1505,7 @@ export function TournamentOverlaySwissDashboard({ onError, onActivePathChange }:
                   </div>
 
                   <button
-                    onClick={handleSyncStartggNow}
+                    onClick={() => handleSyncStartggNow()}
                     disabled={startggLoading}
                     className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-cyan-500/20 flex items-center gap-2"
                   >
