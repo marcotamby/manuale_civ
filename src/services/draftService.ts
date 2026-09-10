@@ -36,6 +36,10 @@ export interface DraftState {
   guestBans: string[];
   hostSnipes: string[];
   guestSnipes: string[];
+  pendingHostSnipe?: string | null;
+  pendingGuestSnipe?: string | null;
+  hostSessionToken?: string | null;
+  guestSessionToken?: string | null;
   hostReady?: boolean;
   guestReady?: boolean;
   hostClaimed?: boolean;

@@ -1,13 +1,22 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Swords, Users, Shield, Clock, Eye, Check, X, RefreshCcw, Copy, Monitor, Trophy, Target, Lock, Search, Loader2 } from 'lucide-react';
+import { Swords, Users, Shield, Clock, Eye, Check, X, RefreshCcw, Copy, Monitor, Trophy, Target, Lock, Search, Loader2, ArrowLeftRight } from 'lucide-react';
 import { draftService } from '../services/draftService';
-import type { DraftRoom, DraftTurn, TurnAction } from '../services/draftService';
+import type { DraftRoom, DraftTurn, TurnAction, DraftState } from '../services/draftService';
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
 import { useAuth } from './AuthContext';
 
 type UserRole = 'HOST' | 'GUEST' | 'SPECTATOR';
+
+const getSessionToken = (rId: string): string => {
+  let token = sessionStorage.getItem(`draft_session_token_${rId}`);
+  if (!token) {
+    token = 'p_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+    sessionStorage.setItem(`draft_session_token_${rId}`, token);
+  }
+  return token;
+};
 
 export function DraftRoomPage() {
   const { user } = useAuth();
@@ -40,6 +49,26 @@ export function DraftRoomPage() {
     loadRoom(roomId);
     const unsubscribe = draftService.subscribeToRoom(roomId, (updatedRoom) => {
       setRoom(updatedRoom);
+      if (updatedRoom.status === 'waiting') {
+        const myToken = getSessionToken(roomId);
+        if (updatedRoom.state?.hostSessionToken === myToken) {
+          setRole((prev) => {
+            if (prev !== 'HOST') {
+              sessionStorage.setItem(`draft_role_${roomId}`, 'HOST');
+              return 'HOST';
+            }
+            return prev;
+          });
+        } else if (updatedRoom.state?.guestSessionToken === myToken) {
+          setRole((prev) => {
+            if (prev !== 'GUEST') {
+              sessionStorage.setItem(`draft_role_${roomId}`, 'GUEST');
+              return 'GUEST';
+            }
+            return prev;
+          });
+        }
+      }
     });
 
     return () => {
@@ -62,7 +91,14 @@ export function DraftRoomPage() {
       const userAutoName = user?.nickname?.trim() || user?.email?.trim();
       if (data) {
         setRoom(data);
-        if (data.state?.hostClaimed && !data.state?.guestClaimed) {
+        const myToken = getSessionToken(id);
+        if (data.state?.hostSessionToken === myToken) {
+          setRole('HOST');
+          sessionStorage.setItem(`draft_role_${id}`, 'HOST');
+        } else if (data.state?.guestSessionToken === myToken) {
+          setRole('GUEST');
+          sessionStorage.setItem(`draft_role_${id}`, 'GUEST');
+        } else if (data.state?.hostClaimed && !data.state?.guestClaimed) {
           setJoiningRole('GUEST');
           setJoiningName(userAutoName || (data.guest_name && data.guest_name !== 'Giocatore 2' ? data.guest_name : 'Giocatore 2'));
         } else if (!data.state?.hostClaimed && data.state?.guestClaimed) {
@@ -219,14 +255,17 @@ export function DraftRoomPage() {
       return;
     }
 
-    const nextState = { ...state };
+    const nextState: DraftState = { ...state };
     const updates: Partial<DraftRoom> = { state: nextState };
+    const myToken = roomId ? getSessionToken(roomId) : '';
 
     if (joiningRole === 'HOST') {
       nextState.hostClaimed = true;
+      nextState.hostSessionToken = myToken;
       updates.host_name = joiningName || room.host_name || 'Giocatore 1';
     } else if (joiningRole === 'GUEST') {
       nextState.guestClaimed = true;
+      nextState.guestSessionToken = myToken;
       updates.guest_name = joiningName || room.guest_name || 'Giocatore 2';
     }
 
@@ -235,6 +274,95 @@ export function DraftRoomPage() {
       setRoom(updated);
       setRole(joiningRole);
       if (roomId) sessionStorage.setItem(`draft_role_${roomId}`, joiningRole);
+    }
+  };
+
+  // Role Inversion / Change:
+  // If alone in the room: change role and stop
+  // If already 2 in the room: invert roles between the two players
+  const handleRoleSwapOrChange = async () => {
+    if (!room || room.status !== 'waiting') return;
+
+    if (role === 'SPECTATOR' || !role) {
+      if (roomId) sessionStorage.removeItem(`draft_role_${roomId}`);
+      setRole(null);
+      return;
+    }
+
+    const myToken = roomId ? getSessionToken(roomId) : '';
+    const nextState: DraftState = { ...state };
+    const updates: Partial<DraftRoom> = { state: nextState };
+
+    const isBothInRoom = !!state.hostClaimed && !!state.guestClaimed;
+
+    if (isBothInRoom) {
+      // Both players are in the room: SWAP / INVERT roles
+      const prevHostName = room.host_name;
+      const prevGuestName = room.guest_name;
+      const prevHostToken = state.hostSessionToken;
+      const prevGuestToken = state.guestSessionToken;
+
+      updates.host_name = prevGuestName;
+      updates.guest_name = prevHostName;
+
+      // Invert tokens so both clients automatically sync via Realtime
+      nextState.hostSessionToken = prevGuestToken || (role === 'GUEST' ? myToken : null);
+      nextState.guestSessionToken = prevHostToken || (role === 'HOST' ? myToken : null);
+
+      nextState.hostReady = false;
+      nextState.guestReady = false;
+
+      const newRole: UserRole = role === 'HOST' ? 'GUEST' : 'HOST';
+      setRole(newRole);
+      if (roomId) sessionStorage.setItem(`draft_role_${roomId}`, newRole);
+
+      const updated = await draftService.updateRoom(room.id, updates);
+      if (updated) setRoom(updated);
+    } else {
+      // User is alone in the room: CHANGE role and stop
+      const userAutoName = user?.nickname?.trim() || user?.email?.trim();
+
+      if (role === 'HOST') {
+        // Free Host
+        nextState.hostClaimed = false;
+        nextState.hostReady = false;
+        nextState.hostSessionToken = null;
+        updates.host_name = 'Giocatore 1';
+
+        // Claim Guest
+        nextState.guestClaimed = true;
+        nextState.guestReady = false;
+        nextState.guestSessionToken = myToken;
+        updates.guest_name = (room.host_name && room.host_name !== 'Giocatore 1')
+          ? room.host_name
+          : (userAutoName || 'Giocatore 2');
+
+        setRole('GUEST');
+        if (roomId) sessionStorage.setItem(`draft_role_${roomId}`, 'GUEST');
+
+        const updated = await draftService.updateRoom(room.id, updates);
+        if (updated) setRoom(updated);
+      } else if (role === 'GUEST') {
+        // Free Guest
+        nextState.guestClaimed = false;
+        nextState.guestReady = false;
+        nextState.guestSessionToken = null;
+        updates.guest_name = 'Giocatore 2';
+
+        // Claim Host
+        nextState.hostClaimed = true;
+        nextState.hostReady = false;
+        nextState.hostSessionToken = myToken;
+        updates.host_name = (room.guest_name && room.guest_name !== 'Giocatore 2')
+          ? room.guest_name
+          : (userAutoName || 'Giocatore 1');
+
+        setRole('HOST');
+        if (roomId) sessionStorage.setItem(`draft_role_${roomId}`, 'HOST');
+
+        const updated = await draftService.updateRoom(room.id, updates);
+        if (updated) setRoom(updated);
+      }
     }
   };
 
@@ -260,10 +388,16 @@ export function DraftRoomPage() {
     return !state.hiddenPicks?.includes(id);
   };
 
-  const isHostTurn = currentTurn?.player === 'HOST';
-  const isGuestTurn = currentTurn?.player === 'GUEST';
+  const isSnipeAction = currentTurn?.action === 'SNIPE';
+  const hostNeedsSnipe = isSnipeAction && !state.pendingHostSnipe;
+  const guestNeedsSnipe = isSnipeAction && !state.pendingGuestSnipe;
+
+  const isHostTurn = isSnipeAction ? hostNeedsSnipe : currentTurn?.player === 'HOST';
+  const isGuestTurn = isSnipeAction ? guestNeedsSnipe : currentTurn?.player === 'GUEST';
   const isAdminTurn = currentTurn?.player === 'ADMIN';
-  const isMyTurn = (role === 'HOST' && isHostTurn) || (role === 'GUEST' && isGuestTurn);
+  const isMyTurn = isSnipeAction
+    ? (role === 'HOST' ? hostNeedsSnipe : role === 'GUEST' ? guestNeedsSnipe : false)
+    : ((role === 'HOST' && isHostTurn) || (role === 'GUEST' && isGuestTurn));
 
   const allUsedCivs = useMemo(() => [
     ...(state.hostPicks || []),
@@ -390,10 +524,13 @@ export function DraftRoomPage() {
 
     if (currentTurn.target === 'CIV') {
       if (currentTurn.action === 'SNIPE') {
-        const opponentPicks = currentTurn.player === 'HOST' ? state.guestPicks : state.hostPicks;
-        if (opponentPicks && opponentPicks.length > 0) {
-          const randomCivId = opponentPicks[Math.floor(Math.random() * opponentPicks.length)];
-          executeAction(randomCivId);
+        const myActualRole = role === 'HOST' ? 'HOST' : 'GUEST';
+        const opponentPicks = myActualRole === 'HOST' ? state.guestPicks : state.hostPicks;
+        const snipedList = myActualRole === 'HOST' ? (state.guestSnipes || []) : (state.hostSnipes || []);
+        const available = (opponentPicks || []).filter(id => !snipedList.includes(id));
+        if (available.length > 0) {
+          const randomCivId = available[Math.floor(Math.random() * available.length)];
+          executeAction(randomCivId, myActualRole);
         }
       } else {
         const available = civilizationsData.filter(c => !allUsedCivs.includes(c.id));
@@ -410,6 +547,32 @@ export function DraftRoomPage() {
       }
     }
   };
+
+  // Fallback for AFK or disconnected opponent during simultaneous snipe
+  useEffect(() => {
+    if (!room || room.status !== 'in_progress' || !currentTurn || currentTurn.action !== 'SNIPE') return;
+    if (timeLeft > 0) return;
+
+    // When timer is at 0, primary client auto-picks for any missing player
+    const isPrimaryClient = role === 'HOST' || (!state.hostClaimed && role === 'GUEST') || role === 'SPECTATOR';
+    if (!isPrimaryClient) return;
+
+    const timeout = setTimeout(() => {
+      if (!state.pendingHostSnipe && state.guestPicks?.length) {
+        const available = (state.guestPicks || []).filter(id => !(state.guestSnipes || []).includes(id));
+        if (available.length > 0) {
+          executeAction(available[Math.floor(Math.random() * available.length)], 'HOST');
+        }
+      } else if (!state.pendingGuestSnipe && state.hostPicks?.length) {
+        const available = (state.hostPicks || []).filter(id => !(state.hostSnipes || []).includes(id));
+        if (available.length > 0) {
+          executeAction(available[Math.floor(Math.random() * available.length)], 'GUEST');
+        }
+      }
+    }, 1500);
+
+    return () => clearTimeout(timeout);
+  }, [timeLeft, room?.status, currentTurn, state.pendingHostSnipe, state.pendingGuestSnipe, state.guestPicks, state.hostPicks]);
 
   // Helper function to animate flying card/flag to target header slot
   const triggerFlyAnimation = (itemId: string, target: 'CIV' | 'MAP', player: 'HOST' | 'GUEST' | 'ADMIN', action: TurnAction) => {
@@ -498,14 +661,12 @@ export function DraftRoomPage() {
   };
 
   // Execute Pick, Ban, or Snipe action
-  const executeAction = async (itemId: string) => {
+  const executeAction = async (itemId: string, forcedPlayer?: 'HOST' | 'GUEST') => {
     if (!room || !currentTurn) return;
 
-    const player = currentTurn.player;
     const action = currentTurn.action;
     const target = currentTurn.target;
-
-    triggerFlyAnimation(itemId, target, player, action);
+    const player = forcedPlayer || (action === 'SNIPE' ? (role === 'HOST' ? 'HOST' : 'GUEST') : currentTurn.player);
 
     const banMode = currentTurn.banMode || 'GLOBAL';
     const isHidden = currentTurn.isHidden;
@@ -518,6 +679,8 @@ export function DraftRoomPage() {
       guestBans: [...(state.guestBans || [])],
       hostSnipes: [...(state.hostSnipes || [])],
       guestSnipes: [...(state.guestSnipes || [])],
+      pendingHostSnipe: state.pendingHostSnipe,
+      pendingGuestSnipe: state.pendingGuestSnipe,
       mapPicks: [...(state.mapPicks || [])],
       mapBans: [...(state.mapBans || [])],
       hostMapPicks: [...(state.hostMapPicks || [])],
@@ -529,6 +692,83 @@ export function DraftRoomPage() {
       hiddenPicks: [...(state.hiddenPicks || [])],
       hiddenBans: [...(state.hiddenBans || [])]
     };
+
+    // Handle Simultaneous SNIPE
+    if (action === 'SNIPE') {
+      if (player === 'HOST') {
+        if (state.pendingGuestSnipe) {
+          // Guest already chose, Host has now chosen -> BOTH HAVE CHOSEN! Reveal both!
+          // Host sniped Guest's civ (itemId); Guest sniped Host's civ (state.pendingGuestSnipe)
+          if (!nextState.guestSnipes.includes(itemId)) nextState.guestSnipes.push(itemId);
+          if (!nextState.hostSnipes.includes(state.pendingGuestSnipe)) nextState.hostSnipes.push(state.pendingGuestSnipe);
+          nextState.pendingHostSnipe = null;
+          nextState.pendingGuestSnipe = null;
+
+          triggerFlyAnimation(itemId, 'CIV', 'HOST', 'SNIPE');
+          triggerFlyAnimation(state.pendingGuestSnipe, 'CIV', 'GUEST', 'SNIPE');
+
+          const stepIncrement = (turns[currentStep + 1]?.action === 'SNIPE') ? 2 : 1;
+          const nextStepIndex = room.current_step + stepIncrement;
+          const isCompleted = nextStepIndex >= turns.length;
+
+          const updated = await draftService.updateRoom(room.id, {
+            state: nextState,
+            current_step: isCompleted ? room.current_step : nextStepIndex,
+            status: isCompleted ? 'completed' : 'in_progress'
+          });
+          if (updated) setRoom(updated);
+          return;
+        } else {
+          // Only Host chose so far -> store pending choice, waiting for Guest
+          nextState.pendingHostSnipe = itemId;
+          triggerFlyAnimation(itemId, 'CIV', 'HOST', 'SNIPE');
+
+          const updated = await draftService.updateRoom(room.id, {
+            state: nextState
+          });
+          if (updated) setRoom(updated);
+          return;
+        }
+      } else if (player === 'GUEST') {
+        if (state.pendingHostSnipe) {
+          // Host already chose, Guest has now chosen -> BOTH HAVE CHOSEN! Reveal both!
+          // Host sniped Guest's civ (state.pendingHostSnipe); Guest sniped Host's civ (itemId)
+          if (!nextState.guestSnipes.includes(state.pendingHostSnipe)) nextState.guestSnipes.push(state.pendingHostSnipe);
+          if (!nextState.hostSnipes.includes(itemId)) nextState.hostSnipes.push(itemId);
+          nextState.pendingHostSnipe = null;
+          nextState.pendingGuestSnipe = null;
+
+          triggerFlyAnimation(state.pendingHostSnipe, 'CIV', 'HOST', 'SNIPE');
+          triggerFlyAnimation(itemId, 'CIV', 'GUEST', 'SNIPE');
+
+          const stepIncrement = (turns[currentStep + 1]?.action === 'SNIPE') ? 2 : 1;
+          const nextStepIndex = room.current_step + stepIncrement;
+          const isCompleted = nextStepIndex >= turns.length;
+
+          const updated = await draftService.updateRoom(room.id, {
+            state: nextState,
+            current_step: isCompleted ? room.current_step : nextStepIndex,
+            status: isCompleted ? 'completed' : 'in_progress'
+          });
+          if (updated) setRoom(updated);
+          return;
+        } else {
+          // Only Guest chose so far -> store pending choice, waiting for Host
+          nextState.pendingGuestSnipe = itemId;
+          triggerFlyAnimation(itemId, 'CIV', 'GUEST', 'SNIPE');
+
+          const updated = await draftService.updateRoom(room.id, {
+            state: nextState
+          });
+          if (updated) setRoom(updated);
+          return;
+        }
+      }
+      return;
+    }
+
+    // Normal BAN or PICK action
+    triggerFlyAnimation(itemId, target, player, action);
 
     if (action === 'BAN') {
       nextState.banModes[itemId] = banMode;
@@ -546,14 +786,6 @@ export function DraftRoomPage() {
       } else if (action === 'BAN') {
         if (player === 'HOST') nextState.guestBans.push(itemId);
         else nextState.hostBans.push(itemId);
-      } else if (action === 'SNIPE') {
-        if (player === 'HOST') {
-          if (!nextState.guestSnipes.includes(itemId)) nextState.guestSnipes.push(itemId);
-          if (!nextState.guestPicks.includes(itemId)) nextState.guestPicks.push(itemId);
-        } else {
-          if (!nextState.hostSnipes.includes(itemId)) nextState.hostSnipes.push(itemId);
-          if (!nextState.hostPicks.includes(itemId)) nextState.hostPicks.push(itemId);
-        }
       }
     } else if (target === 'MAP') {
       if (action === 'PICK') {
@@ -806,15 +1038,43 @@ export function DraftRoomPage() {
             <span>{copiedLink ? '✓ Copiato!' : 'Copia Link Stanza'}</span>
           </button>
 
-          <button
-            onClick={() => {
-              sessionStorage.removeItem(`draft_role_${roomId}`);
-              setRole(null);
-            }}
-            className="px-3.5 py-1.5 bg-[#0b101e] hover:bg-slate-800 text-slate-300 rounded-xl text-xs font-bold border border-slate-700/80 transition-all shadow-md"
-          >
-            Cambia Ruolo
-          </button>
+          {room.status === 'waiting' && (
+            <button
+              onClick={handleRoleSwapOrChange}
+              title={
+                state.hostClaimed && state.guestClaimed
+                  ? 'Inverti ruoli tra Giocatore 1 e Giocatore 2'
+                  : role === 'HOST'
+                  ? 'Passa al ruolo di Guest'
+                  : role === 'GUEST'
+                  ? 'Passa al ruolo di Host'
+                  : 'Scegli Ruolo'
+              }
+              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0b101e] hover:bg-slate-800 text-slate-300 hover:text-white rounded-xl text-xs font-bold border border-slate-700/80 transition-all shadow-md active:scale-95 cursor-pointer"
+            >
+              {state.hostClaimed && state.guestClaimed ? (
+                <>
+                  <ArrowLeftRight size={14} className="text-cyan-400" />
+                  <span>Inverti Ruoli</span>
+                </>
+              ) : role === 'HOST' ? (
+                <>
+                  <RefreshCcw size={14} className="text-blue-400" />
+                  <span>Passa a Guest</span>
+                </>
+              ) : role === 'GUEST' ? (
+                <>
+                  <RefreshCcw size={14} className="text-red-400" />
+                  <span>Passa a Host</span>
+                </>
+              ) : (
+                <>
+                  <Users size={14} className="text-cyan-400" />
+                  <span>Scegli Ruolo</span>
+                </>
+              )}
+            </button>
+          )}
 
           <button
             onClick={() => setIsOverlayMode(!isOverlayMode)}
@@ -835,7 +1095,7 @@ export function DraftRoomPage() {
 
         {/* Player 1 Host Header (Clean Floating Layout) */}
         <div className={`md:col-span-4 flex flex-col justify-between gap-3 p-1 sm:p-2 transition-all ${
-          isHostTurn && room.status === 'in_progress' ? 'border-l-4 border-red-500 pl-3' : ''
+          (isHostTurn || (isSnipeAction && !state.pendingHostSnipe)) && room.status === 'in_progress' ? 'border-l-4 border-red-500 pl-3' : ''
         }`}>
           <div className="flex items-center gap-3">
             <div className={`w-11 h-11 rounded-2xl flex items-center justify-center font-extrabold text-base shrink-0 shadow-md ${
@@ -855,6 +1115,17 @@ export function DraftRoomPage() {
                   <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-amber-500/20 text-amber-400 rounded border border-amber-500/40 animate-pulse">
                     ⌛ IN ATTESA
                   </span>
+                )}
+                {isSnipeAction && room.status === 'in_progress' && (
+                  state.pendingHostSnipe ? (
+                    <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-purple-500/20 text-purple-300 rounded border border-purple-500/40">
+                      ✓ SNIPE INVIATO
+                    </span>
+                  ) : (
+                    <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-purple-500/10 text-purple-400 rounded border border-purple-500/20 animate-pulse">
+                      🎯 IN SCELTA...
+                    </span>
+                  )
                 )}
               </div>
               {/* Player Name Font */}
@@ -1023,7 +1294,7 @@ export function DraftRoomPage() {
           {room.status === 'in_progress' && currentTurn && (
             <div className="space-y-3 w-full">
               <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center justify-center gap-2">
-                <span>Step {room.current_step + 1} di {turns.length} • {currentTurn.player === 'ADMIN' ? '👑 Turno Admin' : currentTurn.player === 'HOST' ? '🔴 Turno Host' : '🔵 Turno Guest'}</span>
+                <span>Step {room.current_step + 1} di {turns.length} • {isSnipeAction ? '🎯 SNIPE Contemporaneo' : currentTurn.player === 'ADMIN' ? '👑 Turno Admin' : currentTurn.player === 'HOST' ? '🔴 Turno Host' : '🔵 Turno Guest'}</span>
                 {currentTurn.isHidden && (
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-purple-950/80 border border-purple-500/60 rounded-full text-purple-300 font-extrabold text-[10px] uppercase tracking-wider animate-pulse">
                     <Lock size={11} className="text-purple-400" /> Nascosto
@@ -1034,6 +1305,8 @@ export function DraftRoomPage() {
               <div className={`px-4 py-2 rounded-2xl border text-sm font-bold tracking-tight inline-block shadow-md ${
                 isAdminTurn
                   ? 'bg-amber-950/60 text-amber-300 border-amber-500/50'
+                  : isSnipeAction
+                  ? 'bg-purple-950/60 text-purple-300 border-purple-500/50'
                   : isMyTurn
                   ? 'bg-slate-800 text-cyan-300 border-cyan-500/50'
                   : 'bg-[#090e1a] text-slate-300 border-slate-800'
@@ -1051,12 +1324,22 @@ export function DraftRoomPage() {
                         : '🔮 Rivelazione ban e pick in corso...'}
                     </span>
                   </span>
+                ) : isSnipeAction ? (
+                  role === 'HOST' ? (
+                    hostNeedsSnipe
+                      ? `🎯 Effettua lo SNIPE tra i pick di ${room.guest_name} (Contemporaneo)`
+                      : `⏳ Hai scelto! In attesa che ${room.guest_name} completi lo SNIPE...`
+                  ) : role === 'GUEST' ? (
+                    guestNeedsSnipe
+                      ? `🎯 Effettua lo SNIPE tra i pick di ${room.host_name} (Contemporaneo)`
+                      : `⏳ Hai scelto! In attesa che ${room.host_name} completi lo SNIPE...`
+                  ) : (
+                    `🎯 Fase SNIPE in contemporanea (${state.pendingHostSnipe ? `${room.host_name} Pronto ✓` : `${room.host_name} in scelta...`} | ${state.pendingGuestSnipe ? `${room.guest_name} Pronto ✓` : `${room.guest_name} in scelta...`})`
+                  )
                 ) : isMyTurn ? (
                   `Il tuo Turno: ${
                     currentTurn.action === 'BAN'
                       ? (currentTurn.target === 'MAP' || room.preset?.scope === 'maps' ? 'Banna 1 mappa' : 'Banna 1 civiltà')
-                      : currentTurn.action === 'SNIPE'
-                      ? 'Effettua 1 SNIPE tra i pick dell\'avversario'
                       : (currentTurn.target === 'MAP' || room.preset?.scope === 'maps' ? 'Picka 1 mappa' : 'Picka 1 civiltà')
                   }${currentTurn.isHidden ? ' (🔒 Scelta Segreta)' : ''}`
                 ) : (
@@ -1165,11 +1448,22 @@ export function DraftRoomPage() {
 
         {/* Player 2 Guest Header (Clean Floating Layout) */}
         <div className={`md:col-span-4 flex flex-col justify-between gap-3 p-1 sm:p-2 transition-all ${
-          isGuestTurn && room.status === 'in_progress' ? 'border-r-4 border-blue-500 pr-3' : ''
+          (isGuestTurn || (isSnipeAction && !state.pendingGuestSnipe)) && room.status === 'in_progress' ? 'border-r-4 border-blue-500 pr-3' : ''
         }`}>
           <div className="flex items-center justify-end gap-3 text-right">
             <div className="overflow-hidden">
               <div className="flex items-center justify-end gap-2">
+                {isSnipeAction && room.status === 'in_progress' && (
+                  state.pendingGuestSnipe ? (
+                    <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-purple-500/20 text-purple-300 rounded border border-purple-500/40">
+                      ✓ SNIPE INVIATO
+                    </span>
+                  ) : (
+                    <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-purple-500/10 text-purple-400 rounded border border-purple-500/20 animate-pulse">
+                      🎯 IN SCELTA...
+                    </span>
+                  )
+                )}
                 {!guestClaimed && (
                   <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-amber-500/20 text-amber-400 rounded border border-amber-500/40 animate-pulse">
                     ⌛ IN ATTESA
@@ -1325,11 +1619,17 @@ export function DraftRoomPage() {
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
               <Swords size={16} className="text-cyan-400" /> Civiltà Disponibili
             </h3>
-            {isMyTurn && room.status === 'in_progress' && (
+            {room.status === 'in_progress' && (
               <span className="text-xs font-bold text-cyan-400 hidden sm:inline">
-                {currentTurn?.action === 'SNIPE'
-                  ? 'Clicca su una civiltà dell\'avversario per effettuare lo SNIPE'
-                  : 'Clicca su una civiltà per selezionarla'}
+                {isSnipeAction
+                  ? (role === 'HOST'
+                      ? (hostNeedsSnipe ? `Clicca su una civiltà di ${room.guest_name} per effettuare lo SNIPE` : 'Scelta effettuata! In attesa dell\'avversario...')
+                      : role === 'GUEST'
+                      ? (guestNeedsSnipe ? `Clicca su una civiltà di ${room.host_name} per effettuare lo SNIPE` : 'Scelta effettuata! In attesa dell\'avversario...')
+                      : 'Fase di SNIPE in contemporanea')
+                  : isMyTurn
+                  ? 'Clicca su una civiltà per selezionarla'
+                  : ''}
               </span>
             )}
           </div>
@@ -1348,44 +1648,58 @@ export function DraftRoomPage() {
               const action = currentTurn?.action;
               const activePlayer = currentTurn?.player;
 
+              const isMyPendingSnipe = isSnipeTurn && (
+                (role === 'HOST' && state.pendingHostSnipe === civ.id) ||
+                (role === 'GUEST' && state.pendingGuestSnipe === civ.id)
+              );
+
               let isClickable = false;
               let isUsed = isHostPick || isGuestPick || isHostBan || isGuestBan || isHostSnipe || isGuestSnipe;
 
-              if (isMyTurn && room.status === 'in_progress' && currentTurn) {
+              if (room.status === 'in_progress' && currentTurn) {
                 if (action === 'SNIPE') {
-                  isClickable = activePlayer === 'HOST' ? !!isGuestPick : !!isHostPick;
-                } else if (action === 'PICK') {
-                  if (isHostPick || isGuestPick || isHostSnipe || isGuestSnipe) {
-                    isClickable = false;
-                    isUsed = true;
-                  } else if ((isHostBan || isGuestBan) && banMode === 'GLOBAL') {
-                    isClickable = false;
-                    isUsed = true;
-                  } else {
-                    const bannedByOpponent = activePlayer === 'HOST' ? isGuestBan : isHostBan;
-                    if (bannedByOpponent) {
-                      isClickable = false;
-                      isUsed = true;
-                    } else {
-                      isClickable = true;
-                      isUsed = false;
-                    }
+                  if (role === 'HOST') {
+                    isClickable = !!isGuestPick && !(state.guestSnipes || []).includes(civ.id) && !state.pendingHostSnipe;
+                  } else if (role === 'GUEST') {
+                    isClickable = !!isHostPick && !(state.hostSnipes || []).includes(civ.id) && !state.pendingGuestSnipe;
                   }
-                } else if (action === 'BAN') {
-                  if (isHostPick || isGuestPick || isHostSnipe || isGuestSnipe) {
-                    isClickable = false;
-                    isUsed = true;
-                  } else if ((isHostBan || isGuestBan) && banMode === 'GLOBAL') {
-                    isClickable = false;
-                    isUsed = true;
-                  } else {
-                    const bannedBySelf = activePlayer === 'HOST' ? isHostBan : isGuestBan;
-                    if (bannedBySelf && (banMode === 'EXCLUSIVE' || banMode === 'GLOBAL')) {
+                  if (isClickable) {
+                    isUsed = false;
+                  }
+                } else if (isMyTurn) {
+                  if (action === 'PICK') {
+                    if (isHostPick || isGuestPick || isHostSnipe || isGuestSnipe) {
+                      isClickable = false;
+                      isUsed = true;
+                    } else if ((isHostBan || isGuestBan) && banMode === 'GLOBAL') {
                       isClickable = false;
                       isUsed = true;
                     } else {
-                      isClickable = true;
-                      isUsed = false;
+                      const bannedByOpponent = activePlayer === 'HOST' ? isGuestBan : isHostBan;
+                      if (bannedByOpponent) {
+                        isClickable = false;
+                        isUsed = true;
+                      } else {
+                        isClickable = true;
+                        isUsed = false;
+                      }
+                    }
+                  } else if (action === 'BAN') {
+                    if (isHostPick || isGuestPick || isHostSnipe || isGuestSnipe) {
+                      isClickable = false;
+                      isUsed = true;
+                    } else if ((isHostBan || isGuestBan) && banMode === 'GLOBAL') {
+                      isClickable = false;
+                      isUsed = true;
+                    } else {
+                      const bannedBySelf = activePlayer === 'HOST' ? isHostBan : isGuestBan;
+                      if (bannedBySelf && (banMode === 'EXCLUSIVE' || banMode === 'GLOBAL')) {
+                        isClickable = false;
+                        isUsed = true;
+                      } else {
+                        isClickable = true;
+                        isUsed = false;
+                      }
                     }
                   }
                 }
@@ -1428,6 +1742,15 @@ export function DraftRoomPage() {
                   </span>
 
                   {/* Overlays for Picked, Banned or Sniped */}
+                  {isMyPendingSnipe && (
+                    <div className="absolute inset-0 bg-purple-950/85 border-2 border-purple-400 flex flex-col items-center justify-center gap-1 text-purple-200 backdrop-blur-sm z-20 animate-pulse">
+                      <Target size={24} className="text-purple-300 stroke-[2.5]" />
+                      <span className="text-[9px] font-black uppercase tracking-wider text-purple-300 bg-purple-900/90 px-1.5 py-0.5 rounded border border-purple-400/60">
+                        IL TUO SNIPE
+                      </span>
+                      <span className="text-[8px] text-purple-300/80 font-semibold">(Segreto)</span>
+                    </div>
+                  )}
                   {!isSnipeTurn && isHostPick && (
                     <div className="absolute top-1.5 right-1.5 bg-red-600/90 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded shadow border border-red-400/50">
                       PICKED (P1)
