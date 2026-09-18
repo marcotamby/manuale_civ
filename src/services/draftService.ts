@@ -86,6 +86,20 @@ export function generateDraftId(length = 7): string {
   return result;
 }
 
+export function generateSessionToken(): string {
+  return 'p_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+}
+
+export function getSessionToken(rId: string): string {
+  let token = sessionStorage.getItem(`draft_session_token_${rId}`);
+  if (!token) {
+    token = generateSessionToken();
+    sessionStorage.setItem(`draft_session_token_${rId}`, token);
+  }
+  return token;
+}
+
+
 // Helper to save/read fallback room & presets in local storage
 function setLocalRoom(room: DraftRoom) {
   try {
@@ -311,7 +325,12 @@ export const draftService = {
   },
 
   // Room Management
-  async createRoom(preset: DraftPreset, playerName: string = 'Giocatore 1', role?: TurnPlayer): Promise<DraftRoom> {
+  async createRoom(
+    preset: DraftPreset,
+    playerName: string = 'Giocatore 1',
+    role?: TurnPlayer,
+    sessionToken?: string
+  ): Promise<DraftRoom> {
     const roomId = generateDraftId(7);
     const isHost = role === 'HOST';
     const isGuest = role === 'GUEST';
@@ -341,6 +360,8 @@ export const draftService = {
         guestReady: false,
         hostClaimed: isHost,
         guestClaimed: isGuest,
+        hostSessionToken: isHost ? (sessionToken || null) : null,
+        guestSessionToken: isGuest ? (sessionToken || null) : null,
         mapPicks: [],
         mapBans: [],
         hostMapPicks: [],

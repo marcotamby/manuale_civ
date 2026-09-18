@@ -1,22 +1,13 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Swords, Users, Shield, Clock, Eye, Check, X, RefreshCcw, Copy, Monitor, Trophy, Target, Lock, Search, Loader2, ArrowLeftRight } from 'lucide-react';
-import { draftService } from '../services/draftService';
+import { draftService, getSessionToken } from '../services/draftService';
 import type { DraftRoom, DraftTurn, TurnAction, DraftState } from '../services/draftService';
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
 import { useAuth } from './AuthContext';
 
 type UserRole = 'HOST' | 'GUEST' | 'SPECTATOR';
-
-const getSessionToken = (rId: string): string => {
-  let token = sessionStorage.getItem(`draft_session_token_${rId}`);
-  if (!token) {
-    token = 'p_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
-    sessionStorage.setItem(`draft_session_token_${rId}`, token);
-  }
-  return token;
-};
 
 export function DraftRoomPage() {
   const { user } = useAuth();
@@ -100,13 +91,16 @@ export function DraftRoomPage() {
           sessionStorage.setItem(`draft_role_${id}`, 'GUEST');
         } else if (data.state?.hostClaimed && !data.state?.guestClaimed) {
           setJoiningRole('GUEST');
-          setJoiningName(userAutoName || (data.guest_name && data.guest_name !== 'Giocatore 2' ? data.guest_name : 'Giocatore 2'));
+          setJoiningName(userAutoName || '');
         } else if (!data.state?.hostClaimed && data.state?.guestClaimed) {
           setJoiningRole('HOST');
-          setJoiningName(userAutoName || (data.host_name && data.host_name !== 'Giocatore 1' ? data.host_name : 'Giocatore 1'));
-        } else {
-          setJoiningRole(null);
           setJoiningName(userAutoName || '');
+        } else if (!data.state?.hostClaimed && !data.state?.guestClaimed) {
+          setJoiningRole('HOST');
+          setJoiningName(userAutoName || '');
+        } else {
+          setJoiningRole('SPECTATOR');
+          setJoiningName('');
         }
       }
     } catch (err) {
@@ -258,15 +252,24 @@ export function DraftRoomPage() {
     const nextState: DraftState = { ...state };
     const updates: Partial<DraftRoom> = { state: nextState };
     const myToken = roomId ? getSessionToken(roomId) : '';
+    const finalName = joiningName.trim() || user?.nickname?.trim() || (joiningRole === 'HOST' ? 'Host' : 'Guest');
 
     if (joiningRole === 'HOST') {
       nextState.hostClaimed = true;
       nextState.hostSessionToken = myToken;
-      updates.host_name = joiningName || room.host_name || 'Giocatore 1';
+      updates.host_name = finalName;
+      if (!nextState.guestClaimed) {
+        nextState.guestClaimed = false;
+        nextState.guestSessionToken = null;
+      }
     } else if (joiningRole === 'GUEST') {
       nextState.guestClaimed = true;
       nextState.guestSessionToken = myToken;
-      updates.guest_name = joiningName || room.guest_name || 'Giocatore 2';
+      updates.guest_name = finalName;
+      if (!nextState.hostClaimed) {
+        nextState.hostClaimed = false;
+        nextState.hostSessionToken = null;
+      }
     }
 
     const updated = await draftService.updateRoom(room.id, updates);
@@ -924,29 +927,71 @@ export function DraftRoomPage() {
               <p className="text-xs text-slate-400 mt-1">Stanza Match: <strong className="text-cyan-400">{room.title}</strong></p>
             </div>
 
-            <div className="space-y-3">
+            {/* Context Info Banner */}
+            {hostClaimed && !guestClaimed ? (
+              <div className="p-3 bg-red-950/40 border border-red-500/40 rounded-2xl text-xs text-red-200 text-center font-medium">
+                🔴 <strong>{room.host_name}</strong> è già entrato come Host.
+                <div className="text-emerald-400 font-bold mt-1">Scegli il ruolo Guest per giocare contro di lui!</div>
+              </div>
+            ) : !hostClaimed && guestClaimed ? (
+              <div className="p-3 bg-blue-950/40 border border-blue-500/40 rounded-2xl text-xs text-blue-200 text-center font-medium">
+                🔵 <strong>{room.guest_name}</strong> è già entrato come Guest.
+                <div className="text-emerald-400 font-bold mt-1">Scegli il ruolo Host per giocare contro di lui!</div>
+              </div>
+            ) : hostClaimed && guestClaimed ? (
+              <div className="p-3 bg-amber-950/40 border border-amber-500/40 rounded-2xl text-xs text-amber-200 text-center font-medium">
+                ⚠️ Entrambi i ruoli giocatore sono occupati (Host: <strong>{room.host_name}</strong>, Guest: <strong>{room.guest_name}</strong>).
+                <div className="text-purple-300 font-bold mt-1">Puoi entrare come Spettatore per guardare la diretta!</div>
+              </div>
+            ) : (
+              <div className="p-3 bg-slate-800/60 border border-slate-700/60 rounded-2xl text-xs text-slate-300 text-center font-medium">
+                Scegli se giocare come <strong>Host (Player 1)</strong> o <strong>Guest (Player 2)</strong>.
+              </div>
+            )}
+
+            <div className="space-y-2.5">
               {/* Host option */}
               <button
                 disabled={hostClaimed}
                 onClick={() => {
                   setJoiningRole('HOST');
                   const userAutoName = user?.nickname?.trim() || user?.email?.trim();
-                  if (userAutoName) {
+                  if (userAutoName && !joiningName) {
                     setJoiningName(userAutoName);
-                  } else if (!joiningName || joiningName === 'Giocatore 2') {
-                    setJoiningName(room.host_name && room.host_name !== 'Giocatore 1' ? room.host_name : 'Giocatore 1');
                   }
                 }}
                 className={`w-full py-3.5 px-4 rounded-2xl border font-bold text-sm flex items-center justify-between transition-all ${
                   hostClaimed
                     ? 'bg-slate-900/50 border-slate-800 text-slate-500 opacity-60 cursor-not-allowed'
                     : joiningRole === 'HOST'
-                    ? 'bg-red-600/30 border-red-500 text-white ring-2 ring-red-500/50'
-                    : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300 border-slate-700'
+                    ? 'bg-red-600/30 border-red-500 text-white ring-2 ring-red-500/50 shadow-lg shadow-red-500/10'
+                    : 'bg-slate-800/80 hover:bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-600 cursor-pointer'
                 }`}
               >
-                <span>🔴 Host: {hostClaimed ? `${room.host_name} (Occupato)` : 'Giocatore 1'}</span>
-                {hostClaimed ? <Lock size={16} /> : <Shield size={18} className="text-red-400" />}
+                <div className="flex items-center gap-2.5 text-left">
+                  <Shield size={18} className={hostClaimed ? 'text-slate-500' : 'text-red-400'} />
+                  <div>
+                    <span className="block font-extrabold">
+                      🔴 Host (Player 1)
+                    </span>
+                    <span className="text-[11px] font-normal text-slate-400 block">
+                      {hostClaimed ? `Occupato da ${room.host_name}` : 'Slot libero per giocare'}
+                    </span>
+                  </div>
+                </div>
+                {hostClaimed ? (
+                  <span className="flex items-center gap-1 text-xs font-bold text-slate-500 bg-slate-800 px-2 py-1 rounded-lg border border-slate-700">
+                    <Lock size={12} /> Occupato
+                  </span>
+                ) : (
+                  <span className={`text-xs font-extrabold px-2.5 py-1 rounded-lg border ${
+                    joiningRole === 'HOST'
+                      ? 'bg-red-500/30 text-red-200 border-red-400/50'
+                      : 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                  }`}>
+                    {joiningRole === 'HOST' ? '✓ SELEZIONATO' : 'LIBERO'}
+                  </span>
+                )}
               </button>
 
               {/* Guest option */}
@@ -955,35 +1000,67 @@ export function DraftRoomPage() {
                 onClick={() => {
                   setJoiningRole('GUEST');
                   const userAutoName = user?.nickname?.trim() || user?.email?.trim();
-                  if (userAutoName) {
+                  if (userAutoName && !joiningName) {
                     setJoiningName(userAutoName);
-                  } else if (!joiningName || joiningName === 'Giocatore 1') {
-                    setJoiningName(room.guest_name && room.guest_name !== 'Giocatore 2' ? room.guest_name : 'Giocatore 2');
                   }
                 }}
                 className={`w-full py-3.5 px-4 rounded-2xl border font-bold text-sm flex items-center justify-between transition-all ${
                   guestClaimed
                     ? 'bg-slate-900/50 border-slate-800 text-slate-500 opacity-60 cursor-not-allowed'
                     : joiningRole === 'GUEST'
-                    ? 'bg-blue-600/30 border-blue-500 text-white ring-2 ring-blue-500/50'
-                    : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300 border-slate-700'
+                    ? 'bg-blue-600/30 border-blue-500 text-white ring-2 ring-blue-500/50 shadow-lg shadow-blue-500/10'
+                    : 'bg-slate-800/80 hover:bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-600 cursor-pointer'
                 }`}
               >
-                <span>🔵 Guest: {guestClaimed ? `${room.guest_name} (Occupato)` : 'Giocatore 2'}</span>
-                {guestClaimed ? <Lock size={16} /> : <Shield size={18} className="text-blue-400" />}
+                <div className="flex items-center gap-2.5 text-left">
+                  <Shield size={18} className={guestClaimed ? 'text-slate-500' : 'text-blue-400'} />
+                  <div>
+                    <span className="block font-extrabold">
+                      🔵 Guest (Player 2)
+                    </span>
+                    <span className="text-[11px] font-normal text-slate-400 block">
+                      {guestClaimed ? `Occupato da ${room.guest_name}` : 'Slot libero per giocare'}
+                    </span>
+                  </div>
+                </div>
+                {guestClaimed ? (
+                  <span className="flex items-center gap-1 text-xs font-bold text-slate-500 bg-slate-800 px-2 py-1 rounded-lg border border-slate-700">
+                    <Lock size={12} /> Occupato
+                  </span>
+                ) : (
+                  <span className={`text-xs font-extrabold px-2.5 py-1 rounded-lg border ${
+                    joiningRole === 'GUEST'
+                      ? 'bg-blue-500/30 text-blue-200 border-blue-400/50'
+                      : 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                  }`}>
+                    {joiningRole === 'GUEST' ? '✓ SELEZIONATO' : 'LIBERO'}
+                  </span>
+                )}
               </button>
 
               {/* Spectator option */}
               <button
                 onClick={() => setJoiningRole('SPECTATOR')}
-                className={`w-full py-3.5 px-4 rounded-2xl border font-bold text-sm flex items-center justify-between transition-all ${
+                className={`w-full py-3.5 px-4 rounded-2xl border font-bold text-sm flex items-center justify-between transition-all cursor-pointer ${
                   joiningRole === 'SPECTATOR'
-                    ? 'bg-purple-600/30 border-purple-500 text-white ring-2 ring-purple-500/50'
-                    : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300 border-slate-700'
+                    ? 'bg-purple-600/30 border-purple-500 text-white ring-2 ring-purple-500/50 shadow-lg shadow-purple-500/10'
+                    : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300 border-slate-700 hover:border-slate-600'
                 }`}
               >
-                <span>👁️ Entra come Spettatore / Streamer</span>
-                <Eye size={18} className="text-purple-400" />
+                <div className="flex items-center gap-2.5 text-left">
+                  <Eye size={18} className="text-purple-400" />
+                  <div>
+                    <span className="block font-extrabold">👁️ Spettatore / Streamer</span>
+                    <span className="text-[11px] font-normal text-slate-400 block">Osserva il draft in tempo reale</span>
+                  </div>
+                </div>
+                <span className={`text-xs font-extrabold px-2.5 py-1 rounded-lg border ${
+                  joiningRole === 'SPECTATOR'
+                    ? 'bg-purple-500/30 text-purple-200 border-purple-400/50'
+                    : 'bg-slate-700/50 text-slate-400 border-slate-600/40'
+                }`}>
+                  {joiningRole === 'SPECTATOR' ? '✓ SELEZIONATO' : 'LIBERO'}
+                </span>
               </button>
             </div>
 
@@ -991,28 +1068,34 @@ export function DraftRoomPage() {
             {joiningRole && joiningRole !== 'SPECTATOR' && (
               <div className="text-left space-y-1.5 pt-2">
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
-                  Il tuo Nome in-game
+                  Il tuo Nome in-game {joiningRole === 'HOST' ? '(Host - P1)' : '(Guest - P2)'}
                 </label>
                 <input
                   type="text"
                   value={joiningName}
                   onChange={(e) => setJoiningName(e.target.value)}
-                  placeholder="Inserisci il tuo Nickname"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:border-cyan-400 focus:outline-none"
+                  placeholder="Inserisci il tuo Nickname in-game"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white font-bold text-sm focus:border-cyan-400 focus:outline-none placeholder:text-slate-600"
                 />
               </div>
             )}
 
             <button
               onClick={handleConfirmRole}
-              disabled={!joiningRole}
+              disabled={!joiningRole || (joiningRole === 'HOST' && hostClaimed) || (joiningRole === 'GUEST' && guestClaimed)}
               className={`w-full py-3.5 font-extrabold text-sm rounded-2xl transition-all ${
-                joiningRole
-                  ? 'bg-slate-200 hover:bg-white text-black shadow-lg cursor-pointer'
+                joiningRole && !((joiningRole === 'HOST' && hostClaimed) || (joiningRole === 'GUEST' && guestClaimed))
+                  ? 'bg-slate-200 hover:bg-white text-black shadow-lg cursor-pointer active:scale-98'
                   : 'bg-slate-800/80 text-slate-500 border border-slate-700/60 cursor-not-allowed opacity-50'
               }`}
             >
-              CONFERMA ED ENTRA IN STANZA
+              {joiningRole === 'HOST'
+                ? 'CONFERMA ED ENTRA COME HOST (P1)'
+                : joiningRole === 'GUEST'
+                ? 'CONFERMA ED ENTRA COME GUEST (P2)'
+                : joiningRole === 'SPECTATOR'
+                ? 'ENTRA COME SPETTATORE'
+                : 'SELEZIONA UN RUOLO'}
             </button>
           </div>
         </div>

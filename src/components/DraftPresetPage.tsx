@@ -1,16 +1,29 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Swords, ArrowRight, Loader2 } from 'lucide-react';
-import { draftService } from '../services/draftService';
+import { Swords, ArrowRight, Loader2, Shield } from 'lucide-react';
+import { draftService, generateSessionToken } from '../services/draftService';
 import type { DraftPreset } from '../services/draftService';
+import { useAuth } from './AuthContext';
 
 export function DraftPresetPage() {
+  const { user } = useAuth();
   const { presetId } = useParams<{ presetId: string }>();
   const navigate = useNavigate();
 
   const [preset, setPreset] = useState<DraftPreset | null>(null);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+
+  const [chosenRole, setChosenRole] = useState<'HOST' | 'GUEST'>('HOST');
+  const [nickname, setNickname] = useState('');
+
+  useEffect(() => {
+    if (user?.nickname) {
+      setNickname(user.nickname);
+    } else if (user?.email) {
+      setNickname(user.email.split('@')[0]);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (presetId) {
@@ -52,8 +65,11 @@ export function DraftPresetPage() {
     if (!preset) return;
     setCreating(true);
     try {
-      const room = await draftService.createRoom(preset);
-      sessionStorage.removeItem(`draft_role_${room.id}`);
+      const sessionToken = generateSessionToken();
+      const finalName = nickname.trim() || user?.nickname?.trim() || (chosenRole === 'HOST' ? 'Host' : 'Guest');
+      const room = await draftService.createRoom(preset, finalName, chosenRole, sessionToken);
+      sessionStorage.setItem(`draft_session_token_${room.id}`, sessionToken);
+      sessionStorage.setItem(`draft_role_${room.id}`, chosenRole);
       navigate(`/draft/room/${room.id}`);
     } catch (err) {
       console.error('Error creating draft room:', err);
@@ -128,12 +144,69 @@ export function DraftPresetPage() {
           </div>
         </div>
 
+        {/* Role & Nickname Configuration */}
+        <div className="max-w-md mx-auto bg-[#0b101e] border border-slate-700/80 rounded-2xl p-4 sm:p-5 space-y-4 shadow-xl">
+          <div className="text-center">
+            <h3 className="text-sm font-extrabold text-white uppercase tracking-wider">
+              Configura il tuo Ingresso in Stanza
+            </h3>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Scegli come vuoi entrare; potrai condividere il link con l'avversario.
+            </p>
+          </div>
+
+          <div className="space-y-1.5 text-left">
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+              Il tuo Ruolo iniziale
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setChosenRole('HOST')}
+                className={`py-2.5 px-3 rounded-xl border text-xs font-extrabold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                  chosenRole === 'HOST'
+                    ? 'bg-red-600/30 border-red-500 text-white ring-2 ring-red-500/50 shadow-md shadow-red-500/20'
+                    : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white hover:border-slate-600'
+                }`}
+              >
+                <Shield size={14} className={chosenRole === 'HOST' ? 'text-red-400' : 'text-slate-500'} />
+                <span>🔴 Host (P1)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setChosenRole('GUEST')}
+                className={`py-2.5 px-3 rounded-xl border text-xs font-extrabold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                  chosenRole === 'GUEST'
+                    ? 'bg-blue-600/30 border-blue-500 text-white ring-2 ring-blue-500/50 shadow-md shadow-blue-500/20'
+                    : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white hover:border-slate-600'
+                }`}
+              >
+                <Shield size={14} className={chosenRole === 'GUEST' ? 'text-blue-400' : 'text-slate-500'} />
+                <span>🔵 Guest (P2)</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-1.5 text-left">
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+              Il tuo Nickname in-game
+            </label>
+            <input
+              type="text"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              placeholder="Inserisci il tuo Nickname"
+              className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-white font-bold text-sm focus:border-cyan-400 focus:outline-none placeholder:text-slate-600"
+            />
+          </div>
+        </div>
+
         {/* Action Button */}
-        <div className="pt-4 text-center">
+        <div className="pt-2 text-center">
           <button
             onClick={handleStartDraft}
             disabled={creating}
-            className="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-300 hover:from-white hover:to-slate-200 text-black font-extrabold text-lg rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-all flex items-center justify-center gap-3 mx-auto disabled:opacity-50"
+            className="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-300 hover:from-white hover:to-slate-200 text-black font-extrabold text-lg rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-all flex items-center justify-center gap-3 mx-auto disabled:opacity-50 cursor-pointer"
           >
             {creating ? (
               <>

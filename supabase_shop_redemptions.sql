@@ -71,7 +71,12 @@ CREATE OR REPLACE FUNCTION notify_shop_redemption_discord()
 RETURNS trigger AS $$
 DECLARE
   payload jsonb;
-  discord_url text := 'https://discord.com/api/webhooks/1511719567590817954/k8yCVluVaJiJ7H_CeTFFldsUzdlAhnPE7kmr_Vr4KCU-gUDp7tRTLU9ov303ab60u0kg';
+  -- ATTENZIONE SICUREZZA: Non committare mai l'URL reale del webhook su GitHub!
+  -- Inserisci il nuovo webhook generato su Discord solo direttamente nell'SQL Editor di Supabase o tramite app.settings
+  discord_url text := coalesce(
+    nullif(current_setting('app.settings.discord_shop_webhook', true), ''),
+    'INSERISCI_QUI_IL_NUOVO_WEBHOOK_URL_SOLO_IN_SUPABASE'
+  );
 BEGIN
   payload := jsonb_build_object(
     'content', format('🛒 **Nuovo riscatto sul Negozio Pecore!**' || chr(10) || 
