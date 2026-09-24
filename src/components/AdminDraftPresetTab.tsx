@@ -17,9 +17,10 @@ export function AdminDraftPresetTab() {
 
   // Custom Premium Delete Confirmation Modal State
   const [deleteConfirm, setDeleteConfirm] = useState<{
-    type: 'preset' | 'room';
-    id: string;
+    type: 'preset' | 'room' | 'multiple_rooms';
+    id?: string;
     title: string;
+    roomIds?: string[];
   } | null>(null);
 
   // Draft History State
@@ -27,6 +28,8 @@ export function AdminDraftPresetTab() {
   const [historyRooms, setHistoryRooms] = useState<DraftRoom[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [showArchivedFilter, setShowArchivedFilter] = useState(false);
+  const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([]);
+  const [isBatchProcessing, setIsBatchProcessing] = useState(false);
 
   useEffect(() => {
     loadPresets();
@@ -46,6 +49,7 @@ export function AdminDraftPresetTab() {
 
   const handleOpenHistory = async (preset: DraftPreset) => {
     setHistoryPreset(preset);
+    setSelectedRoomIds([]);
     setLoadingHistory(true);
     try {
       const rooms = await draftService.getRoomsByPresetId(preset.id);
@@ -60,6 +64,7 @@ export function AdminDraftPresetTab() {
   const handleToggleArchiveRoom = async (roomId: string, currentArchivedState: boolean) => {
     const nextArchived = !currentArchivedState;
     setHistoryRooms(prev => prev.map(r => r.id === roomId ? { ...r, is_archived: nextArchived, state: { ...r.state, is_archived: nextArchived } } : r));
+    setSelectedRoomIds(prev => prev.filter(id => id !== roomId));
     await draftService.archiveRoom(roomId, nextArchived);
     if (historyPreset) {
       const rooms = await draftService.getRoomsByPresetId(historyPreset.id);
@@ -67,10 +72,41 @@ export function AdminDraftPresetTab() {
     }
   };
 
+  const handleBatchArchive = async (toArchived: boolean) => {
+    const idsToProcess = selectedRoomIds.filter(id => filteredRooms.some(r => r.id === id));
+    if (idsToProcess.length === 0) return;
+
+    setIsBatchProcessing(true);
+    try {
+      setHistoryRooms(prev => prev.map(r => idsToProcess.includes(r.id) ? { ...r, is_archived: toArchived, state: { ...r.state, is_archived: toArchived } } : r));
+      await draftService.archiveMultipleRooms(idsToProcess, toArchived);
+      if (historyPreset) {
+        const rooms = await draftService.getRoomsByPresetId(historyPreset.id);
+        setHistoryRooms(rooms);
+      }
+      setSelectedRoomIds(prev => prev.filter(id => !idsToProcess.includes(id)));
+    } catch (err) {
+      console.error('Batch archive error:', err);
+    } finally {
+      setIsBatchProcessing(false);
+    }
+  };
+
+  const handlePromptBatchDelete = () => {
+    const idsToDelete = selectedRoomIds.filter(id => filteredRooms.some(r => r.id === id));
+    if (idsToDelete.length === 0) return;
+
+    setDeleteConfirm({
+      type: 'multiple_rooms',
+      title: `${idsToDelete.length} stanze selezionate`,
+      roomIds: idsToDelete
+    });
+  };
+
   const handleConfirmDelete = async () => {
     if (!deleteConfirm) return;
 
-    if (deleteConfirm.type === 'preset') {
+    if (deleteConfirm.type === 'preset' && deleteConfirm.id) {
       try {
         await draftService.deletePreset(deleteConfirm.id);
         setDeleteConfirm(null);
@@ -78,15 +114,34 @@ export function AdminDraftPresetTab() {
       } catch (err) {
         console.error('Failed to delete preset:', err);
       }
-    } else if (deleteConfirm.type === 'room') {
+    } else if (deleteConfirm.type === 'room' && deleteConfirm.id) {
       const roomIdToDelete = deleteConfirm.id;
       setDeleteConfirm(null);
+      setSelectedRoomIds(prev => prev.filter(id => id !== roomIdToDelete));
       setHistoryRooms(prev => prev.filter(r => r.id !== roomIdToDelete));
       
       await draftService.deleteRoom(roomIdToDelete);
       if (historyPreset) {
         const rooms = await draftService.getRoomsByPresetId(historyPreset.id);
         setHistoryRooms(rooms.filter(r => r.id !== roomIdToDelete));
+      }
+    } else if (deleteConfirm.type === 'multiple_rooms' && deleteConfirm.roomIds) {
+      const idsToDelete = deleteConfirm.roomIds;
+      setDeleteConfirm(null);
+      setIsBatchProcessing(true);
+      setSelectedRoomIds(prev => prev.filter(id => !idsToDelete.includes(id)));
+      setHistoryRooms(prev => prev.filter(r => !idsToDelete.includes(r.id)));
+
+      try {
+        await draftService.deleteMultipleRooms(idsToDelete);
+        if (historyPreset) {
+          const rooms = await draftService.getRoomsByPresetId(historyPreset.id);
+          setHistoryRooms(rooms.filter(r => !idsToDelete.includes(r.id)));
+        }
+      } catch (err) {
+        console.error('Failed to delete multiple rooms:', err);
+      } finally {
+        setIsBatchProcessing(false);
       }
     }
   };
@@ -233,6 +288,24 @@ export function AdminDraftPresetTab() {
 
   // Filter rooms by archived state
   const filteredRooms = historyRooms.filter(r => showArchivedFilter ? !!r.is_archived : !r.is_archived);
+  const selectedCountInFilter = filteredRooms.filter(r => selectedRoomIds.includes(r.id)).length;
+  const allFilteredSelected = filteredRooms.length > 0 && selectedCountInFilter === filteredRooms.length;
+  const someFilteredSelected = selectedCountInFilter > 0 && !allFilteredSelected;
+
+  const handleToggleSelectAll = () => {
+    if (allFilteredSelected) {
+      setSelectedRoomIds(prev => prev.filter(id => !filteredRooms.some(r => r.id === id)));
+    } else {
+      const filteredIds = filteredRooms.map(r => r.id);
+      setSelectedRoomIds(prev => Array.from(new Set([...prev, ...filteredIds])));
+    }
+  };
+
+  const handleToggleSelectRoom = (roomId: string) => {
+    setSelectedRoomIds(prev =>
+      prev.includes(roomId) ? prev.filter(id => id !== roomId) : [...prev, roomId]
+    );
+  };
 
   return (
     <div className="space-y-6 font-sans">
@@ -246,10 +319,18 @@ export function AdminDraftPresetTab() {
             </div>
             <div>
               <h3 className="text-xl font-extrabold text-white tracking-tight">
-                {deleteConfirm.type === 'preset' ? 'Eliminare il Preset?' : 'Eliminare Stanza dallo Storico?'}
+                {deleteConfirm.type === 'preset'
+                  ? 'Eliminare il Preset?'
+                  : deleteConfirm.type === 'multiple_rooms'
+                  ? `Eliminare ${deleteConfirm.roomIds?.length} Stanze dallo Storico?`
+                  : 'Eliminare Stanza dallo Storico?'}
               </h3>
               <p className="text-sm text-slate-300 mt-2">
-                Sei sicuro di voler eliminare definitivamente <strong className="text-white">"{deleteConfirm.title}"</strong>?
+                {deleteConfirm.type === 'multiple_rooms' ? (
+                  <>Sei sicuro di voler eliminare definitivamente le <strong className="text-white">{deleteConfirm.roomIds?.length} stanze selezionate</strong> dallo storico?</>
+                ) : (
+                  <>Sei sicuro di voler eliminare definitivamente <strong className="text-white">"{deleteConfirm.title}"</strong>?</>
+                )}
               </p>
               <p className="text-xs text-red-400 mt-1 font-semibold">
                 Questa azione è irreversibile.
@@ -298,7 +379,7 @@ export function AdminDraftPresetTab() {
       {/* Draft History Modal */}
       {historyPreset && (
         <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0b101e] border border-slate-700/60 rounded-3xl p-6 sm:p-8 max-w-4xl w-full space-y-6 shadow-2xl max-h-[90vh] flex flex-col">
+          <div className="bg-[#0b101e] border border-slate-700/60 rounded-3xl p-6 sm:p-8 max-w-4xl w-full space-y-4 shadow-2xl max-h-[90vh] flex flex-col">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-800 shrink-0">
               <div>
                 <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
@@ -311,7 +392,10 @@ export function AdminDraftPresetTab() {
               {/* Filter & Close */}
               <div className="flex items-center gap-2 self-end sm:self-auto">
                 <button
-                  onClick={() => setShowArchivedFilter(!showArchivedFilter)}
+                  onClick={() => {
+                    setShowArchivedFilter(!showArchivedFilter);
+                    setSelectedRoomIds([]);
+                  }}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${
                     showArchivedFilter
                       ? 'bg-purple-950/60 border-purple-500 text-purple-300'
@@ -322,13 +406,85 @@ export function AdminDraftPresetTab() {
                   <span>{showArchivedFilter ? 'Mostra Attivi' : 'Mostra Archivio'}</span>
                 </button>
                 <button
-                  onClick={() => setHistoryPreset(null)}
+                  onClick={() => {
+                    setHistoryPreset(null);
+                    setSelectedRoomIds([]);
+                  }}
                   className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors"
                 >
                   <X size={20} />
                 </button>
               </div>
             </div>
+
+            {/* Selection & Batch Actions Bar */}
+            {!loadingHistory && filteredRooms.length > 0 && (
+              <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-950/70 border border-slate-800/80 p-3 rounded-2xl shrink-0">
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2.5 cursor-pointer select-none text-xs font-bold text-slate-200 hover:text-white">
+                    <input
+                      type="checkbox"
+                      checked={allFilteredSelected}
+                      ref={el => {
+                        if (el) el.indeterminate = someFilteredSelected;
+                      }}
+                      onChange={handleToggleSelectAll}
+                      className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-cyan-500 focus:ring-cyan-500/30 cursor-pointer accent-cyan-500"
+                    />
+                    <span>Seleziona tutti ({filteredRooms.length})</span>
+                  </label>
+
+                  {selectedCountInFilter > 0 && (
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold">
+                      {selectedCountInFilter} selezionat{selectedCountInFilter === 1 ? 'a' : 'e'}
+                    </span>
+                  )}
+                </div>
+
+                {selectedCountInFilter > 0 && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {showArchivedFilter ? (
+                      <button
+                        onClick={() => handleBatchArchive(false)}
+                        disabled={isBatchProcessing}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-950/70 hover:bg-emerald-900/90 border border-emerald-500/50 text-emerald-300 rounded-xl text-xs font-bold transition-all shadow disabled:opacity-50"
+                        title="Ripristina le stanze selezionate dall'archivio"
+                      >
+                        {isBatchProcessing ? <Loader2 size={13} className="animate-spin" /> : <RotateCcw size={13} />}
+                        <span>Ripristina selezionati ({selectedCountInFilter})</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleBatchArchive(true)}
+                        disabled={isBatchProcessing}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-950/70 hover:bg-purple-900/90 border border-purple-500/50 text-purple-300 rounded-xl text-xs font-bold transition-all shadow disabled:opacity-50"
+                        title="Archivia le stanze selezionate"
+                      >
+                        {isBatchProcessing ? <Loader2 size={13} className="animate-spin" /> : <Archive size={13} />}
+                        <span>Archivia selezionati ({selectedCountInFilter})</span>
+                      </button>
+                    )}
+
+                    <button
+                      onClick={handlePromptBatchDelete}
+                      disabled={isBatchProcessing}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-red-950/70 hover:bg-red-900/90 border border-red-500/50 text-red-300 rounded-xl text-xs font-bold transition-all shadow disabled:opacity-50"
+                      title="Elimina definitivamente le stanze selezionate"
+                    >
+                      <Trash2 size={13} />
+                      <span>Elimina selezionati ({selectedCountInFilter})</span>
+                    </button>
+
+                    <button
+                      onClick={() => setSelectedRoomIds(prev => prev.filter(id => !filteredRooms.some(r => r.id === id)))}
+                      className="text-xs text-slate-400 hover:text-slate-200 px-2 py-1 transition-colors font-medium"
+                    >
+                      Deseleziona
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="flex-1 overflow-y-auto space-y-3 pr-1">
               {loadingHistory ? (
@@ -345,40 +501,57 @@ export function AdminDraftPresetTab() {
                 filteredRooms.map((room) => {
                   const state = room.state || { hostPicks: [], guestPicks: [] };
                   const isArchived = !!room.is_archived;
+                  const isSelected = selectedRoomIds.includes(room.id);
                   return (
                     <div
                       key={room.id}
                       className={`p-4 rounded-2xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all ${
-                        isArchived ? 'bg-slate-950/30 border-slate-800/60 opacity-70' : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                        isSelected
+                          ? 'bg-cyan-950/25 border-cyan-500/60 shadow-[0_0_15px_rgba(6,182,212,0.12)]'
+                          : isArchived
+                          ? 'bg-slate-950/30 border-slate-800/60 opacity-70'
+                          : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
                       }`}
                     >
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-extrabold text-white text-base">
-                            🔴 {room.host_name} <span className="text-slate-500 font-normal">vs</span> 🔵 {room.guest_name}
-                          </span>
-                          <span className={`text-[10px] uppercase font-black px-2 py-0.5 rounded-md border ${
-                            room.status === 'completed'
-                              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-                              : room.status === 'in_progress'
-                              ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
-                              : 'bg-slate-800 text-slate-400 border-slate-700'
-                          }`}>
-                            {room.status}
-                          </span>
-                          {isArchived && (
-                            <span className="text-[9px] font-bold px-1.5 py-0.5 bg-purple-500/20 text-purple-300 rounded border border-purple-500/40">
-                              ARCHIVIATO
-                            </span>
-                          )}
+                      <div className="flex items-start gap-3 w-full sm:w-auto">
+                        <div className="pt-1 shrink-0">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => handleToggleSelectRoom(room.id)}
+                            className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-cyan-500 focus:ring-cyan-500/30 cursor-pointer accent-cyan-500"
+                            aria-label={`Seleziona draft ${room.host_name} vs ${room.guest_name}`}
+                          />
                         </div>
-                        <p className="text-xs text-slate-400">
-                          Data: {new Date(room.created_at || Date.now()).toLocaleString('it-IT')} • ID Stanza: <strong className="text-slate-200">{room.id}</strong>
-                        </p>
-                        <div className="flex flex-wrap gap-1 text-[11px] pt-1">
-                          <span className="text-red-400 font-bold">P1:</span> {state.hostPicks?.join(', ') || 'Nessun pick'}
-                          <span className="text-slate-600 px-1">•</span>
-                          <span className="text-blue-400 font-bold">P2:</span> {state.guestPicks?.join(', ') || 'Nessun pick'}
+
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-extrabold text-white text-base">
+                              🔴 {room.host_name} <span className="text-slate-500 font-normal">vs</span> 🔵 {room.guest_name}
+                            </span>
+                            <span className={`text-[10px] uppercase font-black px-2 py-0.5 rounded-md border ${
+                              room.status === 'completed'
+                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                                : room.status === 'in_progress'
+                                ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
+                                : 'bg-slate-800 text-slate-400 border-slate-700'
+                            }`}>
+                              {room.status}
+                            </span>
+                            {isArchived && (
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 bg-purple-500/20 text-purple-300 rounded border border-purple-500/40">
+                                ARCHIVIATO
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-slate-400">
+                            Data: {new Date(room.created_at || Date.now()).toLocaleString('it-IT')} • ID Stanza: <strong className="text-slate-200">{room.id}</strong>
+                          </p>
+                          <div className="flex flex-wrap gap-1 text-[11px] pt-1">
+                            <span className="text-red-400 font-bold">P1:</span> {state.hostPicks?.join(', ') || 'Nessun pick'}
+                            <span className="text-slate-600 px-1">•</span>
+                            <span className="text-blue-400 font-bold">P2:</span> {state.guestPicks?.join(', ') || 'Nessun pick'}
+                          </div>
                         </div>
                       </div>
 

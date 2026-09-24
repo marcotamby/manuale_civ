@@ -694,7 +694,7 @@ export function TournamentsPage() {
               config: { 
                 ...config, 
                 directLink: 'https://challonge.com/it/gyunrhoc',
-                bannerUrl: config.bannerUrl || '/vetro_oro.png',
+                bannerUrl: config.bannerUrl || '/vetro_oro.webp',
                 period: config.period || 'Marzo 2026',
                 type: config.type || '3v3', // Default to 3v3 for Scudi d'oro unless DB says otherwise
                 podium: config.podium || [

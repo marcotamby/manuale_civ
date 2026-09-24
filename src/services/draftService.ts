@@ -496,6 +496,75 @@ export const draftService = {
     return true;
   },
 
+  async archiveMultipleRooms(roomIds: string[], isArchived: boolean): Promise<boolean> {
+    if (!roomIds.length) return true;
+    for (const id of roomIds) {
+      markLocalRoomArchived(id, isArchived);
+      const local = getLocalRoom(id);
+      if (local) {
+        local.is_archived = isArchived;
+        if (local.state) local.state.is_archived = isArchived;
+        setLocalRoom(local);
+      }
+    }
+
+    try {
+      const { data: currentRooms } = await supabase
+        .from('draft_rooms')
+        .select('id, state')
+        .in('id', roomIds);
+
+      if (currentRooms && currentRooms.length > 0) {
+        await Promise.all(currentRooms.map(async (r) => {
+          const nextState = { ...(r.state || {}), is_archived: isArchived };
+          let { error } = await supabase
+            .from('draft_rooms')
+            .update({ is_archived: isArchived, state: nextState })
+            .eq('id', r.id);
+
+          if (error && error.message?.includes('is_archived')) {
+            await supabase
+              .from('draft_rooms')
+              .update({ state: nextState })
+              .eq('id', r.id);
+          }
+        }));
+      } else {
+        await supabase
+          .from('draft_rooms')
+          .update({ is_archived: isArchived })
+          .in('id', roomIds);
+      }
+    } catch (e) {
+      console.warn('Supabase archive multiple rooms notice:', e);
+    }
+    return true;
+  },
+
+  async deleteMultipleRooms(roomIds: string[]): Promise<boolean> {
+    if (!roomIds.length) return true;
+    for (const id of roomIds) {
+      markLocalRoomDeleted(id);
+      try {
+        localStorage.removeItem(`fallback_draft_room_${id}`);
+      } catch (e) {}
+    }
+
+    try {
+      const { error } = await supabase
+        .from('draft_rooms')
+        .delete()
+        .in('id', roomIds);
+
+      if (error) {
+        console.warn('Error deleting multiple draft rooms:', error.message);
+      }
+    } catch (e) {
+      console.warn('Supabase delete multiple rooms exception:', e);
+    }
+    return true;
+  },
+
   async deleteRoom(roomId: string): Promise<boolean> {
     markLocalRoomDeleted(roomId);
     try {
