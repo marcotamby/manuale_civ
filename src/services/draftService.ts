@@ -311,6 +311,47 @@ export const draftService = {
     return savedPreset;
   },
 
+  async duplicatePreset(presetOrId: DraftPreset | string, newTitle: string): Promise<DraftPreset | null> {
+    let source: DraftPreset | null = null;
+    if (typeof presetOrId === 'string') {
+      source = await this.getPresetById(presetOrId);
+    } else {
+      source = presetOrId;
+    }
+    if (!source) throw new Error('Preset non trovato');
+
+    const trimmedTitle = newTitle.trim();
+    if (!trimmedTitle) throw new Error('Il nuovo titolo è obbligatorio');
+
+    const pool = (source.map_pool && Array.isArray(source.map_pool) && source.map_pool.length > 0)
+      ? [...source.map_pool]
+      : (source.turns && Array.isArray(source.turns))
+      ? (source.turns.find((t: any) => Array.isArray(t._map_pool)) as any)?._map_pool || [...AOE4_MAPS]
+      : [...AOE4_MAPS];
+
+    const clonedTurns: DraftTurn[] = (source.turns || []).map((t, idx) => ({
+      step: idx + 1,
+      player: t.player,
+      action: t.action,
+      target: t.target,
+      amount: t.amount,
+      timeLimit: t.timeLimit,
+      ...(t.banMode ? { banMode: t.banMode } : {}),
+      ...(t.isHidden !== undefined ? { isHidden: t.isHidden } : {})
+    }));
+
+    const newPresetPayload: Partial<DraftPreset> = {
+      title: trimmedTitle,
+      description: source.description || '',
+      scope: source.scope || 'civs',
+      is_active: source.is_active ?? true,
+      turns: clonedTurns,
+      map_pool: pool
+    };
+
+    return await this.savePreset(newPresetPayload);
+  },
+
   async deletePreset(id: string): Promise<boolean> {
     removeLocalPreset(id);
     const { error } = await supabase

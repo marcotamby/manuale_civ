@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { GripVertical, Plus, Trash2, Edit2, Copy, Check, Clock, Layers, ChevronUp, ChevronDown, Swords, History, ExternalLink, X, Archive, RotateCcw, AlertTriangle, Loader2, Search, Lock, Eye } from 'lucide-react';
+import { GripVertical, Plus, Trash2, Edit2, Copy, CopyPlus, Check, Clock, Layers, ChevronUp, ChevronDown, Swords, History, ExternalLink, X, Archive, RotateCcw, AlertTriangle, Loader2, Search, Lock, Eye } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { draftService } from '../services/draftService';
 import type { DraftPreset, DraftTurn, TurnPlayer, TurnAction, TurnTarget, BanMode, DraftRoom } from '../services/draftService';
 import { AOE4_MAPS } from '../data/aoe4Maps';
@@ -14,6 +15,21 @@ export function AdminDraftPresetTab() {
   // In-button saving state
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Duplicate Preset Modal State
+  const [duplicateModal, setDuplicateModal] = useState<{
+    isOpen: boolean;
+    sourcePreset: DraftPreset | null;
+    newTitle: string;
+    error?: string;
+    isDuplicating: boolean;
+  }>({
+    isOpen: false,
+    sourcePreset: null,
+    newTitle: '',
+    error: undefined,
+    isDuplicating: false,
+  });
 
   // Custom Premium Delete Confirmation Modal State
   const [deleteConfirm, setDeleteConfirm] = useState<{
@@ -190,6 +206,62 @@ export function AdminDraftPresetTab() {
     setTimeout(() => setCopiedId(null), 3000);
   };
 
+  const handleOpenDuplicate = (preset: DraftPreset) => {
+    setDuplicateModal({
+      isOpen: true,
+      sourcePreset: preset,
+      newTitle: '',
+      error: undefined,
+      isDuplicating: false,
+    });
+  };
+
+  const handleConfirmDuplicate = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!duplicateModal.sourcePreset) return;
+
+    const trimmedTitle = duplicateModal.newTitle.trim();
+    if (!trimmedTitle) {
+      setDuplicateModal(prev => ({
+        ...prev,
+        error: 'Devi obbligatoriamente scegliere un nuovo nome per il duplicato.'
+      }));
+      return;
+    }
+
+    if (trimmedTitle.toLowerCase() === duplicateModal.sourcePreset.title.trim().toLowerCase()) {
+      setDuplicateModal(prev => ({
+        ...prev,
+        error: 'Il nuovo nome deve essere diverso dal nome del preset originale.'
+      }));
+      return;
+    }
+
+    setDuplicateModal(prev => ({ ...prev, isDuplicating: true, error: undefined }));
+
+    try {
+      const created = await draftService.duplicatePreset(duplicateModal.sourcePreset, trimmedTitle);
+      if (created) {
+        toast.success(`Preset "${trimmedTitle}" duplicato con successo!`);
+      }
+      setDuplicateModal({
+        isOpen: false,
+        sourcePreset: null,
+        newTitle: '',
+        error: undefined,
+        isDuplicating: false,
+      });
+      await loadPresets();
+    } catch (err: any) {
+      console.error('Failed to duplicate preset:', err);
+      setDuplicateModal(prev => ({
+        ...prev,
+        isDuplicating: false,
+        error: err?.message || 'Errore durante la duplicazione del preset.'
+      }));
+    }
+  };
+
   // Drag and drop reordering state
   const [draggedTurnIndex, setDraggedTurnIndex] = useState<number | null>(null);
   const [dragOverTurnIndex, setDragOverTurnIndex] = useState<number | null>(null);
@@ -307,9 +379,145 @@ export function AdminDraftPresetTab() {
     );
   };
 
+  const isDuplicateNameEmpty = !duplicateModal.newTitle.trim();
+  const isDuplicateNameSameAsSource = duplicateModal.sourcePreset
+    ? duplicateModal.newTitle.trim().toLowerCase() === duplicateModal.sourcePreset.title.trim().toLowerCase()
+    : false;
+  const isDuplicateInvalid = isDuplicateNameEmpty || isDuplicateNameSameAsSource;
+  const duplicateSuggestedTitle = duplicateModal.sourcePreset ? `${duplicateModal.sourcePreset.title} (Copia)` : '';
+
   return (
     <div className="space-y-6 font-sans">
       
+      {/* Premium Custom Duplicate Modal */}
+      {duplicateModal.isOpen && duplicateModal.sourcePreset && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
+          <div className="bg-[#0b101e] border border-indigo-500/50 rounded-3xl p-6 sm:p-8 max-w-lg w-full space-y-5 shadow-[0_0_50px_rgba(99,102,241,0.25)] my-auto animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-indigo-950/70 border border-indigo-500/50 rounded-2xl flex items-center justify-center text-indigo-400 shrink-0">
+                  <CopyPlus size={24} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-white tracking-tight">
+                    Duplica Preset Draft
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Crea una copia indipendente con configurazione e turni clonati
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDuplicateModal({ isOpen: false, sourcePreset: null, newTitle: '', error: undefined, isDuplicating: false })}
+                className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Source Preset Summary Box */}
+            <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-3.5 space-y-1.5 text-xs">
+              <span className="text-slate-400 font-medium">Preset di origine:</span>
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-bold text-slate-200 text-sm truncate">
+                  {duplicateModal.sourcePreset.title}
+                </span>
+                <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 shrink-0">
+                  {duplicateModal.sourcePreset.scope === 'civs' ? '⚔️ Civiltà' : '🗺️ Mappe'}
+                </span>
+              </div>
+              <div className="text-[11px] text-slate-400">
+                {duplicateModal.sourcePreset.turns?.length || 0} turni • Timer {duplicateModal.sourcePreset.turns?.[0]?.timeLimit || 30}s / turno
+              </div>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleConfirmDuplicate} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                  Nuovo Nome del Preset <span className="text-indigo-400">* (obbligatorio)</span>
+                </label>
+                <input
+                  type="text"
+                  autoFocus
+                  value={duplicateModal.newTitle}
+                  onChange={(e) => setDuplicateModal(prev => ({ ...prev, newTitle: e.target.value, error: undefined }))}
+                  placeholder={`Es. ${duplicateModal.sourcePreset.title} (Copia)`}
+                  className="w-full bg-slate-950/90 border border-slate-700/80 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/30 rounded-xl px-4 py-3 text-white text-sm font-medium outline-none transition-all placeholder:text-slate-600"
+                />
+
+                {/* Validation messages */}
+                <div className="mt-2 text-xs">
+                  {duplicateModal.error ? (
+                    <p className="text-rose-400 font-semibold flex items-center gap-1.5">
+                      <AlertTriangle size={13} className="shrink-0" />
+                      <span>{duplicateModal.error}</span>
+                    </p>
+                  ) : isDuplicateNameEmpty ? (
+                    <p className="text-amber-400/90 font-medium flex items-center gap-1.5">
+                      <AlertTriangle size={13} className="shrink-0" />
+                      <span>È obbligatorio scegliere un nuovo nome prima di confermare.</span>
+                    </p>
+                  ) : isDuplicateNameSameAsSource ? (
+                    <p className="text-rose-400 font-medium flex items-center gap-1.5">
+                      <AlertTriangle size={13} className="shrink-0" />
+                      <span>Il nuovo nome deve essere diverso da quello del preset originale.</span>
+                    </p>
+                  ) : (
+                    <p className="text-emerald-400 font-medium flex items-center gap-1.5">
+                      <Check size={13} className="shrink-0" />
+                      <span>Nome valido pronto per la duplicazione!</span>
+                    </p>
+                  )}
+                </div>
+
+                {/* Suggestion shortcut */}
+                {duplicateSuggestedTitle && duplicateModal.newTitle !== duplicateSuggestedTitle && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <span className="text-[11px] text-slate-500">Suggerimento:</span>
+                    <button
+                      type="button"
+                      onClick={() => setDuplicateModal(prev => ({ ...prev, newTitle: duplicateSuggestedTitle, error: undefined }))}
+                      className="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold underline underline-offset-2 hover:no-underline transition-colors"
+                    >
+                      Usa "{duplicateSuggestedTitle}"
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setDuplicateModal({ isOpen: false, sourcePreset: null, newTitle: '', error: undefined, isDuplicating: false })}
+                  className="py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-2xl font-bold text-sm transition-all border border-slate-700"
+                >
+                  Annulla
+                </button>
+                <button
+                  type="submit"
+                  disabled={isDuplicateInvalid || duplicateModal.isDuplicating}
+                  className="py-3 px-4 bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white rounded-2xl font-extrabold text-sm shadow-lg shadow-indigo-950/50 transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {duplicateModal.isDuplicating ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Duplicazione...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CopyPlus size={16} />
+                      <span>Conferma Duplicazione</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Premium Custom Delete Confirmation Modal */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
@@ -942,36 +1150,62 @@ export function AdminDraftPresetTab() {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
-            <button
-              onClick={() => setEditingPreset(null)}
-              className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold text-sm"
-            >
-              Annulla
-            </button>
-            <button
-              onClick={handleSavePreset}
-              disabled={isSaving}
-              className={`px-6 py-2.5 rounded-xl font-extrabold text-sm shadow-lg transition-all flex items-center gap-2 ${
-                saveSuccess
-                  ? 'bg-emerald-600 text-white shadow-emerald-900/40'
-                  : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white'
-              }`}
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="animate-spin" size={16} />
-                  <span>Salvataggio...</span>
-                </>
-              ) : saveSuccess ? (
-                <>
-                  <Check size={16} />
-                  <span>✓ Salvato con Successo!</span>
-                </>
-              ) : (
-                <span>Salva Preset</span>
+          <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 pt-4 border-t border-slate-800">
+            <div>
+              {editingPreset.id && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const presetToDuplicate: DraftPreset = {
+                      id: editingPreset.id || '',
+                      title: editingPreset.title || 'Preset Draft',
+                      description: editingPreset.description,
+                      scope: editingPreset.scope || 'civs',
+                      is_active: editingPreset.is_active ?? true,
+                      turns: editingPreset.turns || [],
+                      map_pool: editingPreset.map_pool || []
+                    };
+                    handleOpenDuplicate(presetToDuplicate);
+                  }}
+                  className="px-4 py-2 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/40 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm"
+                  title="Duplica questa configurazione con un nuovo nome"
+                >
+                  <CopyPlus size={14} />
+                  <span>Duplica come Nuovo</span>
+                </button>
               )}
-            </button>
+            </div>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => setEditingPreset(null)}
+                className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold text-sm"
+              >
+                Annulla
+              </button>
+              <button
+                onClick={handleSavePreset}
+                disabled={isSaving}
+                className={`px-6 py-2.5 rounded-xl font-extrabold text-sm shadow-lg transition-all flex items-center gap-2 ${
+                  saveSuccess
+                    ? 'bg-emerald-600 text-white shadow-emerald-900/40'
+                    : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white'
+                }`}
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="animate-spin" size={16} />
+                    <span>Salvataggio...</span>
+                  </>
+                ) : saveSuccess ? (
+                  <>
+                    <Check size={16} />
+                    <span>✓ Salvato con Successo!</span>
+                  </>
+                ) : (
+                  <span>Salva Preset</span>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1047,23 +1281,34 @@ export function AdminDraftPresetTab() {
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-800/60">
+                <div className="flex items-center justify-between gap-1.5 pt-1 border-t border-slate-800/60">
                   <button
                     onClick={() => setEditingPreset({
                       ...preset,
                       map_pool: (preset.map_pool && Array.isArray(preset.map_pool)) ? preset.map_pool : (preset.turns && Array.isArray(preset.turns)) ? (preset.turns.find((t: any) => Array.isArray(t._map_pool)) as any)?._map_pool || [...AOE4_MAPS] : [...AOE4_MAPS]
                     })}
                     className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-slate-800/40 hover:bg-slate-800 text-slate-300 rounded-lg text-xs font-semibold transition-colors"
+                    title="Modifica questo preset"
                   >
-                    <Edit2 size={14} />
+                    <Edit2 size={13} />
                     <span>Modifica</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleOpenDuplicate(preset)}
+                    className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-semibold transition-colors"
+                    title="Duplica questo preset con un nuovo nome"
+                  >
+                    <CopyPlus size={13} />
+                    <span>Duplica</span>
                   </button>
 
                   <button
                     onClick={() => setDeleteConfirm({ type: 'preset', id: preset.id, title: preset.title })}
                     className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-xs font-semibold transition-colors"
+                    title="Elimina questo preset"
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={13} />
                     <span>Elimina</span>
                   </button>
                 </div>
