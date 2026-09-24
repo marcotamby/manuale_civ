@@ -11,6 +11,7 @@ const MAPS_DATA: MapInfo[] = [
   { name: "Ancient Spires", category: "Ibrida", url: "https://liquipedia.net/ageofempires/Ancient_Spires" },
   { name: "Arabia", category: "Terrestre", url: "https://liquipedia.net/ageofempires/Arabia_(AoE4)" },
   { name: "Archipelago", category: "Acquatica", url: "https://liquipedia.net/ageofempires/Archipelago_(AoE4)" },
+  { name: "Baldland", category: "Terrestre", url: "https://liquipedia.net/ageofempires/Baldland" },
   { name: "Black Forest", category: "Chiusa", url: "https://liquipedia.net/ageofempires/Black_Forest_(AoE4)" },
   { name: "Boulder Bay", category: "Acquatica", url: "https://liquipedia.net/ageofempires/Boulder_Bay" },
   { name: "Confluence", category: "Ibrida", url: "https://liquipedia.net/ageofempires/Confluence_(AoE4)" },

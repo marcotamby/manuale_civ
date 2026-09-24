@@ -6,6 +6,7 @@ export const AOE4_MAPS = [
   "Ancient Spires",
   "Archipelago",
   "Atacama",
+  "Baldland",
   "Baltic",
   "Basin",
   "Black Forest",
