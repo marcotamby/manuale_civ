@@ -1267,11 +1267,8 @@ export function DraftRoomPage() {
       {/* Control Top Row - Clean Pill Buttons */}
       <div className="flex flex-wrap justify-between items-center gap-2 px-1 py-1">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-extrabold px-3 py-1.5 rounded-full bg-[#0b101e] text-cyan-300 border border-slate-700 uppercase tracking-wider">
-            {room.title}
-          </span>
-          <span className="text-xs text-slate-400 hidden sm:inline">
-            Ruolo: <strong className={role === 'HOST' ? 'text-red-400 font-bold' : role === 'GUEST' ? 'text-blue-400 font-bold' : 'text-slate-300'}>{role}</strong>
+          <span className="text-xs text-slate-400">
+            Ruolo: <strong className={role === 'HOST' ? 'text-red-400 font-bold' : role === 'GUEST' ? 'text-blue-400 font-bold' : 'text-slate-300'}>{role || 'Spettatore'}</strong>
           </span>
         </div>
 
@@ -1334,6 +1331,97 @@ export function DraftRoomPage() {
             <span>{isOverlayMode ? 'Esci da Modalità Stream' : 'Modalità Stream'}</span>
           </button>
         </div>
+      </div>
+
+      {/* AoE2CM-Style Draft Title & Steps Timeline */}
+      <div className="flex flex-col items-center justify-center space-y-2.5 py-1 sm:py-2 w-full text-center">
+        {/* Draft Title */}
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-100 tracking-tight font-serif drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] px-2">
+          {room.title || room.preset?.title || 'Draft Match'}
+        </h1>
+
+        {/* Timeline with START and END */}
+        {turns && turns.length > 0 && (
+          <div className="w-full max-w-full overflow-x-auto no-scrollbar py-2 px-1">
+            <div className="inline-flex items-center justify-center min-w-full gap-1.5 sm:gap-2">
+              <span className="text-[11px] font-black tracking-widest text-slate-400 uppercase shrink-0 select-none mr-1">
+                START
+              </span>
+
+              {turns.map((turn, idx) => {
+                const isCurrent = room.status === 'in_progress' && idx === currentStep;
+                const isPast = room.status === 'completed' || (room.status === 'in_progress' && idx < currentStep);
+                const isStriped = !!turn.isHidden;
+
+                const isRevealAction = turn.action === 'REVEAL_BANS' || turn.action === 'REVEAL_PICKS' || turn.action === 'REVEAL_ALL';
+                const isAutoMap = turn.action === 'AUTO_PICK_LAST_MAP';
+
+                return (
+                  <div
+                    key={`step-timeline-${idx}`}
+                    title={`Step ${turn.step}: ${turn.player === 'HOST' ? room.host_name : turn.player === 'GUEST' ? room.guest_name : 'Admin'} - ${turn.action} ${turn.target === 'MAP' ? 'Mappa' : 'Civiltà'}${turn.isHidden ? ' (Scelta Segreta)' : ''}`}
+                    className={`flex flex-col items-center gap-1 shrink-0 transition-all ${
+                      isCurrent
+                        ? 'border-2 border-amber-300 bg-amber-300/10 rounded-lg p-1 shadow-[0_0_12px_rgba(252,211,77,0.45)] scale-105'
+                        : isPast
+                        ? 'p-1 border border-slate-800/60 rounded-lg bg-slate-900/40 opacity-80 hover:opacity-100'
+                        : 'p-1 border border-slate-800/40 rounded-lg bg-slate-950/40 opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    {/* Top bar indicator */}
+                    <div
+                      className={`w-full h-1.5 rounded-full transition-all ${
+                        isStriped
+                          ? 'bg-[repeating-linear-gradient(45deg,#06b6d4,#06b6d4_4px,#eab308_4px,#eab308_8px)]'
+                          : isCurrent
+                          ? 'bg-amber-400 animate-pulse'
+                          : isPast
+                          ? 'bg-emerald-500/80'
+                          : 'bg-slate-700/80'
+                      }`}
+                    />
+
+                    {/* Step badge */}
+                    {isRevealAction ? (
+                      <div className="bg-slate-200 text-slate-900 font-extrabold text-[10px] px-2 py-0.5 rounded shadow-sm tracking-wider uppercase">
+                        REVEAL
+                      </div>
+                    ) : isAutoMap ? (
+                      <div className="bg-amber-400 text-amber-950 font-black text-[10px] px-2 py-0.5 rounded shadow-sm tracking-wider uppercase">
+                        MAP
+                      </div>
+                    ) : (
+                      <div className="flex items-center rounded overflow-hidden shadow-sm text-[10px] font-black leading-none">
+                        <span className={`px-1.5 py-1 ${
+                          turn.player === 'HOST'
+                            ? 'bg-red-600 text-white'
+                            : turn.player === 'GUEST'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-amber-600 text-white'
+                        }`}>
+                          {turn.player === 'HOST' ? 'H' : turn.player === 'GUEST' ? 'G' : 'A'}
+                        </span>
+                        <span className={`px-2 py-1 tracking-wider ${
+                          turn.action === 'PICK'
+                            ? 'bg-[#0e3b22] text-[#4ade80]'
+                            : turn.action === 'BAN'
+                            ? 'bg-[#450a0a] text-[#f87171]'
+                            : 'bg-[#3b0764] text-[#c084fc]'
+                        }`}>
+                          {turn.action}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              <span className="text-[11px] font-black tracking-widest text-slate-400 uppercase shrink-0 select-none ml-1">
+                END
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Main Status Header - No Background Boxes Behind Player Headers */}
