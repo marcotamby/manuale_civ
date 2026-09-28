@@ -536,14 +536,53 @@ export function DraftRoomPage() {
           executeAction(randomCivId, myActualRole);
         }
       } else {
-        const available = civilizationsData.filter(c => !allUsedCivs.includes(c.id));
+        const available = civilizationsData.filter(c => {
+          const isHostPick = (state.hostPicks || []).includes(c.id);
+          const isGuestPick = (state.guestPicks || []).includes(c.id);
+          const isHostSnipe = (state.hostSnipes || []).includes(c.id);
+          const isGuestSnipe = (state.guestSnipes || []).includes(c.id);
+          if (isHostPick || isGuestPick || isHostSnipe || isGuestSnipe) return false;
+
+          const isHostBan = (state.hostBans || []).includes(c.id);
+          const isGuestBan = (state.guestBans || []).includes(c.id);
+          const banMode = state.banModes?.[c.id] || 'GLOBAL';
+
+          if (currentTurn.action === 'PICK') {
+            if ((isHostBan || isGuestBan) && banMode === 'GLOBAL') return false;
+            const bannedByOpponent = currentTurn.player === 'HOST' ? isGuestBan : isHostBan;
+            return !bannedByOpponent;
+          } else if (currentTurn.action === 'BAN') {
+            if ((isHostBan || isGuestBan) && banMode === 'GLOBAL') return false;
+            const bannedBySelf = currentTurn.player === 'HOST' ? isHostBan : isGuestBan;
+            return !(bannedBySelf && (banMode === 'EXCLUSIVE' || banMode === 'GLOBAL'));
+          }
+          return !allUsedCivs.includes(c.id);
+        });
         if (available.length > 0) {
           const randomCiv = available[Math.floor(Math.random() * available.length)];
           executeAction(randomCiv.id);
         }
       }
     } else if (currentTurn.target === 'MAP') {
-      const available = activeMapPool.filter(m => !allUsedMaps.includes(m));
+      const available = activeMapPool.filter(m => {
+        const isMapPicked = (state.mapPicks || []).includes(m);
+        if (isMapPicked) return false;
+
+        const isHostMapBan = (state.hostMapBans || []).includes(m);
+        const isGuestMapBan = (state.guestMapBans || []).includes(m);
+        const banMode = state.banModes?.[m] || 'GLOBAL';
+
+        if (currentTurn.action === 'PICK') {
+          if ((isHostMapBan || isGuestMapBan) && banMode === 'GLOBAL') return false;
+          const bannedByOpponent = currentTurn.player === 'HOST' ? isGuestMapBan : isHostMapBan;
+          return !bannedByOpponent;
+        } else if (currentTurn.action === 'BAN') {
+          if ((isHostMapBan || isGuestMapBan) && banMode === 'GLOBAL') return false;
+          const bannedBySelf = currentTurn.player === 'HOST' ? isHostMapBan : isGuestMapBan;
+          return !(bannedBySelf && (banMode === 'EXCLUSIVE' || banMode === 'GLOBAL'));
+        }
+        return !allUsedMaps.includes(m);
+      });
       if (available.length > 0) {
         const randomMap = available[Math.floor(Math.random() * available.length)];
         executeAction(randomMap);
@@ -787,8 +826,8 @@ export function DraftRoomPage() {
         if (player === 'HOST') nextState.hostPicks.push(itemId);
         else nextState.guestPicks.push(itemId);
       } else if (action === 'BAN') {
-        if (player === 'HOST') nextState.guestBans.push(itemId);
-        else nextState.hostBans.push(itemId);
+        if (player === 'HOST') nextState.hostBans.push(itemId);
+        else nextState.guestBans.push(itemId);
       }
     } else if (target === 'MAP') {
       if (action === 'PICK') {
@@ -1228,8 +1267,8 @@ export function DraftRoomPage() {
                 <div id="host-ban-container" className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
                   {state.hostBans && state.hostBans.length > 0 ? (
                     state.hostBans.map(id => {
-                      const isHidden = isBanHiddenForRole(id, 'GUEST');
-                      const isSelfHidden = !state.revealedBans && room?.status !== 'completed' && state.hiddenBans?.includes(id) && role === 'GUEST';
+                      const isHidden = isBanHiddenForRole(id, 'HOST');
+                      const isSelfHidden = !state.revealedBans && room?.status !== 'completed' && state.hiddenBans?.includes(id) && role === 'HOST';
                       const c = getCivObj(id);
                       return isHidden ? (
                         <div key={`hban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md animate-pop-in">
@@ -1580,8 +1619,8 @@ export function DraftRoomPage() {
                 <div id="guest-ban-container" className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
                   {state.guestBans && state.guestBans.length > 0 ? (
                     state.guestBans.map(id => {
-                      const isHidden = isBanHiddenForRole(id, 'HOST');
-                      const isSelfHidden = !state.revealedBans && room?.status !== 'completed' && state.hiddenBans?.includes(id) && role === 'HOST';
+                      const isHidden = isBanHiddenForRole(id, 'GUEST');
+                      const isSelfHidden = !state.revealedBans && room?.status !== 'completed' && state.hiddenBans?.includes(id) && role === 'GUEST';
                       const c = getCivObj(id);
                       return isHidden ? (
                         <div key={`gban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md animate-pop-in">
@@ -1850,10 +1889,19 @@ export function DraftRoomPage() {
                       <span className="text-[9px] font-extrabold uppercase tracking-wider">SNIPED</span>
                     </div>
                   )}
-                  {(isHostBan || isGuestBan) && (
+                  {(isHostBan || isGuestBan) && (!isClickable || banMode === 'GLOBAL') && (
                     <div className="absolute inset-0 bg-black/65 flex flex-col items-center justify-center gap-0.5 text-red-400 backdrop-blur-[1px]">
                       <X size={26} className="stroke-[3]" />
-                      <span className="text-[9px] font-extrabold uppercase tracking-wider">BANNED</span>
+                      <span className="text-[9px] font-extrabold uppercase tracking-wider">
+                        {banMode === 'EXCLUSIVE'
+                          ? `BANNATA (${isHostBan ? 'DA P1' : 'DA P2'})`
+                          : 'BANNED'}
+                      </span>
+                    </div>
+                  )}
+                  {(isHostBan || isGuestBan) && isClickable && banMode === 'EXCLUSIVE' && (
+                    <div className="absolute top-1.5 left-1.5 bg-red-950/90 text-red-300 text-[8px] font-extrabold px-1.5 py-0.5 rounded shadow border border-red-500/50">
+                      EBAN (PICKABILE)
                     </div>
                   )}
                 </button>
@@ -1993,10 +2041,19 @@ export function DraftRoomPage() {
                       <span className="text-xs font-black uppercase tracking-wider">PICKED</span>
                     </div>
                   )}
-                  {isMapBanned && (
+                  {isMapBanned && (!isClickable || banMode === 'GLOBAL') && (
                     <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center text-red-400 gap-1 backdrop-blur-[1px]">
                       <X size={28} className="stroke-[3]" />
-                      <span className="text-xs font-black uppercase tracking-wider">BANNED</span>
+                      <span className="text-xs font-black uppercase tracking-wider">
+                        {banMode === 'EXCLUSIVE'
+                          ? `BANNATA (${isHostMapBan ? 'DA P1' : 'DA P2'})`
+                          : 'BANNED'}
+                      </span>
+                    </div>
+                  )}
+                  {isMapBanned && isClickable && banMode === 'EXCLUSIVE' && (
+                    <div className="absolute top-1.5 left-1.5 bg-red-950/90 text-red-300 text-[9px] font-extrabold px-1.5 py-0.5 rounded shadow border border-red-500/50">
+                      EBAN (PICKABILE)
                     </div>
                   )}
                 </button>
