@@ -549,12 +549,12 @@ export function DraftRoomPage() {
 
           if (currentTurn.action === 'PICK') {
             if ((isHostBan || isGuestBan) && banMode === 'GLOBAL') return false;
-            const bannedByOpponent = currentTurn.player === 'HOST' ? isGuestBan : isHostBan;
-            return !bannedByOpponent;
+            const isBannedForMe = currentTurn.player === 'HOST' ? isHostBan : isGuestBan;
+            return !isBannedForMe;
           } else if (currentTurn.action === 'BAN') {
             if ((isHostBan || isGuestBan) && banMode === 'GLOBAL') return false;
-            const bannedBySelf = currentTurn.player === 'HOST' ? isHostBan : isGuestBan;
-            return !(bannedBySelf && (banMode === 'EXCLUSIVE' || banMode === 'GLOBAL'));
+            const alreadyBannedByMe = currentTurn.player === 'HOST' ? isGuestBan : isHostBan;
+            return !(alreadyBannedByMe && (banMode === 'EXCLUSIVE' || banMode === 'GLOBAL'));
           }
           return !allUsedCivs.includes(c.id);
         });
@@ -826,8 +826,8 @@ export function DraftRoomPage() {
         if (player === 'HOST') nextState.hostPicks.push(itemId);
         else nextState.guestPicks.push(itemId);
       } else if (action === 'BAN') {
-        if (player === 'HOST') nextState.hostBans.push(itemId);
-        else nextState.guestBans.push(itemId);
+        if (player === 'HOST') nextState.guestBans.push(itemId);
+        else nextState.hostBans.push(itemId);
       }
     } else if (target === 'MAP') {
       if (action === 'PICK') {
@@ -1267,8 +1267,8 @@ export function DraftRoomPage() {
                 <div id="host-ban-container" className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
                   {state.hostBans && state.hostBans.length > 0 ? (
                     state.hostBans.map(id => {
-                      const isHidden = isBanHiddenForRole(id, 'HOST');
-                      const isSelfHidden = !state.revealedBans && room?.status !== 'completed' && state.hiddenBans?.includes(id) && role === 'HOST';
+                      const isHidden = isBanHiddenForRole(id, 'GUEST');
+                      const isSelfHidden = !state.revealedBans && room?.status !== 'completed' && state.hiddenBans?.includes(id) && role === 'GUEST';
                       const c = getCivObj(id);
                       return isHidden ? (
                         <div key={`hban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md animate-pop-in">
@@ -1619,8 +1619,8 @@ export function DraftRoomPage() {
                 <div id="guest-ban-container" className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
                   {state.guestBans && state.guestBans.length > 0 ? (
                     state.guestBans.map(id => {
-                      const isHidden = isBanHiddenForRole(id, 'GUEST');
-                      const isSelfHidden = !state.revealedBans && room?.status !== 'completed' && state.hiddenBans?.includes(id) && role === 'GUEST';
+                      const isHidden = isBanHiddenForRole(id, 'HOST');
+                      const isSelfHidden = !state.revealedBans && room?.status !== 'completed' && state.hiddenBans?.includes(id) && role === 'HOST';
                       const c = getCivObj(id);
                       return isHidden ? (
                         <div key={`gban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md animate-pop-in">
@@ -1797,8 +1797,8 @@ export function DraftRoomPage() {
                       isClickable = false;
                       isUsed = true;
                     } else {
-                      const bannedByOpponent = activePlayer === 'HOST' ? isGuestBan : isHostBan;
-                      if (bannedByOpponent) {
+                      const isBannedForMe = activePlayer === 'HOST' ? isHostBan : isGuestBan;
+                      if (isBannedForMe) {
                         isClickable = false;
                         isUsed = true;
                       } else {
@@ -1814,8 +1814,8 @@ export function DraftRoomPage() {
                       isClickable = false;
                       isUsed = true;
                     } else {
-                      const bannedBySelf = activePlayer === 'HOST' ? isHostBan : isGuestBan;
-                      if (bannedBySelf && (banMode === 'EXCLUSIVE' || banMode === 'GLOBAL')) {
+                      const alreadyBannedByMe = activePlayer === 'HOST' ? isGuestBan : isHostBan;
+                      if (alreadyBannedByMe && (banMode === 'EXCLUSIVE' || banMode === 'GLOBAL')) {
                         isClickable = false;
                         isUsed = true;
                       } else {
@@ -1894,7 +1894,7 @@ export function DraftRoomPage() {
                       <X size={26} className="stroke-[3]" />
                       <span className="text-[9px] font-extrabold uppercase tracking-wider">
                         {banMode === 'EXCLUSIVE'
-                          ? `BANNATA (${isHostBan ? 'DA P1' : 'DA P2'})`
+                          ? `BANNATA A ${isHostBan ? 'P1' : 'P2'}`
                           : 'BANNED'}
                       </span>
                     </div>
