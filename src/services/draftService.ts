@@ -58,6 +58,7 @@ export interface DraftState {
   hiddenPicks?: string[];
   hiddenBans?: string[];
   is_archived?: boolean;
+  matchResults?: Record<string, 'won' | 'lost'>;
 }
 
 export interface DraftRoom {

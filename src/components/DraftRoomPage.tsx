@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Swords, Users, Shield, Clock, Eye, Check, X, RefreshCcw, Copy, Monitor, Trophy, Target, Lock, Search, Loader2, ArrowLeftRight } from 'lucide-react';
+import { Swords, Users, Shield, Clock, Eye, Check, X, RefreshCcw, Copy, Monitor, Trophy, Target, Lock, Search, Loader2, ArrowLeftRight, Crown } from 'lucide-react';
 import { draftService, getSessionToken } from '../services/draftService';
 import type { DraftRoom, DraftTurn, TurnAction, DraftState } from '../services/draftService';
 import { civilizationsData } from '../data/aoe4Data';
@@ -40,6 +40,11 @@ export function DraftRoomPage() {
     loadRoom(roomId);
     const unsubscribe = draftService.subscribeToRoom(roomId, (updatedRoom) => {
       setRoom(updatedRoom);
+      if (updatedRoom.state?.matchResults) {
+        try {
+          localStorage.setItem(`draft_match_results_${roomId}`, JSON.stringify(updatedRoom.state.matchResults));
+        } catch (e) {}
+      }
       if (updatedRoom.status === 'waiting') {
         const myToken = getSessionToken(roomId);
         if (updatedRoom.state?.hostSessionToken === myToken) {
@@ -81,6 +86,14 @@ export function DraftRoomPage() {
       const data = await draftService.getRoom(id);
       const userAutoName = user?.nickname?.trim() || user?.email?.trim();
       if (data) {
+        if (!data.state?.matchResults) {
+          try {
+            const raw = localStorage.getItem(`draft_match_results_${id}`);
+            if (raw) {
+              data.state = { ...(data.state || {}), matchResults: JSON.parse(raw) };
+            }
+          } catch (e) {}
+        }
         setRoom(data);
         const myToken = getSessionToken(id);
         if (data.state?.hostSessionToken === myToken) {
@@ -128,7 +141,8 @@ export function DraftRoomPage() {
     hostMapBans: [],
     guestMapBans: [],
     adminMapPicks: [],
-    mapPool: []
+    mapPool: [],
+    matchResults: {}
   };
 
   const hostClaimed = !!state.hostClaimed;
@@ -160,6 +174,116 @@ export function DraftRoomPage() {
   }, [state.guestPicks, state.guestSnipes]);
 
   const isSingleCivMatchup = room?.status === 'completed' && hostFinalCivs.length === 1 && guestFinalCivs.length === 1;
+
+  const toggleMatchResult = async (player: 'HOST' | 'GUEST' | 'ADMIN', itemId: string, targetResult?: 'won' | 'lost') => {
+    if (!room) return;
+    const key = `${player}_${itemId}`;
+    const current = (state.matchResults || {})[key];
+
+    let nextResult: 'won' | 'lost' | undefined;
+    if (targetResult) {
+      nextResult = current === targetResult ? undefined : targetResult;
+    } else {
+      // Cycle: undefined -> won -> lost -> undefined
+      if (!current) nextResult = 'won';
+      else if (current === 'won') nextResult = 'lost';
+      else nextResult = undefined;
+    }
+
+    const nextMatchResults = { ...(state.matchResults || {}) };
+    if (nextResult) {
+      nextMatchResults[key] = nextResult;
+    } else {
+      delete nextMatchResults[key];
+    }
+
+    const nextState: DraftState = {
+      ...state,
+      matchResults: nextMatchResults
+    };
+
+    setRoom(prev => prev ? { ...prev, state: nextState } : null);
+
+    try {
+      localStorage.setItem(`draft_match_results_${room.id}`, JSON.stringify(nextMatchResults));
+    } catch (e) {}
+
+    try {
+      await draftService.updateRoom(room.id, {
+        state: nextState
+      });
+    } catch (err) {
+      console.error('Error updating match results:', err);
+    }
+  };
+
+  const toggleAdminMapWinner = async (mapName: string, winner: 'HOST' | 'GUEST') => {
+    if (!room) return;
+    const hostKey = `ADMIN_${mapName}_HOST`;
+    const guestKey = `ADMIN_${mapName}_GUEST`;
+    const currentHost = (state.matchResults || {})[hostKey];
+    const currentGuest = (state.matchResults || {})[guestKey];
+
+    const nextMatchResults = { ...(state.matchResults || {}) };
+
+    if (winner === 'HOST') {
+      if (currentHost === 'won') {
+        delete nextMatchResults[hostKey];
+      } else {
+        nextMatchResults[hostKey] = 'won';
+        delete nextMatchResults[guestKey];
+      }
+    } else {
+      if (currentGuest === 'won') {
+        delete nextMatchResults[guestKey];
+      } else {
+        nextMatchResults[guestKey] = 'won';
+        delete nextMatchResults[hostKey];
+      }
+    }
+
+    const nextState: DraftState = {
+      ...state,
+      matchResults: nextMatchResults
+    };
+
+    setRoom(prev => prev ? { ...prev, state: nextState } : null);
+
+    try {
+      localStorage.setItem(`draft_match_results_${room.id}`, JSON.stringify(nextMatchResults));
+      await draftService.updateRoom(room.id, { state: nextState });
+    } catch (e) {}
+  };
+
+  const hostWinsCount = useMemo(() => {
+    const results = state.matchResults || {};
+    let count = 0;
+    (state.hostPicks || []).forEach(id => {
+      if (results[`HOST_${id}`] === 'won') count++;
+    });
+    (state.hostMapPicks || []).forEach(map => {
+      if (results[`HOST_${map}`] === 'won') count++;
+    });
+    (state.adminMapPicks || []).forEach(map => {
+      if (results[`ADMIN_${map}_HOST`] === 'won') count++;
+    });
+    return count;
+  }, [state.matchResults, state.hostPicks, state.hostMapPicks, state.adminMapPicks]);
+
+  const guestWinsCount = useMemo(() => {
+    const results = state.matchResults || {};
+    let count = 0;
+    (state.guestPicks || []).forEach(id => {
+      if (results[`GUEST_${id}`] === 'won') count++;
+    });
+    (state.guestMapPicks || []).forEach(map => {
+      if (results[`GUEST_${map}`] === 'won') count++;
+    });
+    (state.adminMapPicks || []).forEach(map => {
+      if (results[`ADMIN_${map}_GUEST`] === 'won') count++;
+    });
+    return count;
+  }, [state.matchResults, state.guestPicks, state.guestMapPicks, state.adminMapPicks]);
 
   const hasAnimatedFinalVSRef = useRef(false);
 
@@ -1260,22 +1384,22 @@ export function DraftRoomPage() {
           </div>
 
           {/* Picked / Banned / Sniped Flags Rows */}
-          <div className="space-y-2.5 pt-2.5 border-t border-slate-800/80">
+          <div className="space-y-3 pt-2.5 border-t border-slate-800/80">
             {room.preset?.scope !== 'maps' && (
               <div className="flex items-center gap-2">
                 <span className="text-xs font-black text-red-400 uppercase w-14 shrink-0 tracking-wider">BAN</span>
-                <div id="host-ban-container" className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
+                <div id="host-ban-container" className="flex flex-wrap gap-2 min-h-[44px] items-center">
                   {state.hostBans && state.hostBans.length > 0 ? (
                     state.hostBans.map(id => {
                       const isHidden = isBanHiddenForRole(id, 'GUEST');
                       const isSelfHidden = !state.revealedBans && room?.status !== 'completed' && state.hiddenBans?.includes(id) && role === 'GUEST';
                       const c = getCivObj(id);
                       return isHidden ? (
-                        <div key={`hban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md animate-pop-in">
+                        <div key={`hban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-11 h-11 sm:w-12 sm:h-12 md:w-13 md:h-13 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md animate-pop-in">
                           <Lock size={16} />
                         </div>
                       ) : (
-                        <div key={`hban-${id}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-red-500/60 shadow-md animate-pop-in">
+                        <div key={`hban-${id}`} className="relative w-11 h-11 sm:w-12 sm:h-12 md:w-13 md:h-13 overflow-hidden rounded-xl border-2 border-red-500/60 shadow-md animate-pop-in">
                           <img src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-full h-full object-cover opacity-70 grayscale" />
                           {isSelfHidden && (
                             <div className="absolute top-0.5 right-0.5 bg-purple-900/90 text-purple-200 p-0.5 rounded-full shadow border border-purple-400/80 z-10" title="Ban Segreto (Nascosto all'avversario)">
@@ -1295,15 +1419,15 @@ export function DraftRoomPage() {
             {room.preset?.scope === 'maps' && state.hostMapBans && state.hostMapBans.length > 0 && (
               <div className="flex items-center gap-2">
                 <span className="text-xs font-black text-red-400 uppercase w-14 shrink-0 tracking-wider">BAN</span>
-                <div id="host-map-ban-container" className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
+                <div id="host-map-ban-container" className="flex flex-wrap gap-2 min-h-[44px] items-center">
                   {state.hostMapBans.map((mapName, idx) => {
                     const isHidden = isBanHiddenForRole(mapName, 'HOST');
                     return isHidden ? (
-                      <div key={`hmapban-${idx}`} title="Ban Mappa Nascosto (In attesa della rivelazione)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 shadow-md animate-pop-in">
+                      <div key={`hmapban-${idx}`} title="Ban Mappa Nascosto (In attesa della rivelazione)" className="w-11 h-11 sm:w-12 sm:h-12 md:w-13 md:h-13 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 shadow-md animate-pop-in">
                         <Lock size={16} />
                       </div>
                     ) : (
-                      <div key={`hmapban-${idx}`} title={`BAN MAPPA: ${mapName}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md animate-pop-in">
+                      <div key={`hmapban-${idx}`} title={`BAN MAPPA: ${mapName}`} className="relative w-11 h-11 sm:w-12 sm:h-12 md:w-13 md:h-13 overflow-hidden rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md animate-pop-in">
                         <img src={`/maps/${mapName}.png`} onError={(e) => { (e.target as any).src = '/header-bg.png'; }} alt={mapName} className="w-full h-full object-cover" />
                       </div>
                     );
@@ -1312,70 +1436,212 @@ export function DraftRoomPage() {
               </div>
             )}
 
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-black text-emerald-400 uppercase w-14 shrink-0 tracking-wider">PICK</span>
-              <div id="host-pick-container" className="flex flex-wrap gap-1.5 min-h-[44px] items-center">
-                {room.preset?.scope === 'maps' ? (
-                  state.hostMapPicks && state.hostMapPicks.length > 0 ? (
-                    state.hostMapPicks.map((mapName, idx) => {
-                      const isHidden = isPickHiddenForRole(mapName, 'HOST');
-                      const isSelfHidden = !state.revealedPicks && room?.status !== 'completed' && state.hiddenPicks?.includes(mapName) && role === 'HOST';
-                      return isHidden ? (
-                        <div key={`hmap-${idx}`} title="Pick Mappa Nascosto (In attesa della rivelazione)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-purple-950/80 border border-purple-500/60 flex items-center justify-center text-purple-400 shadow-md animate-pop-in">
-                          <Lock size={16} />
-                        </div>
-                      ) : (
-                        <div key={`hmap-${idx}`} title={`PICK MAPPA: ${mapName}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-emerald-500 shadow-md animate-pop-in">
+            {/* Map Picks (when available) */}
+            {state.hostMapPicks && state.hostMapPicks.length > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black text-emerald-400 uppercase w-14 shrink-0 tracking-wider">
+                  {room.preset?.scope === 'maps' ? 'PICK' : 'MAPPE'}
+                </span>
+                <div id="host-map-pick-container" className="flex flex-wrap gap-2 min-h-[44px] items-center">
+                  {state.hostMapPicks.map((mapName, idx) => {
+                    const isHidden = isPickHiddenForRole(mapName, 'HOST');
+                    const isSelfHidden = !state.revealedPicks && room?.status !== 'completed' && state.hiddenPicks?.includes(mapName) && role === 'HOST';
+                    const mapResult = state.matchResults?.[`HOST_${mapName}`];
+                    return isHidden ? (
+                      <div key={`hmap-${idx}`} title="Pick Mappa Nascosto (In attesa della rivelazione)" className="w-13 h-13 sm:w-15 sm:h-15 md:w-16 md:h-16 rounded-xl bg-purple-950/80 border border-purple-500/60 flex items-center justify-center text-purple-400 shadow-md animate-pop-in">
+                        <Lock size={16} />
+                      </div>
+                    ) : (
+                      <div key={`hmap-${idx}`} className="flex flex-col items-center gap-1 animate-pop-in">
+                        {room?.status === 'completed' && (
+                          <div className="flex items-center bg-slate-900/95 border border-slate-700/80 rounded-md p-0.5 shadow-md">
+                            <button
+                              type="button"
+                              title="Segna mappa come Vinta"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleMatchResult('HOST', mapName, 'won');
+                              }}
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-0.5 border ${
+                                mapResult === 'won'
+                                  ? 'bg-emerald-600 border-emerald-400 text-white shadow-[0_0_8px_rgba(16,185,129,0.5)]'
+                                  : 'bg-transparent border-transparent text-slate-400 hover:text-emerald-300 hover:bg-emerald-500/20'
+                              }`}
+                            >
+                              <Check size={11} strokeWidth={3} />
+                              {mapResult === 'won' && <span className="text-[9px] uppercase tracking-wider">Vinta</span>}
+                            </button>
+
+                            <button
+                              type="button"
+                              title="Segna mappa come Persa"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleMatchResult('HOST', mapName, 'lost');
+                              }}
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-0.5 border ${
+                                mapResult === 'lost'
+                                  ? 'bg-rose-600 border-rose-400 text-white shadow-[0_0_8px_rgba(244,63,94,0.5)]'
+                                  : 'bg-transparent border-transparent text-slate-400 hover:text-rose-300 hover:bg-rose-500/20'
+                              }`}
+                            >
+                              <X size={11} strokeWidth={3} />
+                              {mapResult === 'lost' && <span className="text-[9px] uppercase tracking-wider">Persa</span>}
+                            </button>
+                          </div>
+                        )}
+
+                        <div
+                          onClick={() => {
+                            if (room?.status === 'completed') {
+                              toggleMatchResult('HOST', mapName);
+                            }
+                          }}
+                          title={`PICK MAPPA: ${mapName}${room?.status === 'completed' ? ' (Clicca per cambiare esito)' : ''}`}
+                          className={`relative w-13 h-13 sm:w-15 sm:h-15 md:w-16 md:h-16 overflow-hidden rounded-xl border-2 transition-all shadow-md ${
+                            room?.status === 'completed' ? 'cursor-pointer hover:scale-105' : ''
+                          } ${
+                            mapResult === 'won'
+                              ? 'border-emerald-400 ring-2 ring-emerald-400/80 shadow-[0_0_15px_rgba(16,185,129,0.45)]'
+                              : mapResult === 'lost'
+                              ? 'border-rose-500/80 ring-1 ring-rose-500/40 grayscale-[0.5] opacity-75'
+                              : 'border-emerald-500 shadow-emerald-950/40'
+                          }`}
+                        >
                           <img src={`/maps/${mapName}.png`} onError={(e) => { (e.target as any).src = '/header-bg.png'; }} alt={mapName} className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-black/30" />
+                          <div className="absolute inset-0 bg-black/20" />
                           {isSelfHidden && (
                             <div className="absolute top-0.5 right-0.5 bg-purple-900/90 text-purple-200 p-0.5 rounded-full shadow border border-purple-400/80 z-10" title="Scelta Segreta (Nascosta all'avversario)">
                               <Lock size={10} />
                             </div>
                           )}
+                          {mapResult === 'won' && (
+                            <div className="absolute top-0.5 right-0.5 bg-emerald-600 text-white p-0.5 rounded shadow z-10" title="Partita Vinta">
+                              <Check size={10} strokeWidth={3} />
+                            </div>
+                          )}
+                          {mapResult === 'lost' && (
+                            <div className="absolute top-0.5 right-0.5 bg-rose-600 text-white p-0.5 rounded shadow z-10" title="Partita Persa">
+                              <X size={10} strokeWidth={3} />
+                            </div>
+                          )}
                         </div>
-                      );
-                    })
-                  ) : (
-                    <span className="text-xs text-slate-600 italic">-</span>
-                  )
-                ) : (
-                  state.hostPicks && state.hostPicks.length > 0 ? (
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Civ Picks (when scope is civs or when civ picks exist) */}
+            {(room.preset?.scope !== 'maps' || (state.hostPicks && state.hostPicks.length > 0)) && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black text-emerald-400 uppercase w-14 shrink-0 tracking-wider">
+                  {state.hostMapPicks && state.hostMapPicks.length > 0 ? 'CIV' : 'PICK'}
+                </span>
+                <div id="host-pick-container" className="flex flex-wrap gap-2 min-h-[44px] items-center">
+                  {state.hostPicks && state.hostPicks.length > 0 ? (
                     state.hostPicks.map(id => {
                       const isHidden = isPickHiddenForRole(id, 'HOST');
                       const isSelfHidden = !state.revealedPicks && room?.status !== 'completed' && state.hiddenPicks?.includes(id) && role === 'HOST';
                       const c = getCivObj(id);
                       const isSniped = state.hostSnipes?.includes(id);
+                      const civResult = state.matchResults?.[`HOST_${id}`];
                       return isHidden ? (
-                        <div key={`hpick-${id}`} title="Pick Nascosto (In attesa della rivelazione)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-purple-950/80 border border-purple-500/60 flex items-center justify-center text-purple-400 shadow-md animate-pop-in">
+                        <div key={`hpick-${id}`} title="Pick Nascosto (In attesa della rivelazione)" className="w-13 h-13 sm:w-15 sm:h-15 md:w-16 md:h-16 rounded-xl bg-purple-950/80 border border-purple-500/60 flex items-center justify-center text-purple-400 shadow-md animate-pop-in">
                           <Lock size={16} />
                         </div>
                       ) : (
-                        <div key={`hpick-${id}`} className={`relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 shadow-md animate-pop-in ${
-                          isSniped ? 'border-red-500/80 shadow-red-950/50' : 'border-emerald-500 shadow-emerald-950/40'
-                        }`}>
-                          <img src={c.flag} alt={c.name} title={isSniped ? `SNIPED: ${c.name}` : `PICK: ${c.name}`} className={`w-full h-full object-cover ${isSniped ? 'grayscale opacity-50' : ''}`} />
-                          {isSelfHidden && (
-                            <div className="absolute top-0.5 right-0.5 bg-purple-900/90 text-purple-200 p-0.5 rounded-full shadow border border-purple-400/80 z-10" title="Scelta Segreta (Nascosta all'avversario)">
-                              <Lock size={10} />
+                        <div key={`hpick-${id}`} className="flex flex-col items-center gap-1 animate-pop-in">
+                          {room?.status === 'completed' && !isSniped && (
+                            <div className="flex items-center bg-slate-900/95 border border-slate-700/80 rounded-md p-0.5 shadow-md">
+                              <button
+                                type="button"
+                                title="Segna civiltà come Vinta"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleMatchResult('HOST', id, 'won');
+                                }}
+                                className={`px-1.5 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-0.5 border ${
+                                  civResult === 'won'
+                                    ? 'bg-emerald-600 border-emerald-400 text-white shadow-[0_0_8px_rgba(16,185,129,0.5)]'
+                                    : 'bg-transparent border-transparent text-slate-400 hover:text-emerald-300 hover:bg-emerald-500/20'
+                                }`}
+                              >
+                                <Check size={11} strokeWidth={3} />
+                                {civResult === 'won' && <span className="text-[9px] uppercase tracking-wider">Vinta</span>}
+                              </button>
+
+                              <button
+                                type="button"
+                                title="Segna civiltà come Persa"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleMatchResult('HOST', id, 'lost');
+                                }}
+                                className={`px-1.5 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-0.5 border ${
+                                  civResult === 'lost'
+                                    ? 'bg-rose-600 border-rose-400 text-white shadow-[0_0_8px_rgba(244,63,94,0.5)]'
+                                    : 'bg-transparent border-transparent text-slate-400 hover:text-rose-300 hover:bg-rose-500/20'
+                                }`}
+                              >
+                                <X size={11} strokeWidth={3} />
+                                {civResult === 'lost' && <span className="text-[9px] uppercase tracking-wider">Persa</span>}
+                              </button>
                             </div>
                           )}
-                          {isSniped && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[0.5px]">
-                              <span className="bg-red-600/90 text-white text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rotate-[-25deg] shadow-lg border border-red-400/80 whitespace-nowrap">
-                                SNIPED
-                              </span>
-                            </div>
-                          )}
+
+                          <div
+                            onClick={() => {
+                              if (room?.status === 'completed' && !isSniped) {
+                                toggleMatchResult('HOST', id);
+                              }
+                            }}
+                            className={`relative w-13 h-13 sm:w-15 sm:h-15 md:w-16 md:h-16 overflow-hidden rounded-xl border-2 transition-all shadow-md ${
+                              room?.status === 'completed' && !isSniped ? 'cursor-pointer hover:scale-105' : ''
+                            } ${
+                              civResult === 'won'
+                                ? 'border-emerald-400 ring-2 ring-emerald-400/80 shadow-[0_0_15px_rgba(16,185,129,0.45)]'
+                                : civResult === 'lost'
+                                ? 'border-rose-500/80 ring-1 ring-rose-500/40 grayscale-[0.5] opacity-75'
+                                : isSniped
+                                ? 'border-red-500/80 shadow-red-950/50'
+                                : 'border-emerald-500 shadow-emerald-950/40'
+                            }`}
+                          >
+                            <img src={c.flag} alt={c.name} title={isSniped ? `SNIPED: ${c.name}` : `PICK: ${c.name}${room?.status === 'completed' ? ' (Clicca per cambiare esito)' : ''}`} className={`w-full h-full object-cover ${isSniped ? 'grayscale opacity-50' : ''}`} />
+                            {isSelfHidden && (
+                              <div className="absolute top-0.5 right-0.5 bg-purple-900/90 text-purple-200 p-0.5 rounded-full shadow border border-purple-400/80 z-10" title="Scelta Segreta (Nascosta all'avversario)">
+                                <Lock size={10} />
+                              </div>
+                            )}
+                            {civResult === 'won' && (
+                              <div className="absolute top-0.5 right-0.5 bg-emerald-600 text-white p-0.5 rounded shadow z-10" title="Partita Vinta">
+                                <Check size={10} strokeWidth={3} />
+                              </div>
+                            )}
+                            {civResult === 'lost' && (
+                              <div className="absolute top-0.5 right-0.5 bg-rose-600 text-white p-0.5 rounded shadow z-10" title="Partita Persa">
+                                <X size={10} strokeWidth={3} />
+                              </div>
+                            )}
+                            {isSniped && (
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[0.5px]">
+                                <span className="bg-red-600/90 text-white text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rotate-[-25deg] shadow-lg border border-red-400/80 whitespace-nowrap">
+                                  SNIPED
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       );
                     })
                   ) : (
                     <span className="text-xs text-slate-600 italic">-</span>
-                  )
-                )}
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
@@ -1501,9 +1767,26 @@ export function DraftRoomPage() {
                     {/* P1 Final Civ Card */}
                     {(() => {
                       const c1 = getCivObj(hostFinalCivs[0]);
+                      const isHostWon = state.matchResults?.[`HOST_${hostFinalCivs[0]}`] === 'won';
+                      const isHostLost = state.matchResults?.[`HOST_${hostFinalCivs[0]}`] === 'lost';
                       return (
-                        <div id="final-matchup-p1" className="relative w-36 sm:w-48 aspect-[4/3] rounded-2xl overflow-hidden border-2 border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.45)] group transition-all animate-in fade-in zoom-in-75 duration-700">
+                        <div
+                          id="final-matchup-p1"
+                          onClick={() => toggleMatchResult('HOST', hostFinalCivs[0])}
+                          className={`relative w-36 sm:w-48 aspect-[4/3] rounded-2xl overflow-hidden border-2 transition-all cursor-pointer group animate-in fade-in zoom-in-75 duration-700 ${
+                            isHostWon
+                              ? 'border-emerald-400 ring-4 ring-emerald-400/80 shadow-[0_0_35px_rgba(16,185,129,0.55)]'
+                              : isHostLost
+                              ? 'border-rose-500/80 grayscale-[0.6] opacity-75'
+                              : 'border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.45)]'
+                          }`}
+                        >
                           <img src={c1.flag} alt={c1.name} title={c1.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                          {isHostWon && (
+                            <div className="absolute top-2 left-2 bg-emerald-600/90 text-white px-2 py-0.5 rounded-lg text-xs font-black flex items-center gap-1 shadow-lg border border-emerald-400">
+                              <Crown size={13} className="text-amber-300" /> VINCITORE
+                            </div>
+                          )}
                         </div>
                       );
                     })()}
@@ -1520,9 +1803,26 @@ export function DraftRoomPage() {
                     {/* P2 Final Civ Card */}
                     {(() => {
                       const c2 = getCivObj(guestFinalCivs[0]);
+                      const isGuestWon = state.matchResults?.[`GUEST_${guestFinalCivs[0]}`] === 'won';
+                      const isGuestLost = state.matchResults?.[`GUEST_${guestFinalCivs[0]}`] === 'lost';
                       return (
-                        <div id="final-matchup-p2" className="relative w-36 sm:w-48 aspect-[4/3] rounded-2xl overflow-hidden border-2 border-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.45)] group transition-all animate-in fade-in zoom-in-75 duration-700">
+                        <div
+                          id="final-matchup-p2"
+                          onClick={() => toggleMatchResult('GUEST', guestFinalCivs[0])}
+                          className={`relative w-36 sm:w-48 aspect-[4/3] rounded-2xl overflow-hidden border-2 transition-all cursor-pointer group animate-in fade-in zoom-in-75 duration-700 ${
+                            isGuestWon
+                              ? 'border-emerald-400 ring-4 ring-emerald-400/80 shadow-[0_0_35px_rgba(16,185,129,0.55)]'
+                              : isGuestLost
+                              ? 'border-rose-500/80 grayscale-[0.6] opacity-75'
+                              : 'border-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.45)]'
+                          }`}
+                        >
                           <img src={c2.flag} alt={c2.name} title={c2.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                          {isGuestWon && (
+                            <div className="absolute top-2 right-2 bg-emerald-600/90 text-white px-2 py-0.5 rounded-lg text-xs font-black flex items-center gap-1 shadow-lg border border-emerald-400">
+                              <Crown size={13} className="text-amber-300" /> VINCITORE
+                            </div>
+                          )}
                         </div>
                       );
                     })()}
@@ -1532,6 +1832,21 @@ export function DraftRoomPage() {
                 <div className="space-y-1.5">
                   <Trophy className="mx-auto text-cyan-400" size={32} />
                   <h2 className="text-xl font-extrabold text-white tracking-tight">DRAFT COMPLETATO</h2>
+                </div>
+              )}
+
+              {/* Series Score Display */}
+              {(hostWinsCount > 0 || guestWinsCount > 0) && (
+                <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-[#0b101e]/90 border border-amber-500/40 rounded-2xl shadow-xl shadow-black/60 text-xs sm:text-sm font-black animate-pop-in">
+                  <span className="text-red-400 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                    {room.host_name}: {hostWinsCount}
+                  </span>
+                  <span className="text-slate-500 font-normal">|</span>
+                  <span className="text-blue-400 flex items-center gap-1.5">
+                    {guestWinsCount} :{room.guest_name}
+                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                  </span>
                 </div>
               )}
             </div>
@@ -1544,25 +1859,78 @@ export function DraftRoomPage() {
                 👑 MAPPA DECIDER / RIMANENTE (ADMIN)
               </span>
               <div id="admin-map-container" className="flex flex-wrap justify-center gap-3">
-                {state.adminMapPicks.map((mapName, idx) => (
-                  <div
-                    key={`admin-map-${idx}`}
-                    className="relative w-52 sm:w-64 aspect-[16/9] overflow-hidden rounded-2xl border-2 border-amber-400 shadow-[0_0_30px_rgba(251,191,36,0.35)] group transition-all animate-pop-in"
-                  >
-                    <img
-                      src={`/maps/${mapName}.png`}
-                      onError={(e) => { (e.target as any).src = '/header-bg.png'; }}
-                      alt={mapName}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent pointer-events-none" />
-                    <div className="absolute bottom-2 left-2 right-2 text-center">
-                      <span className="text-sm sm:text-base font-black text-white drop-shadow-[0_2px_6px_rgba(0,0,0,1)] line-clamp-1">
-                        {mapName}
-                      </span>
+                {state.adminMapPicks.map((mapName, idx) => {
+                  const adminHostWon = state.matchResults?.[`ADMIN_${mapName}_HOST`] === 'won';
+                  const adminGuestWon = state.matchResults?.[`ADMIN_${mapName}_GUEST`] === 'won';
+                  return (
+                    <div key={`admin-map-${idx}`} className="flex flex-col items-center gap-1.5">
+                      {room.status === 'completed' && (
+                        <div className="flex items-center gap-1.5 z-10 bg-slate-900/90 border border-slate-700/80 p-1 rounded-xl shadow-md">
+                          <button
+                            type="button"
+                            title={`Segna come vinta da ${room.host_name}`}
+                            onClick={() => toggleAdminMapWinner(mapName, 'HOST')}
+                            className={`px-2.5 py-1 rounded-lg text-[10px] font-black transition-all flex items-center gap-1 border ${
+                              adminHostWon
+                                ? 'bg-red-600 border-red-400 text-white shadow-[0_0_10px_rgba(239,68,68,0.5)]'
+                                : 'bg-transparent border-transparent text-slate-300 hover:text-red-400 hover:bg-red-500/10'
+                            }`}
+                          >
+                            <span className="w-2 h-2 rounded-full bg-red-400" />
+                            <span>Vinta: {room.host_name}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            title={`Segna come vinta da ${room.guest_name}`}
+                            onClick={() => toggleAdminMapWinner(mapName, 'GUEST')}
+                            className={`px-2.5 py-1 rounded-lg text-[10px] font-black transition-all flex items-center gap-1 border ${
+                              adminGuestWon
+                                ? 'bg-blue-600 border-blue-400 text-white shadow-[0_0_10px_rgba(59,130,246,0.5)]'
+                                : 'bg-transparent border-transparent text-slate-300 hover:text-blue-400 hover:bg-blue-500/10'
+                            }`}
+                          >
+                            <span className="w-2 h-2 rounded-full bg-blue-400" />
+                            <span>Vinta: {room.guest_name}</span>
+                          </button>
+                        </div>
+                      )}
+
+                      <div
+                        className={`relative w-52 sm:w-64 aspect-[16/9] overflow-hidden rounded-2xl border-2 shadow-[0_0_30px_rgba(251,191,36,0.35)] group transition-all animate-pop-in ${
+                          adminHostWon
+                            ? 'border-red-500 ring-2 ring-red-400/80 shadow-[0_0_20px_rgba(239,68,68,0.5)]'
+                            : adminGuestWon
+                            ? 'border-blue-500 ring-2 ring-blue-400/80 shadow-[0_0_20px_rgba(59,130,246,0.5)]'
+                            : 'border-amber-400'
+                        }`}
+                      >
+                        <img
+                          src={`/maps/${mapName}.png`}
+                          onError={(e) => { (e.target as any).src = '/header-bg.png'; }}
+                          alt={mapName}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent pointer-events-none" />
+                        <div className="absolute bottom-2 left-2 right-2 text-center">
+                          <span className="text-sm sm:text-base font-black text-white drop-shadow-[0_2px_6px_rgba(0,0,0,1)] line-clamp-1">
+                            {mapName}
+                          </span>
+                          {adminHostWon && (
+                            <span className="inline-block mt-0.5 text-[10px] font-extrabold text-red-300 px-2 py-0.2 bg-red-950/80 rounded border border-red-500/60">
+                              ✓ Vinta da {room.host_name}
+                            </span>
+                          )}
+                          {adminGuestWon && (
+                            <span className="inline-block mt-0.5 text-[10px] font-extrabold text-blue-300 px-2 py-0.2 bg-blue-950/80 rounded border border-blue-500/60">
+                              ✓ Vinta da {room.guest_name}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -1613,21 +1981,21 @@ export function DraftRoomPage() {
           </div>
 
           {/* Picked / Banned / Sniped Flags Rows */}
-          <div className="space-y-2.5 pt-2.5 border-t border-slate-800/80">
+          <div className="space-y-3 pt-2.5 border-t border-slate-800/80">
             {room.preset?.scope !== 'maps' && (
               <div className="flex items-center justify-end gap-2">
-                <div id="guest-ban-container" className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
+                <div id="guest-ban-container" className="flex flex-wrap gap-2 justify-end min-h-[44px] items-center">
                   {state.guestBans && state.guestBans.length > 0 ? (
                     state.guestBans.map(id => {
                       const isHidden = isBanHiddenForRole(id, 'HOST');
                       const isSelfHidden = !state.revealedBans && room?.status !== 'completed' && state.hiddenBans?.includes(id) && role === 'HOST';
                       const c = getCivObj(id);
                       return isHidden ? (
-                        <div key={`gban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md animate-pop-in">
+                        <div key={`gban-${id}`} title="Ban Nascosto (In attesa del turno reveal)" className="w-11 h-11 sm:w-12 sm:h-12 md:w-13 md:h-13 rounded-xl bg-slate-900 border border-slate-700 flex flex-col items-center justify-center text-slate-400 shadow-md animate-pop-in">
                           <Lock size={16} />
                         </div>
                       ) : (
-                        <div key={`gban-${id}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-red-500/60 shadow-md animate-pop-in">
+                        <div key={`gban-${id}`} className="relative w-11 h-11 sm:w-12 sm:h-12 md:w-13 md:h-13 overflow-hidden rounded-xl border-2 border-red-500/60 shadow-md animate-pop-in">
                           <img src={c.flag} alt={c.name} title={`BAN: ${c.name}`} className="w-full h-full object-cover opacity-70 grayscale" />
                           {isSelfHidden && (
                             <div className="absolute top-0.5 right-0.5 bg-purple-900/90 text-purple-200 p-0.5 rounded-full shadow border border-purple-400/80 z-10" title="Ban Segreto (Nascosto all'avversario)">
@@ -1647,15 +2015,15 @@ export function DraftRoomPage() {
 
             {room.preset?.scope === 'maps' && state.guestMapBans && state.guestMapBans.length > 0 && (
               <div className="flex items-center justify-end gap-2">
-                <div id="guest-map-ban-container" className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
+                <div id="guest-map-ban-container" className="flex flex-wrap gap-2 justify-end min-h-[44px] items-center">
                   {state.guestMapBans.map((mapName, idx) => {
                     const isHidden = isBanHiddenForRole(mapName, 'GUEST');
                     return isHidden ? (
-                      <div key={`gmapban-${idx}`} title="Ban Mappa Nascosto (In attesa della rivelazione)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 shadow-md animate-pop-in">
+                      <div key={`gmapban-${idx}`} title="Ban Mappa Nascosto (In attesa della rivelazione)" className="w-11 h-11 sm:w-12 sm:h-12 md:w-13 md:h-13 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 shadow-md animate-pop-in">
                         <Lock size={16} />
                       </div>
                     ) : (
-                      <div key={`gmapban-${idx}`} title={`BAN MAPPA: ${mapName}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md animate-pop-in">
+                      <div key={`gmapban-${idx}`} title={`BAN MAPPA: ${mapName}`} className="relative w-11 h-11 sm:w-12 sm:h-12 md:w-13 md:h-13 overflow-hidden rounded-xl border-2 border-red-500/60 opacity-70 grayscale shadow-md animate-pop-in">
                         <img src={`/maps/${mapName}.png`} onError={(e) => { (e.target as any).src = '/header-bg.png'; }} alt={mapName} className="w-full h-full object-cover" />
                       </div>
                     );
@@ -1665,70 +2033,212 @@ export function DraftRoomPage() {
               </div>
             )}
 
-            <div className="flex items-center justify-end gap-2">
-              <div id="guest-pick-container" className="flex flex-wrap gap-1.5 justify-end min-h-[44px] items-center">
-                {room.preset?.scope === 'maps' ? (
-                  state.guestMapPicks && state.guestMapPicks.length > 0 ? (
-                    state.guestMapPicks.map((mapName, idx) => {
-                      const isHidden = isPickHiddenForRole(mapName, 'GUEST');
-                      const isSelfHidden = !state.revealedPicks && room?.status !== 'completed' && state.hiddenPicks?.includes(mapName) && role === 'GUEST';
-                      return isHidden ? (
-                        <div key={`gmap-${idx}`} title="Pick Mappa Nascosto (In attesa della rivelazione)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-purple-950/80 border border-purple-500/60 flex items-center justify-center text-purple-400 shadow-md animate-pop-in">
-                          <Lock size={16} />
-                        </div>
-                      ) : (
-                        <div key={`gmap-${idx}`} title={`PICK MAPPA: ${mapName}`} className="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 border-emerald-500 shadow-md animate-pop-in">
+            {/* Map Picks (when available) */}
+            {state.guestMapPicks && state.guestMapPicks.length > 0 && (
+              <div className="flex items-center justify-end gap-2">
+                <div id="guest-map-pick-container" className="flex flex-wrap gap-2 justify-end min-h-[44px] items-center">
+                  {state.guestMapPicks.map((mapName, idx) => {
+                    const isHidden = isPickHiddenForRole(mapName, 'GUEST');
+                    const isSelfHidden = !state.revealedPicks && room?.status !== 'completed' && state.hiddenPicks?.includes(mapName) && role === 'GUEST';
+                    const mapResult = state.matchResults?.[`GUEST_${mapName}`];
+                    return isHidden ? (
+                      <div key={`gmap-${idx}`} title="Pick Mappa Nascosto (In attesa della rivelazione)" className="w-13 h-13 sm:w-15 sm:h-15 md:w-16 md:h-16 rounded-xl bg-purple-950/80 border border-purple-500/60 flex items-center justify-center text-purple-400 shadow-md animate-pop-in">
+                        <Lock size={16} />
+                      </div>
+                    ) : (
+                      <div key={`gmap-${idx}`} className="flex flex-col items-center gap-1 animate-pop-in">
+                        {room?.status === 'completed' && (
+                          <div className="flex items-center bg-slate-900/95 border border-slate-700/80 rounded-md p-0.5 shadow-md">
+                            <button
+                              type="button"
+                              title="Segna mappa come Vinta"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleMatchResult('GUEST', mapName, 'won');
+                              }}
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-0.5 border ${
+                                mapResult === 'won'
+                                  ? 'bg-emerald-600 border-emerald-400 text-white shadow-[0_0_8px_rgba(16,185,129,0.5)]'
+                                  : 'bg-transparent border-transparent text-slate-400 hover:text-emerald-300 hover:bg-emerald-500/20'
+                              }`}
+                            >
+                              <Check size={11} strokeWidth={3} />
+                              {mapResult === 'won' && <span className="text-[9px] uppercase tracking-wider">Vinta</span>}
+                            </button>
+
+                            <button
+                              type="button"
+                              title="Segna mappa come Persa"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleMatchResult('GUEST', mapName, 'lost');
+                              }}
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-0.5 border ${
+                                mapResult === 'lost'
+                                  ? 'bg-rose-600 border-rose-400 text-white shadow-[0_0_8px_rgba(244,63,94,0.5)]'
+                                  : 'bg-transparent border-transparent text-slate-400 hover:text-rose-300 hover:bg-rose-500/20'
+                              }`}
+                            >
+                              <X size={11} strokeWidth={3} />
+                              {mapResult === 'lost' && <span className="text-[9px] uppercase tracking-wider">Persa</span>}
+                            </button>
+                          </div>
+                        )}
+
+                        <div
+                          onClick={() => {
+                            if (room?.status === 'completed') {
+                              toggleMatchResult('GUEST', mapName);
+                            }
+                          }}
+                          title={`PICK MAPPA: ${mapName}${room?.status === 'completed' ? ' (Clicca per cambiare esito)' : ''}`}
+                          className={`relative w-13 h-13 sm:w-15 sm:h-15 md:w-16 md:h-16 overflow-hidden rounded-xl border-2 transition-all shadow-md ${
+                            room?.status === 'completed' ? 'cursor-pointer hover:scale-105' : ''
+                          } ${
+                            mapResult === 'won'
+                              ? 'border-emerald-400 ring-2 ring-emerald-400/80 shadow-[0_0_15px_rgba(16,185,129,0.45)]'
+                              : mapResult === 'lost'
+                              ? 'border-rose-500/80 ring-1 ring-rose-500/40 grayscale-[0.5] opacity-75'
+                              : 'border-emerald-500 shadow-emerald-950/40'
+                          }`}
+                        >
                           <img src={`/maps/${mapName}.png`} onError={(e) => { (e.target as any).src = '/header-bg.png'; }} alt={mapName} className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-black/30" />
+                          <div className="absolute inset-0 bg-black/20" />
                           {isSelfHidden && (
                             <div className="absolute top-0.5 right-0.5 bg-purple-900/90 text-purple-200 p-0.5 rounded-full shadow border border-purple-400/80 z-10" title="Scelta Segreta (Nascosta all'avversario)">
                               <Lock size={10} />
                             </div>
                           )}
+                          {mapResult === 'won' && (
+                            <div className="absolute top-0.5 right-0.5 bg-emerald-600 text-white p-0.5 rounded shadow z-10" title="Partita Vinta">
+                              <Check size={10} strokeWidth={3} />
+                            </div>
+                          )}
+                          {mapResult === 'lost' && (
+                            <div className="absolute top-0.5 right-0.5 bg-rose-600 text-white p-0.5 rounded shadow z-10" title="Partita Persa">
+                              <X size={10} strokeWidth={3} />
+                            </div>
+                          )}
                         </div>
-                      );
-                    })
-                  ) : (
-                    <span className="text-xs text-slate-600 italic">-</span>
-                  )
-                ) : (
-                  state.guestPicks && state.guestPicks.length > 0 ? (
+                      </div>
+                    );
+                  })}
+                </div>
+                <span className="text-xs font-black text-emerald-400 uppercase w-14 shrink-0 text-right tracking-wider">
+                  {room.preset?.scope === 'maps' ? 'PICK' : 'MAPPE'}
+                </span>
+              </div>
+            )}
+
+            {/* Civ Picks (when scope is civs or when civ picks exist) */}
+            {(room.preset?.scope !== 'maps' || (state.guestPicks && state.guestPicks.length > 0)) && (
+              <div className="flex items-center justify-end gap-2">
+                <div id="guest-pick-container" className="flex flex-wrap gap-2 justify-end min-h-[44px] items-center">
+                  {state.guestPicks && state.guestPicks.length > 0 ? (
                     state.guestPicks.map(id => {
                       const isHidden = isPickHiddenForRole(id, 'GUEST');
                       const isSelfHidden = !state.revealedPicks && room?.status !== 'completed' && state.hiddenPicks?.includes(id) && role === 'GUEST';
                       const c = getCivObj(id);
                       const isSniped = state.guestSnipes?.includes(id);
+                      const civResult = state.matchResults?.[`GUEST_${id}`];
                       return isHidden ? (
-                        <div key={`gpick-${id}`} title="Pick Nascosto (In attesa della rivelazione)" className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-purple-950/80 border border-purple-500/60 flex items-center justify-center text-purple-400 shadow-md animate-pop-in">
+                        <div key={`gpick-${id}`} title="Pick Nascosto (In attesa della rivelazione)" className="w-13 h-13 sm:w-15 sm:h-15 md:w-16 md:h-16 rounded-xl bg-purple-950/80 border border-purple-500/60 flex items-center justify-center text-purple-400 shadow-md animate-pop-in">
                           <Lock size={16} />
                         </div>
                       ) : (
-                        <div key={`gpick-${id}`} className={`relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden rounded-xl border-2 shadow-md animate-pop-in ${
-                          isSniped ? 'border-red-500/80 shadow-red-950/50' : 'border-emerald-500 shadow-emerald-950/40'
-                        }`}>
-                          <img src={c.flag} alt={c.name} title={isSniped ? `SNIPED: ${c.name}` : `PICK: ${c.name}`} className={`w-full h-full object-cover ${isSniped ? 'grayscale opacity-50' : ''}`} />
-                          {isSelfHidden && (
-                            <div className="absolute top-0.5 right-0.5 bg-purple-900/90 text-purple-200 p-0.5 rounded-full shadow border border-purple-400/80 z-10" title="Scelta Segreta (Nascosta all'avversario)">
-                              <Lock size={10} />
+                        <div key={`gpick-${id}`} className="flex flex-col items-center gap-1 animate-pop-in">
+                          {room?.status === 'completed' && !isSniped && (
+                            <div className="flex items-center bg-slate-900/95 border border-slate-700/80 rounded-md p-0.5 shadow-md">
+                              <button
+                                type="button"
+                                title="Segna civiltà come Vinta"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleMatchResult('GUEST', id, 'won');
+                                }}
+                                className={`px-1.5 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-0.5 border ${
+                                  civResult === 'won'
+                                    ? 'bg-emerald-600 border-emerald-400 text-white shadow-[0_0_8px_rgba(16,185,129,0.5)]'
+                                    : 'bg-transparent border-transparent text-slate-400 hover:text-emerald-300 hover:bg-emerald-500/20'
+                                }`}
+                              >
+                                <Check size={11} strokeWidth={3} />
+                                {civResult === 'won' && <span className="text-[9px] uppercase tracking-wider">Vinta</span>}
+                              </button>
+
+                              <button
+                                type="button"
+                                title="Segna civiltà come Persa"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleMatchResult('GUEST', id, 'lost');
+                                }}
+                                className={`px-1.5 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-0.5 border ${
+                                  civResult === 'lost'
+                                    ? 'bg-rose-600 border-rose-400 text-white shadow-[0_0_8px_rgba(244,63,94,0.5)]'
+                                    : 'bg-transparent border-transparent text-slate-400 hover:text-rose-300 hover:bg-rose-500/20'
+                                }`}
+                              >
+                                <X size={11} strokeWidth={3} />
+                                {civResult === 'lost' && <span className="text-[9px] uppercase tracking-wider">Persa</span>}
+                              </button>
                             </div>
                           )}
-                          {isSniped && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[0.5px]">
-                              <span className="bg-red-600/90 text-white text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rotate-[-25deg] shadow-lg border border-red-400/80 whitespace-nowrap">
-                                SNIPED
-                              </span>
-                            </div>
-                          )}
+
+                          <div
+                            onClick={() => {
+                              if (room?.status === 'completed' && !isSniped) {
+                                toggleMatchResult('GUEST', id);
+                              }
+                            }}
+                            className={`relative w-13 h-13 sm:w-15 sm:h-15 md:w-16 md:h-16 overflow-hidden rounded-xl border-2 transition-all shadow-md ${
+                              room?.status === 'completed' && !isSniped ? 'cursor-pointer hover:scale-105' : ''
+                            } ${
+                              civResult === 'won'
+                                ? 'border-emerald-400 ring-2 ring-emerald-400/80 shadow-[0_0_15px_rgba(16,185,129,0.45)]'
+                                : civResult === 'lost'
+                                ? 'border-rose-500/80 ring-1 ring-rose-500/40 grayscale-[0.5] opacity-75'
+                                : isSniped
+                                ? 'border-red-500/80 shadow-red-950/50'
+                                : 'border-emerald-500 shadow-emerald-950/40'
+                            }`}
+                          >
+                            <img src={c.flag} alt={c.name} title={isSniped ? `SNIPED: ${c.name}` : `PICK: ${c.name}${room?.status === 'completed' ? ' (Clicca per cambiare esito)' : ''}`} className={`w-full h-full object-cover ${isSniped ? 'grayscale opacity-50' : ''}`} />
+                            {isSelfHidden && (
+                              <div className="absolute top-0.5 right-0.5 bg-purple-900/90 text-purple-200 p-0.5 rounded-full shadow border border-purple-400/80 z-10" title="Scelta Segreta (Nascosta all'avversario)">
+                                <Lock size={10} />
+                              </div>
+                            )}
+                            {civResult === 'won' && (
+                              <div className="absolute top-0.5 right-0.5 bg-emerald-600 text-white p-0.5 rounded shadow z-10" title="Partita Vinta">
+                                <Check size={10} strokeWidth={3} />
+                              </div>
+                            )}
+                            {civResult === 'lost' && (
+                              <div className="absolute top-0.5 right-0.5 bg-rose-600 text-white p-0.5 rounded shadow z-10" title="Partita Persa">
+                                <X size={10} strokeWidth={3} />
+                              </div>
+                            )}
+                            {isSniped && (
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[0.5px]">
+                                <span className="bg-red-600/90 text-white text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rotate-[-25deg] shadow-lg border border-red-400/80 whitespace-nowrap">
+                                  SNIPED
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       );
                     })
                   ) : (
                     <span className="text-xs text-slate-600 italic">-</span>
-                  )
-                )}
+                  )}
+                </div>
+                <span className="text-xs font-black text-emerald-400 uppercase w-14 shrink-0 text-right tracking-wider">
+                  {state.guestMapPicks && state.guestMapPicks.length > 0 ? 'CIV' : 'PICK'}
+                </span>
               </div>
-              <span className="text-xs font-black text-emerald-400 uppercase w-14 shrink-0 text-right tracking-wider">PICK</span>
-            </div>
+            )}
           </div>
         </div>
 
