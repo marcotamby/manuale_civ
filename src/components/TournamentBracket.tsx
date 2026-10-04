@@ -212,10 +212,62 @@ function BracketSet({ set, isFirstRound, isLastRound, hideConnectors }: { set: S
       <div className="glass rounded-xl border border-white/5 hover:border-yellow-500/40 transition-all duration-300 w-full shadow-lg relative z-10 hover:z-[110]">
         <div className="flex flex-col">
         {set.slots.map((slot, idx) => {
-          const isWinner = slot.standing?.stats.score.value !== null && 
-                          set.slots.every(s => s === slot || (s.standing?.stats.score.value || 0) < (slot.standing?.stats.score.value || 0));
-          const score = slot.standing?.stats.score.value;
           const entrant = slot.entrant;
+          const rawScore = slot.standing?.stats?.score?.value ?? null;
+          
+          // Se lo score numerico manca in startgg, proviamo a estrarlo da displayScore o winnerId
+          let score: number | string | null = rawScore;
+          let isWinner = false;
+
+          // 1. Check da winnerId
+          if (set.winnerId != null && entrant?.id != null) {
+            if (String(set.winnerId) === String(entrant.id)) {
+              isWinner = true;
+            }
+          }
+
+          // 2. Fallback su displayScore se lo score numerico non è impostato
+          if (score === null && set.displayScore) {
+            const parts = set.displayScore.split(' - ');
+            if (parts.length === 2) {
+              const p0 = parts[0].trim();
+              const p1 = parts[1].trim();
+              const m0Num = p0.match(/(\d+)\s*$/);
+              const m1Num = p1.match(/(\d+)\s*$/);
+              const entrantName = (entrant?.name || '').trim().toLowerCase();
+
+              if (m0Num && m1Num) {
+                // Formato 'Nome 1 - Nome 0'
+                const name0 = p0.slice(0, m0Num.index).trim().toLowerCase();
+                if (entrantName && name0.includes(entrantName)) {
+                  score = parseInt(m0Num[1], 10);
+                } else {
+                  score = parseInt(m1Num[1], 10);
+                }
+              } else {
+                // Formato 'PlayerA W - PlayerB L'
+                if (entrantName) {
+                  if (p0.toLowerCase().includes(entrantName)) {
+                    if (/\bW\b/i.test(p0)) { score = 'W'; isWinner = true; }
+                    else if (/\bL\b/i.test(p0)) { score = 'L'; }
+                  } else if (p1.toLowerCase().includes(entrantName)) {
+                    if (/\bW\b/i.test(p1)) { score = 'W'; isWinner = true; }
+                    else if (/\bL\b/i.test(p1)) { score = 'L'; }
+                  }
+                }
+              }
+            }
+          }
+
+          // Se score numerico è presente e non c'era winnerId definito
+          if (!isWinner && rawScore !== null && rawScore !== undefined) {
+            isWinner = set.slots.every(s => s === slot || (s.standing?.stats?.score?.value || 0) < (rawScore || 0));
+          }
+
+          // Se è winner accertato e non c'è un punteggio, mostriamo 'W' (o 1)
+          if (score === null && isWinner) {
+            score = 'W';
+          }
 
           return (
             <div 
