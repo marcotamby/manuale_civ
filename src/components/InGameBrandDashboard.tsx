@@ -31,6 +31,10 @@ const DEFAULT_STATE: OverlayState = {
   dayNumber: 1,
   dayText: 'Giornata 1',
   mapName: 'Dry Arabia',
+  league: 'gold',
+  scoreP1: 0,
+  scoreP2: 0,
+  showScores: true,
   showTopBanner: true,
   showMinimapCrest: true,
   showMinimapInfo: true,
@@ -101,13 +105,13 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
     }
   };
 
-  const handleDaySelect = (day: number) => {
-    const updated = {
-      ...state,
-      dayNumber: day,
-      dayText: `Giornata ${day}`
-    };
-    pushLiveState(updated, true);
+  const handleLeagueSelect = (league: 'gold' | 'silver') => {
+    pushLiveState({ ...state, league }, true);
+  };
+
+  const changeScore = (key: 'scoreP1' | 'scoreP2', delta: number) => {
+    const next = Math.max(0, (Number(state[key]) || 0) + delta);
+    pushLiveState({ ...state, [key]: next }, true);
   };
 
   const handleMapSelect = (map: string) => {
@@ -218,7 +222,7 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
-                2. Giornata (Sotto la Mappa)
+                2. Lega (Sotto la Mappa)
               </label>
               <button
                 type="button"
@@ -234,34 +238,89 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
               </button>
             </div>
             
-            <div className="grid grid-cols-4 gap-2">
-              {[1, 2, 3, 4].map((d) => (
+            <div className="grid grid-cols-2 gap-2">
+              {([
+                { id: 'gold', label: 'Lega Oro', active: 'bg-yellow-500/20 border-yellow-400 text-yellow-300 shadow-md shadow-yellow-500/20 scale-[1.02]' },
+                { id: 'silver', label: 'Lega Argento', active: 'bg-slate-300/20 border-slate-300 text-slate-100 shadow-md shadow-slate-300/20 scale-[1.02]' }
+              ] as const).map((l) => (
                 <button
-                  key={d}
-                  onClick={() => handleDaySelect(d)}
+                  key={l.id}
+                  onClick={() => handleLeagueSelect(l.id)}
                   className={`py-2 px-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all border ${
-                    (state.dayNumber || 1) === d
-                      ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-md shadow-cyan-500/20 scale-[1.02]'
+                    (state.league || 'gold') === l.id
+                      ? l.active
                       : 'bg-[#0e1424] border-white/10 text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  Giorno {d}
+                  {l.label}
                 </button>
               ))}
             </div>
+          </div>
 
-            <div className="flex items-center gap-2 pt-1">
-              <span className="text-[11px] text-slate-400">Testo personalizzato:</span>
-              <input
-                type="text"
-                value={state.dayText || ''}
-                onChange={(e) => pushLiveState({ ...state, dayText: e.target.value })}
-                placeholder="Giornata 1"
-                className="flex-1 bg-[#0e1424] border border-white/10 focus:border-cyan-400/60 rounded-lg px-3 py-1 text-xs font-bold text-cyan-300 focus:outline-none"
-              />
+        </div>
+
+        {/* Row 1b: Punteggi Giocatori (Tondetti ai lati del banner) */}
+        <div className="bg-black/40 border border-white/10 rounded-xl p-5 flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-orange-400"></span>
+              Punteggio Giocatori (Tondetti ai lati del banner)
+            </label>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => pushLiveState({ ...state, scoreP1: 0, scoreP2: 0 }, true)}
+                className="text-xs font-bold px-2.5 py-1 rounded-lg border bg-white/5 border-white/10 text-slate-300 hover:text-white"
+              >
+                Azzera
+              </button>
+              <button
+                type="button"
+                onClick={() => pushLiveState({ ...state, showScores: state.showScores === false ? true : false }, true)}
+                className={`text-xs font-bold flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-all ${
+                  state.showScores !== false
+                    ? 'bg-yellow-500/15 border-yellow-500/40 text-yellow-300'
+                    : 'bg-white/5 border-white/10 text-slate-500'
+                }`}
+              >
+                {state.showScores !== false ? <Eye size={13} /> : <EyeOff size={13} />}
+                {state.showScores !== false ? 'Visibile' : 'Nascosto'}
+              </button>
             </div>
           </div>
 
+          <div className="grid grid-cols-2 gap-4">
+            {([
+              { key: 'scoreP1', label: 'Giocatore Sinistra' },
+              { key: 'scoreP2', label: 'Giocatore Destra' }
+            ] as const).map((p) => (
+              <div key={p.key} className="flex items-center justify-between gap-3 bg-[#0e1424] border border-white/10 rounded-xl px-4 py-2.5">
+                <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">{p.label}</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => changeScore(p.key, -1)}
+                    className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 text-white font-black hover:bg-white/10"
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    min={0}
+                    value={state[p.key] ?? 0}
+                    onChange={(e) => pushLiveState({ ...state, [p.key]: Math.max(0, parseInt(e.target.value) || 0) })}
+                    className="w-14 text-center bg-black/40 border border-yellow-500/40 rounded-full py-1 text-base font-black text-yellow-300 focus:outline-none"
+                  />
+                  <button
+                    onClick={() => changeScore(p.key, 1)}
+                    className="w-8 h-8 rounded-lg bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 font-black hover:bg-yellow-500/30"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Row 2: Ricerca e Selezione Mappa */}

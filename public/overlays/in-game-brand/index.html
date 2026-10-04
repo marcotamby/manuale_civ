@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -99,6 +99,37 @@
             line-height: 1;
         }
 
+        /* Tondetti punteggio (posizionati in assoluto ai lati del banner: non spostano nulla) */
+        .score-circle {
+            position: absolute;
+            top: 50%;
+            width: 36px;
+            height: 36px;
+            margin-top: -18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: linear-gradient(180deg, rgba(25, 38, 50, 0.96) 0%, rgba(16, 25, 34, 0.98) 100%);
+            border: 2px solid var(--gold-main);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 215, 0, 0.35), 0 0 12px rgba(212, 175, 55, 0.2);
+            pointer-events: none;
+        }
+
+        .score-circle.left { left: -48px; }
+        .score-circle.right { right: -48px; }
+
+        .score-value {
+            font-family: 'Fondamento', 'Eagle Lake', 'Cinzel', serif;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1;
+            background: linear-gradient(180deg, #ffffff 0%, #fff176 30%, #ffa726 65%, #ff5722 95%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 14px rgba(255, 167, 38, 0.4));
+        }
+
         /* =========================================================================
            2. MINIMAP UNIFIED FRAME & PANELS (Pure 1:1 45° Diamond - Calibrato)
            ========================================================================= */
@@ -184,7 +215,9 @@
 
     <!-- 1. TOP BRAND BANNER (Solo nome torneo - Sotto HUD Timer con Raccordo Dorato) -->
     <div id="top-brand-banner">
+        <div class="score-circle left" id="score-circle-left"><span class="score-value" id="score-left">0</span></div>
         <div class="top-tournament-title" id="top-title-text">Ends of Summer Champions</div>
+        <div class="score-circle right" id="score-circle-right"><span class="score-value" id="score-right">0</span></div>
     </div>
 
     <!-- 2. MINIMAP COMPLETE BRAND WRAPPER (1:1 45° Diamond + Bordo Morbido + Dentellatura EGC) -->
@@ -232,7 +265,7 @@
         <!-- Map & Day Info (Bottom-Right) -->
         <div class="minimap-bottom-content" id="minimap-info-content">
             <div class="minimap-map-name" id="minimap-map-name">Dry Arabia</div>
-            <div class="minimap-day-text" id="minimap-day-text">Giornata 1</div>
+            <div class="minimap-day-text" id="minimap-day-text">Lega Oro</div>
         </div>
     </div>
 
@@ -266,12 +299,18 @@
             const title = displayName || s.tournamentTitle || s.titleText || 'Ends of Summer Champions';
             const formattedTitle = formatTitle(title);
             const mapName = s.mapName || 'Dry Arabia';
-            const dayNum = s.dayNumber !== undefined ? s.dayNumber : 1;
-            const dayText = s.dayText || `Giornata ${dayNum}`;
+            const leagueText = s.league === 'silver' ? 'Lega Argento' : 'Lega Oro';
 
             // Top Banner Element
             const topBanner = document.getElementById('top-brand-banner');
             document.getElementById('top-title-text').innerText = formattedTitle;
+
+            // Punteggi giocatori (tondetti ai lati del banner)
+            document.getElementById('score-left').innerText = Number(s.scoreP1) || 0;
+            document.getElementById('score-right').innerText = Number(s.scoreP2) || 0;
+            const showScores = s.showScores !== false;
+            document.getElementById('score-circle-left').classList.toggle('hidden-element', !showScores);
+            document.getElementById('score-circle-right').classList.toggle('hidden-element', !showScores);
 
             // Minimap Elements
             const minimapWrapper = document.getElementById('minimap-brand-wrapper');
@@ -282,7 +321,7 @@
             const minimapDay = document.getElementById('minimap-day-text');
             const minimapMap = document.getElementById('minimap-map-name');
 
-            minimapDay.innerText = dayText;
+            minimapDay.innerText = leagueText;
             minimapMap.innerText = mapName;
 
             // Visibility Toggles

@@ -38,6 +38,10 @@ export interface OverlayState {
   matchFormat?: string;
   dayText?: string;
   mapName?: string;
+  league?: 'gold' | 'silver';
+  scoreP1?: number;
+  scoreP2?: number;
+  showScores?: boolean;
   minimapBrandTitle?: string;
   minimapBrandSub?: string;
   showTopBanner?: boolean;
