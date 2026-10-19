@@ -1,5 +1,5 @@
 {
-  "ignoreCommand": "git diff --quiet ${VERCEL_GIT_PREVIOUS_SHA:-HEAD^} HEAD -- . ':!backups' ':!.github'",
+  "ignoreCommand": "prev=$(git rev-parse --verify \"${VERCEL_GIT_PREVIOUS_SHA}^{commit}\" 2>/dev/null || git rev-parse --verify HEAD~9 2>/dev/null || echo HEAD^); git diff --quiet \"$prev\" HEAD -- . ':!backups' ':!.github'",
   "headers": [
     {
       "source": "/assets/(.*)",
