@@ -34,6 +34,10 @@ const CIV_ID_TO_API_KEY: Record<string, string> = {
   templar: 'knights_templar',
   tughlaq: 'tughlaq_dynasty',
   zhuxi: 'zhu_xis_legacy',
+  scots: 'scots',
+  scozzesi: 'scots',
+  vichinghi: 'vikings',
+  vikings: 'vikings',
 };
 
 type RankLevel = '' | 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond' | 'conqueror' | '≥gold' | '≥platinum' | '≥diamond';

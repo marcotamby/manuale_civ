@@ -10,6 +10,7 @@ const getCivArticle = (name: string): string => {
     'Bizantini': 'i ',
     'Cinesi': 'i ',
     'Dinastia di Tughlaq': 'la ',
+    'Dinastia Jin': 'la ',
     'Eredità di Zhu Xi': "l'",
     'Francesi': 'i ',
     'Giapponesi': 'i ',
@@ -26,7 +27,9 @@ const getCivArticle = (name: string): string => {
     'Rusiani': 'i ',
     'Sacro Romano Impero': 'il ',
     'Sengoku Daimyo': 'i ',
-    'Sultanato di Delhi': 'il '
+    'Sultanato di Delhi': 'il ',
+    'Scozzesi': 'gli ',
+    'Vichinghi': 'i '
   };
   return articles[name] ?? 'gli ';
 };

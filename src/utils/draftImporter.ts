@@ -52,7 +52,11 @@ export const mapAoe2cmCivId = (id: string): string => {
     'jindynasty': 'jin-dynasty',
     'goldenhorde': 'goldenhorde',
     'macedoniandynasty': 'macedonian',
-    'macedonian': 'macedonian'
+    'macedonian': 'macedonian',
+    'scots': 'scozzesi',
+    'scozzesi': 'scozzesi',
+    'vikings': 'vikings',
+    'vichinghi': 'vikings'
   };
   
   if (mapping[clean]) return mapping[clean];

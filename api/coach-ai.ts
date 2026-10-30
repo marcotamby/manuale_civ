@@ -152,7 +152,11 @@ const CIV_NAME_TO_SLUG: Record<string, string> = {
   'dinastia macedone': 'macedonian',
   'orda d\'oro': 'goldenhorde',
   'golden horde': 'goldenhorde',
-  'tughlaq': 'tughlaq'
+  'tughlaq': 'tughlaq',
+  'scozzesi': 'scozzesi',
+  'scots': 'scozzesi',
+  'vichinghi': 'vikings',
+  'vikings': 'vikings'
 };
 
 const CIV_SUMMARIES: Record<string, string> = {
@@ -249,7 +253,15 @@ const CIV_SUMMARIES: Record<string, string> = {
 
   'tughlaq': `[DINASTIA TUGHLAQ - ID: tughlaq]
 - Natura: Variante indiana con elefanti corazzati e guerrieri d'assalto Tughlaq.
-- Unità Uniche: Elefante corazzato / Guerriero Tughlaq (Età II/III).`
+- Unità Uniche: Elefante corazzato / Guerriero Tughlaq (Età II/III).`,
+
+  'scozzesi': `[SCOZZESI (SCOTS) - ID: scozzesi]
+- Natura: Civiltà difensiva e da imboscata con Case-Torri (Tower Houses), Bestiame delle Highlands sui cespugli di bacche, Sala di Raduno (Mustering Hall), Stagni Ittici Monastici e scelta regionale tra Landmark delle Highlands e delle Lowlands.
+- Unità Uniche: Ghillie / Highland Cattle / Pikeman (Età I - Dark Age), Cateran / Highland Archer / Kirkman (Età II - Feudale), Gallowglass (Età III - Castelli), Border Reiver / Tacksman (Età IV - Imperiale).`,
+
+  'vikings': `[VICHINGHI (VIKINGS) - ID: vikings]
+- Natura: Civiltà da incursione con reclutamento automatico gratuito degli abitanti fino alla capacità fornita dalle Longhouse, estensioni Longhouse (Farmstead, Bee Skeps, Pasture and Loom, Smithy), Saghe norrene, Völur con Boschi Sacri, mura del Danevirke e fanteria da mischia che si cura raccogliendo cibo sulla mappa.
+- Unità Uniche: Berserker / Bondi (Età I - Dark Age), Early Hirdman / Shield Maiden / Völur / Longship / Drakkar / Fishing Knarr (Età II - Feudale), Jylland Knight / Skåne Crossbowmen (Età III - Castelli).`
 };
 
 function getMapContext(userMessage: string): string {
@@ -286,7 +298,7 @@ async function fetchPlayerStatsContext(userMessage: string): Promise<string> {
     'inglesi', 'francesi', 'mongoli', 'rus', 'partita', 'matchup', 'consiglio', 'come', 'villi', 'build',
     'order', 'fast', 'castle', 'feudal', 'imperial', 'dark', 'mucche', 'drago', 'cinesi', 'ottomani',
     'maliani', 'delhi', 'giapponesi', 'bisantini', 'ayyubids', 'zhuxi', 'lancaster', 'templar', 'sengoku',
-    'macedonian', 'goldenhorde', 'tughlaq', 'guida', 'mappa', 'mie', 'mio', 'miei', 'nostro', 'nostri'
+    'macedonian', 'goldenhorde', 'tughlaq', 'scozzesi', 'scots', 'vichinghi', 'vikings', 'guida', 'mappa', 'mie', 'mio', 'miei', 'nostro', 'nostri'
   ];
   if (searchQuery && excludedKeywords.includes(searchQuery.toLowerCase())) {
     searchQuery = '';
@@ -522,9 +534,10 @@ async function fetchMatchupContext(userMessage: string): Promise<string> {
       return '';
     }
 
+    const toApiCiv = (slug: string) => slug === 'scozzesi' ? 'scots' : slug === 'jin-dynasty' ? 'jin_dynasty' : slug;
     if (detectedSlugs.length >= 2) {
-      const civA = detectedSlugs[0];
-      const civB = detectedSlugs[1];
+      const civA = toApiCiv(detectedSlugs[0]);
+      const civB = toApiCiv(detectedSlugs[1]);
       const match = allData.find(m => 
         (m.civilization === civA && m.other_civilization === civB) ||
         (m.civilization === civB && m.other_civilization === civA)
@@ -540,7 +553,7 @@ async function fetchMatchupContext(userMessage: string): Promise<string> {
         return `STATISTICHE UFFICIALI E REALI IN TEMPO REALE DAL PORTALE / AOE4WORLD (Rank: ${rank ? rank.toUpperCase() : 'TUTTI I RANK'}):\n- ${nameA}: Win Rate **${winRateA.toFixed(1)}%** (${match.win_count} vittorie su ${match.games_count} partite totali)\n- ${nameB}: Win Rate **${winRateB.toFixed(1)}%**\nCITA OBBLIGATORIAMENTE QUESTI DATI E PERCENTUALI PRECISE NELLA TUA RISPOSTA!`;
       }
     } else if (detectedSlugs.length === 1) {
-      const civA = detectedSlugs[0];
+      const civA = toApiCiv(detectedSlugs[0]);
       const matches = allData.filter(m => m.civilization === civA);
       if (matches.length > 0) {
         const topList = matches.slice(0, 5).map(m => `- contro ${m.other_civilization.replace('_', ' ')}: Win Rate ${m.win_rate.toFixed(1)}% (${m.games_count} partite)`).join('\n');

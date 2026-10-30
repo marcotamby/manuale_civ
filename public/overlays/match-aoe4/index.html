@@ -139,7 +139,11 @@
             'tughlaq': 'Tughlaq Dynasty.webp',
             'sengoku': 'Sengoku Daimyo.webp',
             'macedonian': 'Macedonian Dynasty.webp',
-            'jin-dynasty': 'Jin Dynasty.png'
+            'jin-dynasty': 'Jin Dynasty.png',
+            'scozzesi': 'Scots.webp',
+            'scots': 'Scots.webp',
+            'vikings': 'Vikings.webp',
+            'vichinghi': 'Vikings.webp'
         };
 
         const { createClient } = window.supabase;
@@ -175,7 +179,7 @@
         function getCivUrl(id) {
             if (!id) return '';
             if (id.startsWith('/') || id.includes('.png') || id.includes('.webp')) return id;
-            const filename = civMap[id] || id + '.webp';
+            const filename = civMap[id] || civMap[id.toLowerCase()] || id + '.webp';
             return filename.startsWith('/') ? filename : `/civs/${filename}`;
         }
 

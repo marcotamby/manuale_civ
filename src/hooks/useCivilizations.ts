@@ -28,7 +28,11 @@ export function useCivilizations() {
           id: row.id,
           name: row.name,
           flag: row.flag 
-            ? row.flag.replace('.png', '.webp').replace("Jeanne d'Arc", "jeannedarc") 
+            ? row.flag
+                .replace('/flags/scots.png', '/civs/Scots.webp')
+                .replace('/flags/vikings.png', '/civs/Vikings.webp')
+                .replace('.png', '.webp')
+                .replace("Jeanne d'Arc", "jeannedarc") 
             : localCiv?.flag?.replace('.png', '.webp'),
           difficulty: row.difficulty,
           shortDescription: row.short_description || localCiv?.shortDescription || '',

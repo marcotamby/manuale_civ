@@ -6968,6 +6968,783 @@ const civilizationsDataRaw: Civilization[] = [
       "Hanno costantemente bisogno di oro e quindi di difenderlo a tutti i costi, vederselo negare potrebbe essere fatale."
     ],
     "primaryColor": "#3b82f6"
+  },
+  {
+    "id": "scozzesi",
+    "name": "Scozzesi",
+    "flag": "/civs/Scots.webp",
+    "difficulty": "Medio",
+    "shortDescription": "Gli scozzesi schierano una fanteria tenace, specializzata nel tendere imboscate ai nemici con l'elemento sorpresa. Le case-torri e i masti proteggono le loro comunità e il prezioso bestiame dai predoni che imperversano nelle campagne. Raduna rapidamente i rinforzi nella Sala di Raduno, ricerca potenti tecnologie delle Highlands o delle Lowlands e difendi il Regno di Scozia.",
+    "passiveBonuses": [
+      "Case Nobiliari (Tower Houses): Le Case-Torri sostituiscono gli Avamposti, aumentano la popolazione massima e producono Ghillie e Bestiame delle Highlands.",
+      "Ricchezza delle Highlands (Highland Wealth): Il Bestiame delle Highlands pascola presso i cespugli di bacche producendo 30 Cibo al minuto. La capacità iniziale è di 9 capi e aumenta di +4 per ogni Landmark delle Highlands costruito.",
+      "Imboscata delle Highlands (Highland Ambush): La fanteria non subisce penalità alla visuale nelle foreste furtive (Stealth Forests) e ottiene bonus alla velocità di movimento e in combattimento quando l'Imboscata delle Highlands è attiva.",
+      "Schiltron Scozzese: I Gallowglass possono piantare le armi per bloccare le cariche di cavalleria di base, mentre gli Uomini d'Arme sbloccano questa abilità ricercando Asce di Lochaber.",
+      "Lowlands e Highlands: A ogni passaggio d'età scegli tra un Landmark delle Highlands o delle Lowlands; ogni Landmark costruito dimezza il costo delle tecnologie corrispondenti nella Sala di Raduno.",
+      "Rispondere alla Chiamata (Mustering Hall): Dalla Sala di Raduno (disponibile dall'Età Feudale) puoi radunare rapidamente gruppi di guerrieri. Costruire edifici militari nella sua influenza ne aumenta il livello (fino al Tier 3), aggiungendo cariche di raduno, riducendone il costo e aumentando la salute delle truppe radunate.",
+      "Stagni Ittici Monastici (Monastic Fishponds): I Kirkman possono creare Stagni Ittici da cui raccogliere Oro, aumentando anche la velocità di raccolta dei lavoratori vicini (+10%). I Landmark delle Lowlands aumentano il limite massimo di Stagni Ittici.",
+      "Rovine del Castello (Castle Ruins): Quando un Mastio (Keep) viene distrutto, applica un effetto terra bruciata che riduce l'efficacia in combattimento dei nemici vicini e diventa una Rovina riparabile prima della distruzione definitiva.",
+      "Rete Difensiva dei Loch: Le feritoie per frecce navali sui Porti costano il 50% in meno."
+    ],
+    "uniqueUnits": [
+      {
+        "id": "ghillie",
+        "age": 1,
+        "name": "Ghillie",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.63,
+          "attack": 1,
+          "health": 110
+        },
+        "imageId": "scots/ghillie-1",
+        "strengths": [
+          "Stealth",
+          "Scouting",
+          "Vision in Stealth Forests"
+        ],
+        "weaknesses": [
+          "Combat Units"
+        ],
+        "description": "Esploratore esperto di mimetizzazione e caccia. Può attivare la furtività in campo aperto, vedere dentro le foreste furtive e rigenerare salute, ma è molto debole in combattimento."
+      },
+      {
+        "id": "highland-cattle",
+        "age": 1,
+        "name": "Highland Cattle",
+        "type": "Worker",
+        "stats": {
+          "armor": 0,
+          "speed": 1,
+          "attack": 0,
+          "health": 75
+        },
+        "imageId": "highland-cattle-1",
+        "strengths": [
+          "Passive Food Generation"
+        ],
+        "weaknesses": [
+          "Raiding Units"
+        ],
+        "description": "Bestiame delle Highlands che pascola presso i cespugli di bacche producendo 30 Cibo al minuto. Capacità iniziale di 9 capi (+4 per ogni Landmark delle Highlands)."
+      },
+      {
+        "id": "pikeman",
+        "age": 1,
+        "name": "Pikeman",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.25,
+          "attack": 7,
+          "health": 90
+        },
+        "imageId": "pikeman-1",
+        "strengths": [
+          "Cavalry",
+          "Elephants"
+        ],
+        "weaknesses": [
+          "Archers",
+          "Heavy Infantry"
+        ],
+        "description": "Fanteria leggera armata di lunga picca con portata d'attacco aumentata, eccellente contro qualsiasi unità a cavallo."
+      },
+      {
+        "id": "cateran",
+        "age": 2,
+        "name": "Cateran",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.5,
+          "attack": 9,
+          "health": 110
+        },
+        "imageId": "cateran-2",
+        "strengths": [
+          "Workers",
+          "Buildings",
+          "Raiding"
+        ],
+        "weaknesses": [
+          "Archers",
+          "Knights"
+        ],
+        "description": "Fanteria leggera da mischia estremamente veloce delle Highlands, dotata di attacco con torcia potenziato e danni bonus contro lavoratori ed edifici."
+      },
+      {
+        "id": "highland-archer",
+        "age": 2,
+        "name": "Highland Archer",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.25,
+          "attack": 6,
+          "health": 70
+        },
+        "imageId": "highland-archer-2",
+        "strengths": [
+          "Light Infantry",
+          "Spearmen",
+          "High Rate of Fire"
+        ],
+        "weaknesses": [
+          "Horsemen",
+          "Armored Units"
+        ],
+        "description": "Arciere delle Highlands con gittata ridotta ma danno superiore e rateo di fuoco elevato, micidiale contro bersagli senza armatura."
+      },
+      {
+        "id": "kirkman",
+        "age": 2,
+        "name": "Kirkman",
+        "type": "Religious",
+        "stats": {
+          "armor": 0,
+          "speed": 1.13,
+          "attack": 0,
+          "health": 90
+        },
+        "imageId": "kirkman-2",
+        "strengths": [
+          "Fishponds (Gold)",
+          "Healing",
+          "Relics"
+        ],
+        "weaknesses": [
+          "Combat Units"
+        ],
+        "description": "Unità religiosa di supporto capace di creare e raccogliere Oro dagli Stagni Ittici, curare gli alleati e raccogliere le Reliquie (disponibile in Età II con la Stone of Destiny o in Età III)."
+      },
+      {
+        "id": "gallowglass",
+        "age": 3,
+        "name": "Gallowglass",
+        "type": "Infantry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.13,
+          "attack": 19,
+          "health": 180
+        },
+        "imageId": "gallowglass-3",
+        "strengths": [
+          "Area Melee Damage",
+          "Braces vs Cavalry",
+          "Infantry"
+        ],
+        "weaknesses": [
+          "Crossbowmen",
+          "Handcannoneers"
+        ],
+        "description": "Fanteria pesante da mischia equipaggiata con spada Claymore a due mani che infligge danni ad area e può bloccare le cariche di cavalleria."
+      },
+      {
+        "id": "border-reiver",
+        "age": 4,
+        "name": "Border Reiver",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.69,
+          "attack": 19,
+          "health": 140
+        },
+        "imageId": "border-reiver-4",
+        "strengths": [
+          "Ranged Cavalry",
+          "Raiding",
+          "Buildings"
+        ],
+        "weaknesses": [
+          "Horsemen",
+          "Archers",
+          "Spearmen"
+        ],
+        "description": "Cavalleria leggera armata di pistola a polvere da sparo, veloce e letale contro gli arcieri a cavallo e nelle incursioni con torce."
+      },
+      {
+        "id": "tacksman",
+        "age": 4,
+        "name": "Tacksman",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.13,
+          "attack": 38,
+          "health": 130
+        },
+        "imageId": "tacksman-4",
+        "strengths": [
+          "Infantry",
+          "Cavalry",
+          "Buffs Highland Warriors"
+        ],
+        "weaknesses": [
+          "Horsemen",
+          "Mangonels"
+        ],
+        "description": "Fanteria a polvere da sparo d'élite delle Highlands che infligge danni elevatissimi e potenzia i danni dei guerrieri delle Highlands vicini."
+      }
+    ],
+    "technologies": [
+      {
+        "id": "barmkins",
+        "age": 2,
+        "name": "Barmkins",
+        "building": "Tower House",
+        "description": "Aggiunge 4 slot di presidio per il Bestiame delle Highlands nelle Case-Torri."
+      },
+      {
+        "id": "fermtouns-and-pastures",
+        "age": 2,
+        "name": "Fermtouns and Pastures",
+        "building": "Mill",
+        "description": "Gli abitanti raccolgono dalle fattorie il 20% più velocemente e il Bestiame delle Highlands raccoglie dalle bacche il 20% più velocemente."
+      },
+      {
+        "id": "wallaces-rally",
+        "age": 2,
+        "name": "Wallace's Rally",
+        "building": "Blacksmith",
+        "description": "Aumenta la velocità di produzione della fanteria del 50% e conferisce +25% velocità di movimento fuori dal combattimento per 25 secondi."
+      },
+      {
+        "id": "caterans-trail",
+        "age": 2,
+        "name": "Cateran's Trail",
+        "building": "Mustering Hall",
+        "description": "I Cateran aumentano la velocità di movimento della fanteria del 15%; la fanteria si cura di 1 PS/s nelle foreste furtive fuori dal combattimento."
+      },
+      {
+        "id": "lions-duty",
+        "age": 2,
+        "name": "Lion's Duty",
+        "building": "Mustering Hall",
+        "description": "La fanteria ottiene +1 armatura quando si trova vicino a Landmark, Masti, Case-Torri e Torri delle mura in pietra."
+      },
+      {
+        "id": "lochaber-axes",
+        "age": 3,
+        "name": "Lochaber Axes",
+        "building": "Barracks",
+        "description": "Gli Uomini d'Arme ottengono +3 danni, +4 danni contro cavalleria e la capacità di bloccare le cariche di cavalleria."
+      },
+      {
+        "id": "clan-traditions",
+        "age": 3,
+        "name": "Clan Traditions",
+        "building": "Mustering Hall",
+        "description": "Aumenta il danno della fanteria da mischia del 15% e prolunga di 10 secondi la durata del bonus Imboscata delle Highlands."
+      },
+      {
+        "id": "stew-ponds",
+        "age": 3,
+        "name": "Stew Ponds",
+        "building": "Mustering Hall",
+        "description": "Aumenta di +1 il limite di Stagni Ittici, porta il bonus di raccolta dei lavoratori vicini dal 10% al 20% e genera un Kirkman gratuito."
+      },
+      {
+        "id": "basket-hilted-broadswords",
+        "age": 4,
+        "name": "Basket-hilted Broadswords",
+        "building": "Barracks",
+        "description": "I Cateran ottengono +25% velocità d'attacco e +2 armatura da mischia."
+      },
+      {
+        "id": "feuds-aside",
+        "age": 4,
+        "name": "Feuds Aside",
+        "building": "Mustering Hall",
+        "description": "Aumenta del 20% la velocità d'attacco di Tacksman, Border Reiver e macchine d'assedio a polvere da sparo."
+      },
+      {
+        "id": "we-stand-alone",
+        "age": 4,
+        "name": "We Stand Alone",
+        "building": "Mustering Hall",
+        "description": "Aumenta del 30% la salute di tutti gli edifici, del 50% la velocità d'attacco delle postazioni difensive e ripara automaticamente gli edifici danneggiati."
+      },
+      {
+        "id": "snaphance-locks",
+        "age": 4,
+        "name": "Snaphance Locks",
+        "building": "University",
+        "description": "Tacksman e Border Reiver ottengono +5 danni contro la fanteria da mischia e un breve bonus alla velocità di movimento dopo aver sparato."
+      }
+    ],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e Ghillie, funge da punto di consegna per tutte le risorse e aumenta la popolazione massima."
+      },
+      {
+        "id": "abbey-of-the-isles",
+        "age": 2,
+        "name": "Abbey of the Isles (Highlands)",
+        "type": "Religious",
+        "imageId": "abbey-of-the-isles-1",
+        "description": "Contiene una Reliquia del Santo che cura le unità nell'area. La reliquia può essere spostata negli edifici militari o tecnologici per fornire +135% alla velocità di produzione e ricerca oltre alla cura ad area."
+      },
+      {
+        "id": "stone-of-destiny",
+        "age": 2,
+        "name": "Stone of Destiny (Lowlands)",
+        "type": "Economic",
+        "imageId": "stone-of-destiny-1",
+        "description": "Gli edifici costruiti attorno alla Pietra del Destino rimborsano il 30% del loro costo di costruzione in Oro (esclusi i Landmark). Sblocca in anticipo i Kirkman per creare gli Stagni Ittici."
+      },
+      {
+        "id": "snowdoun-gate",
+        "age": 3,
+        "name": "Snowdoun Gate (Lowlands)",
+        "type": "Military",
+        "imageId": "snowdoun-gate-2",
+        "description": "Produce gratuitamente fanteria selezionabile per un valore di 190 risorse al minuto. Le tecnologie ricercate nella Sala di Raduno aumentano la velocità di produzione del 15% (+15% aggiuntivo se ci sono nemici vicini)."
+      },
+      {
+        "id": "tower-of-skye",
+        "age": 3,
+        "name": "Tower of Skye (Highlands)",
+        "type": "Defensive",
+        "imageId": "tower-of-skye-2",
+        "description": "Funge da Casa-Torre dotata di feritoie e postazione di springalda. Crea una foresta furtiva locale e aumenta il danno della fanteria del 15% nelle foreste furtive. Permette alle Case-Torri di creare altre foreste furtive."
+      },
+      {
+        "id": "dhun-eideann",
+        "age": 4,
+        "name": "Dhùn Èideann (Lowlands)",
+        "type": "Defensive",
+        "imageId": "dhun-eideann-3",
+        "description": "Fortezza armata con i cannoni 'Sette Sorelle' per difendere l'area. Produce armi d'assedio a polvere da sparo con uno sconto di 100 Oro e conferisce +1 casella di gittata alle armi d'assedio a polvere da sparo."
+      },
+      {
+        "id": "three-loch-lookout",
+        "age": 4,
+        "name": "Three Loch Lookout (Highlands)",
+        "type": "Military",
+        "imageId": "three-loch-lookout-3",
+        "description": "Offre un'ampia visuale, aggiunge 3 cariche di raduno e aumenta del 75% il numero di guerrieri ottenuti con il raduno. Se costruito vicino all'acqua, permette di radunare anche una flotta reale."
+      }
+    ],
+    "videos": [],
+    "buildOrders": [],
+    "strengths": [
+      "Imboscate e Mobilità: Il bonus nelle foreste furtive, i Ghillie con furtività in campo aperto e i Cateran veloci rendono gli Scozzesi letali nei raid e nelle imboscate.",
+      "Economia Passiva Solida: Il Bestiame delle Highlands sui cespugli di bacche e gli Stagni Ittici dei Kirkman garantiscono ottime entrate di Cibo e Oro.",
+      "Rinforzi Istantanei (Mustering): La Sala di Raduno permette di richiamare istantaneamente battaglioni di fanteria, cavalleria o assedio nei momenti decisivi.",
+      "Difesa Resiliente: Le Case-Torri ospitano il bestiame e aumentano la popolazione, mentre i Masti distrutti indeboliscono i nemici e possono essere ricostruiti."
+    ],
+    "weaknesses": [
+      "Esposizione del Bestiame: Il Bestiame delle Highlands deve pascolare vicino ai cespugli di bacche, risultando vulnerabile alle incursioni nemiche se non protetto dalle Case-Torri.",
+      "Gittata Ridotta degli Arcieri: Gli Highland Archer infliggono più danni e sparano rapidamente, ma hanno una gittata inferiore rispetto agli arcieri standard.",
+      "Scelte Regionali Vincolanti: Scegliere Landmark delle Highlands o delle Lowlands dimezza solo un ramo di tecnologie della Sala di Raduno, richiedendo una pianificazione strategica precisa."
+    ],
+    "primaryColor": "#1d4ed8"
+  },
+  {
+    "id": "vikings",
+    "name": "Vichinghi",
+    "flag": "/civs/Vikings.webp",
+    "difficulty": "Medio",
+    "shortDescription": "I Vichinghi sono predoni provenienti dal nord che sopraffacevano i propri nemici grazie a una potente fanteria da mischia in grado di sopravvivere nutrendosi delle risorse dei territori nemici. Le loro “longhouse”, strutture flessibili, consentono loro di far crescere facilmente la popolazione e l'economia. Le saghe e la religione norrena ispirano i loro guerrieri a combattere senza paura per l'onore degli dei.",
+    "passiveBonuses": [
+      "Migrazione del Nord (Northern Migration): I Centri Città reclutano automaticamente Abitanti del villaggio gratuitamente fino alla Capacità Abitanti, che aumenta di +10 per ogni Longhouse costruita.",
+      "Longhouse Versatili: Le Longhouse sostituiscono le case, possono reclutare i Bondi e possono essere potenziate con 4 estensioni: Farmstead (2 campi agricoli con raccolta +50%), Bee Skeps (generano 50 Oro al minuto), Pasture and Loom (ricerca automaticamente le armature) o Smithy (ricerca automaticamente i potenziamenti ai danni).",
+      "Saghe Norrene (Sagas): Le Saghe sono missioni completabili in qualsiasi momento della partita per sbloccare bonus permanenti per l'economia e l'esercito.",
+      "Völur e Boschi Sacri (Sacred Groves): Le Völur viaggiano tra le Longhouse potenziando la produzione di Bee Skeps e Farmstead, oppure possono sacrificarsi su una Reliquia per creare un Bosco Sacro che genera passivamente Berserker e aumenta l'armatura delle unità vicine.",
+      "Vivere della Terra (Living Off The Land): La fanteria militare può curarsi raccogliendo Cibo direttamente dai depositi naturali (cespugli di bacche, cervi o cinghiali).",
+      "Mura del Danevirke: I Vichinghi non possiedono mura in pietra, ma possono potenziare le palizzate in mura del Danevirke (+1000 salute e +5 armatura contro il fuoco).",
+      "Influenza Navale: Costruire Longhouse nell'area di influenza di un Porto riduce il costo delle navi in tutti i Porti del 4% per ogni Longhouse (fino al 16%)."
+    ],
+    "uniqueUnits": [
+      {
+        "id": "berserker",
+        "age": 1,
+        "name": "Berserker",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.3,
+          "attack": 8,
+          "health": 90
+        },
+        "imageId": "berserker-1",
+        "strengths": [
+          "Light Units",
+          "High Speed",
+          "Berserkergang Regen"
+        ],
+        "weaknesses": [
+          "Archers",
+          "Heavy Infantry"
+        ],
+        "description": "Fanteria leggera veloce armata di doppia ascia. Quando la salute scende sotto la soglia critica attiva Berserkergang, rigenerando salute e aumentando i danni."
+      },
+      {
+        "id": "bondi",
+        "age": 1,
+        "name": "Bondi",
+        "type": "Infantry",
+        "stats": {
+          "armor": 1,
+          "speed": 1.25,
+          "attack": 7,
+          "health": 90
+        },
+        "imageId": "bondi-1",
+        "strengths": [
+          "Cavalry",
+          "Shield Wall Bonus Health"
+        ],
+        "weaknesses": [
+          "Archers",
+          "Heavy Infantry"
+        ],
+        "description": "Lanciere unico con salute e armatura superiori. Quando più Bondi sono vicini formano un Muro di Scudi (Shield Wall) che aumenta temporaneamente la loro salute."
+      },
+      {
+        "id": "hirdman",
+        "age": 2,
+        "name": "Early Hirdman",
+        "type": "Infantry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.18,
+          "attack": 12,
+          "health": 125
+        },
+        "imageId": "hirdman-2",
+        "strengths": [
+          "Light Infantry",
+          "Archers",
+          "High Armor"
+        ],
+        "weaknesses": [
+          "Crossbowmen",
+          "Knights"
+        ],
+        "description": "Fanteria pesante corazzata disponibile già in Età Feudale con danni e armatura aumentati, ulteriormente potenziabile con le Spade Ulfberht."
+      },
+      {
+        "id": "shield-maiden",
+        "age": 2,
+        "name": "Shield Maiden",
+        "type": "Ranged",
+        "stats": {
+          "armor": 2,
+          "speed": 1,
+          "attack": 8,
+          "health": 100
+        },
+        "imageId": "shield-maiden-2",
+        "strengths": [
+          "Base Defense",
+          "Villager Armor Aura",
+          "Ranged"
+        ],
+        "weaknesses": [
+          "Horsemen"
+        ],
+        "description": "Fanteria pesante a distanza armata di giavellotto, reclutata alla Konungr Hall. Ottiene +2 danni e +25% velocità vicino agli edifici alleati e conferisce +2 armatura agli abitanti vicini."
+      },
+      {
+        "id": "volur",
+        "age": 2,
+        "name": "Völur",
+        "type": "Religious",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 0,
+          "health": 90
+        },
+        "imageId": "volur-2",
+        "strengths": [
+          "Longhouse Boost",
+          "Sacred Groves"
+        ],
+        "weaknesses": [
+          "Combat Units"
+        ],
+        "description": "Unità religiosa di supporto che si sposta tra le Longhouse potenziandone la produzione, oppure può sacrificarsi su una Reliquia per creare un Bosco Sacro che genera Berserker."
+      },
+      {
+        "id": "longship",
+        "age": 2,
+        "name": "Longship",
+        "type": "Ranged",
+        "stats": {
+          "armor": 1,
+          "speed": 1.85,
+          "attack": 6,
+          "health": 300
+        },
+        "imageId": "longship-2",
+        "strengths": [
+          "Naval Raids",
+          "Troop Transport"
+        ],
+        "weaknesses": [
+          "Demolition Ships",
+          "Drakkars"
+        ],
+        "description": "Nave da guerra a remi con arcieri che funge anche da trasporto truppe: ogni unità non-abitante imbarcata aumenta la salute di +30 e aggiunge una freccia extra."
+      },
+      {
+        "id": "drakkar",
+        "age": 2,
+        "name": "Drakkar",
+        "type": "Siege",
+        "stats": {
+          "armor": 3,
+          "speed": 1.5,
+          "attack": 6,
+          "health": 500
+        },
+        "imageId": "drakkar-2",
+        "strengths": [
+          "Enemy Ships",
+          "Net Slow"
+        ],
+        "weaknesses": [
+          "Demolition Ships"
+        ],
+        "description": "Nave drago che sostituisce la nave springalda, armata di lanciatori d'ascia e capace di lanciare reti per rallentare le imbarcazioni nemiche."
+      },
+      {
+        "id": "fishing-knarr",
+        "age": 2,
+        "name": "Fishing Knarr",
+        "type": "Worker",
+        "stats": {
+          "armor": 0,
+          "speed": 1.5,
+          "attack": 0,
+          "health": 100
+        },
+        "imageId": "fishing-knarr-2",
+        "strengths": [
+          "Fishing",
+          "Light Transport"
+        ],
+        "weaknesses": [
+          "Military Ships"
+        ],
+        "description": "Peschereccio vichingo capace sia di raccogliere pesce sia di trasportare un piccolo gruppo di unità terrestri attraverso l'acqua."
+      },
+      {
+        "id": "jylland-knight",
+        "age": 3,
+        "name": "Jylland Knight",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.63,
+          "attack": 22,
+          "health": 200
+        },
+        "imageId": "jylland-knight-3",
+        "strengths": [
+          "Archers",
+          "Infantry",
+          "Gold on Death"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Crossbowmen"
+        ],
+        "description": "Cavalleria pesante da mischia più economica rispetto al cavaliere standard; conferisce 10 Oro quando cade in battaglia (30 Oro con il Valdemar Castle)."
+      },
+      {
+        "id": "skane-crossbowmen",
+        "age": 3,
+        "name": "Skåne Crossbowmen",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.13,
+          "attack": 9,
+          "health": 75
+        },
+        "imageId": "sk-ne-crossbowmen-3",
+        "strengths": [
+          "Heavy Infantry",
+          "Heavy Cavalry",
+          "Low Cost"
+        ],
+        "weaknesses": [
+          "Horsemen",
+          "Archers"
+        ],
+        "description": "Balestriere economico specializzato nell'abbattere unità pesanti e corazzate."
+      }
+    ],
+    "technologies": [
+      {
+        "id": "farmstead",
+        "age": 1,
+        "name": "Farmstead",
+        "building": "Longhouse",
+        "description": "Trasforma la Longhouse in punto di consegna del Cibo e aggiunge due campi agricoli raccolti il 50% più velocemente delle fattorie (+500 salute alla Longhouse, max 6)."
+      },
+      {
+        "id": "bee-skeps",
+        "age": 1,
+        "name": "Bee Skeps",
+        "building": "Longhouse",
+        "description": "Genera passivamente 50 Oro al minuto e aumenta la salute della Longhouse di 500 (max 6)."
+      },
+      {
+        "id": "pasture-and-loom",
+        "age": 2,
+        "name": "Pasture and Loom",
+        "building": "Longhouse",
+        "description": "Ricerca automaticamente le tecnologie di armatura da mischia e a distanza. Aumenta la salute della Longhouse di 750 (max 1)."
+      },
+      {
+        "id": "smithy",
+        "age": 2,
+        "name": "Smithy",
+        "building": "Longhouse",
+        "description": "Ricerca automaticamente le tecnologie di danno da mischia e a distanza. Aumenta la salute della Longhouse di 750 (max 1)."
+      },
+      {
+        "id": "bondi-forester",
+        "age": 2,
+        "name": "Bondi Forester",
+        "building": "Longhouse",
+        "description": "Ogni Bondi fornisce 10 Legno al minuto, fino a un massimo di 250 Legno al minuto."
+      },
+      {
+        "id": "hamrammr",
+        "age": 2,
+        "name": "Hamrammr",
+        "building": "Barracks",
+        "description": "Berserkergang si attiva al 50% di salute e cura il 50% di salute in più."
+      },
+      {
+        "id": "turnshoes",
+        "age": 2,
+        "name": "Turnshoes",
+        "building": "Barracks",
+        "description": "Aumenta la velocità di movimento della fanteria da mischia del 15% e il danno da carica del 30%."
+      },
+      {
+        "id": "farmathr",
+        "age": 2,
+        "name": "Farmathr",
+        "building": "Market",
+        "description": "Aumenta la salute di Mercanti e Navi Mercantili del 25% e la velocità di movimento del 10%."
+      },
+      {
+        "id": "danevirke",
+        "age": 3,
+        "name": "Danevirke",
+        "building": "Town Center / Valdemar Castle",
+        "description": "Converte le palizzate in mura del Danevirke con +1000 salute e +5 armatura contro il fuoco."
+      },
+      {
+        "id": "ulfberht-swords",
+        "age": 3,
+        "name": "Ulfberht Swords",
+        "building": "Barracks",
+        "description": "Gli Hirdman equipaggiano le spade Ulfberht, aumentando il loro danno di +5."
+      },
+      {
+        "id": "hagl-brodda",
+        "age": 3,
+        "name": "Hagl Brodda",
+        "building": "Archery Range",
+        "description": "Gli Arcieri scagliano una pioggia di frecce quando attaccano, sparando 2 frecce aggiuntive nelle vicinanze."
+      },
+      {
+        "id": "leikr-training",
+        "age": 4,
+        "name": "Leikr Training",
+        "building": "University",
+        "description": "La fanteria da mischia ottiene +15% danni, +20% salute e +0,3 caselle di portata d'attacco."
+      }
+    ],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Recluta automaticamente Abitanti del villaggio senza costo fino alla Capacità Abitanti (+10 per ogni Longhouse). I pilastri accanto alla capitale mostrano il progresso delle Saghe."
+      },
+      {
+        "id": "baugr-fort",
+        "age": 2,
+        "name": "Baugr Fort",
+        "type": "Military",
+        "imageId": "baugr-fort-1",
+        "description": "Funge da Caserma con tutte le unità e tecnologie. Tutte le Caserme lavorano il 25% più velocemente e le tecnologie della Caserma costano il 15% in meno. Potenzia immediatamente Bondi e Berserker al grado Indurito (Hardened)."
+      },
+      {
+        "id": "konungr-hall",
+        "age": 2,
+        "name": "Konungr Hall",
+        "type": "Economic",
+        "imageId": "konungr-hall-1",
+        "description": "Organizza un banchetto ogni 60 secondi che fornisce 10 Cibo + 5 Cibo per ogni Longhouse. Dispone di una chiamata unica di Shield Maiden e permette di reclutarne fino a 1 + 1 per ogni Longhouse costruita."
+      },
+      {
+        "id": "gullinn-temple",
+        "age": 3,
+        "name": "Gullinn Temple",
+        "type": "Religious",
+        "imageId": "gullinn-temple-2",
+        "description": "Funge da Bosco Sacro (Sacred Grove). Permette alle Völur di stabilire Boschi Sacri anche sui Siti Sacri e sblocca la Saga del Dreki che aumenta del 15% la produzione di Berserker nei Boschi Sacri."
+      },
+      {
+        "id": "valdemar-castle",
+        "age": 3,
+        "name": "Valdemar Castle",
+        "type": "Defensive",
+        "imageId": "valdemar-castle-2",
+        "description": "Funge da Mastio (Keep). Conferisce la tecnologia Danevirke che trasforma le palizzate in mura fortificate (+1000 PS e +5 armatura fuoco). I Jylland Knight forniscono +20 Oro aggiuntivo quando vengono uccisi."
+      },
+      {
+        "id": "kongens-dor-cathedral",
+        "age": 4,
+        "name": "Kongens Dør Cathedral",
+        "type": "Economic",
+        "imageId": "kongens-d-r-cathedral-3",
+        "description": "Funge da Monastero e aumenta la popolazione massima di +10. Possiede un'aura in espansione che riscuote una decima di 12,5 Oro per ogni Longhouse ogni 30 secondi e offre la tecnologia Folkekirken (+10 popolazione)."
+      },
+      {
+        "id": "rikets-nyckel-castle",
+        "age": 4,
+        "name": "Rikets Nyckel Castle",
+        "type": "Defensive",
+        "imageId": "rikets-nyckel-castle-3",
+        "description": "Funge da Mastio che scaglia raffiche di frecce. Aumenta la popolazione massima di +10, riduce del 50% il costo di tutte le tecnologie di grado delle unità e genera 10 Skåne Crossbowmen al completamento."
+      }
+    ],
+    "videos": [],
+    "buildOrders": [],
+    "strengths": [
+      "Crescita Economica Gratuita: Gli abitanti vengono prodotti gratuitamente in automatico dai Centri Città man mano che si costruiscono le Longhouse.",
+      "Fanteria da Mischia Devastante: Bondi con muro di scudi, Berserker con rigenerazione furiosa e Hirdman corazzati dominano gli scontri corpo a corpo e si curano raccogliendo cibo sulla mappa.",
+      "Flessibilità delle Longhouse: Le estensioni delle Longhouse forniscono cibo rapido, oro passivo e ricerche militari automatiche.",
+      "Dominio Navale: Longship (che trasportano truppe e sparano più frecce) e Drakkar (che rallentano le navi nemiche con le reti) rendono la flotta vichinga temibile."
+    ],
+    "weaknesses": [
+      "Assenza di Mura in Pietra: Pur avendo il potenziamento Danevirke per le palizzate, non dispongono di vere mura in pietra contro l'assedio pesante.",
+      "Dipendenza dalle Longhouse: La capacità di abitanti, l'economia passiva e le tecnologie dipendono dalle Longhouse, che sono un bersaglio primario per il nemico.",
+      "Raggio d'Azione Limitato: La forza principale risiede nella fanteria da mischia; gli Skåne Crossbowmen sono economici ma fragili."
+    ],
+    "primaryColor": "#0284c7"
   }
 ];
 

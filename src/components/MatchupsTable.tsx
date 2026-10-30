@@ -33,6 +33,10 @@ const CIV_ID_TO_API_KEY: Record<string, string> = {
   templar: 'knights_templar',
   tughlaq: 'tughlaq_dynasty',
   zhuxi: 'zhu_xis_legacy',
+  scots: 'scots',
+  scozzesi: 'scots',
+  vichinghi: 'vikings',
+  vikings: 'vikings',
 };
 
 // Reverse map: API key → app civ ID (for looking up flag/name)

@@ -66,6 +66,8 @@ const CIV_LIST = [
   { id: 'sengoku', name: 'Sengoku Daimyo', flag: '/civs/Sengoku Daimyo.webp' },
   { id: 'templar', name: 'Cavalieri Templari', flag: '/civs/Knights Templar.webp' },
   { id: 'tughlaq', name: 'Dinastia Tughlaq', flag: '/civs/Tughlaq Dynasty.webp' },
+  { id: 'scozzesi', name: 'Scozzesi', flag: '/civs/Scots.webp' },
+  { id: 'vikings', name: 'Vichinghi', flag: '/civs/Vikings.webp' },
   { id: 'zhuxi', name: 'Eredità di Zhu Xi', flag: '/civs/Zhu Xis Legacy.webp' },
 ];
 
