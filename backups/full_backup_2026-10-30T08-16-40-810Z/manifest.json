@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-10-30T08-16-40-810Z",
+  "tables": [
+    "civilizations",
+    "global_units",
+    "suggestions",
+    "questions",
+    "announcements",
+    "faq_settings",
+    "faq_sections",
+    "faq_items",
+    "profiles",
+    "build_order_votes",
+    "betting_markets",
+    "user_bets",
+    "betting_notifications",
+    "tournaments",
+    "tournament_matches",
+    "stream_overlays",
+    "draft_presets",
+    "draft_rooms",
+    "qa_votes",
+    "audit_log",
+    "coach_ai_logs"
+  ],
+  "success": 21,
+  "failed": 0,
+  "totalRows": 928
+}

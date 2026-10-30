@@ -1,1 +1,732 @@
-[]
+[
+  {
+    "id": "e7370ec6-5d4c-4989-b4de-4db479a303e2",
+    "created_at": "2026-06-02T15:38:08.389349+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "CREATE_ANNOUNCEMENT",
+    "target_type": "announcements",
+    "target_id": null,
+    "description": "Creato annuncio \"Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300\"",
+    "details": {
+      "form": {
+        "body": "Regolamento e iscrizioni: https://aoe4guide.it/tornei/coach-cup/regolamento",
+        "type": "banner",
+        "title": "Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300",
+        "target": "all",
+        "is_active": true
+      }
+    }
+  },
+  {
+    "id": "2b585045-39f6-49a8-9354-a6bb93bc7374",
+    "created_at": "2026-06-02T15:45:10.327635+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "UPDATE_ANNOUNCEMENT",
+    "target_type": "announcements",
+    "target_id": "a8860482-df52-4884-8391-e13f7bc7905d",
+    "description": "Aggiornato annuncio ID a8860482-df52-4884-8391-e13f7bc7905d (\"Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300\")",
+    "details": {
+      "form": {
+        "body": "Regolamento e iscrizioni: https://aoe4guide.it/tornei/coach-cup/regolamento",
+        "type": "banner",
+        "title": "Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300",
+        "target": "all",
+        "is_active": true
+      }
+    }
+  },
+  {
+    "id": "09960e72-df3d-4d50-be85-45047819f774",
+    "created_at": "2026-06-02T15:46:55.763049+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "REMOVE_STAFF_USER",
+    "target_type": "profiles",
+    "target_id": "djalfredoneservice@gmail.com",
+    "description": "Rimosso \"djalfredoneservice@gmail.com\" dallo staff (revocati tutti i ruoli e permessi)",
+    "details": {
+      "target_email": "djalfredoneservice@gmail.com"
+    }
+  },
+  {
+    "id": "d64c086e-3e2e-4a8e-bcae-33165ca94593",
+    "created_at": "2026-06-02T15:47:13.069527+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "UPDATE_NICKNAME",
+    "target_type": "profiles",
+    "target_id": "alessandro.cortegiani@gmail.com",
+    "description": "Modificato nickname di \"alessandro.cortegiani@gmail.com\" in \"Papoz90\"",
+    "details": {
+      "nickname": "Papoz90",
+      "target_email": "alessandro.cortegiani@gmail.com"
+    }
+  },
+  {
+    "id": "d07ad146-891b-4534-b4d6-6b7cc395bcdf",
+    "created_at": "2026-06-02T16:20:27.250576+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "TOGGLE_USER_PERMISSION",
+    "target_type": "profiles",
+    "target_id": "marco.tamborrino.94@gmail.com",
+    "description": "Modificato permesso \"can_view_admin\" per \"marco.tamborrino.94@gmail.com\" a \"true\"",
+    "details": {
+      "field": "can_view_admin",
+      "value": true,
+      "updates": {
+        "can_view_admin": true
+      },
+      "target_email": "marco.tamborrino.94@gmail.com"
+    }
+  },
+  {
+    "id": "527e48b3-c9d1-4115-b2d4-82306183fb20",
+    "created_at": "2026-06-02T16:20:29.600198+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "TOGGLE_USER_PERMISSION",
+    "target_type": "profiles",
+    "target_id": "contattodisparta@gmail.com",
+    "description": "Modificato permesso \"can_view_admin\" per \"contattodisparta@gmail.com\" a \"true\"",
+    "details": {
+      "field": "can_view_admin",
+      "value": true,
+      "updates": {
+        "can_view_admin": true
+      },
+      "target_email": "contattodisparta@gmail.com"
+    }
+  },
+  {
+    "id": "a4f92916-89b0-4aa8-827a-86eccb156e02",
+    "created_at": "2026-06-02T16:20:30.624133+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "TOGGLE_USER_PERMISSION",
+    "target_type": "profiles",
+    "target_id": "cani.vincenzo@gmail.com",
+    "description": "Modificato permesso \"can_view_admin\" per \"cani.vincenzo@gmail.com\" a \"true\"",
+    "details": {
+      "field": "can_view_admin",
+      "value": true,
+      "updates": {
+        "can_view_admin": true
+      },
+      "target_email": "cani.vincenzo@gmail.com"
+    }
+  },
+  {
+    "id": "c08f5692-172c-4cfc-93ea-77710904b751",
+    "created_at": "2026-06-02T16:20:31.354781+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "TOGGLE_USER_PERMISSION",
+    "target_type": "profiles",
+    "target_id": "lestocommunity@gmail.com",
+    "description": "Modificato permesso \"can_view_admin\" per \"lestocommunity@gmail.com\" a \"true\"",
+    "details": {
+      "field": "can_view_admin",
+      "value": true,
+      "updates": {
+        "can_view_admin": true
+      },
+      "target_email": "lestocommunity@gmail.com"
+    }
+  },
+  {
+    "id": "d0d65ee4-d60f-4d6b-b324-4dcc014cdbe6",
+    "created_at": "2026-06-02T16:23:14.68753+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "UPDATE_ANNOUNCEMENT",
+    "target_type": "announcements",
+    "target_id": "a8860482-df52-4884-8391-e13f7bc7905d",
+    "description": "Aggiornato annuncio ID a8860482-df52-4884-8391-e13f7bc7905d (\"Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300\")",
+    "details": {
+      "form": {
+        "body": "Regolamento e iscrizioni: https://aoe4guide.it/tornei/coppa-lanciere-di-santa-clotilde/regolamento",
+        "type": "banner",
+        "title": "Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300",
+        "target": "all",
+        "is_active": true
+      }
+    }
+  },
+  {
+    "id": "bda1c563-c82d-4375-a330-b7864496d96c",
+    "created_at": "2026-06-02T16:23:29.148537+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "UPDATE_ANNOUNCEMENT",
+    "target_type": "announcements",
+    "target_id": "a8860482-df52-4884-8391-e13f7bc7905d",
+    "description": "Aggiornato annuncio ID a8860482-df52-4884-8391-e13f7bc7905d (\"Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300\")",
+    "details": {
+      "form": {
+        "body": "Regolamento e iscrizioni: https://aoe4guide.it/tornei/coppa-lanciere-di-santa-clotilde/regolamento",
+        "type": "both",
+        "title": "Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300",
+        "target": "all",
+        "is_active": true
+      }
+    }
+  },
+  {
+    "id": "cb91a645-1b1a-4329-9cca-b7a8b598ed1f",
+    "created_at": "2026-06-02T16:26:04.487715+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "UPDATE_ANNOUNCEMENT",
+    "target_type": "announcements",
+    "target_id": "a8860482-df52-4884-8391-e13f7bc7905d",
+    "description": "Aggiornato annuncio ID a8860482-df52-4884-8391-e13f7bc7905d (\"Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300\")",
+    "details": {
+      "form": {
+        "body": "Regolamento e iscrizioni: https://aoe4guide.it/tornei/coppa-lanciere-di-santa-clotilde/regolamento",
+        "type": "both",
+        "title": "Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300",
+        "target": "all",
+        "is_active": true
+      }
+    }
+  },
+  {
+    "id": "4c398b4d-069a-417a-926f-375d62531323",
+    "created_at": "2026-06-02T16:30:53.816336+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "UPDATE_ANNOUNCEMENT",
+    "target_type": "announcements",
+    "target_id": "a8860482-df52-4884-8391-e13f7bc7905d",
+    "description": "Aggiornato annuncio ID a8860482-df52-4884-8391-e13f7bc7905d (\"Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300\")",
+    "details": {
+      "form": {
+        "body": "[Regolamento e iscrizioni](https://aoe4guide.it/tornei/coppa-lanciere-di-santa-clotilde/regolamento)",
+        "type": "both",
+        "title": "Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300",
+        "target": "all",
+        "is_active": true
+      }
+    }
+  },
+  {
+    "id": "e6122913-5023-48aa-a010-ddceedd82ce0",
+    "created_at": "2026-06-02T16:37:30.922801+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "UPDATE_ANNOUNCEMENT",
+    "target_type": "announcements",
+    "target_id": "a8860482-df52-4884-8391-e13f7bc7905d",
+    "description": "Aggiornato annuncio ID a8860482-df52-4884-8391-e13f7bc7905d (\"Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300\")",
+    "details": {
+      "form": {
+        "body": "[Regolamento e iscrizioni](https://aoe4guide.it/tornei/coppa-lanciere-di-santa-clotilde/regolamento)",
+        "type": "both",
+        "title": "Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300",
+        "target": "all",
+        "btn_url": "https://aoe4guide.it/tornei/coppa-lanciere-di-santa-clotilde/regolamento",
+        "btn_label": "Iscriviti!",
+        "is_active": true
+      }
+    }
+  },
+  {
+    "id": "60b98d04-66c7-4411-a92a-a31257575b1c",
+    "created_at": "2026-06-02T17:28:34.404528+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "UPDATE_ANNOUNCEMENT",
+    "target_type": "announcements",
+    "target_id": "a8860482-df52-4884-8391-e13f7bc7905d",
+    "description": "Aggiornato annuncio ID a8860482-df52-4884-8391-e13f7bc7905d (\"Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300\")",
+    "details": {
+      "form": {
+        "body": "[Regolamento e iscrizioni](https://aoe4guide.it/tornei/coppa-lanciere-di-santa-clotilde/regolamento)\nTrovi il pulsante \"Register\" anche sul server discord alla sezione \"Annunci\"",
+        "type": "both",
+        "title": "Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300",
+        "target": "all",
+        "btn_url": "https://aoe4guide.it/tornei/coppa-lanciere-di-santa-clotilde/regolamento",
+        "btn_label": "Iscriviti!",
+        "is_active": true
+      }
+    }
+  },
+  {
+    "id": "13e1cf84-d5ab-4066-b2ee-b1bbfefaea71",
+    "created_at": "2026-06-02T17:28:55.476749+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "UPDATE_ANNOUNCEMENT",
+    "target_type": "announcements",
+    "target_id": "a8860482-df52-4884-8391-e13f7bc7905d",
+    "description": "Aggiornato annuncio ID a8860482-df52-4884-8391-e13f7bc7905d (\"Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300\")",
+    "details": {
+      "form": {
+        "body": "[Regolamento e iscrizioni](https://aoe4guide.it/tornei/coppa-lanciere-di-santa-clotilde/regolamento)",
+        "type": "both",
+        "title": "Torneo 1v1 mercoledì ore 21.00! Fascia di elo 1100-1300",
+        "target": "all",
+        "btn_url": "https://aoe4guide.it/tornei/coppa-lanciere-di-santa-clotilde/regolamento",
+        "btn_label": "Iscriviti!",
+        "is_active": true
+      }
+    }
+  },
+  {
+    "id": "052321da-1d70-4dc2-ab78-d2ddfcc61aa1",
+    "created_at": "2026-06-02T20:54:01.422228+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "TOGGLE_USER_PERMISSION",
+    "target_type": "profiles",
+    "target_id": "mustoracingofficial@gmail.com",
+    "description": "Modificato permesso \"can_view_admin\" per \"mustoracingofficial@gmail.com\" a \"true\"",
+    "details": {
+      "field": "can_view_admin",
+      "value": true,
+      "target_email": "mustoracingofficial@gmail.com"
+    }
+  },
+  {
+    "id": "b18311f0-52f4-40e3-8634-72e56a630ac3",
+    "created_at": "2026-06-02T20:54:02.059002+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "TOGGLE_USER_PERMISSION",
+    "target_type": "profiles",
+    "target_id": "mustoracingofficial@gmail.com",
+    "description": "Modificato permesso \"can_view_admin\" per \"mustoracingofficial@gmail.com\" a \"false\"",
+    "details": {
+      "field": "can_view_admin",
+      "value": false,
+      "target_email": "mustoracingofficial@gmail.com"
+    }
+  },
+  {
+    "id": "cf65e1ae-0a3e-43f7-a5f3-0295d5ef428c",
+    "created_at": "2026-06-03T07:20:11.346931+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "UPDATE_ANNOUNCEMENT",
+    "target_type": "announcements",
+    "target_id": "a8860482-df52-4884-8391-e13f7bc7905d",
+    "description": "Aggiornato annuncio ID a8860482-df52-4884-8391-e13f7bc7905d (\"Torneo 1v1 mercoledì ore 21.00! Nessuna restrizione di elo\")",
+    "details": {
+      "form": {
+        "body": "[Regolamento e iscrizioni](https://aoe4guide.it/tornei/coppa-lanciere-di-santa-clotilde/regolamento)",
+        "type": "both",
+        "title": "Torneo 1v1 mercoledì ore 21.00! Nessuna restrizione di elo",
+        "target": "all",
+        "btn_url": "https://aoe4guide.it/tornei/coppa-lanciere-di-santa-clotilde/regolamento",
+        "btn_label": "Iscriviti!",
+        "is_active": true
+      }
+    }
+  },
+  {
+    "id": "d1f5c2b7-df95-4d0a-9988-55937397c93f",
+    "created_at": "2026-06-03T12:26:42.116736+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "SHEEP_REFILL",
+    "target_type": "profiles",
+    "target_id": "marco.tamborrino.94@gmail.com",
+    "description": "Modificato saldo pecore per marcotamby a 3000 🐑 (variazione: +3000)",
+    "details": {
+      "amount": 3000,
+      "is_set": false,
+      "new_balance": 3000,
+      "target_email": "marco.tamborrino.94@gmail.com",
+      "previous_balance": 0
+    }
+  },
+  {
+    "id": "31f0bdef-2044-4140-8faa-bd440cefba6f",
+    "created_at": "2026-06-03T13:02:12.354346+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "SHEEP_REFILL",
+    "target_type": "profiles",
+    "target_id": "marco.tamborrino.94@gmail.com",
+    "description": "Modificato saldo pecore per marcotamby a 500 🐑 (variazione: +500)",
+    "details": {
+      "amount": 500,
+      "is_set": false,
+      "new_balance": 500,
+      "target_email": "marco.tamborrino.94@gmail.com",
+      "previous_balance": 0
+    }
+  },
+  {
+    "id": "2454893f-e2ad-4856-9351-7e0a98543577",
+    "created_at": "2026-06-03T13:17:03.103753+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "SHEEP_REFILL",
+    "target_type": "profiles",
+    "target_id": "marco.tamborrino.94@gmail.com",
+    "description": "Modificato saldo pecore per marcotamby a 500 🐑 (variazione: +500)",
+    "details": {
+      "amount": 500,
+      "is_set": false,
+      "new_balance": 500,
+      "target_email": "marco.tamborrino.94@gmail.com",
+      "previous_balance": 0
+    }
+  },
+  {
+    "id": "1cc3ff0d-1702-4ad2-b7c4-baeb5b04e963",
+    "created_at": "2026-06-03T13:24:48.451112+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "DELIVER_SERVICE",
+    "target_type": "profiles",
+    "target_id": "marco.tamborrino.94@gmail.com",
+    "description": "Erogato servizio \"Analisi Replay\" per utente \"marco.tamborrino.94@gmail.com\"",
+    "details": {
+      "service_id": "replay_review",
+      "target_email": "marco.tamborrino.94@gmail.com",
+      "redemption_id": "8f1ea9a5-2e89-49b4-a77d-3471c2def986"
+    }
+  },
+  {
+    "id": "c12e017f-7853-4c87-8b1a-c8a4fa569e85",
+    "created_at": "2026-06-03T13:25:01.605946+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "SHEEP_REFILL",
+    "target_type": "profiles",
+    "target_id": "marco.tamborrino.94@gmail.com",
+    "description": "Modificato saldo pecore per marcotamby a 150 🐑 (variazione: +150)",
+    "details": {
+      "amount": 150,
+      "is_set": false,
+      "new_balance": 150,
+      "target_email": "marco.tamborrino.94@gmail.com",
+      "previous_balance": 0
+    }
+  },
+  {
+    "id": "2434f549-0c7c-4ad2-8b1b-45f76065070b",
+    "created_at": "2026-06-03T19:05:47.508433+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "DELETE_ANNOUNCEMENT",
+    "target_type": "announcements",
+    "target_id": "a8860482-df52-4884-8391-e13f7bc7905d",
+    "description": "Eliminato annuncio ID a8860482-df52-4884-8391-e13f7bc7905d",
+    "details": {
+      "announcement_id": "a8860482-df52-4884-8391-e13f7bc7905d"
+    }
+  },
+  {
+    "id": "7c874189-d14d-4e1d-b477-04375098941c",
+    "created_at": "2026-06-15T20:08:06.984486+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "CREATE_ANNOUNCEMENT",
+    "target_type": "announcements",
+    "target_id": null,
+    "description": "Creato annuncio \"È iniziata la Coach Cup!\"",
+    "details": {
+      "form": {
+        "body": "Non perdertela, seguici su Twitch![Twitch](https://www.twitch.tv/aoeitalia)",
+        "type": "banner",
+        "title": "È iniziata la Coach Cup!",
+        "target": "all",
+        "btn_url": "",
+        "btn_label": "",
+        "is_active": true
+      }
+    }
+  },
+  {
+    "id": "b39ff03b-92d4-42bc-8817-691c6bf277ca",
+    "created_at": "2026-06-15T20:08:56.699486+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "UPDATE_ANNOUNCEMENT",
+    "target_type": "announcements",
+    "target_id": "5b7a8aeb-dc16-47ab-be1c-b44f444fa13e",
+    "description": "Aggiornato annuncio ID 5b7a8aeb-dc16-47ab-be1c-b44f444fa13e (\"È iniziata la Coach Cup!\")",
+    "details": {
+      "form": {
+        "body": "Non perdertela, seguici su [Twitch!](https://www.twitch.tv/aoeitalia)",
+        "type": "banner",
+        "title": "È iniziata la Coach Cup!",
+        "target": "all",
+        "btn_url": "",
+        "btn_label": "",
+        "is_active": true
+      }
+    }
+  },
+  {
+    "id": "519d54f9-c5ed-4a25-9161-ac48a81dd1bc",
+    "created_at": "2026-06-15T21:08:08.920418+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "SHEEP_BULK_REFILL",
+    "target_type": "profiles",
+    "target_id": "all_active",
+    "description": "Ricarica massiva: +100 pecore 🐑 a tutti i 18 pastori attivi",
+    "details": {
+      "amount": 100,
+      "refilled_users": [
+        {
+          "new": 1447,
+          "email": "mustoracingofficial@gmail.com",
+          "previous": 1347
+        },
+        {
+          "new": 1083,
+          "email": "timsamcro@gmail.com",
+          "previous": 983
+        },
+        {
+          "new": 320,
+          "email": "dadduedo@gmail.com",
+          "previous": 220
+        },
+        {
+          "new": 302,
+          "email": "mattiaminuti03@gmail.com",
+          "previous": 202
+        },
+        {
+          "new": 299,
+          "email": "contattodisparta@gmail.com",
+          "previous": 199
+        },
+        {
+          "new": 298,
+          "email": "luca.biasco03@gmail.com",
+          "previous": 198
+        },
+        {
+          "new": 286,
+          "email": "matteo.tamborrino.99@gmail.com",
+          "previous": 186
+        },
+        {
+          "new": 280,
+          "email": "samu.carpa@gmail.com",
+          "previous": 180
+        },
+        {
+          "new": 250,
+          "email": "marco.tamborrino.94@gmail.com",
+          "previous": 150
+        },
+        {
+          "new": 249,
+          "email": "alfredosalsa.info@gmail.com",
+          "previous": 149
+        },
+        {
+          "new": 237,
+          "email": "cassinicola@gmail.com",
+          "previous": 137
+        },
+        {
+          "new": 180,
+          "email": "rabaglino.davide87@gmail.com",
+          "previous": 80
+        },
+        {
+          "new": 175,
+          "email": "cani.vincenzo@gmail.com",
+          "previous": 75
+        },
+        {
+          "new": 170,
+          "email": "erparanoia85@gmail.com",
+          "previous": 70
+        },
+        {
+          "new": 162,
+          "email": "mattia16theking@libero.it",
+          "previous": 62
+        },
+        {
+          "new": 160,
+          "email": "nicolochinellato80@gmail.com",
+          "previous": 60
+        },
+        {
+          "new": 136,
+          "email": "chosenturkey2021@gmail.com",
+          "previous": 36
+        },
+        {
+          "new": 100,
+          "email": "michael.alberti18@gmail.com",
+          "previous": 0
+        }
+      ],
+      "shepherds_count": 18
+    }
+  },
+  {
+    "id": "0f20bdd2-c1fc-4147-a41a-ca4aec6ea4af",
+    "created_at": "2026-06-15T21:12:22.854093+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "SHEEP_REFILL",
+    "target_type": "profiles",
+    "target_id": "marco.tamborrino.94@gmail.com",
+    "description": "Modificato saldo pecore per marcotamby a 150 🐑 (variazione: -100)",
+    "details": {
+      "amount": -100,
+      "is_set": false,
+      "new_balance": 150,
+      "target_email": "marco.tamborrino.94@gmail.com",
+      "previous_balance": 250
+    }
+  },
+  {
+    "id": "381ec97e-d57d-4aa6-93b8-2987368e40f0",
+    "created_at": "2026-06-15T21:12:29.12366+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "SHEEP_REFILL",
+    "target_type": "profiles",
+    "target_id": "marco.tamborrino.94@gmail.com",
+    "description": "Modificato saldo pecore per marcotamby a 100 🐑 (variazione: -50)",
+    "details": {
+      "amount": -50,
+      "is_set": false,
+      "new_balance": 100,
+      "target_email": "marco.tamborrino.94@gmail.com",
+      "previous_balance": 150
+    }
+  },
+  {
+    "id": "4daa501e-5473-4fb6-8ec7-cdb27694086e",
+    "created_at": "2026-07-02T06:32:30.837722+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "UPDATE_NICKNAME",
+    "target_type": "profiles",
+    "target_id": "lulupen78@gmail.com",
+    "description": "Modificato nickname di \"lulupen78@gmail.com\" in \"\"",
+    "details": {
+      "nickname": "",
+      "target_email": "lulupen78@gmail.com"
+    }
+  },
+  {
+    "id": "427af045-0ab3-4696-8b15-d7c8d463606c",
+    "created_at": "2026-07-15T06:18:16.70947+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "DELETE_ANNOUNCEMENT",
+    "target_type": "announcements",
+    "target_id": "5b7a8aeb-dc16-47ab-be1c-b44f444fa13e",
+    "description": "Eliminato annuncio ID 5b7a8aeb-dc16-47ab-be1c-b44f444fa13e",
+    "details": {
+      "announcement_id": "5b7a8aeb-dc16-47ab-be1c-b44f444fa13e"
+    }
+  },
+  {
+    "id": "77aab52d-1ca3-4382-9c98-8cdad5cf857a",
+    "created_at": "2026-07-23T12:15:19.608078+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "UPDATE_NICKNAME",
+    "target_type": "profiles",
+    "target_id": "franceeeeeeee5566@gmail.com",
+    "description": "Modificato nickname di \"franceeeeeeee5566@gmail.com\" in \"\"",
+    "details": {
+      "nickname": "",
+      "target_email": "franceeeeeeee5566@gmail.com"
+    }
+  },
+  {
+    "id": "9afa2e88-ad34-4b63-bc88-d2761ffdf7ba",
+    "created_at": "2026-07-30T12:26:53.589936+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "CREATE_ANNOUNCEMENT",
+    "target_type": "announcements",
+    "target_id": null,
+    "description": "Creato annuncio \"il 26 agosto arriva End of Summer Champions!\"",
+    "details": {
+      "form": {
+        "body": "Nuovo torneo 1v1 all'orizzonte. Leggi il [regolamento](https://aoe4guide.it/tornei/end-of-summer-champions/regolamento) e... ti aspettiamo!",
+        "type": "banner",
+        "title": "il 26 agosto arriva End of Summer Champions!",
+        "target": "all",
+        "btn_url": "",
+        "btn_label": "",
+        "is_active": true
+      }
+    }
+  },
+  {
+    "id": "f8e7ed14-3559-4076-b999-4df431f7a4df",
+    "created_at": "2026-08-21T15:23:59.849121+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "UPDATE_ANNOUNCEMENT",
+    "target_type": "announcements",
+    "target_id": "ae926e73-2bdd-45f7-b60e-808c25b6e015",
+    "description": "Aggiornato annuncio ID ae926e73-2bdd-45f7-b60e-808c25b6e015 (\"Il 3 settembre arriva End of Summer Champions!\")",
+    "details": {
+      "form": {
+        "body": "Nuovo torneo 1v1 all'orizzonte. Leggi il [regolamento](https://aoe4guide.it/tornei/end-of-summer-champions/regolamento) e... ti aspettiamo!",
+        "type": "banner",
+        "title": "Il 3 settembre arriva End of Summer Champions!",
+        "target": "all",
+        "btn_url": "",
+        "btn_label": "",
+        "is_active": true
+      }
+    }
+  },
+  {
+    "id": "94269b08-be30-4aaa-97e1-db3e92e59bb8",
+    "created_at": "2026-10-30T07:36:42.468313+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "CREATE_CIVILIZATION",
+    "target_type": "civilizations",
+    "target_id": "scozzesi",
+    "description": "Creata nuova civiltà \"Scozzesi\"",
+    "details": {
+      "civ_id": "scozzesi",
+      "details": {
+        "id": "scozzesi",
+        "flag": "/flags/scots.png",
+        "name": "Scozzesi",
+        "difficulty": "Medio",
+        "aoe4worldUrl": "https://aoe4world.com/explorer/civs/scots/",
+        "short_description": "Gli scozzesi schierano una fanteria tenace, specializzata nel tendere imboscate ai nemici con l'elemento sorpresa. Le case-torri e i masti proteggono le loro comunità e il prezioso bestiame dai predoni che imperversano nelle campagne. Raduna rapidamente i rinforzi nella Sala di Raduno, ricerca potenti tecnologie delle Highlands o delle Lowlands e difendi il Regno di Scozia."
+      }
+    }
+  },
+  {
+    "id": "bf359f04-8cef-4c90-b1c6-7bfb509aad5c",
+    "created_at": "2026-10-30T07:38:12.238758+00:00",
+    "user_email": "marco.tamborrino.94@gmail.com",
+    "user_nickname": "marcotamby",
+    "action": "CREATE_CIVILIZATION",
+    "target_type": "civilizations",
+    "target_id": "vikings",
+    "description": "Creata nuova civiltà \"Vichinghi\"",
+    "details": {
+      "civ_id": "vikings",
+      "details": {
+        "id": "vikings",
+        "flag": "/flags/vikings.png",
+        "name": "Vichinghi",
+        "difficulty": "Medio",
+        "aoe4worldUrl": "https://aoe4world.com/explorer/civs/vikings/",
+        "short_description": "I Vichinghi sono predoni provenienti dal nord che sopraffacevano i propri nemici grazie a una potente fanteria da mischia in grado di sopravvivere nutrendosi delle risorse dei territori nemici. Le loro “longhouse”, strutture flessibili, consentono loro di far crescere facilmente la popolazione e l'economia. Le saghe e la religione norrena ispirano i loro guerrieri a combattere senza paura per l'onore degli dei."
+      }
+    }
+  }
+]

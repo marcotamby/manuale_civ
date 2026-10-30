@@ -89,6 +89,6 @@
       "destination": "/api/seo-bot?path=/civ/:path*"
     },
     { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/((?!api/|civs/|flags/|maps/|badges/).*)", "destination": "/index.html" }
   ]
 }

@@ -9,85 +9,62 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+const FALLBACK_URL = 'https://laliiuqjpxanhwhxajlm.supabase.co';
+const FALLBACK_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhbGlpdXFqcHhhbmh3aHhhamxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjQ5MjEsImV4cCI6MjA4ODU0MDkyMX0.1xIE1MXy1JxgGzpP0Hitotz8o3aMwASV8NUr06bQjkA';
 
-if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ Credenziali Supabase mancanti nel file .env');
-  process.exit(1);
-}
+const rawUrl = (process.env.VITE_SUPABASE_URL || '').replace(/\s/g, '');
+const supabaseUrl = rawUrl.startsWith('https://') ? rawUrl : FALLBACK_URL;
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const rawServiceKey = (process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || '').replace(/\s/g, '');
+const rawAnonKey = (process.env.VITE_SUPABASE_ANON_KEY || '').replace(/\s/g, '');
+const primaryKey = rawServiceKey || rawAnonKey || FALLBACK_ANON_KEY;
 
-// Full list of tables identified in the audit
+const supabasePrimary = createClient(supabaseUrl, primaryKey);
+const supabaseFallback = createClient(FALLBACK_URL, rawAnonKey || FALLBACK_ANON_KEY);
+
+// Active tables in Supabase
 const TABLES_TO_BACKUP = [
   'civilizations',
+  'global_units',
   'suggestions',
+  'questions',
+  'announcements',
   'faq_settings',
   'faq_sections',
   'faq_items',
   'profiles',
-  'build_orders',
   'build_order_votes',
   'betting_markets',
   'user_bets',
   'betting_notifications',
   'tournaments',
-  'tournament_teams',
   'tournament_matches',
   'stream_overlays',
-  'votes',
+  'draft_presets',
+  'draft_rooms',
   'qa_votes',
-  'units',
-  'landmarks',
-  'technologies',
-  'matchups',
-  'players',
-  'teams',
-  'matches',
-  'brackets',
-  'logs',
-  'audit_log'
+  'audit_log',
+  'coach_ai_logs'
 ];
 
-async function backupDatabase() {
-  console.log('🚀 INIZIO BACKUP TOTALE DEL DATABASE SUPABASE...');
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const rootDir = process.cwd();
-  const backupDir = path.join(rootDir, 'backups');
-  const latestDir = path.join(backupDir, 'latest');
-
-  // Ensure directories exist
-  [backupDir, latestDir].forEach(dir => {
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  });
-
-  const sessionBackupDir = path.join(backupDir, `full_backup_${timestamp}`);
-  fs.mkdirSync(sessionBackupDir, { recursive: true });
-
-  let successCount = 0;
-  let failCount = 0;
-
-  for (const table of TABLES_TO_BACKUP) {
-    console.log(`📡 Scaricamento tabella: ${table}...`);
-    
-    // Fetch with pagination for safety, though most tables are small
+async function fetchTableRows(table: string) {
+  for (const client of [supabasePrimary, supabaseFallback]) {
     let allData: any[] = [];
     let from = 0;
     const step = 1000;
     let hasMore = true;
+    let hadError = false;
 
     while (hasMore) {
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from(table)
         .select('*')
         .range(from, from + step - 1);
 
       if (error) {
-        console.error(`❌ Errore scaricamento ${table}:`, error.message);
-        failCount++;
+        hadError = true;
         hasMore = false;
-        continue;
+        break;
       }
 
       if (data && data.length > 0) {
@@ -102,33 +79,62 @@ async function backupDatabase() {
       }
     }
 
-    if (allData.length > 0 || successCount >= 0) { // Even empty tables are backed up as []
-      const tableFileName = `${table}.json`;
-      
-      // Save to timestamped folder
-      fs.writeFileSync(
-        path.join(sessionBackupDir, tableFileName), 
-        JSON.stringify(allData, null, 2)
-      );
-      
-      // Save to latest folder for easy git tracking
-      fs.writeFileSync(
-        path.join(latestDir, tableFileName), 
-        JSON.stringify(allData, null, 2)
-      );
-      
-      console.log(`✅ Tabella '${table}' salvata (${allData.length} righe)`);
-      successCount++;
+    if (!hadError) {
+      return { data: allData, error: null };
     }
   }
+  return { data: null, error: new Error(`Impossibile scaricare la tabella ${table}`) };
+}
 
-  // Create a manifest file
+async function backupDatabase() {
+  console.log('🚀 INIZIO BACKUP TOTALE DEL DATABASE SUPABASE...');
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const rootDir = process.cwd();
+  const backupDir = path.join(rootDir, 'backups');
+  const latestDir = path.join(backupDir, 'latest');
+
+  [backupDir, latestDir].forEach(dir => {
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  });
+
+  const sessionBackupDir = path.join(backupDir, `full_backup_${timestamp}`);
+  fs.mkdirSync(sessionBackupDir, { recursive: true });
+
+  let successCount = 0;
+  let failCount = 0;
+  let totalRows = 0;
+
+  for (const table of TABLES_TO_BACKUP) {
+    console.log(`📡 Scaricamento tabella: ${table}...`);
+    const { data: allData, error } = await fetchTableRows(table);
+
+    if (error || !allData) {
+      console.error(`❌ Errore scaricamento ${table}:`, error?.message);
+      failCount++;
+      continue;
+    }
+
+    const tableFileName = `${table}.json`;
+    fs.writeFileSync(
+      path.join(sessionBackupDir, tableFileName),
+      JSON.stringify(allData, null, 2)
+    );
+    fs.writeFileSync(
+      path.join(latestDir, tableFileName),
+      JSON.stringify(allData, null, 2)
+    );
+
+    totalRows += allData.length;
+    console.log(`✅ Tabella '${table}' salvata (${allData.length} righe)`);
+    successCount++;
+  }
+
   const manifest = {
     timestamp,
     tables: TABLES_TO_BACKUP,
     success: successCount,
     failed: failCount,
-    totalRows: 0 // Could sum if needed
+    totalRows
   };
   fs.writeFileSync(path.join(sessionBackupDir, 'manifest.json'), JSON.stringify(manifest, null, 2));
   fs.writeFileSync(path.join(latestDir, 'manifest.json'), JSON.stringify(manifest, null, 2));
@@ -137,8 +143,13 @@ async function backupDatabase() {
   console.log(`🎉 BACKUP COMPLETATO!`);
   console.log(`✅ Successi: ${successCount}`);
   console.log(`❌ Falliti: ${failCount}`);
+  console.log(`📊 Righe totali salvate: ${totalRows}`);
   console.log(`📂 Salvato in: ${sessionBackupDir}`);
   console.log(`=========================================\n`);
+
+  if (successCount === 0) {
+    process.exit(1);
+  }
 }
 
 backupDatabase().catch(err => {

@@ -5,8 +5,16 @@ import path from 'path';
 
 dotenv.config();
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL!;
-const supabaseKey = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY!;
+const FALLBACK_URL = 'https://laliiuqjpxanhwhxajlm.supabase.co';
+const FALLBACK_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhbGlpdXFqcHhhbmh3aHhhamxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjQ5MjEsImV4cCI6MjA4ODU0MDkyMX0.1xIE1MXy1JxgGzpP0Hitotz8o3aMwASV8NUr06bQjkA';
+
+const rawUrl = (process.env.VITE_SUPABASE_URL || '').replace(/\s/g, '');
+const supabaseUrl = rawUrl.startsWith('https://') ? rawUrl : FALLBACK_URL;
+
+const rawServiceKey = (process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || '').replace(/\s/g, '');
+const rawAnonKey = (process.env.VITE_SUPABASE_ANON_KEY || '').replace(/\s/g, '');
+const supabaseKey = rawServiceKey || rawAnonKey || FALLBACK_ANON_KEY;
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function downloadFolder(bucketName: string, folderPath: string, localBaseDir: string) {
@@ -36,7 +44,6 @@ async function downloadFolder(bucketName: string, folderPath: string, localBaseD
     const { data, error: downloadError } = await supabase.storage.from(bucketName).download(fullPath);
     
     if (downloadError) {
-      // If it fails with "{} " error, it might be a folder that was misidentified
       console.warn(`⚠️ Possibile cartella o errore download ${fullPath}. Riprovo come cartella...`);
       await downloadFolder(bucketName, fullPath, localBaseDir);
       continue;
@@ -66,7 +73,7 @@ async function backupStorage() {
     fs.mkdirSync(backupDir, { recursive: true });
   }
 
-  const BUCKETS = ['civilizations', 'tournaments']; // List known buckets
+  const BUCKETS = ['civilizations', 'tournaments'];
   
   for (const bucket of BUCKETS) {
       try {

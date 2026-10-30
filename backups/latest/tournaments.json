@@ -1,1 +1,785 @@
-[]
+[
+  {
+    "id": "b0b9bcb5-ea50-416f-95ff-7a841f76474a",
+    "slug": "tb-68121",
+    "source": "startgg",
+    "organizer": "marcotamby",
+    "direct_link": "https://tourneybot.gg/tourneys/68121?utm_medium=tourneybot&utm_source=register#viewer",
+    "period": "23 aprile 2026",
+    "created_at": "2026-04-21T10:24:18.781515+00:00",
+    "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/tournaments/tournament-1776947175693.png",
+    "status": "Concluso",
+    "podium": [
+      {
+        "entrant": {
+          "name": "Tia"
+        },
+        "players": [],
+        "placement": 1
+      },
+      {
+        "entrant": {
+          "name": "Sparta"
+        },
+        "players": [],
+        "placement": 2
+      },
+      {
+        "entrant": {
+          "name": "Mimmofalena"
+        },
+        "players": [],
+        "placement": 3
+      },
+      {
+        "entrant": {
+          "name": "Scapolocaldo667"
+        },
+        "players": [],
+        "placement": 3
+      }
+    ],
+    "name": "Eliminatoria di San Giorgio",
+    "type": "1v1",
+    "has_regolamento": false,
+    "regolamento_content": "",
+    "updated_at": "2026-05-30T11:25:46.169+00:00",
+    "display_order": 4,
+    "banner_position_x": 50,
+    "banner_position_y": 50,
+    "vods": [
+      {
+        "id": "vod-1779713811759",
+        "url": "https://www.youtube.com/watch?v=0s0EDh8Mle4&t=1640s",
+        "round": "",
+        "score": "",
+        "title": "Torneo completo"
+      }
+    ],
+    "is_archived": false,
+    "max_participants": 16,
+    "discord_channel_id": null,
+    "discord_message_id": null,
+    "auto_bracket": true,
+    "map": null,
+    "event_date": null,
+    "event_time": null
+  },
+  {
+    "id": "4b203bd5-cf62-491c-af86-6355cfd549e9",
+    "slug": "tournament/torneo-1v1-2026",
+    "source": "startgg",
+    "organizer": "marcotamby",
+    "direct_link": "https://www.start.gg/tournament/torneo-1v1-2026/event/1v1/brackets",
+    "period": "Gennaio - Febbraio 2026",
+    "created_at": "2026-04-23T08:34:27.508451+00:00",
+    "banner_url": "",
+    "status": "Concluso",
+    "podium": [
+      {
+        "entrant": {
+          "id": 22214071,
+          "name": "gattoratto"
+        },
+        "players": [],
+        "placement": 1
+      },
+      {
+        "entrant": {
+          "id": 22214088,
+          "name": "Rhraresh"
+        },
+        "players": [],
+        "placement": 2
+      },
+      {
+        "entrant": {
+          "name": "Gorat"
+        },
+        "players": [],
+        "placement": 3
+      }
+    ],
+    "name": "Torneo 1v1 2026",
+    "type": "1v1",
+    "has_regolamento": false,
+    "regolamento_content": "",
+    "updated_at": "2026-07-24T08:05:59.035+00:00",
+    "display_order": 2,
+    "banner_position_x": 50,
+    "banner_position_y": 50,
+    "vods": [],
+    "is_archived": false,
+    "max_participants": 8,
+    "discord_channel_id": null,
+    "discord_message_id": null,
+    "auto_bracket": true,
+    "map": null,
+    "event_date": null,
+    "event_time": null
+  },
+  {
+    "id": "84d5a321-c095-4963-9480-82c0b043eb64",
+    "slug": "gli-8-traditori",
+    "source": "startgg",
+    "organizer": "AoeItalia",
+    "direct_link": "https://tourneybot.gg/tourneys/68353?utm_medium=tourneybot&utm_source=results_embed",
+    "period": "30 aprile 2026",
+    "created_at": "2026-04-27T07:25:47.882886+00:00",
+    "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/tournaments/tournament-1777274738288.jpeg",
+    "status": "Concluso",
+    "podium": [
+      {
+        "entrant": {
+          "name": "Sam98"
+        },
+        "players": [],
+        "placement": 1
+      },
+      {
+        "entrant": {
+          "name": "Axel"
+        },
+        "players": [],
+        "placement": 2
+      },
+      {
+        "entrant": {
+          "name": "Alfred"
+        },
+        "players": [],
+        "placement": 3
+      }
+    ],
+    "name": "Gli 8 Traditori",
+    "type": "FFA",
+    "has_regolamento": false,
+    "regolamento_content": "",
+    "updated_at": "2026-05-30T11:25:50.705+00:00",
+    "display_order": 5,
+    "banner_position_x": 52,
+    "banner_position_y": 1,
+    "vods": [
+      {
+        "id": "vod-1779714002772",
+        "url": "https://www.youtube.com/watch?v=R7erF8x33MQ",
+        "round": "",
+        "score": "",
+        "title": "Torneo FFA completo"
+      }
+    ],
+    "is_archived": false,
+    "max_participants": 16,
+    "discord_channel_id": null,
+    "discord_message_id": null,
+    "auto_bracket": true,
+    "map": null,
+    "event_date": null,
+    "event_time": null
+  },
+  {
+    "id": "2bd99b2b-1ff2-4438-b4dc-bef0eab1ed35",
+    "slug": "it",
+    "source": "challonge",
+    "organizer": "Kani",
+    "direct_link": "https://challonge.com/it/gyunrhoc",
+    "period": "Marzo 2026",
+    "created_at": "2026-04-23T08:39:30.800896+00:00",
+    "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/tournaments/tournament-1776943717654.png",
+    "status": "Concluso",
+    "podium": [
+      {
+        "entrant": {
+          "name": "Va bene tutto"
+        },
+        "players": [
+          "Mikecok",
+          "VladyK",
+          "Papoz90"
+        ],
+        "placement": 1
+      },
+      {
+        "entrant": {
+          "name": " Scarsicomelammerda"
+        },
+        "players": [
+          "Lozingaro",
+          "JaggedEar",
+          "Axel"
+        ],
+        "placement": 2
+      },
+      {
+        "entrant": {
+          "name": "Cerbero"
+        },
+        "players": [
+          "Stardust",
+          "Greis",
+          "MaurinoWallace"
+        ],
+        "placement": 3
+      }
+    ],
+    "name": "Torneo degli Scudi d'Oro",
+    "type": "3v3",
+    "has_regolamento": false,
+    "regolamento_content": "",
+    "updated_at": "2026-05-30T11:25:41.811+00:00",
+    "display_order": 3,
+    "banner_position_x": 50,
+    "banner_position_y": 50,
+    "vods": [],
+    "is_archived": false,
+    "max_participants": 16,
+    "discord_channel_id": null,
+    "discord_message_id": null,
+    "auto_bracket": true,
+    "map": null,
+    "event_date": null,
+    "event_time": null
+  },
+  {
+    "id": "43f7e078-32b6-4353-8d3a-b54d157b5f0d",
+    "slug": "coach-cup",
+    "source": "challonge",
+    "organizer": "Kani",
+    "direct_link": "https://challonge.com/it/70u780ku/",
+    "period": "dal 14 Giugno al 12 Luglio",
+    "created_at": "2026-05-28T21:40:53.027242+00:00",
+    "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/tournaments/tournament-1780005167131.png",
+    "status": "Concluso",
+    "podium": [
+      {
+        "entrant": {
+          "name": "TrabuccoEnjoyer"
+        },
+        "players": [],
+        "division": "Esploratori",
+        "placement": 1
+      },
+      {
+        "entrant": {
+          "name": "Eddu"
+        },
+        "players": [],
+        "division": "Lancieri",
+        "placement": 1
+      },
+      {
+        "entrant": {
+          "name": "Eddu"
+        },
+        "players": [],
+        "division": "Coach",
+        "placement": 1
+      },
+      {
+        "entrant": {
+          "name": "Daddu23"
+        },
+        "players": [],
+        "division": "Coach",
+        "placement": 2
+      },
+      {
+        "entrant": {
+          "name": "Revelations93_TV"
+        },
+        "players": [],
+        "division": "Coach",
+        "placement": 3
+      },
+      {
+        "entrant": {
+          "name": "Spyro"
+        },
+        "players": [],
+        "division": "Esploratori",
+        "placement": 2
+      },
+      {
+        "entrant": {
+          "name": "Kleidemos84"
+        },
+        "players": [],
+        "division": "Esploratori",
+        "placement": 3
+      },
+      {
+        "entrant": {
+          "name": "NicoAoeIta"
+        },
+        "players": [],
+        "division": "Lancieri",
+        "placement": 2
+      },
+      {
+        "entrant": {
+          "name": "PeruBabyLama"
+        },
+        "players": [],
+        "division": "Lancieri",
+        "placement": 3
+      }
+    ],
+    "name": "Coach Cup",
+    "type": "1v1",
+    "has_regolamento": true,
+    "regolamento_content": "<h2>Regolamento — Coach Cup \n</h2><h3> Panoramica</h3>La Coach Cup è un torneo <b>1vs1</b> di <b>Age of Empires IV</b> pensato per offrire un ambiente competitivo e formativo.<br>Il torneo dura <b>4 settimane</b>: ogni allievo gioca una partita a settimana contro un avversario della propria lega.<br>Ogni settimana gli Allievi scelgono un <b>Coach diverso</b> tramite <b>draft live</b>, garantendo varietà e crescita.\n\n<h3> 1. Descrizione</h3>Il torneo è diviso in due leghe basate sul <b>RM 1v1 Elo</b>:<br><ul><li><b>Esploratori</b> (fino a 1100 Elo)</li><li><b>Lancieri</b> (fino a 1300 Elo)</li></ul>\nGli Allievi giocano <b>1vs1</b> nella propria lega con il supporto di un Coach che li guida in tempo reale tramite <b>condivisione schermo</b>.<br>Il Coach può parlare liberamente, suggerire <b>build</b>, <b>timing</b>, <b>macro</b>, <b>scouting</b> e <b>priorità</b>.<br>\nPrima di ogni turno si svolge un <b>draft live</b> dei Coach (vedi sezione 6⁠).<br>Le partite sono trasmesse in <b>streaming</b> con <b>doppia POV</b> e audio del coaching.<br>A fine torneo gli Allievi votano il <b>Coach preferito</b>.\n\n<h3> 2. Premi</h3>Al termine del torneo vengono assegnati due riconoscimenti principali: uno per i <b>Coach</b> e uno per gli <b>Allievi</b>.<br>\nIl <b>Coach più votato</b> ottiene:\n<ul><li><b>15 Pecore</b></li><li>un <b>tag Discord dedicato</b></li><li>menzione nell’<b>Albo d’Oro</b> della community</li></ul>\nL’<b>Allievo vincitore</b> (miglior score dopo 4 turni) ottiene:\n<ul><li><b>5 Pecore</b></li><li>un <b>tag Discord dedicato</b></li><li>menzione nell’<b>Albo d’Oro</b> della community</li></ul>\n<h3> 3. Iscrizione</h3>Le iscrizioni sono aperte dal <b>14 giugno al 21 giugno</b>.<br>Ogni partecipante deve indicare il proprio <b>profilo aoe4world</b> e se partecipa come <b>Coach</b> o <b>Allievo</b>.<br>I Coach devono indicare le <b>civiltà</b> in cui sono più esperti, come riferimento per il draft.<br>\nIscriviti qua → ⁠<a href=\"https://discord.com/channels/185687473337139200/1509494857289175070\" target=\"_blank\">👨‍🏫｜iscrizioni</a><h3>3.1 Misure Anticheat&nbsp;</h3><div>Vietati gli <b>smurf</b>: usare il profilo con <b>RM 1v1 Elo</b> più alto.</div><div>Lo staff può assegnare un <b>Elo arbitrario</b> se i dati sono incoerenti.</div><div>Vietato <b>perdere apposta</b> per alterare l’Elo.</div><div>Vietato lo <b>stream‑sniping</b>.</div><div>I nuovi giocatori faranno una breve <b>verifica in vocale</b>.</div><div>Segnalare allo staff eventuali <b>sospetti</b> prima dell’inizio.</div><div>Sfruttare <b>bug</b> comporta la sconfitta automatica.</div><div><h3>&nbsp;4. Struttura del Torneo</h3>Il torneo dura <b>4 settimane</b> e utilizza il sistema <b>Svizzera</b> con 4 turni, uno a settimana.<br>Nel formato Svizzera tutti giocano lo <b>stesso numero di partite</b> e non ci sono eliminazioni.<br>Al primo turno gli accoppiamenti sono <b>casuali</b>; nei successivi si affrontano giocatori con lo <b>stesso score</b> o il più vicino possibile.<br>Ogni turno è <b>Bo1</b>.<br>Dopo ogni turno si rifà il <b>draft dei Coach</b> e si aggiorna la <b>classifica</b>.<br>Vince l’allievo con il <b>miglior score finale</b>.</div><h3>4.1 Criteri di spareggio</h3><div>1) <b>Buchholz</b> – somma degli score degli avversari affrontati<br>2) <b>Sonneborn‑Berger</b> – score degli avversari battuti<br>3) <b>Scontro diretto</b><br>4) <b>Elo minore</b> (RM 1v1 Elo)</div><div><h3>&nbsp;5. Gestione delle Partite</h3>Il ritardo massimo è di <b>15 minuti</b>.<br>La partita va giocata <b>nella settimana del turno</b>.<br>Le modifiche di orario vanno comunicate nel <b>canale dedicato</b>.<br>Se non c’è accordo, si gioca <b>domenica alle 21:00</b>.<br>Chi non si presenta entro il limite perde <b>a tavolino</b>.&nbsp;</div><div><h3>5.1 Disconnessioni e desync</h3><ul><li>Disconnessione entro <b>5 minuti</b> → si rigioca con stesse civ e mappa.</li><li>Dopo 5 minuti → decide l’<b>avversario</b>.</li><li>In caso di <b>desync</b> → decidono gli admin se ripetere o assegnare la vittoria.</li></ul></div><h3>&nbsp;6. Draft dei Coach</h3>Il draft dei Coach si svolge <b>in live nel canale vocale indicato</b>, ogni <b>domenica alle 22:30</b>.<br>Nel <b>primo turno</b>, gli Allievi scelgono i Coach in ordine di <b>Elo</b>, partendo dal più basso.<br>Dal <b>secondo turno in poi</b>, l’ordine di scelta segue la <b>classifica settimanale della Svizzera</b> → ⁠<a href=\"https://discord.com/channels/185687473337139200/1509848020714524722\" target=\"_blank\">👨‍🏫｜calendario-e-classifica</a>.&nbsp;<div>Un Coach non può essere scelto <b>due volte</b> dallo stesso Allievo.<br>In caso di <b>assenze improvvise</b>, lo staff può assegnare dei Coach d’ufficio.\n\n<h3> 7. Comportamento</h3>Tutti i partecipanti devono mantenere un atteggiamento <b>rispettoso</b> verso avversari, Allievi, Coach e Staff.<br>Il Coach deve fornire indicazioni <b>chiare</b> e <b>costruttive</b>.<br>L’Allievo deve <b>collaborare</b>, ascoltare e presentarsi <b>puntuale</b>.<br>Il <b>trash talk leggero</b> è tollerato, ma non deve sfociare in insulti o flame.<br>Comportamenti <b>tossici</b> o <b>discriminatori</b> possono portare a richiami o penalità.\n\n<h3> 8. Contatti e Supporto</h3>Per dubbi, problemi o segnalazioni:<br><ul><li>usare il canale ⁠<a href=\"https://discord.com/channels/185687473337139200/1509591304890482770\" target=\"_blank\">👨‍🏫｜chat-torneo</a></li><li>contattare direttamente in privato @Kani o lo @Staff</li></ul><div><br></div></div>",
+    "updated_at": "2026-07-17T08:43:13.36+00:00",
+    "display_order": 7,
+    "banner_position_x": 50,
+    "banner_position_y": 50,
+    "vods": [
+      {
+        "id": "vod-1784270093895",
+        "url": "https://www.youtube.com/watch?v=Jw5zKHV-aqU",
+        "round": "",
+        "score": "",
+        "title": "Michele D'Alessandro (Ayyubidi) (coach: Daddu23) vs NicoAoeItalia (Maliani)"
+      },
+      {
+        "id": "vod-1784270129701",
+        "url": "https://www.youtube.com/watch?v=BqugBdCKZ-U",
+        "round": "",
+        "score": "",
+        "title": "Eddu (coach marcotamby) vs PeruBabyLama (coach Sam98)"
+      },
+      {
+        "id": "vod-1784272020271",
+        "url": "https://www.youtube.com/watch?v=Mtg7zlTGOs0",
+        "round": "",
+        "score": "",
+        "title": "macromacro77 (Francia) vs mattiatheking (Giapponesi) - Coaches: Sparta - DragonballSZ"
+      },
+      {
+        "id": "vod-1784272055443",
+        "url": "https://www.youtube.com/watch?v=PZIbblYdWj0",
+        "round": "",
+        "score": "",
+        "title": "m4ttia16theking (Giapponesi) vs NicoAoeIta (Maliani) - Coaches: Sparta - DragonballSZ"
+      },
+      {
+        "id": "vod-1784272062825",
+        "url": "https://www.youtube.com/watch?v=-wr9L8V8GW0",
+        "round": "",
+        "score": "",
+        "title": "Trabucco (coach: Revelations93_TV) vs Giulian"
+      },
+      {
+        "id": "vod-1784272095869",
+        "url": "https://www.youtube.com/watch?v=VJb0dM3uhm8",
+        "round": "",
+        "score": "",
+        "title": "pyro (coach marcotamby) vs Kleidemos84 (coach RiccardoNardoni)"
+      },
+      {
+        "id": "vod-1784272109159",
+        "url": "https://www.youtube.com/watch?v=IqMx1_7KnMI",
+        "round": "",
+        "score": "",
+        "title": "Giulian74 (Cavalieri Templari) VS Spyro (Orda d'Oro) - Coaches: Sparta - Revelations93_IV"
+      },
+      {
+        "id": "vod-1784272135533",
+        "url": "https://www.youtube.com/watch?v=PK5qCdgMFls",
+        "round": "",
+        "score": "",
+        "title": "Berjas (Giapponese) VS KingClaw (Ottomani) (coach: @Alexander95)"
+      },
+      {
+        "id": "vod-1784272141006",
+        "url": "https://www.youtube.com/watch?v=shhBQamON1w",
+        "round": "",
+        "score": "",
+        "title": "mattia16theking (Giapponesi) VS Micheledalex (Ayyubids) (coach: Marcotamby)"
+      },
+      {
+        "id": "vod-1784272160869",
+        "url": "https://www.youtube.com/watch?v=mr0DR5Z_tyE",
+        "round": "",
+        "score": "",
+        "title": "Micheledalex (Ayyubids) (coach: Sparta) VS mattia16theking (Giapponesi)"
+      },
+      {
+        "id": "vod-1784272188601",
+        "url": "https://www.youtube.com/watch?v=TrEW_dxGt2I&t=350s",
+        "round": "",
+        "score": "",
+        "title": "Berjas (Giapponesi) (coach: xxalfredj90xx) vs TrabuccoEnjoyer (Ordine del drago)"
+      },
+      {
+        "id": "vod-1784272198828",
+        "url": "https://www.youtube.com/watch?v=VrHgKd_zO0o",
+        "round": "",
+        "score": "",
+        "title": "TrabuccoEnjoyer (Ordine del drago) (coach: Damage) vs Berjas (Giapponesi)"
+      },
+      {
+        "id": "vod-1784272212955",
+        "url": "https://www.youtube.com/watch?v=mBaMT57PEcE",
+        "round": "",
+        "score": "",
+        "title": "macromarco (HRE) (coach: daddu) vs micheledalex (Ayyubidi)"
+      },
+      {
+        "id": "vod-1784272230966",
+        "url": "https://www.youtube.com/watch?v=wyVcA723ho0",
+        "round": "",
+        "score": "",
+        "title": "micheledalex (Ayyubidi) (coach: marcotamby) vs macromarco (HRE)"
+      },
+      {
+        "id": "vod-1784272247212",
+        "url": "https://www.youtube.com/watch?v=6Zi7BTuS_Bo&t=2239s",
+        "round": "",
+        "score": "",
+        "title": "nicoaoeitalia.com (Maliani) (coach: marcotamby) vs rcdivo (Lancaster)"
+      },
+      {
+        "id": "vod-1784272258039",
+        "url": "https://www.youtube.com/watch?v=g9gjF-slZfI",
+        "round": "",
+        "score": "",
+        "title": "rcdivo (Lancaster) (coach: spartaaoe) vs nicoaoeitalia.com (Maliani)"
+      },
+      {
+        "id": "vod-1784272280023",
+        "url": "https://www.youtube.com/watch?v=-zk3oestz0U",
+        "round": "",
+        "score": "",
+        "title": "Eddu (Ottomani) (coach: Scapolocaldo667) vs m4ttia_fnonyoutube (Giapponesi)"
+      }
+    ],
+    "is_archived": false,
+    "max_participants": 16,
+    "discord_channel_id": null,
+    "discord_message_id": null,
+    "auto_bracket": true,
+    "map": null,
+    "event_date": null,
+    "event_time": null
+  },
+  {
+    "id": "c00bfcaf-5dcc-4116-bd5d-8f43c5c42598",
+    "slug": "tornei-dei-nabbi",
+    "source": "local",
+    "organizer": "marcotamby",
+    "direct_link": null,
+    "period": "23 luglio 2026",
+    "created_at": "2026-07-23T06:51:57.328454+00:00",
+    "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/tournaments/tournament-1784789397858.jpg",
+    "status": "Programmato",
+    "podium": [],
+    "name": "Tornei dei nabbi",
+    "type": "1v1",
+    "has_regolamento": false,
+    "regolamento_content": "",
+    "updated_at": "2026-07-23T07:23:46.772+00:00",
+    "display_order": 1,
+    "banner_position_x": 50,
+    "banner_position_y": 50,
+    "vods": [],
+    "is_archived": true,
+    "max_participants": 8,
+    "discord_channel_id": null,
+    "discord_message_id": null,
+    "auto_bracket": true,
+    "map": null,
+    "event_date": null,
+    "event_time": null
+  },
+  {
+    "id": "aa5c8879-da75-4050-b968-c76bc195a035",
+    "slug": "coppa-lanciere-di-santa-clotilde",
+    "source": "startgg",
+    "organizer": "Aoeitalia",
+    "direct_link": "https://tourneybot.gg/tourneys/70992?utm_medium=tourneybot&utm_source=bracket",
+    "period": "22 luglio 2026",
+    "created_at": "2026-05-30T09:53:28.150482+00:00",
+    "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/tournaments/tournament-1780467818527.png",
+    "status": "Concluso",
+    "podium": [
+      {
+        "entrant": {
+          "name": "Tia"
+        },
+        "players": [],
+        "division": "",
+        "placement": 1
+      },
+      {
+        "entrant": {
+          "name": "Dragonball Sparking Zero"
+        },
+        "players": [],
+        "division": "",
+        "placement": 2
+      },
+      {
+        "entrant": {
+          "name": "Scapolocaldo667"
+        },
+        "players": [],
+        "division": "",
+        "placement": 3
+      },
+      {
+        "entrant": {
+          "name": "Sparta"
+        },
+        "players": [],
+        "division": "",
+        "placement": 3
+      }
+    ],
+    "name": "Coppa di Santa Maddalena",
+    "type": "1v1",
+    "has_regolamento": true,
+    "regolamento_content": "<b><h2><b>Struttura torneo</b></h2><p><b>Orario</b>: dalle 21.00 in poi</p><p><b>Numero di partecipanti</b>: 8</p><p><b>Civiltà</b>: Nessuna restrizione</p><p><b>Mappa:</b> Dry Arabia</p><p><b>Modalità</b>: Eliminazione diretta BO1</p><p><b>Restrizione Elo</b>: nessuna</p><p><u>Info generali</u></p><p>Il torneo si svolgerà tutto in una serata (3 partite al massimo)</p><p>Il torneo sarà ad eliminazione diretta (chi perde è fuori, chi vince continua il torneo)</p><p>Ad ognuno degli 8 giocatori viene assegnato un seed a seconda degli Scudi Singolo posseduti sul sito <a href=\"https://aoeitalia.com/classifiche/aoe4\" target=\"_blank\">https://aoeitalia.com/classifiche/aoe4</a></p><p>Verrà creato il tabellone nella seguente maniera:</p><p>seed 1 vs seed 8</p><p>seed 4 vs seed 5</p><p>seed 2 vs seed 7</p><p>seed 3 vs seed 6</p><p>Le partite da disputare saranno: 4 quarti di finale, 2 semifinali e 1 finale.</p><p>Sarà giocato un incontro diretto BO1 (solo andata) per tutte le fasi.</p><p>Se un giocatore non dovesse presentarsi all'incontro in orario, l'incontro viene segnato come perso (saranno concessi solamente 10 minuti di ritardo).</p><p><a href=\"https://discord.com/channels/185687473337139200/508823493438210050\" target=\"_blank\" class=\"premium-link-button\">ISCRIVITI!</a></p><p><b></b></p><p><b></b></p><p><b></b></p></b>",
+    "updated_at": "2026-07-23T10:34:12.633+00:00",
+    "display_order": 8,
+    "banner_position_x": 48,
+    "banner_position_y": 17,
+    "vods": [],
+    "is_archived": false,
+    "max_participants": 8,
+    "discord_channel_id": null,
+    "discord_message_id": "1529484819291967502",
+    "auto_bracket": true,
+    "map": null,
+    "event_date": null,
+    "event_time": null
+  },
+  {
+    "id": "7de4cc84-f715-47a1-b916-b6b46a35794d",
+    "slug": "tournament/torneo-2v2-di-primavera",
+    "source": "startgg",
+    "organizer": "marcotamby",
+    "direct_link": "https://www.start.gg/tournament/torneo-2v2-di-primavera/events",
+    "period": "Maggio 2026",
+    "created_at": "2026-04-23T07:49:01.340432+00:00",
+    "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/tournaments/tournament-1776947460292.png",
+    "status": "Concluso",
+    "podium": [
+      {
+        "entrant": {
+          "id": 23420655,
+          "name": "Inna Jiffy"
+        },
+        "players": [
+          "Sam98",
+          "Jll"
+        ],
+        "division": "Low elo",
+        "placement": 1
+      },
+      {
+        "entrant": {
+          "id": 23331744,
+          "name": "FrattaGrumo"
+        },
+        "players": [
+          "Alexander95",
+          "Timmy"
+        ],
+        "division": "Low elo",
+        "placement": 2
+      },
+      {
+        "entrant": {
+          "id": 23420654,
+          "name": "Fattoni & Co"
+        },
+        "players": [
+          "Mikecok",
+          "Papoz90"
+        ],
+        "division": "Low elo",
+        "placement": 3
+      },
+      {
+        "entrant": {
+          "id": 23331660,
+          "name": "I Dottori"
+        },
+        "players": [
+          "Mattia16theking",
+          "Magellan"
+        ],
+        "division": "Low elo",
+        "placement": 3
+      },
+      {
+        "entrant": {
+          "name": "4Legacy"
+        },
+        "players": [
+          "gattoratto",
+          "Tia"
+        ],
+        "division": "High elo",
+        "placement": 1
+      },
+      {
+        "entrant": {
+          "name": "HIIYT"
+        },
+        "players": [
+          "marcotamby",
+          "Sparta"
+        ],
+        "division": "High elo",
+        "placement": 2
+      },
+      {
+        "entrant": {
+          "name": "Scapolo & Ammogliato"
+        },
+        "players": [
+          "Barone Rosso",
+          "Scapolocaldo667"
+        ],
+        "division": "High elo",
+        "placement": 3
+      },
+      {
+        "entrant": {
+          "name": "Team Billy"
+        },
+        "players": [
+          "SmearyNeptune",
+          "Alfred"
+        ],
+        "division": "High elo",
+        "placement": 3
+      }
+    ],
+    "name": "Torneo 2v2 di primavera",
+    "type": "2v2",
+    "has_regolamento": true,
+    "regolamento_content": "<b><b><b><b><b><b><h2><b>Regolamento torneo 2v2 - maggio 2026</b></h2><p>Benvenuti nel primo torneo 2v2 del 2026!&nbsp;</p><p><b>📅 Struttura e tempistiche</b></p><p>Il torneo inizierà il 4 maggio.</p><p><a href=\"https://discord.gg/vqBUNeZQr5\" target=\"_blank\" class=\"premium-link-button\">Iscriviti al torneo!</a></p><ul><li><p><b>Fase Unica: </b>tabellone a eliminazione diretta</p></li><li><p><b>Gestione match:</b> i team hanno <b>7 giorni di tempo</b> per concordare e disputare ogni incontro.</p></li><li><p><b>Flessibilità e ritardi:</b> è ammesso lo slittamento di un match alla settimana successiva <b>solo se</b> i team si impegnano ufficialmente a recuperare disputando due turni nella stessa settimana.<br><i>Nota: In caso di sconfitta nel match recuperato, un team viene eliminato normalmente e il tabellone prosegue senza ulteriori ritardi. Sarà il team vincente a dover disputare un ulteriore match in quella settimana per recuperare lo slittamento.</i></p></li></ul>⚔️ Divisione Leghe in base all’elo</b><p>I partecipanti verranno suddivisi in due categorie per garantire fair play e competitività:</p><table><tbody><tr><td><p><b>Lega</b></p></td><td><p><b>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Requisito elo</b></p></td><td><p><b>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Formato incontri</b></p></td></tr><tr><td><p><b>Low elo</b></p></td><td><p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Sotto 1300 elo</p></td><td><p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;BO3 (Finale BO5)</p></td></tr><tr><td><p><b>High elo</b></p></td><td><p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Sopra 1300 elo</p></td><td><p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;BO3 (Finale BO5)</p></td></tr></tbody></table><br><p><i>L'ELO di riferimento sarà quello tg più alto al momento dell’iscrizione</i></p>🛠 Composizione team e regole draft</b><p>La composizione dei team è <b>libera</b>, ma il draft delle civiltà segue regole specifiche per incentivare la varietà dei game:</p>Lega low elo:</b><ul><li><p><b>No civ repeat:</b> all'interno della stessa serie (BO3 o BO5), un team non può riutilizzare una stessa combinazione di civiltà con cui ha già vinto o perso un game precedente, ma può utilizzare di nuovo una seconda volta una civiltà già usata in abbinamento a una civiltà diversa. Nessuna civiltà può essere utilizzata per più di due volte. Non è ovviamente possibile usare un doppione della stessa civiltà nello stesso game: esempio, entrambi i giocatori prendono francesi e giocano quindi \"doppio francesi\".</p></li><li><p><b>Draft civ:</b> a inizio set vengono draftate 9 civiltà per team, che potrà usarle scegliendone 2 da un civ pick prima di ogni game.</p></li><li><p>Link:<br><b>- <a href=\"https://aoe2cm.net/preset/kpbVd\" target=\"_blank\">Draft mappe</a><br>- <a href=\"https://aoe2cm.net/preset/npEDk\" target=\"_blank\">Draft civ</a><br>- <a href=\"https://aoe2cm.net/preset/GjJGq\" target=\"_blank\">Pick civ</a></b></p></li></ul>Lega high elo:</b><ul><li><p><b>No civ repeat:</b> all'interno della stessa serie (BO3 o BO5), un team non può mai riutilizzare le stesse civiltà per più di una volta, da intendersi sia singolarmente che accoppiate.</p></li><li><p><b>Ban: </b>all'inizio di ogni serie, ogni team dichiara <b>2 civiltà da bannare</b> agli avversari. Le civiltà bannate non potranno essere utilizzate per l'intera durata della serie (BO3/BO5).</p></li><li><p><b>Draft civ:</b> a inizio set vengono draftate 9 civiltà per team, che potrà usarle scegliendone 3 da un civ pick prima di ogni game.</p></li><li><p><b>Snipe: </b>prima di ogni game i team sniperano una delle 3 civiltà al team avversario.</p></li></ul>🎮 Caratteristiche degli incontri</b></b><ul><b><li><p><b>Tutti i turni (esclusa finale):</b> best of 3 (BO3). Vince chi si aggiudica 2 game.</p></li><li><p><b>Gran finale:</b> best of 5 (BO5). Vince chi si aggiudica 3 game.</p></li><li><p><b>Mappe:</b> verrà condiviso un draft mappe apposito. La mappa che rimane per ultima nel draft è la mappa del game uno. La mappa del game 2 viene scelta dal team perdente tra le 2 homemap draftate dai team.</p></li></b><li><p><b>Link<br>- <a href=\"https://aoe2cm.net/preset/kpbVd\">Draft </a><a href=\"https://aoe2cm.net/preset/kpbVd\" target=\"_blank\">mappe</a><br>- <a href=\"https://aoe2cm.net/preset/nHKEV\" target=\"_blank\">Draft civ</a><br>- <a href=\"https://aoe2cm.net/preset/kaqdB\" target=\"_blank\">Pick civ</a></b></p></li></ul><b><b>📋 Note aggiuntive</b><ol><li><p><b>Comunicazioni:</b> I capitani devono accordarsi nel canale Discord dedicato entro le prime 48 ore della settimana di riferimento.</p></li><li><p><b>Screenshot:</b> i risultati vanno condivisi in modalità nascosta, per evitare spoiler se i game non vengono streammati in diretta (aggiungere due stanghette prima || e due stanghette dopo || il risultato)</p></li><li><p><b>Disconnessioni:</b> in caso di crash entro i primi 5 minuti di gioco (e senza scontri avvenuti), il match può essere restartato con le stesse civiltà e mappe. Oltre tale limite, la decisione spetta agli admin o al fair play degli avversari.</p></li></ol><p>🏆 <b>Premi</b></p><p><b>Coppe e premi:</b> I primi classificati di ogni lega vincono una coppa (una coppa per ogni player vincitore) e 20 pecore age (10 pecore a testa).</p></b><br>",
+    "updated_at": "2026-07-23T10:42:27.441+00:00",
+    "display_order": 6,
+    "banner_position_x": 50,
+    "banner_position_y": 50,
+    "vods": [
+      {
+        "id": "vod-1779715028766",
+        "url": "https://youtu.be/2ebiRqbH4Qg?si=KFHv8dWlqFYVnHTz",
+        "round": "Quarti di finale low elo",
+        "score": "2-0",
+        "title": "FrattaGrumo vs A.P.P.F"
+      },
+      {
+        "id": "vod-1779716099348",
+        "url": "https://www.youtube.com/watch?v=lqfP3m8e2Qw",
+        "round": "Quarti di finale low elo",
+        "score": "2-0",
+        "title": "Inna Jiffy vs Gli Svalvolati"
+      },
+      {
+        "id": "vod-1779716120491",
+        "url": "https://www.youtube.com/watch?v=XxT3Xdqi18c",
+        "round": "Quarti di finale low elo",
+        "score": "2-0",
+        "title": "I Dottori vs Araba Fenice"
+      },
+      {
+        "id": "vod-1779716145671",
+        "url": "https://www.youtube.com/watch?v=rXCfGNoqO0s",
+        "round": "Quarti di finale low elo",
+        "score": "2-0",
+        "title": "Fattoni & Co vs I Catastrophos"
+      },
+      {
+        "id": "vod-1779716170802",
+        "url": "youtube.com/watch?v=LY0B4i5_zh8&pp=0gcJCQMLAYcqIYzv",
+        "round": "Semifinali high elo",
+        "score": "2-0",
+        "title": "4Legacy vs Team BIlli"
+      },
+      {
+        "id": "vod-1779716209692",
+        "url": "https://www.youtube.com/watch?v=5XcXbfTDKEg",
+        "round": "Semifinali high elo",
+        "score": "2-1",
+        "title": "HIIYT vs Scapolo & Ammogliato"
+      },
+      {
+        "id": "vod-1779716244429",
+        "url": "https://www.youtube.com/watch?v=Db-M_6A0n54",
+        "round": "Quarti di finale high elo",
+        "score": "0-2",
+        "title": "M&N's vs Team Billi"
+      },
+      {
+        "id": "vod-1779778652027",
+        "url": "https://www.youtube.com/watch?v=JWcGMXkAYU0",
+        "round": "Semifinali low elo",
+        "score": "2-0",
+        "title": "FrattaGrumo vs Fattoni & Co"
+      },
+      {
+        "id": "vod-1779778688919",
+        "url": "https://www.youtube.com/watch?v=h2WfS0BrdjU",
+        "round": "Finale high elo",
+        "score": "3-0",
+        "title": "4Legacy vs HIIYT"
+      },
+      {
+        "id": "vod-1780055857123",
+        "url": "https://www.youtube.com/watch?v=M6M6UcS6cDE",
+        "round": "Semifinale low elo",
+        "score": "2-0",
+        "title": "Inna Jiffy vs I Dottori"
+      },
+      {
+        "id": "vod-1780174054871",
+        "url": "https://youtu.be/kC9higbmp4s?is=FUkARtWv8AFpzMpb",
+        "round": "Finale low elo",
+        "score": "3-0",
+        "title": "Inna Jiffy vs FrattaGrumo"
+      }
+    ],
+    "is_archived": false,
+    "max_participants": 8,
+    "discord_channel_id": null,
+    "discord_message_id": null,
+    "auto_bracket": true,
+    "map": null,
+    "event_date": null,
+    "event_time": null
+  },
+  {
+    "id": "597dbaaf-6fb4-49dc-aa64-a742aeffb8d4",
+    "slug": "end-of-summer-champions",
+    "source": "startgg",
+    "organizer": "marcotamby",
+    "direct_link": "https://www.start.gg/tournament/end-of-summer-champions/event/eliminazione-diretta",
+    "period": "Da agosto a ottobre 2026",
+    "created_at": "2026-07-30T11:52:09.59704+00:00",
+    "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/tournaments/tournament-1785411925196.webp",
+    "status": "Programmato",
+    "podium": [],
+    "name": "End of Summer Champions",
+    "type": "Team",
+    "has_regolamento": false,
+    "regolamento_content": "<h2 style=\"text-align: center;\"><b><b>End of Summer Champions</b></b></h2><h3><b></b></h3><h3><b>1. Struttura del torneo</b></h3><div><p style=\"font-weight: bold;\">Il torneo si articola in due fasi principali: le giornate di qualificazione e le fasi finali (lega d'oro e lega d'argento).</p><h3 style=\"font-weight: bold;\"><b>1.1 Fase 1: qualificazioni (4 giornate)</b></h3><ul style=\"font-weight: bold;\"><li><p><b>Formato:</b>&nbsp;girone unico alla svizzera in modalità best of 1 (bo1), massimo 16 giocatori per giornata e 4 turni per ogni giocatore.</p></li><li><p><b>Qualificazione:</b> i primi 2 con più punti si qualificano alla fase finale del torneo in lega oro. Il terzo e il quarto si qualificano nella lega d'argento, a meno di non risultare qualificati per la lega d'oro in una giornata successiva. In quel caso verranno estratti altri giocatori per la lega d’argento sempre dai risultati finali delle giornate alla svizzera.</p></li></ul><div style=\"\"><b><h3><b>1.2 Fase 2: fasi finali</b></h3><ul><li><p><b>Lega d'oro (top 8):</b> tabellone a eliminazione diretta con match best of 5 (bo5).</p></li><li><p><b>Lega d'argento (top 8-16):</b> tabellone a eliminazione diretta con match best of 3 (bo3).</p></li></ul><p><i>Nota: i dettagli specifici relativi a draft, mappe e regole per la lega d'oro e la lega d'argento saranno comunicati successivamente.</i></p></b><h2 style=\"font-weight: bold;\"><b>2. Calendario e date</b></h2><p style=\"font-weight: bold;\">Tutti i match delle qualificazioni si svolgeranno nelle seguenti date (da confermare):</p><ul style=\"\"><li style=\"font-weight: bold;\"><p><b>1ª giornata di qualificazione:</b> giovedì 3 settembre</p></li><li style=\"font-weight: bold;\"><p><b>2ª giornata di qualificazione:</b> mercoledì 9 settembre</p></li><li style=\"\"><p style=\"\"><b style=\"font-weight: bold;\">3ª&nbsp;</b><b style=\"font-weight: bold;\">giornata di qualificazione:</b><span style=\"font-weight: 700;\">&nbsp;</span>giovedì 17 settembre</p></li><li style=\"\"><p style=\"\"><b style=\"font-weight: bold;\">4ª&nbsp;</b><b style=\"font-weight: bold;\">giornata di qualificazione:</b><b style=\"font-weight: bold;\">&nbsp;</b>martedì 22 settembre</p></li></ul><p style=\"font-weight: bold;\"><i>(Gli orari esatti dei check-in e dell'inizio dei match verranno confermati sui canali ufficiali del torneo).</i></p><h2 style=\"font-weight: bold;\"><b>3. Formato dei match e draft (qualificazioni)</b></h2><p style=\"font-weight: bold;\">Durante le 4 giornate di qualificazione, la procedura di pick/ban per ogni scontro bo1 segue queste regole:</p><ol style=\"font-weight: bold;\"><li><p><b>Ban civiltà:</b> ogni giocatore effettua 1 ban di una civiltà.&nbsp;</p></li><li><p><b>Pick civiltà:</b> ogni giocatore sceglie 2 civiltà tra quelle disponibili.</p></li><li><p><b>Snipe:</b> ogni giocatore effettua 1 snipe (elimina 1 delle 2 civiltà scelte dall'avversario).</p></li><li><p><b>Game:</b> il match si giocherà utilizzando la civiltà superstite per ciascun player.</p></li></ol><div><b><a href=\"https://aoe4guide.it/draft/preset/preset-1785595415028\" target=\"_blank\">Civ draft</a></b></div><div><br></div><div>Map pool per le giornate di qualificazione:</div><div><ul><li><p><b>Arabia Arida<br></b></p></li><li><p><b>Lipany</b></p></li><li><p><b>Rupe</b></p></li><li><p><b>Coastal Cliff</b></p></li><li><p><b>Holy Island</b></p></li><li><p><b>Gola</b></p></li><li><p><b>Frisian Marshes</b></p></li></ul></div><div><b><a href=\"https://aoe4guide.it/draft/preset/preset-1785844333278\" target=\"_blank\">Map draft</a></b></div><div><br></div><div>Il seed più alto hosta.</div><div style=\"\"><b><h2><b>5. Premi in palio</b></h2><p>I migliori giocatori del torneo si aggiudicheranno:</p><ul><li><p>🎁 <b>Pecore Amazon</b>&nbsp;<i>(1st e 2nd posto per ogni lega)</i></p></li><li><p>📦 <b>Gadget a sorpresa</b> ufficiali a tema <i>(3rd e 4th posto per ogni lega)</i></p></li></ul><p><i>(La ripartizione esatta delle pecore tra lega d'oro e lega d'argento verrà annunciata prima dell'inizio delle fasi finali).</i></p><h2><b>6. Regole di condotta e fair play</b></h2><p><b></b></p><ul><li><p><b>Puntualità:</b> è richiesto a tutti i partecipanti di presentarsi al check-in e all'orario di inizio del proprio match. Un ritardo superiore a 15 minuti senza preavviso comporterà la sconfitta a tavolino.</p></li><li><p><b>Connessione e disconnessioni:</b> in caso di disconnessione nei primi 3 minuti di partita il game verrà rigiocato (a meno di vantaggi clamorosi causati da un drush). La vittoria potrà essere assegnata all'avversario a discrezione degli organizzatori/admin.</p></li><li><p><b>Comportamento:</b> insulti, atteggiamenti tossici o l'uso di exploit/bug noti del gioco comporteranno la squalifica immediata dal torneo.</p></li></ul></b></div></div></div>",
+    "updated_at": "2026-10-04T13:29:40.966+00:00",
+    "display_order": 9,
+    "banner_position_x": 50,
+    "banner_position_y": 22,
+    "vods": [],
+    "is_archived": false,
+    "max_participants": 8,
+    "discord_channel_id": null,
+    "discord_message_id": null,
+    "auto_bracket": true,
+    "map": null,
+    "event_date": null,
+    "event_time": null
+  }
+]

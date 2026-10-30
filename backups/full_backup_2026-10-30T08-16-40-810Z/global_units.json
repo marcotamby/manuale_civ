@@ -1,0 +1,195 @@
+[
+  {
+    "id": "spearman",
+    "name": "Spearman",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "armor": 0,
+      "speed": 1.25,
+      "attack": 7,
+      "health": 80
+    },
+    "strengths": [
+      "Cavalry"
+    ],
+    "weaknesses": [
+      "Archers",
+      "Heavy Infantry"
+    ],
+    "description": "Infantry best used against mounted units.\n+ Anti-cavalry specialist\n+ Additional damage against Elephants\n- Weak against heavy infantry\n- Countered by Archers",
+    "image_id": null
+  },
+  {
+    "id": "archer",
+    "name": "Archer",
+    "type": "Ranged",
+    "age": 2,
+    "stats": {
+      "armor": 0,
+      "speed": 1.25,
+      "attack": 5,
+      "health": 70
+    },
+    "strengths": [
+      "Spearmen",
+      "Crossbowmen"
+    ],
+    "weaknesses": [
+      "Cavalry",
+      "Man-at-Arms"
+    ],
+    "description": "Cheap ranged infantry with good damage vs. unarmored targets.\n+ High rate of fire\n- Weak against high ranged armor targets\n- Countered by Horsemen",
+    "image_id": null
+  },
+  {
+    "id": "mangonel",
+    "name": "Mangonel",
+    "type": "Siege",
+    "age": 3,
+    "stats": {
+      "armor": 0,
+      "speed": 0.75,
+      "attack": 10,
+      "health": 130
+    },
+    "strengths": [
+      "Ranged Infantry",
+      "Light Infantry"
+    ],
+    "weaknesses": [
+      "Springalds",
+      "Cavalry"
+    ],
+    "description": "Fires multiple projectiles dealing damage in an area.\n+ Effective against massed units\n- Must be set up to fire",
+    "image_id": null
+  },
+  {
+    "id": "man-at-arms",
+    "name": "Man-at-Arms",
+    "type": "Infantry",
+    "age": 3,
+    "stats": {
+      "armor": 4,
+      "speed": 1.13,
+      "attack": 12,
+      "health": 155
+    },
+    "strengths": [
+      "Light Infantry",
+      "Archers"
+    ],
+    "weaknesses": [
+      "Crossbowmen",
+      "Heavy Cavalry"
+    ],
+    "description": "Tough infantry with good damage.\n+ High armor\n- Slow movement\n- Countered by Knights, Lancers, and Crossbowmen",
+    "image_id": null
+  },
+  {
+    "id": "springald",
+    "name": "Springald",
+    "type": "Siege",
+    "age": 3,
+    "stats": {
+      "armor": 3,
+      "speed": 0.88,
+      "attack": 14,
+      "health": 85
+    },
+    "strengths": [
+      "Siege"
+    ],
+    "weaknesses": [
+      "Melee Units"
+    ],
+    "description": "Anti-unit siege weapon. Fires bolts that pierce multiple units.\n+ Does not require setup to fire\n+ Bonus damage vs. melee infantry\n- Trivial damage vs. buildings",
+    "image_id": null
+  },
+  {
+    "id": "knight",
+    "name": "Knight",
+    "type": "Cavalry",
+    "age": 3,
+    "stats": {
+      "armor": 4,
+      "speed": 1.63,
+      "attack": 24,
+      "health": 230
+    },
+    "strengths": [
+      "Archers",
+      "Swordsmen"
+    ],
+    "weaknesses": [
+      "Spearmen",
+      "Camels"
+    ],
+    "description": "Expensive cavalry with high damage and melee armor. Effective against melee units.\n+ Heavy armor\n+ Strong in melee combat\n- Countered by Spearmen and Crossbowmen",
+    "image_id": null
+  },
+  {
+    "id": "crossbowman",
+    "name": "Crossbowman",
+    "type": "Ranged",
+    "age": 3,
+    "stats": {
+      "armor": 0,
+      "speed": 1.13,
+      "attack": 11,
+      "health": 80
+    },
+    "strengths": [
+      "Heavy Infantry",
+      "Heavy Cavalry"
+    ],
+    "weaknesses": [
+      "Light Cavalry",
+      "Archers"
+    ],
+    "description": "High damage ranged unit best against heavy targets.\n+ Anti-heavy specialist\n- Low health\n- Countered by Horsemen",
+    "image_id": null
+  },
+  {
+    "id": "bombard",
+    "name": "Bombard",
+    "type": "Siege",
+    "age": 4,
+    "stats": {
+      "armor": 0,
+      "speed": 0.75,
+      "attack": 55,
+      "health": 210
+    },
+    "strengths": [
+      "Buildings"
+    ],
+    "weaknesses": [
+      "Melee Units"
+    ],
+    "description": "Intimidating siege gun excellent against buildings or any stubborn targets.\n+ High damage\n- Must be set up to fire",
+    "image_id": null
+  },
+  {
+    "id": "handcannoneer",
+    "name": "Handcannoneer",
+    "type": "Ranged",
+    "age": 4,
+    "stats": {
+      "armor": 0,
+      "speed": 1.13,
+      "attack": 38,
+      "health": 130
+    },
+    "strengths": [
+      "Infantry",
+      "Cavalry"
+    ],
+    "weaknesses": [
+      "Mangonels",
+      "Archers"
+    ],
+    "description": "Powerful all-purpose ranged infantry.\n+ High damage\n- High cost\n- Slow movement speed\n- Countered by Horsemen",
+    "image_id": null
+  }
+]
