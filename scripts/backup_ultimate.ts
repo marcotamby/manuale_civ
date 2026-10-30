@@ -13,14 +13,19 @@ const FALLBACK_URL = 'https://laliiuqjpxanhwhxajlm.supabase.co';
 const FALLBACK_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhbGlpdXFqcHhhbmh3aHhhamxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjQ5MjEsImV4cCI6MjA4ODU0MDkyMX0.1xIE1MXy1JxgGzpP0Hitotz8o3aMwASV8NUr06bQjkA';
 
 const rawUrl = (process.env.VITE_SUPABASE_URL || '').replace(/\s/g, '');
-const supabaseUrl = rawUrl.startsWith('https://') ? rawUrl : FALLBACK_URL;
-
 const rawServiceKey = (process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || '').replace(/\s/g, '');
 const rawAnonKey = (process.env.VITE_SUPABASE_ANON_KEY || '').replace(/\s/g, '');
-const primaryKey = rawServiceKey || rawAnonKey || FALLBACK_ANON_KEY;
 
-const supabasePrimary = createClient(supabaseUrl, primaryKey);
-const supabaseFallback = createClient(FALLBACK_URL, rawAnonKey || FALLBACK_ANON_KEY);
+// Build candidate clients in priority order:
+// 1. Env URL + Service Role Key (if present)
+// 2. Env URL + Env Anon Key (if present)
+// 3. Guaranteed working project URL + project Anon Key
+const clients = [
+  ...(rawUrl.startsWith('https://') && rawServiceKey ? [createClient(rawUrl, rawServiceKey)] : []),
+  ...(rawUrl.startsWith('https://') && rawAnonKey ? [createClient(rawUrl, rawAnonKey)] : []),
+  ...(rawServiceKey ? [createClient(FALLBACK_URL, rawServiceKey)] : []),
+  createClient(FALLBACK_URL, FALLBACK_ANON_KEY)
+];
 
 // Active tables in Supabase
 const TABLES_TO_BACKUP = [
@@ -48,7 +53,9 @@ const TABLES_TO_BACKUP = [
 ];
 
 async function fetchTableRows(table: string) {
-  for (const client of [supabasePrimary, supabaseFallback]) {
+  let lastError: any = null;
+
+  for (const client of clients) {
     let allData: any[] = [];
     let from = 0;
     const step = 1000;
@@ -56,26 +63,34 @@ async function fetchTableRows(table: string) {
     let hadError = false;
 
     while (hasMore) {
-      const { data, error } = await client
-        .from(table)
-        .select('*')
-        .range(from, from + step - 1);
+      try {
+        const { data, error } = await client
+          .from(table)
+          .select('*')
+          .range(from, from + step - 1);
 
-      if (error) {
+        if (error) {
+          lastError = error;
+          hadError = true;
+          hasMore = false;
+          break;
+        }
+
+        if (data && data.length > 0) {
+          allData = [...allData, ...data];
+          if (data.length < step) {
+            hasMore = false;
+          } else {
+            from += step;
+          }
+        } else {
+          hasMore = false;
+        }
+      } catch (err) {
+        lastError = err;
         hadError = true;
         hasMore = false;
         break;
-      }
-
-      if (data && data.length > 0) {
-        allData = [...allData, ...data];
-        if (data.length < step) {
-          hasMore = false;
-        } else {
-          from += step;
-        }
-      } else {
-        hasMore = false;
       }
     }
 
@@ -83,7 +98,11 @@ async function fetchTableRows(table: string) {
       return { data: allData, error: null };
     }
   }
-  return { data: null, error: new Error(`Impossibile scaricare la tabella ${table}`) };
+
+  return {
+    data: null,
+    error: new Error(lastError?.message || String(lastError || `Impossibile scaricare la tabella ${table}`))
+  };
 }
 
 async function backupDatabase() {

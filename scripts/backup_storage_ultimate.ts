@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
@@ -9,15 +9,27 @@ const FALLBACK_URL = 'https://laliiuqjpxanhwhxajlm.supabase.co';
 const FALLBACK_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhbGlpdXFqcHhhbmh3aHhhamxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjQ5MjEsImV4cCI6MjA4ODU0MDkyMX0.1xIE1MXy1JxgGzpP0Hitotz8o3aMwASV8NUr06bQjkA';
 
 const rawUrl = (process.env.VITE_SUPABASE_URL || '').replace(/\s/g, '');
-const supabaseUrl = rawUrl.startsWith('https://') ? rawUrl : FALLBACK_URL;
-
 const rawServiceKey = (process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || '').replace(/\s/g, '');
 const rawAnonKey = (process.env.VITE_SUPABASE_ANON_KEY || '').replace(/\s/g, '');
-const supabaseKey = rawServiceKey || rawAnonKey || FALLBACK_ANON_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const clients: SupabaseClient[] = [
+  ...(rawUrl.startsWith('https://') && rawServiceKey ? [createClient(rawUrl, rawServiceKey)] : []),
+  ...(rawUrl.startsWith('https://') && rawAnonKey ? [createClient(rawUrl, rawAnonKey)] : []),
+  ...(rawServiceKey ? [createClient(FALLBACK_URL, rawServiceKey)] : []),
+  createClient(FALLBACK_URL, FALLBACK_ANON_KEY)
+];
 
-async function downloadFolder(bucketName: string, folderPath: string, localBaseDir: string) {
+async function getWorkingClient(bucketName: string): Promise<SupabaseClient> {
+  for (const client of clients) {
+    try {
+      const { error } = await client.storage.from(bucketName).list('');
+      if (!error) return client;
+    } catch (_) {}
+  }
+  return clients[clients.length - 1];
+}
+
+async function downloadFolder(supabase: SupabaseClient, bucketName: string, folderPath: string, localBaseDir: string) {
   console.log(`📡 Esplorazione bucket '${bucketName}', cartella '${folderPath}'...`);
   
   const { data: items, error } = await supabase.storage.from(bucketName).list(folderPath);
@@ -32,20 +44,18 @@ async function downloadFolder(bucketName: string, folderPath: string, localBaseD
   for (const item of items) {
     const fullPath = folderPath ? `${folderPath}/${item.name}` : item.name;
     
-    // Supabase JS client: items with no id or specific metadata are usually folders
     if (!item.id && !item.metadata) {
       console.log(`📂 Trovata sottocartella: ${fullPath}`);
-      await downloadFolder(bucketName, fullPath, localBaseDir);
+      await downloadFolder(supabase, bucketName, fullPath, localBaseDir);
       continue;
     }
 
-    // It's a file
     console.log(`📥 Scaricamento file: ${fullPath}...`);
     const { data, error: downloadError } = await supabase.storage.from(bucketName).download(fullPath);
     
     if (downloadError) {
       console.warn(`⚠️ Possibile cartella o errore download ${fullPath}. Riprovo come cartella...`);
-      await downloadFolder(bucketName, fullPath, localBaseDir);
+      await downloadFolder(supabase, bucketName, fullPath, localBaseDir);
       continue;
     }
 
@@ -76,11 +86,12 @@ async function backupStorage() {
   const BUCKETS = ['civilizations', 'tournaments'];
   
   for (const bucket of BUCKETS) {
-      try {
-          await downloadFolder(bucket, '', backupDir);
-      } catch (e) {
-          console.warn(`⚠️ Impossibile accedere al bucket ${bucket}`);
-      }
+    try {
+      const client = await getWorkingClient(bucket);
+      await downloadFolder(client, bucket, '', backupDir);
+    } catch (e) {
+      console.warn(`⚠️ Impossibile accedere al bucket ${bucket}`);
+    }
   }
 
   console.log('🎉 Backup Storage completato!');
