@@ -1,0 +1,17 @@
+[
+  {
+    "id": "490e30e5-ab56-49fd-989a-211282c953aa",
+    "tournament_id": "aa5c8879-da75-4050-b968-c76bc195a035",
+    "round": 1,
+    "match_number": 1,
+    "player1_id": "27dc9711-c0b2-49a2-9fc3-87a0ba3b5c34",
+    "player2_id": "c3d77f5e-2774-419a-acd5-b8ab0b5e140d",
+    "player1_score": 0,
+    "player2_score": 0,
+    "winner_id": null,
+    "next_match_id": null,
+    "next_match_slot": null,
+    "status": "in_progress",
+    "updated_at": "2026-07-22T14:46:04.556084+00:00"
+  }
+]

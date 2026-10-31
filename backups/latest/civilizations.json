@@ -1,401 +1,5 @@
 [
   {
-    "id": "vikings",
-    "name": "Vichinghi",
-    "flag": "/civs/Vikings.webp?v=2",
-    "difficulty": "Medio",
-    "short_description": "I Vichinghi sono predoni provenienti dal nord che sopraffacevano i propri nemici grazie a una potente fanteria da mischia in grado di sopravvivere nutrendosi delle risorse dei territori nemici. Le loro “longhouse”, strutture flessibili, consentono loro di far crescere facilmente la popolazione e l'economia. Le saghe e la religione norrena ispirano i loro guerrieri a combattere senza paura per l'onore degli dei.",
-    "passive_bonuses": [
-      "Migrazione del Nord (Northern Migration): I Centri Città reclutano automaticamente Abitanti del villaggio gratuitamente fino alla Capacità Abitanti, che aumenta di +10 per ogni Longhouse costruita.",
-      "Longhouse Versatili: Le Longhouse sostituiscono le case, possono reclutare i Bondi e possono essere potenziate con 4 estensioni: Farmstead (2 campi agricoli con raccolta +50%), Bee Skeps (generano 50 Oro al minuto), Pasture and Loom (ricerca automaticamente le armature) o Smithy (ricerca automaticamente i potenziamenti ai danni).",
-      "Saghe Norrene (Sagas): Le Saghe sono missioni completabili in qualsiasi momento della partita per sbloccare bonus permanenti per l'economia e l'esercito.",
-      "Völur e Boschi Sacri (Sacred Groves): Le Völur viaggiano tra le Longhouse potenziando la produzione di Bee Skeps e Farmstead, oppure possono sacrificarsi su una Reliquia per creare un Bosco Sacro che genera passivamente Berserker e aumenta l'armatura delle unità vicine.",
-      "Vivere della Terra (Living Off The Land): La fanteria militare può curarsi raccogliendo Cibo direttamente dai depositi naturali (cespugli di bacche, cervi o cinghiali).",
-      "Mura del Danevirke: I Vichinghi non possiedono mura in pietra, ma possono potenziare le palizzate in mura del Danevirke (+1000 salute e +5 armatura contro il fuoco).",
-      "Influenza Navale: Costruire Longhouse nell'area di influenza di un Porto riduce il costo delle navi in tutti i Porti del 4% per ogni Longhouse (fino al 16%)."
-    ],
-    "unique_units": [
-      {
-        "id": "berserker",
-        "age": 1,
-        "name": "Berserker",
-        "type": "Infantry",
-        "stats": {
-          "armor": 0,
-          "speed": 1.3,
-          "attack": 8,
-          "health": 90
-        },
-        "imageId": "berserker-1",
-        "strengths": [
-          "Light Units",
-          "High Speed",
-          "Berserkergang Regen"
-        ],
-        "weaknesses": [
-          "Archers",
-          "Heavy Infantry"
-        ],
-        "description": "Fanteria leggera veloce armata di doppia ascia. Quando la salute scende sotto la soglia critica attiva Berserkergang, rigenerando salute e aumentando i danni."
-      },
-      {
-        "id": "bondi",
-        "age": 1,
-        "name": "Bondi",
-        "type": "Infantry",
-        "stats": {
-          "armor": 1,
-          "speed": 1.25,
-          "attack": 7,
-          "health": 90
-        },
-        "imageId": "bondi-1",
-        "strengths": [
-          "Cavalry",
-          "Shield Wall Bonus Health"
-        ],
-        "weaknesses": [
-          "Archers",
-          "Heavy Infantry"
-        ],
-        "description": "Lanciere unico con salute e armatura superiori. Quando più Bondi sono vicini formano un Muro di Scudi (Shield Wall) che aumenta temporaneamente la loro salute."
-      },
-      {
-        "id": "hirdman",
-        "age": 2,
-        "name": "Early Hirdman",
-        "type": "Infantry",
-        "stats": {
-          "armor": 4,
-          "speed": 1.18,
-          "attack": 12,
-          "health": 125
-        },
-        "imageId": "hirdman-2",
-        "strengths": [
-          "Light Infantry",
-          "Archers",
-          "High Armor"
-        ],
-        "weaknesses": [
-          "Crossbowmen",
-          "Knights"
-        ],
-        "description": "Fanteria pesante corazzata disponibile già in Età Feudale con danni e armatura aumentati, ulteriormente potenziabile con le Spade Ulfberht."
-      },
-      {
-        "id": "shield-maiden",
-        "age": 2,
-        "name": "Shield Maiden",
-        "type": "Ranged",
-        "stats": {
-          "armor": 2,
-          "speed": 1,
-          "attack": 8,
-          "health": 100
-        },
-        "imageId": "shield-maiden-2",
-        "strengths": [
-          "Base Defense",
-          "Villager Armor Aura",
-          "Ranged"
-        ],
-        "weaknesses": [
-          "Horsemen"
-        ],
-        "description": "Fanteria pesante a distanza armata di giavellotto, reclutata alla Konungr Hall. Ottiene +2 danni e +25% velocità vicino agli edifici alleati e conferisce +2 armatura agli abitanti vicini."
-      },
-      {
-        "id": "volur",
-        "age": 2,
-        "name": "Völur",
-        "type": "Religious",
-        "stats": {
-          "armor": 0,
-          "speed": 1.12,
-          "attack": 0,
-          "health": 90
-        },
-        "imageId": "volur-2",
-        "strengths": [
-          "Longhouse Boost",
-          "Sacred Groves"
-        ],
-        "weaknesses": [
-          "Combat Units"
-        ],
-        "description": "Unità religiosa di supporto che si sposta tra le Longhouse potenziandone la produzione, oppure può sacrificarsi su una Reliquia per creare un Bosco Sacro che genera Berserker."
-      },
-      {
-        "id": "longship",
-        "age": 2,
-        "name": "Longship",
-        "type": "Ranged",
-        "stats": {
-          "armor": 1,
-          "speed": 1.85,
-          "attack": 6,
-          "health": 300
-        },
-        "imageId": "longship-2",
-        "strengths": [
-          "Naval Raids",
-          "Troop Transport"
-        ],
-        "weaknesses": [
-          "Demolition Ships",
-          "Drakkars"
-        ],
-        "description": "Nave da guerra a remi con arcieri che funge anche da trasporto truppe: ogni unità non-abitante imbarcata aumenta la salute di +30 e aggiunge una freccia extra."
-      },
-      {
-        "id": "drakkar",
-        "age": 2,
-        "name": "Drakkar",
-        "type": "Siege",
-        "stats": {
-          "armor": 3,
-          "speed": 1.5,
-          "attack": 6,
-          "health": 500
-        },
-        "imageId": "drakkar-2",
-        "strengths": [
-          "Enemy Ships",
-          "Net Slow"
-        ],
-        "weaknesses": [
-          "Demolition Ships"
-        ],
-        "description": "Nave drago che sostituisce la nave springalda, armata di lanciatori d'ascia e capace di lanciare reti per rallentare le imbarcazioni nemiche."
-      },
-      {
-        "id": "fishing-knarr",
-        "age": 2,
-        "name": "Fishing Knarr",
-        "type": "Worker",
-        "stats": {
-          "armor": 0,
-          "speed": 1.5,
-          "attack": 0,
-          "health": 100
-        },
-        "imageId": "fishing-knarr-2",
-        "strengths": [
-          "Fishing",
-          "Light Transport"
-        ],
-        "weaknesses": [
-          "Military Ships"
-        ],
-        "description": "Peschereccio vichingo capace sia di raccogliere pesce sia di trasportare un piccolo gruppo di unità terrestri attraverso l'acqua."
-      },
-      {
-        "id": "jylland-knight",
-        "age": 3,
-        "name": "Jylland Knight",
-        "type": "Cavalry",
-        "stats": {
-          "armor": 4,
-          "speed": 1.63,
-          "attack": 22,
-          "health": 200
-        },
-        "imageId": "jylland-knight-3",
-        "strengths": [
-          "Archers",
-          "Infantry",
-          "Gold on Death"
-        ],
-        "weaknesses": [
-          "Spearmen",
-          "Crossbowmen"
-        ],
-        "description": "Cavalleria pesante da mischia più economica rispetto al cavaliere standard; conferisce 10 Oro quando cade in battaglia (30 Oro con il Valdemar Castle)."
-      },
-      {
-        "id": "skane-crossbowmen",
-        "age": 3,
-        "name": "Skåne Crossbowmen",
-        "type": "Ranged",
-        "stats": {
-          "armor": 0,
-          "speed": 1.13,
-          "attack": 9,
-          "health": 75
-        },
-        "imageId": "sk-ne-crossbowmen-3",
-        "strengths": [
-          "Heavy Infantry",
-          "Heavy Cavalry",
-          "Low Cost"
-        ],
-        "weaknesses": [
-          "Horsemen",
-          "Archers"
-        ],
-        "description": "Balestriere economico specializzato nell'abbattere unità pesanti e corazzate."
-      }
-    ],
-    "technologies": [
-      {
-        "id": "farmstead",
-        "age": 1,
-        "name": "Farmstead",
-        "building": "Longhouse",
-        "description": "Trasforma la Longhouse in punto di consegna del Cibo e aggiunge due campi agricoli raccolti il 50% più velocemente delle fattorie (+500 salute alla Longhouse, max 6)."
-      },
-      {
-        "id": "bee-skeps",
-        "age": 1,
-        "name": "Bee Skeps",
-        "building": "Longhouse",
-        "description": "Genera passivamente 50 Oro al minuto e aumenta la salute della Longhouse di 500 (max 6)."
-      },
-      {
-        "id": "pasture-and-loom",
-        "age": 2,
-        "name": "Pasture and Loom",
-        "building": "Longhouse",
-        "description": "Ricerca automaticamente le tecnologie di armatura da mischia e a distanza. Aumenta la salute della Longhouse di 750 (max 1)."
-      },
-      {
-        "id": "smithy",
-        "age": 2,
-        "name": "Smithy",
-        "building": "Longhouse",
-        "description": "Ricerca automaticamente le tecnologie di danno da mischia e a distanza. Aumenta la salute della Longhouse di 750 (max 1)."
-      },
-      {
-        "id": "bondi-forester",
-        "age": 2,
-        "name": "Bondi Forester",
-        "building": "Longhouse",
-        "description": "Ogni Bondi fornisce 10 Legno al minuto, fino a un massimo di 250 Legno al minuto."
-      },
-      {
-        "id": "hamrammr",
-        "age": 2,
-        "name": "Hamrammr",
-        "building": "Barracks",
-        "description": "Berserkergang si attiva al 50% di salute e cura il 50% di salute in più."
-      },
-      {
-        "id": "turnshoes",
-        "age": 2,
-        "name": "Turnshoes",
-        "building": "Barracks",
-        "description": "Aumenta la velocità di movimento della fanteria da mischia del 15% e il danno da carica del 30%."
-      },
-      {
-        "id": "farmathr",
-        "age": 2,
-        "name": "Farmathr",
-        "building": "Market",
-        "description": "Aumenta la salute di Mercanti e Navi Mercantili del 25% e la velocità di movimento del 10%."
-      },
-      {
-        "id": "danevirke",
-        "age": 3,
-        "name": "Danevirke",
-        "building": "Town Center / Valdemar Castle",
-        "description": "Converte le palizzate in mura del Danevirke con +1000 salute e +5 armatura contro il fuoco."
-      },
-      {
-        "id": "ulfberht-swords",
-        "age": 3,
-        "name": "Ulfberht Swords",
-        "building": "Barracks",
-        "description": "Gli Hirdman equipaggiano le spade Ulfberht, aumentando il loro danno di +5."
-      },
-      {
-        "id": "hagl-brodda",
-        "age": 3,
-        "name": "Hagl Brodda",
-        "building": "Archery Range",
-        "description": "Gli Arcieri scagliano una pioggia di frecce quando attaccano, sparando 2 frecce aggiuntive nelle vicinanze."
-      },
-      {
-        "id": "leikr-training",
-        "age": 4,
-        "name": "Leikr Training",
-        "building": "University",
-        "description": "La fanteria da mischia ottiene +15% danni, +20% salute e +0,3 caselle di portata d'attacco."
-      }
-    ],
-    "videos": [],
-    "build_orders": [],
-    "landmarks": [
-      {
-        "id": "town-center",
-        "age": 1,
-        "name": "Centro Città",
-        "type": "Economic",
-        "imageId": "town-center-1",
-        "description": "L'edificio principale della civiltà. Recluta automaticamente Abitanti del villaggio senza costo fino alla Capacità Abitanti (+10 per ogni Longhouse). I pilastri accanto alla capitale mostrano il progresso delle Saghe."
-      },
-      {
-        "id": "baugr-fort",
-        "age": 2,
-        "name": "Baugr Fort",
-        "type": "Military",
-        "imageId": "baugr-fort-1",
-        "description": "Funge da Caserma con tutte le unità e tecnologie. Tutte le Caserme lavorano il 25% più velocemente e le tecnologie della Caserma costano il 15% in meno. Potenzia immediatamente Bondi e Berserker al grado Indurito (Hardened)."
-      },
-      {
-        "id": "konungr-hall",
-        "age": 2,
-        "name": "Konungr Hall",
-        "type": "Economic",
-        "imageId": "konungr-hall-1",
-        "description": "Organizza un banchetto ogni 60 secondi che fornisce 10 Cibo + 5 Cibo per ogni Longhouse. Dispone di una chiamata unica di Shield Maiden e permette di reclutarne fino a 1 + 1 per ogni Longhouse costruita."
-      },
-      {
-        "id": "gullinn-temple",
-        "age": 3,
-        "name": "Gullinn Temple",
-        "type": "Religious",
-        "imageId": "gullinn-temple-2",
-        "description": "Funge da Bosco Sacro (Sacred Grove). Permette alle Völur di stabilire Boschi Sacri anche sui Siti Sacri e sblocca la Saga del Dreki che aumenta del 15% la produzione di Berserker nei Boschi Sacri."
-      },
-      {
-        "id": "valdemar-castle",
-        "age": 3,
-        "name": "Valdemar Castle",
-        "type": "Defensive",
-        "imageId": "valdemar-castle-2",
-        "description": "Funge da Mastio (Keep). Conferisce la tecnologia Danevirke che trasforma le palizzate in mura fortificate (+1000 PS e +5 armatura fuoco). I Jylland Knight forniscono +20 Oro aggiuntivo quando vengono uccisi."
-      },
-      {
-        "id": "kongens-dor-cathedral",
-        "age": 4,
-        "name": "Kongens Dør Cathedral",
-        "type": "Economic",
-        "imageId": "kongens-d-r-cathedral-3",
-        "description": "Funge da Monastero e aumenta la popolazione massima di +10. Possiede un'aura in espansione che riscuote una decima di 12,5 Oro per ogni Longhouse ogni 30 secondi e offre la tecnologia Folkekirken (+10 popolazione)."
-      },
-      {
-        "id": "rikets-nyckel-castle",
-        "age": 4,
-        "name": "Rikets Nyckel Castle",
-        "type": "Defensive",
-        "imageId": "rikets-nyckel-castle-3",
-        "description": "Funge da Mastio che scaglia raffiche di frecce. Aumenta la popolazione massima di +10, riduce del 50% il costo di tutte le tecnologie di grado delle unità e genera 10 Skåne Crossbowmen al completamento."
-      }
-    ],
-    "strengths": [
-      "Crescita Economica Gratuita: Gli abitanti vengono prodotti gratuitamente in automatico dai Centri Città man mano che si costruiscono le Longhouse.",
-      "Fanteria da Mischia Devastante: Bondi con muro di scudi, Berserker con rigenerazione furiosa e Hirdman corazzati dominano gli scontri corpo a corpo e si curano raccogliendo cibo sulla mappa.",
-      "Flessibilità delle Longhouse: Le estensioni delle Longhouse forniscono cibo rapido, oro passivo e ricerche militari automatiche.",
-      "Dominio Navale: Longship (che trasportano truppe e sparano più frecce) e Drakkar (che rallentano le navi nemiche con le reti) rendono la flotta vichinga temibile."
-    ],
-    "weaknesses": [
-      "Assenza di Mura in Pietra: Pur avendo il potenziamento Danevirke per le palizzate, non dispongono di vere mura in pietra contro l'assedio pesante.",
-      "Dipendenza dalle Longhouse: La capacità di abitanti, l'economia passiva e le tecnologie dipendono dalle Longhouse, che sono un bersaglio primario per il nemico.",
-      "Raggio d'Azione Limitato: La forza principale risiede nella fanteria da mischia; gli Skåne Crossbowmen sono economici ma fragili."
-    ]
-  },
-  {
     "id": "orderofthedragon",
     "name": "Ordine del Drago",
     "flag": "/civs/Order of the Dragon.webp",
@@ -3830,6 +3434,570 @@
       "Non hanno mura in pietra senza la \"Spasskaya Tower\" (Landmark età IV)",
       "Dipendenza dalla mappa: se la mappa ha pochi animali o poca foresta, i Rusiani perdono gran parte dei loro bonus iniziali. Un avversario che \"ruba\" le prede ai Rusiani può azzoppare la loro economia.",
       "Microgestione iniziale: per ottenere il massimo, il giocatore deve usare gli scout in modo aggressivo su tutta la mappa fin dai primi secondi, il che richiede molta micro e multitasking."
+    ]
+  },
+  {
+    "id": "vikings",
+    "name": "Vichinghi",
+    "flag": "/civs/Vikings.webp?v=2",
+    "difficulty": "Facile",
+    "short_description": "I Vichinghi sono predoni provenienti dal nord che sopraffacevano i propri nemici grazie a una potente fanteria da mischia in grado di sopravvivere nutrendosi delle risorse dei territori nemici. Le loro “longhouse”, strutture flessibili, consentono loro di far crescere facilmente la popolazione e l'economia. Le saghe e la religione norrena ispirano i loro guerrieri a combattere senza paura per l'onore degli dei.",
+    "passive_bonuses": [
+      "Migrazione del Nord (Northern Migration): I Centri Città reclutano automaticamente Abitanti del villaggio gratuitamente fino alla Capacità Abitanti, che aumenta di +10 per ogni Longhouse costruita.",
+      "Longhouse Versatili: Le Longhouse sostituiscono le case, possono reclutare i Bondi e possono essere potenziate con 4 estensioni: Farmstead (2 campi agricoli con raccolta +50%), Bee Skeps (generano 50 Oro al minuto), Pasture and Loom (ricerca automaticamente le armature) o Smithy (ricerca automaticamente i potenziamenti ai danni).",
+      "Saghe Norrene (Sagas): Le Saghe sono missioni completabili in qualsiasi momento della partita per sbloccare bonus permanenti per l'economia e l'esercito.",
+      "Völur e Boschi Sacri (Sacred Groves): Le Völur viaggiano tra le Longhouse potenziando la produzione di Bee Skeps e Farmstead, oppure possono sacrificarsi su una Reliquia per creare un Bosco Sacro che genera passivamente Berserker e aumenta l'armatura delle unità vicine.",
+      "Vivere della Terra (Living Off The Land): La fanteria militare può curarsi raccogliendo Cibo direttamente dai depositi naturali (cespugli di bacche, cervi o cinghiali).",
+      "Mura del Danevirke: I Vichinghi non possiedono mura in pietra, ma possono potenziare le palizzate in mura del Danevirke (+1000 salute e +5 armatura contro il fuoco).",
+      "Influenza Navale: Costruire Longhouse nell'area di influenza di un Porto riduce il costo delle navi in tutti i Porti del 4% per ogni Longhouse (fino al 16%)."
+    ],
+    "unique_units": [
+      {
+        "id": "berserker",
+        "age": 1,
+        "name": "Berserker",
+        "type": "Infantry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.3,
+          "attack": 8,
+          "health": 90
+        },
+        "imageId": "berserker-1",
+        "strengths": [
+          "Light Units",
+          "High Speed",
+          "Berserkergang Regen"
+        ],
+        "weaknesses": [
+          "Archers",
+          "Heavy Infantry"
+        ],
+        "description": "Fanteria leggera veloce armata di doppia ascia. Quando la salute scende sotto la soglia critica attiva Berserkergang, rigenerando salute e aumentando i danni."
+      },
+      {
+        "id": "bondi",
+        "age": 1,
+        "name": "Bondi",
+        "type": "Infantry",
+        "stats": {
+          "armor": 1,
+          "speed": 1.25,
+          "attack": 7,
+          "health": 90
+        },
+        "imageId": "bondi-1",
+        "strengths": [
+          "Cavalry",
+          "Shield Wall Bonus Health"
+        ],
+        "weaknesses": [
+          "Archers",
+          "Heavy Infantry"
+        ],
+        "description": "Lanciere unico con salute e armatura superiori. Quando più Bondi sono vicini formano un Muro di Scudi (Shield Wall) che aumenta temporaneamente la loro salute."
+      },
+      {
+        "id": "hirdman",
+        "age": 2,
+        "name": "Early Hirdman",
+        "type": "Infantry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.18,
+          "attack": 12,
+          "health": 125
+        },
+        "imageId": "hirdman-2",
+        "strengths": [
+          "Light Infantry",
+          "Archers",
+          "High Armor"
+        ],
+        "weaknesses": [
+          "Crossbowmen",
+          "Knights"
+        ],
+        "description": "Fanteria pesante corazzata disponibile già in Età Feudale con danni e armatura aumentati, ulteriormente potenziabile con le Spade Ulfberht."
+      },
+      {
+        "id": "shield-maiden",
+        "age": 2,
+        "name": "Shield Maiden",
+        "type": "Ranged",
+        "stats": {
+          "armor": 2,
+          "speed": 1,
+          "attack": 8,
+          "health": 100
+        },
+        "imageId": "shield-maiden-2",
+        "strengths": [
+          "Base Defense",
+          "Villager Armor Aura",
+          "Ranged"
+        ],
+        "weaknesses": [
+          "Horsemen"
+        ],
+        "description": "Fanteria pesante a distanza armata di giavellotto, reclutata alla Konungr Hall. Ottiene +2 danni e +25% velocità vicino agli edifici alleati e conferisce +2 armatura agli abitanti vicini."
+      },
+      {
+        "id": "volur",
+        "age": 2,
+        "name": "Völur",
+        "type": "Religious",
+        "stats": {
+          "armor": 0,
+          "speed": 1.12,
+          "attack": 0,
+          "health": 90
+        },
+        "imageId": "volur-2",
+        "strengths": [
+          "Longhouse Boost",
+          "Sacred Groves"
+        ],
+        "weaknesses": [
+          "Combat Units"
+        ],
+        "description": "Unità religiosa di supporto che si sposta tra le Longhouse potenziandone la produzione, oppure può sacrificarsi su una Reliquia per creare un Bosco Sacro che genera Berserker."
+      },
+      {
+        "id": "longship",
+        "age": 2,
+        "name": "Longship",
+        "type": "Ranged",
+        "stats": {
+          "armor": 1,
+          "speed": 1.85,
+          "attack": 6,
+          "health": 300
+        },
+        "imageId": "longship-2",
+        "strengths": [
+          "Naval Raids",
+          "Troop Transport"
+        ],
+        "weaknesses": [
+          "Demolition Ships",
+          "Drakkars"
+        ],
+        "description": "Nave da guerra a remi con arcieri che funge anche da trasporto truppe: ogni unità non-abitante imbarcata aumenta la salute di +30 e aggiunge una freccia extra."
+      },
+      {
+        "id": "drakkar",
+        "age": 2,
+        "name": "Drakkar",
+        "type": "Siege",
+        "stats": {
+          "armor": 3,
+          "speed": 1.5,
+          "attack": 6,
+          "health": 500
+        },
+        "imageId": "drakkar-2",
+        "strengths": [
+          "Enemy Ships",
+          "Net Slow"
+        ],
+        "weaknesses": [
+          "Demolition Ships"
+        ],
+        "description": "Nave drago che sostituisce la nave springalda, armata di lanciatori d'ascia e capace di lanciare reti per rallentare le imbarcazioni nemiche."
+      },
+      {
+        "id": "fishing-knarr",
+        "age": 2,
+        "name": "Fishing Knarr",
+        "type": "Worker",
+        "stats": {
+          "armor": 0,
+          "speed": 1.5,
+          "attack": 0,
+          "health": 100
+        },
+        "imageId": "fishing-knarr-2",
+        "strengths": [
+          "Fishing",
+          "Light Transport"
+        ],
+        "weaknesses": [
+          "Military Ships"
+        ],
+        "description": "Peschereccio vichingo capace sia di raccogliere pesce sia di trasportare un piccolo gruppo di unità terrestri attraverso l'acqua."
+      },
+      {
+        "id": "jylland-knight",
+        "age": 3,
+        "name": "Jylland Knight",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.63,
+          "attack": 22,
+          "health": 200
+        },
+        "imageId": "jylland-knight-3",
+        "strengths": [
+          "Archers",
+          "Infantry",
+          "Gold on Death"
+        ],
+        "weaknesses": [
+          "Spearmen",
+          "Crossbowmen"
+        ],
+        "description": "Cavalleria pesante da mischia più economica rispetto al cavaliere standard; conferisce 10 Oro quando cade in battaglia (30 Oro con il Valdemar Castle)."
+      },
+      {
+        "id": "skane-crossbowmen",
+        "age": 3,
+        "name": "Skåne Crossbowmen",
+        "type": "Ranged",
+        "stats": {
+          "armor": 0,
+          "speed": 1.13,
+          "attack": 9,
+          "health": 75
+        },
+        "imageId": "sk-ne-crossbowmen-3",
+        "strengths": [
+          "Heavy Infantry",
+          "Heavy Cavalry",
+          "Low Cost"
+        ],
+        "weaknesses": [
+          "Horsemen",
+          "Archers"
+        ],
+        "description": "Balestriere economico specializzato nell'abbattere unità pesanti e corazzate."
+      }
+    ],
+    "technologies": [
+      {
+        "id": "farmstead",
+        "age": 1,
+        "name": "Farmstead",
+        "building": "Longhouse",
+        "description": "Trasforma la Longhouse in punto di consegna del Cibo e aggiunge due campi agricoli raccolti il 50% più velocemente delle fattorie (+500 salute alla Longhouse, max 6)."
+      },
+      {
+        "id": "bee-skeps",
+        "age": 1,
+        "name": "Bee Skeps",
+        "building": "Longhouse",
+        "description": "Genera passivamente 50 Oro al minuto e aumenta la salute della Longhouse di 500 (max 6)."
+      },
+      {
+        "id": "pasture-and-loom",
+        "age": 2,
+        "name": "Pasture and Loom",
+        "building": "Longhouse",
+        "description": "Ricerca automaticamente le tecnologie di armatura da mischia e a distanza. Aumenta la salute della Longhouse di 750 (max 1)."
+      },
+      {
+        "id": "smithy",
+        "age": 2,
+        "name": "Smithy",
+        "building": "Longhouse",
+        "description": "Ricerca automaticamente le tecnologie di danno da mischia e a distanza. Aumenta la salute della Longhouse di 750 (max 1)."
+      },
+      {
+        "id": "bondi-forester",
+        "age": 2,
+        "name": "Bondi Forester",
+        "building": "Longhouse",
+        "description": "Ogni Bondi fornisce 10 Legno al minuto, fino a un massimo di 250 Legno al minuto."
+      },
+      {
+        "id": "hamrammr",
+        "age": 2,
+        "name": "Hamrammr",
+        "building": "Barracks",
+        "description": "Berserkergang si attiva al 50% di salute e cura il 50% di salute in più."
+      },
+      {
+        "id": "turnshoes",
+        "age": 2,
+        "name": "Turnshoes",
+        "building": "Barracks",
+        "description": "Aumenta la velocità di movimento della fanteria da mischia del 15% e il danno da carica del 30%."
+      },
+      {
+        "id": "farmathr",
+        "age": 2,
+        "name": "Farmathr",
+        "building": "Market",
+        "description": "Aumenta la salute di Mercanti e Navi Mercantili del 25% e la velocità di movimento del 10%."
+      },
+      {
+        "id": "danevirke",
+        "age": 3,
+        "name": "Danevirke",
+        "building": "Town Center / Valdemar Castle",
+        "description": "Converte le palizzate in mura del Danevirke con +1000 salute e +5 armatura contro il fuoco."
+      },
+      {
+        "id": "ulfberht-swords",
+        "age": 3,
+        "name": "Ulfberht Swords",
+        "building": "Barracks",
+        "description": "Gli Hirdman equipaggiano le spade Ulfberht, aumentando il loro danno di +5."
+      },
+      {
+        "id": "hagl-brodda",
+        "age": 3,
+        "name": "Hagl Brodda",
+        "building": "Archery Range",
+        "description": "Gli Arcieri scagliano una pioggia di frecce quando attaccano, sparando 2 frecce aggiuntive nelle vicinanze."
+      },
+      {
+        "id": "leikr-training",
+        "age": 4,
+        "name": "Leikr Training",
+        "building": "University",
+        "description": "La fanteria da mischia ottiene +15% danni, +20% salute e +0,3 caselle di portata d'attacco."
+      }
+    ],
+    "videos": [],
+    "build_orders": [
+      {
+        "id": "bo-1793367430018",
+        "map": "Dry Arabia",
+        "steps": [
+          {
+            "note": "Non c'è motivo di costruirla troppo lontano.",
+            "time": "[00:00]",
+            "action": "Costruisci immediatamente una long house vicino al tuo centro città."
+          },
+          {
+            "time": "[00:09]",
+            "action": "Invia 2 abitanti sulla legna."
+          },
+          {
+            "note": "I tuoi abitanti non costano cibo, rendendo facile la produzione di bondi. L'obiettivo è mettere pressione, negare oro e pietra all'avversario. Produci 2 bondi iniziali.",
+            "time": "[00:23]",
+            "action": "Inizia a produrre bondi (lancieri) dalla long house."
+          },
+          {
+            "note": "Raccogli cibo sufficiente per produrre i 2 lancieri bondi.",
+            "time": "[01:02]",
+            "action": "Dopo aver inviato 2 abitanti sulla legna, raggruppa i nuovi abitanti sul cibo."
+          },
+          {
+            "note": "Questo serve per completare la saga 'cervo ed economia' (raccogliere 2500 cibo da cervi, cinghiali o pesce costiero) che fornisce agli abitanti un bonus del 10% di velocità di raccolta e +5 capacità di trasporto.",
+            "time": "[01:34]",
+            "action": "Appena produci il secondo lanciere bondi, invia 6 abitanti sul branco di cervi."
+          },
+          {
+            "note": "La ricerca 'tecniche di sopravvivenza' può essere fatta più tardi.",
+            "time": "[02:58]",
+            "action": "Costruisci un mulino. Raccogli 50 legna per costruire un campo minerario."
+          },
+          {
+            "note": "L'economia vichinga è particolare perché gli abitanti sono gratuiti.",
+            "time": "[03:24]",
+            "action": "Quando hai abbastanza legna per 2 lancieri bondi, un mulino e un campo minerario, invia gli abitanti sull'oro e inizia a lavorare per l'avanzamento di età."
+          },
+          {
+            "note": "La distribuzione degli abitanti sarà circa 8 sul cibo, 3 sulla legna, 5 sull'oro. Questo potrebbe sembrare molto oro, ma sarà speso in età feudale.",
+            "time": "[03:51]",
+            "action": "Raggruppa gli abitanti sull'oro fino ad averne 5 in totale."
+          },
+          {
+            "note": "Questo monumento fornisce l'aggiornamento 'indurito' per bondi e berserker, riduce il costo delle tecnologie della caserma del 15% e aumenta la velocità di lavoro delle caserme del 25%.",
+            "time": "[05:19]",
+            "action": "Avanza all'età feudale (età II) costruendo il monumento fortezza di bowerer."
+          },
+          {
+            "note": "Lascia 2 abitanti sul cibo (sufficienti per la produzione di unità), 5 sull'oro, e il resto sulla legna per la costruzione di long house.",
+            "time": "[06:04]",
+            "action": "Sposta 2 abitanti dal cibo alla legna."
+          },
+          {
+            "note": "I vichinghi hanno un limite di abitanti separato dal limite di popolazione generale. Ogni long house aumenta il limite di abitanti di 20. È fondamentale continuare a produrre long house per non essere limitati nella produzione di abitanti.",
+            "time": "[06:58]",
+            "action": "Costruisci una seconda long house per aumentare il limite di abitanti."
+          },
+          {
+            "note": "La distribuzione degli abitanti sarà 5 sull'oro, 6 sulla legna, il resto sul cibo.",
+            "time": "[07:51]",
+            "action": "Raggruppa i nuovi abitanti sulle pecore o sui cervi."
+          },
+          {
+            "note": "Se i tuoi lancieri bondi non stanno attaccando, puoi farli subire danni dal centro città nemico e poi farli curare mangiando le risorse alimentari nemiche (pecore, cervi, bacche) per completare la saga di bjorn (recuperare 1000 punti salute con la fanteria). Questo bonus aumenta la salute della fanteria del 10% e la portata della carica di 2 caselle.",
+            "time": "[08:14]",
+            "action": "Inizia a produrre unità militari dalla fortezza di bowerer."
+          },
+          {
+            "note": "Contro civiltà con cavalleria, produci più lancieri bondi. Altrimenti, inizia con berserker o herdmen per mettere pressione. Puoi raggruppare la fortezza di bowerer e le long house per produrre lancieri bondi da entrambi gli edifici.",
+            "time": "[10:02]",
+            "action": "Inizia a produrre unità militari dalla fortezza di bowerer."
+          },
+          {
+            "note": "I velour possono stabilire boschetti sacri sulle reliquie per produrre berserker gratuitamente.",
+            "time": "[10:49]",
+            "action": "Produci herdmen e velour."
+          },
+          {
+            "note": "Questo è necessario per il limite di abitanti.",
+            "time": "[11:29]",
+            "action": "Costruisci una terza long house."
+          },
+          {
+            "note": "Ogni boschetto sacro produce berserker gratuitamente (circa 69 risorse al minuto). I boschetti sacri aumentano anche l'armatura della fanteria vicina di +1.",
+            "time": "[11:30]",
+            "action": "Produci 3 velour e usali per stabilire 3 boschetti sacri su 3 reliquie."
+          },
+          {
+            "note": "Anche con 5 abitanti sull'oro, sarai in grado di spendere le risorse grazie all'investimento in unità gratuite nel tempo.",
+            "time": "[12:55]",
+            "action": "Continua a costruire long house secondo necessità per il limite di abitanti."
+          },
+          {
+            "note": "Posiziona i boschetti sacri strategicamente, possibilmente vicino alla tua base o in posizioni difendibili.",
+            "time": "[13:30]",
+            "action": "Continua a produrre herdmen e berserker (dai boschetti sacri)."
+          },
+          {
+            "note": "La distribuzione degli abitanti sarà circa 10 sul cibo, 6 sulla legna, il resto sull'oro.",
+            "time": "[15:21]",
+            "action": "Raggruppa i nuovi abitanti sull'oro fino ad averne di più."
+          },
+          {
+            "note": "Questo aggiornamento costa 100 risorse e fornisce entrambi i bonus di armatura. Cerca di avviarlo intorno ai 7 minuti di gioco (tempo originale).",
+            "time": "[15:58]",
+            "action": "Ricerca 'pascolo e telaio' (pasture and loom) per ottenere gli aggiornamenti dell'armatura (mischia e a distanza)."
+          },
+          {
+            "note": "Questo assicura le tue fonti di cibo.",
+            "time": "[16:36]",
+            "action": "Costruisci una torre per difendere le risorse (es. cervi) e un mulino per raccogliere il cibo in sicurezza."
+          },
+          {
+            "note": "Anche questo aggiornamento richiede tempo. Una volta raggiunta l'età dei castelli, questi aggiornamenti passeranno automaticamente al livello successivo.",
+            "time": "[17:00]",
+            "action": "Ricerca 'fucina' (smithy) per ottenere gli aggiornamenti di danno (mischia e a distanza)."
+          },
+          {
+            "note": "La distribuzione degli abitanti dovrebbe essere circa 7 sull'oro, 16 sul cibo, 6 sulla legna.",
+            "time": "[18:37]",
+            "action": "Costruisci una caserma aggiuntiva."
+          },
+          {
+            "note": "Questo aggiornamento aumenta la velocità di movimento della fanteria da mischia del 15% e il danno da carica del 30%. È estremamente potente per un all-in feudale.",
+            "time": "[19:36]",
+            "action": "Se intendi rimanere in età feudale e fare un all-in, ricerca 'scarpe da svolta' (turn shoes) dalla caserma."
+          },
+          {
+            "note": "Il tempio di gulen agisce come un boschetto sacro (produce berserker gratuitamente), permette ai velour di stabilire boschetti sacri sui siti sacri e sblocca la saga di drake che aumenta la produzione di berserker dei boschetti sacri del 50%. Questo è ideale per uno stile di gioco basato sulla fanteria.",
+            "time": "[21:29]",
+            "action": "Per avanzare all'età dei castelli (età III), scegli il monumento tempio di gulen."
+          },
+          {
+            "note": "1) Lasciarli sulle reliquie (sconsigliato per l'esposizione). 2) Distruggere i boschetti sacri sulle reliquie, produrre nuovi velour per catturare i siti sacri, e usare monaci per riportare le reliquie alla tua base. 3) Se non hai controllo della mappa, distruggi i boschetti sacri sulle reliquie, riporta le reliquie alla tua base con i monaci e costruisci nuovi boschetti sacri all'interno della tua base per sicurezza.",
+            "time": "[23:26]",
+            "action": "Considera le opzioni per i boschetti sacri in età dei castelli."
+          },
+          {
+            "note": "Le fattorie (farmstead) raccolgono il 50% più velocemente di una fattoria normale e possono essere potenziate in 2 secondi. Sono efficienti in termini di popolazione e possono essere supervisionate dai velour.",
+            "time": "[25:51]",
+            "action": "Quando le risorse sulla mappa scarseggiano, potenzia le fattorie (farmstead) fino a sei prima di passare alle fattorie tradizionali."
+          },
+          {
+            "note": "Questo fornisce una fonte passiva di oro.",
+            "time": "[27:00]",
+            "action": "Se hai legna in eccesso e non hai bisogno di cibo, costruisci alveari (beekeeps) per generare 50 oro al minuto."
+          },
+          {
+            "note": "Questo è un modo per scalare l'economia in età avanzata, trasformando la tua armata in una fonte di risorse.",
+            "time": "[27:37]",
+            "action": "Contro civiltà con cavalieri, se hai 15-20 lancieri, ricerca l'aggiornamento che fornisce 10 legna al minuto per ogni lanciere (fino a 250 legna al minuto)."
+          }
+        ],
+        "title": "BO semplice per iniziare coi Vichinghi",
+        "source": "https://www.youtube.com/watch?v=Oz9z-US4vzk&t=1080s",
+        "sources": [
+          "https://www.youtube.com/watch?v=Oz9z-US4vzk&t=1080s"
+        ],
+        "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/build-orders/vikings-bo-1793367738673.webp",
+        "difficulty": 1,
+        "author_rank": "Conqueror I",
+        "description": "Questo build order si concentra sull'aggressione precoce con i vichinghi, sfruttando la produzione gratuita di abitanti e le unità uniche della civiltà per mettere pressione sull'avversario fin dalla dark age e dalla feudale. L'obiettivo è negare risorse e completare le saghe per ottenere potenti bonus economici e militari.",
+        "author_nickname": "marcotamby",
+        "banner_position": 16,
+        "banner_position_x": 50
+      }
+    ],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Recluta automaticamente Abitanti del villaggio senza costo fino alla Capacità Abitanti (+10 per ogni Longhouse). I pilastri accanto alla capitale mostrano il progresso delle Saghe."
+      },
+      {
+        "id": "baugr-fort",
+        "age": 2,
+        "name": "Baugr Fort",
+        "type": "Military",
+        "imageId": "baugr-fort-1",
+        "description": "Funge da Caserma con tutte le unità e tecnologie. Tutte le Caserme lavorano il 25% più velocemente e le tecnologie della Caserma costano il 15% in meno. Potenzia immediatamente Bondi e Berserker al grado Indurito (Hardened)."
+      },
+      {
+        "id": "konungr-hall",
+        "age": 2,
+        "name": "Konungr Hall",
+        "type": "Economic",
+        "imageId": "konungr-hall-1",
+        "description": "Organizza un banchetto ogni 60 secondi che fornisce 10 Cibo + 5 Cibo per ogni Longhouse. Dispone di una chiamata unica di Shield Maiden e permette di reclutarne fino a 1 + 1 per ogni Longhouse costruita."
+      },
+      {
+        "id": "gullinn-temple",
+        "age": 3,
+        "name": "Gullinn Temple",
+        "type": "Religious",
+        "imageId": "gullinn-temple-2",
+        "description": "Funge da Bosco Sacro (Sacred Grove). Permette alle Völur di stabilire Boschi Sacri anche sui Siti Sacri e sblocca la Saga del Dreki che aumenta del 15% la produzione di Berserker nei Boschi Sacri."
+      },
+      {
+        "id": "valdemar-castle",
+        "age": 3,
+        "name": "Valdemar Castle",
+        "type": "Defensive",
+        "imageId": "valdemar-castle-2",
+        "description": "Funge da Mastio (Keep). Conferisce la tecnologia Danevirke che trasforma le palizzate in mura fortificate (+1000 PS e +5 armatura fuoco). I Jylland Knight forniscono +20 Oro aggiuntivo quando vengono uccisi."
+      },
+      {
+        "id": "kongens-dor-cathedral",
+        "age": 4,
+        "name": "Kongens Dør Cathedral",
+        "type": "Economic",
+        "imageId": "kongens-d-r-cathedral-3",
+        "description": "Funge da Monastero e aumenta la popolazione massima di +10. Possiede un'aura in espansione che riscuote una decima di 12,5 Oro per ogni Longhouse ogni 30 secondi e offre la tecnologia Folkekirken (+10 popolazione)."
+      },
+      {
+        "id": "rikets-nyckel-castle",
+        "age": 4,
+        "name": "Rikets Nyckel Castle",
+        "type": "Defensive",
+        "imageId": "rikets-nyckel-castle-3",
+        "description": "Funge da Mastio che scaglia raffiche di frecce. Aumenta la popolazione massima di +10, riduce del 50% il costo di tutte le tecnologie di grado delle unità e genera 10 Skåne Crossbowmen al completamento."
+      }
+    ],
+    "strengths": [
+      "Crescita Economica Gratuita: Gli abitanti vengono prodotti gratuitamente in automatico dai Centri Città man mano che si costruiscono le Longhouse.",
+      "Fanteria da Mischia Devastante: Bondi con muro di scudi, Berserker con rigenerazione furiosa e Hirdman corazzati dominano gli scontri corpo a corpo e si curano raccogliendo cibo sulla mappa.",
+      "Flessibilità delle Longhouse: Le estensioni delle Longhouse forniscono cibo rapido, oro passivo e ricerche militari automatiche.",
+      "Dominio Navale: Longship (che trasportano truppe e sparano più frecce) e Drakkar (che rallentano le navi nemiche con le reti) rendono la flotta vichinga temibile."
+    ],
+    "weaknesses": [
+      "Assenza di Mura in Pietra: Pur avendo il potenziamento Danevirke per le palizzate, non dispongono di vere mura in pietra contro l'assedio pesante.",
+      "Dipendenza dalle Longhouse: La capacità di abitanti, l'economia passiva e le tecnologie dipendono dalle Longhouse, che sono un bersaglio primario per il nemico.",
+      "Raggio d'Azione Limitato: La forza principale risiede nella fanteria da mischia; gli Skåne Crossbowmen sono economici ma fragili."
     ]
   },
   {

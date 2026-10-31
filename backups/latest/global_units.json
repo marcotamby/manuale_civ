@@ -1,26 +1,5 @@
 [
   {
-    "id": "spearman",
-    "name": "Spearman",
-    "type": "Infantry",
-    "age": 1,
-    "stats": {
-      "armor": 0,
-      "speed": 1.25,
-      "attack": 7,
-      "health": 80
-    },
-    "strengths": [
-      "Cavalry"
-    ],
-    "weaknesses": [
-      "Archers",
-      "Heavy Infantry"
-    ],
-    "description": "Infantry best used against mounted units.\n+ Anti-cavalry specialist\n+ Additional damage against Elephants\n- Weak against heavy infantry\n- Countered by Archers",
-    "image_id": null
-  },
-  {
     "id": "archer",
     "name": "Archer",
     "type": "Ranged",
@@ -190,6 +169,27 @@
       "Archers"
     ],
     "description": "Powerful all-purpose ranged infantry.\n+ High damage\n- High cost\n- Slow movement speed\n- Countered by Horsemen",
+    "image_id": null
+  },
+  {
+    "id": "spearman",
+    "name": "Spearman",
+    "type": "Infantry",
+    "age": 1,
+    "stats": {
+      "armor": 0,
+      "speed": 1.25,
+      "attack": 7,
+      "health": 80
+    },
+    "strengths": [
+      "Cavalry"
+    ],
+    "weaknesses": [
+      "Archers",
+      "Heavy Infantry"
+    ],
+    "description": "Infantry best used against mounted units.\n+ Anti-cavalry specialist\n+ Additional damage against Elephants\n- Weak against heavy infantry\n- Countered by Archers",
     "image_id": null
   }
 ]
