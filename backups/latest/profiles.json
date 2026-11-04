@@ -1287,6 +1287,27 @@
     ]
   },
   {
+    "email": "giacibocca@hotmail.it",
+    "nickname": "",
+    "rank": "Unranked",
+    "created_at": "2026-11-04T09:07:05.740916+00:00",
+    "updated_at": "2026-11-04T09:07:05.740916+00:00",
+    "role": "user",
+    "is_streamer": false,
+    "can_manage_tournaments": false,
+    "can_manage_civs": false,
+    "can_manage_buildorders": false,
+    "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocLpoY2tRIw8z3O7Q2YeMyt73DRk3XyKWvpH9eWN6axWnx-Q8A=s96-c",
+    "sheep_balance": 100,
+    "aoe4_profile_id": null,
+    "can_view_admin": false,
+    "selected_title": null,
+    "unlocked_titles": [],
+    "selected_avatar_effect": null,
+    "unlocked_avatar_effects": [],
+    "unlocked_services": []
+  },
+  {
     "email": "damage100895@gmail.com",
     "nickname": "",
     "rank": "Unranked",
