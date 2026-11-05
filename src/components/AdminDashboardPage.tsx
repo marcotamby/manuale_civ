@@ -1010,6 +1010,7 @@ export default function AdminDashboardPage() {
       const data = await response.json();
       setBoForm((prev: any) => ({
         ...prev,
+        title: prev.title || data.title || '',
         description: data.description || prev.description,
         steps: data.steps && data.steps.length > 0 ? data.steps : prev.steps
       }));
@@ -5377,7 +5378,7 @@ export default function AdminDashboardPage() {
                               {/* AI Transcription Extraction Box */}
                               <div className="bg-[#0c192c]/50 border-2 border-cyan-500/20 p-6 rounded-3xl space-y-4">
                                 <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] block flex items-center gap-1.5">
-                                  <Sparkles size={14} className="animate-bounce" /> Gemini AI Trascrizione (Analisi Automatica Passaggi)
+                                  <Sparkles size={14} className="animate-bounce" /> Gemini 3.5 AI Trascrizione (Analisi Automatica Passaggi)
                                 </label>
                                 <textarea
                                   value={boManualText}
@@ -5391,7 +5392,7 @@ export default function AdminDashboardPage() {
                                     <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                                       <div className="h-full bg-cyan-400 transition-all duration-300 shadow-[0_0_10px_rgba(6,182,212,0.5)]" style={{ width: `${boAnalysisProgress}%` }}></div>
                                     </div>
-                                    <span className="text-[9px] text-cyan-500 font-black block uppercase tracking-widest">Analisi in corso con Gemini...</span>
+                                    <span className="text-[9px] text-cyan-500 font-black block uppercase tracking-widest">Analisi in corso con Gemini 3.5 AI...</span>
                                   </div>
                                 )}
                                 <div className="flex justify-end">

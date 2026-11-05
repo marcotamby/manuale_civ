@@ -328,6 +328,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
       
       setEditedBO(prev => ({
         ...prev,
+        title: prev.title || data.title || '',
         description: data.description || prev.description,
         steps: data.steps && data.steps.length > 0 ? data.steps : prev.steps
       }));
@@ -701,7 +702,7 @@ export function AdminBOEditorModal({ civ, isOpen, onClose, onSave, boIndex }: Ad
                 {isAnalyzing && (
                   <div className="space-y-2 animate-in fade-in duration-300">
                     <div className="flex justify-between items-end">
-                      <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">Analisi in corso con Gemini 2.5...</span>
+                      <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">Analisi in corso con Gemini 3.5 AI...</span>
                       <span className="text-[10px] font-black text-cyan-400">{Math.round(analysisProgress)}%</span>
                     </div>
                     <div className="h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
