@@ -2930,7 +2930,575 @@
       }
     ],
     "videos": [],
-    "build_orders": [],
+    "build_orders": [
+      {
+        "id": "bo-1793865810205",
+        "map": "Dry Arabia",
+        "steps": [
+          {
+            "note": "Distribuzione: tutti i villi su cibo.",
+            "time": "00:00",
+            "action": "Invia il bestiame (Highland cattle) ai cespugli di bacche e assegna tutti i villi iniziali al cibo."
+          },
+          {
+            "note": "La case-torri aumenta il limite di popolazione di 15 e permette la produzione di bestiame.",
+            "time": "00:30",
+            "action": "Produci un villo dal centro città e invia un villo a costruire una case-torri (tower house) vicino ai cespugli di bacche."
+          },
+          {
+            "note": "Obiettivo: accumulare 50 legna per il campo minerario.",
+            "time": "01:11",
+            "action": "Invia 2 villi alla legna e imposta il punto di raduno del centro città sul cibo."
+          },
+          {
+            "note": "Distribuzione: 3 villi su oro per finanziare la produzione di bestiame.",
+            "time": "01:36",
+            "action": "Appena raggiunta la legna necessaria, costruisci un campo minerario e invia i 2 villi (più quello che ha terminato la case-torri) all'oro."
+          },
+          {
+            "note": "Obiettivo: arrivare a 6 capi di bestiame per massimizzare la rendita di cibo.",
+            "time": "02:01",
+            "action": "Inizia a produrre bestiame dalla case-torri e invialo a pascolare sui cespugli di bacche."
+          },
+          {
+            "note": "Distribuzione: 12 villi su cibo, 3 su oro, resto su legna.",
+            "time": "03:40",
+            "action": "Avvia l'avanzamento all'Età II (Feudale) costruendo il Landmark Stone of Destiny."
+          },
+          {
+            "note": "Distribuzione: 10 villi su legna, 3 su oro, resto su cibo.",
+            "time": "04:50",
+            "action": "Durante l'avanzamento, sposta 10 villi sulla legna."
+          },
+          {
+            "note": "Il posizionamento vicino allo Stone of Destiny garantisce un rimborso del 30% del costo in oro.",
+            "time": "07:45",
+            "action": "Appena raggiunta l'Età II, produci un kirkman e costruisci una stalla e un poligono di tiro all'interno dell'influenza dello Stone of Destiny."
+          },
+          {
+            "note": "Lo stagno ittico aumenta la velocità di raccolta dei villi vicini del 10% e genera oro.",
+            "time": "08:35",
+            "action": "Posiziona il kirkman vicino alla linea di alberi e crea uno stagno ittico monastico."
+          },
+          {
+            "note": "Gli arcieri delle Highlands hanno meno gittata ma infliggono più danni base.",
+            "time": "09:20",
+            "action": "Inizia la produzione costante di cavalieri leggeri (horsemen) e arcieri delle Highlands."
+          },
+          {
+            "note": "Usa l'eccesso di cibo per produrre altro bestiame se non sei sotto pressione.",
+            "time": "10:50",
+            "action": "Bilancia l'economia portando 10 villi su cibo e 16-18 villi su legna, rallyando i nuovi villi sul cibo."
+          },
+          {
+            "note": "Mantieni la produzione di bestiame fino al limite massimo di 9 capi.",
+            "time": "12:50",
+            "action": "Costruisci un fabbro per le tecnologie di potenziamento e continua a massimizzare la produzione di unità."
+          },
+          {
+            "note": "Costruisci edifici di produzione attorno alla sala di raduno per sbloccare bonus aggiuntivi.",
+            "time": "13:10",
+            "action": "Costruisci la sala di raduno (mustering hall) per sbloccare la produzione rapida di unità e le tecnologie uniche."
+          }
+        ],
+        "title": "Build Order Aggressivo Scozzesi: Tower House e Cattle Economy",
+        "source": "https://www.youtube.com/watch?v=m2rgwmCQRcA",
+        "sources": [
+          "https://www.youtube.com/watch?v=m2rgwmCQRcA"
+        ],
+        "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/build-orders/scozzesi-bo-1793865913368.webp",
+        "difficulty": 1,
+        "author_rank": "Conqueror I",
+        "description": "Una strategia aggressiva basata sull'economia del bestiame (Highland cattle) per massimizzare la produzione di unità in Dark Age e Feudale. Sfrutta il Landmark Stone of Destiny per potenziare l'economia tramite i stagni ittici monastici e il rimborso in oro sugli edifici.",
+        "author_nickname": "marcotamby",
+        "banner_position": 6,
+        "banner_position_x": 50
+      },
+      {
+        "id": "bo-sco-ccVjKpIlNutx5DqzpGPM",
+        "map": "Dry Arabia",
+        "steps": [
+          {
+            "note": "Distribuzione: 2 cibo, 3 legna, 0 oro, 0 pietra. Un villo costruisce una casa-torre tra bacche e oro.",
+            "time": "00:00",
+            "action": "Invia 2 villi alle pecore, 3 villi alla legna e posiziona il bestiame delle Highlands sui cespugli di bacche."
+          },
+          {
+            "note": "Distribuzione: 2 cibo, 3 legna, 0 oro, 0 pietra, 2 costruttori.",
+            "time": "00:15",
+            "action": "Invia il prossimo villo prodotto alla casa-torre e porta le pecore vicine al centro città."
+          },
+          {
+            "note": "Distribuzione: 5 cibo, 0 legna, 0 oro, 0 pietra, 2 costruttori.",
+            "time": "00:28",
+            "action": "Una volta ottenute 30 unità di legna, sposta i 3 villi dalla legna alle pecore."
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 0 legna, 0 oro, 0 pietra, 3 costruttori.",
+            "time": "00:42",
+            "action": "Invia il villo appena prodotto a costruire un campo minerario sull'oro."
+          },
+          {
+            "note": "Distribuzione: 8 cibo, 0 legna, 3 oro, 0 pietra.",
+            "time": "01:05",
+            "action": "Sposta i 3 villi costruttori all'oro. Completa un totale di 6 bestiami delle Highlands e imposta il punto di raduno del centro città sulle pecore fino all'avanzamento d'età."
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 9 legna, 3 oro, 5 costruttori.",
+            "time": "03:28",
+            "action": "Seleziona 5 villi per costruire la Stone of Destiny. Sposta tutti i villi che raccoglievano pecore alla legna e imposta il punto di raduno sulla legna."
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 9 legna, 3 oro, 5 costruttori.",
+            "time": "03:45",
+            "action": "Appena raggiunte 200 unità di legna, costruisci una caserma o un poligono di tiro."
+          },
+          {
+            "note": "Distribuzione: 12 cibo, 11 legna, 3 oro.",
+            "time": "04:54",
+            "action": "Imposta il punto di raduno dei 5 villi costruttori sulle pecore. Produci kirkman e costruisci uno stagno ittico monastico vicino alla legna."
+          },
+          {
+            "note": "Distribuzione: 12 cibo, 11 legna, 3 oro.",
+            "time": "05:10",
+            "action": "Costruisci una casa per evitare il blocco abitativo e inizia la produzione di unità militari come i picchieri."
+          },
+          {
+            "note": "Distribuzione: 12 cibo, 11 legna, 0 oro.",
+            "time": "05:25",
+            "action": "Produci un altro kirkman e un secondo stagno ittico monastico vicino ai cervi. Sposta i villi dall'oro a costruire una casa-torre sui cervi."
+          }
+        ],
+        "title": "Build Order Scozzesi per il Rango Conqueror (Swaggy Professor)",
+        "source": "https://www.youtube.com/watch?v=H37JNp7pVBU",
+        "sources": [
+          "https://www.youtube.com/watch?v=H37JNp7pVBU"
+        ],
+        "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/build-orders/scozzesi-bo-1793865913368.webp",
+        "difficulty": 2,
+        "author_rank": "Conqueror III",
+        "description": "Questa build order è ottimizzata per massimizzare l'economia iniziale degli Scozzesi sfruttando il bestiame delle Highlands e le case-torri. L'obiettivo è un passaggio rapido all'Età II per stabilire una presenza militare con kirkman e picchieri, supportata da una solida produzione di cibo tramite stagni ittici monastici.",
+        "author_nickname": "Swaggy Professor",
+        "banner_position": 6,
+        "banner_position_x": 50
+      },
+      {
+        "id": "bo-sco-U91jpn43QhIDpvuoe1bC",
+        "map": "Dry Arabia",
+        "steps": [
+          {
+            "note": "Distribuzione: 3 cibo, 3 legna, 1 costruttore.",
+            "time": "00:00",
+            "action": "Costruisci una casa-torre posizionandola tra l'oro e i cespugli di bacche."
+          },
+          {
+            "note": "Distribuzione: 3 cibo, 3 legna, 2 costruttori.",
+            "time": "00:15",
+            "action": "I primi 2 villi prodotti costruiscono un campo minerario sull'oro e completano la casa-torre, poi passano alla raccolta dell'oro."
+          },
+          {
+            "note": "Distribuzione: 7 cibo, 3 oro.",
+            "time": "01:00",
+            "action": "Una volta accumulata 55 legna, sposta tutti i villi sulle pecore e imposta il punto di raduno del centro città sulle pecore."
+          },
+          {
+            "note": "Distribuzione: 7 cibo, 3 oro. Il bestiame potenzia la raccolta dai cespugli.",
+            "time": "01:30",
+            "action": "Produci 3 unità di bestiame delle Highlands e usa l'esploratore per individuare la posizione del nemico."
+          },
+          {
+            "note": "Distribuzione: 15 cibo, 3 oro.",
+            "time": "02:30",
+            "action": "Inizia la costruzione del monumento Abbey of the Isles con 3 villi per passare alla Feudal Age."
+          },
+          {
+            "note": "Distribuzione: 8 cibo, 5 legna, 3 oro, 3 costruttori.",
+            "time": "03:30",
+            "action": "Continua la produzione di abitanti e bilancia la raccolta per preparare la produzione militare."
+          },
+          {
+            "note": "Distribuzione: 10 cibo, 5 legna, 3 oro, 4 costruttori.",
+            "time": "04:00",
+            "action": "Con 150 legna, costruisci una caserma."
+          },
+          {
+            "note": "Distribuzione: 15 cibo, 5 legna, 3 oro. La reliquia potenzia la velocità di produzione o le statistiche delle unità.",
+            "time": "04:30",
+            "action": "Raggiunta la Feudal Age, produci 10 Gallowglass e attiva l'abilità della reliquia (Stone of Destiny) nella caserma."
+          },
+          {
+            "note": "Distribuzione: 16 cibo, 5 legna, 3 oro. Costruire il fabbro vicino al fronte permette una pressione costante.",
+            "time": "05:15",
+            "action": "Invia 1 villo verso la base nemica per costruire un fabbro in posizione offensiva."
+          },
+          {
+            "note": "Distribuzione: 21 cibo, 5 legna, 1 costruttore.",
+            "time": "06:00",
+            "action": "Quando la miniera d'oro scende sotto le 3.500 unità, sposta 3 villi dall'oro alle pecore."
+          },
+          {
+            "note": "Distribuzione: 23 cibo, 6 legna.",
+            "time": "06:30",
+            "action": "Sposta la reliquia nel fabbro e ricerca immediatamente l'upgrade 'Iron Undermesh' per la corazza."
+          },
+          {
+            "note": "Distribuzione: 24 cibo, 6 legna. Mantieni la pressione costante sugli abitanti nemici.",
+            "time": "07:15",
+            "action": "Con il supporto dei primi 10 soldati, inizia la produzione massiccia di Cateran per l'assalto finale."
+          }
+        ],
+        "title": "Qui arriva Wallace!! (ImpulseGold)",
+        "source": "https://aoe4guides.com/builds/U91jpn43QhIDpvuoe1bC",
+        "sources": [],
+        "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/build-orders/scozzesi-bo-1793865913368.webp",
+        "difficulty": 2,
+        "author_rank": "Platinum I",
+        "description": "Una build aggressiva per gli Scozzesi focalizzata sulla produzione rapida di fanteria e l'uso strategico delle reliquie della Stone of Destiny per potenziare gli edifici militari. L'obiettivo è soffocare l'avversario all'inizio dell'Età Feudale con Cateran e Gallowglass supportati da un fabbro avanzato.",
+        "author_nickname": "ImpulseGold",
+        "banner_position": 6,
+        "banner_position_x": 50
+      },
+      {
+        "id": "bo-sco-UKoPjtsbOrfRwydUySsG",
+        "map": "Open Maps",
+        "steps": [
+          {
+            "note": "Distribuzione: 5 villi sul cibo, 1 villo costruttore. Produci subito il bestiame delle Highlands sui cespugli di bacche.",
+            "time": "00:00",
+            "action": "Costruisci immediatamente una casa-torre sui cespugli di bacche, poi torna a raccogliere dalle pecore."
+          },
+          {
+            "note": "Distribuzione: 5 villi sul cibo, 2 sulla legna, 1 costruttore.",
+            "time": "00:15",
+            "action": "Manda 2 nuovi villi sugli alberi isolati per raccogliere 25 unità di legna, poi spostali sulle pecore."
+          },
+          {
+            "note": "Distribuzione: 7 villi sul cibo, 1 costruttore (che si sposterà sull'oro).",
+            "time": "00:40",
+            "action": "Manda i successivi 3 villi sull'oro e costruisci un campo minerario."
+          },
+          {
+            "note": "Distribuzione: 8 villi sul cibo, 1 sull'oro. Il bestiame potenzia la raccolta delle bacche.",
+            "time": "01:13",
+            "action": "Metti in coda 5 unità di bestiame delle Highlands sui cespugli di bacche."
+          },
+          {
+            "note": "Distribuzione: 8 villi sul cibo, 3 sull'oro.",
+            "time": "01:40",
+            "action": "Manda 3 villi sugli alberi isolati e successivamente costruisci un campo di legname."
+          },
+          {
+            "note": "Sposta gli altri 4 villi dal cibo alla pietra (campo minerario). Sposta i 3 villi dall'oro alla pietra. Distribuzione: 6+ legna, 7 pietra, 4 costruttori.",
+            "time": "03:34",
+            "action": "Inizia il passaggio alla Feudal Age costruendo il monumento Stone of Destiny con 4 villi prelevati dal cibo."
+          },
+          {
+            "note": "Utilizza i villi che hanno terminato il monumento e quelli sulla pietra per massimizzare la velocità di costruzione.",
+            "time": "05:26",
+            "action": "Il passaggio alla Feudal Age è completato. Inizia immediatamente la costruzione del secondo centro città."
+          },
+          {
+            "note": "Tutti i villi coinvolti terminano la costruzione. Inizia la produzione costante di villi da entrambi i centri città.",
+            "time": "05:48",
+            "action": "Il secondo centro città è completato."
+          }
+        ],
+        "title": "Boom di Bestiame in Dark Age - 2 Centri Città (Mango)",
+        "source": "https://aoe4guides.com/builds/UKoPjtsbOrfRwydUySsG",
+        "sources": [],
+        "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/build-orders/scozzesi-bo-1793865913368.webp",
+        "difficulty": 2,
+        "author_rank": "Conqueror III",
+        "description": "Questa build si focalizza sul massimizzare la raccolta dai cespugli di bacche tramite il bestiame delle Highlands per ottenere un secondo centro città rapido intorno al minuto 5:48. L'obiettivo è creare un vantaggio economico schiacciante sfruttando i bonus unici degli Scozzesi.",
+        "author_nickname": "Mango",
+        "banner_position": 6,
+        "banner_position_x": 50
+      },
+      {
+        "id": "bo-sco-wd6bqIzVkNVZNOIRahty",
+        "map": "Dry Arabia",
+        "steps": [
+          {
+            "note": "Distribuzione: 5 cibo, 1 costruttore",
+            "time": "00:00",
+            "action": "Invia 5 abitanti al cibo (pecore) e 1 abitante al bestiame delle Highlands sui cespugli di bacche; costruisci una casa-torre sulle bacche e un campo minerario sull'oro."
+          },
+          {
+            "note": "Distribuzione: 5 cibo, 2 legna, 1 oro",
+            "time": "00:25",
+            "action": "Imposta il punto di raduno del centro città sulla legna; il costruttore rimane sull'oro."
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 2 legna, 1 oro",
+            "time": "01:00",
+            "action": "Coda di produzione per il 2° bestiame delle Highlands dalla casa-torre; imposta il punto di raduno sul cibo."
+          },
+          {
+            "note": "Distribuzione: 7 cibo, 1 legna, 1 oro, 1 costruttore",
+            "time": "01:08",
+            "action": "1 abitante dalla legna costruisce una caserma (saltare se non si subisce un rush in Età I)."
+          },
+          {
+            "note": "Distribuzione: 9 cibo, 1 legna, 2 oro",
+            "time": "01:35",
+            "action": "Coda di produzione per il 3° bestiame delle Highlands; imposta il punto di raduno sull'oro fino ad avere 2 abitanti per mantenere la produzione costante."
+          },
+          {
+            "note": "Distribuzione: 10 cibo, 2 legna, 2 oro",
+            "time": "02:10",
+            "action": "Addestra 1-2 picchieri per proteggere il bestiame delle Highlands sulle bacche; coda di produzione per il 4° bestiame."
+          },
+          {
+            "note": "Distribuzione: 9 cibo, 4 legna, 4 oro",
+            "time": "03:05",
+            "action": "Coda di produzione per il 5° e 6° bestiame delle Highlands; imposta il punto di raduno su legna e oro."
+          },
+          {
+            "note": "Distribuzione: 8 cibo, 5 legna, 6 oro",
+            "time": "04:02",
+            "action": "Con 6/6 bestiame delle Highlands sulle bacche (180 cibo/min), costruisci la 2ª casa-torre sulle bacche successive."
+          },
+          {
+            "note": "Distribuzione: 10 legna, 6 oro, 4 costruttori",
+            "time": "04:20",
+            "action": "Inizia l'avanzamento all'Età Feudale con l'Abbey of the Isles usando 4 abitanti dal cibo; sposta i restanti abitanti dal cibo alla legna."
+          },
+          {
+            "note": "Distribuzione: 8 cibo, 11 legna, 2 costruttori",
+            "time": "04:45",
+            "action": "Sposta tutti i 6 abitanti dall'oro al cibo e alla legna; costruisci un poligono di tiro o una stalla in base all'avversario."
+          },
+          {
+            "note": "Distribuzione: 5 cibo, 12 legna, 5 oro",
+            "time": "06:08",
+            "action": "Età Feudale completata; sbloccato il limite di 13 bestiame delle Highlands. Invia 5 abitanti all'oro, costruisci un mulino e mantieni la coda di produzione del bestiame."
+          },
+          {
+            "note": "Distribuzione: 9 cibo, 14 legna, 5 oro",
+            "time": "06:48",
+            "action": "Ricerca Fermtouns e Pastures al mulino (+20% velocità raccolta); posiziona una reliquia nel poligono di tiro o nella stalla per produzione rapida."
+          },
+          {
+            "note": "Distribuzione: 13 cibo, 11 legna, 4 oro",
+            "time": "08:55",
+            "action": "Raggiunto il limite di 13/13 bestiame delle Highlands (481 cibo/min passivo); massimizza le unità per il controllo mappa e prepara l'Età dei Castelli."
+          },
+          {
+            "note": "Distribuzione: 12 cibo, 12 legna, 3 oro, 11 costruttori",
+            "time": "10:08",
+            "action": "Inizia l'avanzamento all'Età dei Castelli con la Tower of Skye usando 11 abitanti; costruisci un fabbro e una sala di raduno."
+          },
+          {
+            "note": "Distribuzione: 16 cibo, 23 legna",
+            "time": "11:20",
+            "action": "Età dei Castelli completata; addestra altri 4 bestiame delle Highlands dalla Tower of Skye (17 totali = 629 cibo/min). Ricerca Fairy's Protection e transita verso le fattorie."
+          }
+        ],
+        "title": "Corvinus1 1 TC Cattle Boom (Abbey of the Isles) - Scozzesi",
+        "source": "https://www.youtube.com/watch?v=1w1d7Bf-BP8",
+        "sources": [
+          "https://www.youtube.com/watch?v=1w1d7Bf-BP8"
+        ],
+        "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/build-orders/scozzesi-bo-1793865913368.webp",
+        "difficulty": 2,
+        "author_rank": "Conqueror III",
+        "description": "Una strategia di economia passiva basata sul massimizzare la produzione di bestiame delle Highlands per sostenere un boom economico costante. L'obiettivo è raggiungere rapidamente l'Età dei Castelli tramite l'Abbey of the Isles e la Tower of Skye, garantendo una rendita alimentare passiva superiore a 600 cibo/min.",
+        "author_nickname": "Corvinus1",
+        "banner_position": 6,
+        "banner_position_x": 50
+      },
+      {
+        "id": "bo-sco-DdkFFBg7BCiL0fRMQXeE",
+        "map": "Dry Arabia",
+        "steps": [
+          {
+            "note": "Distribuzione: 6 cibo. Assicurati di posizionare il bestiame correttamente per massimizzare la raccolta.",
+            "time": "00:00",
+            "action": "Inizia con 6 villi sul cibo raccogliendo dai cespugli di bacche con il bestiame delle Highlands"
+          },
+          {
+            "note": "I primi 3 villi prodotti andranno all'oro.",
+            "time": "00:15",
+            "action": "Imposta il punto di raduno del centro città sull'oro e costruisci un campo minerario"
+          },
+          {
+            "note": "1 villo rimane sulle pecore per mantenere una produzione costante.",
+            "time": "01:00",
+            "action": "Una volta trovati i cervi, sposta 5 villi su di essi"
+          },
+          {
+            "note": "Distribuzione: 3 oro, il resto al cibo.",
+            "time": "02:00",
+            "action": "Raggiunti i 3 villi sull'oro, sposta il punto di raduno sul cibo"
+          },
+          {
+            "note": "Necessario per evitare il blocco della popolazione.",
+            "time": "02:30",
+            "action": "Manda 1 villo alla legna per costruire una casa"
+          },
+          {
+            "note": "Usa 4 villi per la costruzione. Sposta il punto di raduno sulla legna.",
+            "time": "03:15",
+            "action": "Inizia la costruzione del monumento Stone of Destiny per passare alla Feudal Age (Età II)"
+          },
+          {
+            "note": "Inizia l'accumulo di legna per le strutture religiose e difensive.",
+            "time": "04:00",
+            "action": "Sposta tutti i villi che erano sulle pecore alla legna"
+          },
+          {
+            "note": "I kirkman sono essenziali per la rigenerazione del cibo nello stagno.",
+            "time": "04:30",
+            "action": "Produci 2 kirkman per attivare lo stagno ittico monastico"
+          },
+          {
+            "note": "La casa-torre fornisce protezione e bonus di raccolta nell'area.",
+            "time": "05:00",
+            "action": "Manda 7 villi e 1 kirkman sui cervi e costruisci una casa-torre"
+          },
+          {
+            "note": "Distribuzione: 4 villi sull'oro con protezione della casa-torre, il resto al cibo.",
+            "time": "05:45",
+            "action": "Sposta i villi dagli alberi isolati (straggler trees) al cibo; 4 villi costruiscono una casa-torre sull'oro"
+          },
+          {
+            "note": "Ottimizza il posizionamento per facilitare la gestione dei kirkman.",
+            "time": "06:15",
+            "action": "Posiziona lo stagno ittico monastico tra l'oro e la base"
+          },
+          {
+            "note": "Usa 7 villi per un passaggio rapido.",
+            "time": "07:30",
+            "action": "Inizia la costruzione della Snowdoun Gate per passare alla Castle Age (Età III)"
+          },
+          {
+            "note": "Bilanciamento risorse per la produzione di unità dell'Età III.",
+            "time": "07:45",
+            "action": "Sposta 5 villi dal cibo alla legna e costruisci un campo di legname"
+          },
+          {
+            "note": "Prepara i kirkman per uscire sulla mappa appena scatta l'Età III.",
+            "time": "08:30",
+            "action": "Continua la produzione di kirkman per gli stagni ittici e la raccolta delle reliquie"
+          },
+          {
+            "note": "Priorità assoluta per l'economia a lungo termine e i bonus della civiltà.",
+            "time": "09:30",
+            "action": "Invia i kirkman a raccogliere le reliquie sulla mappa"
+          },
+          {
+            "note": "Usa i border reiver per scortare i kirkman e ottenere il controllo della mappa.",
+            "time": "10:00",
+            "action": "Attiva la sala di raduno (Mustering Hall) per produrre border reiver"
+          },
+          {
+            "note": "Riporta i kirkman agli stagni ittici per massimizzare la produzione di cibo infinita.",
+            "time": "11:00",
+            "action": "Transizione finale: sposta i villi dai cervi esauriti alla legna"
+          }
+        ],
+        "title": "Fast Age 3 & Sala di Raduno (Jeando)",
+        "source": "https://www.youtube.com/watch?v=fZtlXO4XZbU",
+        "sources": [
+          "https://www.youtube.com/watch?v=fZtlXO4XZbU"
+        ],
+        "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/build-orders/scozzesi-bo-1793865913368.webp",
+        "difficulty": 2,
+        "author_rank": "Conqueror III",
+        "description": "Una strategia ottimizzata per raggiungere rapidamente l'Età dei Castelli (Età III) sfruttando i bonus economici unici degli Scozzesi. Si concentra sull'uso dei Kirkman e dello stagno ittico monastico per una transizione veloce verso il controllo della mappa con i Border Reiver.",
+        "author_nickname": "Jeando",
+        "banner_position": 6,
+        "banner_position_x": 50
+      },
+      {
+        "id": "bo-sco-ZDOq0hgMof9iDHZItWg5",
+        "map": "Dry Arabia",
+        "steps": [
+          {
+            "note": "Distribuzione: 6 cibo, 3 oro (9 villi totali)",
+            "time": "00:00",
+            "action": "Invia 5 abitanti al cibo e 1 abitante a gestire il bestiame delle Highlands sui cespugli di bacche; 1 abitante costruisce la casa-torre e il campo minerario sull'oro, mentre altri 2 abitanti si uniscono all'oro."
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 3 legna, 3 oro",
+            "time": "00:20",
+            "action": "Invia 3 abitanti alla legna."
+          },
+          {
+            "note": "Distribuzione: 4 cibo, 3 legna, 3 oro",
+            "time": "01:00",
+            "action": "Imposta il punto di raduno del centro città sul cibo fino all'avanzamento d'età. Produci 5 capi di bestiame delle Highlands dalla casa-torre vicino ai cespugli di bacche senza interrompere la produzione di abitanti."
+          },
+          {
+            "note": "Distribuzione: 9 cibo, 3 oro",
+            "time": "01:30",
+            "action": "Dopo aver accumulato 75 legna, sposta i 3 abitanti dalla legna al cibo e costruisci un mulino sui cervi."
+          },
+          {
+            "note": "Distribuzione: 10 cibo, 3 oro",
+            "time": "01:50",
+            "action": "Sposta 8 abitanti dalle pecore ai cervi e ricerca Tecniche di Sopravvivenza al mulino."
+          },
+          {
+            "note": "Distribuzione: 14 cibo, 1 legna, 6 oro, 2 costruttori",
+            "time": "03:55",
+            "action": "Inizia l'avanzamento all'Età II (Feudale) con l'Abbazia delle Isole usando 2 abitanti dal cibo; al termine della costruzione, inviali alla legna. Sposta 1 abitante dalle pecore alla legna e tutti gli altri all'oro fino a raggiungerne 8."
+          },
+          {
+            "note": "Distribuzione: 15 cibo, 1 legna, 8 oro, 2 costruttori",
+            "time": "04:40",
+            "action": "Imposta il punto di raduno del centro città sul cibo."
+          },
+          {
+            "note": "Distribuzione: 18 cibo, 1 legna, 8 oro, 2 costruttori",
+            "time": "05:45",
+            "action": "Imposta il punto di raduno del centro città su una casa."
+          },
+          {
+            "note": "Distribuzione: 20 cibo, 3 legna, 8 oro",
+            "time": "06:20",
+            "action": "L'Età II è completata."
+          },
+          {
+            "note": "Distribuzione: 20 cibo, 3 legna, 8 costruttori",
+            "time": "06:21",
+            "action": "Inizia l'avanzamento all'Età III (Castelli) con la Torre di Skye usando tutti gli 8 abitanti dall'oro; al termine, riportali all'oro."
+          },
+          {
+            "note": "Distribuzione: 22 cibo, 3 legna, 8 costruttori",
+            "time": "07:15",
+            "action": "Costruisci la sala di raduno."
+          },
+          {
+            "note": "Distribuzione: 23 cibo, 3 legna, 8 oro",
+            "time": "07:35",
+            "action": "L'Età III è completata. Imposta il punto di raduno alla legna e sposta 7 abitanti dal cibo alla legna."
+          },
+          {
+            "note": "Distribuzione: 15 cibo, 13 legna, 8 oro",
+            "time": "08:00",
+            "action": "Raduna 12 Border Reiver dalla sala di raduno e attacca gli abitanti nemici. Sposta 10 abitanti dal cibo alla legna e ricerca Doppia Scure."
+          },
+          {
+            "note": "Distribuzione: 17 cibo, 13 legna, 8 oro",
+            "time": "08:45",
+            "action": "Costruisci una stalla e produci cavalieri senza sosta. Inserisci una reliquia nella stalla per velocizzare la produzione. Successivamente, costruisci un fabbro vicino alla base nemica e posiziona una reliquia al suo interno per curare le unità."
+          }
+        ],
+        "title": "Build Order Border Reiver Aggressivo (Swaggy Professor)",
+        "source": "https://www.youtube.com/watch?v=vRM5B-84laA",
+        "sources": [
+          "https://www.youtube.com/watch?v=vRM5B-84laA"
+        ],
+        "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/build-orders/scozzesi-bo-1793865913368.webp",
+        "difficulty": 2,
+        "author_rank": "Conqueror III",
+        "description": "Una strategia estremamente aggressiva basata sull'utilizzo dei Border Reiver per decimare l'economia nemica. Sfrutta il bestiame delle Highlands per un'economia solida in Età I e un rapido passaggio all'Età III tramite la Torre di Skye per inondare la mappa di unità d'incursione.",
+        "author_nickname": "Swaggy Professor",
+        "banner_position": 6,
+        "banner_position_x": 50
+      }
+    ],
     "landmarks": [
       {
         "id": "town-center",
@@ -3437,6 +4005,350 @@
     ]
   },
   {
+    "id": "ayyubids",
+    "name": "Ayyubidi",
+    "flag": "/civs/Ayyubids.webp",
+    "difficulty": "Medio",
+    "short_description": "La civiltà variante degli Abbasidi. Unità a cammello uniche e numerose scelte per l'age up dalla Casa della Sapienza, che permette di sbloccare potenti bonus dell'Età dell'Oro e di avanzare attraverso le ere. Gli Ayyubidi si concentrano su unità versatili per ottenere un vantaggio tattico sul campo di battaglia.",
+    "passive_bonuses": [
+      "Non usano abitanti per avanzare di epoca. Si scelgono delle \"Ali\" (Economica, Militare, Tecnologica, Culturale) che forniscono bonus immediati (come unità istantanee o risorse) che scalano di potenza in base all'era in cui vengono ricercate.",
+      "I mulini vicino ai cespugli di bacche aumentano la capacità di cibo di +100. Gli abitanti raccolgono bacche il 25% più velocemente.",
+      "Le unità a cammello riducono il danno dei cavalieri nemici vicini del 20%.",
+      "I mercanti vanno molto più veloci (tuttavia portano meno oro).",
+      "Costruendo edifici nell'area di influenza della Casa della Saggezza, si sbloccano bonus speciali (velocità di raccolta, ricerca e produzione), suddivisi in 3 livelli.",
+      "I porti costano il 50% in meno.",
+      "Non possono raccogliere carne dai cinghiali."
+    ],
+    "unique_units": [
+      {
+        "id": "desert-raider",
+        "age": 2,
+        "name": "Desert Raider",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 0,
+          "speed": 1.62,
+          "attack": 10,
+          "health": 120
+        },
+        "imageId": "desert-raider-2",
+        "strengths": [
+          "Light Units"
+        ],
+        "weaknesses": [
+          "Knights"
+        ],
+        "description": "Versatile raider that can switch between melee and ranged."
+      },
+      {
+        "id": "camel-lancer",
+        "age": 3,
+        "name": "Camel Lancer",
+        "type": "Cavalry",
+        "stats": {
+          "armor": 3,
+          "speed": 1.62,
+          "attack": 22,
+          "health": 210
+        },
+        "imageId": "camel-lancer-3",
+        "strengths": [
+          "Cavalry"
+        ],
+        "weaknesses": [
+          "Spearmen"
+        ],
+        "description": "Strong heavy camel cavalry."
+      },
+      {
+        "id": "ghulam-ayyubid",
+        "age": 3,
+        "name": "Ghulam",
+        "type": "Infantry",
+        "stats": {
+          "armor": 4,
+          "speed": 1.12,
+          "attack": 12,
+          "health": 195
+        },
+        "imageId": "ghulam-3",
+        "strengths": [
+          "Light Infantry"
+        ],
+        "weaknesses": [
+          "Knights"
+        ],
+        "description": "Tough infantry with a double-strike attack."
+      },
+      {
+        "id": "manjaniq-ayy",
+        "age": 3,
+        "name": "Manjaniq",
+        "type": "Siege",
+        "stats": {
+          "armor": 0,
+          "speed": 0.75,
+          "attack": 40,
+          "health": 130
+        },
+        "imageId": "mangonel-3",
+        "strengths": [
+          "Massed units"
+        ],
+        "weaknesses": [
+          "Springalds"
+        ],
+        "description": "Improved mangonel variant with unique projectiles."
+      },
+      {
+        "id": "atabeg-ayy",
+        "age": 2,
+        "name": "Atabeg",
+        "type": "Religious",
+        "stats": {
+          "armor": 0,
+          "speed": 1,
+          "attack": 0,
+          "health": 90
+        },
+        "imageId": "monk-1",
+        "strengths": [
+          "Buffing"
+        ],
+        "weaknesses": [
+          "Combat units"
+        ],
+        "description": "Support unit that increases the health of trained units."
+      },
+      {
+        "id": "tower-sultan-ayy",
+        "age": 3,
+        "name": "Tower of the Sultan",
+        "type": "Siege",
+        "stats": {
+          "armor": 0,
+          "speed": 0.5,
+          "attack": 600,
+          "health": 800
+        },
+        "imageId": "https://data.aoe4world.com/images/units/tower-of-the-sultan-3.png",
+        "strengths": [
+          "Buildings",
+          "Tanking"
+        ],
+        "weaknesses": [
+          "Melee"
+        ],
+        "description": "Massive siege tower that transports infantry."
+      }
+    ],
+    "technologies": [],
+    "videos": [
+      "WYleGQJH6CI",
+      "50-nZof-uGM",
+      "cacvDac1U0o",
+      "N7C-EHk-Up8",
+      "sD8GS0fydCA"
+    ],
+    "build_orders": [
+      {
+        "id": "bo-1773601206733",
+        "map": "",
+        "steps": [
+          {
+            "note": "",
+            "time": "00:00",
+            "action": "Tutti gli abitanti costruiscono un mulino e cominciano a raccogliere le bacche, l'esploratore può ora cercare più pecore possibili senza dover tornare a depositarle al centro città dopo poco."
+          },
+          {
+            "note": "",
+            "time": "00:20",
+            "action": "+1 al cibo, mentre va alle bacche, costruisce una casa, la cui influenza deve unire il centro città al mulino. "
+          },
+          {
+            "note": "",
+            "time": "00:40 ",
+            "action": "+2 all'oro"
+          },
+          {
+            "note": "",
+            "time": "1:00",
+            "action": "+1 abitante che costruisce la Casa della Saggezza, poi va all'oro"
+          },
+          {
+            "note": "",
+            "time": "1:20",
+            "action": "+1 oro all'oro, per un totale di 4 all'oro. Il resto al cibo finchè non clicchiamo per la feudale, dove sceglieremo l'Ala Culturale: Logistica."
+          },
+          {
+            "note": "",
+            "time": "2:30",
+            "action": "Una volta cliccato l'avanzamento di età, spostiamo 5 abitanti dal cibo al legno, dovranno prendere 150 di legno per una torre sull'oro e una casa aggiuntiva, poi prenderanno 50 di pietra (senza area mineraria) per potenziare la torre che sta salendo sull'oro.\n\nFatto questo, tornano al cibo. Se la pressione avversaria è troppo soffocante, mettiamo 8 abitanti al legno e costruiamo una scuderia in un posto sicuro vicino al centro città, la combo Delvish + Camel Riders dovrebbe scongiurare il peggio."
+          },
+          {
+            "note": "",
+            "time": "2:50",
+            "action": "+1 oro (5 in totale), il resto al cibo"
+          },
+          {
+            "note": "",
+            "time": "~6:30",
+            "action": "Cercando di non perdere nessun abitante e prendendo meno danni possibili in generale, clicchiamo il prima possibile l'età 3, scegliendo l'Ala Economica: Industria\n\nQuesto ci fornirà 900 di legno e 400 di pietra e bonus alla costruzione. \n\nSe è sicuro, cominciamo a spostare i nostri due dervish vicino a due reliquie diverse, pronti a raccogliere appena saremo in terza.\n\nSe vogliamo fare cammelli pesanti, cominciamo a produrre più abitanti e posizionarli sull'oro, costruiamo una seconda torre sull'oro in caso, mettendo abbastanza abitanti dal cibo al legno per prepararci all'età III.\n"
+          },
+          {
+            "note": "",
+            "time": "8:00",
+            "action": "Arrivati in età III, decidiamo cosa fare:\n\nsicuramente costruiamo una moschea, per ospitare le reliquie che ora è prioritario prendere.\n\nPoi, se stiamo subendo molta pressione, usiamo la pietra per potenziare la/le nostre torri, possiamo fortificarle e munirle di spingarda con i 400 pietra che abbia, se necessario. \n\nPossiamo invece giocare di macro, mettendo giù un secondo centro città (casi isolati, meglio strutture militari)\n\nNel altri casi: \n\n- costruiamo un mercato e vendiamo la pietra\n- costriamo 2-3 scuderie aggiuntive e cominciare a produrre cammellieri pesanti in massa.\n\n- Se l'avversario invece ha molte picche ma non ha cavalieri pesanti: costruisce 2-3 caserme e prediligi i ghoulam\n\n\n- con il legno che stai raccogliendo, costruisci un fabbro!\n\n"
+          },
+          {
+            "note": "",
+            "time": "> 8:00",
+            "action": "La tua età dei castelli deve trovare il tuo avversario in un momento di difficoltà, sfrutta i cammelli pesanti o i ghulam per guadagnare controllo sulla mappa, vai subito in base al tuo avversario e cerca di far danno quanto prima!\n\nMentre lo fai, cerca di prendere tutte e 5 le reliquie e porta i tuoi abitanti fuori nella mappa a prendere cervi od altre risorse utili, aiutandoli con una torre se necessario.\n\nRicordati che le tue unità ferite possono essere curate dai tuoi Dervish!\n\n"
+          },
+          {
+            "note": "",
+            "time": "10:00",
+            "action": "Divertiti!"
+          }
+        ],
+        "title": "FC Dervish + Industry (Età 3 veloce)",
+        "banner_url": "https://static.wikia.nocookie.net/ageofempires/images/6/66/AOE4_CASTLE_AGE_DERVISH.png/revision/latest/scale-to-width-down/1000?cb=20231120162136",
+        "difficulty": 2,
+        "author_rank": "Conqueror I",
+        "description": "Gli ayyubidi sono una civiltà che fa del tempismo la loro arma migliore. \nIn età 3 ottengono molti bonus e unità temibili che, se schierate nel momento corretto, possono facilmente conquistare mappa ed a volte proprio vincere la partita in poco tempo.",
+        "author_nickname": "Sparta",
+        "banner_position": 18
+      }
+    ],
+    "landmarks": [
+      {
+        "id": "town-center",
+        "age": 1,
+        "name": "Centro Città",
+        "type": "Economic",
+        "imageId": "town-center-1",
+        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
+      },
+      {
+        "id": "house-of-wisdom-ay",
+        "age": 1,
+        "name": "House of Wisdom (Costruita in Età I)",
+        "type": "Technology",
+        "imageId": "house-of-wisdom",
+        "description": "Dalla House of Wisdom si scelgono le Ali per avanzare. A differenza degli Abbasidi, le ali forniscono bonus immediati unici tra due scelte per ala."
+      },
+      {
+        "id": "culture-wing-logistics-2",
+        "age": 2,
+        "name": "Ala Culturale (Curatori / Avanzamento)",
+        "type": "Religious",
+        "imageId": "culture-wing",
+        "description": "Scegli tra Dervisci gratuiti (Logistica) o avanzamenti d'età più veloci ed economici (Avanzamento). Disponibile in tutte le età."
+      },
+      {
+        "id": "economic-wing-growth-2",
+        "age": 2,
+        "name": "Ala Economica (Crescita / Industria)",
+        "type": "Economic",
+        "imageId": "economic-wing",
+        "description": "Scegli tra la creazione automatica di abitanti extra (Crescita) o grandi carichi di legno gratuiti (Industria). Disponibile in tutte le età."
+      },
+      {
+        "id": "military-wing-smith-2",
+        "age": 2,
+        "name": "Ala Militare (Fabbri / Rinforzi)",
+        "type": "Military",
+        "imageId": "military-wing",
+        "description": "Scegli tra potenziamenti da Fabbro automatici gratuiti (Maestri Fabbri) o un flusso costante di Desert Raiders gratuiti (Rinforzi). Disponibile in tutte le età."
+      },
+      {
+        "id": "trade-wing-bazaar-2",
+        "age": 2,
+        "name": "Ala Commerciale (Bazar / Consiglieri)",
+        "type": "Economic",
+        "imageId": "trade-wing",
+        "description": "Scegli tra mercanti neutrali che offrono scambi eccellenti (Bazar) o potenti Atabeg che supportano le guarnigioni (Consiglieri). Disponibile in tutte le età."
+      },
+      {
+        "id": "culture-wing-logistics-3",
+        "age": 3,
+        "name": "Ala Culturale (Curatori / Avanzamento)",
+        "type": "Religious",
+        "imageId": "culture-wing",
+        "description": "Ottieni Dervisci (Logistica) o sconti sull'avanzamento d'età (Avanzamento)."
+      },
+      {
+        "id": "economic-wing-growth-3",
+        "age": 3,
+        "name": "Ala Economica (Crescita / Industria)",
+        "type": "Economic",
+        "imageId": "economic-wing",
+        "description": "Abitanti gratuiti extra (Crescita) o legna immediata (Industria)."
+      },
+      {
+        "id": "military-wing-smith-3",
+        "age": 3,
+        "name": "Ala Militare (Fabbri / Rinforzi)",
+        "type": "Military",
+        "imageId": "military-wing",
+        "description": "Upgrades del fabbro gratuiti e istantanei (Maestri Fabbri) o spawn periodico di Desert Raiders d'élite (Rinforzi)."
+      },
+      {
+        "id": "trade-wing-bazaar-3",
+        "age": 3,
+        "name": "Ala Commerciale (Bazar / Consiglieri)",
+        "type": "Economic",
+        "imageId": "trade-wing",
+        "description": "Genera scambi speciali al Bazar (Bazar) o fornisce preziosi Atabeg per potenziare la salute dell'esercito (Consiglieri)."
+      },
+      {
+        "id": "culture-wing-logistics-4",
+        "age": 4,
+        "name": "Ala Culturale (Curatori / Avanzamento)",
+        "type": "Religious",
+        "imageId": "culture-wing",
+        "description": "Dervisci o avanzamento d'età finale."
+      },
+      {
+        "id": "economic-wing-growth-4",
+        "age": 4,
+        "name": "Ala Economica (Crescita / Industria)",
+        "type": "Economic",
+        "imageId": "economic-wing",
+        "description": "Enorme flusso di abitanti rapidi o massiccia iniezione di legno."
+      },
+      {
+        "id": "military-wing-smith-4",
+        "age": 4,
+        "name": "Ala Militare (Fabbri / Rinforzi)",
+        "type": "Military",
+        "imageId": "military-wing",
+        "description": "Garantisce gli ultimi potenziamenti fabbro o grandi spawn di incursori del deserto."
+      },
+      {
+        "id": "trade-wing-bazaar-4",
+        "age": 4,
+        "name": "Ala Commerciale (Bazar / Consiglieri)",
+        "type": "Economic",
+        "imageId": "trade-wing",
+        "description": "Ultimi scambi neutri iper-convenienti o Atabeg supremi."
+      }
+    ],
+    "strengths": [
+      "Fast castle fortissima",
+      "Grazie alle ali della Casa della Sapienza, possono decidere se ricevere un boost economico (abitanti extra), militare (unità subito pronte) o tecnologico, adattandosi alla strategia dell'avversario.",
+      "La fanteria può costruire arieti e altre macchine d'assedio senza dover ricercare la tecnologia specifica. Possiedono inoltre unità d'assedio uniche come il Manjaniq (una variante del mangano con attacco incendiario ad area) e la Torre del Sultano. Anche le unità a cammello possono costruire armi d'assedio dopo essere passati di era con l'ala militare.",
+      "Desert Raider: un'unità su cammello che può passare dalla modalità melee a quella a distanza (arco), eccellente per raidare.",
+      "Ghulam: fanteria pesante (man at arms) molto resistente ed efficace contro la fanteria leggera.",
+      "Derviscio: unità religiosa a cavallo capace di curare le truppe, molto veloce a spostarmi anche quando trasporta reliquie"
+    ],
+    "weaknesses": [
+      "Non possono cacciare cinghiali: l'incapacità di raccogliere cibo dai cinghiali limita le loro opzioni di raccolta di cibo ad alto rendimento sulla mappa",
+      "Dipendenza dalla Casa della Sapienza: se l'avversario riesce a mettere pressione o distruggere l'influenza della Casa della Sapienza, la civiltà perde gran parte dei bonus legati alle Età dell'Oro.",
+      "Unità costose: sebbene potenti, le unità a cammello sono spesso costose in termini di oro e cibo; perderle in scontri sbagliati può essere fatale."
+    ]
+  },
+  {
     "id": "vikings",
     "name": "Vichinghi",
     "flag": "/civs/Vikings.webp?v=2",
@@ -3928,6 +4840,701 @@
         "author_nickname": "marcotamby",
         "banner_position": 16,
         "banner_position_x": 50
+      },
+      {
+        "id": "bo-vik-WiWD5PRXgC5LVHet9Hth",
+        "map": "Open Maps",
+        "steps": [
+          {
+            "note": "Distribuzione: 6 cibo",
+            "time": "00:00",
+            "action": "Invia 6 villi alle pecore e costruisci una longhouse."
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 3 oro",
+            "time": "00:22",
+            "action": "Invia i successivi 3 villi al campo minerario per raccogliere oro."
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 5 legna, 3 oro",
+            "time": "01:28",
+            "action": "Invia i successivi 5 villi alla legna."
+          },
+          {
+            "note": "Distribuzione: 2 cibo, 5 legna, 3 oro, 4 costruttori",
+            "time": "01:55",
+            "action": "Inizia l'avanzamento all'Età II utilizzando 4 villi dalle pecore per costruire il Baugr Fort."
+          },
+          {
+            "note": "Distribuzione: 12 cibo, 5 legna, 3 oro",
+            "time": "02:37",
+            "action": "Costruisci un campo di legname e porta il numero di villi sulle pecore a 12."
+          },
+          {
+            "note": "Distribuzione: 7 cibo, 5 legna, 3 oro",
+            "time": "03:33",
+            "action": "Metti in coda pascolo e telaio e costruisci un bosco sacro sulla reliquia più vicina."
+          },
+          {
+            "note": "Distribuzione: 9 cibo, 5 legna, 3 oro",
+            "time": "04:03",
+            "action": "Aggiungi una seconda longhouse e inizia a produrre Hirdman senza sosta."
+          },
+          {
+            "note": "Distribuzione: 12 cibo, 5 legna, 3 oro",
+            "time": "04:50",
+            "action": "Sposta 5 villi verso i cervi e costruisci un avamposto e un mulino."
+          },
+          {
+            "note": "Distribuzione: 12 cibo, 5 legna, 5 oro",
+            "time": "06:00",
+            "action": "Una volta raggiunti 12 villi sul cibo, sposta il rally point per inviare 8 villi sull'oro."
+          },
+          {
+            "note": "Distribuzione: 12 cibo, 4 legna, 5 oro",
+            "time": "06:10",
+            "action": "Costruisci una caserma."
+          },
+          {
+            "note": "Distribuzione: 12 cibo, 5 legna, 8 oro",
+            "time": "07:00",
+            "action": "Aggiungi altri 2 boschi sacri (limite massimo di 3 totali)."
+          },
+          {
+            "note": "Distribuzione: 12 cibo, 8 legna, 8 oro",
+            "time": "07:10",
+            "action": "Porta il numero di villi sulla legna a 8."
+          }
+        ],
+        "title": "Vichinghi Feudal All-In (Valdemar)",
+        "source": "https://www.youtube.com/watch?v=GR8f06In3Fw",
+        "sources": [
+          "https://www.youtube.com/watch?v=GR8f06In3Fw"
+        ],
+        "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/build-orders/vikings-bo-1793367738673.webp",
+        "difficulty": 2,
+        "author_rank": "Conqueror III",
+        "description": "Questa strategia mira a stabilire una produzione costante di Berserker e Hirdman precoci sfruttando i Boschi Sacri per il potenziamento economico e militare. L'obiettivo è una pressione aggressiva in Età Feudale, con la possibilità di transizione verso l'Età dei Castelli tramite il Tempio di Gullen se la partita non si conclude rapidamente.",
+        "author_nickname": "Valdemar",
+        "banner_position": 16,
+        "banner_position_x": 50
+      },
+      {
+        "id": "bo-vik-X4sYO5c7wMTVqy5HYh9z",
+        "map": "Dry Arabia",
+        "steps": [
+          {
+            "note": "Distribuzione: 5 legna, 1 costruttore",
+            "time": "00:00",
+            "action": "Inizia con 5 villi su legna e 1 villo a costruire una Longhouse; imposta il punto di raduno del centro città sulle pecore."
+          },
+          {
+            "note": "Distribuzione: 4 cibo, 5 oro",
+            "time": "01:00",
+            "action": "Appena raggiunti 200 legna, potenzia la Longhouse con Alveari e sposta 5 villi su oro per raccogliere 50 oro."
+          },
+          {
+            "note": "Distribuzione: 10 cibo",
+            "time": "01:34",
+            "action": "Dopo aver raccolto 50 oro, sposta i villi sulle pecore."
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 6 legna",
+            "time": "02:16",
+            "action": "Appena raggiunti 400 cibo, sposta 6 villi dalle pecore alla legna."
+          },
+          {
+            "note": "Distribuzione: 2 cibo, 7 legna, 4 costruttori",
+            "time": "02:35",
+            "action": "Invia 4 villi dalle pecore a costruire il Baugr Fort."
+          },
+          {
+            "note": "Distribuzione: 0 cibo, 6 legna, 0 oro, 4 pietra, 4 costruttori",
+            "time": "02:40",
+            "action": "Appena ottenuti 50 legna, sposta 3 villi dalle pecore alla pietra, costruisci un campo minerario e imposta il punto di raduno dei nuovi villi su legna."
+          },
+          {
+            "note": "Distribuzione: 8 legna, 4 pietra, 4 costruttori",
+            "time": "04:00",
+            "action": "Assegna 1 villo costruttore alla costruzione di una Longhouse e invia gli altri 3 villi alle pecore tramite shift-click."
+          },
+          {
+            "note": "Distribuzione: 3 cibo, 9 legna, 4 pietra, 1 costruttore",
+            "time": "04:12",
+            "action": "Un villo inizia a costruire una Longhouse, al termine si sposterà sulle pecore."
+          },
+          {
+            "note": "Distribuzione: 4 cibo, 8 legna, 8 costruttori",
+            "time": "05:16",
+            "action": "Con 4 villi su legna e 4 su pietra, inizia la costruzione del secondo centro città sull'oro; mantieni 8 villi su legna e imposta il punto di raduno sulle pecore."
+          },
+          {
+            "note": "Distribuzione: 5 cibo, 8 legna, 8 costruttori",
+            "time": "05:34",
+            "action": "Ricerca il potenziamento Pascolo e Telaio dalla seconda Longhouse."
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 7 legna, 8 costruttori",
+            "time": "06:09",
+            "action": "Sposta 1 villo dalla legna per costruire la terza Longhouse."
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 7 legna, 8 oro, 1 costruttore",
+            "time": "06:11",
+            "action": "Il secondo centro città è completato."
+          },
+          {
+            "note": "Distribuzione: 9 cibo, 8 legna, 8 oro",
+            "time": "06:46",
+            "action": "Ricerca il potenziamento Fabbro dalla terza Longhouse."
+          },
+          {
+            "note": "Distribuzione: 12 cibo, 8 legna, 8 oro, 1 costruttore",
+            "time": "07:33",
+            "action": "Costruisci la prima stalla con 1 villo preso dalle pecore."
+          },
+          {
+            "note": "Distribuzione: 15 cibo, 8 legna, 8 oro, 1 costruttore",
+            "time": "08:04",
+            "action": "Imposta la costruzione della seconda stalla tramite shift-click."
+          },
+          {
+            "note": "Distribuzione: 4 cibo, 8 legna, 8 oro, 12 costruttori",
+            "time": "08:10",
+            "action": "Inizia l'avanzamento all'Età dei Castelli con 12 villi su cibo (Valdemar Castle)."
+          },
+          {
+            "note": "Distribuzione: 13 cibo, 9 legna, 14 oro; costruisci progressivamente nuove Longhouse e un monastero per le reliquie",
+            "time": "09:00",
+            "action": "Raggiunta l'Età dei Castelli con 2 centri città e 2 stalle; imposta il punto di raduno su legna, inizia a produrre cavalieri e attiva il Bosco Sacro."
+          }
+        ],
+        "title": "Vichinghi 2 TC (VortiX)",
+        "source": "https://www.youtube.com/watch?v=Js7ANJ6vm5U",
+        "sources": [
+          "https://www.youtube.com/watch?v=Js7ANJ6vm5U"
+        ],
+        "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/build-orders/vikings-bo-1793367738673.webp",
+        "difficulty": 2,
+        "author_rank": "Conqueror III",
+        "description": "Una strategia economica aggressiva che punta a un rapido secondo centro città per massimizzare la produzione di villi. L'obiettivo è stabilizzare l'economia in Età I per poi transitare verso l'Età dei Castelli con una solida base di stalle e cavalieri.",
+        "author_nickname": "VortiX",
+        "banner_position": 16,
+        "banner_position_x": 50
+      },
+      {
+        "id": "bo-vik-zGUovupZhIJxyqWrAqk5",
+        "map": "Dry Arabia",
+        "steps": [
+          {
+            "note": "Distribuzione: 3 cibo, 2 legna, 1 costruttore.",
+            "time": "00:00",
+            "action": "Costruisci una longhouse con un villo e rimandalo subito a raccogliere cibo."
+          },
+          {
+            "note": "Distribuzione: 8 cibo, 2 legna.",
+            "time": "00:30",
+            "action": "Concentra la produzione di villi sul cibo e addestra 1 o 2 bondi a seconda dell'avversario (salta questo passaggio contro Inglesi)."
+          },
+          {
+            "note": "Distribuzione: 6 villi ai cervi (mulino), 5 villi all'oro (campo minerario), i nuovi villi vanno alla legna.",
+            "time": "01:15",
+            "action": "Raccogli legna sufficiente per costruire un mulino sui cervi e un campo minerario sull'oro."
+          },
+          {
+            "note": "Distribuzione: 4 cibo, 2 legna, 5 oro, 4 costruttori. Aumenta i villi sulla legna fino a 12-14 durante la transizione.",
+            "time": "02:30",
+            "action": "Utilizza 4 villi dai cervi per iniziare la costruzione del baugr per passare alla Feudal Age."
+          },
+          {
+            "note": "La scelta delle unità dipende dalla composizione dell'esercito nemico scoutato.",
+            "time": "04:30",
+            "action": "Una volta in Età Feudale, adatta la produzione militare: hirdman precoce e arcieri contro unità da mischia, oppure cavalieri dello Jylland e arcieri contro unità a distanza."
+          },
+          {
+            "note": "Costruisci prima le case, poi procedi con il potenziamento dell'estensione.",
+            "time": "06:00",
+            "action": "Quando sei in vantaggio, costruisci 2 longhouse e ricerca l'estensione farmstead."
+          },
+          {
+            "note": "Distribuzione ideale: 8 cibo, 15 legna, 5 oro.",
+            "time": "07:30",
+            "action": "Bilancia l'economia per sostenere la produzione militare continua."
+          },
+          {
+            "note": "Tecnologie prioritarie: Ascia a doppia lama, orticoltura e carriola.",
+            "time": "08:00",
+            "action": "Ricerca immediatamente i potenziamenti economici nel mulino e nel campo di legname."
+          },
+          {
+            "note": "Mantieni la pressione militare e continua a scalare con le saghe norrene se possibile.",
+            "time": "09:00",
+            "action": "Prosegui la partita in stile libero adattandoti alle mosse dell'avversario."
+          }
+        ],
+        "title": "Tulilord Viking Push (Filson)",
+        "source": "https://aoe4guides.com/builds/zGUovupZhIJxyqWrAqk5",
+        "sources": [],
+        "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/build-orders/vikings-bo-1793367738673.webp",
+        "difficulty": 2,
+        "author_rank": "Conqueror II",
+        "description": "Una strategia di pressione aggressiva per i Vichinghi che sfrutta un rapido passaggio all'Età Feudale tramite il Baugr. L'obiettivo è stabilire una forte economia basata sulla legna per supportare la produzione militare costante e le estensioni delle longhouse.",
+        "author_nickname": "Filson",
+        "banner_position": 16,
+        "banner_position_x": 50
+      },
+      {
+        "id": "bo-vik-IaV1n6h50nePBYTFO01X",
+        "map": "Dry Arabia",
+        "steps": [
+          {
+            "note": "Distribuzione: 5 cibo, 1 costruttore",
+            "time": "00:00",
+            "action": "Invia tutti i 6 villi iniziali al cibo (pecore); uno di essi costruisce una Longhouse vicino alle bacche."
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 1 legna",
+            "time": "00:30",
+            "action": "Longhouse completata: il costruttore torna alle pecore. Imposta il punto di raccolta del centro città sulla legna per i prossimi 2 villi."
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 2 legna",
+            "time": "01:00",
+            "action": "A 150 cibo, recluta 2 Bondi dalla Longhouse per molestare l'oro, la pietra o le cervi nemiche."
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 2 legna, 1 oro",
+            "time": "01:06",
+            "action": "Imposta il punto di raccolta del centro città sull'oro per i prossimi 2 villi."
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 3 oro, 1 costruttore",
+            "time": "01:30",
+            "action": "A 50 legna, un villo dalla legna costruisce un campo minerario sull'oro; l'altro inizia a estrarre."
+          },
+          {
+            "note": "Distribuzione: 7 cibo, 4 oro",
+            "time": "01:50",
+            "action": "Campo minerario completato: il costruttore inizia a estrarre oro (4 totali). Imposta il punto di raccolta sul cibo."
+          },
+          {
+            "note": "Distribuzione: 7 cibo, 4 legna",
+            "time": "02:10",
+            "action": "A 200 oro, i 4 villi dell'oro si spostano a tagliare legna vicino alla pietra."
+          },
+          {
+            "note": "Distribuzione: 8 cibo, 4 legna",
+            "time": "02:20",
+            "action": "Mantieni 8 villi sul cibo fino a raggiungere 400 cibo e 200 oro per l'avanzamento d'età."
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 5 legna, 2 costruttori",
+            "time": "02:34",
+            "action": "Inizia l'avanzamento all'Età Feudale: 2 villi dal cibo costruiscono la Konungr Hall. Imposta il punto di raccolta sulla legna."
+          },
+          {
+            "note": "Distribuzione: 11 legna, 2 costruttori",
+            "time": "02:40",
+            "action": "Sposta i 6 villi dal cibo alla legna; i villi non costano cibo, quindi interrompi la raccolta."
+          },
+          {
+            "note": "Distribuzione: 7 legna, 3 pietra, 3 costruttori",
+            "time": "02:50",
+            "action": "A 50 legna, un villo costruisce un campo minerario sulla pietra; altri 3 iniziano a estrarre."
+          },
+          {
+            "note": "Distribuzione: 8 legna, 4 pietra, 2 costruttori",
+            "time": "03:10",
+            "action": "Campo minerario completato: il costruttore si unisce alla pietra (4 totali)."
+          },
+          {
+            "note": "Distribuzione: 9 legna, 4 pietra, 3 costruttori",
+            "time": "03:40",
+            "action": "A 50 legna, un villo costruisce un campo di legname."
+          },
+          {
+            "note": "Distribuzione: 11 legna, 4 pietra, 2 costruttori",
+            "time": "04:05",
+            "action": "Campo di legname completato: il costruttore inizia a tagliare legna (11 totali)."
+          },
+          {
+            "note": "Distribuzione: 2 legna, 4 pietra, 11 costruttori",
+            "time": "04:22",
+            "action": "9 villi dalla legna si spostano verso i cervi per costruire il secondo centro città (attendi 400 legna e 300 pietra)."
+          },
+          {
+            "note": "Distribuzione: 6 legna, 4 pietra, 9 costruttori",
+            "time": "04:50",
+            "action": "Età Feudale raggiunta: i 2 costruttori della Konungr Hall si spostano alla legna."
+          },
+          {
+            "note": "Distribuzione: 10 legna, 9 costruttori",
+            "time": "05:00",
+            "action": "A 300 pietra, i 4 villi della pietra si spostano alla legna."
+          },
+          {
+            "note": "Distribuzione: 11 legna, 9 costruttori",
+            "time": "05:10",
+            "action": "A 400 legna, i 9 villi costruiscono il secondo centro città sui cervi."
+          },
+          {
+            "note": "Distribuzione: 8 legna, 12 costruttori",
+            "time": "05:25",
+            "action": "A 150 legna, 3 villi costruiscono una Longhouse; non reclutare nuovi villi finché non è pronta."
+          },
+          {
+            "note": "Distribuzione: 11 legna, 9 costruttori",
+            "time": "05:45",
+            "action": "Longhouse completata: i 3 costruttori tornano alla legna. Mantieni sempre una Longhouse in costruzione."
+          },
+          {
+            "note": "Distribuzione: 10 cibo, 11 legna",
+            "time": "06:00",
+            "action": "Secondo centro città completato: i 9 costruttori iniziano a raccogliere dai cervi. Imposta il punto di raccolta sul cibo in entrambi i centri città."
+          },
+          {
+            "note": "Distribuzione: 13 cibo, 10 legna, 1 costruttore",
+            "time": "06:30",
+            "action": "Un villo dalla legna costruisce una caserma vicino al secondo centro città."
+          },
+          {
+            "note": "Distribuzione: 13 cibo, 11 legna, 2 oro",
+            "time": "06:50",
+            "action": "Caserma completata: il costruttore torna alla legna. Imposta il punto di raccolta sull'oro (punta a 10+ minatori prima dei Castelli)."
+          },
+          {
+            "note": "Distribuzione: 13 cibo, 10 legna, 3 oro, 1 costruttore",
+            "time": "07:00",
+            "action": "Un villo dalla legna costruisce una Longhouse (+10 capacità villi, +1 Shield Maiden)."
+          },
+          {
+            "note": "Distribuzione: 13 cibo, 11 legna, 5 oro",
+            "time": "07:20",
+            "action": "Recluta Bondi dalla caserma e Shield Maiden dalla Konungr Hall per difendere il secondo centro città."
+          },
+          {
+            "note": "Distribuzione: 13 cibo, 10 legna, 8 oro, 1 costruttore",
+            "time": "08:00",
+            "action": "Un villo dalla legna costruisce una Longhouse (pianifica una ogni 2 minuti)."
+          },
+          {
+            "note": "Distribuzione: 13 cibo, 11 legna, 10 oro",
+            "time": "08:20",
+            "action": "Con 10 villi sull'oro, imposta il punto di raccolta sul cibo per accumulare risorse per il Valdemar Castle (1200 cibo, 600 oro)."
+          },
+          {
+            "note": "Distribuzione: 7 cibo, 11 legna, 10 oro, 6 costruttori",
+            "time": "08:21",
+            "action": "Inizia l'avanzamento all'Età dei Castelli: 6 villi dal cibo costruiscono il Valdemar Castle vicino al secondo centro città."
+          },
+          {
+            "note": "Distribuzione: 7 cibo, 26 legna, 10 oro",
+            "time": "10:00",
+            "action": "Età dei Castelli raggiunta: i 6 costruttori si spostano alla legna. Inizia la produzione di balestrieri della Scania e cavalieri dello Jylland."
+          },
+          {
+            "note": "Distribuzione: 7 cibo, 26 legna, 10 oro, 3 costruttori",
+            "time": "10:30",
+            "action": "3 villi dalla legna costruiscono 2 stalle e 3 arcerie per la produzione costante di unità."
+          }
+        ],
+        "title": "Viking TTC Boom (MicroMindGG / Valdemar)",
+        "source": "https://www.youtube.com/watch?v=TtDmif9HJe0",
+        "sources": [
+          "https://www.youtube.com/watch?v=TtDmif9HJe0"
+        ],
+        "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/build-orders/vikings-bo-1793367738673.webp",
+        "difficulty": 2,
+        "author_rank": "Conqueror III",
+        "description": "Una strategia di espansione aggressiva basata sul 2TC Boom dei Vichinghi, sfruttando il reclutamento automatico dei villi e la capacità di costruzione delle Longhouse. L'obiettivo è raggiungere l'Età dei Castelli intorno al minuto 10:00, mantenendo una produzione costante di unità militari per proteggere l'economia.",
+        "author_nickname": "Valdemar (via MicroMindGG)",
+        "banner_position": 16,
+        "banner_position_x": 50
+      },
+      {
+        "id": "bo-vik-svQMPDHZBTWGdS0voCRH",
+        "map": "Dry Arabia",
+        "steps": [
+          {
+            "note": "Distribuzione: 5 legna, 1 costruttore (6 villi totali)",
+            "time": "00:00",
+            "action": "Costruire una longhouse e spostare i villi verso il secondo bosco disponibile."
+          },
+          {
+            "note": "Distribuzione: 1 cibo, 8 legna",
+            "time": "01:00",
+            "action": "Spostare i villi su cibo dopo aver raggiunto 8 unità su legna; al raggiungimento di 200 legna, potenziare la longhouse con gli alveari."
+          },
+          {
+            "note": "Distribuzione: 1 cibo, 8 legna, 1 oro",
+            "time": "01:18",
+            "action": "Con i primi 50 legna ottenuti dopo il potenziamento, costruire un campo minerario sull'oro."
+          },
+          {
+            "note": "Distribuzione: 7 cibo, 1 oro (più villi in transizione)",
+            "time": "01:35",
+            "action": "Con i successivi 50 legna, costruire un mulino in una posizione strategica per preparare la ricerca della Carriola; spostare i villi dal legname al cibo una volta terminato il secondo bosco."
+          },
+          {
+            "note": "Distribuzione: 8 cibo, 3 oro",
+            "time": "02:05",
+            "action": "Avviare la ricerca della Carriola."
+          },
+          {
+            "note": "Distribuzione: 8 cibo, legna variabile, 5 oro",
+            "time": "02:45",
+            "action": "Iniziare a spostare nuovi villi sulla legna per preparare la produzione di unità militari."
+          },
+          {
+            "note": "Distribuzione: 8 cibo, 1 legna, 5 oro",
+            "time": "03:00",
+            "action": "Accumulare le risorse necessarie per l'avanzamento d'età; la Carriola è quasi completata e gli alveari forniscono il bonus di abitanti extra."
+          }
+        ],
+        "title": "Build Order: Alveari e Carriola in Dark Age (Sofianosss)",
+        "source": "https://aoe4guides.com/builds/svQMPDHZBTWGdS0voCRH",
+        "sources": [],
+        "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/build-orders/vikings-bo-1793367738673.webp",
+        "difficulty": 2,
+        "author_rank": "Unranked",
+        "description": "Questa strategia si concentra sull'ottenimento rapido degli alveari (bee skeps) durante l'Età I per massimizzare la produzione di abitanti, sfruttando il bonus di reclutamento automatico dei Vichinghi. L'obiettivo è accelerare l'economia tramite la ricerca della Carriola prima di avanzare all'Età II, garantendo una transizione fluida verso la caccia ai cervi o al cinghiale.",
+        "author_nickname": "Sofianosss",
+        "banner_position": 16,
+        "banner_position_x": 50
+      },
+      {
+        "id": "bo-vik-f1cGuEvTi40uJGCon8KI",
+        "map": "Dry Arabia",
+        "steps": [
+          {
+            "note": "Distribuzione: 6 cibo",
+            "time": "00:00",
+            "action": "Invia 6 villi alle pecore vicino al Centro Città e usa lo Scout per trovare pecore aggiuntive."
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 1 oro",
+            "time": "00:22",
+            "action": "Il primo villo prodotto costruisce un campo minerario sull'oro e inizia a estrarre."
+          },
+          {
+            "note": "Distribuzione: 5 cibo, 3 oro, 1 costruttore",
+            "time": "01:06",
+            "action": "Invia i successivi 2 villi all'oro. Un villo dalle pecore costruisce una Longhouse lontano dalla linea di alberi."
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 1 legna, 3 oro",
+            "time": "01:28",
+            "action": "Invia i nuovi villi agli alberi isolati (Straggler Trees) senza costruire un campo di legname; deposita la legna direttamente al Centro Città."
+          },
+          {
+            "note": "Distribuzione: 9 legna",
+            "time": "01:50",
+            "action": "Quando l'oro scende a 3.900, sposta i 3 villi dall'oro agli alberi isolati. Forza il deposito del cibo dai villi alle pecore."
+          },
+          {
+            "note": "Distribuzione: 9 legna, 2 costruttori",
+            "time": "02:00",
+            "action": "Inizia l'avanzamento all'Età II costruendo la Konungr Hall (o Baugr Fort) con 2 villi. Gli altri 4 villi vanno alla legna."
+          },
+          {
+            "note": "Distribuzione: 6 legna, 4 pietra, 2 costruttori",
+            "time": "02:12",
+            "action": "Se sotto pressione, sposta 3 villi dalla legna alla pietra e costruisci un campo minerario."
+          },
+          {
+            "note": "Distribuzione: 6 legna, 5 pietra, 2 costruttori",
+            "time": "02:34",
+            "action": "Invia il 13° villo alla pietra. I nuovi villi vanno agli alberi isolati."
+          },
+          {
+            "note": "Distribuzione: 8 legna, 5 pietra, 2 costruttori",
+            "time": "03:18",
+            "action": "Invia i nuovi villi ad aiutare nella costruzione della Konungr Hall."
+          },
+          {
+            "note": "Distribuzione: 6 legna, 5 pietra, 5 costruttori",
+            "time": "03:40",
+            "action": "Invia altri 2 villi dalla legna alla costruzione della Konungr Hall per completarla non appena la pietra è pronta."
+          },
+          {
+            "note": "Distribuzione: 9 legna, 5 pietra, 3 costruttori",
+            "time": "04:15",
+            "action": "Età II raggiunta. Sposta i villi dalla legna isolata alla linea di alberi principale."
+          },
+          {
+            "note": "Distribuzione: 9 legna, 8 costruttori",
+            "time": "04:18",
+            "action": "Forza il deposito della pietra e costruisci il secondo Centro Città sulla linea di alberi principale con 8 villi."
+          },
+          {
+            "note": "Distribuzione: 18 legna, 1 costruttore",
+            "time": "04:55",
+            "action": "Secondo Centro Città completato. Costruisci immediatamente 2 Longhouse per evitare il cap di popolazione."
+          },
+          {
+            "note": "Distribuzione: 20 legna",
+            "time": "05:00",
+            "action": "Focus totale sulla legna. Espandi con ulteriori Longhouse e Alveari (Bee Skeps) per l'oro passivo."
+          }
+        ],
+        "title": "Vichinghi: Strategia 2 Centri Città e Baugr (Swaggy Professor)",
+        "source": "https://www.youtube.com/watch?v=3AqIiuRbd_w",
+        "sources": [
+          "https://www.youtube.com/watch?v=3AqIiuRbd_w"
+        ],
+        "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/build-orders/vikings-bo-1793367738673.webp",
+        "difficulty": 2,
+        "author_rank": "Conqueror III",
+        "description": "Una build order aggressiva focalizzata sull'economia rapida tramite il posizionamento di un secondo Centro Città precoce. Sfrutta il reclutamento automatico dei villi e l'efficienza delle Longhouse per scalare rapidamente in Età II.",
+        "author_nickname": "Swaggy Professor",
+        "banner_position": 16,
+        "banner_position_x": 50
+      },
+      {
+        "id": "bo-vik-xrXUig3REtxZKRSKXNIt",
+        "map": "Dry Arabia",
+        "steps": [
+          {
+            "note": "Distribuzione: 0 cibo, 5 legna, 0 oro, 0 pietra.",
+            "time": "00:00",
+            "action": "Invia 5 villi alla legna e costruisci una Longhouse."
+          },
+          {
+            "note": "Distribuzione: 0 cibo, 5 legna, 0 oro, 0 pietra.",
+            "time": "00:15",
+            "action": "Imposta il punto di raccolta del centro città sulla legna e costruisci gli alveari (bee skeps)."
+          },
+          {
+            "note": "Distribuzione: 0 cibo, 5 legna, 0 oro, 0 pietra.",
+            "time": "00:30",
+            "action": "Costruisci un campo di legname."
+          },
+          {
+            "note": "Distribuzione: X cibo, 5 legna, 0 oro, 0 pietra.",
+            "time": "01:00",
+            "action": "Una volta terminati gli alberi isolati vicino al centro città, mantieni 5 villi alla legna e sposta i restanti sul cibo."
+          },
+          {
+            "note": "Distribuzione: X cibo, 5 legna, 0 oro, 0 pietra.",
+            "time": "01:30",
+            "action": "Dalla Longhouse, costruisci ulteriori alveari (bee skeps)."
+          },
+          {
+            "note": "Distribuzione: X cibo, 5 legna, 0 oro, 0 pietra (4 villi impegnati nella costruzione).",
+            "time": "02:00",
+            "action": "Assegna 4 villi alla costruzione della Konungr Hall."
+          },
+          {
+            "note": "Distribuzione: 0 cibo, X legna, 0 oro, 0 pietra.",
+            "time": "02:30",
+            "action": "Invia tutti i villi alla legna per accumulare risorse necessarie a costruire 4 Longhouse con relativi alveari."
+          },
+          {
+            "note": "Distribuzione: Bilanciata per transizione Età II.",
+            "time": "05:00",
+            "action": "Ricerca l'aggiornamento 'Doppia scure' (Double Broadax) per migliorare l'efficienza di raccolta della legna."
+          },
+          {
+            "note": "Distribuzione: Variabile in base alla necessità di oro e cibo per l'avanzamento.",
+            "time": "08:00",
+            "action": "Sposta i villi verso le risorse necessarie per il passaggio all'Età III (Castelli)."
+          }
+        ],
+        "title": "Build Order Vichinghi: Longhouse e Alveari (Jeando)",
+        "source": "https://www.youtube.com/watch?v=AtT1-omY8Ys",
+        "sources": [
+          "https://www.youtube.com/watch?v=AtT1-omY8Ys"
+        ],
+        "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/build-orders/vikings-bo-1793367738673.webp",
+        "difficulty": 2,
+        "author_rank": "Conqueror III",
+        "description": "Questa strategia si focalizza sull'ottimizzazione economica iniziale tramite le Longhouse e gli alveari (bee skeps) per massimizzare la raccolta di legna e cibo. L'obiettivo è stabilire una solida base produttiva in Età I per sostenere una transizione rapida e un'economia resiliente.",
+        "author_nickname": "Jeando",
+        "banner_position": 16,
+        "banner_position_x": 50
+      },
+      {
+        "id": "bo-vik-iwsk3L0UqUcRrOt4pKML",
+        "map": "Dry Arabia",
+        "steps": [
+          {
+            "note": "Distribuzione: 5 cibo, 1 costruttore (6 villi totali)",
+            "time": "00:00",
+            "action": "Assegna 5 villi alle pecore e usa 1 villo per costruire una longhouse"
+          },
+          {
+            "note": "L'obiettivo è rallentare il passaggio di età o la raccolta di risorse critiche del nemico.",
+            "time": "00:10",
+            "action": "Metti in coda 2 bondi e inviali a disturbare l'avversario (oro, pietra o cervi)"
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 1 legna",
+            "time": "00:22",
+            "action": "Manda i nuovi villi prodotti alla legna"
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 2 legna, 1 oro (transizione verso 4 villi sull'oro)",
+            "time": "01:06",
+            "action": "Manda 2 nuovi villi all'oro e costruisci un campo minerario. Appena hai abbastanza legna, sposta anche i 2 villi della legna sull'oro"
+          },
+          {
+            "note": "Distribuzione: 6 cibo, 4 oro",
+            "time": "01:30",
+            "action": "Completa la costruzione del campo minerario"
+          },
+          {
+            "note": "Distribuzione: 7 cibo, 4 oro",
+            "time": "01:50",
+            "action": "Manda tutti i nuovi villi al cibo fino al passaggio di età"
+          },
+          {
+            "note": "Preparazione per il secondo Centro Città.",
+            "time": "02:15",
+            "action": "Sposta i villi dall'oro alla pietra non appena accumuli 200 oro"
+          },
+          {
+            "note": "Distribuzione: 1 cibo, 5 legna, 4 pietra",
+            "time": "02:30",
+            "action": "Inizia il passaggio all'Età Feudale (Età II) costruendo la Sala del Re (Konungr Hall) con 2-3 villi"
+          },
+          {
+            "note": "Distribuzione: 7 legna, 4 pietra",
+            "time": "03:45",
+            "action": "Costruisci un campo minerario sulla pietra e sposta la macro sulla legna. Tutti i nuovi villi vanno alla legna"
+          },
+          {
+            "note": "Distribuzione: 3 legna, 4 pietra, 9 costruttori",
+            "time": "04:30",
+            "action": "Sposta 9 villi dalla legna per andare a costruire il secondo Centro Città (TC) vicino a una fonte di cibo (cervi)"
+          },
+          {
+            "note": "Distribuzione: 4 cibo, 8 legna, 9 costruttori",
+            "time": "05:00",
+            "action": "Inizia la costruzione del secondo Centro Città"
+          },
+          {
+            "note": "Distribuzione: 2 cibo, 10 legna, 9 costruttori",
+            "time": "05:25",
+            "action": "Costruisci immediatamente una longhouse non appena possibile"
+          },
+          {
+            "note": "Punta a raggiungere l'Età III entro il decimo minuto per stabilizzare il vantaggio economico.",
+            "time": "10:00",
+            "action": "Produci unità militari per difenderti o pressare e passa all'Età dei Castelli (Età III)"
+          }
+        ],
+        "title": "Strategia Valdemar Castle (Valdemar)",
+        "source": "https://www.youtube.com/watch?v=TtDmif9HJe0",
+        "sources": [
+          "https://www.youtube.com/watch?v=TtDmif9HJe0"
+        ],
+        "banner_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/build-orders/vikings-bo-1793367738673.webp",
+        "difficulty": 2,
+        "author_rank": "Conqueror III",
+        "description": "Una build aggressiva per i Vichinghi che utilizza 2 bondi precoci per disturbare l'economia avversaria, seguita da una rapida transizione a 2 Centri Città e un passaggio veloce all'Età dei Castelli (Età III) intorno al minuto 10:00.",
+        "author_nickname": "Valdemar",
+        "banner_position": 16,
+        "banner_position_x": 50
       }
     ],
     "landmarks": [
@@ -3998,350 +5605,6 @@
       "Assenza di Mura in Pietra: Pur avendo il potenziamento Danevirke per le palizzate, non dispongono di vere mura in pietra contro l'assedio pesante.",
       "Dipendenza dalle Longhouse: La capacità di abitanti, l'economia passiva e le tecnologie dipendono dalle Longhouse, che sono un bersaglio primario per il nemico.",
       "Raggio d'Azione Limitato: La forza principale risiede nella fanteria da mischia; gli Skåne Crossbowmen sono economici ma fragili."
-    ]
-  },
-  {
-    "id": "ayyubids",
-    "name": "Ayyubidi",
-    "flag": "/civs/Ayyubids.webp",
-    "difficulty": "Medio",
-    "short_description": "La civiltà variante degli Abbasidi. Unità a cammello uniche e numerose scelte per l'age up dalla Casa della Sapienza, che permette di sbloccare potenti bonus dell'Età dell'Oro e di avanzare attraverso le ere. Gli Ayyubidi si concentrano su unità versatili per ottenere un vantaggio tattico sul campo di battaglia.",
-    "passive_bonuses": [
-      "Non usano abitanti per avanzare di epoca. Si scelgono delle \"Ali\" (Economica, Militare, Tecnologica, Culturale) che forniscono bonus immediati (come unità istantanee o risorse) che scalano di potenza in base all'era in cui vengono ricercate.",
-      "I mulini vicino ai cespugli di bacche aumentano la capacità di cibo di +100. Gli abitanti raccolgono bacche il 25% più velocemente.",
-      "Le unità a cammello riducono il danno dei cavalieri nemici vicini del 20%.",
-      "I mercanti vanno molto più veloci (tuttavia portano meno oro).",
-      "Costruendo edifici nell'area di influenza della Casa della Saggezza, si sbloccano bonus speciali (velocità di raccolta, ricerca e produzione), suddivisi in 3 livelli.",
-      "I porti costano il 50% in meno.",
-      "Non possono raccogliere carne dai cinghiali."
-    ],
-    "unique_units": [
-      {
-        "id": "desert-raider",
-        "age": 2,
-        "name": "Desert Raider",
-        "type": "Cavalry",
-        "stats": {
-          "armor": 0,
-          "speed": 1.62,
-          "attack": 10,
-          "health": 120
-        },
-        "imageId": "desert-raider-2",
-        "strengths": [
-          "Light Units"
-        ],
-        "weaknesses": [
-          "Knights"
-        ],
-        "description": "Versatile raider that can switch between melee and ranged."
-      },
-      {
-        "id": "camel-lancer",
-        "age": 3,
-        "name": "Camel Lancer",
-        "type": "Cavalry",
-        "stats": {
-          "armor": 3,
-          "speed": 1.62,
-          "attack": 22,
-          "health": 210
-        },
-        "imageId": "camel-lancer-3",
-        "strengths": [
-          "Cavalry"
-        ],
-        "weaknesses": [
-          "Spearmen"
-        ],
-        "description": "Strong heavy camel cavalry."
-      },
-      {
-        "id": "ghulam-ayyubid",
-        "age": 3,
-        "name": "Ghulam",
-        "type": "Infantry",
-        "stats": {
-          "armor": 4,
-          "speed": 1.12,
-          "attack": 12,
-          "health": 195
-        },
-        "imageId": "ghulam-3",
-        "strengths": [
-          "Light Infantry"
-        ],
-        "weaknesses": [
-          "Knights"
-        ],
-        "description": "Tough infantry with a double-strike attack."
-      },
-      {
-        "id": "manjaniq-ayy",
-        "age": 3,
-        "name": "Manjaniq",
-        "type": "Siege",
-        "stats": {
-          "armor": 0,
-          "speed": 0.75,
-          "attack": 40,
-          "health": 130
-        },
-        "imageId": "mangonel-3",
-        "strengths": [
-          "Massed units"
-        ],
-        "weaknesses": [
-          "Springalds"
-        ],
-        "description": "Improved mangonel variant with unique projectiles."
-      },
-      {
-        "id": "atabeg-ayy",
-        "age": 2,
-        "name": "Atabeg",
-        "type": "Religious",
-        "stats": {
-          "armor": 0,
-          "speed": 1,
-          "attack": 0,
-          "health": 90
-        },
-        "imageId": "monk-1",
-        "strengths": [
-          "Buffing"
-        ],
-        "weaknesses": [
-          "Combat units"
-        ],
-        "description": "Support unit that increases the health of trained units."
-      },
-      {
-        "id": "tower-sultan-ayy",
-        "age": 3,
-        "name": "Tower of the Sultan",
-        "type": "Siege",
-        "stats": {
-          "armor": 0,
-          "speed": 0.5,
-          "attack": 600,
-          "health": 800
-        },
-        "imageId": "https://data.aoe4world.com/images/units/tower-of-the-sultan-3.png",
-        "strengths": [
-          "Buildings",
-          "Tanking"
-        ],
-        "weaknesses": [
-          "Melee"
-        ],
-        "description": "Massive siege tower that transports infantry."
-      }
-    ],
-    "technologies": [],
-    "videos": [
-      "WYleGQJH6CI",
-      "50-nZof-uGM",
-      "cacvDac1U0o",
-      "N7C-EHk-Up8",
-      "sD8GS0fydCA"
-    ],
-    "build_orders": [
-      {
-        "id": "bo-1773601206733",
-        "map": "",
-        "steps": [
-          {
-            "note": "",
-            "time": "00:00",
-            "action": "Tutti gli abitanti costruiscono un mulino e cominciano a raccogliere le bacche, l'esploratore può ora cercare più pecore possibili senza dover tornare a depositarle al centro città dopo poco."
-          },
-          {
-            "note": "",
-            "time": "00:20",
-            "action": "+1 al cibo, mentre va alle bacche, costruisce una casa, la cui influenza deve unire il centro città al mulino. "
-          },
-          {
-            "note": "",
-            "time": "00:40 ",
-            "action": "+2 all'oro"
-          },
-          {
-            "note": "",
-            "time": "1:00",
-            "action": "+1 abitante che costruisce la Casa della Saggezza, poi va all'oro"
-          },
-          {
-            "note": "",
-            "time": "1:20",
-            "action": "+1 oro all'oro, per un totale di 4 all'oro. Il resto al cibo finchè non clicchiamo per la feudale, dove sceglieremo l'Ala Culturale: Logistica."
-          },
-          {
-            "note": "",
-            "time": "2:30",
-            "action": "Una volta cliccato l'avanzamento di età, spostiamo 5 abitanti dal cibo al legno, dovranno prendere 150 di legno per una torre sull'oro e una casa aggiuntiva, poi prenderanno 50 di pietra (senza area mineraria) per potenziare la torre che sta salendo sull'oro.\n\nFatto questo, tornano al cibo. Se la pressione avversaria è troppo soffocante, mettiamo 8 abitanti al legno e costruiamo una scuderia in un posto sicuro vicino al centro città, la combo Delvish + Camel Riders dovrebbe scongiurare il peggio."
-          },
-          {
-            "note": "",
-            "time": "2:50",
-            "action": "+1 oro (5 in totale), il resto al cibo"
-          },
-          {
-            "note": "",
-            "time": "~6:30",
-            "action": "Cercando di non perdere nessun abitante e prendendo meno danni possibili in generale, clicchiamo il prima possibile l'età 3, scegliendo l'Ala Economica: Industria\n\nQuesto ci fornirà 900 di legno e 400 di pietra e bonus alla costruzione. \n\nSe è sicuro, cominciamo a spostare i nostri due dervish vicino a due reliquie diverse, pronti a raccogliere appena saremo in terza.\n\nSe vogliamo fare cammelli pesanti, cominciamo a produrre più abitanti e posizionarli sull'oro, costruiamo una seconda torre sull'oro in caso, mettendo abbastanza abitanti dal cibo al legno per prepararci all'età III.\n"
-          },
-          {
-            "note": "",
-            "time": "8:00",
-            "action": "Arrivati in età III, decidiamo cosa fare:\n\nsicuramente costruiamo una moschea, per ospitare le reliquie che ora è prioritario prendere.\n\nPoi, se stiamo subendo molta pressione, usiamo la pietra per potenziare la/le nostre torri, possiamo fortificarle e munirle di spingarda con i 400 pietra che abbia, se necessario. \n\nPossiamo invece giocare di macro, mettendo giù un secondo centro città (casi isolati, meglio strutture militari)\n\nNel altri casi: \n\n- costruiamo un mercato e vendiamo la pietra\n- costriamo 2-3 scuderie aggiuntive e cominciare a produrre cammellieri pesanti in massa.\n\n- Se l'avversario invece ha molte picche ma non ha cavalieri pesanti: costruisce 2-3 caserme e prediligi i ghoulam\n\n\n- con il legno che stai raccogliendo, costruisci un fabbro!\n\n"
-          },
-          {
-            "note": "",
-            "time": "> 8:00",
-            "action": "La tua età dei castelli deve trovare il tuo avversario in un momento di difficoltà, sfrutta i cammelli pesanti o i ghulam per guadagnare controllo sulla mappa, vai subito in base al tuo avversario e cerca di far danno quanto prima!\n\nMentre lo fai, cerca di prendere tutte e 5 le reliquie e porta i tuoi abitanti fuori nella mappa a prendere cervi od altre risorse utili, aiutandoli con una torre se necessario.\n\nRicordati che le tue unità ferite possono essere curate dai tuoi Dervish!\n\n"
-          },
-          {
-            "note": "",
-            "time": "10:00",
-            "action": "Divertiti!"
-          }
-        ],
-        "title": "FC Dervish + Industry (Età 3 veloce)",
-        "banner_url": "https://static.wikia.nocookie.net/ageofempires/images/6/66/AOE4_CASTLE_AGE_DERVISH.png/revision/latest/scale-to-width-down/1000?cb=20231120162136",
-        "difficulty": 2,
-        "author_rank": "Conqueror I",
-        "description": "Gli ayyubidi sono una civiltà che fa del tempismo la loro arma migliore. \nIn età 3 ottengono molti bonus e unità temibili che, se schierate nel momento corretto, possono facilmente conquistare mappa ed a volte proprio vincere la partita in poco tempo.",
-        "author_nickname": "Sparta",
-        "banner_position": 18
-      }
-    ],
-    "landmarks": [
-      {
-        "id": "town-center",
-        "age": 1,
-        "name": "Centro Città",
-        "type": "Economic",
-        "imageId": "town-center-1",
-        "description": "L'edificio principale della civiltà. Produce abitanti e funge da punto di consegna per tutte le risorse."
-      },
-      {
-        "id": "house-of-wisdom-ay",
-        "age": 1,
-        "name": "House of Wisdom (Costruita in Età I)",
-        "type": "Technology",
-        "imageId": "house-of-wisdom",
-        "description": "Dalla House of Wisdom si scelgono le Ali per avanzare. A differenza degli Abbasidi, le ali forniscono bonus immediati unici tra due scelte per ala."
-      },
-      {
-        "id": "culture-wing-logistics-2",
-        "age": 2,
-        "name": "Ala Culturale (Curatori / Avanzamento)",
-        "type": "Religious",
-        "imageId": "culture-wing",
-        "description": "Scegli tra Dervisci gratuiti (Logistica) o avanzamenti d'età più veloci ed economici (Avanzamento). Disponibile in tutte le età."
-      },
-      {
-        "id": "economic-wing-growth-2",
-        "age": 2,
-        "name": "Ala Economica (Crescita / Industria)",
-        "type": "Economic",
-        "imageId": "economic-wing",
-        "description": "Scegli tra la creazione automatica di abitanti extra (Crescita) o grandi carichi di legno gratuiti (Industria). Disponibile in tutte le età."
-      },
-      {
-        "id": "military-wing-smith-2",
-        "age": 2,
-        "name": "Ala Militare (Fabbri / Rinforzi)",
-        "type": "Military",
-        "imageId": "military-wing",
-        "description": "Scegli tra potenziamenti da Fabbro automatici gratuiti (Maestri Fabbri) o un flusso costante di Desert Raiders gratuiti (Rinforzi). Disponibile in tutte le età."
-      },
-      {
-        "id": "trade-wing-bazaar-2",
-        "age": 2,
-        "name": "Ala Commerciale (Bazar / Consiglieri)",
-        "type": "Economic",
-        "imageId": "trade-wing",
-        "description": "Scegli tra mercanti neutrali che offrono scambi eccellenti (Bazar) o potenti Atabeg che supportano le guarnigioni (Consiglieri). Disponibile in tutte le età."
-      },
-      {
-        "id": "culture-wing-logistics-3",
-        "age": 3,
-        "name": "Ala Culturale (Curatori / Avanzamento)",
-        "type": "Religious",
-        "imageId": "culture-wing",
-        "description": "Ottieni Dervisci (Logistica) o sconti sull'avanzamento d'età (Avanzamento)."
-      },
-      {
-        "id": "economic-wing-growth-3",
-        "age": 3,
-        "name": "Ala Economica (Crescita / Industria)",
-        "type": "Economic",
-        "imageId": "economic-wing",
-        "description": "Abitanti gratuiti extra (Crescita) o legna immediata (Industria)."
-      },
-      {
-        "id": "military-wing-smith-3",
-        "age": 3,
-        "name": "Ala Militare (Fabbri / Rinforzi)",
-        "type": "Military",
-        "imageId": "military-wing",
-        "description": "Upgrades del fabbro gratuiti e istantanei (Maestri Fabbri) o spawn periodico di Desert Raiders d'élite (Rinforzi)."
-      },
-      {
-        "id": "trade-wing-bazaar-3",
-        "age": 3,
-        "name": "Ala Commerciale (Bazar / Consiglieri)",
-        "type": "Economic",
-        "imageId": "trade-wing",
-        "description": "Genera scambi speciali al Bazar (Bazar) o fornisce preziosi Atabeg per potenziare la salute dell'esercito (Consiglieri)."
-      },
-      {
-        "id": "culture-wing-logistics-4",
-        "age": 4,
-        "name": "Ala Culturale (Curatori / Avanzamento)",
-        "type": "Religious",
-        "imageId": "culture-wing",
-        "description": "Dervisci o avanzamento d'età finale."
-      },
-      {
-        "id": "economic-wing-growth-4",
-        "age": 4,
-        "name": "Ala Economica (Crescita / Industria)",
-        "type": "Economic",
-        "imageId": "economic-wing",
-        "description": "Enorme flusso di abitanti rapidi o massiccia iniezione di legno."
-      },
-      {
-        "id": "military-wing-smith-4",
-        "age": 4,
-        "name": "Ala Militare (Fabbri / Rinforzi)",
-        "type": "Military",
-        "imageId": "military-wing",
-        "description": "Garantisce gli ultimi potenziamenti fabbro o grandi spawn di incursori del deserto."
-      },
-      {
-        "id": "trade-wing-bazaar-4",
-        "age": 4,
-        "name": "Ala Commerciale (Bazar / Consiglieri)",
-        "type": "Economic",
-        "imageId": "trade-wing",
-        "description": "Ultimi scambi neutri iper-convenienti o Atabeg supremi."
-      }
-    ],
-    "strengths": [
-      "Fast castle fortissima",
-      "Grazie alle ali della Casa della Sapienza, possono decidere se ricevere un boost economico (abitanti extra), militare (unità subito pronte) o tecnologico, adattandosi alla strategia dell'avversario.",
-      "La fanteria può costruire arieti e altre macchine d'assedio senza dover ricercare la tecnologia specifica. Possiedono inoltre unità d'assedio uniche come il Manjaniq (una variante del mangano con attacco incendiario ad area) e la Torre del Sultano. Anche le unità a cammello possono costruire armi d'assedio dopo essere passati di era con l'ala militare.",
-      "Desert Raider: un'unità su cammello che può passare dalla modalità melee a quella a distanza (arco), eccellente per raidare.",
-      "Ghulam: fanteria pesante (man at arms) molto resistente ed efficace contro la fanteria leggera.",
-      "Derviscio: unità religiosa a cavallo capace di curare le truppe, molto veloce a spostarmi anche quando trasporta reliquie"
-    ],
-    "weaknesses": [
-      "Non possono cacciare cinghiali: l'incapacità di raccogliere cibo dai cinghiali limita le loro opzioni di raccolta di cibo ad alto rendimento sulla mappa",
-      "Dipendenza dalla Casa della Sapienza: se l'avversario riesce a mettere pressione o distruggere l'influenza della Casa della Sapienza, la civiltà perde gran parte dei bonus legati alle Età dell'Oro.",
-      "Unità costose: sebbene potenti, le unità a cammello sono spesso costose in termini di oro e cibo; perderle in scontri sbagliati può essere fatale."
     ]
   },
   {
