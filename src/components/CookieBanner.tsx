@@ -65,7 +65,7 @@ export function CookieBanner() {
           <div className="text-sm text-gray-300 flex-1 flex items-start gap-3">
             <Shield className="text-cyan-400 shrink-0 mt-0.5" size={18} />
             <p>
-              <strong>Informativa sui Cookie:</strong> Utilizziamo cookie tecnici ed essenziali per il funzionamento del sito. Con il tuo consenso, utilizziamo anche cookie opzionali per tracciare le presenze in tempo reale.
+              <strong>Informativa sui Cookie e Tracciamento:</strong> Utilizziamo cookie tecnici essenziali per il funzionamento del sito e non impieghiamo pixel di tracciamento pubblicitari o nelle email. Con il tuo consenso, attiviamo il contatore presenze e le statistiche aggregate.
               <a href="/privacy" className="text-cyan-400 hover:underline ml-1">Leggi la Privacy Policy</a>
             </p>
           </div>
@@ -157,7 +157,7 @@ export function CookieBanner() {
                         Contatore Presenze e Statistiche
                       </h4>
                       <p className="text-xs text-gray-400 leading-relaxed">
-                        Utilizza Supabase Presence per conteggiarti (in forma totalmente anonima) nel contatore degli utenti online e visualizzare quali sezioni del sito sono visitate. Se disattivato, sarai escluso dalle presenze.
+                        Utilizza Supabase Presence per conteggiarti (in forma totalmente anonima) nel contatore degli utenti online e Google Analytics (con Consent Mode) per statistiche aggregate sulle sezioni visitate. Nessun pixel di profilazione o di tracciamento apertura email viene utilizzato. Se disattivato, sarai escluso dalle presenze e dalle statistiche.
                       </p>
                     </div>
                   </div>

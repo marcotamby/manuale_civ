@@ -6,14 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Il manuale definitivo per Age of Empires 4. Build order, civiltà, strategie e molto altro per migliorare il tuo gioco." />
     
-    <!-- Google tag (gtag.js) -->
+    <!-- Google tag (gtag.js) with Consent Mode v2 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-LDSX0LVECH"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
+      var savedConsent = null;
+      try { savedConsent = localStorage.getItem('cookieConsent'); } catch (e) {}
+      gtag('consent', 'default', {
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'analytics_storage': savedConsent === 'accepted' ? 'granted' : 'denied'
+      });
       gtag('js', new Date());
 
-      gtag('config', 'G-LDSX0LVECH');
+      gtag('config', 'G-LDSX0LVECH', { 'anonymize_ip': true });
+
+      window.addEventListener('cookie-consent-changed', function () {
+        var updatedConsent = null;
+        try { updatedConsent = localStorage.getItem('cookieConsent'); } catch (e) {}
+        gtag('consent', 'update', {
+          'analytics_storage': updatedConsent === 'accepted' ? 'granted' : 'denied'
+        });
+      });
     </script>
 
   </head>

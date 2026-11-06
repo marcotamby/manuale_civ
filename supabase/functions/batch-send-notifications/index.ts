@@ -119,7 +119,8 @@ serve(async (req) => {
               </div>
             </div>
             <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
-              <p style="font-size: 12px; color: #9ca3af; margin: 0;">&copy; ${new Date().getFullYear()} Manuale Civ. Tutti i diritti riservati.</p>
+              <p style="font-size: 12px; color: #9ca3af; margin: 0 0 6px 0;">&copy; ${new Date().getFullYear()} Manuale Civ. Tutti i diritti riservati.</p>
+              <p style="font-size: 11px; color: #9ca3af; margin: 0;">Comunicazione tecnica di servizio priva di pixel di tracciamento. <a href="https://www.aoe4guide.it/privacy" style="color: #6b7280; text-decoration: underline;">Informativa Privacy</a></p>
             </div>
           </div>
         </body>
