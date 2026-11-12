@@ -869,6 +869,258 @@
     "background_url": null
   },
   {
+    "id": "tournament-swiss",
+    "state": {
+      "rounds": {
+        "1": [
+          {
+            "id": 108056947,
+            "p1": {
+              "name": "Chrysaor",
+              "civId": "goldenhorde",
+              "score": 1
+            },
+            "p2": {
+              "name": "Sparta",
+              "civId": "templar",
+              "score": 0
+            },
+            "winner": 1
+          },
+          {
+            "id": 108056948,
+            "p1": {
+              "name": "Scapolocaldo667",
+              "civId": "",
+              "score": 1
+            },
+            "p2": {
+              "name": "Il Cataro",
+              "civId": "",
+              "score": 0
+            },
+            "winner": 1
+          },
+          {
+            "id": 108056949,
+            "p1": {
+              "name": "TuckerMann",
+              "civId": "",
+              "score": 1
+            },
+            "p2": {
+              "name": "Eddy",
+              "civId": "",
+              "score": 0
+            },
+            "winner": 1
+          }
+        ],
+        "2": [
+          {
+            "id": 108056953,
+            "p1": {
+              "name": "Chrysaor",
+              "civId": "",
+              "score": 1
+            },
+            "p2": {
+              "name": "Scapolocaldo667",
+              "civId": "",
+              "score": 0
+            },
+            "winner": 1
+          },
+          {
+            "id": 108056954,
+            "p1": {
+              "name": "Sparta",
+              "civId": "",
+              "score": 1
+            },
+            "p2": {
+              "name": "Eddy",
+              "civId": "",
+              "score": 0
+            },
+            "winner": 1
+          },
+          {
+            "id": 108056955,
+            "p1": {
+              "name": "Il Cataro",
+              "civId": "english",
+              "score": 0
+            },
+            "p2": {
+              "name": "TuckerMann",
+              "civId": "templar",
+              "score": 1
+            },
+            "winner": 2
+          }
+        ],
+        "3": [
+          {
+            "id": 108057185,
+            "p1": {
+              "name": "TuckerMann",
+              "civId": "",
+              "score": 0
+            },
+            "p2": {
+              "name": "Chrysaor",
+              "civId": "",
+              "score": 1
+            },
+            "winner": 2
+          },
+          {
+            "id": 108057186,
+            "p1": {
+              "name": "Sparta",
+              "civId": "",
+              "score": 0
+            },
+            "p2": {
+              "name": "Scapolocaldo667",
+              "civId": "",
+              "score": 1
+            },
+            "winner": 2
+          },
+          {
+            "id": 108057187,
+            "p1": {
+              "name": "Il Cataro",
+              "civId": "",
+              "score": 1
+            },
+            "p2": {
+              "name": "Eddy",
+              "civId": "",
+              "score": 0
+            },
+            "winner": 1
+          }
+        ],
+        "4": [
+          {
+            "id": 108057271,
+            "p1": {
+              "name": "Scapolocaldo667",
+              "civId": "",
+              "score": 1
+            },
+            "p2": {
+              "name": "Eddy",
+              "civId": "",
+              "score": 0
+            },
+            "winner": 1
+          },
+          {
+            "id": 108057272,
+            "p1": {
+              "name": "Sparta",
+              "civId": "",
+              "score": 0
+            },
+            "p2": {
+              "name": "TuckerMann",
+              "civId": "",
+              "score": 1
+            },
+            "winner": 2
+          },
+          {
+            "id": 108057273,
+            "p1": {
+              "name": "Chrysaor",
+              "civId": "",
+              "score": 1
+            },
+            "p2": {
+              "name": "Il Cataro",
+              "civId": "",
+              "score": 0
+            },
+            "winner": 1
+          }
+        ]
+      },
+      "startgg": {
+        "slug": "https://www.start.gg/tournament/end-of-summer-champions/details",
+        "eventId": "1699619",
+        "phaseId": "2384887",
+        "autoSync": true,
+        "lastSyncedAt": "23:04:41",
+        "syncInterval": 12
+      },
+      "dayNumber": 4,
+      "standings": [
+        {
+          "id": "startgg_5",
+          "name": "Chrysaor",
+          "wins": 4,
+          "losses": 0,
+          "points": 4,
+          "tieBreak": 0
+        },
+        {
+          "id": "startgg_1",
+          "name": "Scapolocaldo667",
+          "wins": 3,
+          "losses": 1,
+          "points": 3,
+          "tieBreak": 0
+        },
+        {
+          "id": "startgg_4",
+          "name": "TuckerMann",
+          "wins": 3,
+          "losses": 1,
+          "points": 3,
+          "tieBreak": 0
+        },
+        {
+          "id": "startgg_3",
+          "name": "Sparta",
+          "wins": 1,
+          "losses": 3,
+          "points": 1,
+          "tieBreak": 0
+        },
+        {
+          "id": "startgg_6",
+          "name": "Il Cataro",
+          "wins": 1,
+          "losses": 3,
+          "points": 1,
+          "tieBreak": 0
+        },
+        {
+          "id": "startgg_2",
+          "name": "Eddy",
+          "wins": 0,
+          "losses": 4,
+          "points": 0,
+          "tieBreak": 0
+        }
+      ],
+      "activeView": "rounds",
+      "totalRounds": 4,
+      "goldSlotsCount": 2,
+      "tournamentTitle": "Ends of summer champions",
+      "silverSlotsCount": 2
+    },
+    "updated_at": "2026-11-11T22:04:41.412+00:00",
+    "display_name": "Ends of summer champions",
+    "icon_url": null,
+    "description": "Giornate di qualificazione torneo 1v1",
+    "background_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/overlay-backgrounds/tournament-swiss-bg-1787479176421.jpg"
+  },
+  {
     "id": "tournament-2v2-high-match",
     "state": {
       "t1": {
@@ -1204,263 +1456,11 @@
       "titleBorderColor": "#000000",
       "titleBorderWidth": 0
     },
-    "updated_at": "2026-10-27T01:29:30.042+00:00",
+    "updated_at": "2026-11-12T02:35:30.212+00:00",
     "display_name": null,
     "icon_url": null,
     "description": null,
     "background_url": ""
-  },
-  {
-    "id": "tournament-swiss",
-    "state": {
-      "rounds": {
-        "1": [
-          {
-            "id": 108056947,
-            "p1": {
-              "name": "Chrysaor",
-              "civId": "goldenhorde",
-              "score": 1
-            },
-            "p2": {
-              "name": "Sparta",
-              "civId": "templar",
-              "score": 0
-            },
-            "winner": 1
-          },
-          {
-            "id": 108056948,
-            "p1": {
-              "name": "Scapolocaldo667",
-              "civId": "",
-              "score": 1
-            },
-            "p2": {
-              "name": "Il Cataro",
-              "civId": "",
-              "score": 0
-            },
-            "winner": 1
-          },
-          {
-            "id": 108056949,
-            "p1": {
-              "name": "TuckerMann",
-              "civId": "",
-              "score": 1
-            },
-            "p2": {
-              "name": "Eddy",
-              "civId": "",
-              "score": 0
-            },
-            "winner": 1
-          }
-        ],
-        "2": [
-          {
-            "id": 108056953,
-            "p1": {
-              "name": "Chrysaor",
-              "civId": "",
-              "score": 1
-            },
-            "p2": {
-              "name": "Scapolocaldo667",
-              "civId": "",
-              "score": 0
-            },
-            "winner": 1
-          },
-          {
-            "id": 108056954,
-            "p1": {
-              "name": "Sparta",
-              "civId": "",
-              "score": 1
-            },
-            "p2": {
-              "name": "Eddy",
-              "civId": "",
-              "score": 0
-            },
-            "winner": 1
-          },
-          {
-            "id": 108056955,
-            "p1": {
-              "name": "Il Cataro",
-              "civId": "english",
-              "score": 0
-            },
-            "p2": {
-              "name": "TuckerMann",
-              "civId": "templar",
-              "score": 1
-            },
-            "winner": 2
-          }
-        ],
-        "3": [
-          {
-            "id": 108057185,
-            "p1": {
-              "name": "TuckerMann",
-              "civId": "",
-              "score": 0
-            },
-            "p2": {
-              "name": "Chrysaor",
-              "civId": "",
-              "score": 1
-            },
-            "winner": 2
-          },
-          {
-            "id": 108057186,
-            "p1": {
-              "name": "Sparta",
-              "civId": "",
-              "score": 0
-            },
-            "p2": {
-              "name": "Scapolocaldo667",
-              "civId": "",
-              "score": 1
-            },
-            "winner": 2
-          },
-          {
-            "id": 108057187,
-            "p1": {
-              "name": "Il Cataro",
-              "civId": "",
-              "score": 1
-            },
-            "p2": {
-              "name": "Eddy",
-              "civId": "",
-              "score": 0
-            },
-            "winner": 1
-          }
-        ],
-        "4": [
-          {
-            "id": 108057271,
-            "p1": {
-              "name": "Scapolocaldo667",
-              "civId": "",
-              "score": 1
-            },
-            "p2": {
-              "name": "Eddy",
-              "civId": "",
-              "score": 0
-            },
-            "winner": 1
-          },
-          {
-            "id": 108057272,
-            "p1": {
-              "name": "Sparta",
-              "civId": "",
-              "score": 0
-            },
-            "p2": {
-              "name": "TuckerMann",
-              "civId": "",
-              "score": 1
-            },
-            "winner": 2
-          },
-          {
-            "id": 108057273,
-            "p1": {
-              "name": "Chrysaor",
-              "civId": "",
-              "score": 1
-            },
-            "p2": {
-              "name": "Il Cataro",
-              "civId": "",
-              "score": 0
-            },
-            "winner": 1
-          }
-        ]
-      },
-      "startgg": {
-        "slug": "https://www.start.gg/tournament/end-of-summer-champions/details",
-        "eventId": "1699619",
-        "phaseId": "2384887",
-        "autoSync": true,
-        "lastSyncedAt": "00:00:49",
-        "syncInterval": 12
-      },
-      "dayNumber": 4,
-      "standings": [
-        {
-          "id": "startgg_5",
-          "name": "Chrysaor",
-          "wins": 4,
-          "losses": 0,
-          "points": 4,
-          "tieBreak": 0
-        },
-        {
-          "id": "startgg_1",
-          "name": "Scapolocaldo667",
-          "wins": 3,
-          "losses": 1,
-          "points": 3,
-          "tieBreak": 0
-        },
-        {
-          "id": "startgg_4",
-          "name": "TuckerMann",
-          "wins": 3,
-          "losses": 1,
-          "points": 3,
-          "tieBreak": 0
-        },
-        {
-          "id": "startgg_3",
-          "name": "Sparta",
-          "wins": 1,
-          "losses": 3,
-          "points": 1,
-          "tieBreak": 0
-        },
-        {
-          "id": "startgg_6",
-          "name": "Il Cataro",
-          "wins": 1,
-          "losses": 3,
-          "points": 1,
-          "tieBreak": 0
-        },
-        {
-          "id": "startgg_2",
-          "name": "Eddy",
-          "wins": 0,
-          "losses": 4,
-          "points": 0,
-          "tieBreak": 0
-        }
-      ],
-      "activeView": "rounds",
-      "totalRounds": 4,
-      "goldSlotsCount": 2,
-      "tournamentTitle": "Ends of summer champions",
-      "silverSlotsCount": 2
-    },
-    "updated_at": "2026-09-22T22:00:49.887+00:00",
-    "display_name": "Ends of summer champions",
-    "icon_url": null,
-    "description": "Giornate di qualificazione torneo 1v1",
-    "background_url": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/overlay-backgrounds/tournament-swiss-bg-1787479176421.jpg"
   },
   {
     "id": "tournament-1v1-bracket",
