@@ -39,7 +39,7 @@
             overflow: hidden;
             color: #ffffff;
             font-family: 'Outfit', 'Inter', sans-serif;
-            background: #040711 url('../background/background.png') center/cover no-repeat;
+            background: #040711 url('./bg.jpg') center/cover no-repeat;
             position: relative;
         }
 
@@ -133,10 +133,9 @@
             border: 2px solid rgba(255, 255, 255, 0.75);
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.65);
             flex-shrink: 0;
-            background: #0f172a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: transparent;
+            display: block;
+            line-height: 0;
         }
 
         .country-flag-wrap svg,
@@ -1062,7 +1061,6 @@
                     <span class="skills-kicker">Player Skills</span>
                     <span id="skills-p1-name" class="skills-player-label">CHRYSAOR</span>
                 </div>
-                <div id="skills-p1-avg" class="skills-avg-badge">AVG 8.0</div>
             </div>
             <div id="skills-p1-list" class="skills-list"></div>
         </aside>
@@ -1077,7 +1075,6 @@
                     <span class="skills-kicker">Player Skills</span>
                     <span id="skills-p2-name" class="skills-player-label">GATTORATTO</span>
                 </div>
-                <div id="skills-p2-avg" class="skills-avg-badge">AVG 8.0</div>
             </div>
             <div id="skills-p2-list" class="skills-list"></div>
         </aside>
@@ -1143,18 +1140,18 @@
         };
 
         const COUNTRY_FLAGS = {
-            ch: `<svg viewBox="0 0 32 24"><rect width="32" height="24" fill="#d52b1e"/><rect x="13" y="4" width="6" height="16" fill="#fff"/><rect x="8" y="9" width="16" height="6" fill="#fff"/></svg>`,
-            it: `<svg viewBox="0 0 3 2"><rect width="1" height="2" fill="#009246"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ce2b37"/></svg>`,
-            de: `<svg viewBox="0 0 5 3"><rect width="5" height="1" y="0" fill="#000"/><rect width="5" height="1" y="1" fill="#dd0000"/><rect width="5" height="1" y="2" fill="#ffce00"/></svg>`,
-            fr: `<svg viewBox="0 0 3 2"><rect width="1" height="2" fill="#0055a4"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ef4135"/></svg>`,
-            es: `<svg viewBox="0 0 3 2"><rect width="3" height="2" fill="#aa151b"/><rect y="0.5" width="3" height="1" fill="#f1bf00"/></svg>`,
-            gb: `<svg viewBox="0 0 60 30"><clipPath id="s"><path d="M0,0 v30 h60 v-30 z"/></clipPath><path d="M0,0 v30 h60 v-30 z" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="3"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></svg>`,
-            us: `<svg viewBox="0 0 38 20"><rect width="38" height="20" fill="#b22234"/><path d="M0,3h38M0,7h38M0,11h38M0,15h38M0,19h38" stroke="#fff" stroke-width="1.5"/><rect width="16" height="11" fill="#3c3b6e"/></svg>`,
-            at: `<svg viewBox="0 0 3 2"><rect width="3" height="2" fill="#ed2939"/><rect y="0.66" width="3" height="0.67" fill="#fff"/></svg>`,
-            nl: `<svg viewBox="0 0 3 2"><rect width="3" height="0.67" y="0" fill="#ae1c28"/><rect width="3" height="0.67" y="0.66" fill="#fff"/><rect width="3" height="0.67" y="1.33" fill="#21468b"/></svg>`,
-            pl: `<svg viewBox="0 0 8 5"><rect width="8" height="2.5" fill="#fff"/><rect y="2.5" width="8" height="2.5" fill="#dc143c"/></svg>`,
-            se: `<svg viewBox="0 0 16 10"><rect width="16" height="10" fill="#006aa7"/><rect x="5" width="2" height="10" fill="#fecc00"/><rect y="4" width="16" height="2" fill="#fecc00"/></svg>`,
-            eu: `<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#003399"/><circle cx="15" cy="10" r="6" fill="none" stroke="#ffcc00" stroke-width="1.6" stroke-dasharray="1 2.14"/></svg>`
+            ch: `<svg viewBox="0 0 74 50" preserveAspectRatio="none"><rect width="74" height="50" fill="#d52b1e"/><rect x="31" y="9" width="12" height="32" fill="#fff"/><rect x="21" y="19" width="32" height="12" fill="#fff"/></svg>`,
+            it: `<svg viewBox="0 0 3 2" preserveAspectRatio="none"><rect width="1" height="2" fill="#009246"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ce2b37"/></svg>`,
+            de: `<svg viewBox="0 0 5 3" preserveAspectRatio="none"><rect width="5" height="1" y="0" fill="#000"/><rect width="5" height="1" y="1" fill="#dd0000"/><rect width="5" height="1" y="2" fill="#ffce00"/></svg>`,
+            fr: `<svg viewBox="0 0 3 2" preserveAspectRatio="none"><rect width="1" height="2" fill="#0055a4"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ef4135"/></svg>`,
+            es: `<svg viewBox="0 0 3 2" preserveAspectRatio="none"><rect width="3" height="2" fill="#aa151b"/><rect y="0.5" width="3" height="1" fill="#f1bf00"/></svg>`,
+            gb: `<svg viewBox="0 0 60 30" preserveAspectRatio="xMidYMid slice"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="3"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></svg>`,
+            us: `<svg viewBox="0 0 38 20" preserveAspectRatio="none"><rect width="38" height="20" fill="#b22234"/><path d="M0,3h38M0,7h38M0,11h38M0,15h38M0,19h38" stroke="#fff" stroke-width="1.5"/><rect width="16" height="11" fill="#3c3b6e"/></svg>`,
+            at: `<svg viewBox="0 0 3 2" preserveAspectRatio="none"><rect width="3" height="2" fill="#ed2939"/><rect y="0.66" width="3" height="0.67" fill="#fff"/></svg>`,
+            nl: `<svg viewBox="0 0 3 2" preserveAspectRatio="none"><rect width="3" height="0.67" y="0" fill="#ae1c28"/><rect width="3" height="0.67" y="0.66" fill="#fff"/><rect width="3" height="0.67" y="1.33" fill="#21468b"/></svg>`,
+            pl: `<svg viewBox="0 0 8 5" preserveAspectRatio="none"><rect width="8" height="2.5" fill="#fff"/><rect y="2.5" width="8" height="2.5" fill="#dc143c"/></svg>`,
+            se: `<svg viewBox="0 0 16 10" preserveAspectRatio="none"><rect width="16" height="10" fill="#006aa7"/><rect x="5" width="2" height="10" fill="#fecc00"/><rect y="4" width="16" height="2" fill="#fecc00"/></svg>`,
+            eu: `<svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice"><rect width="30" height="20" fill="#003399"/><circle cx="15" cy="10" r="6" fill="none" stroke="#ffcc00" stroke-width="1.6" stroke-dasharray="1 2.14"/></svg>`
         };
 
         const PLACEHOLDER_AVATAR = `
@@ -1215,8 +1212,19 @@
         function renderPhoto(containerId, photoUrl) {
             const el = document.getElementById(containerId);
             if (!el) return;
-            if (photoUrl && photoUrl.trim()) {
-                el.innerHTML = `<img src="${escapeHtml(photoUrl.trim())}" alt="Player" onerror="this.parentElement.innerHTML=\`${PLACEHOLDER_AVATAR.replace(/"/g, '&quot;')}\`" />`;
+            const trimmed = (photoUrl || '').trim();
+            if (el.dataset.photoUrl === trimmed && el.firstChild) return;
+            el.dataset.photoUrl = trimmed;
+
+            if (trimmed) {
+                const img = document.createElement('img');
+                img.alt = 'Player';
+                img.src = trimmed;
+                img.onerror = () => {
+                    el.innerHTML = PLACEHOLDER_AVATAR;
+                };
+                el.innerHTML = '';
+                el.appendChild(img);
             } else {
                 el.innerHTML = PLACEHOLDER_AVATAR;
             }
@@ -1238,18 +1246,15 @@
             }).join('');
         }
 
-        function renderSkills(listId, avgId, skillsObj) {
+        function renderSkills(listId, skillsObj) {
             const listEl = document.getElementById(listId);
-            const avgEl = document.getElementById(avgId);
             if (!listEl) return;
 
             const s = skillsObj || { micro: 7, macro: 7, apm: 7, strategia: 7, creativita: 7 };
-            let sum = 0;
 
             listEl.innerHTML = SKILL_FIELDS.map(f => {
                 const raw = Number(s[f.key] ?? 5);
                 const val = Math.max(1, Math.min(10, isNaN(raw) ? 5 : raw));
-                sum += val;
                 const pct = (val / 10) * 100;
                 const displayVal = Number.isInteger(val) ? val : val.toFixed(1);
                 return `
@@ -1268,10 +1273,6 @@
                     </div>
                 `;
             }).join('');
-
-            if (avgEl) {
-                avgEl.innerText = `AVG ${(sum / SKILL_FIELDS.length).toFixed(1)}`;
-            }
         }
 
         function createDiamondCard(map, idx) {
@@ -1395,7 +1396,7 @@
         }
 
         function render(state, backgroundUrl) {
-            const targetBg = backgroundUrl || '../background/background.png';
+            const targetBg = backgroundUrl || './bg.jpg';
             if (currentBackgroundUrl !== targetBg) {
                 currentBackgroundUrl = targetBg;
                 document.body.style.backgroundImage = `url('${targetBg}?v=${sessionBuster}')`;
@@ -1420,7 +1421,7 @@
             renderCountryFlag('p1-flag', p1.country ?? 'ch');
             renderPhoto('p1-photo', p1.photoUrl);
             renderDraftStrip('p1-draft-strip', p1.draftCivs);
-            renderSkills('skills-p1-list', 'skills-p1-avg', p1.skills);
+            renderSkills('skills-p1-list', p1.skills);
 
             // Player 2
             const p2 = s.p2 || {};
@@ -1432,7 +1433,7 @@
             renderCountryFlag('p2-flag', p2.country ?? 'it');
             renderPhoto('p2-photo', p2.photoUrl);
             renderDraftStrip('p2-draft-strip', p2.draftCivs);
-            renderSkills('skills-p2-list', 'skills-p2-avg', p2.skills);
+            renderSkills('skills-p2-list', p2.skills);
 
             // Maps Bo5
             renderMaps(s.maps || [

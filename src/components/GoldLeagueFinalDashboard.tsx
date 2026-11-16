@@ -148,6 +148,8 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
   const [autoSyncMap, setAutoSyncMap] = useState(false);
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const stateRef = useRef(state);
+  stateRef.current = state;
   const p1PhotoRef = useRef<HTMLInputElement>(null);
   const p2PhotoRef = useRef<HTMLInputElement>(null);
 
@@ -156,25 +158,29 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
       .getOverlayState(OVERLAY_ID)
       .then((saved) => {
         if (saved && Object.keys(saved).length > 0) {
-          setState((prev) => ({
-            ...prev,
-            ...saved,
-            p1: {
-              ...prev.p1,
-              ...(saved.p1 || {}),
-              skills: { ...DEFAULT_SKILLS, ...(saved.p1?.skills || {}) },
-              draftCivs: Array.isArray(saved.p1?.draftCivs) ? (saved.p1!.draftCivs as DraftCivEntry[]) : []
-            },
-            p2: {
-              ...prev.p2,
-              ...(saved.p2 || {}),
-              skills: { ...DEFAULT_SKILLS, ...(saved.p2?.skills || {}) },
-              draftCivs: Array.isArray(saved.p2?.draftCivs) ? (saved.p2!.draftCivs as DraftCivEntry[]) : []
-            },
-            maps: Array.isArray(saved.maps) && saved.maps.length > 0 ? saved.maps : prev.maps,
-            timer: { ...prev.timer, ...(saved.timer || {}) },
-            casters: Array.isArray(saved.casters) && saved.casters.length > 0 ? saved.casters : prev.casters
-          }));
+          setState((prev) => {
+            const merged = {
+              ...prev,
+              ...saved,
+              p1: {
+                ...prev.p1,
+                ...(saved.p1 || {}),
+                skills: { ...DEFAULT_SKILLS, ...(saved.p1?.skills || {}) },
+                draftCivs: Array.isArray(saved.p1?.draftCivs) ? (saved.p1!.draftCivs as DraftCivEntry[]) : []
+              },
+              p2: {
+                ...prev.p2,
+                ...(saved.p2 || {}),
+                skills: { ...DEFAULT_SKILLS, ...(saved.p2?.skills || {}) },
+                draftCivs: Array.isArray(saved.p2?.draftCivs) ? (saved.p2!.draftCivs as DraftCivEntry[]) : []
+              },
+              maps: Array.isArray(saved.maps) && saved.maps.length > 0 ? saved.maps : prev.maps,
+              timer: { ...prev.timer, ...(saved.timer || {}) },
+              casters: Array.isArray(saved.casters) && saved.casters.length > 0 ? saved.casters : prev.casters
+            };
+            stateRef.current = merged;
+            return merged;
+          });
         }
       })
       .catch((err) => onError('Errore caricamento stato Finale Lega Oro: ' + err.message))
@@ -182,6 +188,7 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
   }, [onError]);
 
   const pushState = (nextState: typeof DEFAULT_STATE, immediate = false) => {
+    stateRef.current = nextState;
     setState(nextState);
     setIsLiveSyncing(true);
 
@@ -190,7 +197,7 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
     const exec = async () => {
       setIsSaving(true);
       try {
-        await overlayService.updateOverlayState(OVERLAY_ID, nextState as unknown as OverlayState);
+        await overlayService.updateOverlayState(OVERLAY_ID, stateRef.current as unknown as OverlayState);
         setIsLiveSyncing(false);
         setShowSuccess(true);
         setTimeout(() => setShowSuccess(false), 1600);
@@ -203,7 +210,7 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
     };
 
     if (immediate) {
-      exec();
+      return exec();
     } else {
       debounceRef.current = setTimeout(exec, 260);
     }
@@ -353,38 +360,95 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
     }
   };
 
+  const prepareAvatarAsset = (file: File): Promise<{ blob: Blob; dataUrl: string; ext: string }> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Impossibile leggere il file immagine.'));
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('Formato immagine non valido.'));
+        img.onload = () => {
+          const maxSide = 512;
+          let { width, height } = img;
+          if (width > maxSide || height > maxSide) {
+            const ratio = Math.min(maxSide / width, maxSide / height);
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Canvas non disponibile.'));
+            return;
+          }
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/png');
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                reject(new Error('Conversione immagine fallita.'));
+                return;
+              }
+              resolve({ blob, dataUrl, ext: 'png' });
+            },
+            'image/png',
+            0.92
+          );
+        };
+        img.src = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handlePhotoUpload = async (playerKey: 'p1' | 'p2', file: File | undefined) => {
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      onError('Immagine troppo grande (max 5MB).');
+    if (file.size > 15 * 1024 * 1024) {
+      onError('Immagine troppo grande (max 15MB).');
       return;
     }
     setUploadingPhotoFor(playerKey);
     try {
-      const ext = file.name.split('.').pop() || 'png';
-      const filePath = `overlay-avatars/${OVERLAY_ID}-${playerKey}-${Date.now()}.${ext}`;
-      const { error: uploadErr } = await supabase.storage
-        .from('civilizations')
-        .upload(filePath, file, { cacheControl: '3600', upsert: false });
+      const { blob, dataUrl, ext } = await prepareAvatarAsset(file);
+      let finalPhotoUrl = '';
 
-      if (uploadErr) throw uploadErr;
+      try {
+        const filePath = `overlay-avatars/${OVERLAY_ID}-${playerKey}-${Date.now()}.${ext}`;
+        const { error: uploadErr } = await supabase.storage
+          .from('civilizations')
+          .upload(filePath, blob, { contentType: 'image/png', cacheControl: '3600', upsert: true });
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('civilizations')
-        .getPublicUrl(filePath);
+        if (!uploadErr) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('civilizations')
+            .getPublicUrl(filePath);
+          finalPhotoUrl = publicUrl;
+        } else {
+          console.warn('Supabase storage avatar upload fallback to data URL:', uploadErr.message);
+        }
+      } catch (storageErr) {
+        console.warn('Supabase storage unavailable, fallback to data URL:', storageErr);
+      }
 
-      pushState(
+      if (!finalPhotoUrl) {
+        finalPhotoUrl = dataUrl;
+      }
+
+      const latest = stateRef.current;
+      await pushState(
         {
-          ...state,
+          ...latest,
           [playerKey]: {
-            ...state[playerKey],
-            photoUrl: publicUrl
+            ...latest[playerKey],
+            photoUrl: finalPhotoUrl
           }
         },
         true
       );
     } catch (err: any) {
-      onError(`Errore upload foto giocatore: ${err?.message || 'caricamento fallito'}`);
+      onError(`Errore caricamento foto giocatore: ${err?.message || 'caricamento fallito'}`);
     } finally {
       setUploadingPhotoFor(null);
     }
@@ -835,13 +899,6 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
                     <span className="text-[11px] font-black uppercase tracking-widest text-white flex items-center gap-2">
                       <BarChart3 size={14} className={accentText} />
                       Skills Giocatore (1 - 10)
-                    </span>
-                    <span className="text-[11px] font-bold text-gray-400">
-                      Media:{' '}
-                      {(
-                        SKILL_CONFIG.reduce((acc, s) => acc + (player.skills?.[s.key] ?? 5), 0) /
-                        SKILL_CONFIG.length
-                      ).toFixed(1)}
                     </span>
                   </div>
 
