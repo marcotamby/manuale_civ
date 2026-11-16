@@ -241,6 +241,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
   const [selectedOverlay, setSelectedOverlay] = useState<OverlayItem | null>(null);
   const [activeTab, setActiveTab] = useState<'preview' | 'dashboard'>('preview');
   const [previewScale, setPreviewScale] = useState(1);
+  const [previewBuster, setPreviewBuster] = useState(() => Date.now());
   const containerRef = useRef<HTMLDivElement>(null);
   const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: ToastType }>({
     isVisible: false,
@@ -334,6 +335,7 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
 
   useEffect(() => {
     if (activeTab !== 'preview') return;
+    setPreviewBuster(Date.now());
     const updateScale = () => {
       const container = containerRef.current;
       if (container) {
@@ -717,7 +719,8 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                         <div className="absolute inset-0 flex items-center justify-center p-6 overflow-hidden">
                           <div className="w-full h-full relative" ref={containerRef}>
                             <iframe 
-                              src={effectiveOverlayPath} 
+                              key={`${selectedOverlay.id}-${previewBuster}`}
+                              src={`${effectiveOverlayPath}${effectiveOverlayPath.includes('?') ? '&' : '?'}v=${previewBuster}`} 
                               className="absolute border-none bg-transparent" 
                               style={{ 
                                 width: '1920px', 

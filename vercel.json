@@ -56,6 +56,15 @@
       ]
     },
     {
+      "source": "/overlays/(.*\\.html)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
       "source": "/(.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|woff|woff2))",
       "headers": [
         {
