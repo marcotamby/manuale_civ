@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>Finale Lega Oro - Chrysaor vs Gattoratto</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Outfit:wght@400;600;700;800;900&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --gold: #d4af37;
+            --gold-bright: #ffd700;
+            --gold-soft: #fff0a8;
+            --gold-glow: rgba(255, 215, 0, 0.45);
+            --p1-color: #f59e0b;
+            --p1-bright: #ffd700;
+            --p2-color: #e11d48;
+            --p2-bright: #fb7185;
+            --cyan: #38bdf8;
+            --cyan-glow: rgba(56, 189, 248, 0.5);
+            --bg-panel: rgba(8, 13, 26, 0.88);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        html, body {
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            color: #ffffff;
+            font-family: 'Outfit', 'Inter', sans-serif;
+            background: #040711 url('../background/background.png') center/cover no-repeat;
+            position: relative;
+        }
+
+        /* Ambient vignette & gold aura */
+        .ambient-layer {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 50% 8%, rgba(255, 215, 0, 0.14) 0%, transparent 55%),
+                radial-gradient(ellipse at 12% 55%, rgba(245, 158, 11, 0.08) 0%, transparent 45%),
+                radial-gradient(ellipse at 88% 55%, rgba(225, 29, 72, 0.08) 0%, transparent 45%),
+                linear-gradient(to bottom, rgba(4, 7, 17, 0.45) 0%, rgba(4, 7, 17, 0.18) 40%, rgba(4, 7, 17, 0.55) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* =========================================================
+           1. TOP HEADER (EGCTV INSPIRED)
+           ========================================================= */
+        #top-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1920px;
+            height: 118px;
+            display: flex;
+            align-items: stretch;
+            z-index: 50;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85);
+        }
+
+        .player-banner {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 3px solid var(--gold);
+        }
+
+        .player-banner.left {
+            background: linear-gradient(90deg,
+                rgba(217, 150, 12, 0.92) 0%,
+                rgba(166, 108, 12, 0.88) 48%,
+                rgba(15, 23, 42, 0.96) 100%);
+            padding-left: 34px;
+            padding-right: 12px;
+            justify-content: space-between;
+        }
+
+        .player-banner.right {
+            background: linear-gradient(270deg,
+                rgba(185, 28, 44, 0.92) 0%,
+                rgba(136, 19, 44, 0.88) 48%,
+                rgba(15, 23, 42, 0.96) 100%);
+            padding-right: 34px;
+            padding-left: 12px;
+            justify-content: space-between;
+            flex-direction: row-reverse;
+        }
+
+        /* Subtle diagonal gloss on player banners */
+        .player-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 55%, rgba(0, 0, 0, 0.25) 100%);
+            pointer-events: none;
+        }
+
+        .player-identity {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            position: relative;
+            z-index: 2;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .player-banner.right .player-identity {
+            flex-direction: row-reverse;
+            text-align: right;
+        }
+
+        .country-flag-wrap {
+            width: 74px;
+            height: 50px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.75);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.65);
+            flex-shrink: 0;
+            background: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .country-flag-wrap svg,
+        .country-flag-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .player-text-col {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .player-name {
+            font-size: 46px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            line-height: 1.02;
+            color: #ffffff;
+            text-shadow: 0 4px 14px rgba(0, 0, 0, 0.85), 0 1px 2px rgba(0, 0, 0, 0.9);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-seed-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 3px;
+        }
+
+        .player-banner.right .player-seed-row {
+            justify-content: flex-end;
+        }
+
+        .player-seed {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.92);
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+        }
+
+        /* Player Portrait Frame (EGCTV style next to center) */
+        .player-photo-frame {
+            width: 110px;
+            height: 110px;
+            border-radius: 10px;
+            border: 2.5px solid var(--gold-bright);
+            background: radial-gradient(circle at 50% 35%, #1e293b 0%, #090d16 100%);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.8), 0 0 18px rgba(255, 215, 0, 0.25);
+            overflow: hidden;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .player-photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+        }
+
+        .player-photo-placeholder {
+            width: 64px;
+            height: 64px;
+            opacity: 0.45;
+            color: var(--gold-soft);
+        }
+
+        /* Center Event Hub */
+        #center-event-box {
+            width: 490px;
+            background: linear-gradient(180deg, #0b1326 0%, #060a16 100%);
+            border-bottom: 3px solid var(--gold-bright);
+            border-left: 2px solid rgba(212, 175, 55, 0.55);
+            border-right: 2px solid rgba(212, 175, 55, 0.55);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+            padding: 6px 18px;
+        }
+
+        .event-eyebrow {
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--cyan);
+            text-shadow: 0 0 10px var(--cyan-glow);
+            margin-bottom: 2px;
+        }
+
+        .event-title {
+            font-family: 'Cinzel', 'Outfit', serif;
+            font-size: 36px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #ffffff 0%, #ffef99 42%, #d4af37 85%, #a17912 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 18px rgba(212, 175, 55, 0.4));
+            white-space: nowrap;
+            line-height: 1.08;
+        }
+
+        /* =========================================================
+           2. SCOREBOARD ARCH & DRAFT CIVS BAR (BELOW TOP HEADER)
+           ========================================================= */
+        #sub-header-bar {
+            position: absolute;
+            top: 118px;
+            left: 0;
+            width: 1920px;
+            height: 86px;
+            z-index: 45;
+            pointer-events: none;
+        }
+
+        /* Center Scoreboard + Best Of Arch */
+        #score-arch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 520px;
+            height: 84px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 22px;
+        }
+
+        .score-arch-backdrop {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 440px;
+            height: 78px;
+            background: linear-gradient(180deg, rgba(8, 14, 28, 0.96) 0%, rgba(12, 22, 44, 0.92) 100%);
+            border: 2px solid var(--gold);
+            border-top: none;
+            border-radius: 0 0 36px 36px;
+            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.85), 0 0 24px rgba(212, 175, 55, 0.25);
+            z-index: 0;
+        }
+
+        .score-orb {
+            position: relative;
+            z-index: 2;
+            width: 82px;
+            height: 82px;
+            margin-top: -12px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, #1d4ed8 0%, #0a183a 65%, #050a18 100%);
+            border: 3.5px solid var(--gold-bright);
+            box-shadow:
+                0 8px 25px rgba(0, 0, 0, 0.9),
+                0 0 22px rgba(56, 189, 248, 0.45),
+                inset 0 2px 10px rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 46px;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 3px 10px rgba(0, 0, 0, 0.9);
+        }
+
+        .score-orb.p1 {
+            border-color: var(--p1-bright);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.9), 0 0 24px rgba(255, 215, 0, 0.45), inset 0 2px 10px rgba(255, 255, 255, 0.28);
+        }
+
+        .score-orb.p2 {
+            border-color: var(--p2-bright);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.9), 0 0 24px rgba(251, 113, 133, 0.45), inset 0 2px 10px rgba(255, 255, 255, 0.28);
+        }
+
+        .bo-center-info {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 220px;
+            text-align: center;
+            margin-top: -6px;
+        }
+
+        .match-stage-label {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #cbd5e1;
+        }
+
+        .best-of-badge {
+            margin-top: 4px;
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold-bright);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9), 0 0 14px rgba(255, 215, 0, 0.35);
+        }
+
+        /* Draft Civs Medallions Row */
+        .draft-civs-strip {
+            position: absolute;
+            top: 14px;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .draft-civs-strip.left {
+            left: 42px;
+            right: 1225px;
+            justify-content: flex-end;
+        }
+
+        .draft-civs-strip.right {
+            right: 42px;
+            left: 1225px;
+            justify-content: flex-start;
+        }
+
+        .draft-label-tag {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.55);
+            background: rgba(8, 13, 26, 0.78);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            padding: 4px 10px;
+            border-radius: 999px;
+            margin: 0 4px;
+            white-space: nowrap;
+        }
+
+        .draft-orb {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 2.5px solid rgba(255, 255, 255, 0.75);
+            background-color: #090e1a;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 255, 255, 0.12);
+            position: relative;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .draft-orb.pick {
+            border-color: var(--gold-bright);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.85), 0 0 12px rgba(255, 215, 0, 0.35);
+        }
+
+        .draft-orb.played {
+            border-color: rgba(148, 163, 184, 0.5);
+            filter: brightness(0.65) saturate(0.7);
+        }
+
+        .draft-orb.played::after {
+            content: '✓';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.35);
+            color: #4ade80;
+            font-size: 24px;
+            font-weight: 900;
+            text-shadow: 0 2px 6px #000;
+        }
+
+        .draft-orb.ban {
+            border-color: #ef4444;
+            filter: grayscale(0.45) brightness(0.6);
+        }
+
+        .draft-orb.ban::after {
+            content: '✕';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(127, 29, 29, 0.35);
+            color: #ff3b3b;
+            font-size: 28px;
+            font-weight: 900;
+            text-shadow: 0 2px 8px #000;
+        }
+
+        .draft-orb.snipe {
+            border-color: #f97316;
+            filter: brightness(0.65);
+        }
+
+        .draft-orb.snipe::after {
+            content: '⌖';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.35);
+            color: #fb923c;
+            font-size: 30px;
+            font-weight: 900;
+            text-shadow: 0 2px 8px #000;
+        }
+
+        /* =========================================================
+           3. CENTRAL STAGE: SKILLS PANELS + ISOMETRIC BO5 MAPS
+           ========================================================= */
+        #main-stage {
+            position: absolute;
+            top: 215px;
+            left: 0;
+            width: 1920px;
+            height: 560px;
+            z-index: 20;
+        }
+
+        /* Skills Panels (Left & Right) */
+        .skills-panel {
+            position: absolute;
+            top: 38px;
+            width: 356px;
+            background: linear-gradient(165deg, rgba(10, 16, 34, 0.92) 0%, rgba(6, 10, 20, 0.94) 100%);
+            backdrop-filter: blur(14px);
+            border-radius: 22px;
+            padding: 22px 24px 24px;
+            box-shadow: 0 22px 50px rgba(0, 0, 0, 0.78);
+        }
+
+        .skills-panel.left {
+            left: 42px;
+            border: 1.5px solid rgba(255, 215, 0, 0.45);
+            box-shadow: 0 22px 50px rgba(0, 0, 0, 0.8), inset 0 0 24px rgba(245, 158, 11, 0.08);
+        }
+
+        .skills-panel.right {
+            right: 42px;
+            border: 1.5px solid rgba(251, 113, 133, 0.45);
+            box-shadow: 0 22px 50px rgba(0, 0, 0, 0.8), inset 0 0 24px rgba(225, 29, 72, 0.08);
+        }
+
+        .skills-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .skills-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .skills-kicker {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #94a3b8;
+        }
+
+        .skills-player-label {
+            font-size: 22px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #ffffff;
+        }
+
+        .skills-avg-badge {
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        .skills-panel.left .skills-avg-badge {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            color: var(--gold-bright);
+        }
+
+        .skills-panel.right .skills-avg-badge {
+            background: rgba(225, 29, 72, 0.15);
+            border: 1px solid rgba(251, 113, 133, 0.5);
+            color: #fda4af;
+        }
+
+        .skills-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .skill-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .skill-meta {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+        }
+
+        .skill-name {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #e2e8f0;
+        }
+
+        .skill-score {
+            font-size: 16px;
+            font-weight: 900;
+            color: #ffffff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .skill-score span {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        .skill-bar-track {
+            position: relative;
+            width: 100%;
+            height: 13px;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 999px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.7);
+        }
+
+        .skill-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+        }
+
+        .skills-panel.left .skill-bar-fill {
+            background: linear-gradient(90deg, #b45309 0%, #f59e0b 55%, #fef08a 100%);
+            box-shadow: 0 0 14px rgba(251, 191, 36, 0.75);
+        }
+
+        .skills-panel.right .skill-bar-fill {
+            background: linear-gradient(90deg, #9f1239 0%, #f43f5e 55%, #fda4af 100%);
+            box-shadow: 0 0 14px rgba(244, 63, 94, 0.75);
+        }
+
+        /* Subtle 10-step tick overlay on skill bars */
+        .skill-bar-ticks {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            pointer-events: none;
+        }
+
+        .skill-bar-ticks div {
+            border-right: 1px solid rgba(4, 7, 17, 0.55);
+        }
+
+        .skill-bar-ticks div:last-child {
+            border-right: none;
+        }
+
+        /* =========================================================
+           4. ISOMETRIC DIAMOND MAPS DRAFT (CENTER)
+           ========================================================= */
+        #maps-stage {
+            position: absolute;
+            top: 0;
+            left: 416px;
+            right: 416px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+        }
+
+        .maps-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 34px;
+        }
+
+        .map-node {
+            position: relative;
+            width: 316px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.35s ease;
+        }
+
+        @keyframes nextDiamondPulse {
+            0%, 100% {
+                transform: scale(1.02);
+                filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.55));
+            }
+            50% {
+                transform: scale(1.06);
+                filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.85));
+            }
+        }
+
+        .map-node.is-next {
+            z-index: 15;
+            animation: nextDiamondPulse 2.4s infinite ease-in-out;
+        }
+
+        .map-status-pill {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 25;
+            padding: 4px 14px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8);
+        }
+
+        .map-status-pill.next-pill {
+            background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%);
+            color: #ffffff;
+            border: 1.5px solid #bae6fd;
+        }
+
+        .map-status-pill.game-num-pill {
+            background: rgba(8, 13, 26, 0.9);
+            color: var(--gold-bright);
+            border: 1px solid rgba(212, 175, 55, 0.55);
+        }
+
+        .diamond-stage {
+            position: relative;
+            width: 280px;
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .diamond-clip {
+            width: 274px;
+            height: 156px;
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            background: #0a1020;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .diamond-bg-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: filter 0.3s ease;
+        }
+
+        .map-node.has-winner .diamond-bg-img {
+            filter: brightness(0.78);
+        }
+
+        .diamond-vignette {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 45%, rgba(4, 7, 17, 0.55) 100%);
+            pointer-events: none;
+        }
+
+        .diamond-border-svg {
+            position: absolute;
+            inset: 0;
+            width: 280px;
+            height: 160px;
+            pointer-events: none;
+            z-index: 6;
+            filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.85));
+        }
+
+        /* Side Civ Medallions on the Isometric Diamond (EGCTV style) */
+        .map-civ-badge {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: #090e1a;
+            border: 2.5px solid var(--gold);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.9), 0 0 12px rgba(0, 0, 0, 0.6);
+            background-size: cover;
+            background-position: center;
+            z-index: 12;
+            overflow: visible;
+        }
+
+        .map-civ-badge.left {
+            left: -14px;
+            border-color: var(--p1-bright);
+        }
+
+        .map-civ-badge.right {
+            right: -14px;
+            border-color: var(--p2-bright);
+        }
+
+        .map-civ-badge.is-loser {
+            filter: grayscale(0.75) brightness(0.45);
+            border-color: rgba(148, 163, 184, 0.45);
+        }
+
+        .map-civ-badge.is-winner {
+            box-shadow: 0 0 22px rgba(255, 215, 0, 0.9), 0 6px 18px rgba(0, 0, 0, 0.9);
+            transform: translateY(-50%) scale(1.08);
+        }
+
+        .map-winner-crown {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 22px;
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.95));
+            z-index: 20;
+        }
+
+        .map-name-plate {
+            margin-top: 8px;
+            padding: 6px 22px;
+            background: linear-gradient(180deg, rgba(12, 19, 38, 0.96) 0%, rgba(6, 10, 20, 0.96) 100%);
+            border: 1.5px solid rgba(212, 175, 55, 0.55);
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 900;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.75);
+            white-space: nowrap;
+            max-width: 290px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .map-node.is-next .map-name-plate {
+            border-color: var(--cyan);
+            color: #e0f2fe;
+            box-shadow: 0 0 18px rgba(56, 189, 248, 0.35);
+        }
+
+        /* =========================================================
+           5. BOTTOM BAR: CASTER (LEFT) | TIMER (CENTER) | LOGO (RIGHT)
+           ========================================================= */
+        /* Single Caster Bottom-Left */
+        #caster-container {
+            position: absolute;
+            left: 42px;
+            bottom: 30px;
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        #caster-container.hidden {
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            visibility: hidden;
+        }
+
+        .caster-webcam-frame {
+            width: 400px;
+            height: 225px;
+            border: 2.5px solid var(--gold-bright);
+            background: rgba(6, 10, 20, 0.25);
+            border-radius: 10px;
+            position: relative;
+            box-shadow:
+                0 16px 45px rgba(0, 0, 0, 0.85),
+                0 0 24px rgba(212, 175, 55, 0.25),
+                inset 0 0 22px rgba(56, 189, 248, 0.15);
+            overflow: hidden;
+        }
+
+        .caster-webcam-frame::before,
+        .caster-webcam-frame::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-color: var(--cyan);
+            border-style: solid;
+            pointer-events: none;
+        }
+
+        .caster-webcam-frame::before {
+            top: 6px;
+            left: 6px;
+            border-width: 2px 0 0 2px;
+        }
+
+        .caster-webcam-frame::after {
+            bottom: 6px;
+            right: 6px;
+            border-width: 0 2px 2px 0;
+        }
+
+        .caster-name-plate {
+            background: linear-gradient(135deg, rgba(14, 22, 42, 0.96) 0%, rgba(8, 12, 24, 0.98) 100%);
+            border: 2px solid var(--gold);
+            border-radius: 999px;
+            padding: 7px 34px;
+            min-width: 240px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--gold-bright);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.85), 0 0 16px rgba(212, 175, 55, 0.25);
+        }
+
+        /* Timer Bottom-Center (EGCTV style) */
+        #timer-container {
+            position: absolute;
+            left: 50%;
+            bottom: 52px;
+            transform: translateX(-50%);
+            z-index: 40;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, rgba(10, 18, 38, 0.92) 0%, rgba(5, 9, 20, 0.95) 100%);
+            border: 2px solid rgba(56, 189, 248, 0.65);
+            border-radius: 14px;
+            padding: 14px 44px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), 0 0 25px rgba(56, 189, 248, 0.25);
+            min-width: 340px;
+        }
+
+        .timer-label {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #cbd5e1;
+        }
+
+        #timer-display {
+            font-size: 38px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: #ffffff;
+            text-shadow: 0 0 18px rgba(56, 189, 248, 0.55);
+            font-variant-numeric: tabular-nums;
+            margin-top: 2px;
+        }
+
+        /* Logo AoE Italia Bottom-Right */
+        #brand-logo-container {
+            position: absolute;
+            right: 48px;
+            bottom: 36px;
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #brand-logo-container.hidden {
+            display: none;
+        }
+
+        .brand-logo-aura {
+            padding: 18px 28px;
+            border-radius: 24px;
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.78) 0%, rgba(6, 10, 20, 0.45) 100%);
+            border: 1.5px solid rgba(212, 175, 55, 0.35);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.75), 0 0 30px rgba(212, 175, 55, 0.14);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-logo-img {
+            max-width: 240px;
+            max-height: 155px;
+            object-fit: contain;
+            filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 18px rgba(212, 175, 55, 0.35));
+        }
+
+        .brand-logo-caption {
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--gold-bright);
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-layer"></div>
+
+    <!-- 1. TOP HEADER -->
+    <header id="top-header">
+        <!-- Player 1 (Left) -->
+        <div class="player-banner left">
+            <div class="player-identity">
+                <div id="p1-flag" class="country-flag-wrap"></div>
+                <div class="player-text-col">
+                    <div id="p1-name" class="player-name">CHRYSAOR</div>
+                    <div class="player-seed-row">
+                        <span id="p1-seed" class="player-seed">SEED #1</span>
+                    </div>
+                </div>
+            </div>
+            <div id="p1-photo" class="player-photo-frame"></div>
+        </div>
+
+        <!-- Center Event Title -->
+        <div id="center-event-box">
+            <div id="event-subtitle" class="event-eyebrow">AGE OF EMPIRES IV • AOE ITALIA</div>
+            <div id="event-title" class="event-title">FINALE LEGA ORO</div>
+        </div>
+
+        <!-- Player 2 (Right) -->
+        <div class="player-banner right">
+            <div class="player-identity">
+                <div id="p2-flag" class="country-flag-wrap"></div>
+                <div class="player-text-col">
+                    <div id="p2-name" class="player-name">GATTORATTO</div>
+                    <div class="player-seed-row">
+                        <span id="p2-seed" class="player-seed">SEED #2</span>
+                    </div>
+                </div>
+            </div>
+            <div id="p2-photo" class="player-photo-frame"></div>
+        </div>
+    </header>
+
+    <!-- 2. SCOREBOARD ARCH & CIV DRAFT MEDALLIONS -->
+    <div id="sub-header-bar">
+        <div id="p1-draft-strip" class="draft-civs-strip left"></div>
+
+        <div id="score-arch">
+            <div class="score-arch-backdrop"></div>
+            <div id="p1-score" class="score-orb p1">0</div>
+            <div class="bo-center-info">
+                <div id="match-stage" class="match-stage-label">GRAND FINAL</div>
+                <div id="best-of-label" class="best-of-badge">BEST OF 5</div>
+            </div>
+            <div id="p2-score" class="score-orb p2">0</div>
+        </div>
+
+        <div id="p2-draft-strip" class="draft-civs-strip right"></div>
+    </div>
+
+    <!-- 3. MAIN STAGE: SKILLS + BO5 MAPS -->
+    <main id="main-stage">
+        <!-- Left Skills Panel (P1) -->
+        <aside class="skills-panel left">
+            <div class="skills-header">
+                <div class="skills-title-group">
+                    <span class="skills-kicker">Player Skills</span>
+                    <span id="skills-p1-name" class="skills-player-label">CHRYSAOR</span>
+                </div>
+                <div id="skills-p1-avg" class="skills-avg-badge">AVG 8.0</div>
+            </div>
+            <div id="skills-p1-list" class="skills-list"></div>
+        </aside>
+
+        <!-- Center Isometric Diamond Maps -->
+        <section id="maps-stage"></section>
+
+        <!-- Right Skills Panel (P2) -->
+        <aside class="skills-panel right">
+            <div class="skills-header">
+                <div class="skills-title-group">
+                    <span class="skills-kicker">Player Skills</span>
+                    <span id="skills-p2-name" class="skills-player-label">GATTORATTO</span>
+                </div>
+                <div id="skills-p2-avg" class="skills-avg-badge">AVG 8.0</div>
+            </div>
+            <div id="skills-p2-list" class="skills-list"></div>
+        </aside>
+    </main>
+
+    <!-- 4. BOTTOM AREA: SINGLE CASTER (LEFT), TIMER (CENTER), LOGO (RIGHT) -->
+    <div id="caster-container" class="hidden">
+        <div class="caster-webcam-frame"></div>
+        <div id="caster-name" class="caster-name-plate">CASTER</div>
+    </div>
+
+    <div id="timer-container">
+        <div id="timer-label" class="timer-label">IL GAME STA PER INIZIARE...</div>
+        <div id="timer-display">05:00</div>
+    </div>
+
+    <div id="brand-logo-container">
+        <div class="brand-logo-aura">
+            <img src="/aoeitalia-logo.png" alt="AoE Italia" class="brand-logo-img" />
+            <div id="logo-caption" class="brand-logo-caption">AOE ITALIA • LEGA ORO</div>
+        </div>
+    </div>
+
+    <script>
+        const SUB_URL = "https://laliiuqjpxanhwhxajlm.supabase.co";
+        const SUB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhbGlpdXFqcHhhbmh3aHhhamxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjQ5MjEsImV4cCI6MjA4ODU0MDkyMX0.1xIE1MXy1JxgGzpP0Hitotz8o3aMwASV8NUr06bQjkA";
+        const OVERLAY_ID = "gold-league-final";
+
+        const { createClient } = window.supabase;
+        const client = createClient(SUB_URL, SUB_KEY);
+        let lastState = null;
+        let currentBackgroundUrl = null;
+        const sessionBuster = Date.now();
+
+        const CIV_MAP = {
+            'abbasid': 'Abbasid Dynasty.webp',
+            'ayyubids': 'Ayyubids.webp',
+            'byzantines': 'Byzantines.webp',
+            'chinese': 'Chinese.webp',
+            'delhi': 'Delhi Sultanate.webp',
+            'english': 'English.webp',
+            'french': 'French.webp',
+            'goldenhorde': 'Golden Horde.webp',
+            'hre': 'Holy Roman Empire.webp',
+            'japanese': 'Japanese.webp',
+            'jeannedarc': 'jeannedarc.webp',
+            'jin-dynasty': 'Jin Dynasty.webp',
+            'lancaster': 'House of Lancaster.webp',
+            'macedonian': 'Macedonian Dynasty.webp',
+            'malians': 'Malians.webp',
+            'mongols': 'Mongols.webp',
+            'orderofthedragon': 'Order of the Dragon.webp',
+            'ottomans': 'Ottomans.webp',
+            'rus': 'Rus.webp',
+            'scozzesi': 'Scots.webp',
+            'scots': 'Scots.webp',
+            'sengoku': 'Sengoku Daimyo.webp',
+            'templar': 'Knights Templar.webp',
+            'tughlaq': 'Tughlaq Dynasty.webp',
+            'vikings': 'Vikings.webp',
+            'vichinghi': 'Vikings.webp',
+            'zhuxi': 'Zhu Xis Legacy.webp'
+        };
+
+        const COUNTRY_FLAGS = {
+            ch: `<svg viewBox="0 0 32 24"><rect width="32" height="24" fill="#d52b1e"/><rect x="13" y="4" width="6" height="16" fill="#fff"/><rect x="8" y="9" width="16" height="6" fill="#fff"/></svg>`,
+            it: `<svg viewBox="0 0 3 2"><rect width="1" height="2" fill="#009246"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ce2b37"/></svg>`,
+            de: `<svg viewBox="0 0 5 3"><rect width="5" height="1" y="0" fill="#000"/><rect width="5" height="1" y="1" fill="#dd0000"/><rect width="5" height="1" y="2" fill="#ffce00"/></svg>`,
+            fr: `<svg viewBox="0 0 3 2"><rect width="1" height="2" fill="#0055a4"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ef4135"/></svg>`,
+            es: `<svg viewBox="0 0 3 2"><rect width="3" height="2" fill="#aa151b"/><rect y="0.5" width="3" height="1" fill="#f1bf00"/></svg>`,
+            gb: `<svg viewBox="0 0 60 30"><clipPath id="s"><path d="M0,0 v30 h60 v-30 z"/></clipPath><path d="M0,0 v30 h60 v-30 z" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="3"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></svg>`,
+            us: `<svg viewBox="0 0 38 20"><rect width="38" height="20" fill="#b22234"/><path d="M0,3h38M0,7h38M0,11h38M0,15h38M0,19h38" stroke="#fff" stroke-width="1.5"/><rect width="16" height="11" fill="#3c3b6e"/></svg>`,
+            at: `<svg viewBox="0 0 3 2"><rect width="3" height="2" fill="#ed2939"/><rect y="0.66" width="3" height="0.67" fill="#fff"/></svg>`,
+            nl: `<svg viewBox="0 0 3 2"><rect width="3" height="0.67" y="0" fill="#ae1c28"/><rect width="3" height="0.67" y="0.66" fill="#fff"/><rect width="3" height="0.67" y="1.33" fill="#21468b"/></svg>`,
+            pl: `<svg viewBox="0 0 8 5"><rect width="8" height="2.5" fill="#fff"/><rect y="2.5" width="8" height="2.5" fill="#dc143c"/></svg>`,
+            se: `<svg viewBox="0 0 16 10"><rect width="16" height="10" fill="#006aa7"/><rect x="5" width="2" height="10" fill="#fecc00"/><rect y="4" width="16" height="2" fill="#fecc00"/></svg>`,
+            eu: `<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#003399"/><circle cx="15" cy="10" r="6" fill="none" stroke="#ffcc00" stroke-width="1.6" stroke-dasharray="1 2.14"/></svg>`
+        };
+
+        const PLACEHOLDER_AVATAR = `
+            <svg class="player-photo-placeholder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+            </svg>
+        `;
+
+        const SKILL_FIELDS = [
+            { key: 'micro', label: 'Micro' },
+            { key: 'macro', label: 'Macro' },
+            { key: 'apm', label: 'APM' },
+            { key: 'strategia', label: 'Strategia' },
+            { key: 'creativita', label: 'Creatività' }
+        ];
+
+        function escapeHtml(text) {
+            if (text === undefined || text === null) return '';
+            return String(text).replace(/[&<>"']/g, m => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+            }[m]));
+        }
+
+        function getCivUrl(id) {
+            if (!id) return '';
+            if (id.startsWith('/') || id.includes('.webp') || id.includes('.png')) {
+                return id.startsWith('/') ? id : `/${id}`;
+            }
+            const file = CIV_MAP[id.toLowerCase()];
+            return file ? `/civs/${file}` : `/civs/${id}.webp`;
+        }
+
+        function getMapUrl(name) {
+            if (!name) return '/maps/Dry Arabia.png';
+            if (name === 'Marshland') return '/maps/Marshland.jpg';
+            return `/maps/${name}.png`;
+        }
+
+        function renderCountryFlag(containerId, countryCode) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            const code = (countryCode || '').toLowerCase().trim();
+            if (!code || code === 'none') {
+                el.style.display = 'none';
+                return;
+            }
+            el.style.display = 'flex';
+            if (code.startsWith('http') || code.startsWith('/')) {
+                el.innerHTML = `<img src="${escapeHtml(code)}" alt="flag" />`;
+            } else if (COUNTRY_FLAGS[code]) {
+                el.innerHTML = COUNTRY_FLAGS[code];
+            } else {
+                el.innerHTML = `<span style="font-weight:900;font-size:16px;text-transform:uppercase;">${escapeHtml(code.slice(0, 3))}</span>`;
+            }
+        }
+
+        function renderPhoto(containerId, photoUrl) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            if (photoUrl && photoUrl.trim()) {
+                el.innerHTML = `<img src="${escapeHtml(photoUrl.trim())}" alt="Player" onerror="this.parentElement.innerHTML=\`${PLACEHOLDER_AVATAR.replace(/"/g, '&quot;')}\`" />`;
+            } else {
+                el.innerHTML = PLACEHOLDER_AVATAR;
+            }
+        }
+
+        function renderDraftStrip(containerId, draftCivs) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            const items = Array.isArray(draftCivs) ? draftCivs : [];
+            if (items.length === 0) {
+                el.innerHTML = '';
+                return;
+            }
+            el.innerHTML = items.map(item => {
+                const civId = typeof item === 'string' ? item : item?.civId;
+                const status = typeof item === 'string' ? 'pick' : (item?.status || 'pick');
+                if (!civId) return '';
+                return `<div class="draft-orb ${escapeHtml(status)}" style="background-image: url('${getCivUrl(civId)}')"></div>`;
+            }).join('');
+        }
+
+        function renderSkills(listId, avgId, skillsObj) {
+            const listEl = document.getElementById(listId);
+            const avgEl = document.getElementById(avgId);
+            if (!listEl) return;
+
+            const s = skillsObj || { micro: 7, macro: 7, apm: 7, strategia: 7, creativita: 7 };
+            let sum = 0;
+
+            listEl.innerHTML = SKILL_FIELDS.map(f => {
+                const raw = Number(s[f.key] ?? 5);
+                const val = Math.max(1, Math.min(10, isNaN(raw) ? 5 : raw));
+                sum += val;
+                const pct = (val / 10) * 100;
+                const displayVal = Number.isInteger(val) ? val : val.toFixed(1);
+                return `
+                    <div class="skill-row">
+                        <div class="skill-meta">
+                            <span class="skill-name">${f.label}</span>
+                            <span class="skill-score">${displayVal} <span>/ 10</span></span>
+                        </div>
+                        <div class="skill-bar-track">
+                            <div class="skill-bar-fill" style="width: ${pct}%"></div>
+                            <div class="skill-bar-ticks">
+                                <div></div><div></div><div></div><div></div><div></div>
+                                <div></div><div></div><div></div><div></div><div></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (avgEl) {
+                avgEl.innerText = `AVG ${(sum / SKILL_FIELDS.length).toFixed(1)}`;
+            }
+        }
+
+        function createDiamondCard(map, idx) {
+            const isNext = !!map.isNext;
+            const winner = Number(map.winner || 0);
+            const p1Won = winner === 1;
+            const p2Won = winner === 2;
+            const hasWinner = p1Won || p2Won;
+
+            const p1Civ = map.p1Civ || (Array.isArray(map.t1Civs) ? map.t1Civs[0] : '') || '';
+            const p2Civ = map.p2Civ || (Array.isArray(map.t2Civs) ? map.t2Civs[0] : '') || '';
+            const mapName = (map.name || `Mappa ${idx + 1}`).trim();
+
+            const strokeColor = isNext ? '#38bdf8' : (hasWinner ? '#ffd700' : '#d4af37');
+            const strokeWidth = isNext ? '4' : '3';
+
+            let statusPill = `<div class="map-status-pill game-num-pill">GAME ${idx + 1}</div>`;
+            if (isNext) {
+                statusPill = `<div class="map-status-pill next-pill">PROSSIMO GAME</div>`;
+            }
+
+            return `
+                <div class="map-node ${isNext ? 'is-next' : ''} ${hasWinner ? 'has-winner' : ''}">
+                    ${statusPill}
+                    <div class="diamond-stage">
+                        ${p1Civ ? `
+                            <div class="map-civ-badge left ${p1Won ? 'is-winner' : (p2Won ? 'is-loser' : '')}" style="background-image: url('${getCivUrl(p1Civ)}')">
+                                ${p1Won ? '<div class="map-winner-crown">👑</div>' : ''}
+                            </div>
+                        ` : ''}
+
+                        <div class="diamond-clip">
+                            <img class="diamond-bg-img" src="${getMapUrl(mapName)}" alt="${escapeHtml(mapName)}" onerror="this.src='/maps/Dry Arabia.png'" />
+                            <div class="diamond-vignette"></div>
+                        </div>
+
+                        <svg class="diamond-border-svg" viewBox="0 0 280 160" fill="none">
+                            <polygon points="140,3 277,80 140,157 3,80" stroke="${strokeColor}" stroke-width="${strokeWidth}" stroke-linejoin="round" />
+                            <polygon points="140,9 267,80 140,151 13,80" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-linejoin="round" />
+                        </svg>
+
+                        ${p2Civ ? `
+                            <div class="map-civ-badge right ${p2Won ? 'is-winner' : (p1Won ? 'is-loser' : '')}" style="background-image: url('${getCivUrl(p2Civ)}')">
+                                ${p2Won ? '<div class="map-winner-crown">👑</div>' : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="map-name-plate">${escapeHtml(mapName)}</div>
+                </div>
+            `;
+        }
+
+        function renderMaps(maps) {
+            const container = document.getElementById('maps-stage');
+            if (!container) return;
+            const list = Array.isArray(maps) ? maps : [];
+            if (list.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            // Layout: for Bo5 -> 3 on top, 2 on bottom (inverted pyramid);
+            // for Bo3 -> 1 on top, 2 on bottom (EGCTV pyramid);
+            // for Bo1 -> 1 centered; for Bo7 -> 4 top, 3 bottom.
+            let topRow = [];
+            let bottomRow = [];
+
+            if (list.length <= 2) {
+                topRow = list;
+            } else if (list.length === 3) {
+                topRow = [list[0]];
+                bottomRow = [list[1], list[2]];
+            } else if (list.length === 4) {
+                topRow = list.slice(0, 2);
+                bottomRow = list.slice(2, 4);
+            } else {
+                const topCount = Math.ceil(list.length / 2);
+                topRow = list.slice(0, topCount);
+                bottomRow = list.slice(topCount);
+            }
+
+            let html = `<div class="maps-row">${topRow.map((m, i) => createDiamondCard(m, i)).join('')}</div>`;
+            if (bottomRow.length > 0) {
+                const offset = topRow.length;
+                html += `<div class="maps-row">${bottomRow.map((m, i) => createDiamondCard(m, offset + i)).join('')}</div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return [m, s].map(v => v.toString().padStart(2, '0')).join(':');
+        }
+
+        function updateTimer() {
+            const container = document.getElementById('timer-container');
+            const label = document.getElementById('timer-label');
+            const display = document.getElementById('timer-display');
+            if (!container || !display) return;
+
+            if (!lastState || !lastState.timer || !lastState.timer.active) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'flex';
+            const elapsed = Math.floor((Date.now() - (lastState.timer.timestamp || Date.now())) / 1000);
+            const total = ((lastState.timer.min || 0) * 60) + (lastState.timer.sec || 0);
+            const remaining = Math.max(0, total - elapsed);
+
+            if (remaining <= 0) {
+                if (label) label.style.display = 'none';
+                display.innerText = 'IL GAME STA PER INIZIARE!';
+                display.style.fontSize = '22px';
+            } else {
+                if (label) label.style.display = 'block';
+                display.innerText = formatTime(remaining);
+                display.style.fontSize = '38px';
+            }
+        }
+
+        function render(state, backgroundUrl) {
+            const targetBg = backgroundUrl || '../background/background.png';
+            if (currentBackgroundUrl !== targetBg) {
+                currentBackgroundUrl = targetBg;
+                document.body.style.backgroundImage = `url('${targetBg}?v=${sessionBuster}')`;
+            }
+
+            const s = state || {};
+            lastState = s;
+
+            // Header Event Titles
+            document.getElementById('event-title').innerText = s.tournamentTitle || 'FINALE LEGA ORO';
+            document.getElementById('event-subtitle').innerText = s.stageSubtitle || 'AGE OF EMPIRES IV • AOE ITALIA';
+            document.getElementById('match-stage').innerText = s.dayText || 'GRAND FINAL';
+            document.getElementById('best-of-label').innerText = s.matchFormat || `BEST OF ${(s.maps || []).length || 5}`;
+
+            // Player 1
+            const p1 = s.p1 || {};
+            const p1Name = p1.name || 'CHRYSAOR';
+            document.getElementById('p1-name').innerText = p1Name;
+            document.getElementById('skills-p1-name').innerText = p1Name;
+            document.getElementById('p1-seed').innerText = p1.seed ? `SEED #${String(p1.seed).replace('#', '')}` : '';
+            document.getElementById('p1-score').innerText = p1.score ?? 0;
+            renderCountryFlag('p1-flag', p1.country ?? 'ch');
+            renderPhoto('p1-photo', p1.photoUrl);
+            renderDraftStrip('p1-draft-strip', p1.draftCivs);
+            renderSkills('skills-p1-list', 'skills-p1-avg', p1.skills);
+
+            // Player 2
+            const p2 = s.p2 || {};
+            const p2Name = p2.name || 'GATTORATTO';
+            document.getElementById('p2-name').innerText = p2Name;
+            document.getElementById('skills-p2-name').innerText = p2Name;
+            document.getElementById('p2-seed').innerText = p2.seed ? `SEED #${String(p2.seed).replace('#', '')}` : '';
+            document.getElementById('p2-score').innerText = p2.score ?? 0;
+            renderCountryFlag('p2-flag', p2.country ?? 'it');
+            renderPhoto('p2-photo', p2.photoUrl);
+            renderDraftStrip('p2-draft-strip', p2.draftCivs);
+            renderSkills('skills-p2-list', 'skills-p2-avg', p2.skills);
+
+            // Maps Bo5
+            renderMaps(s.maps || [
+                { name: 'Dry Arabia', p1Civ: '', p2Civ: '', winner: 0, isNext: true },
+                { name: 'Frisian Marshes', p1Civ: '', p2Civ: '', winner: 0, isNext: false },
+                { name: 'Silk Road', p1Civ: '', p2Civ: '', winner: 0, isNext: false },
+                { name: 'High View', p1Civ: '', p2Civ: '', winner: 0, isNext: false },
+                { name: 'Lipany', p1Civ: '', p2Civ: '', winner: 0, isNext: false }
+            ]);
+
+            // Single Caster Bottom-Left
+            const caster = (s.casters || [])[0];
+            const casterBox = document.getElementById('caster-container');
+            const casterName = document.getElementById('caster-name');
+            if (casterBox && casterName) {
+                if (caster && caster.active) {
+                    casterBox.classList.remove('hidden');
+                    casterName.innerText = caster.name || 'CASTER';
+                } else {
+                    casterBox.classList.add('hidden');
+                }
+            }
+
+            // Logo Bottom-Right
+            const logoBox = document.getElementById('brand-logo-container');
+            if (logoBox) {
+                if (s.showLogo === false) {
+                    logoBox.classList.add('hidden');
+                } else {
+                    logoBox.classList.remove('hidden');
+                }
+            }
+            const logoCaption = document.getElementById('logo-caption');
+            if (logoCaption) {
+                logoCaption.innerText = s.minimapBrandTitle || 'AOE ITALIA • LEGA ORO';
+            }
+
+            updateTimer();
+        }
+
+        async function init() {
+            render(null, null);
+            try {
+                const { data } = await client
+                    .from('stream_overlays')
+                    .select('state, background_url')
+                    .eq('id', OVERLAY_ID)
+                    .single();
+                if (data) render(data.state, data.background_url);
+            } catch (e) {
+                console.warn('Initial overlay load fallback to defaults:', e);
+            }
+
+            client
+                .channel(`public:${OVERLAY_ID}`)
+                .on(
+                    'postgres_changes',
+                    { event: '*', schema: 'public', table: 'stream_overlays', filter: `id=eq.${OVERLAY_ID}` },
+                    payload => {
+                        if (payload.new) {
+                            render(payload.new.state, payload.new.background_url);
+                        }
+                    }
+                )
+                .subscribe();
+
+            setInterval(async () => {
+                try {
+                    const { data } = await client
+                        .from('stream_overlays')
+                        .select('state, background_url')
+                        .eq('id', OVERLAY_ID)
+                        .single();
+                    if (data) render(data.state, data.background_url);
+                } catch (e) {}
+            }, 5000);
+
+            setInterval(updateTimer, 1000);
+        }
+
+        init();
+    </script>
+</body>
+</html>

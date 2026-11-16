@@ -22,6 +22,7 @@ import { TournamentOverlay2v2Dashboard } from './TournamentOverlay2v2Dashboard';
 import { TournamentOverlaySwissDashboard } from './TournamentOverlaySwissDashboard';
 import { InGameBrandDashboard } from './InGameBrandDashboard';
 import { DraftMatchingDashboard } from './DraftMatchingDashboard';
+import { GoldLeagueFinalDashboard } from './GoldLeagueFinalDashboard';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
 import { overlayService } from '../services/overlayService';
@@ -41,6 +42,13 @@ interface AdminOverlayModalProps {
 }
 
 const OVERLAYS: OverlayItem[] = [
+  {
+    id: 'gold-league-final',
+    name: 'Finale Lega Oro (1V1)',
+    description: 'Overlay speciale stile EGCTV per la Finale Lega Oro Bo5 (Chrysaor vs Gattoratto) con Skills, Draft e Foto.',
+    path: '/overlays/gold-league-final/index.html',
+    icon: Trophy
+  },
   {
     id: 'aoe4-match',
     name: 'AoE4 Match 3V3',
@@ -728,7 +736,9 @@ export function AdminOverlayModal({ isOpen, onClose }: AdminOverlayModalProps) {
                     </div>
                   ) : (
                     <div className="h-full bg-black/20 p-8">
-                      {selectedOverlay.id === 'aoe4-match' ? (
+                      {selectedOverlay.id === 'gold-league-final' ? (
+                        <GoldLeagueFinalDashboard onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} />
+                      ) : selectedOverlay.id === 'aoe4-match' ? (
                         <AoE4MatchDashboard onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} />
                       ) : selectedOverlay.id === 'draft-matching' ? (
                         <DraftMatchingDashboard onError={(msg) => setToast({ isVisible: true, message: msg, type: 'error' })} />

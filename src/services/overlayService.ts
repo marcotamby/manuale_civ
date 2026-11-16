@@ -2,15 +2,35 @@ import { supabase } from '../lib/supabaseClient';
 // Real-time overlay service for AoE4 match data sync
 
 
+export interface PlayerSkills {
+  micro: number;
+  macro: number;
+  apm: number;
+  strategia: number;
+  creativita: number;
+}
+
+export interface GoldFinalPlayer {
+  name: string;
+  score: number;
+  seed?: string;
+  country?: string;
+  photoUrl?: string;
+  civId?: string;
+  draftCivs?: { civId: string; status?: 'pick' | 'ban' | 'snipe' | 'played' }[];
+  skills?: PlayerSkills;
+}
+
 export interface OverlayState {
   t1?: { name: string; score: number; players: string[]; active?: boolean };
   t2?: { name: string; score: number; players: string[]; active?: boolean };
-  p1?: { name: string; score: number; civId: string };
-  p2?: { name: string; score: number; civId: string };
+  p1?: { name: string; score: number; civId: string } & Partial<GoldFinalPlayer>;
+  p2?: { name: string; score: number; civId: string } & Partial<GoldFinalPlayer>;
   map?: string;
   maps?: any[];
   timer?: { active: boolean; min?: number; sec?: number; timestamp?: number; startTime?: number | null };
   casters?: { active: boolean; name: string }[];
+  showLogo?: boolean;
   bracket?: any;
   coaches?: any[];
   students?: any[];
