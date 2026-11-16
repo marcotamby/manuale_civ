@@ -26,15 +26,39 @@ interface InGameBrandDashboardProps {
 }
 
 
+const COUNTRY_OPTIONS = [
+  { code: 'ch', label: 'Svizzera (CH)' },
+  { code: 'it', label: 'Italia (IT)' },
+  { code: 'de', label: 'Germania (DE)' },
+  { code: 'fr', label: 'Francia (FR)' },
+  { code: 'gb', label: 'Regno Unito (GB)' },
+  { code: 'es', label: 'Spagna (ES)' },
+  { code: 'at', label: 'Austria (AT)' },
+  { code: 'nl', label: 'Paesi Bassi (NL)' },
+  { code: 'pl', label: 'Polonia (PL)' },
+  { code: 'se', label: 'Svezia (SE)' },
+  { code: 'us', label: 'Stati Uniti (US)' },
+  { code: 'eu', label: 'Europa (EU)' },
+  { code: 'none', label: 'Nessuna bandiera' }
+];
+
 const DEFAULT_STATE: OverlayState = {
-  tournamentTitle: 'Ends of Summer Champions',
+  tournamentTitle: 'Finale Lega Oro',
+  matchFormat: 'BEST OF 5',
+  showMatchFormat: true,
   dayNumber: 1,
   dayText: 'Giornata 1',
   mapName: 'Dry Arabia',
   league: 'gold',
   scoreP1: 0,
   scoreP2: 0,
+  p1Country: 'ch',
+  p2Country: 'it',
+  p1Seed: '1',
+  p2Seed: '2',
   showScores: true,
+  showFlags: true,
+  showSeeds: true,
   showTopBanner: true,
   showMinimapCrest: true,
   showMinimapInfo: true,
@@ -211,10 +235,47 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
               type="text"
               value={state.tournamentTitle || ''}
               onChange={(e) => pushLiveState({ ...state, tournamentTitle: e.target.value })}
-              placeholder="Ends of Summer Champions"
+              placeholder="Finale Lega Oro"
               className="bg-[#0e1424] border border-white/10 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-sm font-bold text-white focus:outline-none"
             />
-            <p className="text-[11px] text-slate-400">Posizionato al centro sotto l'HUD spettatore.</p>
+            <div className="flex items-center justify-between gap-2 pt-1">
+              <div className="flex items-center gap-1.5">
+                {['BEST OF 3', 'BEST OF 5', 'BEST OF 7'].map((fmt) => (
+                  <button
+                    key={fmt}
+                    type="button"
+                    onClick={() => pushLiveState({ ...state, matchFormat: fmt }, true)}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border transition-all ${
+                      (state.matchFormat || 'BEST OF 5').toUpperCase() === fmt
+                        ? 'bg-cyan-500/20 border-cyan-400 text-cyan-200'
+                        : 'bg-[#0e1424] border-white/10 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {fmt.replace('BEST OF ', 'BO')}
+                  </button>
+                ))}
+              </div>
+              <input
+                type="text"
+                value={state.matchFormat ?? 'BEST OF 5'}
+                onChange={(e) => pushLiveState({ ...state, matchFormat: e.target.value })}
+                placeholder="BEST OF 5"
+                className="w-32 bg-[#0e1424] border border-white/10 focus:border-cyan-400/60 rounded-lg px-2.5 py-1 text-xs font-black uppercase text-cyan-200 focus:outline-none text-center"
+              />
+              <button
+                type="button"
+                onClick={() => pushLiveState({ ...state, showMatchFormat: state.showMatchFormat === false ? true : false }, true)}
+                className={`text-[11px] font-bold flex items-center gap-1 px-2 py-1 rounded-lg border transition-all ${
+                  state.showMatchFormat !== false
+                    ? 'bg-cyan-500/15 border-cyan-400/40 text-cyan-300'
+                    : 'bg-white/5 border-white/10 text-slate-500'
+                }`}
+                title="Mostra/nascondi Best Of"
+              >
+                {state.showMatchFormat !== false ? <Eye size={12} /> : <EyeOff size={12} />}
+              </button>
+            </div>
+            <p className="text-[11px] text-slate-400">Calibrato esattamente sotto il blocco centrale dell'HUD spettatore (y=135px).</p>
           </div>
 
           {/* Selettore Giornata (Area Scura Minimappa) */}
@@ -260,20 +321,44 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
 
         </div>
 
-        {/* Row 1b: Punteggi Giocatori (Tondetti ai lati del banner) */}
+        {/* Row 1b: Punteggi, Bandiere & Seed Giocatori (Stile EGC) */}
         <div className="bg-black/40 border border-white/10 rounded-xl p-5 flex flex-col gap-3">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-orange-400"></span>
-              Punteggio Giocatori (Tondetti ai lati del banner)
+              Punteggi, Bandiere & Seed (Stile EGC ai lati del banner)
             </label>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => pushLiveState({ ...state, scoreP1: 0, scoreP2: 0 }, true)}
                 className="text-xs font-bold px-2.5 py-1 rounded-lg border bg-white/5 border-white/10 text-slate-300 hover:text-white"
               >
                 Azzera
+              </button>
+              <button
+                type="button"
+                onClick={() => pushLiveState({ ...state, showFlags: state.showFlags === false ? true : false }, true)}
+                className={`text-xs font-bold flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-all ${
+                  state.showFlags !== false
+                    ? 'bg-cyan-500/15 border-cyan-400/40 text-cyan-300'
+                    : 'bg-white/5 border-white/10 text-slate-500'
+                }`}
+              >
+                {state.showFlags !== false ? <Eye size={13} /> : <EyeOff size={13} />}
+                Bandiere
+              </button>
+              <button
+                type="button"
+                onClick={() => pushLiveState({ ...state, showSeeds: state.showSeeds === false ? true : false }, true)}
+                className={`text-xs font-bold flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-all ${
+                  state.showSeeds !== false
+                    ? 'bg-amber-500/15 border-amber-400/40 text-amber-300'
+                    : 'bg-white/5 border-white/10 text-slate-500'
+                }`}
+              >
+                {state.showSeeds !== false ? <Eye size={13} /> : <EyeOff size={13} />}
+                Seed
               </button>
               <button
                 type="button"
@@ -285,38 +370,67 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
                 }`}
               >
                 {state.showScores !== false ? <Eye size={13} /> : <EyeOff size={13} />}
-                {state.showScores !== false ? 'Visibile' : 'Nascosto'}
+                Punteggi
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {([
-              { key: 'scoreP1', label: 'Giocatore Sinistra' },
-              { key: 'scoreP2', label: 'Giocatore Destra' }
+              { key: 'scoreP1', countryKey: 'p1Country', seedKey: 'p1Seed', label: 'Giocatore Sinistra (P1)' },
+              { key: 'scoreP2', countryKey: 'p2Country', seedKey: 'p2Seed', label: 'Giocatore Destra (P2)' }
             ] as const).map((p) => (
-              <div key={p.key} className="flex items-center justify-between gap-3 bg-[#0e1424] border border-white/10 rounded-xl px-4 py-2.5">
-                <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">{p.label}</span>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => changeScore(p.key, -1)}
-                    className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 text-white font-black hover:bg-white/10"
-                  >
-                    −
-                  </button>
-                  <input
-                    type="number"
-                    min={0}
-                    value={state[p.key] ?? 0}
-                    onChange={(e) => pushLiveState({ ...state, [p.key]: Math.max(0, parseInt(e.target.value) || 0) })}
-                    className="w-14 text-center bg-black/40 border border-yellow-500/40 rounded-full py-1 text-base font-black text-yellow-300 focus:outline-none"
-                  />
-                  <button
-                    onClick={() => changeScore(p.key, 1)}
-                    className="w-8 h-8 rounded-lg bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 font-black hover:bg-yellow-500/30"
-                  >
-                    +
-                  </button>
+              <div key={p.key} className="bg-[#0e1424] border border-white/10 rounded-xl p-3.5 space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">{p.label}</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => changeScore(p.key, -1)}
+                      className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 text-white font-black hover:bg-white/10"
+                    >
+                      −
+                    </button>
+                    <input
+                      type="number"
+                      min={0}
+                      value={state[p.key] ?? 0}
+                      onChange={(e) => pushLiveState({ ...state, [p.key]: Math.max(0, parseInt(e.target.value) || 0) })}
+                      className="w-14 text-center bg-black/40 border border-yellow-500/40 rounded-full py-1 text-base font-black text-yellow-300 focus:outline-none"
+                    />
+                    <button
+                      onClick={() => changeScore(p.key, 1)}
+                      className="w-8 h-8 rounded-lg bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 font-black hover:bg-yellow-500/30"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-[1fr_100px] gap-2.5">
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Bandiera</label>
+                    <select
+                      value={(state[p.countryKey] as string) || 'none'}
+                      onChange={(e) => pushLiveState({ ...state, [p.countryKey]: e.target.value }, true)}
+                      className="w-full bg-black/40 border border-white/10 focus:border-cyan-400/60 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none"
+                    >
+                      {COUNTRY_OPTIONS.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Seed #</label>
+                    <input
+                      type="text"
+                      value={(state[p.seedKey] as string) ?? ''}
+                      onChange={(e) => pushLiveState({ ...state, [p.seedKey]: e.target.value })}
+                      placeholder="1"
+                      className="w-full bg-black/40 border border-white/10 focus:border-yellow-400/60 rounded-lg px-2.5 py-1.5 text-xs font-black text-center text-yellow-200 focus:outline-none"
+                    />
+                  </div>
                 </div>
               </div>
             ))}

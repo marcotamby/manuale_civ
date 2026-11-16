@@ -3,19 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
-    <title>In-Game Brand Overlay - AoE Italia</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>In-Game Brand Overlay EGC Style - AoE Italia</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Fondamento:ital@0;1&family=Inter:wght@400;500;600;700;800;900&family=MedievalSharp&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Fondamento:ital@0;1&family=Inter:wght@400;600;700;800;900&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --gold-main: #d4af37;
             --gold-bright: #ffd700;
-            --gold-glow: rgba(212, 175, 55, 0.45);
+            --gold-soft: #fef08a;
+            --gold-glow: rgba(212, 175, 55, 0.5);
             --cyan-main: #00d2ff;
             --cyan-bright: #38bdf8;
             --cyan-glow: rgba(0, 210, 255, 0.45);
+            --p1-accent: #3b82f6;
+            --p2-accent: #f97316;
         }
 
         * {
@@ -29,109 +35,234 @@
             height: 1080px;
             overflow: hidden;
             background: transparent !important;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Outfit', 'Inter', sans-serif;
             color: #ffffff;
             position: relative;
             user-select: none;
         }
 
         /* =========================================================================
-           1. TOP BANNER (NOME DEL TORNEO - Raccordo Seamless con HUD Spettatore)
+           1. TOP EGC BAR (Calibrata su HUD AoE4 1920x1080: x=805..1115, y=135px)
            ========================================================================= */
+        #top-brand-wrapper {
+            position: absolute;
+            top: 135px;
+            left: 0;
+            width: 1920px;
+            height: 64px;
+            z-index: 100;
+            pointer-events: none;
+            transition: top 0.15s ease;
+        }
+
+        /* Blocco Centrale: esattamente largo 310px (x=805..1115) */
         #top-brand-banner {
             position: absolute;
-            top: 136px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 296px;
-            height: 34px;
+            left: 805px;
+            top: 0;
+            width: 310px;
+            height: 56px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(180deg, rgba(25, 38, 50, 0.96) 0%, rgba(16, 25, 34, 0.98) 100%);
+            gap: 2px;
+            background: linear-gradient(180deg, rgba(19, 31, 49, 0.98) 0%, rgba(9, 15, 27, 0.99) 100%);
             border: 2px solid var(--gold-main);
-            border-top: 1px solid rgba(255, 215, 0, 0.35);
-            border-radius: 0 0 8px 8px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 215, 0, 0.35), 0 0 12px rgba(212, 175, 55, 0.2);
-            z-index: 100;
-            padding: 0 8px;
-            transition: all 0.2s ease;
+            border-top: 1.5px solid rgba(255, 215, 0, 0.45);
+            border-radius: 0 0 12px 12px;
+            box-shadow:
+                0 10px 28px rgba(0, 0, 0, 0.9),
+                inset 0 1px 0 rgba(255, 215, 0, 0.3),
+                0 0 18px rgba(212, 175, 55, 0.25);
+            padding: 3px 10px 4px;
         }
 
-        /* Staffe dorate angolari di raccordo superiore che si agganciano all'HUD fisso del gioco */
-        #top-brand-banner::before {
-            content: '';
-            position: absolute;
-            top: -6px;
-            left: -2px;
-            width: 8px;
-            height: 8px;
-            border-left: 2px solid var(--gold-bright);
-            border-top: 2px solid var(--gold-bright);
-            filter: drop-shadow(0 0 4px var(--gold-glow));
-            pointer-events: none;
-        }
-
+        /* Staffe dorate di raccordo agli angoli dell'HUD centrale AoE4 */
+        #top-brand-banner::before,
         #top-brand-banner::after {
             content: '';
             position: absolute;
-            top: -6px;
-            right: -2px;
-            width: 8px;
-            height: 8px;
-            border-right: 2px solid var(--gold-bright);
-            border-top: 2px solid var(--gold-bright);
-            filter: drop-shadow(0 0 4px var(--gold-glow));
+            top: -7px;
+            width: 10px;
+            height: 10px;
+            border-top: 2.5px solid var(--gold-bright);
+            filter: drop-shadow(0 0 5px var(--gold-glow));
             pointer-events: none;
+        }
+
+        #top-brand-banner::before {
+            left: -2px;
+            border-left: 2.5px solid var(--gold-bright);
+        }
+
+        #top-brand-banner::after {
+            right: -2px;
+            border-right: 2.5px solid var(--gold-bright);
         }
 
         .top-tournament-title {
-            font-family: 'Fondamento', 'Eagle Lake', 'Cinzel', serif;
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: 1.2px;
-            background: linear-gradient(180deg, #ffffff 0%, #fff176 30%, #ffa726 65%, #ff5722 95%);
+            font-family: 'Cinzel', 'Fondamento', serif;
+            font-size: 17px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #ffffff 0%, #fef08a 38%, #f59e0b 82%, #d97706 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 14px rgba(255, 167, 38, 0.4));
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95));
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 288px;
             text-align: center;
-            line-height: 1;
+            line-height: 1.1;
         }
 
-        /* Tondetti punteggio (posizionati in assoluto ai lati del banner: non spostano nulla) */
-        .score-circle {
+        .top-format-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1px 12px;
+            border-radius: 999px;
+            background: rgba(0, 210, 255, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.45);
+            font-family: 'Outfit', sans-serif;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: #e0f2fe;
+            text-shadow: 0 0 8px var(--cyan-glow);
+            line-height: 1.25;
+        }
+
+        /* Ali Giocatori (Score + Bandiera + Seed) saldate a sinistra (x<=805) e destra (x>=1115) */
+        .player-wing {
             position: absolute;
-            top: 50%;
-            width: 44px;
-            height: 35px;
-            margin-top: -16px; /* abbassato di ~1.5px/2px rispetto a prima */
+            top: 0;
+            height: 54px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .player-wing.left {
+            right: 1115px; /* si appoggia al bordo x=805 */
+            flex-direction: row-reverse;
+        }
+
+        .player-wing.right {
+            left: 1115px; /* si appoggia al bordo x=1115 */
+            flex-direction: row;
+        }
+
+        /* Scudo Punteggio Grande stile EGC */
+        .egc-score-shield {
+            width: 62px;
+            height: 56px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 20px / 16px; /* forma ovale raffinata ed elegante */
-            background: linear-gradient(180deg, rgba(25, 38, 50, 0.96) 0%, rgba(16, 25, 34, 0.98) 100%);
-            border: 2px solid var(--gold-main);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 215, 0, 0.35), 0 0 12px rgba(212, 175, 55, 0.2);
+            position: relative;
+            border: 2px solid var(--gold-bright);
+            border-top: 1.5px solid rgba(255, 215, 0, 0.55);
+            box-shadow:
+                0 10px 26px rgba(0, 0, 0, 0.9),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25),
+                0 0 16px rgba(212, 175, 55, 0.35);
+            overflow: hidden;
+        }
+
+        .player-wing.left .egc-score-shield {
+            background: linear-gradient(180deg, rgba(22, 46, 84, 0.98) 0%, rgba(10, 20, 42, 0.99) 100%);
+            border-right: none;
+            border-radius: 0 0 0 12px;
+        }
+
+        .player-wing.right .egc-score-shield {
+            background: linear-gradient(180deg, rgba(78, 32, 18, 0.98) 0%, rgba(30, 12, 10, 0.99) 100%);
+            border-left: none;
+            border-radius: 0 0 12px 0;
+        }
+
+        .egc-score-shield::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, transparent 50%);
             pointer-events: none;
         }
 
-        .score-circle.left { left: -54px; }
-        .score-circle.right { right: -54px; }
-
         .score-value {
-            font-family: 'Fondamento', 'Eagle Lake', 'Cinzel', serif;
-            font-size: 21px;
-            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            font-size: 36px;
+            font-weight: 900;
             line-height: 1;
-            background: linear-gradient(180deg, #ffffff 0%, #fff176 30%, #ffa726 65%, #ff5722 95%);
+            background: linear-gradient(180deg, #ffffff 0%, #fef08a 45%, #f59e0b 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 14px rgba(255, 167, 38, 0.4));
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 1));
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Targa Bandiera + Seed affiancata allo scudo punteggio */
+        .player-meta-plate {
+            height: 44px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 0 14px;
+            background: linear-gradient(180deg, rgba(16, 27, 44, 0.96) 0%, rgba(8, 14, 25, 0.98) 100%);
+            border: 1.5px solid rgba(212, 175, 55, 0.72);
+            border-top: 1px solid rgba(255, 215, 0, 0.35);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.85);
+        }
+
+        .player-wing.left .player-meta-plate {
+            border-right: none;
+            border-radius: 0 0 0 12px;
+            flex-direction: row-reverse;
+        }
+
+        .player-wing.right .player-meta-plate {
+            border-left: none;
+            border-radius: 0 0 12px 0;
+            flex-direction: row;
+        }
+
+        .flag-box {
+            width: 40px;
+            height: 26px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1.5px solid rgba(255, 255, 255, 0.75);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.7);
+            flex-shrink: 0;
+            line-height: 0;
+        }
+
+        .flag-box svg,
+        .flag-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .seed-tag {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #fef08a;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95);
+            white-space: nowrap;
         }
 
         /* =========================================================================
-           2. MINIMAP UNIFIED FRAME & PANELS (Pure 1:1 45° Diamond - Calibrato)
+           2. MINIMAP UNIFIED FRAME & PANELS (Calibrata su centro 1728, 873)
            ========================================================================= */
         #minimap-brand-wrapper {
             position: absolute;
@@ -141,7 +272,7 @@
             height: 444px;
             z-index: 100;
             pointer-events: none;
-            transition: all 0.2s ease;
+            transition: bottom 0.15s ease;
         }
 
         .minimap-wrapper-svg {
@@ -149,30 +280,31 @@
             inset: 0;
             width: 100%;
             height: 100%;
-            filter: drop-shadow(-4px 4px 15px rgba(0, 0, 0, 0.9));
+            filter: drop-shadow(-4px 4px 16px rgba(0, 0, 0, 0.92));
         }
 
         /* Logo AoE Italia Top-Right Content */
         .minimap-logo-content {
             position: absolute;
-            top: 20px;
-            right: 4px;
-            width: 140px;
-            height: 110px;
+            top: 26px;
+            right: 6px;
+            width: 138px;
+            height: 106px;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 2;
+            transition: top 0.15s ease;
         }
 
         .minimap-logo-img {
-            max-height: 72px;
-            max-width: 125px;
+            max-height: 70px;
+            max-width: 122px;
             object-fit: contain;
-            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 10px rgba(212, 175, 55, 0.35));
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 12px rgba(212, 175, 55, 0.4));
         }
 
-        /* Map Name & Day Bottom-Right Content */
+        /* Map Name & League Bottom-Right Content */
         .minimap-bottom-content {
             position: absolute;
             bottom: 14px;
@@ -185,7 +317,7 @@
         }
 
         .minimap-map-name {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Outfit', 'Inter', sans-serif;
             font-size: 22px;
             font-weight: 900;
             letter-spacing: 0.8px;
@@ -196,10 +328,10 @@
         }
 
         .minimap-day-text {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Outfit', 'Inter', sans-serif;
             font-size: 13px;
             font-weight: 900;
-            letter-spacing: 1.5px;
+            letter-spacing: 1.8px;
             color: var(--cyan-bright);
             text-transform: uppercase;
             text-shadow: 0 0 10px var(--cyan-glow), 0 2px 4px rgba(0, 0, 0, 1);
@@ -213,20 +345,44 @@
 </head>
 <body>
 
-    <!-- 1. TOP BRAND BANNER (Solo nome torneo - Sotto HUD Timer con Raccordo Dorato) -->
-    <div id="top-brand-banner">
-        <div class="score-circle left" id="score-circle-left"><span class="score-value" id="score-left">0</span></div>
-        <div class="top-tournament-title" id="top-title-text">Ends of Summer Champions</div>
-        <div class="score-circle right" id="score-circle-right"><span class="score-value" id="score-right">0</span></div>
+    <!-- 1. TOP EGC EXTENSION BAR -->
+    <div id="top-brand-wrapper">
+        <!-- Left Player Wing (Score + Flag + Seed) -->
+        <div class="player-wing left" id="wing-left">
+            <div class="egc-score-shield" id="score-box-left">
+                <span class="score-value" id="score-left">0</span>
+            </div>
+            <div class="player-meta-plate" id="meta-left">
+                <div class="flag-box" id="flag-left"></div>
+                <span class="seed-tag" id="seed-left">SEED #1</span>
+            </div>
+        </div>
+
+        <!-- Center Tournament Title & Best Of (Exact 310px match with AoE4 HUD) -->
+        <div id="top-brand-banner">
+            <div class="top-tournament-title" id="top-title-text">Finale Lega Oro</div>
+            <div class="top-format-pill" id="top-format-text">BEST OF 5</div>
+        </div>
+
+        <!-- Right Player Wing (Score + Flag + Seed) -->
+        <div class="player-wing right" id="wing-right">
+            <div class="egc-score-shield" id="score-box-right">
+                <span class="score-value" id="score-right">0</span>
+            </div>
+            <div class="player-meta-plate" id="meta-right">
+                <div class="flag-box" id="flag-right"></div>
+                <span class="seed-tag" id="seed-right">SEED #2</span>
+            </div>
+        </div>
     </div>
 
-    <!-- 2. MINIMAP COMPLETE BRAND WRAPPER (1:1 45° Diamond + Bordo Morbido + Dentellatura EGC) -->
+    <!-- 2. MINIMAP COMPLETE BRAND WRAPPER (Calibrato sul centro esatto 1728, 873 -> locale 252, 237) -->
     <div id="minimap-brand-wrapper">
         <svg class="minimap-wrapper-svg" viewBox="0 0 444 444" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <linearGradient id="panelBg" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#0b1224" stop-opacity="0.98"/>
-                    <stop offset="100%" stop-color="#040711" stop-opacity="0.98"/>
+                    <stop offset="0%" stop-color="#0d172b" stop-opacity="0.98"/>
+                    <stop offset="100%" stop-color="#050914" stop-opacity="0.99"/>
                 </linearGradient>
                 <linearGradient id="goldStroke" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stop-color="#ffd700"/>
@@ -235,25 +391,23 @@
                 </linearGradient>
             </defs>
 
-            <!-- 1. Top-Right Panel (copre toggle Y=0..61 e diagonale 45° a 432,237) -->
+            <!-- 1. Top-Right Panel (copre toggle visuale + diagonale 45° a 428,237 con bordo oro) -->
             <g id="svg-minimap-top-group">
-                <polygon points="256,0 444,0 444,247 432,237 256,61" fill="url(#panelBg)"/>
-                <line x1="256" y1="61" x2="432" y2="237" stroke="url(#goldStroke)" stroke-width="3" stroke-linecap="round"/>
+                <polygon points="252,61 294,16 444,16 444,237 428,237" fill="url(#panelBg)"/>
+                <polyline points="444,16 294,16 252,61 428,237 444,237" stroke="url(#goldStroke)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
             </g>
 
-            <!-- 2. Bottom-Right Panel (diagonale 45° a filo da 432,237 a 256,413) -->
+            <!-- 2. Bottom-Right Panel (diagonale 45° a filo da 428,237 a 252,413) -->
             <g id="svg-minimap-bottom-group">
-                <polygon points="432,237 444,227 444,444 256,444 256,413" fill="url(#panelBg)"/>
-                <line x1="432" y1="237" x2="256" y2="413" stroke="url(#goldStroke)" stroke-width="3" stroke-linecap="round"/>
+                <polygon points="428,237 444,237 444,444 252,444 252,413" fill="url(#panelBg)"/>
+                <polyline points="444,237 428,237 252,413 252,444" stroke="url(#goldStroke)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
             </g>
 
-            <!-- 3. Outer Scalloped / Starburst Dark Frame (Fascia Scura Spessa 10px + Dentellatura Esterna) -->
+            <!-- 3. Outer Scalloped / Starburst Dark Frame (Centro 252,237, raggio 176) -->
             <g id="svg-minimap-frame-group">
-                <polygon points="248.9,53.9 224.4,58.7 219.6,83.3 195.0,88.0 190.3,112.6 165.7,117.4 160.9,141.9 136.4,146.7 131.6,171.3 107.0,176.0 102.3,200.6 77.7,205.4 72.9,229.9 77.7,268.6 102.3,273.4 107.0,298.0 131.6,302.7 136.4,327.3 160.9,332.1 165.7,356.6 190.3,361.4 195.0,386.0 219.6,390.7 224.4,415.3 248.9,420.1 256,413 80,237 256,61" fill="url(#panelBg)"/>
-                <!-- Outer Jagged Gold Line -->
-                <polyline points="248.9,53.9 224.4,58.7 219.6,83.3 195.0,88.0 190.3,112.6 165.7,117.4 160.9,141.9 136.4,146.7 131.6,171.3 107.0,176.0 102.3,200.6 77.7,205.4 72.9,229.9 77.7,268.6 102.3,273.4 107.0,298.0 131.6,302.7 136.4,327.3 160.9,332.1 165.7,356.6 190.3,361.4 195.0,386.0 219.6,390.7 224.4,415.3 248.9,420.1" stroke="url(#goldStroke)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                <!-- Inner Diamond Left Gold Line -->
-                <polyline points="256,413 80,237 256,61" stroke="url(#goldStroke)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <polygon points="244.9,53.9 220.4,58.7 215.6,83.3 191.0,88.0 186.3,112.6 161.7,117.4 156.9,141.9 132.4,146.7 127.6,171.3 103.0,176.0 98.3,200.6 73.7,205.4 68.9,229.9 73.7,268.6 98.3,273.4 103.0,298.0 127.6,302.7 132.4,327.3 156.9,332.1 161.7,356.6 186.3,361.4 191.0,386.0 215.6,390.7 220.4,415.3 244.9,420.1 252,413 76,237 252,61" fill="url(#panelBg)"/>
+                <polyline points="244.9,53.9 220.4,58.7 215.6,83.3 191.0,88.0 186.3,112.6 161.7,117.4 156.9,141.9 132.4,146.7 127.6,171.3 103.0,176.0 98.3,200.6 73.7,205.4 68.9,229.9 73.7,268.6 98.3,273.4 103.0,298.0 127.6,302.7 132.4,327.3 156.9,332.1 161.7,356.6 186.3,361.4 191.0,386.0 215.6,390.7 220.4,415.3 244.9,420.1" stroke="url(#goldStroke)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <polyline points="252,413 76,237 252,61" stroke="url(#goldStroke)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
             </g>
         </svg>
 
@@ -262,7 +416,7 @@
             <img src="/aoeitalia-logo.png" alt="AoE Italia" class="minimap-logo-img">
         </div>
 
-        <!-- Map & Day Info (Bottom-Right) -->
+        <!-- Map & League Info (Bottom-Right) -->
         <div class="minimap-bottom-content" id="minimap-info-content">
             <div class="minimap-map-name" id="minimap-map-name">Dry Arabia</div>
             <div class="minimap-day-text" id="minimap-day-text">Lega Oro</div>
@@ -277,14 +431,27 @@
         const { createClient } = window.supabase;
         const client = createClient(SUB_URL, SUB_KEY);
 
+        const COUNTRY_FLAGS = {
+            ch: `<svg viewBox="0 0 40 26" preserveAspectRatio="none"><rect width="40" height="26" fill="#d52b1e"/><rect x="17" y="4" width="6" height="18" fill="#fff"/><rect x="11" y="10" width="18" height="6" fill="#fff"/></svg>`,
+            it: `<svg viewBox="0 0 3 2" preserveAspectRatio="none"><rect width="1" height="2" fill="#009246"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ce2b37"/></svg>`,
+            de: `<svg viewBox="0 0 5 3" preserveAspectRatio="none"><rect width="5" height="1" y="0" fill="#000"/><rect width="5" height="1" y="1" fill="#dd0000"/><rect width="5" height="1" y="2" fill="#ffce00"/></svg>`,
+            fr: `<svg viewBox="0 0 3 2" preserveAspectRatio="none"><rect width="1" height="2" fill="#0055a4"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ef4135"/></svg>`,
+            es: `<svg viewBox="0 0 3 2" preserveAspectRatio="none"><rect width="3" height="2" fill="#aa151b"/><rect y="0.5" width="3" height="1" fill="#f1bf00"/></svg>`,
+            gb: `<svg viewBox="0 0 60 30" preserveAspectRatio="xMidYMid slice"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="3"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></svg>`,
+            us: `<svg viewBox="0 0 38 20" preserveAspectRatio="none"><rect width="38" height="20" fill="#b22234"/><path d="M0,3h38M0,7h38M0,11h38M0,15h38M0,19h38" stroke="#fff" stroke-width="1.5"/><rect width="16" height="11" fill="#3c3b6e"/></svg>`,
+            at: `<svg viewBox="0 0 3 2" preserveAspectRatio="none"><rect width="3" height="2" fill="#ed2939"/><rect y="0.66" width="3" height="0.67" fill="#fff"/></svg>`,
+            nl: `<svg viewBox="0 0 3 2" preserveAspectRatio="none"><rect width="3" height="0.67" y="0" fill="#ae1c28"/><rect width="3" height="0.67" y="0.66" fill="#fff"/><rect width="3" height="0.67" y="1.33" fill="#21468b"/></svg>`,
+            pl: `<svg viewBox="0 0 8 5" preserveAspectRatio="none"><rect width="8" height="2.5" fill="#fff"/><rect y="2.5" width="8" height="2.5" fill="#dc143c"/></svg>`,
+            se: `<svg viewBox="0 0 16 10" preserveAspectRatio="none"><rect width="16" height="10" fill="#006aa7"/><rect x="5" width="2" height="10" fill="#fecc00"/><rect y="4" width="16" height="2" fill="#fecc00"/></svg>`,
+            eu: `<svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice"><rect width="30" height="20" fill="#003399"/><circle cx="15" cy="10" r="6" fill="none" stroke="#ffcc00" stroke-width="1.6" stroke-dasharray="1 2.14"/></svg>`
+        };
+
         function formatTitle(raw) {
-            if (!raw) return 'Ends of Summer Champions';
+            if (!raw) return 'Finale Lega Oro';
             const lowerWords = ['of', 'dei', 'del', 'della', 'degli', 'delle', 'di', 'da', 'in', 'and', 'the', 'e', 'a', 'su', 'per', 'con', 'tra', 'fra'];
             return raw.trim().split(/\s+/).map((word, index) => {
                 const wLower = word.toLowerCase();
-                if (index > 0 && lowerWords.includes(wLower)) {
-                    return wLower;
-                }
+                if (index > 0 && lowerWords.includes(wLower)) return wLower;
                 if (word === word.toUpperCase() && word.length > 2) {
                     return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
                 }
@@ -292,64 +459,89 @@
             }).join(' ');
         }
 
+        function renderPlayerMeta(side, country, seed, showFlags, showSeeds) {
+            const plate = document.getElementById(`meta-${side}`);
+            const flagEl = document.getElementById(`flag-${side}`);
+            const seedEl = document.getElementById(`seed-${side}`);
+
+            const code = (country || '').toLowerCase().trim();
+            const hasFlag = showFlags && code && code !== 'none' && COUNTRY_FLAGS[code];
+            const cleanSeed = (seed || '').trim().replace(/^#/, '');
+            const hasSeed = showSeeds && cleanSeed.length > 0;
+
+            if (hasFlag) {
+                flagEl.innerHTML = COUNTRY_FLAGS[code];
+                flagEl.classList.remove('hidden-element');
+            } else {
+                flagEl.innerHTML = '';
+                flagEl.classList.add('hidden-element');
+            }
+
+            if (hasSeed) {
+                seedEl.innerText = `SEED #${cleanSeed}`;
+                seedEl.classList.remove('hidden-element');
+            } else {
+                seedEl.classList.add('hidden-element');
+            }
+
+            plate.classList.toggle('hidden-element', !hasFlag && !hasSeed);
+        }
+
         function render(state, displayName) {
             const s = state || {};
 
-            // 1. Titles & Day
-            const title = displayName || s.tournamentTitle || s.titleText || 'Ends of Summer Champions';
-            const formattedTitle = formatTitle(title);
-            const mapName = s.mapName || 'Dry Arabia';
-            const leagueText = s.league === 'silver' ? 'Lega Argento' : 'Lega Oro';
+            // 1. Titolo & Best of
+            const title = s.tournamentTitle || s.titleText || displayName || 'Finale Lega Oro';
+            document.getElementById('top-title-text').innerText = formatTitle(title);
 
-            // Top Banner Element
-            const topBanner = document.getElementById('top-brand-banner');
-            document.getElementById('top-title-text').innerText = formattedTitle;
+            const formatEl = document.getElementById('top-format-text');
+            const showFormat = s.showMatchFormat !== false;
+            formatEl.innerText = s.matchFormat || 'BEST OF 5';
+            formatEl.classList.toggle('hidden-element', !showFormat);
 
-            // Punteggi giocatori (tondetti ai lati del banner)
+            // 2. Punteggi grandi EGC
             document.getElementById('score-left').innerText = Number(s.scoreP1) || 0;
             document.getElementById('score-right').innerText = Number(s.scoreP2) || 0;
             const showScores = s.showScores !== false;
-            document.getElementById('score-circle-left').classList.toggle('hidden-element', !showScores);
-            document.getElementById('score-circle-right').classList.toggle('hidden-element', !showScores);
+            document.getElementById('score-box-left').classList.toggle('hidden-element', !showScores);
+            document.getElementById('score-box-right').classList.toggle('hidden-element', !showScores);
 
-            // Minimap Elements
+            // 3. Bandiere & Seed
+            const showFlags = s.showFlags !== false;
+            const showSeeds = s.showSeeds !== false;
+            renderPlayerMeta('left', s.p1Country ?? 'ch', s.p1Seed ?? '1', showFlags, showSeeds);
+            renderPlayerMeta('right', s.p2Country ?? 'it', s.p2Seed ?? '2', showFlags, showSeeds);
+
+            // Visibilità Top Bar
+            const topWrapper = document.getElementById('top-brand-wrapper');
+            topWrapper.classList.toggle('hidden-element', s.showTopBanner === false);
+
+            // 4. Minimappa
+            const mapName = s.mapName || 'Dry Arabia';
+            const leagueText = s.league === 'silver' ? 'Lega Argento' : 'Lega Oro';
             const minimapWrapper = document.getElementById('minimap-brand-wrapper');
             const minimapTopGroup = document.getElementById('svg-minimap-top-group');
             const minimapBottomGroup = document.getElementById('svg-minimap-bottom-group');
             const minimapLogo = document.getElementById('minimap-logo-content');
             const minimapInfo = document.getElementById('minimap-info-content');
-            const minimapDay = document.getElementById('minimap-day-text');
-            const minimapMap = document.getElementById('minimap-map-name');
 
-            minimapDay.innerText = leagueText;
-            minimapMap.innerText = mapName;
+            document.getElementById('minimap-day-text').innerText = leagueText;
+            document.getElementById('minimap-map-name').innerText = mapName;
 
-            // Visibility Toggles
-            if (s.showTopBanner === false) {
-                topBanner.classList.add('hidden-element');
-            } else {
-                topBanner.classList.remove('hidden-element');
-            }
+            const showCrest = s.showMinimapCrest !== false;
+            minimapTopGroup?.classList.toggle('hidden-element', !showCrest);
+            minimapLogo?.classList.toggle('hidden-element', !showCrest);
 
-            if (s.showMinimapCrest === false) {
-                if (minimapTopGroup) minimapTopGroup.classList.add('hidden-element');
-                if (minimapLogo) minimapLogo.classList.add('hidden-element');
-            } else {
-                if (minimapTopGroup) minimapTopGroup.classList.remove('hidden-element');
-                if (minimapLogo) minimapLogo.classList.remove('hidden-element');
-            }
+            const showInfo = s.showMinimapInfo !== false;
+            minimapBottomGroup?.classList.toggle('hidden-element', !showInfo);
+            minimapInfo?.classList.toggle('hidden-element', !showInfo);
 
-            if (s.showMinimapInfo === false) {
-                if (minimapBottomGroup) minimapBottomGroup.classList.add('hidden-element');
-                if (minimapInfo) minimapInfo.classList.add('hidden-element');
-            } else {
-                if (minimapBottomGroup) minimapBottomGroup.classList.remove('hidden-element');
-                if (minimapInfo) minimapInfo.classList.remove('hidden-element');
-            }
-
-            // Fine-tune offsets
+            // Offset fine tuning
             if (s.topBannerOffsetY !== undefined) {
-                topBanner.style.top = `${136 + Number(s.topBannerOffsetY)}px`;
+                topWrapper.style.top = `${135 + Number(s.topBannerOffsetY)}px`;
+            }
+            if (s.minimapCrestOffsetY !== undefined && minimapLogo) {
+                minimapLogo.style.top = `${26 + Number(s.minimapCrestOffsetY)}px`;
             }
             if (s.minimapBottomOffsetY !== undefined) {
                 minimapWrapper.style.bottom = `${0 + Number(s.minimapBottomOffsetY)}px`;
@@ -357,6 +549,7 @@
         }
 
         async function init() {
+            render({});
             try {
                 const { data, error } = await client
                     .from('stream_overlays')
@@ -366,8 +559,6 @@
 
                 if (!error && data) {
                     render(data.state, data.display_name);
-                } else {
-                    render({});
                 }
 
                 client
@@ -382,6 +573,17 @@
                         if (rec) render(rec.state, rec.display_name);
                     })
                     .subscribe();
+
+                setInterval(async () => {
+                    try {
+                        const { data: fresh } = await client
+                            .from('stream_overlays')
+                            .select('state, display_name')
+                            .eq('id', OVERLAY_ID)
+                            .single();
+                        if (fresh) render(fresh.state, fresh.display_name);
+                    } catch (e) {}
+                }, 5000);
 
             } catch (err) {
                 console.error("Errore init in-game-brand:", err);

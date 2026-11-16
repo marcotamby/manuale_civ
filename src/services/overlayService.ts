@@ -62,6 +62,13 @@ export interface OverlayState {
   scoreP1?: number;
   scoreP2?: number;
   showScores?: boolean;
+  p1Seed?: string;
+  p2Seed?: string;
+  p1Country?: string;
+  p2Country?: string;
+  showFlags?: boolean;
+  showSeeds?: boolean;
+  showMatchFormat?: boolean;
   minimapBrandTitle?: string;
   minimapBrandSub?: string;
   showTopBanner?: boolean;
