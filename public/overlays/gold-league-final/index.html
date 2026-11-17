@@ -407,38 +407,36 @@
             height: 58px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+        }
+
+        .draft-civs-strip.compact {
+            gap: 6px;
         }
 
         .draft-civs-strip.left {
-            left: 42px;
-            right: 1225px;
+            left: 26px;
+            right: 1218px;
             justify-content: flex-end;
         }
 
         .draft-civs-strip.right {
-            right: 42px;
-            left: 1225px;
+            right: 26px;
+            left: 1218px;
             justify-content: flex-start;
         }
 
-        .draft-label-tag {
-            font-size: 10px;
-            font-weight: 900;
-            letter-spacing: 2.5px;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.55);
-            background: rgba(8, 13, 26, 0.78);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            padding: 4px 10px;
-            border-radius: 999px;
-            margin: 0 4px;
-            white-space: nowrap;
+        .draft-group-divider {
+            width: 2px;
+            height: 30px;
+            background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+            margin: 0 3px;
+            flex-shrink: 0;
         }
 
         .draft-orb {
-            width: 52px;
-            height: 52px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             border: 2.5px solid rgba(255, 255, 255, 0.75);
             background-color: #090e1a;
@@ -450,44 +448,67 @@
             overflow: hidden;
         }
 
+        .draft-civs-strip.compact .draft-orb {
+            width: 41px;
+            height: 41px;
+        }
+
         .draft-orb.pick {
             border-color: var(--gold-bright);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.85), 0 0 12px rgba(255, 215, 0, 0.35);
         }
 
         .draft-orb.played {
-            border-color: rgba(148, 163, 184, 0.5);
-            filter: brightness(0.65) saturate(0.7);
+            border-color: rgba(74, 222, 128, 0.75);
+        }
+
+        .draft-orb.played::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(4, 15, 10, 0.55);
         }
 
         .draft-orb.played::after {
             content: '✓';
             position: absolute;
             inset: 0;
+            z-index: 2;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 0, 0, 0.35);
             color: #4ade80;
             font-size: 24px;
             font-weight: 900;
-            text-shadow: 0 2px 6px #000;
+            text-shadow: 0 2px 8px #000;
         }
 
         .draft-orb.ban {
             border-color: #ef4444;
-            filter: grayscale(0.45) brightness(0.6);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.85), 0 0 12px rgba(239, 68, 68, 0.45);
+        }
+
+        .draft-orb.ban::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(35, 6, 6, 0.62);
+            backdrop-filter: grayscale(0.75);
         }
 
         .draft-orb.ban::after {
             content: '✕';
             position: absolute;
             inset: 0;
+            z-index: 2;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(127, 29, 29, 0.35);
             color: #ff3b3b;
+            font-size: 26px;
+            font-weight: 900;
+            text-shadow: 0 2px 10px #000, 0 0 8px rgba(255, 59, 59, 0.75);
+        }
             font-size: 28px;
             font-weight: 900;
             text-shadow: 0 2px 8px #000;
@@ -756,6 +777,51 @@
             background: rgba(8, 13, 26, 0.9);
             color: var(--gold-bright);
             border: 1px solid rgba(212, 175, 55, 0.55);
+        }
+
+        .map-status-pill.win-p1-pill {
+            background: linear-gradient(90deg, #b45309 0%, #fbbf24 100%);
+            color: #090d16;
+            border: 1.5px solid #fef08a;
+            box-shadow: 0 4px 16px rgba(251, 191, 36, 0.55);
+        }
+
+        .map-status-pill.win-p2-pill {
+            background: linear-gradient(90deg, #9f1239 0%, #fb7185 100%);
+            color: #ffffff;
+            border: 1.5px solid #fecdd3;
+            box-shadow: 0 4px 16px rgba(244, 63, 94, 0.55);
+        }
+
+        .map-winner-banner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 18;
+            padding: 5px 16px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.9);
+        }
+
+        .map-winner-banner.p1 {
+            background: rgba(12, 18, 32, 0.9);
+            border: 2px solid #ffd700;
+            color: #fef08a;
+            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.9), 0 0 18px rgba(255, 215, 0, 0.5);
+        }
+
+        .map-winner-banner.p2 {
+            background: rgba(20, 8, 16, 0.92);
+            border: 2px solid #fb7185;
+            color: #ffe4e6;
+            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.9), 0 0 18px rgba(244, 63, 94, 0.5);
         }
 
         .diamond-stage {
@@ -1279,20 +1345,39 @@
             }
         }
 
-        function renderDraftStrip(containerId, draftCivs) {
+        function renderDraftStrip(containerId, draftCivs, side) {
             const el = document.getElementById(containerId);
             if (!el) return;
-            const items = Array.isArray(draftCivs) ? draftCivs : [];
+            const rawItems = Array.isArray(draftCivs) ? draftCivs : [];
+            const items = rawItems
+                .map(item => ({
+                    civId: typeof item === 'string' ? item : item?.civId,
+                    status: typeof item === 'string' ? 'pick' : (item?.status || 'pick')
+                }))
+                .filter(item => !!item.civId);
+
             if (items.length === 0) {
                 el.innerHTML = '';
+                el.classList.remove('compact');
                 return;
             }
-            el.innerHTML = items.map(item => {
-                const civId = typeof item === 'string' ? item : item?.civId;
-                const status = typeof item === 'string' ? 'pick' : (item?.status || 'pick');
-                if (!civId) return '';
-                return `<div class="draft-orb ${escapeHtml(status)}" style="background-image: url('${getCivUrl(civId)}')"></div>`;
-            }).join('');
+
+            el.classList.toggle('compact', items.length >= 10);
+
+            const picks = items.filter(i => i.status !== 'ban');
+            const bans = items.filter(i => i.status === 'ban');
+
+            const renderOrb = (item) =>
+                `<div class="draft-orb ${escapeHtml(item.status)}" style="background-image: url('${getCivUrl(item.civId)}')"></div>`;
+
+            if (picks.length > 0 && bans.length > 0) {
+                const ordered = side === 'left'
+                    ? [...picks.map(renderOrb), '<div class="draft-group-divider"></div>', ...bans.map(renderOrb)]
+                    : [...bans.map(renderOrb), '<div class="draft-group-divider"></div>', ...picks.map(renderOrb)];
+                el.innerHTML = ordered.join('');
+            } else {
+                el.innerHTML = [...picks, ...bans].map(renderOrb).join('');
+            }
         }
 
         function renderSkills(listId, skillsObj) {
@@ -1324,7 +1409,7 @@
             }).join('');
         }
 
-        function createDiamondCard(map, idx) {
+        function createDiamondCard(map, idx, p1Name, p2Name) {
             const isNext = !!map.isNext;
             const winner = Number(map.winner || 0);
             const p1Won = winner === 1;
@@ -1335,13 +1420,21 @@
             const p2Civ = map.p2Civ || (Array.isArray(map.t2Civs) ? map.t2Civs[0] : '') || '';
             const mapName = (map.name || `Mappa ${idx + 1}`).trim();
 
-            const strokeColor = isNext ? '#38bdf8' : (hasWinner ? '#ffd700' : '#d4af37');
-            const strokeWidth = isNext ? '4' : '3';
+            const strokeColor = isNext ? '#38bdf8' : (p1Won ? '#ffd700' : (p2Won ? '#fb7185' : '#d4af37'));
+            const strokeWidth = isNext || hasWinner ? '4' : '3';
 
             let statusPill = `<div class="map-status-pill game-num-pill">GAME ${idx + 1}</div>`;
             if (isNext) {
                 statusPill = `<div class="map-status-pill next-pill">PROSSIMO GAME</div>`;
+            } else if (p1Won) {
+                statusPill = `<div class="map-status-pill win-p1-pill">👑 ${escapeHtml(p1Name || 'P1')}</div>`;
+            } else if (p2Won) {
+                statusPill = `<div class="map-status-pill win-p2-pill">👑 ${escapeHtml(p2Name || 'P2')}</div>`;
             }
+
+            const centerWinnerBanner = hasWinner
+                ? `<div class="map-winner-banner ${p1Won ? 'p1' : 'p2'}">🏆 ${escapeHtml(p1Won ? (p1Name || 'P1') : (p2Name || 'P2'))}</div>`
+                : '';
 
             return `
                 <div class="map-node ${isNext ? 'is-next' : ''} ${hasWinner ? 'has-winner' : ''}">
@@ -1363,6 +1456,8 @@
                             <polygon points="140,9 267,80 140,151 13,80" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-linejoin="round" />
                         </svg>
 
+                        ${centerWinnerBanner}
+
                         ${p2Civ ? `
                             <div class="map-civ-badge right ${p2Won ? 'is-winner' : (p1Won ? 'is-loser' : '')}" style="background-image: url('${getCivUrl(p2Civ)}')">
                                 ${p2Won ? '<div class="map-winner-crown">👑</div>' : ''}
@@ -1374,7 +1469,7 @@
             `;
         }
 
-        function renderMaps(maps) {
+        function renderMaps(maps, p1Name, p2Name) {
             const container = document.getElementById('maps-stage');
             if (!container) return;
             const list = Array.isArray(maps) ? maps : [];
@@ -1403,10 +1498,10 @@
                 bottomRow = list.slice(topCount);
             }
 
-            let html = `<div class="maps-row">${topRow.map((m, i) => createDiamondCard(m, i)).join('')}</div>`;
+            let html = `<div class="maps-row">${topRow.map((m, i) => createDiamondCard(m, i, p1Name, p2Name)).join('')}</div>`;
             if (bottomRow.length > 0) {
                 const offset = topRow.length;
-                html += `<div class="maps-row">${bottomRow.map((m, i) => createDiamondCard(m, offset + i)).join('')}</div>`;
+                html += `<div class="maps-row">${bottomRow.map((m, i) => createDiamondCard(m, offset + i, p1Name, p2Name)).join('')}</div>`;
             }
             container.innerHTML = html;
         }
@@ -1469,7 +1564,7 @@
             document.getElementById('p1-score').innerText = p1.score ?? 0;
             renderCountryFlag('p1-flag', p1.country ?? 'ch');
             renderPhoto('p1-photo', p1);
-            renderDraftStrip('p1-draft-strip', p1.draftCivs);
+            renderDraftStrip('p1-draft-strip', p1.draftCivs, 'left');
             renderSkills('skills-p1-list', p1.skills);
 
             // Player 2
@@ -1481,7 +1576,7 @@
             document.getElementById('p2-score').innerText = p2.score ?? 0;
             renderCountryFlag('p2-flag', p2.country ?? 'it');
             renderPhoto('p2-photo', p2);
-            renderDraftStrip('p2-draft-strip', p2.draftCivs);
+            renderDraftStrip('p2-draft-strip', p2.draftCivs, 'right');
             renderSkills('skills-p2-list', p2.skills);
 
             // Maps Bo5
@@ -1491,7 +1586,7 @@
                 { name: 'Silk Road', p1Civ: '', p2Civ: '', winner: 0, isNext: false },
                 { name: 'High View', p1Civ: '', p2Civ: '', winner: 0, isNext: false },
                 { name: 'Lipany', p1Civ: '', p2Civ: '', winner: 0, isNext: false }
-            ]);
+            ], p1Name, p2Name);
 
             // Single Caster Bottom-Left
             const caster = (s.casters || [])[0];

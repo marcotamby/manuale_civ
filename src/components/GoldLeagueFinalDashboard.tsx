@@ -130,7 +130,7 @@ const DEFAULT_STATE = {
   casters: [{ name: '', active: true }]
 };
 
-const STATUS_CYCLE: DraftCivEntry['status'][] = ['pick', 'played', 'ban', 'snipe'];
+const PICK_STATUS_CYCLE: DraftCivEntry['status'][] = ['pick', 'played', 'snipe'];
 
 const STATUS_BADGE_MAP: Record<DraftCivEntry['status'], { label: string; cls: string }> = {
   pick: { label: 'PICK', cls: 'bg-amber-500/20 text-amber-300 border-amber-400/50' },
@@ -1326,76 +1326,153 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
                   </div>
                 </div>
 
-                {/* Draft Civs Section */}
-                <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-black uppercase tracking-widest text-white flex items-center gap-2">
-                      <Sparkles size={14} className={accentText} />
-                      Draft Civiltà (clicca un badge per cambiare stato)
-                    </span>
-                    <span className="text-[10px] text-gray-500 font-bold">
-                      {player.draftCivs.length} civ
-                    </span>
-                  </div>
+                {/* Draft Civs Section (Picks & Bans separati) */}
+                <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-4">
+                  {/* Picks */}
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-black uppercase tracking-widest text-white flex items-center gap-2">
+                        <Sparkles size={14} className={accentText} />
+                        Civiltà Pickate
+                      </span>
+                      <span className="text-[10px] text-gray-500 font-bold">
+                        {player.draftCivs.filter((d) => d.status !== 'ban').length} pick
+                      </span>
+                    </div>
 
-                  <div className="flex flex-wrap gap-2.5">
-                    {player.draftCivs.map((entry, cIdx) => {
-                      const civ = civilizationsData.find((c) => c.id === entry.civId);
-                      const badge = STATUS_BADGE_MAP[entry.status || 'pick'];
-                      return (
-                        <div
-                          key={`${entry.civId}-${cIdx}`}
-                          className="relative group flex flex-col items-center gap-1 bg-black/60 border border-white/10 rounded-xl p-1.5"
-                        >
-                          <div className="w-11 h-7 rounded-md overflow-hidden border border-white/20">
-                            {civ && <img src={civ.flag} alt={civ.name} className="w-full h-full object-cover" />}
+                    <div className="flex flex-wrap gap-2">
+                      {player.draftCivs.map((entry, cIdx) => {
+                        if (entry.status === 'ban') return null;
+                        const civ = civilizationsData.find((c) => c.id === entry.civId);
+                        const currentStatus = entry.status || 'pick';
+                        const badge = STATUS_BADGE_MAP[currentStatus];
+                        return (
+                          <div
+                            key={`pick-${entry.civId}-${cIdx}`}
+                            className="relative group flex flex-col items-center gap-1 bg-black/60 border border-white/10 rounded-xl p-1.5"
+                          >
+                            <div className="w-11 h-7 rounded-md overflow-hidden border border-white/20">
+                              {civ && <img src={civ.flag} alt={civ.name} className="w-full h-full object-cover" />}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const nextIdx = (PICK_STATUS_CYCLE.indexOf(currentStatus) + 1) % PICK_STATUS_CYCLE.length;
+                                const nextDraft = [...player.draftCivs];
+                                nextDraft[cIdx] = { ...entry, status: PICK_STATUS_CYCLE[nextIdx] };
+                                pushState({ ...state, [key]: { ...player, draftCivs: nextDraft } }, true);
+                              }}
+                              className={`px-1.5 py-0.5 rounded text-[8px] font-black border ${badge.cls}`}
+                              title="Clicca per cambiare tra PICK, GIOCATA, SNIPE"
+                            >
+                              {badge.label}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const nextDraft = player.draftCivs.filter((_, i) => i !== cIdx);
+                                pushState({ ...state, [key]: { ...player, draftCivs: nextDraft } }, true);
+                              }}
+                              className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X size={10} />
+                            </button>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const nextIdx = (STATUS_CYCLE.indexOf(entry.status || 'pick') + 1) % STATUS_CYCLE.length;
-                              const nextDraft = [...player.draftCivs];
-                              nextDraft[cIdx] = { ...entry, status: STATUS_CYCLE[nextIdx] };
-                              pushState({ ...state, [key]: { ...player, draftCivs: nextDraft } }, true);
-                            }}
-                            className={`px-1.5 py-0.5 rounded text-[8px] font-black border ${badge.cls}`}
-                            title="Clicca per cambiare tra PICK, GIOCATA, BAN, SNIPE"
-                          >
-                            {badge.label}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const nextDraft = player.draftCivs.filter((_, i) => i !== cIdx);
-                              pushState({ ...state, [key]: { ...player, draftCivs: nextDraft } }, true);
-                            }}
-                            className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <X size={10} />
-                          </button>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
+
+                    <div className="w-56">
+                      <CivSelectCompact
+                        value=""
+                        label="+ Aggiungi Pick"
+                        onChange={(civId) => {
+                          if (!civId) return;
+                          pushState(
+                            {
+                              ...state,
+                              [key]: {
+                                ...player,
+                                draftCivs: [...player.draftCivs, { civId, status: 'pick' }]
+                              }
+                            },
+                            true
+                          );
+                        }}
+                      />
+                    </div>
                   </div>
 
-                  <div className="w-56">
-                    <CivSelectCompact
-                      value=""
-                      label="+ Aggiungi Civ al Draft"
-                      onChange={(civId) => {
-                        if (!civId) return;
-                        pushState(
-                          {
-                            ...state,
-                            [key]: {
-                              ...player,
-                              draftCivs: [...player.draftCivs, { civId, status: 'pick' }]
-                            }
-                          },
-                          true
+                  {/* Bans */}
+                  <div className="pt-3 border-t border-white/10 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-black uppercase tracking-widest text-red-400 flex items-center gap-2">
+                        <X size={14} className="text-red-400" />
+                        Civiltà Bannate (X)
+                      </span>
+                      <span className="text-[10px] text-gray-500 font-bold">
+                        {player.draftCivs.filter((d) => d.status === 'ban').length} ban
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      {player.draftCivs.map((entry, cIdx) => {
+                        if (entry.status !== 'ban') return null;
+                        const civ = civilizationsData.find((c) => c.id === entry.civId);
+                        return (
+                          <div
+                            key={`ban-${entry.civId}-${cIdx}`}
+                            className="relative group flex flex-col items-center gap-1 bg-red-950/30 border border-red-500/35 rounded-xl p-1.5"
+                          >
+                            <div className="w-11 h-7 rounded-md overflow-hidden border border-red-500/40 relative">
+                              {civ && (
+                                <img
+                                  src={civ.flag}
+                                  alt={civ.name}
+                                  className="w-full h-full object-cover grayscale brightness-75"
+                                />
+                              )}
+                              <div className="absolute inset-0 flex items-center justify-center text-red-500 font-black text-sm drop-shadow">
+                                ✕
+                              </div>
+                            </div>
+                            <span className="px-1.5 py-0.5 rounded text-[8px] font-black border bg-red-500/20 text-red-300 border-red-400/50">
+                              BAN
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const nextDraft = player.draftCivs.filter((_, i) => i !== cIdx);
+                                pushState({ ...state, [key]: { ...player, draftCivs: nextDraft } }, true);
+                              }}
+                              className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X size={10} />
+                            </button>
+                          </div>
                         );
-                      }}
-                    />
+                      })}
+                    </div>
+
+                    <div className="w-56">
+                      <CivSelectCompact
+                        value=""
+                        label="+ Aggiungi Ban"
+                        onChange={(civId) => {
+                          if (!civId) return;
+                          pushState(
+                            {
+                              ...state,
+                              [key]: {
+                                ...player,
+                                draftCivs: [...player.draftCivs, { civId, status: 'ban' }]
+                              }
+                            },
+                            true
+                          );
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1601,7 +1678,17 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
                     onClick={() => {
                       const nextMaps = [...state.maps];
                       nextMaps[idx] = { ...m, winner: m.winner === 1 ? 0 : 1 };
-                      pushState({ ...state, maps: nextMaps }, true);
+                      const p1Wins = nextMaps.filter((item) => item.winner === 1).length;
+                      const p2Wins = nextMaps.filter((item) => item.winner === 2).length;
+                      pushState(
+                        {
+                          ...state,
+                          maps: nextMaps,
+                          p1: { ...state.p1, score: p1Wins },
+                          p2: { ...state.p2, score: p2Wins }
+                        },
+                        true
+                      );
                     }}
                     className={`py-1.5 rounded-lg text-[10px] font-black uppercase truncate px-2 transition-all ${
                       m.winner === 1
@@ -1616,7 +1703,17 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
                     onClick={() => {
                       const nextMaps = [...state.maps];
                       nextMaps[idx] = { ...m, winner: 0 };
-                      pushState({ ...state, maps: nextMaps }, true);
+                      const p1Wins = nextMaps.filter((item) => item.winner === 1).length;
+                      const p2Wins = nextMaps.filter((item) => item.winner === 2).length;
+                      pushState(
+                        {
+                          ...state,
+                          maps: nextMaps,
+                          p1: { ...state.p1, score: p1Wins },
+                          p2: { ...state.p2, score: p2Wins }
+                        },
+                        true
+                      );
                     }}
                     className={`py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${
                       m.winner === 0
@@ -1631,7 +1728,17 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
                     onClick={() => {
                       const nextMaps = [...state.maps];
                       nextMaps[idx] = { ...m, winner: m.winner === 2 ? 0 : 2 };
-                      pushState({ ...state, maps: nextMaps }, true);
+                      const p1Wins = nextMaps.filter((item) => item.winner === 1).length;
+                      const p2Wins = nextMaps.filter((item) => item.winner === 2).length;
+                      pushState(
+                        {
+                          ...state,
+                          maps: nextMaps,
+                          p1: { ...state.p1, score: p1Wins },
+                          p2: { ...state.p2, score: p2Wins }
+                        },
+                        true
+                      );
                     }}
                     className={`py-1.5 rounded-lg text-[10px] font-black uppercase truncate px-2 transition-all ${
                       m.winner === 2
