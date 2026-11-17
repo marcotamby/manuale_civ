@@ -961,7 +961,7 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
             href="/overlays/gold-league-final/stinger-finale-oro.webm"
             download="stinger-finale-oro.webm"
             className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-400/30 text-xs font-black uppercase tracking-wider text-amber-200 transition-all"
-            title="Scarica transizione Stinger OBS 1920x1080 60fps (.webm Alpha + Sound) — Punto transizione: 1300 ms"
+            title="Scarica transizione Stinger OBS 1920x1080 60fps (.webm Alpha + Soundtrack epico, 3.8s) — Punto transizione: 1850 ms"
           >
             <Download size={14} className="text-amber-300" />
             Stinger OBS (.webm)

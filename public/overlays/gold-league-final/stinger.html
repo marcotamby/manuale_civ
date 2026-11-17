@@ -154,7 +154,7 @@
 <body>
   <div class="header">
     <h1>STINGER OBS • FINALE LEGA ORO</h1>
-    <p>Transizione animata 2.8s (1920×1080 • 60fps • Alpha VP9 + Audio Stereo). Simulazione cambio scena a 1300 ms.</p>
+    <p>Transizione animata 3.8s (1920×1080 • 60fps • Alpha VP9 + Colonna sonora epica da battaglia). Simulazione cambio scena a 1850 ms.</p>
   </div>
 
   <div class="stage">
@@ -181,7 +181,7 @@
     </div>
     <div>
       <strong>2. Punto di Transizione</strong>
-      Tipo: <b>Tempo (millisecondi)</b> → Imposta <b>1300 ms</b>
+      Tipo: <b>Tempo (millisecondi)</b> → Imposta <b>1850 ms</b>
     </div>
     <div>
       <strong>3. Audio</strong>
@@ -206,7 +206,7 @@
     }
 
     video.addEventListener('timeupdate', () => {
-      if (!switched && video.currentTime >= 1.30) {
+      if (!switched && video.currentTime >= 1.85) {
         switched = true;
         showingB = !showingB;
         sceneA.style.opacity = showingB ? '0' : '1';
