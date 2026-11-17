@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anteprima Stinger OBS — Finale Lega Oro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Outfit:wght@500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #121a2d 0%, #050811 70%);
+      color: #f8fafc;
+      font-family: 'Outfit', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 20px;
+      gap: 20px;
+    }
+    .header {
+      text-align: center;
+      max-width: 960px;
+    }
+    .header h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      background: linear-gradient(180deg, #fff 0%, #fde047 50%, #d97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .header p {
+      margin-top: 6px;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+    .stage {
+      position: relative;
+      width: min(1040px, 100%);
+      aspect-ratio: 16 / 9;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 2px solid rgba(250, 204, 21, 0.35);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+      background: #0b1120;
+    }
+    .mock-scene {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel', serif;
+      transition: opacity 0.01s linear;
+    }
+    .scene-a {
+      background: radial-gradient(circle at 30% 40%, rgba(245, 158, 11, 0.28), transparent 55%),
+                  linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    }
+    .scene-b {
+      background: radial-gradient(circle at 70% 40%, rgba(56, 189, 248, 0.28), transparent 55%),
+                  linear-gradient(135deg, #064e3b 0%, #0f172a 100%);
+      opacity: 0;
+    }
+    .mock-badge {
+      padding: 6px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #cbd5e1;
+      margin-bottom: 10px;
+    }
+    .mock-title {
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #f8fafc;
+    }
+    video#stinger-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+      transition: transform 0.12s ease, filter 0.15s ease;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-play {
+      background: linear-gradient(135deg, #facc15 0%, #ea580c 100%);
+      color: #090d16;
+      box-shadow: 0 8px 24px rgba(234, 88, 12, 0.35);
+    }
+    .btn-download {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #e0f2fe;
+    }
+    .obs-card {
+      width: min(1040px, 100%);
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+    .obs-card strong {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #fbbf24;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>STINGER OBS • FINALE LEGA ORO</h1>
+    <p>Transizione animata 2.8s (1920×1080 • 60fps • Alpha VP9 + Audio Stereo). Simulazione cambio scena a 1300 ms.</p>
+  </div>
+
+  <div class="stage">
+    <div class="mock-scene scene-a" id="scene-a">
+      <div class="mock-badge">Scena OBS Attuale</div>
+      <div class="mock-title">PRE-GAME / DRAFT</div>
+    </div>
+    <div class="mock-scene scene-b" id="scene-b">
+      <div class="mock-badge">Nuova Scena OBS</div>
+      <div class="mock-title">IN-GAME SPECTATOR</div>
+    </div>
+    <video id="stinger-video" src="./stinger-finale-oro.webm" playsinline preload="auto"></video>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-play" id="btn-play">▶ Riproduci Transizione + Sound</button>
+    <a class="btn btn-download" href="./stinger-finale-oro.webm" download="stinger-finale-oro.webm">⬇ Scarica stinger-finale-oro.webm</a>
+  </div>
+
+  <div class="obs-card">
+    <div>
+      <strong>1. Tipo Transizione OBS</strong>
+      Pannello <em>Transizioni di scena</em> → <b>+</b> → <b>Stinger</b>
+    </div>
+    <div>
+      <strong>2. Punto di Transizione</strong>
+      Tipo: <b>Tempo (millisecondi)</b> → Imposta <b>1300 ms</b>
+    </div>
+    <div>
+      <strong>3. Audio</strong>
+      Abilita <b>Monitoraggio audio</b> se vuoi sentirlo in cuffia (già integrato nello stream).
+    </div>
+  </div>
+
+  <script>
+    const video = document.getElementById('stinger-video');
+    const sceneA = document.getElementById('scene-a');
+    const sceneB = document.getElementById('scene-b');
+    const btnPlay = document.getElementById('btn-play');
+    let switched = false;
+    let showingB = false;
+
+    function playTransition() {
+      switched = false;
+      video.pause();
+      video.currentTime = 0;
+      video.muted = false;
+      video.play().catch((err) => console.error(err));
+    }
+
+    video.addEventListener('timeupdate', () => {
+      if (!switched && video.currentTime >= 1.30) {
+        switched = true;
+        showingB = !showingB;
+        sceneA.style.opacity = showingB ? '0' : '1';
+        sceneB.style.opacity = showingB ? '1' : '0';
+      }
+    });
+
+    btnPlay.addEventListener('click', playTransition);
+  </script>
+</body>
+</html>

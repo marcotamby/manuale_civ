@@ -25,7 +25,9 @@ import {
   Scissors,
   ZoomIn,
   RotateCcw,
-  Search
+  Search,
+  Film,
+  Download
 } from 'lucide-react';
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
@@ -943,6 +945,27 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
               <CheckCircle2 size={14} /> Salvato Live
             </span>
           ) : null}
+
+          <a
+            href="/overlays/gold-league-final/stinger.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-400/30 text-xs font-black uppercase tracking-wider text-cyan-200 transition-all"
+            title="Anteprima interattiva Stinger OBS con Audio"
+          >
+            <Film size={14} className="text-cyan-300" />
+            Anteprima Stinger
+          </a>
+
+          <a
+            href="/overlays/gold-league-final/stinger-finale-oro.webm"
+            download="stinger-finale-oro.webm"
+            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-400/30 text-xs font-black uppercase tracking-wider text-amber-200 transition-all"
+            title="Scarica transizione Stinger OBS 1920x1080 60fps (.webm Alpha + Sound) — Punto transizione: 1300 ms"
+          >
+            <Download size={14} className="text-amber-300" />
+            Stinger OBS (.webm)
+          </a>
 
           <button
             type="button"
