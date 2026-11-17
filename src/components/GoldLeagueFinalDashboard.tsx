@@ -21,7 +21,10 @@ import {
   Radio,
   Eye,
   EyeOff,
-  Tv
+  Tv,
+  Scissors,
+  ZoomIn,
+  RotateCcw
 } from 'lucide-react';
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
@@ -94,6 +97,9 @@ const DEFAULT_STATE = {
     seed: '1',
     country: 'ch',
     photoUrl: '',
+    photoZoom: 1,
+    photoX: 50,
+    photoY: 20,
     civId: '',
     draftCivs: [] as DraftCivEntry[],
     skills: { ...DEFAULT_SKILLS }
@@ -104,6 +110,9 @@ const DEFAULT_STATE = {
     seed: '2',
     country: 'it',
     photoUrl: '',
+    photoZoom: 1.5,
+    photoX: 57,
+    photoY: 18,
     civId: '',
     draftCivs: [] as DraftCivEntry[],
     skills: { ...DEFAULT_SKILLS }
@@ -136,6 +145,7 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
   const [showSuccess, setShowSuccess] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [uploadingPhotoFor, setUploadingPhotoFor] = useState<'p1' | 'p2' | null>(null);
+  const [autoCutoutOnUpload, setAutoCutoutOnUpload] = useState(true);
 
   const [draftCivUrl, setDraftCivUrl] = useState('');
   const [isDraftCivLoading, setIsDraftCivLoading] = useState(false);
@@ -360,47 +370,228 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
     }
   };
 
-  const prepareAvatarAsset = (file: File): Promise<{ blob: Blob; dataUrl: string; ext: string }> => {
+  const removeWallBackground = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+    const imgData = ctx.getImageData(0, 0, width, height);
+    const data = imgData.data;
+
+    let sumR = 0;
+    let sumG = 0;
+    let sumB = 0;
+    let count = 0;
+    const step = Math.max(1, Math.floor(width / 25));
+    for (let x = 0; x < width; x += step) {
+      const idx = (2 * width + x) * 4;
+      sumR += data[idx];
+      sumG += data[idx + 1];
+      sumB += data[idx + 2];
+      count++;
+    }
+    const bgR = sumR / Math.max(1, count);
+    const bgG = sumG / Math.max(1, count);
+    const bgB = sumB / Math.max(1, count);
+
+    const isWall = (idx: number) => {
+      const r = data[idx];
+      const g = data[idx + 1];
+      const b = data[idx + 2];
+      const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+      const chroma = Math.max(r, g, b) - Math.min(r, g, b);
+      const dist = Math.hypot(r - bgR, g - bgG, b - bgB);
+      return luma >= 170 && chroma <= 26 && dist <= 92;
+    };
+
+    const total = width * height;
+    const visited = new Uint8Array(total);
+    const alphaMask = new Uint8Array(total).fill(255);
+    const queue = new Int32Array(total);
+    let head = 0;
+    let tail = 0;
+
+    const pushSeed = (x: number, y: number) => {
+      const p = y * width + x;
+      if (!visited[p] && isWall(p * 4)) {
+        visited[p] = 1;
+        queue[tail++] = p;
+      }
+    };
+
+    for (let x = 0; x < width; x++) {
+      for (let y = 0; y < Math.min(3, height); y++) pushSeed(x, y);
+    }
+    for (let y = 0; y < height; y++) {
+      for (const x of [0, 1, Math.max(0, width - 2), Math.max(0, width - 1)]) pushSeed(x, y);
+    }
+
+    while (head < tail) {
+      const p = queue[head++];
+      alphaMask[p] = 0;
+      const x = p % width;
+      const y = (p - x) / width;
+
+      if (x + 1 < width) {
+        const np = p + 1;
+        if (!visited[np] && isWall(np * 4)) {
+          visited[np] = 1;
+          queue[tail++] = np;
+        }
+      }
+      if (x - 1 >= 0) {
+        const np = p - 1;
+        if (!visited[np] && isWall(np * 4)) {
+          visited[np] = 1;
+          queue[tail++] = np;
+        }
+      }
+      if (y + 1 < height) {
+        const np = p + width;
+        if (!visited[np] && isWall(np * 4)) {
+          visited[np] = 1;
+          queue[tail++] = np;
+        }
+      }
+      if (y - 1 >= 0) {
+        const np = p - width;
+        if (!visited[np] && isWall(np * 4)) {
+          visited[np] = 1;
+          queue[tail++] = np;
+        }
+      }
+    }
+
+    // Erode 1px to kill bright edge fringe, then smooth 3x3
+    const eroded = new Uint8Array(alphaMask);
+    for (let y = 1; y < height - 1; y++) {
+      for (let x = 1; x < width - 1; x++) {
+        const p = y * width + x;
+        if (
+          alphaMask[p - 1] === 0 ||
+          alphaMask[p + 1] === 0 ||
+          alphaMask[p - width] === 0 ||
+          alphaMask[p + width] === 0
+        ) {
+          eroded[p] = 0;
+        }
+      }
+    }
+
+    for (let y = 1; y < height - 1; y++) {
+      for (let x = 1; x < width - 1; x++) {
+        const p = y * width + x;
+        const avg =
+          (eroded[p - width - 1] +
+            eroded[p - width] +
+            eroded[p - width + 1] +
+            eroded[p - 1] +
+            eroded[p] * 2 +
+            eroded[p + 1] +
+            eroded[p + width - 1] +
+            eroded[p + width] +
+            eroded[p + width + 1]) /
+          10;
+        data[p * 4 + 3] = Math.round(avg);
+      }
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+  };
+
+  const renderImageToAvatarAsset = (
+    src: string,
+    applyCutout: boolean
+  ): Promise<{ blob: Blob; dataUrl: string; ext: string }> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onerror = () => reject(new Error('Impossibile elaborare l\'immagine (formato o CORS).'));
+      img.onload = () => {
+        const maxSide = 512;
+        let { width, height } = img;
+        if (width > maxSide || height > maxSide) {
+          const ratio = Math.min(maxSide / width, maxSide / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Canvas non disponibile.'));
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        if (applyCutout) {
+          removeWallBackground(ctx, width, height);
+        }
+        const dataUrl = canvas.toDataURL('image/png');
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error('Conversione immagine fallita.'));
+              return;
+            }
+            resolve({ blob, dataUrl, ext: 'png' });
+          },
+          'image/png',
+          0.92
+        );
+      };
+      img.src = src;
+    });
+  };
+
+  const prepareAvatarAsset = (
+    file: File,
+    applyCutout: boolean
+  ): Promise<{ blob: Blob; dataUrl: string; ext: string }> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onerror = () => reject(new Error('Impossibile leggere il file immagine.'));
       reader.onload = () => {
-        const img = new Image();
-        img.onerror = () => reject(new Error('Formato immagine non valido.'));
-        img.onload = () => {
-          const maxSide = 512;
-          let { width, height } = img;
-          if (width > maxSide || height > maxSide) {
-            const ratio = Math.min(maxSide / width, maxSide / height);
-            width = Math.round(width * ratio);
-            height = Math.round(height * ratio);
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          if (!ctx) {
-            reject(new Error('Canvas non disponibile.'));
-            return;
-          }
-          ctx.drawImage(img, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL('image/png');
-          canvas.toBlob(
-            (blob) => {
-              if (!blob) {
-                reject(new Error('Conversione immagine fallita.'));
-                return;
-              }
-              resolve({ blob, dataUrl, ext: 'png' });
-            },
-            'image/png',
-            0.92
-          );
-        };
-        img.src = reader.result as string;
+        renderImageToAvatarAsset(reader.result as string, applyCutout).then(resolve).catch(reject);
       };
       reader.readAsDataURL(file);
     });
+  };
+
+  const uploadAndSaveAvatar = async (
+    playerKey: 'p1' | 'p2',
+    asset: { blob: Blob; dataUrl: string; ext: string }
+  ) => {
+    let finalPhotoUrl = '';
+    try {
+      const filePath = `overlay-avatars/${OVERLAY_ID}-${playerKey}-${Date.now()}.${asset.ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from('civilizations')
+        .upload(filePath, asset.blob, { contentType: 'image/png', cacheControl: '3600', upsert: true });
+
+      if (!uploadErr) {
+        const {
+          data: { publicUrl }
+        } = supabase.storage.from('civilizations').getPublicUrl(filePath);
+        finalPhotoUrl = publicUrl;
+      } else {
+        console.warn('Supabase storage avatar upload fallback to data URL:', uploadErr.message);
+      }
+    } catch (storageErr) {
+      console.warn('Supabase storage unavailable, fallback to data URL:', storageErr);
+    }
+
+    if (!finalPhotoUrl) {
+      finalPhotoUrl = asset.dataUrl;
+    }
+
+    const latest = stateRef.current;
+    await pushState(
+      {
+        ...latest,
+        [playerKey]: {
+          ...latest[playerKey],
+          photoUrl: finalPhotoUrl
+        }
+      },
+      true
+    );
   };
 
   const handlePhotoUpload = async (playerKey: 'p1' | 'p2', file: File | undefined) => {
@@ -411,44 +602,24 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
     }
     setUploadingPhotoFor(playerKey);
     try {
-      const { blob, dataUrl, ext } = await prepareAvatarAsset(file);
-      let finalPhotoUrl = '';
-
-      try {
-        const filePath = `overlay-avatars/${OVERLAY_ID}-${playerKey}-${Date.now()}.${ext}`;
-        const { error: uploadErr } = await supabase.storage
-          .from('civilizations')
-          .upload(filePath, blob, { contentType: 'image/png', cacheControl: '3600', upsert: true });
-
-        if (!uploadErr) {
-          const { data: { publicUrl } } = supabase.storage
-            .from('civilizations')
-            .getPublicUrl(filePath);
-          finalPhotoUrl = publicUrl;
-        } else {
-          console.warn('Supabase storage avatar upload fallback to data URL:', uploadErr.message);
-        }
-      } catch (storageErr) {
-        console.warn('Supabase storage unavailable, fallback to data URL:', storageErr);
-      }
-
-      if (!finalPhotoUrl) {
-        finalPhotoUrl = dataUrl;
-      }
-
-      const latest = stateRef.current;
-      await pushState(
-        {
-          ...latest,
-          [playerKey]: {
-            ...latest[playerKey],
-            photoUrl: finalPhotoUrl
-          }
-        },
-        true
-      );
+      const asset = await prepareAvatarAsset(file, autoCutoutOnUpload);
+      await uploadAndSaveAvatar(playerKey, asset);
     } catch (err: any) {
       onError(`Errore caricamento foto giocatore: ${err?.message || 'caricamento fallito'}`);
+    } finally {
+      setUploadingPhotoFor(null);
+    }
+  };
+
+  const handleCutoutExistingPhoto = async (playerKey: 'p1' | 'p2') => {
+    const currentUrl = stateRef.current[playerKey]?.photoUrl;
+    if (!currentUrl) return;
+    setUploadingPhotoFor(playerKey);
+    try {
+      const asset = await renderImageToAvatarAsset(currentUrl, true);
+      await uploadAndSaveAvatar(playerKey, asset);
+    } catch (err: any) {
+      onError(`Errore scontorno foto: ${err?.message || 'operazione non riuscita'}`);
     } finally {
       setUploadingPhotoFor(null);
     }
@@ -789,37 +960,74 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
                 </div>
 
                 {/* Identity & Photo Row */}
-                <div className="grid grid-cols-[100px_1fr] gap-4 items-start">
-                  {/* Photo Upload */}
+                <div className="grid grid-cols-[120px_1fr] gap-4 items-start">
+                  {/* Photo Upload + Live EGC Backdrop Preview */}
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-24 h-24 rounded-2xl bg-black/60 border-2 border-white/15 overflow-hidden flex items-center justify-center relative group">
+                    <div
+                      className="w-28 h-28 rounded-2xl border-2 border-amber-400/80 overflow-hidden flex items-center justify-center relative group shadow-lg"
+                      style={{
+                        background: isP1
+                          ? 'radial-gradient(circle at 50% 34%, rgba(56, 189, 248, 0.52) 0%, rgba(30, 64, 175, 0.55) 44%, #060a14 90%)'
+                          : 'radial-gradient(circle at 50% 34%, rgba(56, 189, 248, 0.52) 0%, rgba(159, 18, 57, 0.42) 48%, #060a14 90%)'
+                      }}
+                    >
                       {uploadingPhotoFor === key ? (
                         <Loader2 size={24} className="animate-spin text-amber-400" />
                       ) : player.photoUrl ? (
-                        <img src={player.photoUrl} alt={player.name} className="w-full h-full object-cover object-top" />
+                        <img
+                          src={player.photoUrl}
+                          alt={player.name}
+                          className="w-full h-full object-cover"
+                          style={{
+                            objectPosition: `${player.photoX ?? 50}% ${player.photoY ?? 20}%`,
+                            transform: `scale(${player.photoZoom ?? 1})`,
+                            transformOrigin: `${player.photoX ?? 50}% ${player.photoY ?? 20}%`
+                          }}
+                        />
                       ) : (
-                        <User size={34} className="text-gray-600" />
+                        <User size={34} className="text-gray-500" />
                       )}
                       {player.photoUrl && (
                         <button
                           type="button"
                           onClick={() => pushState({ ...state, [key]: { ...player, photoUrl: '' } }, true)}
-                          className="absolute top-1 right-1 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute top-1 right-1 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
                           title="Rimuovi foto"
                         >
                           <X size={12} />
                         </button>
                       )}
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={uploadingPhotoFor === key}
-                      className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-black uppercase tracking-wider text-gray-300"
-                    >
-                      <Upload size={11} className="text-amber-400" />
-                      Foto
-                    </button>
+                    <div className="grid grid-cols-2 gap-1 w-full">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingPhotoFor === key}
+                        className="flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-black uppercase tracking-wider text-gray-200"
+                      >
+                        <Upload size={11} className="text-amber-400" />
+                        Foto
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleCutoutExistingPhoto(key)}
+                        disabled={uploadingPhotoFor === key || !player.photoUrl}
+                        className="flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 disabled:opacity-40 border border-cyan-400/30 text-[10px] font-black uppercase tracking-wider text-cyan-200"
+                        title="Rimuovi sfondo chiaro dalla foto e usa sfondo EGC"
+                      >
+                        <Scissors size={11} />
+                        Taglia
+                      </button>
+                    </div>
+                    <label className="flex items-center gap-1.5 text-[9px] font-bold text-gray-400 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={autoCutoutOnUpload}
+                        onChange={(e) => setAutoCutoutOnUpload(e.target.checked)}
+                        className="rounded bg-black/40 border-white/20 text-cyan-500 w-3 h-3"
+                      />
+                      Auto-scontorna
+                    </label>
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -832,7 +1040,7 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
                     />
                   </div>
 
-                  {/* Name, Seed, Flag, Photo URL */}
+                  {/* Name, Seed, Flag, Photo URL & Portrait Framing */}
                   <div className="space-y-3">
                     <div className="grid grid-cols-[1fr_100px] gap-2.5">
                       <div>
@@ -888,6 +1096,89 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
                           placeholder="https://..."
                           className="w-full bg-black/50 border border-white/10 focus:border-amber-400/50 rounded-xl px-3 py-2 text-xs text-gray-200 outline-none"
                         />
+                      </div>
+                    </div>
+
+                    {/* Face Centering & Zoom Sliders */}
+                    <div className="bg-black/35 border border-white/10 rounded-xl p-2.5 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-cyan-300 flex items-center gap-1.5">
+                          <ZoomIn size={11} /> Centra Volto & Zoom
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            pushState(
+                              { ...state, [key]: { ...player, photoZoom: 1, photoX: 50, photoY: 20 } },
+                              true
+                            )
+                          }
+                          className="text-[9px] font-bold text-gray-400 hover:text-white flex items-center gap-1"
+                        >
+                          <RotateCcw size={10} /> Reset
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2.5">
+                        <div>
+                          <div className="flex justify-between text-[9px] text-gray-400 font-bold mb-0.5">
+                            <span>Zoom</span>
+                            <span className="text-white">{(player.photoZoom ?? 1).toFixed(2)}x</span>
+                          </div>
+                          <input
+                            type="range"
+                            min={1}
+                            max={2.4}
+                            step={0.05}
+                            value={player.photoZoom ?? 1}
+                            onChange={(e) =>
+                              pushState({
+                                ...state,
+                                [key]: { ...player, photoZoom: parseFloat(e.target.value) }
+                              })
+                            }
+                            className={`w-full cursor-pointer ${accentRange}`}
+                          />
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-[9px] text-gray-400 font-bold mb-0.5">
+                            <span>Pos X</span>
+                            <span className="text-white">{player.photoX ?? 50}%</span>
+                          </div>
+                          <input
+                            type="range"
+                            min={0}
+                            max={100}
+                            step={1}
+                            value={player.photoX ?? 50}
+                            onChange={(e) =>
+                              pushState({
+                                ...state,
+                                [key]: { ...player, photoX: parseInt(e.target.value, 10) }
+                              })
+                            }
+                            className={`w-full cursor-pointer ${accentRange}`}
+                          />
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-[9px] text-gray-400 font-bold mb-0.5">
+                            <span>Pos Y</span>
+                            <span className="text-white">{player.photoY ?? 20}%</span>
+                          </div>
+                          <input
+                            type="range"
+                            min={0}
+                            max={100}
+                            step={1}
+                            value={player.photoY ?? 20}
+                            onChange={(e) =>
+                              pushState({
+                                ...state,
+                                [key]: { ...player, photoY: parseInt(e.target.value, 10) }
+                              })
+                            }
+                            className={`w-full cursor-pointer ${accentRange}`}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>

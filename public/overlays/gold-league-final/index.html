@@ -185,14 +185,19 @@
             text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
         }
 
-        /* Player Portrait Frame (EGCTV style next to center) */
+        /* Player Portrait Frame (EGCTV style studio backdrop) */
         .player-photo-frame {
             width: 110px;
             height: 110px;
             border-radius: 10px;
             border: 2.5px solid var(--gold-bright);
-            background: radial-gradient(circle at 50% 35%, #1e293b 0%, #090d16 100%);
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.8), 0 0 18px rgba(255, 215, 0, 0.25);
+            background:
+                radial-gradient(circle at 50% 34%, rgba(56, 189, 248, 0.55) 0%, rgba(29, 78, 216, 0.52) 42%, rgba(9, 17, 38, 0.96) 82%, #050a18 100%),
+                linear-gradient(180deg, #1d4ed8 0%, #09132c 100%);
+            box-shadow:
+                0 6px 24px rgba(0, 0, 0, 0.85),
+                0 0 20px rgba(56, 189, 248, 0.28),
+                inset 0 0 18px rgba(56, 189, 248, 0.22);
             overflow: hidden;
             flex-shrink: 0;
             position: relative;
@@ -202,11 +207,46 @@
             justify-content: center;
         }
 
+        .player-banner.left .player-photo-frame {
+            background:
+                radial-gradient(circle at 50% 34%, rgba(56, 189, 248, 0.48) 0%, rgba(30, 64, 175, 0.52) 44%, rgba(15, 23, 42, 0.96) 84%, #060a14 100%),
+                linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, #0b1630 100%);
+        }
+
+        .player-banner.right .player-photo-frame {
+            background:
+                radial-gradient(circle at 50% 34%, rgba(56, 189, 248, 0.48) 0%, rgba(30, 64, 175, 0.52) 44%, rgba(15, 23, 42, 0.96) 84%, #060a14 100%),
+                linear-gradient(225deg, rgba(225, 29, 72, 0.25) 0%, #0b1630 100%);
+        }
+
+        .player-photo-frame::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 25%, rgba(255, 255, 255, 0.14) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .player-photo-frame::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            box-shadow: inset 0 -16px 20px rgba(4, 7, 17, 0.72), inset 0 0 12px rgba(255, 215, 0, 0.2);
+            pointer-events: none;
+            z-index: 3;
+        }
+
         .player-photo-frame img {
+            position: relative;
+            z-index: 2;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center top;
+            object-position: var(--photo-x, 50%) var(--photo-y, 20%);
+            transform: scale(var(--photo-zoom, 1));
+            transform-origin: var(--photo-x, 50%) var(--photo-y, 20%);
+            transition: transform 0.2s ease-out;
         }
 
         .player-photo-placeholder {
@@ -1209,10 +1249,19 @@
             }
         }
 
-        function renderPhoto(containerId, photoUrl) {
+        function renderPhoto(containerId, playerObj) {
             const el = document.getElementById(containerId);
             if (!el) return;
+            const photoUrl = playerObj?.photoUrl;
             const trimmed = (photoUrl || '').trim();
+            const zoom = Math.max(1, Math.min(2.8, Number(playerObj?.photoZoom) || 1));
+            const posX = Math.max(0, Math.min(100, playerObj?.photoX !== undefined ? Number(playerObj.photoX) : 50));
+            const posY = Math.max(0, Math.min(100, playerObj?.photoY !== undefined ? Number(playerObj.photoY) : 20));
+
+            el.style.setProperty('--photo-zoom', String(zoom));
+            el.style.setProperty('--photo-x', `${posX}%`);
+            el.style.setProperty('--photo-y', `${posY}%`);
+
             if (el.dataset.photoUrl === trimmed && el.firstChild) return;
             el.dataset.photoUrl = trimmed;
 
@@ -1419,7 +1468,7 @@
             document.getElementById('p1-seed').innerText = p1.seed ? `SEED #${String(p1.seed).replace('#', '')}` : '';
             document.getElementById('p1-score').innerText = p1.score ?? 0;
             renderCountryFlag('p1-flag', p1.country ?? 'ch');
-            renderPhoto('p1-photo', p1.photoUrl);
+            renderPhoto('p1-photo', p1);
             renderDraftStrip('p1-draft-strip', p1.draftCivs);
             renderSkills('skills-p1-list', p1.skills);
 
@@ -1431,7 +1480,7 @@
             document.getElementById('p2-seed').innerText = p2.seed ? `SEED #${String(p2.seed).replace('#', '')}` : '';
             document.getElementById('p2-score').innerText = p2.score ?? 0;
             renderCountryFlag('p2-flag', p2.country ?? 'it');
-            renderPhoto('p2-photo', p2.photoUrl);
+            renderPhoto('p2-photo', p2);
             renderDraftStrip('p2-draft-strip', p2.draftCivs);
             renderSkills('skills-p2-list', p2.skills);
 

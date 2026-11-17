@@ -16,6 +16,9 @@ export interface GoldFinalPlayer {
   seed?: string;
   country?: string;
   photoUrl?: string;
+  photoZoom?: number;
+  photoX?: number;
+  photoY?: number;
   civId?: string;
   draftCivs?: { civId: string; status?: 'pick' | 'ban' | 'snipe' | 'played' }[];
   skills?: PlayerSkills;
