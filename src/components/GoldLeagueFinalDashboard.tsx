@@ -24,7 +24,8 @@ import {
   Tv,
   Scissors,
   ZoomIn,
-  RotateCcw
+  RotateCcw,
+  Search
 } from 'lucide-react';
 import { civilizationsData } from '../data/aoe4Data';
 import { AOE4_MAPS } from '../data/aoe4Maps';
@@ -48,6 +49,8 @@ interface FinalMapEntry {
   name: string;
   p1Civ: string;
   p2Civ: string;
+  p1Snipe?: string;
+  p2Snipe?: string;
   winner: 0 | 1 | 2;
   isNext: boolean;
 }
@@ -120,11 +123,11 @@ const DEFAULT_STATE = {
     skills: { ...DEFAULT_SKILLS }
   },
   maps: [
-    { name: 'Dry Arabia', p1Civ: '', p2Civ: '', winner: 0, isNext: true },
-    { name: 'Frisian Marshes', p1Civ: '', p2Civ: '', winner: 0, isNext: false },
-    { name: 'Silk Road', p1Civ: '', p2Civ: '', winner: 0, isNext: false },
-    { name: 'High View', p1Civ: '', p2Civ: '', winner: 0, isNext: false },
-    { name: 'Lipany', p1Civ: '', p2Civ: '', winner: 0, isNext: false }
+    { name: 'Dry Arabia', p1Civ: '', p2Civ: '', p1Snipe: '', p2Snipe: '', winner: 0, isNext: true },
+    { name: 'Frisian Marshes', p1Civ: '', p2Civ: '', p1Snipe: '', p2Snipe: '', winner: 0, isNext: false },
+    { name: 'Silk Road', p1Civ: '', p2Civ: '', p1Snipe: '', p2Snipe: '', winner: 0, isNext: false },
+    { name: 'High View', p1Civ: '', p2Civ: '', p1Snipe: '', p2Snipe: '', winner: 0, isNext: false },
+    { name: 'Lipany', p1Civ: '', p2Civ: '', p1Snipe: '', p2Snipe: '', winner: 0, isNext: false }
   ] as FinalMapEntry[],
   timer: { active: false, min: 5, sec: 0, timestamp: Date.now() },
   casters: [{ name: '', active: true }]
@@ -722,6 +725,8 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
           ...m,
           p1Civ: m.p2Civ,
           p2Civ: m.p1Civ,
+          p1Snipe: m.p2Snipe || '',
+          p2Snipe: m.p1Snipe || '',
           winner: m.winner === 1 ? 2 : m.winner === 2 ? 1 : 0
         }))
       },
@@ -768,22 +773,42 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
     label?: string;
   }) => {
     const [open, setOpen] = useState(false);
+    const [query, setQuery] = useState('');
     const ref = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
     const selected = civilizationsData.find((c) => c.id === value);
+
+    const filteredCivs = civilizationsData.filter((c) => {
+      const q = query.trim().toLowerCase();
+      if (!q) return true;
+      return c.name.toLowerCase().includes(q) || c.id.toLowerCase().includes(q);
+    });
 
     useEffect(() => {
       const outside = (e: MouseEvent) => {
-        if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+        if (ref.current && !ref.current.contains(e.target as Node)) {
+          setOpen(false);
+          setQuery('');
+        }
       };
       document.addEventListener('mousedown', outside);
       return () => document.removeEventListener('mousedown', outside);
     }, []);
 
+    useEffect(() => {
+      if (open) {
+        setTimeout(() => inputRef.current?.focus(), 10);
+      }
+    }, [open]);
+
     return (
       <div className="relative w-full" ref={ref}>
         <button
           type="button"
-          onClick={() => setOpen(!open)}
+          onClick={() => {
+            setOpen(!open);
+            setQuery('');
+          }}
           className="w-full flex items-center gap-2 bg-[#0d111a] border border-white/10 hover:border-amber-400/50 rounded-xl px-2.5 py-2 text-left transition-all"
         >
           <div className="w-7 h-5 rounded bg-black/50 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
@@ -800,31 +825,77 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
         </button>
 
         {open && (
-          <div className="absolute left-0 top-full mt-1.5 z-[1000] w-56 max-h-60 overflow-y-auto bg-[#0d1220] border border-amber-500/30 rounded-2xl shadow-2xl p-1.5 space-y-0.5 custom-scrollbar">
-            <button
-              type="button"
-              onClick={() => {
-                onChange('');
-                setOpen(false);
-              }}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[11px] font-bold text-gray-400 hover:bg-white/5 hover:text-white"
-            >
-              <X size={12} /> Nessuna
-            </button>
-            {civilizationsData.map((civ) => (
-              <button
-                key={civ.id}
-                type="button"
-                onClick={() => {
-                  onChange(civ.id);
-                  setOpen(false);
-                }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[11px] font-bold text-gray-200 hover:bg-amber-500/15 hover:text-amber-200 text-left"
-              >
-                <img src={civ.flag} alt={civ.name} className="w-6 h-4 rounded-xs object-cover border border-white/10 shrink-0" />
-                <span className="truncate uppercase tracking-wider">{civ.name}</span>
-              </button>
-            ))}
+          <div className="absolute left-0 top-full mt-1.5 z-[1000] w-60 bg-[#0d1220] border border-amber-500/30 rounded-2xl shadow-2xl overflow-hidden">
+            <div className="p-2 border-b border-white/10 bg-black/40">
+              <div className="relative">
+                <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && filteredCivs.length > 0) {
+                      e.preventDefault();
+                      onChange(filteredCivs[0].id);
+                      setOpen(false);
+                      setQuery('');
+                    } else if (e.key === 'Escape') {
+                      setOpen(false);
+                      setQuery('');
+                    }
+                  }}
+                  placeholder="Cerca civiltà..."
+                  className="w-full bg-[#070a13] border border-white/10 focus:border-amber-400/60 rounded-lg pl-7 pr-6 py-1.5 text-[11px] font-bold text-white outline-none placeholder:text-gray-500"
+                />
+                {query && (
+                  <button
+                    type="button"
+                    onClick={() => setQuery('')}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                  >
+                    <X size={11} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="max-h-52 overflow-y-auto p-1.5 space-y-0.5 custom-scrollbar">
+              {!query.trim() && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChange('');
+                    setOpen(false);
+                    setQuery('');
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[11px] font-bold text-gray-400 hover:bg-white/5 hover:text-white"
+                >
+                  <X size={12} /> Nessuna
+                </button>
+              )}
+              {filteredCivs.length > 0 ? (
+                filteredCivs.map((civ) => (
+                  <button
+                    key={civ.id}
+                    type="button"
+                    onClick={() => {
+                      onChange(civ.id);
+                      setOpen(false);
+                      setQuery('');
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[11px] font-bold text-gray-200 hover:bg-amber-500/15 hover:text-amber-200 text-left"
+                  >
+                    <img src={civ.flag} alt={civ.name} className="w-6 h-4 rounded-xs object-cover border border-white/10 shrink-0" />
+                    <span className="truncate uppercase tracking-wider">{civ.name}</span>
+                  </button>
+                ))
+              ) : (
+                <div className="px-3 py-3 text-center text-[11px] text-gray-500">
+                  Nessuna civiltà trovata
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -1642,30 +1713,54 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
                 </select>
 
                 <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <div className="text-[9px] font-bold text-amber-300/80 uppercase mb-1 truncate">
-                      Civ {state.p1.name || 'P1'}
+                  <div className="space-y-1.5">
+                    <div className="text-[9px] font-bold text-amber-300/80 uppercase truncate">
+                      Giocata {state.p1.name || 'P1'}
                     </div>
                     <CivSelectCompact
                       value={m.p1Civ}
-                      label="Civ P1"
+                      label="Giocata P1"
                       onChange={(val) => {
                         const nextMaps = [...state.maps];
                         nextMaps[idx] = { ...m, p1Civ: val };
                         pushState({ ...state, maps: nextMaps }, true);
                       }}
                     />
+                    <div className="text-[9px] font-bold text-red-400/80 uppercase pt-1 truncate">
+                      Sniperata {state.p1.name || 'P1'}
+                    </div>
+                    <CivSelectCompact
+                      value={m.p1Snipe || ''}
+                      label="Sniperata P1"
+                      onChange={(val) => {
+                        const nextMaps = [...state.maps];
+                        nextMaps[idx] = { ...m, p1Snipe: val };
+                        pushState({ ...state, maps: nextMaps }, true);
+                      }}
+                    />
                   </div>
-                  <div>
-                    <div className="text-[9px] font-bold text-rose-300/80 uppercase mb-1 truncate">
-                      Civ {state.p2.name || 'P2'}
+                  <div className="space-y-1.5">
+                    <div className="text-[9px] font-bold text-rose-300/80 uppercase truncate">
+                      Giocata {state.p2.name || 'P2'}
                     </div>
                     <CivSelectCompact
                       value={m.p2Civ}
-                      label="Civ P2"
+                      label="Giocata P2"
                       onChange={(val) => {
                         const nextMaps = [...state.maps];
                         nextMaps[idx] = { ...m, p2Civ: val };
+                        pushState({ ...state, maps: nextMaps }, true);
+                      }}
+                    />
+                    <div className="text-[9px] font-bold text-red-400/80 uppercase pt-1 truncate">
+                      Sniperata {state.p2.name || 'P2'}
+                    </div>
+                    <CivSelectCompact
+                      value={m.p2Snipe || ''}
+                      label="Sniperata P2"
+                      onChange={(val) => {
+                        const nextMaps = [...state.maps];
+                        nextMaps[idx] = { ...m, p2Snipe: val };
                         pushState({ ...state, maps: nextMaps }, true);
                       }}
                     />

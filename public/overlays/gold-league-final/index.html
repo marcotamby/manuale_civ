@@ -863,29 +863,43 @@
         }
 
         /* Side Civ Medallions on the Isometric Diamond (EGCTV style) */
-        .map-civ-badge {
+        .map-civ-stack {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 58px;
-            height: 58px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            z-index: 12;
+        }
+
+        .map-civ-stack.left {
+            left: -16px;
+        }
+
+        .map-civ-stack.right {
+            right: -16px;
+        }
+
+        .map-civ-badge {
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             background: #090e1a;
             border: 2.5px solid var(--gold);
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.9), 0 0 12px rgba(0, 0, 0, 0.6);
             background-size: cover;
             background-position: center;
-            z-index: 12;
-            overflow: visible;
+            position: relative;
+            overflow: hidden;
         }
 
-        .map-civ-badge.left {
-            left: -14px;
+        .map-civ-stack.left .map-civ-badge {
             border-color: var(--p1-bright);
         }
 
-        .map-civ-badge.right {
-            right: -14px;
+        .map-civ-stack.right .map-civ-badge {
             border-color: var(--p2-bright);
         }
 
@@ -896,17 +910,42 @@
 
         .map-civ-badge.is-winner {
             box-shadow: 0 0 22px rgba(255, 215, 0, 0.9), 0 6px 18px rgba(0, 0, 0, 0.9);
-            transform: translateY(-50%) scale(1.08);
+            transform: scale(1.06);
         }
 
-        .map-winner-crown {
+        .map-snipe-badge {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #090e1a;
+            border: 2px solid #ef4444;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.9), 0 0 10px rgba(239, 68, 68, 0.45);
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-snipe-badge::before {
+            content: '';
             position: absolute;
-            top: -22px;
-            left: 50%;
-            transform: translateX(-50%);
+            inset: 0;
+            background: rgba(35, 6, 6, 0.58);
+            backdrop-filter: grayscale(0.7);
+        }
+
+        .map-snipe-badge::after {
+            content: '✕';
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff3b3b;
             font-size: 22px;
-            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.95));
-            z-index: 20;
+            font-weight: 900;
+            text-shadow: 0 2px 8px #000, 0 0 6px rgba(255, 59, 59, 0.8);
         }
 
         .map-name-plate {
@@ -1416,6 +1455,8 @@
 
             const p1Civ = map.p1Civ || (Array.isArray(map.t1Civs) ? map.t1Civs[0] : '') || '';
             const p2Civ = map.p2Civ || (Array.isArray(map.t2Civs) ? map.t2Civs[0] : '') || '';
+            const p1Snipe = map.p1Snipe || '';
+            const p2Snipe = map.p2Snipe || '';
             const mapName = (map.name || `Mappa ${idx + 1}`).trim();
 
             const strokeColor = isNext ? '#38bdf8' : (p1Won ? '#ffd700' : (p2Won ? '#fb7185' : '#d4af37'));
@@ -1438,9 +1479,10 @@
                 <div class="map-node ${isNext ? 'is-next' : ''} ${hasWinner ? 'has-winner' : ''}">
                     ${statusPill}
                     <div class="diamond-stage">
-                        ${p1Civ ? `
-                            <div class="map-civ-badge left ${p1Won ? 'is-winner' : (p2Won ? 'is-loser' : '')}" style="background-image: url('${getCivUrl(p1Civ)}')">
-                                ${p1Won ? '<div class="map-winner-crown">👑</div>' : ''}
+                        ${(p1Civ || p1Snipe) ? `
+                            <div class="map-civ-stack left">
+                                ${p1Civ ? `<div class="map-civ-badge ${p1Won ? 'is-winner' : (p2Won ? 'is-loser' : '')}" style="background-image: url('${getCivUrl(p1Civ)}')"></div>` : ''}
+                                ${p1Snipe ? `<div class="map-snipe-badge" style="background-image: url('${getCivUrl(p1Snipe)}')"></div>` : ''}
                             </div>
                         ` : ''}
 
@@ -1456,9 +1498,10 @@
 
                         ${centerWinnerBanner}
 
-                        ${p2Civ ? `
-                            <div class="map-civ-badge right ${p2Won ? 'is-winner' : (p1Won ? 'is-loser' : '')}" style="background-image: url('${getCivUrl(p2Civ)}')">
-                                ${p2Won ? '<div class="map-winner-crown">👑</div>' : ''}
+                        ${(p2Civ || p2Snipe) ? `
+                            <div class="map-civ-stack right">
+                                ${p2Civ ? `<div class="map-civ-badge ${p2Won ? 'is-winner' : (p1Won ? 'is-loser' : '')}" style="background-image: url('${getCivUrl(p2Civ)}')"></div>` : ''}
+                                ${p2Snipe ? `<div class="map-snipe-badge" style="background-image: url('${getCivUrl(p2Snipe)}')"></div>` : ''}
                             </div>
                         ` : ''}
                     </div>
