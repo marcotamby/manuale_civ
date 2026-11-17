@@ -407,11 +407,7 @@
             height: 58px;
             display: flex;
             align-items: center;
-            gap: 8px;
-        }
-
-        .draft-civs-strip.compact {
-            gap: 6px;
+            gap: var(--orb-gap, 8px);
         }
 
         .draft-civs-strip.left {
@@ -435,8 +431,8 @@
         }
 
         .draft-orb {
-            width: 48px;
-            height: 48px;
+            width: var(--orb-size, 48px);
+            height: var(--orb-size, 48px);
             border-radius: 50%;
             border: 2.5px solid rgba(255, 255, 255, 0.75);
             background-color: #090e1a;
@@ -446,11 +442,6 @@
             position: relative;
             flex-shrink: 0;
             overflow: hidden;
-        }
-
-        .draft-civs-strip.compact .draft-orb {
-            width: 41px;
-            height: 41px;
         }
 
         .draft-orb.pick {
@@ -478,7 +469,7 @@
             align-items: center;
             justify-content: center;
             color: #4ade80;
-            font-size: 24px;
+            font-size: var(--orb-mark-size, 24px);
             font-weight: 900;
             text-shadow: 0 2px 8px #000;
         }
@@ -505,7 +496,7 @@
             align-items: center;
             justify-content: center;
             color: #ff3b3b;
-            font-size: 26px;
+            font-size: var(--orb-mark-size, 26px);
             font-weight: 900;
             text-shadow: 0 2px 10px #000, 0 0 8px rgba(255, 59, 59, 0.75);
         }
@@ -1358,14 +1349,21 @@
 
             if (items.length === 0) {
                 el.innerHTML = '';
-                el.classList.remove('compact');
                 return;
             }
 
-            el.classList.toggle('compact', items.length >= 10);
-
             const picks = items.filter(i => i.status !== 'ban');
             const bans = items.filter(i => i.status === 'ban');
+
+            const n = items.length;
+            const gap = n >= 16 ? 4 : (n >= 11 ? 5 : 8);
+            const dividerExtra = (picks.length > 0 && bans.length > 0) ? 10 : 0;
+            const maxAvail = 660 - dividerExtra - gap * Math.max(0, n - 1);
+            const orbSize = Math.max(24, Math.min(48, Math.floor(maxAvail / n)));
+
+            el.style.setProperty('--orb-size', `${orbSize}px`);
+            el.style.setProperty('--orb-gap', `${gap}px`);
+            el.style.setProperty('--orb-mark-size', `${Math.max(14, Math.round(orbSize * 0.54))}px`);
 
             const renderOrb = (item) =>
                 `<div class="draft-orb ${escapeHtml(item.status)}" style="background-image: url('${getCivUrl(item.civId)}')"></div>`;
