@@ -360,7 +360,7 @@
 
         <!-- Center Tournament Title & Best Of (Exact 310px match with AoE4 HUD) -->
         <div id="top-brand-banner">
-            <div class="top-tournament-title" id="top-title-text">Finale Lega Oro</div>
+            <div class="top-tournament-title" id="top-title-text">Grand Final</div>
             <div class="top-format-pill" id="top-format-text">BEST OF 5</div>
         </div>
 
@@ -447,7 +447,7 @@
         };
 
         function formatTitle(raw) {
-            if (!raw) return 'Finale Lega Oro';
+            if (!raw) return 'Grand Final';
             const lowerWords = ['of', 'dei', 'del', 'della', 'degli', 'delle', 'di', 'da', 'in', 'and', 'the', 'e', 'a', 'su', 'per', 'con', 'tra', 'fra'];
             return raw.trim().split(/\s+/).map((word, index) => {
                 const wLower = word.toLowerCase();
@@ -491,7 +491,7 @@
             const s = state || {};
 
             // 1. Titolo & Best of
-            const title = s.tournamentTitle || s.titleText || displayName || 'Finale Lega Oro';
+            const title = (s.topBannerStage || '').trim() || 'Grand Final';
             document.getElementById('top-title-text').innerText = formatTitle(title);
 
             const formatEl = document.getElementById('top-format-text');

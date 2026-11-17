@@ -58,6 +58,7 @@ export interface OverlayState {
   startgg?: any;
   // In-Game Brand fields
   tournamentTitle?: string;
+  topBannerStage?: string;
   stageSubtitle?: string;
   matchFormat?: string;
   dayText?: string;

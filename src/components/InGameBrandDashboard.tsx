@@ -43,7 +43,7 @@ const COUNTRY_OPTIONS = [
 ];
 
 const DEFAULT_STATE: OverlayState = {
-  tournamentTitle: 'Finale Lega Oro',
+  topBannerStage: 'Grand Final',
   matchFormat: 'BEST OF 5',
   showMatchFormat: true,
   dayNumber: 1,
@@ -216,7 +216,7 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
-                1. Nome Torneo (Banner In Alto)
+                1. Etichetta Banner In Alto
               </label>
               <button
                 type="button"
@@ -233,9 +233,9 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
             </div>
             <input
               type="text"
-              value={state.tournamentTitle || ''}
-              onChange={(e) => pushLiveState({ ...state, tournamentTitle: e.target.value })}
-              placeholder="Finale Lega Oro"
+              value={state.topBannerStage ?? 'Grand Final'}
+              onChange={(e) => pushLiveState({ ...state, topBannerStage: e.target.value })}
+              placeholder="Grand Final"
               className="bg-[#0e1424] border border-white/10 focus:border-yellow-400/60 rounded-xl px-4 py-2.5 text-sm font-bold text-white focus:outline-none"
             />
             <div className="flex items-center justify-between gap-2 pt-1">
