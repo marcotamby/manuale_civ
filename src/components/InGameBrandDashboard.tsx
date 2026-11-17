@@ -275,7 +275,7 @@ export function InGameBrandDashboard({ onError, onActivePathChange }: InGameBran
                 {state.showMatchFormat !== false ? <Eye size={12} /> : <EyeOff size={12} />}
               </button>
             </div>
-            <p className="text-[11px] text-slate-400">Calibrato esattamente sotto il blocco centrale dell'HUD spettatore (y=135px).</p>
+            <p className="text-[11px] text-slate-400">Calibrato esattamente sotto il blocco centrale dell'HUD spettatore (y=141px).</p>
           </div>
 
           {/* Selettore Giornata (Area Scura Minimappa) */}
