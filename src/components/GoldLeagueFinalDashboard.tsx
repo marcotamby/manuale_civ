@@ -97,6 +97,7 @@ const DEFAULT_STATE = {
     seed: '1',
     country: 'ch',
     photoUrl: '',
+    photoOriginalUrl: '',
     photoZoom: 1,
     photoX: 50,
     photoY: 20,
@@ -110,9 +111,10 @@ const DEFAULT_STATE = {
     seed: '2',
     country: 'it',
     photoUrl: '',
-    photoZoom: 1.5,
+    photoOriginalUrl: '',
+    photoZoom: 1.45,
     photoX: 57,
-    photoY: 18,
+    photoY: 20,
     civId: '',
     draftCivs: [] as DraftCivEntry[],
     skills: { ...DEFAULT_SKILLS }
@@ -370,7 +372,81 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
     }
   };
 
-  const removeWallBackground = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+  const selfieSegmenterPromiseRef = useRef<Promise<any> | null>(null);
+
+  const getSelfieSegmenter = async () => {
+    if (!selfieSegmenterPromiseRef.current) {
+      selfieSegmenterPromiseRef.current = (async () => {
+        const visionUrl = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs';
+        const visionMod: any = await import(/* @vite-ignore */ visionUrl);
+        const { FilesetResolver, ImageSegmenter } = visionMod;
+        const fileset = await FilesetResolver.forVisionTasks(
+          'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm'
+        );
+        return ImageSegmenter.createFromOptions(fileset, {
+          baseOptions: {
+            modelAssetPath:
+              'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite',
+            delegate: 'CPU'
+          },
+          runningMode: 'IMAGE',
+          outputCategoryMask: false,
+          outputConfidenceMasks: true
+        });
+      })();
+    }
+    try {
+      return await selfieSegmenterPromiseRef.current;
+    } catch (err) {
+      selfieSegmenterPromiseRef.current = null;
+      throw err;
+    }
+  };
+
+  const applyAiSelfieCutout = async (
+    canvas: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number
+  ) => {
+    const segmenter = await getSelfieSegmenter();
+    const result = segmenter.segment(canvas);
+    try {
+      const masks = result?.confidenceMasks || [];
+      if (masks.length === 0) throw new Error('Nessuna maschera generata');
+
+      let personMaskFloat: Float32Array;
+      let invert = false;
+
+      if (masks.length >= 2) {
+        const labels: string[] = typeof segmenter.getLabels === 'function' ? segmenter.getLabels() : [];
+        const personIdx = labels.findIndex((l) => /selfie|person|foreground/i.test(l));
+        const idx = personIdx >= 0 ? personIdx : 1;
+        personMaskFloat = masks[idx].getAsFloat32Array();
+      } else {
+        personMaskFloat = masks[0].getAsFloat32Array();
+        const tl = personMaskFloat[Math.min(personMaskFloat.length - 1, 2 * width + 2)];
+        const tr = personMaskFloat[Math.min(personMaskFloat.length - 1, 2 * width + Math.max(0, width - 3))];
+        const center = personMaskFloat[Math.floor(height / 2) * width + Math.floor(width / 2)];
+        if (center < (tl + tr) / 2) invert = true;
+      }
+
+      const imgData = ctx.getImageData(0, 0, width, height);
+      const data = imgData.data;
+      const total = width * height;
+      for (let i = 0; i < total; i++) {
+        const rawProb = invert ? 1 - personMaskFloat[i] : personMaskFloat[i];
+        const t = Math.max(0, Math.min(1, (rawProb - 0.25) / 0.48));
+        const smoothAlpha = t * t * (3 - 2 * t);
+        data[i * 4 + 3] = Math.round(smoothAlpha * 255);
+      }
+      ctx.putImageData(imgData, 0, 0);
+    } finally {
+      result?.close?.();
+    }
+  };
+
+  const removeWallBackgroundFallback = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
     const imgData = ctx.getImageData(0, 0, width, height);
     const data = imgData.data;
 
@@ -397,7 +473,7 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
       const luma = 0.299 * r + 0.587 * g + 0.114 * b;
       const chroma = Math.max(r, g, b) - Math.min(r, g, b);
       const dist = Math.hypot(r - bgR, g - bgG, b - bgB);
-      return luma >= 170 && chroma <= 26 && dist <= 92;
+      return luma >= 196 && chroma <= 20 && dist <= 60;
     };
 
     const total = width * height;
@@ -428,37 +504,24 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
       const x = p % width;
       const y = (p - x) / width;
 
-      if (x + 1 < width) {
-        const np = p + 1;
-        if (!visited[np] && isWall(np * 4)) {
-          visited[np] = 1;
-          queue[tail++] = np;
-        }
+      if (x + 1 < width && !visited[p + 1] && isWall((p + 1) * 4)) {
+        visited[p + 1] = 1;
+        queue[tail++] = p + 1;
       }
-      if (x - 1 >= 0) {
-        const np = p - 1;
-        if (!visited[np] && isWall(np * 4)) {
-          visited[np] = 1;
-          queue[tail++] = np;
-        }
+      if (x - 1 >= 0 && !visited[p - 1] && isWall((p - 1) * 4)) {
+        visited[p - 1] = 1;
+        queue[tail++] = p - 1;
       }
-      if (y + 1 < height) {
-        const np = p + width;
-        if (!visited[np] && isWall(np * 4)) {
-          visited[np] = 1;
-          queue[tail++] = np;
-        }
+      if (y + 1 < height && !visited[p + width] && isWall((p + width) * 4)) {
+        visited[p + width] = 1;
+        queue[tail++] = p + width;
       }
-      if (y - 1 >= 0) {
-        const np = p - width;
-        if (!visited[np] && isWall(np * 4)) {
-          visited[np] = 1;
-          queue[tail++] = np;
-        }
+      if (y - 1 >= 0 && !visited[p - width] && isWall((p - width) * 4)) {
+        visited[p - width] = 1;
+        queue[tail++] = p - width;
       }
     }
 
-    // Erode 1px to kill bright edge fringe, then smooth 3x3
     const eroded = new Uint8Array(alphaMask);
     for (let y = 1; y < height - 1; y++) {
       for (let x = 1; x < width - 1; x++) {
@@ -503,7 +566,7 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onerror = () => reject(new Error('Impossibile elaborare l\'immagine (formato o CORS).'));
-      img.onload = () => {
+      img.onload = async () => {
         const maxSide = 512;
         let { width, height } = img;
         if (width > maxSide || height > maxSide) {
@@ -521,7 +584,12 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
         }
         ctx.drawImage(img, 0, 0, width, height);
         if (applyCutout) {
-          removeWallBackground(ctx, width, height);
+          try {
+            await applyAiSelfieCutout(canvas, ctx, width, height);
+          } catch (aiErr) {
+            console.warn('AI Selfie Segmentation fallback to wall flood-fill:', aiErr);
+            removeWallBackgroundFallback(ctx, width, height);
+          }
         }
         const dataUrl = canvas.toDataURL('image/png');
         canvas.toBlob(
@@ -540,27 +608,29 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
     });
   };
 
-  const prepareAvatarAsset = (
-    file: File,
+  const prepareAvatarAssetFromSrc = (
+    dataOrUrl: string,
     applyCutout: boolean
   ): Promise<{ blob: Blob; dataUrl: string; ext: string }> => {
+    return renderImageToAvatarAsset(dataOrUrl, applyCutout);
+  };
+
+  const readFileAsDataUrl = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onerror = () => reject(new Error('Impossibile leggere il file immagine.'));
-      reader.onload = () => {
-        renderImageToAvatarAsset(reader.result as string, applyCutout).then(resolve).catch(reject);
-      };
+      reader.onload = () => resolve(reader.result as string);
       reader.readAsDataURL(file);
     });
   };
 
-  const uploadAndSaveAvatar = async (
+  const uploadAssetToStorageOrDataUrl = async (
     playerKey: 'p1' | 'p2',
+    suffix: string,
     asset: { blob: Blob; dataUrl: string; ext: string }
-  ) => {
-    let finalPhotoUrl = '';
+  ): Promise<string> => {
     try {
-      const filePath = `overlay-avatars/${OVERLAY_ID}-${playerKey}-${Date.now()}.${asset.ext}`;
+      const filePath = `overlay-avatars/${OVERLAY_ID}-${playerKey}-${suffix}-${Date.now()}.${asset.ext}`;
       const { error: uploadErr } = await supabase.storage
         .from('civilizations')
         .upload(filePath, asset.blob, { contentType: 'image/png', cacheControl: '3600', upsert: true });
@@ -569,29 +639,13 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
         const {
           data: { publicUrl }
         } = supabase.storage.from('civilizations').getPublicUrl(filePath);
-        finalPhotoUrl = publicUrl;
-      } else {
-        console.warn('Supabase storage avatar upload fallback to data URL:', uploadErr.message);
+        return publicUrl;
       }
+      console.warn('Supabase storage avatar upload fallback to data URL:', uploadErr.message);
     } catch (storageErr) {
       console.warn('Supabase storage unavailable, fallback to data URL:', storageErr);
     }
-
-    if (!finalPhotoUrl) {
-      finalPhotoUrl = asset.dataUrl;
-    }
-
-    const latest = stateRef.current;
-    await pushState(
-      {
-        ...latest,
-        [playerKey]: {
-          ...latest[playerKey],
-          photoUrl: finalPhotoUrl
-        }
-      },
-      true
-    );
+    return asset.dataUrl;
   };
 
   const handlePhotoUpload = async (playerKey: 'p1' | 'p2', file: File | undefined) => {
@@ -602,8 +656,28 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
     }
     setUploadingPhotoFor(playerKey);
     try {
-      const asset = await prepareAvatarAsset(file, autoCutoutOnUpload);
-      await uploadAndSaveAvatar(playerKey, asset);
+      const rawDataUrl = await readFileAsDataUrl(file);
+      const origAsset = await prepareAvatarAssetFromSrc(rawDataUrl, false);
+      const origUrl = await uploadAssetToStorageOrDataUrl(playerKey, 'orig', origAsset);
+
+      let finalPhotoUrl = origUrl;
+      if (autoCutoutOnUpload) {
+        const cutAsset = await prepareAvatarAssetFromSrc(rawDataUrl, true);
+        finalPhotoUrl = await uploadAssetToStorageOrDataUrl(playerKey, 'cut', cutAsset);
+      }
+
+      const latest = stateRef.current;
+      await pushState(
+        {
+          ...latest,
+          [playerKey]: {
+            ...latest[playerKey],
+            photoUrl: finalPhotoUrl,
+            photoOriginalUrl: origUrl
+          }
+        },
+        true
+      );
     } catch (err: any) {
       onError(`Errore caricamento foto giocatore: ${err?.message || 'caricamento fallito'}`);
     } finally {
@@ -612,12 +686,25 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
   };
 
   const handleCutoutExistingPhoto = async (playerKey: 'p1' | 'p2') => {
-    const currentUrl = stateRef.current[playerKey]?.photoUrl;
-    if (!currentUrl) return;
+    const player = stateRef.current[playerKey];
+    const sourceUrl = player?.photoOriginalUrl || player?.photoUrl;
+    if (!sourceUrl) return;
     setUploadingPhotoFor(playerKey);
     try {
-      const asset = await renderImageToAvatarAsset(currentUrl, true);
-      await uploadAndSaveAvatar(playerKey, asset);
+      const cutAsset = await renderImageToAvatarAsset(sourceUrl, true);
+      const cutUrl = await uploadAssetToStorageOrDataUrl(playerKey, 'cut', cutAsset);
+      const latest = stateRef.current;
+      await pushState(
+        {
+          ...latest,
+          [playerKey]: {
+            ...latest[playerKey],
+            photoUrl: cutUrl,
+            photoOriginalUrl: latest[playerKey].photoOriginalUrl || sourceUrl
+          }
+        },
+        true
+      );
     } catch (err: any) {
       onError(`Errore scontorno foto: ${err?.message || 'operazione non riuscita'}`);
     } finally {
@@ -1019,6 +1106,17 @@ export function GoldLeagueFinalDashboard({ onError }: GoldLeagueFinalDashboardPr
                         Taglia
                       </button>
                     </div>
+                    {player.photoOriginalUrl && player.photoOriginalUrl !== player.photoUrl && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          pushState({ ...state, [key]: { ...player, photoUrl: player.photoOriginalUrl || '' } }, true)
+                        }
+                        className="w-full py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[9px] font-bold uppercase text-gray-300"
+                      >
+                        Ripristina Orig.
+                      </button>
+                    )}
                     <label className="flex items-center gap-1.5 text-[9px] font-bold text-gray-400 cursor-pointer select-none">
                       <input
                         type="checkbox"

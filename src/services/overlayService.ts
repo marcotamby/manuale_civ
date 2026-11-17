@@ -16,6 +16,7 @@ export interface GoldFinalPlayer {
   seed?: string;
   country?: string;
   photoUrl?: string;
+  photoOriginalUrl?: string;
   photoZoom?: number;
   photoX?: number;
   photoY?: number;
