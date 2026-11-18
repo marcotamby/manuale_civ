@@ -549,6 +549,138 @@
     "background_url": null
   },
   {
+    "id": "gold-league-final",
+    "state": {
+      "p1": {
+        "name": "Chrysaor",
+        "seed": "1",
+        "civId": "",
+        "score": 0,
+        "photoX": 50,
+        "photoY": 28,
+        "skills": {
+          "apm": 8,
+          "macro": 9,
+          "micro": 7,
+          "strategia": 7,
+          "creativita": 6
+        },
+        "country": "ch",
+        "photoUrl": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/overlay-avatars/gold-league-final-p1-1794922672655.png",
+        "draftCivs": [
+          {
+            "civId": "macedonian",
+            "status": "pick"
+          },
+          {
+            "civId": "chinese",
+            "status": "pick"
+          },
+          {
+            "civId": "orderofthedragon",
+            "status": "pick"
+          },
+          {
+            "civId": "goldenhorde",
+            "status": "pick"
+          },
+          {
+            "civId": "sengoku",
+            "status": "ban"
+          },
+          {
+            "civId": "byzantines",
+            "status": "ban"
+          }
+        ],
+        "photoZoom": 1.25,
+        "photoOriginalUrl": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/overlay-avatars/gold-league-final-p1-1794921118115.png"
+      },
+      "p2": {
+        "name": "Gattoratto",
+        "seed": "3",
+        "civId": "",
+        "score": 0,
+        "photoX": 60,
+        "photoY": 0,
+        "skills": {
+          "apm": 8,
+          "macro": 8,
+          "micro": 8,
+          "strategia": 7,
+          "creativita": 6
+        },
+        "country": "it",
+        "photoUrl": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/overlay-avatars/gold-league-final-p2-1794922858720.png",
+        "draftCivs": [],
+        "photoZoom": 1.7,
+        "photoOriginalUrl": "https://laliiuqjpxanhwhxajlm.supabase.co/storage/v1/object/public/civilizations/overlay-avatars/gold-league-final-p2-1794921172379.png"
+      },
+      "maps": [
+        {
+          "name": "Dry Arabia",
+          "p1Civ": "chinese",
+          "p2Civ": "byzantines",
+          "isNext": false,
+          "winner": 0,
+          "p1Snipe": "abbasid",
+          "p2Snipe": "rus"
+        },
+        {
+          "name": "Frisian Marshes",
+          "p1Civ": "",
+          "p2Civ": "",
+          "isNext": false,
+          "winner": 0
+        },
+        {
+          "name": "Silk Road",
+          "p1Civ": "",
+          "p2Civ": "",
+          "isNext": false,
+          "winner": 0
+        },
+        {
+          "name": "High View",
+          "p1Civ": "",
+          "p2Civ": "",
+          "isNext": false,
+          "winner": 0
+        },
+        {
+          "name": "Lipany",
+          "p1Civ": "",
+          "p2Civ": "",
+          "isNext": false,
+          "winner": 0
+        }
+      ],
+      "timer": {
+        "min": 5,
+        "sec": 0,
+        "active": false,
+        "timestamp": 1794921540017
+      },
+      "casters": [
+        {
+          "name": "marcotamby",
+          "active": true
+        }
+      ],
+      "dayText": "GRAND FINAL",
+      "showLogo": true,
+      "matchFormat": "BEST OF 5",
+      "stageSubtitle": "AGE OF EMPIRES IV • AOE ITALIA",
+      "tournamentTitle": "FINALE LEGA ORO",
+      "minimapBrandTitle": "AOE ITALIA • LEGA ORO"
+    },
+    "updated_at": "2026-11-17T14:46:08.918+00:00",
+    "display_name": null,
+    "icon_url": null,
+    "description": null,
+    "background_url": null
+  },
+  {
     "id": "tournament-2v2-low-bracket",
     "state": {
       "t1": {
@@ -1463,103 +1595,6 @@
     "background_url": ""
   },
   {
-    "id": "gold-league-final",
-    "state": {
-      "p1": {
-        "name": "Chrysaor",
-        "seed": "1",
-        "civId": "",
-        "score": 0,
-        "skills": {
-          "apm": 8,
-          "macro": 8,
-          "micro": 8,
-          "strategia": 8,
-          "creativita": 8
-        },
-        "country": "ch",
-        "photoUrl": "",
-        "draftCivs": []
-      },
-      "p2": {
-        "name": "Gattoratto",
-        "seed": "2",
-        "civId": "",
-        "score": 0,
-        "skills": {
-          "apm": 8,
-          "macro": 8,
-          "micro": 8,
-          "strategia": 8,
-          "creativita": 8
-        },
-        "country": "it",
-        "photoUrl": "",
-        "draftCivs": []
-      },
-      "maps": [
-        {
-          "name": "Dry Arabia",
-          "p1Civ": "",
-          "p2Civ": "",
-          "isNext": true,
-          "winner": 0
-        },
-        {
-          "name": "Frisian Marshes",
-          "p1Civ": "",
-          "p2Civ": "",
-          "isNext": false,
-          "winner": 0
-        },
-        {
-          "name": "Silk Road",
-          "p1Civ": "",
-          "p2Civ": "",
-          "isNext": false,
-          "winner": 0
-        },
-        {
-          "name": "High View",
-          "p1Civ": "",
-          "p2Civ": "",
-          "isNext": false,
-          "winner": 0
-        },
-        {
-          "name": "Lipany",
-          "p1Civ": "",
-          "p2Civ": "",
-          "isNext": false,
-          "winner": 0
-        }
-      ],
-      "timer": {
-        "min": 5,
-        "sec": 0,
-        "active": false,
-        "timestamp": 1794838465742
-      },
-      "casters": [
-        {
-          "name": "",
-          "active": true
-        }
-      ],
-      "dayText": "GRAND FINAL",
-      "showLogo": true,
-      "matchFormat": "BEST OF 5",
-      "stageSubtitle": "AGE OF EMPIRES IV • AOE ITALIA",
-      "tournamentTitle": "FINALE LEGA ORO",
-      "minimapBrandTitle": "AOE ITALIA • LEGA ORO"
-    },
-    "updated_at": "2026-11-16T14:42:52.862+00:00",
-    "display_name": null,
-    "icon_url": null,
-    "description": null,
-    "background_url": null
-  },
-  {
     "id": "tournament-1v1-bracket",
     "state": {
       "p1": {
@@ -1651,18 +1686,25 @@
     "id": "in-game-brand",
     "state": {
       "theme": "gold",
-      "league": "silver",
+      "league": "gold",
+      "p1Seed": "1",
+      "p2Seed": "3",
       "dayText": "Giornata 4",
       "mapName": "Holy Island",
-      "scoreP1": 1,
-      "scoreP2": 1,
+      "scoreP1": 0,
+      "scoreP2": 0,
       "dayNumber": 4,
+      "p1Country": "ch",
+      "p2Country": "it",
+      "showFlags": true,
+      "showSeeds": true,
       "showScores": true,
-      "matchFormat": "BO1",
+      "matchFormat": "BO5",
       "showTopBanner": true,
       "stageSubtitle": "QUALIFICAZIONI",
       "showMinimapDay": true,
       "minimapBrandSub": "MASTERS",
+      "showMatchFormat": true,
       "showMinimapInfo": true,
       "showMinimapLogo": true,
       "tournamentTitle": "end of summer champions",
@@ -1677,7 +1719,7 @@
       "minimapSidebarOffsetX": 0,
       "minimapSidebarOffsetY": 0
     },
-    "updated_at": "2026-10-04T15:23:20.531+00:00",
+    "updated_at": "2026-11-17T14:44:36.355+00:00",
     "display_name": null,
     "icon_url": null,
     "description": "Overlay trasparente in-game: logo AoEItalia e torneo in alto sotto HUD, badge e info minimappa in basso a destra.",
