@@ -784,37 +784,6 @@
             box-shadow: 0 4px 16px rgba(244, 63, 94, 0.55);
         }
 
-        .map-winner-banner {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 18;
-            padding: 5px 16px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 900;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            white-space: nowrap;
-            backdrop-filter: blur(6px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.9);
-        }
-
-        .map-winner-banner.p1 {
-            background: rgba(12, 18, 32, 0.9);
-            border: 2px solid #ffd700;
-            color: #fef08a;
-            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.9), 0 0 18px rgba(255, 215, 0, 0.5);
-        }
-
-        .map-winner-banner.p2 {
-            background: rgba(20, 8, 16, 0.92);
-            border: 2px solid #fb7185;
-            color: #ffe4e6;
-            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.9), 0 0 18px rgba(244, 63, 94, 0.5);
-        }
-
         .diamond-stage {
             position: relative;
             width: 280px;
@@ -1471,10 +1440,6 @@
                 statusPill = `<div class="map-status-pill win-p2-pill">👑 ${escapeHtml(p2Name || 'P2')}</div>`;
             }
 
-            const centerWinnerBanner = hasWinner
-                ? `<div class="map-winner-banner ${p1Won ? 'p1' : 'p2'}">🏆 ${escapeHtml(p1Won ? (p1Name || 'P1') : (p2Name || 'P2'))}</div>`
-                : '';
-
             return `
                 <div class="map-node ${isNext ? 'is-next' : ''} ${hasWinner ? 'has-winner' : ''}">
                     ${statusPill}
@@ -1495,8 +1460,6 @@
                             <polygon points="140,3 277,80 140,157 3,80" stroke="${strokeColor}" stroke-width="${strokeWidth}" stroke-linejoin="round" />
                             <polygon points="140,9 267,80 140,151 13,80" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-linejoin="round" />
                         </svg>
-
-                        ${centerWinnerBanner}
 
                         ${(p2Civ || p2Snipe) ? `
                             <div class="map-civ-stack right">
