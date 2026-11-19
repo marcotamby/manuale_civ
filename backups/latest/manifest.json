@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-18T11-13-58-791Z",
+  "timestamp": "2026-11-19T11-12-28-483Z",
   "tables": [
     "civilizations",
     "global_units",
@@ -25,5 +25,5 @@
   ],
   "success": 21,
   "failed": 0,
-  "totalRows": 779
+  "totalRows": 789
 }
