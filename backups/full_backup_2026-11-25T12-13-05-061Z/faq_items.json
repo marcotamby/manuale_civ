@@ -1,0 +1,112 @@
+[
+  {
+    "id": "fdda4570-725a-45a3-a26f-d322fd99fb3f",
+    "section_id": "b7848971-20fe-4360-b782-822cd1ef8ad9",
+    "label": "Dettaglio Civiltà",
+    "description": "Ogni civiltà ha una pagina dedicata con bonus, unità uniche, edifici e tecnologie specifiche. È il cuore del manuale per capire come giocare al meglio ogni fazione.",
+    "icon_name": "Shield",
+    "display_order": 0,
+    "created_at": "2026-05-28T11:12:13.636011+00:00",
+    "updated_at": "2026-05-28T11:12:13.636011+00:00"
+  },
+  {
+    "id": "22a77031-1e26-4eb4-a4ae-57640da996f3",
+    "section_id": "b7848971-20fe-4360-b782-822cd1ef8ad9",
+    "label": "Unità & Edifici",
+    "description": "Statistiche dettagliate per ogni singola unità e edificio, inclusi costi e counter.",
+    "icon_name": "Sword",
+    "display_order": 1,
+    "created_at": "2026-05-28T11:12:13.636011+00:00",
+    "updated_at": "2026-05-28T11:12:13.636011+00:00"
+  },
+  {
+    "id": "035ebfb4-f517-4fe1-8ef3-6130062d46f3",
+    "section_id": "b7848971-20fe-4360-b782-822cd1ef8ad9",
+    "label": "Build Orders",
+    "description": "Strategie dettagliate e sequenze ottimizzate per l'inizio delle tue partite, spiegate passo dopo passo per darti il polso della situazione sin dai primi minuti.",
+    "icon_name": "BookOpen",
+    "display_order": 2,
+    "created_at": "2026-05-28T11:12:13.636011+00:00",
+    "updated_at": "2026-05-28T11:12:13.636011+00:00"
+  },
+  {
+    "id": "6ef0745b-eeeb-49d8-a6e5-185f1150af4c",
+    "section_id": "b7848971-20fe-4360-b782-822cd1ef8ad9",
+    "label": "Matchups & Video",
+    "description": "Consigli su come affrontare ogni specifica civiltà nemica, statistiche sulle mappe e dove ogni civiltà performa meglio, più una selezione di video tutorial dai migliori creator della community (anche quelli mediocri).",
+    "icon_name": "PlayCircle",
+    "display_order": 3,
+    "created_at": "2026-05-28T11:12:13.636011+00:00",
+    "updated_at": "2026-05-28T11:12:13.636011+00:00"
+  },
+  {
+    "id": "44f57e20-233d-450c-bc5c-aaf961fce4d5",
+    "section_id": "90e5a1ce-b7bf-44db-b529-50ecb8c5d46e",
+    "label": "Confronta Civiltà",
+    "description": "Nella Dashboard puoi selezionare più civiltà e metterle a confronto diretto per analizzare differenze di bonus e unità. In questa sezione sarai anche in grado di vedere quale delle due civiltà selezionate è favorita in quello specifico matchup, filtrando per rank o per elo.",
+    "icon_name": "Users",
+    "display_order": 0,
+    "created_at": "2026-05-28T11:12:13.811666+00:00",
+    "updated_at": "2026-05-28T11:12:13.811666+00:00"
+  },
+  {
+    "id": "24a6c719-0f10-49e2-b52b-49337b53ba49",
+    "section_id": "90e5a1ce-b7bf-44db-b529-50ecb8c5d46e",
+    "label": "I tuoi Preferiti",
+    "description": "Cliccando sul cuore in ogni civiltà, puoi aggiungerla ai preferiti. Le troverai sempre a portata di mano nella barra laterale. Non solo, ma se viene pubblicato un nuovo build order o un nuovo video per le civiltà che hai nei preferiti, vedrai una notifica sull'icona del tuo profilo e, una volta cliccatoci sopra, potrai vedere quale civiltà ha ricevuto un aggiornamento.",
+    "icon_name": "Heart",
+    "display_order": 1,
+    "created_at": "2026-05-28T11:12:13.811666+00:00",
+    "updated_at": "2026-05-28T11:12:13.811666+00:00"
+  },
+  {
+    "id": "2683b684-df72-4af8-8642-b1ec7f94b952",
+    "section_id": "90e5a1ce-b7bf-44db-b529-50ecb8c5d46e",
+    "label": "Q & A (Domande & Risposte)",
+    "description": "In ogni scheda civiltà puoi fare domande specifiche o rispondere a dubbi di altri giocatori. I player più forti della community italiana risponderanno alle tue richieste in tempi brevi. È lo strumento ideale per consigli tattici e chiarimenti.",
+    "icon_name": "HelpCircle",
+    "display_order": 2,
+    "created_at": "2026-05-28T11:12:13.811666+00:00",
+    "updated_at": "2026-05-28T11:12:13.811666+00:00"
+  },
+  {
+    "id": "886fc179-6e1f-48f6-83e0-85a0ef1ebb17",
+    "section_id": "90e5a1ce-b7bf-44db-b529-50ecb8c5d46e",
+    "label": "Invia Proposte",
+    "description": "Se noti un errore o vuoi suggerire un contenuto, usa il tasto 'Proponi Modifica'. Il tuo contributo è importantissimo per aiutarci a mantenere il manuale aggiornato!",
+    "icon_name": "GitPullRequest",
+    "display_order": 3,
+    "created_at": "2026-05-28T11:12:13.811666+00:00",
+    "updated_at": "2026-05-28T11:12:13.811666+00:00"
+  },
+  {
+    "id": "bdab2904-b4a0-4cd9-b005-b5748b142916",
+    "section_id": "4fc6b244-a4dc-4ed0-8073-15fcfb0d8549",
+    "label": "Partecipazione",
+    "description": "Puoi iscriverti ai tornei attivi seguendo i link a Start.gg o Challonge presenti in ogni scheda torneo. Controlla sempre se le iscrizioni sono aperte!",
+    "icon_name": "Users",
+    "display_order": 0,
+    "created_at": "2026-05-28T11:12:13.975773+00:00",
+    "updated_at": "2026-05-28T11:12:13.975773+00:00"
+  },
+  {
+    "id": "c0a8c2d9-741d-4559-8953-43f174766f18",
+    "section_id": "4fc6b244-a4dc-4ed0-8073-15fcfb0d8549",
+    "label": "Regolamento",
+    "description": "Ogni competizione ha regole specifiche su mappe, civiltà bannate e impostazioni della partita. Consulta il tasto 'Regolamento' per i dettagli.",
+    "icon_name": "BookOpen",
+    "display_order": 1,
+    "created_at": "2026-05-28T11:12:13.975773+00:00",
+    "updated_at": "2026-05-28T11:12:13.975773+00:00"
+  },
+  {
+    "id": "fe8e35cc-e0cf-4e4c-a59d-7f09568de0a4",
+    "section_id": "4fc6b244-a4dc-4ed0-8073-15fcfb0d8549",
+    "label": "Tabelloni & Bracket",
+    "description": "Il manuale si integra con Challonge e Start.gg per mostrarti l'avanzamento dei match in tempo reale. Quando possibile, il tabellone viene integrato direttamente nel sito.",
+    "icon_name": "Layers",
+    "display_order": 2,
+    "created_at": "2026-05-28T11:12:13.975773+00:00",
+    "updated_at": "2026-05-28T11:12:13.975773+00:00"
+  }
+]
